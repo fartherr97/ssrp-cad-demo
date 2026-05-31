@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
+import { FaDiscord } from 'react-icons/fa6';
 
 export default function LoginPage() {
   const { dispatch } = useCAD();
@@ -140,9 +141,13 @@ export default function LoginPage() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 letterSpacing: '0.5px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              🎮  Sign in with Discord
+              <FaDiscord size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+              Sign in with Discord
             </button>
             <div style={{ color: '#2e4060', fontSize: '11px', textAlign: 'center', marginTop: '8px' }}>
               Discord OAuth — connect your account
