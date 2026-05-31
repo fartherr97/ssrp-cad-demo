@@ -12,6 +12,11 @@ export default function LoginPage() {
     dispatch({ type: 'LOGIN', payload: officer });
   };
 
+  const handleDispatchLogin = () => {
+    const dispatcher = OFFICERS.find(o => o.role === 'dispatch') || OFFICERS[0];
+    dispatch({ type: 'LOGIN', payload: dispatcher });
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -127,6 +132,26 @@ export default function LoginPage() {
             }}
           >
             🔐 SIGN IN
+          </button>
+
+          <button
+            onClick={handleDispatchLogin}
+            style={{
+              width: '100%',
+              background: 'linear-gradient(135deg, #6b4d12, #b8881f)',
+              border: '1px solid #f5b740',
+              borderRadius: '5px',
+              color: '#fff',
+              padding: '11px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '1.5px',
+              marginBottom: '12px',
+              boxShadow: '0 0 18px rgba(245,183,64,0.18)',
+            }}
+          >
+            🎧 SIGN IN AS DISPATCHER
           </button>
 
           <div style={{ borderTop: '1px solid #1a3050', paddingTop: '16px', marginTop: '4px' }}>

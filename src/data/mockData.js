@@ -20,6 +20,7 @@ export const OFFICERS = [
   { id: 6, name: "Lisa Park", badge: "MED-3", unitId: "MED-3", dept: 4, deptShort: "AEMS", subdivision: "ALS", rank: "Paramedic", status: "ENRT", callId: "23-1044", location: "County Hospital", discordId: "722516079", role: "user" },
   { id: 7, name: "Frank Donovan", badge: "FD-11", unitId: "FD-11", dept: 3, deptShort: "AFD", subdivision: "Engine", rank: "Firefighter", status: "AVAILABLE", callId: null, location: "Station 4", discordId: "823627180", role: "user" },
   { id: 8, name: "Priya Nair", badge: "831-19", unitId: "831-19", dept: 1, deptShort: "ADPS", subdivision: "Detectives", rank: "Detective", status: "AVAILABLE", callId: null, location: "PD HQ", discordId: "924738291", role: "user" },
+  { id: 9, name: "Dana Mercer", badge: "DISP-1", unitId: "DISP-1", dept: 1, deptShort: "ECC", subdivision: "Dispatch", rank: "Lead Dispatcher", status: "AVAILABLE", callId: null, location: "Emergency Comms Center", discordId: "100200300", role: "dispatch" },
 ];
 
 export const CALLS = [

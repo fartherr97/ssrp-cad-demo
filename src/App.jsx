@@ -4,6 +4,7 @@ import { useResponsive } from './hooks/useResponsive';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import DispatchBoard from './pages/DispatchBoard';
+import DispatchConsole from './pages/DispatchConsole';
 import MDT from './pages/MDT';
 import SearchPage from './pages/SearchPage';
 import CreateCall from './pages/CreateCall';
@@ -27,6 +28,7 @@ function CADApp() {
   if (!currentUser) return <LoginPage />;
 
   const pages = {
+    console: <DispatchConsole />,
     dispatch: <DispatchBoard />,
     mdt: <MDT />,
     search: <SearchPage />,

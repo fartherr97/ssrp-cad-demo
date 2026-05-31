@@ -6,7 +6,7 @@ import {
   FaBullhorn, FaMagnifyingGlass, FaFileLines, FaDesktop,
   FaFolder, FaDatabase, FaMap, FaPhoneFlip, FaIdBadge,
   FaBuilding, FaGavel, FaLayerGroup, FaGear, FaBan,
-  FaBars, FaXmark,
+  FaBars, FaXmark, FaHeadset,
 } from 'react-icons/fa6';
 
 const STATUSES = ['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
@@ -18,6 +18,8 @@ const STATUS_COLORS = {
   OFFDUTY:   '#6b7280',
   ENRT:      '#22c55e',
 };
+
+const CONSOLE_NAV = { page: 'console', label: 'Console', Icon: FaHeadset };
 
 const NAV = [
   { page: 'dispatch',   label: 'CAD',        Icon: FaBullhorn },
@@ -61,6 +63,10 @@ export default function NavBar() {
   const unread      = state.messages.filter(m => !m.read).length;
   const go          = (page) => { dispatch({ type: 'SET_PAGE', payload: page }); setDrawerOpen(false); };
   const statusColor = STATUS_COLORS[myStatus] || '#6b7280';
+
+  // Dispatchers and admins get the Dispatch Console entry at the front of the bar.
+  const canDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
+  const navItems    = canDispatch ? [CONSOLE_NAV, ...NAV] : NAV;
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
@@ -161,7 +167,7 @@ export default function NavBar() {
 
           {/* Main nav grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
-            {NAV.map(item => (
+            {navItems.map(item => (
               <button
                 key={item.page}
                 onClick={() => go(item.page)}
@@ -248,7 +254,7 @@ export default function NavBar() {
           <Sep />
 
           {/* Main nav */}
-          {NAV.map(item => (
+          {navItems.map(item => (
             <ToolBtn
               key={item.page}
               label={item.label}
@@ -341,6 +347,7 @@ function ToolBtn({ label, Icon, active, onClick, admin, badge }) {
 }
 
 const PAGE_TITLES = {
+  console:         'Dispatch Console',
   dispatch:        'Dispatch Board',
   mdt:             'Mobile Data Terminal',
   search:          'Records Search',
