@@ -6,7 +6,7 @@ import {
   FaBullhorn, FaMagnifyingGlass, FaFileLines, FaDesktop,
   FaFolder, FaDatabase, FaMap, FaPhoneFlip, FaIdBadge,
   FaBuilding, FaGavel, FaLayerGroup, FaGear, FaBan,
-  FaBars, FaXmark, FaHeadset,
+  FaBars, FaXmark, FaHeadset, FaHouse,
 } from 'react-icons/fa6';
 
 const STATUSES = ['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
@@ -19,6 +19,7 @@ const STATUS_COLORS = {
   ENRT:      '#22c55e',
 };
 
+const HOME_NAV = { page: 'hub', label: 'Home', Icon: FaHouse };
 const CONSOLE_NAV = { page: 'console', label: 'Console', Icon: FaHeadset };
 
 const NAV = [
@@ -64,9 +65,9 @@ export default function NavBar() {
   const go          = (page) => { dispatch({ type: 'SET_PAGE', payload: page }); setDrawerOpen(false); };
   const statusColor = STATUS_COLORS[myStatus] || '#6b7280';
 
-  // Dispatchers and admins get the Dispatch Console entry at the front of the bar.
+  // Home (hub) leads the bar; dispatchers/admins also get the Console entry.
   const canDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
-  const navItems    = canDispatch ? [CONSOLE_NAV, ...NAV] : NAV;
+  const navItems    = canDispatch ? [HOME_NAV, CONSOLE_NAV, ...NAV] : [HOME_NAV, ...NAV];
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
@@ -82,7 +83,7 @@ export default function NavBar() {
         justifyContent: 'space-between',
         gap: '8px',
       }}>
-        <div onClick={() => go('dispatch')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', minWidth: 0 }}>
+        <div onClick={() => go('hub')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', minWidth: 0 }}>
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: '32px', width: 'auto', flexShrink: 0 }} />
           <div style={{ lineHeight: 1.25, minWidth: 0 }}>
             <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '14px', letterSpacing: '0.2px', whiteSpace: 'nowrap' }}>
@@ -347,6 +348,7 @@ function ToolBtn({ label, Icon, active, onClick, admin, badge }) {
 }
 
 const PAGE_TITLES = {
+  hub:             'Module Selection',
   console:         'Dispatch Console',
   dispatch:        'Dispatch Board',
   mdt:             'Mobile Data Terminal',

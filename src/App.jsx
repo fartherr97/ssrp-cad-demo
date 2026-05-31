@@ -3,6 +3,7 @@ import NavBar from './components/NavBar';
 import { useResponsive } from './hooks/useResponsive';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
+import SelectionHub from './pages/SelectionHub';
 import DispatchBoard from './pages/DispatchBoard';
 import DispatchConsole from './pages/DispatchConsole';
 import MDT from './pages/MDT';
@@ -27,6 +28,9 @@ function CADApp() {
   const { isMobile } = useResponsive();
 
   if (!currentUser) return <LoginPage />;
+
+  // The selection hub renders full-screen without the app chrome.
+  if (currentPage === 'hub') return <SelectionHub />;
 
   const pages = {
     console: <DispatchConsole />,

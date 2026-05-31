@@ -92,7 +92,7 @@ export default function DispatchBoard() {
           gap: '10px',
           padding: '8px 14px',
           marginBottom: '14px',
-          background: 'linear-gradient(180deg, #26282e, #161357X)',
+          background: 'linear-gradient(180deg, #26282e, #15161a)',
           border: '1px solid #2e3138',
           borderRadius: '6px',
           boxShadow: '0 6px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)',

@@ -69,11 +69,9 @@ function addAuditEntry(state, action, module) {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'LOGIN': {
-      const user = action.payload;
-      const landing = user?.role === 'dispatch' ? 'console' : 'dispatch';
-      return { ...state, currentUser: user, currentPage: landing };
-    }
+    case 'LOGIN':
+      // After sign-in, drop into the selection hub where the user picks a module.
+      return { ...state, currentUser: action.payload, currentPage: 'hub' };
     case 'LOGOUT':
       return { ...state, currentUser: null, currentPage: 'login', myCallId: null };
     case 'SET_PAGE':
