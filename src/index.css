@@ -1,0 +1,76 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
+  background: #050d1a;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  background: #050d1a;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #060d1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e3060;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e4080;
+}
+
+/* Selection */
+::selection {
+  background: #1e4080;
+  color: #fff;
+}
+
+/* Input autofill */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px #060d1a inset !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+}
+
+/* Focus outline */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+/* Remove default button/input styles */
+button {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+input, select, textarea {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Table hover */
+tbody tr:hover {
+  background: rgba(30, 64, 128, 0.15) !important;
+}
