@@ -140,82 +140,154 @@ export default function FormsCenter() {
 }
 
 /* ════════════════════════════════════════════════════
-   DOCUMENT FORM • renders like a real paper form
+   DOCUMENT FORM — government citation / official report style
 ════════════════════════════════════════════════════ */
 function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, currentUser, civilians, officers }) {
   const { isMobile } = useResponsive();
-  const formNumber = `SSRP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`;
+  const [formNumber] = useState(`SSRP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`);
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+  const DOC_FONT = "'Arial Narrow', Arial, sans-serif";
+  const DATA_FONT = "'Courier New', Courier, monospace";
+  const BORDER = '1px solid #1a1a2e';
+  const LABEL_BG = '#cdd5e0';
+  const FIELD_BG = '#ffffff';
+  const SHADE_BG = '#f0f3f7';
+
+  const cellLabel = (text, required) => (
+    <div style={{ background: LABEL_BG, borderBottom: BORDER, padding: '2px 6px' }}>
+      <span style={{ fontSize: '9px', fontWeight: 700, color: '#1a1a2e', letterSpacing: '0.6px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>
+        {text}{required && <span style={{ color: '#aa0000', marginLeft: '3px' }}>*</span>}
+      </span>
+    </div>
+  );
 
   return (
     <div>
-      {/* Controls above document */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <button onClick={onBack} style={{ ...smallBtn('#1e4080','#94a3b8'), padding: '7px 14px', fontSize: '15px' }}>← Back</button>
-        <span style={{ color: '#e2a84b', fontWeight: 700, fontSize: '15px' }}>{template.name}</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {!isMobile && <button onClick={() => window.print()} style={{ ...smallBtn('#1e3a50','#60a5fa'), padding: '7px 14px', fontSize: '15px' }}>🖨 Print</button>}
-          <button form="docform" type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '5px', color: '#fff', padding: '7px 20px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>Submit Report</button>
+      {/* CAD-UI toolbar — sits outside document */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
+        <button onClick={onBack} style={{ ...cadBtn('#1e4080','#94a3b8'), padding: '6px 12px' }}>← Back</button>
+        <span style={{ color: '#e2a84b', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+          {!isMobile && (
+            <button onClick={() => window.print()} style={{ ...cadBtn('#1e3a50','#60a5fa'), padding: '6px 12px' }}>🖨 Print</button>
+          )}
+          <button form="docform" type="submit" style={{ background: '#0f2548', border: '2px solid #1a1a2e', borderRadius: '0', color: '#ffffff', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: DOC_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+            SUBMIT REPORT
+          </button>
         </div>
       </div>
 
-      {/* The document itself */}
       <form id="docform" onSubmit={onSubmit}>
         <div style={{
-          background: '#f8fafc',
-          color: '#0f172a',
-          border: '1px solid #cbd5e1',
-          borderRadius: '4px',
-          maxWidth: '860px',
+          background: FIELD_BG,
+          color: '#0a0a1a',
+          border: '2px solid #1a1a2e',
+          maxWidth: '900px',
           margin: '0 auto',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-          fontFamily: "'Ubuntu', sans-serif",
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          fontFamily: DOC_FONT,
           overflow: 'hidden',
         }}>
-          {/* Document header */}
-          <div style={{ background: '#0f2548', padding: '18px 28px', display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '3px solid #1e4080' }}>
-            <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: '54px', width: 'auto' }} />
-            <div style={{ flex: 1, textAlign: 'center' }}>
-              <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '16px', letterSpacing: '1px' }}>SUNSHINE STATE ROLEPLAY</div>
-              <div style={{ color: '#60a5fa', fontSize: '14px', letterSpacing: '1px', marginTop: '2px' }}>SUNSHINE STATE POLICE DEPARTMENT</div>
-              <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: '18px', marginTop: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{template.name}</div>
+
+          {/* ── HEADER ── */}
+          <div style={{ background: '#0f2548', display: 'flex', alignItems: 'stretch', borderBottom: '3px solid #1a1a2e' }}>
+            <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid rgba(255,255,255,0.15)', minWidth: isMobile ? '52px' : '80px' }}>
+              <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: isMobile ? '40px' : '58px', width: 'auto' }} />
             </div>
-            <div style={{ textAlign: 'right', fontSize: '12px', color: '#94a3b8' }}>
-              <div style={{ marginBottom: '4px' }}>Form #</div>
-              <div style={{ color: '#fff', fontWeight: 700, fontSize: '15px', fontFamily: "'Ubuntu Mono', monospace" }}>{formNumber}</div>
-              <div style={{ marginTop: '8px', color: '#94a3b8' }}>Date</div>
-              <div style={{ color: '#fff', fontSize: '14px' }}>{today}</div>
+            <div style={{ flex: 1, padding: '10px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ color: '#b0c4d8', fontSize: isMobile ? '9px' : '11px', letterSpacing: '2px', fontWeight: 400, marginBottom: '1px', fontFamily: DOC_FONT }}>
+                SUNSHINE STATE ROLEPLAY
+              </div>
+              <div style={{ color: '#7aa0bc', fontSize: isMobile ? '8px' : '10px', letterSpacing: '1.5px', marginBottom: '5px', fontFamily: DOC_FONT }}>
+                SUNSHINE STATE POLICE DEPARTMENT
+              </div>
+              <div style={{ color: '#ffffff', fontWeight: 700, fontSize: isMobile ? '14px' : '18px', letterSpacing: '1px', textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.25)', paddingTop: '5px', width: '100%', fontFamily: DOC_FONT }}>
+                {template.name}
+              </div>
+            </div>
+            <div style={{ padding: '10px 12px', borderLeft: '2px solid rgba(255,255,255,0.15)', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: isMobile ? '100px' : '140px' }}>
+              <div style={{ color: '#6a8aa8', fontSize: '8px', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '1px', fontFamily: DOC_FONT }}>REPORT NUMBER</div>
+              <div style={{ color: '#ffffff', fontWeight: 700, fontSize: isMobile ? '10px' : '12px', fontFamily: DATA_FONT, marginBottom: '7px' }}>{formNumber}</div>
+              <div style={{ color: '#6a8aa8', fontSize: '8px', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '1px', fontFamily: DOC_FONT }}>DATE</div>
+              <div style={{ color: '#ffffff', fontSize: isMobile ? '10px' : '12px', fontFamily: DATA_FONT }}>{today}</div>
             </div>
           </div>
 
-          {/* Officer info bar */}
-          <div style={{ background: '#e8edf5', borderBottom: '1px solid #cbd5e1', padding: '8px 16px', display: 'flex', gap: isMobile ? '12px' : '32px', fontSize: '14px', color: '#334155', flexWrap: 'wrap' }}>
-            <span><strong>Officer:</strong> {currentUser?.name} ({currentUser?.badge})</span>
-            <span><strong>Department:</strong> {currentUser?.deptShort}</span>
-            <span><strong>Rank:</strong> {currentUser?.rank}</span>
+          {/* ── OFFICER INFO ROW ── */}
+          <table style={{ width: '100%', borderCollapse: 'collapse', borderBottom: '2px solid #1a1a2e' }}>
+            <tbody>
+              <tr>
+                {[
+                  ['REPORTING OFFICER', currentUser?.name || ''],
+                  ['BADGE NUMBER', currentUser?.badge || ''],
+                  ['DEPARTMENT', currentUser?.deptShort || ''],
+                  ['RANK / TITLE', currentUser?.rank || ''],
+                ].map(([label, val]) => (
+                  <td key={label} style={{ border: BORDER, padding: 0, verticalAlign: 'top' }}>
+                    {cellLabel(label, false)}
+                    <div style={{ padding: '3px 7px 4px', minHeight: '22px', background: SHADE_BG }}>
+                      <span style={{ fontSize: isMobile ? '10px' : '12px', color: '#0a0a1a', fontFamily: DATA_FONT, fontWeight: 600 }}>{val}</span>
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+
+          {/* ── FORM FIELDS ── */}
+          <DocFieldGrid
+            fields={template.fields}
+            formValues={formValues}
+            setFormValues={setFormValues}
+            civilians={civilians}
+            officers={officers}
+            isMobile={isMobile}
+            cellLabel={cellLabel}
+            BORDER={BORDER}
+            FIELD_BG={FIELD_BG}
+            DATA_FONT={DATA_FONT}
+          />
+
+          {/* ── CERTIFICATION BANNER ── */}
+          <div style={{ background: LABEL_BG, borderTop: '2px solid #1a1a2e', borderBottom: BORDER, padding: '3px 10px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 700, color: '#1a1a2e', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>
+              THE UNDERSIGNED CERTIFIES THAT THE FOREGOING INFORMATION IS TRUE AND CORRECT TO THE BEST OF THEIR KNOWLEDGE
+            </span>
           </div>
 
-          {/* Form fields as document cells */}
-          <div style={{ padding: '0' }}>
-            <DocFieldGrid
-              fields={template.fields}
-              formValues={formValues}
-              setFormValues={setFormValues}
-              civilians={civilians}
-              officers={officers}
-            />
-          </div>
+          {/* ── SIGNATURE ROW ── */}
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={{ border: BORDER, padding: 0, width: '45%' }}>
+                  {cellLabel('SUBMITTING OFFICER SIGNATURE', false)}
+                  <div style={{ padding: '4px 7px 8px', minHeight: '38px', background: FIELD_BG }}>
+                    <div style={{ borderBottom: '1px solid #667', height: '26px' }} />
+                  </div>
+                </td>
+                <td style={{ border: BORDER, padding: 0, width: '20%' }}>
+                  {cellLabel('BADGE NUMBER', false)}
+                  <div style={{ padding: '4px 7px 8px', minHeight: '38px', background: SHADE_BG }}>
+                    <span style={{ fontSize: '13px', color: '#0a0a1a', fontFamily: DATA_FONT, fontWeight: 700 }}>{currentUser?.badge}</span>
+                  </div>
+                </td>
+                <td style={{ border: BORDER, padding: 0, width: '35%' }}>
+                  {cellLabel('DATE / TIME SUBMITTED', false)}
+                  <div style={{ padding: '4px 7px 8px', minHeight: '38px', background: SHADE_BG }}>
+                    <span style={{ fontSize: '12px', color: '#0a0a1a', fontFamily: DATA_FONT }}>
+                      {today} {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-          {/* Signature section */}
-          <div style={{ borderTop: '2px solid #cbd5e1', padding: '20px 16px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px', background: '#f1f5f9' }}>
-            <SigLine label="Submitting Officer Signature" />
-            <SigLine label="Badge Number" value={currentUser?.badge} />
-            <SigLine label="Date / Time" value={`${today} • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
-          </div>
-
-          {/* Footer */}
-          <div style={{ background: '#0f2548', padding: '8px 28px', fontSize: '11px', color: '#4a6a8a', textAlign: 'center', letterSpacing: '1px' }}>
-            SUNSHINE STATE ROLEPLAY • COMPUTER AIDED DISPATCH • CONFIDENTIAL LAW ENFORCEMENT DOCUMENT
+          {/* ── FOOTER ── */}
+          <div style={{ background: '#0f2548', borderTop: '2px solid #1a1a2e', padding: '4px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>SUNSHINE STATE ROLEPLAY • COMPUTER AIDED DISPATCH</span>
+            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', fontFamily: DOC_FONT }}>CONFIDENTIAL LAW ENFORCEMENT DOCUMENT</span>
           </div>
         </div>
       </form>
@@ -223,18 +295,23 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
   );
 }
 
-function DocFieldGrid({ fields, formValues, setFormValues, civilians, officers }) {
+function DocFieldGrid({ fields, formValues, setFormValues, civilians, officers, isMobile, cellLabel, BORDER, FIELD_BG, DATA_FONT }) {
   const rows = [];
   let i = 0;
   while (i < fields.length) {
     const f = fields[i];
-    const isWide = f.type === 'textarea' || f.label.toLowerCase().includes('narrative') || f.label.toLowerCase().includes('description') || f.label.toLowerCase().includes('note');
+    const lc = f.label.toLowerCase();
+    const isWide = f.type === 'textarea'
+      || lc.includes('narrative') || lc.includes('description')
+      || lc.includes('note') || lc.includes('charge') || lc.includes('evidence')
+      || lc.includes('reason for') || lc.includes('parties');
     if (isWide) {
       rows.push([f]);
       i++;
     } else {
       const next = fields[i + 1];
-      const nextWide = next && (next.type === 'textarea' || next.label.toLowerCase().includes('narrative'));
+      const nextLc = next?.label.toLowerCase() || '';
+      const nextWide = next && (next.type === 'textarea' || nextLc.includes('narrative') || nextLc.includes('reason for'));
       if (next && !nextWide) {
         rows.push([f, next]);
         i += 2;
@@ -250,27 +327,28 @@ function DocFieldGrid({ fields, formValues, setFormValues, civilians, officers }
       <tbody>
         {rows.map((row, ri) => (
           <tr key={ri}>
-            {row.map((field, ci) => (
-              <td
-                key={field.id}
-                colSpan={row.length === 1 ? 2 : 1}
-                style={{
-                  border: '1px solid #cbd5e1',
-                  padding: '0',
-                  verticalAlign: 'top',
-                  width: row.length === 1 ? '100%' : '50%',
-                }}
-              >
-                <div style={{ padding: '6px 12px 2px', background: '#e2e8f0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    {field.label}{field.required && <span style={{ color: '#ef4444', marginLeft: '3px' }}>*</span>}
-                  </span>
-                </div>
-                <div style={{ padding: '6px 12px 8px', minHeight: field.type === 'textarea' ? '80px' : '36px' }}>
-                  <DocInput field={field} value={formValues[field.label] || ''} onChange={v => setFormValues(fv => ({ ...fv, [field.label]: v }))} civilians={civilians} officers={officers} />
-                </div>
-              </td>
-            ))}
+            {row.map((field) => {
+              const isTextarea = field.type === 'textarea';
+              return (
+                <td
+                  key={field.id}
+                  colSpan={row.length === 1 ? 2 : 1}
+                  style={{ border: BORDER, padding: 0, verticalAlign: 'top' }}
+                >
+                  {cellLabel(field.label, field.required)}
+                  <div style={{ padding: '4px 7px', minHeight: isTextarea ? '80px' : '30px', background: FIELD_BG, display: 'flex', alignItems: isTextarea ? 'flex-start' : 'center' }}>
+                    <DocInput
+                      field={field}
+                      value={formValues[field.label] || ''}
+                      onChange={v => setFormValues(fv => ({ ...fv, [field.label]: v }))}
+                      civilians={civilians}
+                      officers={officers}
+                      DATA_FONT={DATA_FONT}
+                    />
+                  </div>
+                </td>
+              );
+            })}
           </tr>
         ))}
       </tbody>
@@ -278,59 +356,56 @@ function DocFieldGrid({ fields, formValues, setFormValues, civilians, officers }
   );
 }
 
-function DocInput({ field, value, onChange, civilians, officers }) {
-  const inputStyle = {
-    width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid #94a3b8',
-    color: '#0f172a', fontSize: '16px', padding: '2px 0', outline: 'none', fontFamily: "'Ubuntu', sans-serif",
+function DocInput({ field, value, onChange, civilians, officers, DATA_FONT }) {
+  const base = {
+    width: '100%',
+    background: 'transparent',
+    border: 'none',
+    outline: 'none',
+    color: '#0a0a1a',
+    fontSize: '13px',
+    fontFamily: DATA_FONT,
+    padding: 0,
+    boxSizing: 'border-box',
   };
-  const selectStyle = { ...inputStyle, background: 'transparent', cursor: 'pointer' };
 
   if (field.type === 'textarea')
-    return <textarea value={value} onChange={e => onChange(e.target.value)} required={field.required} rows={4} style={{ ...inputStyle, borderBottom: 'none', resize: 'vertical', lineHeight: '1.6', minHeight: '80px' }} />;
+    return <textarea value={value} onChange={e => onChange(e.target.value)} required={field.required} rows={5} style={{ ...base, resize: 'vertical', lineHeight: '1.8', minHeight: '76px', width: '100%' }} />;
   if (field.type === 'text' || field.type === 'number')
-    return <input type={field.type} value={value} onChange={e => onChange(e.target.value)} required={field.required} style={inputStyle} />;
+    return <input type={field.type} value={value} onChange={e => onChange(e.target.value)} required={field.required} style={base} />;
   if (field.type === 'date')
-    return <input type="date" value={value} onChange={e => onChange(e.target.value)} required={field.required} style={inputStyle} />;
+    return <input type="date" value={value} onChange={e => onChange(e.target.value)} required={field.required} style={{ ...base, fontSize: '12px' }} />;
   if (field.type === 'datetime')
-    return <input type="datetime-local" value={value} onChange={e => onChange(e.target.value)} required={field.required} style={inputStyle} />;
+    return <input type="datetime-local" value={value} onChange={e => onChange(e.target.value)} required={field.required} style={{ ...base, fontSize: '12px' }} />;
   if (field.type === 'checkbox')
     return (
-      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#0f172a', fontSize: '16px' }}>
-        <input type="checkbox" checked={!!value} onChange={e => onChange(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#1e4080' }} />
-        Yes
+      <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: '#0a0a1a', fontSize: '12px', fontFamily: DATA_FONT }}>
+        <input type="checkbox" checked={!!value} onChange={e => onChange(e.target.checked)} style={{ width: '13px', height: '13px', accentColor: '#0f2548', cursor: 'pointer', flexShrink: 0 }} />
+        YES
       </label>
     );
   if (field.type === 'dropdown')
     return (
-      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">• Select •</option>
+      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={{ ...base, cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}>
+        <option value="">SELECT...</option>
         {field.options?.map(o => <option key={o}>{o}</option>)}
       </select>
     );
   if (field.type === 'civilian_lookup')
     return (
-      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">• Select Civilian •</option>
+      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={{ ...base, cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}>
+        <option value="">SELECT SUBJECT...</option>
         {civilians.map(c => <option key={c.id}>{c.firstName} {c.lastName}</option>)}
       </select>
     );
   if (field.type === 'badge_lookup')
     return (
-      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">• Select Officer •</option>
-        {officers.map(o => <option key={o.id}>{o.badge} • {o.name}</option>)}
+      <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={{ ...base, cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}>
+        <option value="">SELECT OFFICER...</option>
+        {officers.map(o => <option key={o.id}>{o.badge} - {o.name}</option>)}
       </select>
     );
-  return <input value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />;
-}
-
-function SigLine({ label, value }) {
-  return (
-    <div>
-      <div style={{ borderBottom: '1.5px solid #334155', minHeight: '32px', padding: '4px 0', fontSize: '16px', color: '#0f172a' }}>{value || ''}</div>
-      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
-    </div>
-  );
+  return <input value={value} onChange={e => onChange(e.target.value)} style={base} />;
 }
 
 /* ════════════════════════════════════════════════════
@@ -505,4 +580,5 @@ function Modal({ title, onClose, children }) {
 }
 
 const smallBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '4px', color, padding: '5px 12px', fontSize: '14px', cursor: 'pointer', fontWeight: 600 });
+const cadBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '5px 12px', fontSize: '13px', cursor: 'pointer', fontWeight: 600, fontFamily: 'Ubuntu Mono, monospace' });
 const sBtn = () => ({ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '3px', color: '#64748b', padding: '2px 7px', fontSize: '12px', cursor: 'pointer' });
