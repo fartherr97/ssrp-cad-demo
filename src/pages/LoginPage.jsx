@@ -80,8 +80,9 @@ export default function LoginPage() {
           background: '#0b1929',
           border: '1px solid #1e3a60',
           borderRadius: '10px',
-          padding: '32px 40px',
-          width: '380px',
+          padding: '32px 24px',
+          width: '100%',
+          maxWidth: '380px',
           boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
         }}>
           <div style={{ color: '#e2a84b', fontSize: '14px', fontWeight: 700, marginBottom: '20px', textAlign: 'center', letterSpacing: '2px' }}>

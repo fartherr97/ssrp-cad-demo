@@ -79,6 +79,7 @@ export default function SearchPage() {
 
           {results.civResult && results.civVehicles.length > 0 && (
             <Section title="REGISTERED VEHICLES">
+              <div className="table-scroll">
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
@@ -101,6 +102,7 @@ export default function SearchPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </Section>
           )}
 
@@ -119,6 +121,7 @@ export default function SearchPage() {
 
           {results.civResult && results.civHistory.length > 0 && (
             <Section title="CRIMINAL HISTORY">
+              <div className="table-scroll">
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
@@ -141,6 +144,7 @@ export default function SearchPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </Section>
           )}
 

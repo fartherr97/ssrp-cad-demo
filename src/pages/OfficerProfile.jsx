@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
@@ -12,6 +13,7 @@ export default function OfficerProfile() {
   const [tab, setTab] = useState('info');
   const [requestingTransfer, setRequestingTransfer] = useState(false);
   const [transferNote, setTransferNote] = useState('');
+  const { isMobile } = useResponsive();
 
   if (!myOfficer) return (
     <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', color: '#334155', textAlign: 'center' }}>
@@ -47,7 +49,7 @@ export default function OfficerProfile() {
             {myOfficer.callId && <div style={{ color: '#f59e0b', fontSize: '14px', marginTop: '6px' }}>On Call: {myOfficer.callId}</div>}
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginTop: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '10px', marginTop: '16px' }}>
           {[
             { label: 'Reports Filed', val: myReports.length },
             { label: 'Calls Attended', val: myCallHistory.length },
@@ -72,7 +74,7 @@ export default function OfficerProfile() {
       </div>
 
       {tab === 'info' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
           <InfoCard title="ASSIGNMENT">
             {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '—']].map(([k,v]) => (
               <InfoRow key={k} label={k} value={v || '—'} />
@@ -104,7 +106,7 @@ export default function OfficerProfile() {
       )}
 
       {tab === 'reports' && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+        <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
           <thead>
             <tr style={{ background: '#0a1a35' }}>
               {['Case #','Type','Date','Status','Call'].map(h => (
@@ -124,11 +126,11 @@ export default function OfficerProfile() {
             ))}
             {myReports.length === 0 && <tr><td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#334155' }}>No reports filed.</td></tr>}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       {tab === 'calls' && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+        <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
           <thead>
             <tr style={{ background: '#0a1a35' }}>
               {['Call #','Nature','Location','Priority','Status','Time'].map(h => (
@@ -149,7 +151,7 @@ export default function OfficerProfile() {
             ))}
             {myCallHistory.length === 0 && <tr><td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#334155' }}>No call history.</td></tr>}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       {tab === 'commendations' && (

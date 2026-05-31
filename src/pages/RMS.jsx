@@ -76,7 +76,7 @@ export default function RMS() {
       <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>RECORDS MANAGEMENT SYSTEM</div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
+      <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             {t}
@@ -91,7 +91,7 @@ export default function RMS() {
             <span style={{ color: '#94a3b8', fontSize: '14px' }}>{criminalHistory.length} records</span>
             <button onClick={() => setShowAddArrest(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Add Arrest Record</button>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Date','Case #','Subject','Charges','Officer','Agency','Disposition','Sentence'].map(h => (
@@ -116,7 +116,7 @@ export default function RMS() {
                 );
               })}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
@@ -127,7 +127,7 @@ export default function RMS() {
             <span style={{ color: '#94a3b8', fontSize: '14px' }}>{warrants.filter(w => w.status === 'ACTIVE').length} active warrants</span>
             <button onClick={() => setShowAddWarrant(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Issue Warrant</button>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Subject','Type','Charge','Issued By','Date','Status','Actions'].map(h => (
@@ -152,7 +152,7 @@ export default function RMS() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
@@ -163,7 +163,7 @@ export default function RMS() {
             <span style={{ color: '#94a3b8', fontSize: '14px' }}>{towLogs.length} records</span>
             <button onClick={() => setShowAddTow(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Log Tow</button>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Plate','Vehicle','Towed By','Reason','Location','Date','Status'].map(h => (
@@ -184,7 +184,7 @@ export default function RMS() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

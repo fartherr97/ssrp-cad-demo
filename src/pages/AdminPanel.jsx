@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 const TABS = ['Users', 'Active Sessions', 'Audit Log', 'Whitelist', 'Settings'];
 
@@ -11,6 +12,7 @@ export default function AdminPanel() {
   const [communityName, setCommunityName] = useState('Sunshine State Roleplay Community');
   const [logoUrl, setLogoUrl] = useState('');
   const [accentColor, setAccentColor] = useState('#1a3a6b');
+  const { isMobile } = useResponsive();
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
@@ -20,7 +22,7 @@ export default function AdminPanel() {
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
         {[
           { label: 'Total Officers', val: officers.length, color: '#4a9eff' },
           { label: 'Active Sessions', val: activeSessions.length, color: '#22c55e' },
@@ -35,7 +37,7 @@ export default function AdminPanel() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
+      <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #f59e0b' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#f59e0b' : '#64748b', padding: '7px 14px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             {t}
@@ -45,7 +47,7 @@ export default function AdminPanel() {
 
       {tab === 'Users' && (
         <div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Name','Badge','Discord ID','Role','Department','Rank','Status','Actions'].map(h => (
@@ -74,13 +76,13 @@ export default function AdminPanel() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {tab === 'Active Sessions' && (
         <div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['User','Role','Login Time','Last Active','IP'].map(h => (
@@ -99,13 +101,13 @@ export default function AdminPanel() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {tab === 'Audit Log' && (
         <div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Timestamp','User','Action','Module'].map(h => (
@@ -125,14 +127,14 @@ export default function AdminPanel() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {tab === 'Whitelist' && (
         <div>
           <div style={{ color: '#f59e0b', fontSize: '14px', marginBottom: '12px' }}>Pending Applications: {whitelistApps.filter(w => w.status === 'Pending').length}</div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Discord ID','Name','Applied','Status','Notes','Actions'].map(h => (
@@ -159,7 +161,7 @@ export default function AdminPanel() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 const UNIT_POSITIONS = {
   1: { x: 42, y: 35 },
@@ -32,15 +33,20 @@ export default function LiveMap() {
   const [hoveredCall, setHoveredCall] = useState(null);
   const [showUnits, setShowUnits] = useState(true);
   const [showCalls, setShowCalls] = useState(true);
+  const [showLegend, setShowLegend] = useState(false);
+  const { isMobile } = useResponsive();
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: isMobile ? 'calc(100vh - 50px)' : 'calc(100vh - 102px)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>LIVE MAP — ARCADIA DISPATCH</div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px', flexWrap: 'wrap' }}>
           <LayerToggle active={showUnits} onClick={() => setShowUnits(v => !v)} label="Units" color="#22c55e" />
           <LayerToggle active={showCalls} onClick={() => setShowCalls(v => !v)} label="Calls" color="#ef4444" />
+          {isMobile && (
+            <LayerToggle active={showLegend} onClick={() => setShowLegend(v => !v)} label="Legend" color="#4a9eff" />
+          )}
         </div>
       </div>
 
@@ -193,7 +199,7 @@ export default function LiveMap() {
         </div>
 
         {/* Legend / status panel */}
-        <div style={{ width: '200px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {(!isMobile || showLegend) && <div style={{ width: isMobile ? '100%' : '200px', display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '12px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '4px', padding: '12px' }}>
             <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '10px' }}>LEGEND</div>
             {Object.entries(STATUS_COLORS).map(([s, c]) => (
@@ -224,7 +230,7 @@ export default function LiveMap() {
               </div>
             ))}
           </div>
-        </div>
+        </div>}
       </div>
 
       <style>{`@keyframes pulse { 0%,100% { box-shadow: 0 0 10px #ef444460; } 50% { box-shadow: 0 0 20px #ef4444; } }`}</style>

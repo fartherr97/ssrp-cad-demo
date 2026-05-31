@@ -1,14 +1,17 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 const SIDEBAR_ITEMS = ['Messages', 'Alerts', 'State Returns', 'History', 'Saved'];
 
 export default function MDT() {
   const { state, dispatch } = useCAD();
   const { messages, calls, officers, currentUser, civilians, vehicles } = state;
+  const { isMobile } = useResponsive();
   const [activeSection, setActiveSection] = useState('Messages');
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [mobileMsgView, setMobileMsgView] = useState('list'); // 'list' | 'detail'
   const [searchQuery, setSearchQuery] = useState('');
   const [returnResult, setReturnResult] = useState(null);
 
@@ -19,6 +22,7 @@ export default function MDT() {
   const handleMsgClick = (msg) => {
     setSelectedMessage(msg);
     dispatch({ type: 'MARK_MESSAGE_READ', payload: msg.id });
+    if (isMobile) setMobileMsgView('detail');
   };
 
   const runReturn = () => {
@@ -31,11 +35,178 @@ export default function MDT() {
     setReturnResult({ civ, veh });
   };
 
+  const mainContent = (
+    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      {activeSection === 'Messages' && (
+        <>
+          {/* Message list — hidden on mobile when detail is open */}
+          {(!isMobile || mobileMsgView === 'list') && (
+            <div style={{ width: isMobile ? '100%' : '280px', borderRight: isMobile ? 'none' : '1px solid #1e4080', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '10px 12px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#e2a84b', fontSize: '14px', fontWeight: 700, letterSpacing: '1px' }}>
+                INBOX ({messages.length})
+              </div>
+              {messages.map(msg => (
+                <div
+                  key={msg.id}
+                  onClick={() => handleMsgClick(msg)}
+                  style={{
+                    padding: '10px 12px',
+                    borderBottom: '1px solid #0f1e35',
+                    cursor: 'pointer',
+                    background: selectedMessage?.id === msg.id ? '#0d2545' : !msg.read ? '#090f20' : 'transparent',
+                    borderLeft: `3px solid ${msg.priority === 'HIGH' ? '#ef4444' : '#1e4080'}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: !msg.read ? '#fff' : '#94a3b8', fontSize: '12px', fontWeight: !msg.read ? 700 : 400 }}>{msg.from}</span>
+                    {msg.priority === 'HIGH' && <StatusBadge status="HIGH" />}
+                  </div>
+                  <div style={{ color: !msg.read ? '#e2e8f0' : '#64748b', fontSize: '12px', marginTop: '3px', fontWeight: !msg.read ? 600 : 400 }}>{msg.subject}</div>
+                  <div style={{ color: '#475569', fontSize: '11px', marginTop: '2px' }}>{msg.timestamp}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Message detail — full width on mobile */}
+          {(!isMobile || mobileMsgView === 'detail') && (
+            <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
+              {isMobile && (
+                <button onClick={() => setMobileMsgView('list')} style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '4px', color: '#4a9eff', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', marginBottom: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
+                  ← Back to Inbox
+                </button>
+              )}
+              {selectedMessage ? (
+                <>
+                  <div style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', padding: '12px', marginBottom: '12px', fontSize: '14px' }}>
+                    <div style={{ color: '#4a9eff', fontWeight: 700, marginBottom: '6px', fontSize: '16px' }}>{selectedMessage.subject}</div>
+                    <div style={{ color: '#94a3b8', marginBottom: '4px' }}>From: <span style={{ color: '#e2e8f0' }}>{selectedMessage.from}</span></div>
+                    <div style={{ color: '#94a3b8', marginBottom: '4px' }}>To: <span style={{ color: '#e2e8f0' }}>{selectedMessage.to}</span></div>
+                    <div style={{ color: '#475569', fontSize: '12px' }}>{selectedMessage.timestamp}</div>
+                  </div>
+                  <div style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', color: '#c4cdd6', fontSize: '15px', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                    {selectedMessage.body}
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: '#334155', textAlign: 'center', marginTop: '80px', fontSize: '15px' }}>Select a message to read</div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {activeSection === 'State Returns' && (
+        <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
+          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>STATE TERMINAL — NCIC/DMV RETURNS</div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && runReturn()}
+              placeholder="Enter name, SSN, or plate..."
+              style={{ flex: 1, minWidth: '180px', background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 12px', fontSize: '15px', fontFamily: 'Ubuntu Mono, monospace' }}
+            />
+            <button onClick={runReturn} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 16px', cursor: 'pointer', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
+              RUN RETURN
+            </button>
+          </div>
+          {returnResult && (
+            <div>
+              {returnResult.civ ? (
+                <CivilianTerminal civ={returnResult.civ} />
+              ) : returnResult.veh ? null : (
+                <div style={{ color: '#ef4444', fontFamily: 'Ubuntu Mono, monospace', fontSize: '15px' }}>*** NO RECORDS FOUND FOR QUERY ***</div>
+              )}
+              {returnResult.veh && (
+                <VehicleTerminal veh={returnResult.veh} civ={civilians.find(c => c.id === returnResult.veh.ownerId)} />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeSection === 'Alerts' && (
+        <div style={{ flex: 1, padding: '16px' }}>
+          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>ACTIVE ALERTS</div>
+          <div style={{ background: '#1a0505', border: '1px solid #ef4444', borderRadius: '4px', padding: '12px', marginBottom: '10px', fontSize: '14px', color: '#fca5a5' }}>
+            ⚠️ BOLO — BLACK DODGE CHARGER, PLATE SUS-1109 — OWNER HAS ACTIVE WARRANT — DO NOT APPROACH WITHOUT BACKUP
+          </div>
+          <div style={{ background: '#1a1005', border: '1px solid #f59e0b', borderRadius: '4px', padding: '12px', fontSize: '14px', color: '#fcd34d' }}>
+            ⚠️ INCREASED ACTIVITY — RIVERSIDE DISTRICT — EXERCISE CAUTION
+          </div>
+        </div>
+      )}
+
+      {activeSection === 'History' && (
+        <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
+          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>RETURN HISTORY</div>
+          {[
+            { time: '14:18', query: 'Plate: SUS-1109', result: 'OWNER WANTED' },
+            { time: '14:02', query: 'Name: Darnell Washington', result: 'ACTIVE WARRANT' },
+            { time: '13:45', query: 'Plate: ARC-1204', result: 'CLEAR' },
+          ].map((h, i) => (
+            <div key={i} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '10px 12px', marginBottom: '8px', fontSize: '14px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              <span style={{ color: '#475569' }}>{h.time}</span>
+              <span style={{ color: '#94a3b8' }}>{h.query}</span>
+              <span style={{ color: h.result === 'CLEAR' ? '#22c55e' : '#ef4444', fontWeight: 700 }}>{h.result}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {activeSection === 'Saved' && (
+        <div style={{ flex: 1, padding: '16px' }}>
+          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>SAVED RETURNS</div>
+          <div style={{ color: '#334155', textAlign: 'center', marginTop: '60px', fontSize: '15px' }}>No saved returns.</div>
+        </div>
+      )}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 50px)', fontFamily: 'Ubuntu Mono, monospace' }}>
+        {/* Mobile tab bar */}
+        <div style={{ background: '#060d1a', borderBottom: '1px solid #1e4080', display: 'flex', overflowX: 'auto' }} className="tab-scroll">
+          <div style={{ padding: '8px 12px', borderBottom: '1px solid #1e3060', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <StatusBadge status={myOfficer?.status || 'OFFDUTY'} />
+          </div>
+          {SIDEBAR_ITEMS.map(item => (
+            <button
+              key={item}
+              onClick={() => { setActiveSection(item); setMobileMsgView('list'); }}
+              style={{
+                background: activeSection === item ? '#0d2545' : 'transparent',
+                border: 'none',
+                borderBottom: activeSection === item ? '2px solid #4a9eff' : '2px solid transparent',
+                color: activeSection === item ? '#4a9eff' : '#64748b',
+                padding: '10px 14px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'Ubuntu Mono, monospace',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {item}
+              {item === 'Messages' && unread > 0 && (
+                <span style={{ background: '#ef4444', color: '#fff', borderRadius: '10px', fontSize: '11px', padding: '1px 6px' }}>{unread}</span>
+              )}
+            </button>
+          ))}
+        </div>
+        {mainContent}
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 48px)', fontFamily: 'Ubuntu Mono, monospace' }}>
-      {/* Sidebar */}
-      <div style={{ width: '180px', background: '#060d1a', borderRight: '1px solid #1e4080', display: 'flex', flexDirection: 'column' }}>
-        {/* My status */}
+    <div style={{ display: 'flex', height: 'calc(100vh - 102px)', fontFamily: 'Ubuntu Mono, monospace' }}>
+      {/* Desktop Sidebar */}
+      <div style={{ width: '180px', background: '#060d1a', borderRight: '1px solid #1e4080', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '12px', borderBottom: '1px solid #1e3060' }}>
           <div style={{ color: '#4a9eff', fontSize: '12px', letterSpacing: '1px', marginBottom: '6px' }}>MY STATUS</div>
           <StatusBadge status={myOfficer?.status || 'OFFDUTY'} />
@@ -67,125 +238,7 @@ export default function MDT() {
           </button>
         ))}
       </div>
-
-      {/* Main panel */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {activeSection === 'Messages' && (
-          <>
-            {/* Message list */}
-            <div style={{ width: '280px', borderRight: '1px solid #1e4080', overflow: 'auto' }}>
-              <div style={{ padding: '10px 12px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#e2a84b', fontSize: '14px', fontWeight: 700, letterSpacing: '1px' }}>
-                INBOX ({messages.length})
-              </div>
-              {messages.map(msg => (
-                <div
-                  key={msg.id}
-                  onClick={() => handleMsgClick(msg)}
-                  style={{
-                    padding: '10px 12px',
-                    borderBottom: '1px solid #0f1e35',
-                    cursor: 'pointer',
-                    background: selectedMessage?.id === msg.id ? '#0d2545' : !msg.read ? '#090f20' : 'transparent',
-                    borderLeft: `3px solid ${msg.priority === 'HIGH' ? '#ef4444' : '#1e4080'}`,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: !msg.read ? '#fff' : '#94a3b8', fontSize: '12px', fontWeight: !msg.read ? 700 : 400 }}>{msg.from}</span>
-                    {msg.priority === 'HIGH' && <StatusBadge status="HIGH" />}
-                  </div>
-                  <div style={{ color: !msg.read ? '#e2e8f0' : '#64748b', fontSize: '12px', marginTop: '3px', fontWeight: !msg.read ? 600 : 400 }}>{msg.subject}</div>
-                  <div style={{ color: '#475569', fontSize: '11px', marginTop: '2px' }}>{msg.timestamp}</div>
-                </div>
-              ))}
-            </div>
-            {/* Message detail */}
-            <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-              {selectedMessage ? (
-                <>
-                  <div style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', padding: '12px', marginBottom: '12px', fontSize: '14px' }}>
-                    <div style={{ color: '#4a9eff', fontWeight: 700, marginBottom: '6px', fontSize: '16px' }}>{selectedMessage.subject}</div>
-                    <div style={{ color: '#94a3b8', marginBottom: '4px' }}>From: <span style={{ color: '#e2e8f0' }}>{selectedMessage.from}</span></div>
-                    <div style={{ color: '#94a3b8', marginBottom: '4px' }}>To: <span style={{ color: '#e2e8f0' }}>{selectedMessage.to}</span></div>
-                    <div style={{ color: '#475569', fontSize: '12px' }}>{selectedMessage.timestamp}</div>
-                  </div>
-                  <div style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', color: '#c4cdd6', fontSize: '15px', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
-                    {selectedMessage.body}
-                  </div>
-                </>
-              ) : (
-                <div style={{ color: '#334155', textAlign: 'center', marginTop: '80px', fontSize: '15px' }}>Select a message to read</div>
-              )}
-            </div>
-          </>
-        )}
-
-        {activeSection === 'State Returns' && (
-          <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-            <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>STATE TERMINAL — NCIC/DMV RETURNS</div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && runReturn()}
-                placeholder="Enter name, SSN, or plate..."
-                style={{ flex: 1, background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 12px', fontSize: '15px', fontFamily: 'Ubuntu Mono, monospace' }}
-              />
-              <button onClick={runReturn} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 16px', cursor: 'pointer', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
-                RUN RETURN
-              </button>
-            </div>
-
-            {returnResult && (
-              <div>
-                {returnResult.civ ? (
-                  <CivilianTerminal civ={returnResult.civ} />
-                ) : returnResult.veh ? null : (
-                  <div style={{ color: '#ef4444', fontFamily: 'Ubuntu Mono, monospace', fontSize: '15px' }}>*** NO RECORDS FOUND FOR QUERY ***</div>
-                )}
-                {returnResult.veh && (
-                  <VehicleTerminal veh={returnResult.veh} civ={civilians.find(c => c.id === returnResult.veh.ownerId)} />
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeSection === 'Alerts' && (
-          <div style={{ flex: 1, padding: '16px' }}>
-            <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>ACTIVE ALERTS</div>
-            <div style={{ background: '#1a0505', border: '1px solid #ef4444', borderRadius: '4px', padding: '12px', marginBottom: '10px', fontSize: '14px', color: '#fca5a5' }}>
-              ⚠️ BOLO — BLACK DODGE CHARGER, PLATE SUS-1109 — OWNER HAS ACTIVE WARRANT — DO NOT APPROACH WITHOUT BACKUP
-            </div>
-            <div style={{ background: '#1a1005', border: '1px solid #f59e0b', borderRadius: '4px', padding: '12px', fontSize: '14px', color: '#fcd34d' }}>
-              ⚠️ INCREASED ACTIVITY — RIVERSIDE DISTRICT — EXERCISE CAUTION
-            </div>
-          </div>
-        )}
-
-        {activeSection === 'History' && (
-          <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-            <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>RETURN HISTORY</div>
-            {[
-              { time: '14:18', query: 'Plate: SUS-1109', result: 'OWNER WANTED' },
-              { time: '14:02', query: 'Name: Darnell Washington', result: 'ACTIVE WARRANT' },
-              { time: '13:45', query: 'Plate: ARC-1204', result: 'CLEAR' },
-            ].map((h, i) => (
-              <div key={i} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '10px 12px', marginBottom: '8px', fontSize: '14px', display: 'flex', gap: '16px' }}>
-                <span style={{ color: '#475569' }}>{h.time}</span>
-                <span style={{ color: '#94a3b8' }}>{h.query}</span>
-                <span style={{ color: h.result === 'CLEAR' ? '#22c55e' : '#ef4444', fontWeight: 700 }}>{h.result}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeSection === 'Saved' && (
-          <div style={{ flex: 1, padding: '16px' }}>
-            <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>SAVED RETURNS</div>
-            <div style={{ color: '#334155', textAlign: 'center', marginTop: '60px', fontSize: '15px' }}>No saved returns.</div>
-          </div>
-        )}
-      </div>
+      {mainContent}
     </div>
   );
 }

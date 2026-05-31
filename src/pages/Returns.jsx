@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { CivilianTerminal, VehicleTerminal } from './MDT';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function Returns() {
   const { state } = useCAD();
@@ -38,8 +39,10 @@ export default function Returns() {
     setHistory(h => [{ time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), query: `${type === 'plate' ? 'Plate' : 'Name/SSN'}: ${query}`, result: status }, ...h.slice(0, 9)]);
   };
 
+  const { isMobile } = useResponsive();
+
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '16px', maxWidth: '1100px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: '16px', maxWidth: '1100px' }}>
       <div>
         {/* Terminal header */}
         <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px 4px 0 0', padding: '8px 14px', color: '#4a9eff', fontSize: '12px', letterSpacing: '2px' }}>

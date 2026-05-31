@@ -82,7 +82,7 @@ export default function PenalCode() {
             {cat}
             <span style={{ background: '#1e4080', color: '#4a9eff', borderRadius: '4px', padding: '1px 6px', fontSize: '11px' }}>{charges.length}</span>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Code','Name','Type','Fine','Jail Time','Points','Actions'].map(h => (
@@ -110,7 +110,7 @@ export default function PenalCode() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       ))}
 

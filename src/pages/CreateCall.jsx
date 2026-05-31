@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useResponsive } from '../hooks/useResponsive';
 
 const NATURES = ['Traffic Stop','Domestic Disturbance','Suspicious Person','MVA','MVA w/ Injuries','Structure Fire','Medical Emergency','Robbery','Burglary','Assault','Shots Fired','Welfare Check','Noise Complaint','Foot Pursuit','Vehicle Pursuit','Drug Activity','Trespassing','Stolen Vehicle','Hit and Run'];
 const CITIES = ['Arcadia','Greenview','Roca Bay','Unincorporated'];
@@ -13,6 +14,7 @@ export default function CreateCall() {
   const [createdId, setCreatedId] = useState(null);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const { isMobile } = useResponsive();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -60,7 +62,7 @@ export default function CreateCall() {
       <form onSubmit={handleSubmit}>
         <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
             <Field label="NATURE OF CALL *">
               <select value={form.nature} onChange={e => set('nature', e.target.value)} required style={selectStyle}>
                 <option value="">-- Select Nature --</option>

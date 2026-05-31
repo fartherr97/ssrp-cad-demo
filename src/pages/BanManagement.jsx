@@ -27,7 +27,7 @@ export default function BanManagement() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
         {[
           { label: 'Total Bans', val: bannedUsers.length, color: '#ef4444' },
           { label: 'Active', val: bannedUsers.filter(b => b.status === 'Active').length, color: '#f59e0b' },
@@ -41,7 +41,7 @@ export default function BanManagement() {
         ))}
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+      <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
         <thead>
           <tr style={{ background: '#0a1a35' }}>
             {['User','Discord ID','Reason','Issued By','Date','Duration','Status','Actions'].map(h => (
@@ -71,7 +71,7 @@ export default function BanManagement() {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table></div>
 
       {bannedUsers.length === 0 && (
         <div style={{ color: '#334155', textAlign: 'center', padding: '40px', fontSize: '15px' }}>No bans on record.</div>

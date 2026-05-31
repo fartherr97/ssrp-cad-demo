@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function FormsCenter() {
   const { state, dispatch } = useCAD();
@@ -43,7 +44,7 @@ export default function FormsCenter() {
             <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length} color="#22c55e" />
             <StatusSummary label="Review" count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
+          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Case #','Type','Officer','Date','Status','Call','Actions'].map(h => (
@@ -66,7 +67,7 @@ export default function FormsCenter() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
@@ -142,17 +143,18 @@ export default function FormsCenter() {
    DOCUMENT FORM — renders like a real paper form
 ════════════════════════════════════════════════════ */
 function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, currentUser, civilians, officers }) {
+  const { isMobile } = useResponsive();
   const formNumber = `SSRP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   return (
     <div>
       {/* Controls above document */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <button onClick={onBack} style={{ ...smallBtn('#1e4080','#94a3b8'), padding: '7px 14px', fontSize: '15px' }}>← Back</button>
         <span style={{ color: '#e2a84b', fontWeight: 700, fontSize: '15px' }}>{template.name}</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
-          <button onClick={() => window.print()} style={{ ...smallBtn('#1e3a50','#60a5fa'), padding: '7px 14px', fontSize: '15px' }}>🖨 Print</button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {!isMobile && <button onClick={() => window.print()} style={{ ...smallBtn('#1e3a50','#60a5fa'), padding: '7px 14px', fontSize: '15px' }}>🖨 Print</button>}
           <button form="docform" type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '5px', color: '#fff', padding: '7px 20px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>Submit Report</button>
         </div>
       </div>
@@ -187,7 +189,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
           </div>
 
           {/* Officer info bar */}
-          <div style={{ background: '#e8edf5', borderBottom: '1px solid #cbd5e1', padding: '8px 28px', display: 'flex', gap: '32px', fontSize: '14px', color: '#334155' }}>
+          <div style={{ background: '#e8edf5', borderBottom: '1px solid #cbd5e1', padding: '8px 16px', display: 'flex', gap: isMobile ? '12px' : '32px', fontSize: '14px', color: '#334155', flexWrap: 'wrap' }}>
             <span><strong>Officer:</strong> {currentUser?.name} ({currentUser?.badge})</span>
             <span><strong>Department:</strong> {currentUser?.deptShort}</span>
             <span><strong>Rank:</strong> {currentUser?.rank}</span>
@@ -205,7 +207,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
           </div>
 
           {/* Signature section */}
-          <div style={{ borderTop: '2px solid #cbd5e1', padding: '20px 28px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', background: '#f1f5f9' }}>
+          <div style={{ borderTop: '2px solid #cbd5e1', padding: '20px 16px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px', background: '#f1f5f9' }}>
             <SigLine label="Submitting Officer Signature" />
             <SigLine label="Badge Number" value={currentUser?.badge} />
             <SigLine label="Date / Time" value={`${today} — ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
@@ -335,6 +337,7 @@ function SigLine({ label, value }) {
    TEMPLATE BUILDER
 ════════════════════════════════════════════════════ */
 function TemplateBuilder({ reportTemplates, dispatch }) {
+  const { isMobile } = useResponsive();
   const [tpl, setTpl] = useState({ name: '', fields: [] });
   const [newField, setNewField] = useState({ label: '', type: 'text', required: false, options: '' });
 
@@ -366,7 +369,7 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
   const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '15px', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div style={{ marginTop: '18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+    <div style={{ marginTop: '18px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '18px' }}>
       <div>
         <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>EXISTING TEMPLATES</div>
         {reportTemplates.map(t => (
@@ -459,7 +462,7 @@ function ReviewQueue({ reports, dispatch }) {
 function TabBar({ tabs, active, setActive }) {
   const labels = { submitted: 'Submitted Reports', create: 'Create Report', builder: 'Form Builder', review: 'Review Queue' };
   return (
-    <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060' }}>
+    <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060' }}>
       {tabs.map(t => (
         <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0d2545' : 'transparent', border: active === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: active === t ? '#4a9eff' : '#64748b', padding: '8px 16px', fontSize: '15px', cursor: 'pointer' }}>
           {labels[t] || t}

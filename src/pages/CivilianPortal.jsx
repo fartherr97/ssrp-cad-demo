@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import { useResponsive } from '../hooks/useResponsive';
 
 const BLANK_CIV = { firstName:'',lastName:'',dob:'',gender:'Male',ethnicity:'',height:'',weight:'',hair:'',eyes:'',ssn:'',phone:'',address:'',dlNumber:'',dlClass:'Class C',dlStatus:'ACTIVE',dlExpiry:'' };
 const BLANK_VEH = { plate:'',make:'',model:'',year:'',color:'',regStatus:'VALID',regExpiry:'',ownerId:'' };
@@ -43,6 +44,7 @@ export default function CivilianPortal() {
     setTab('form');
   };
 
+  const { isMobile } = useResponsive();
   const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   return (
@@ -65,7 +67,7 @@ export default function CivilianPortal() {
 
       {tab === 'list' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px, 100%), 1fr))', gap: '12px' }}>
             {civilians.map(civ => {
               const civVehicles = vehicles.filter(v => civ.vehicles.includes(v.id));
               const civWarrants = warrants.filter(w => w.civilianId === civ.id && w.status === 'ACTIVE');
@@ -127,7 +129,7 @@ export default function CivilianPortal() {
               {editCiv ? 'EDIT CHARACTER' : 'CREATE CHARACTER'}
             </div>
             <SectionLabel label="PERSONAL INFORMATION" />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
               {[['First Name','firstName'],['Last Name','lastName'],['Date of Birth','dob'],['SSN','ssn'],['Phone','phone']].map(([l,k]) => (
                 <div key={k}>
                   <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>{l.toUpperCase()}</label>
@@ -144,7 +146,7 @@ export default function CivilianPortal() {
               ))}
             </div>
             <SectionLabel label="PHYSICAL DESCRIPTION" />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
               {[['Height','height'],['Weight','weight'],['Hair Color','hair'],['Eye Color','eyes']].map(([l,k]) => (
                 <div key={k}>
                   <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>{l.toUpperCase()}</label>
@@ -157,7 +159,7 @@ export default function CivilianPortal() {
               <input value={civForm.address} onChange={e => setC('address', e.target.value)} style={base} placeholder="123 Main St, Arcadia" />
             </div>
             <SectionLabel label="DRIVER'S LICENSE" />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
               {[['DL Number','dlNumber'],['DL Expiry','dlExpiry']].map(([l,k]) => (
                 <div key={k}>
                   <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>{l.toUpperCase()}</label>
@@ -185,7 +187,7 @@ export default function CivilianPortal() {
               <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '15px', letterSpacing: '1px' }}>ADD VEHICLE</span>
               <button type="button" onClick={() => setShowVehicleForm(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
               {[['PLATE *','plate'],['MAKE *','make'],['MODEL *','model'],['YEAR','year'],['COLOR','color']].map(([l,k]) => (
                 <div key={k}>
                   <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>{l}</label>

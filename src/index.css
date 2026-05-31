@@ -96,3 +96,25 @@ button:disabled {
 tbody tr:hover {
   background: rgba(30, 64, 128, 0.15) !important;
 }
+
+/* ── Mobile responsive utilities ── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+.tab-scroll::-webkit-scrollbar { display: none; }
+
+@media (max-width: 767px) {
+  /* Touch-friendly minimum tap targets */
+  button { min-height: 36px; }
+
+  /* Prevent zoom on input focus on iOS */
+  input, select, textarea { font-size: 16px !important; }
+}

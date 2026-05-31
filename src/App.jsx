@@ -1,5 +1,6 @@
 import { CADProvider, useCAD } from './store/cadStore';
 import NavBar from './components/NavBar';
+import { useResponsive } from './hooks/useResponsive';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import DispatchBoard from './pages/DispatchBoard';
@@ -21,6 +22,7 @@ import OfficerProfile from './pages/OfficerProfile';
 function CADApp() {
   const { state } = useCAD();
   const { currentUser, currentPage } = state;
+  const { isMobile } = useResponsive();
 
   if (!currentUser) return <LoginPage />;
 
@@ -45,7 +47,7 @@ function CADApp() {
   return (
     <div style={{ minHeight: '100vh', background: '#030810', color: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <div style={{ paddingTop: '102px', flex: 1, background: '#030810' }}>
+      <div style={{ paddingTop: isMobile ? '50px' : '102px', flex: 1, background: '#030810' }}>
         {pages[currentPage] || <DispatchBoard />}
       </div>
       <Footer />
