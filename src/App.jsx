@@ -1,5 +1,6 @@
 import { CADProvider, useCAD } from './store/cadStore';
 import NavBar from './components/NavBar';
+import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import DispatchBoard from './pages/DispatchBoard';
 import MDT from './pages/MDT';
@@ -42,11 +43,12 @@ function CADApp() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#050d1a', color: '#e2e8f0' }}>
+    <div style={{ minHeight: '100vh', background: '#050d1a', color: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <div style={{ paddingTop: '48px', minHeight: 'calc(100vh - 48px)' }}>
+      <div style={{ paddingTop: '90px', flex: 1 }}>
         {pages[currentPage] || <DispatchBoard />}
       </div>
+      <Footer />
     </div>
   );
 }
