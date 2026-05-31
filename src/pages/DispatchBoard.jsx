@@ -21,13 +21,34 @@ const UNIT_TONE = {
 const toneFor = (status) => UNIT_TONE[status] || UNIT_TONE.AVAILABLE;
 
 function useClock() {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
+    const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+  const d = new Date(now);
   const p = (n) => String(n).padStart(2, '0');
-  return `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+  return { clock: `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`, now };
+}
+
+// mm:ss for the first hour, then h:mm:ss, since the call was created.
+function fmtElapsed(fromMs, nowMs) {
+  if (!fromMs) return '--:--';
+  const total = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const p = (n) => String(n).padStart(2, '0');
+  return h > 0 ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+}
+
+// Unassigned calls escalate amber (5m) then red (10m) so officers can triage.
+function elapsedTone(fromMs, nowMs, hasUnits) {
+  if (!fromMs) return '#5f779b';
+  const mins = (nowMs - fromMs) / 60000;
+  if (!hasUnits && mins >= 10) return '#e5484d';
+  if (!hasUnits && mins >= 5) return '#f0883e';
+  return '#7aa0cc';
 }
 
 export default function DispatchBoard() {
@@ -35,7 +56,7 @@ export default function DispatchBoard() {
   const { calls, officers, currentUser, myCallId } = state;
   const [selectedCall, setSelectedCall] = useState(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const clock = useClock();
+  const { clock, now } = useClock();
 
   const activeCalls = calls.filter((c) => c.status !== 'CLOSED');
   const filteredCalls =
@@ -154,7 +175,7 @@ export default function DispatchBoard() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr>
-              {['Call #', 'Nature', 'Location', 'City', 'County', 'Pr', 'Status', 'Units', 'Time', 'Actions'].map((h) => (
+              {['Call #', 'Nature', 'Location', 'City', 'County', 'Pr', 'Status', 'Units', 'Elapsed', 'Time', 'Actions'].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -213,6 +234,9 @@ export default function DispatchBoard() {
                     <StatusBadge status={call.status} />
                   </td>
                   <td style={{ padding: '6px 10px', color: '#4aa3ff' }}>{call.units.join(', ') || '—'}</td>
+                  <td className="tnum" style={{ padding: '6px 10px', fontSize: '12px', fontWeight: 700, color: elapsedTone(call.createdAt, now, call.units.length > 0), whiteSpace: 'nowrap' }}>
+                    ⏱ {fmtElapsed(call.createdAt, now)}
+                  </td>
                   <td className="tnum" style={{ padding: '6px 10px', color: '#5f779b', fontSize: '12px' }}>
                     {call.timestamp?.split(' ')[1]}
                   </td>
@@ -227,7 +251,7 @@ export default function DispatchBoard() {
             })}
             {filteredCalls.length === 0 && (
               <tr>
-                <td colSpan={10} style={{ padding: '18px', textAlign: 'center', color: '#5f779b' }}>
+                <td colSpan={11} style={{ padding: '18px', textAlign: 'center', color: '#5f779b' }}>
                   No calls match this filter.
                 </td>
               </tr>

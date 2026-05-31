@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
@@ -33,6 +33,14 @@ export default function MDT() {
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myCall = calls.find(c => c.id === myOfficer?.callId);
   const unread = messages.filter(m => !m.read).length;
+  const unreadRadio = Math.max(0, state.radioCount - state.radioSeen);
+
+  // Opening the Radio feed acknowledges all pending broadcasts.
+  useEffect(() => {
+    if (activeSection === 'Radio' && unreadRadio > 0) {
+      dispatch({ type: 'MARK_RADIO_SEEN' });
+    }
+  }, [activeSection, unreadRadio, dispatch]);
 
   const handleMsgClick = (msg) => {
     setSelectedMessage(msg);
@@ -232,6 +240,9 @@ export default function MDT() {
               {item}
               {item === 'Messages' && unread > 0 && (
                 <span style={{ background: '#ef4444', color: '#fff', borderRadius: '10px', fontSize: '11px', padding: '1px 6px' }}>{unread}</span>
+              )}
+              {item === 'Radio' && unreadRadio > 0 && (
+                <span style={{ background: '#f5b740', color: '#1a1205', borderRadius: '10px', fontSize: '11px', padding: '1px 6px', fontWeight: 700 }}>{unreadRadio}</span>
               )}
             </button>
           ))}

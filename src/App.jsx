@@ -19,6 +19,7 @@ import BanManagement from './pages/BanManagement';
 import PenalCode from './pages/PenalCode';
 import RecordTemplates from './pages/RecordTemplates';
 import OfficerProfile from './pages/OfficerProfile';
+import RadioToast from './components/RadioToast';
 
 function CADApp() {
   const { state } = useCAD();
@@ -49,6 +50,7 @@ function CADApp() {
   return (
     <div style={{ minHeight: '100vh', color: '#dce6f5', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
+      <RadioToast />
       <div style={{ paddingTop: isMobile ? '50px' : '102px', flex: 1 }}>
         {pages[currentPage] || <DispatchBoard />}
       </div>

@@ -29,6 +29,12 @@ const initialState = {
   activeSessions: ACTIVE_SESSIONS,
   myCallId: null,
   nextId: 1000,
+  // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
+  // the running total of dispatcher radio broadcasts; `radioSeen` is how many
+  // the current viewer has acknowledged (by opening the MDT Radio feed).
+  radioCount: 0,
+  radioSeen: 0,
+  lastRadio: null,
   dispatchLog: [
     { id: 'seed-3', time: '14:22:04', kind: 'call', text: 'Call 23-1042 created — Traffic Stop (Elm St / Route 9)' },
     { id: 'seed-2', time: '14:22:31', kind: 'unit', text: 'Unit 831-12 attached to 23-1042' },
@@ -138,8 +144,15 @@ function reducer(state, action) {
     }
     case 'DISPATCH_RADIO': {
       const log = addDispatchLog(state, `[RADIO] ${action.payload}`, 'alert');
-      return { ...state, ...log };
+      return {
+        ...state,
+        ...log,
+        radioCount: state.radioCount + 1,
+        lastRadio: { text: action.payload, time: nowTime(), id: `${Date.now()}` },
+      };
     }
+    case 'MARK_RADIO_SEEN':
+      return { ...state, radioSeen: state.radioCount };
     case 'SET_MY_CALL':
       return { ...state, myCallId: action.payload };
 
