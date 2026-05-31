@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from './StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
@@ -39,11 +39,22 @@ const ADMIN_NAV = [
   { page: 'bans',            label: 'Bans',        Icon: FaBan },
 ];
 
+function useClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
+
 export default function NavBar() {
   const { state, dispatch } = useCAD();
   const { currentUser, currentPage, officers } = state;
   const { isMobile } = useResponsive();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const clock = useClock();
 
   const myOfficer   = officers.find(o => o.id === currentUser?.id);
   const myStatus    = myOfficer?.status || 'OFFDUTY';
@@ -264,6 +275,19 @@ export default function NavBar() {
               ))}
             </>
           )}
+
+          {/* Live clock + connection (pushed to the right) */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, paddingLeft: '12px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', color: '#7ee2a0' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#46c971', boxShadow: '0 0 6px #46c971', animation: 'cadPulse 1.6s ease-in-out infinite' }} />
+              ONLINE
+            </span>
+            <Sep />
+            <div style={{ textAlign: 'right', lineHeight: 1.2 }}>
+              <div style={{ color: '#f5b740', fontWeight: 700, fontSize: '15px', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '0.5px' }}>{clock}</div>
+              <div style={{ color: '#7aa0cc', fontSize: '8px', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Dispatch Net</div>
+            </div>
+          </div>
         </div>
       )}
     </div>

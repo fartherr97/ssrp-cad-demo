@@ -1,120 +1,279 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ============================================================
+   Sunshine State RP CAD - base / theme tokens
+   FONT: Ubuntu + Ubuntu Mono (loaded in index.html) - DO NOT CHANGE
+   ============================================================ */
 
 :root {
-  font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
-  color-scheme: dark;
-  background: #030810;
-  color: #e2e8f0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Core dispatch navy palette */
+  --cad-bg-0: #060a14;
+  --cad-bg-1: #0a1224;
+  --cad-bg-2: #0e1a33;
+  --cad-bg-3: #122544;
+  --cad-panel: #0d1a31;
+  --cad-panel-2: #11203a;
+  --cad-panel-hi: #16294b;
+  --cad-inset: #08101f;
+  --cad-line: #1c3a63;
+  --cad-border: #1d375f;
+  --cad-border-soft: rgba(21, 38, 66, 0.32);
+
+  /* Text */
+  --cad-text: #dce6f5;
+  --cad-text-dim: #93a6c4;
+  --cad-text-faint: #5f779b;
+  --cad-heading: #f2f7ff;
+
+  /* Accents */
+  --cad-accent: #2f81f7;      /* primary blue */
+  --cad-accent-2: #4aa3ff;
+  --cad-gold: #f5b740;        /* FHP gold */
+  --cad-gold-deep: #c8902a;
+  --cad-red: #e5484d;
+  --cad-orange: #f0883e;
+  --cad-cyan: #2bc7d4;
+  --cad-green: #46c971;
+  --cad-purple: #b56cf0;
+  --cad-magenta: #e060c8;
+
+  /* Status colors (units / calls) */
+  --st-available: #46c971;
+  --st-offduty: #e5484d;
+  --st-enroute: #f5b740;
+  --st-onscene: #c66cf0;
+  --st-onduty: #2bc7d4;
+  --st-busy: #f0883e;
+  --st-panic: #ff3b3b;
+
+  /* Priority */
+  --pr-1: #e5484d;
+  --pr-2: #f0883e;
+  --pr-3: #f5b740;
+  --pr-4: #46c971;
+
+  --cad-radius: 6px;
+  --cad-radius-sm: 4px;
+  --cad-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+  --cad-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+
+  --font-sans: 'Ubuntu', system-ui, sans-serif;
+  --font-mono: 'Ubuntu Mono', ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
-  background: #030810;
-  min-height: 100vh;
-  overflow-x: hidden;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--cad-text);
+  background:
+    radial-gradient(1200px 600px at 15% -10%, #15294d 0%, rgba(21, 41, 77, 0) 55%),
+    radial-gradient(900px 500px at 110% 0%, #11203a 0%, rgba(18, 32, 58, 0) 50%),
+    linear-gradient(160deg, #0a1224 0%, #060a14 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Force Ubuntu into form elements (browsers don't inherit font by default) */
-button, input, select, textarea, optgroup, option {
-  font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-sans);
+  color: var(--cad-heading);
+  font-weight: 700;
+  margin: 0 0 0.4em;
+  letter-spacing: 0.2px;
 }
 
-/* Ubuntu Mono for terminal / NCIC readout sections only */
-.terminal, .terminal * {
-  font-family: 'Ubuntu Mono', 'Courier New', monospace !important;
+a {
+  color: var(--cad-accent-2);
+  text-decoration: none;
+}
+a:hover {
+  color: #8cc5ff;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+code,
+kbd,
+pre,
+.mono {
+  font-family: var(--font-mono);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #060d1a; }
-::-webkit-scrollbar-thumb { background: #1e3060; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2e4080; }
-
-/* Selection */
-::selection { background: #1e4080; color: #fff; }
-
-/* Autofill */
-input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 30px #060d1a inset !important;
-  -webkit-text-fill-color: #e2e8f0 !important;
+button {
+  font-family: var(--font-sans);
 }
 
-/* Focus */
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
+}
+
+/* Scrollbars styled like a control panel */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1f3b66 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(#244a7d, #16294b);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #2c4f86;
+  background-clip: padding-box;
+}
+
+::selection {
+  background: rgba(47, 129, 247, 0.35);
+  color: #fff;
+}
+
+/* Dark autofill so Chrome doesn't paint inputs white */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 40px var(--cad-inset) inset !important;
+  -webkit-text-fill-color: var(--cad-text) !important;
+  caret-color: var(--cad-text);
+}
+
+/* Blue focus ring on interactive elements */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #4a9eff;
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cad-accent);
   outline-offset: 2px;
 }
 
-/* ── Button hover / active effects (universal) ── */
+/* ── Universal button hover / active feedback ── */
 button {
   cursor: pointer;
-  transition: filter 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+  transition: filter 0.15s ease, transform 0.1s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease;
 }
-
 button:hover:not(:disabled) {
-  filter: brightness(1.2);
+  filter: brightness(1.18);
 }
-
 button:active:not(:disabled) {
-  filter: brightness(0.88);
-  transform: scale(0.97);
+  filter: brightness(0.9);
+  transform: translateY(1px) scale(0.99);
 }
-
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   filter: none;
 }
 
-/* ── Login logo float animation ── */
-@keyframes floatLogo {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
+/* ── Ubuntu Mono for terminal / NCIC readout sections ── */
+.terminal,
+.terminal * {
+  font-family: var(--font-mono) !important;
 }
 
+/* ── Table row hover tint (works with inline-styled tables) ── */
+tbody tr:hover {
+  background: rgba(47, 129, 247, 0.12) !important;
+}
+
+/* ── Login logo float animation ── */
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
 .logo-float {
   animation: floatLogo 3.2s ease-in-out infinite;
 }
 
-/* Table hover */
-tbody tr:hover {
-  background: rgba(30, 64, 128, 0.15) !important;
+/* ── Subtle panel sweep used by header/badge accents ── */
+@keyframes cadPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
 }
 
-/* ── Mobile responsive utilities ── */
+/* ── Responsive scroll utilities ── */
 .table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-
 .tab-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scrollbar-width: none;
 }
-.tab-scroll::-webkit-scrollbar { display: none; }
+.tab-scroll::-webkit-scrollbar {
+  display: none;
+}
 
+/* ── Reusable CAD chrome classes (opt-in, theme-token driven) ── */
+.cad-panel {
+  background: linear-gradient(180deg, var(--cad-panel-2), var(--cad-panel));
+  border: 1px solid var(--cad-border);
+  border-radius: var(--cad-radius);
+  box-shadow: var(--cad-shadow), var(--cad-shadow-inset);
+}
+.cad-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, var(--cad-panel-hi), var(--cad-panel-2));
+  border-bottom: 1px solid var(--cad-border);
+  border-radius: var(--cad-radius) var(--cad-radius) 0 0;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--cad-gold);
+}
+.cad-count-pill {
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--cad-accent-2);
+  border: 1px solid var(--cad-border-soft);
+  border-radius: 9px;
+  padding: 1px 8px;
+  font-size: 10px;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* ── Mobile rules ── */
 @media (max-width: 767px) {
-  /* Touch-friendly minimum tap targets */
+  body { font-size: 13px; }
+  /* Touch-friendly tap targets */
   button { min-height: 36px; }
-
-  /* Prevent zoom on input focus on iOS */
+  /* Prevent iOS zoom-on-focus */
   input, select, textarea { font-size: 16px !important; }
 }

@@ -85,8 +85,12 @@ export default function LoginPage() {
           maxWidth: '380px',
           boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
         }}>
-          <div style={{ color: '#e2a84b', fontSize: '14px', fontWeight: 700, marginBottom: '20px', textAlign: 'center', letterSpacing: '2px' }}>
+          <div style={{ color: '#f5b740', fontSize: '14px', fontWeight: 700, marginBottom: '6px', textAlign: 'center', letterSpacing: '2px' }}>
             OFFICER SIGN IN
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', marginBottom: '20px', fontSize: '10px', letterSpacing: '1px', color: '#5f8f6f' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#46c971', boxShadow: '0 0 5px #46c971', animation: 'cadPulse 1.6s ease-in-out infinite' }} />
+            SECURE TERMINAL • DISPATCH NET ONLINE
           </div>
 
           <div style={{ marginBottom: '16px' }}>

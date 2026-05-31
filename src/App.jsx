@@ -45,9 +45,9 @@ function CADApp() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#030810', color: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', color: '#dce6f5', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <div style={{ paddingTop: isMobile ? '50px' : '102px', flex: 1, background: '#030810' }}>
+      <div style={{ paddingTop: isMobile ? '50px' : '102px', flex: 1 }}>
         {pages[currentPage] || <DispatchBoard />}
       </div>
       <Footer />
