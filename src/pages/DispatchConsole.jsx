@@ -29,14 +29,41 @@ const LOG_TONE = {
   info: '#93a6c4',
 };
 
-function useClock() {
-  const [now, setNow] = useState(() => new Date());
+// A single ticking "now" shared by the header clock and every call's elapsed
+// timer, so they stay in sync and only one interval runs.
+function useNow() {
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
+    const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+  return now;
+}
+
+function fmtClock(ms) {
+  const d = new Date(ms);
   const p = (n) => String(n).padStart(2, '0');
-  return `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+// mm:ss for the first hour, then h:mm:ss.
+function fmtElapsed(fromMs, nowMs) {
+  if (!fromMs) return '--:--';
+  const total = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const p = (n) => String(n).padStart(2, '0');
+  return h > 0 ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+}
+
+// Calls that have been waiting unassigned too long should glow red/amber.
+function elapsedTone(fromMs, nowMs, hasUnits) {
+  if (!fromMs) return '#5f779b';
+  const mins = (nowMs - fromMs) / 60000;
+  if (!hasUnits && mins >= 10) return '#e5484d';
+  if (!hasUnits && mins >= 5) return '#f0883e';
+  return '#7aa0cc';
 }
 
 const NATURES = [
@@ -49,7 +76,8 @@ export default function DispatchConsole() {
   const { state, dispatch } = useCAD();
   const { calls, officers, currentUser, dispatchLog } = state;
   const { isMobile } = useResponsive();
-  const clock = useClock();
+  const now = useNow();
+  const clock = fmtClock(now);
 
   const [selectedCallId, setSelectedCallId] = useState(null);
   const [radio, setRadio] = useState('');
@@ -169,9 +197,14 @@ export default function DispatchConsole() {
                     </span>
                     <span style={{ color: '#46c971', fontWeight: 700, fontSize: '13px' }}>{call.id}</span>
                     <span style={{ color: '#dce6f5', fontWeight: 600, fontSize: '13px' }}>{call.nature}</span>
-                    <span style={{ marginLeft: 'auto' }}>
-                      <StatusBadge status={call.status} />
+                    <span
+                      className="tnum"
+                      title="Time since call created"
+                      style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '4px', color: elapsedTone(call.createdAt, now, call.units.length > 0), fontSize: '12px', fontWeight: 700 }}
+                    >
+                      ⏱ {fmtElapsed(call.createdAt, now)}
                     </span>
+                    <StatusBadge status={call.status} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
                     <span style={{ color: '#93a6c4', fontSize: '12px' }}>{call.location}</span>
@@ -190,6 +223,9 @@ export default function DispatchConsole() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ color: '#f5b740', fontWeight: 700, fontSize: '12px' }}>
                   CALL {selectedCall.id} • CONTROL
+                  <span className="tnum" style={{ color: elapsedTone(selectedCall.createdAt, now, selectedCall.units.length > 0), marginLeft: '8px' }}>
+                    ⏱ {fmtElapsed(selectedCall.createdAt, now)}
+                  </span>
                 </span>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button

@@ -3,11 +3,26 @@ import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
 
-const SIDEBAR_ITEMS = ['Messages', 'Alerts', 'State Returns', 'History', 'Saved'];
+const SIDEBAR_ITEMS = ['Messages', 'Radio', 'Alerts', 'State Returns', 'History', 'Saved'];
+
+const LOG_TONE = {
+  call: '#46c971',
+  unit: '#4aa3ff',
+  status: '#f5b740',
+  alert: '#e5484d',
+  info: '#93a6c4',
+};
+const LOG_LABEL = {
+  call: 'CALL',
+  unit: 'UNIT',
+  status: 'STAT',
+  alert: 'RADIO',
+  info: 'INFO',
+};
 
 export default function MDT() {
   const { state, dispatch } = useCAD();
-  const { messages, calls, officers, currentUser, civilians, vehicles } = state;
+  const { messages, calls, officers, currentUser, civilians, vehicles, dispatchLog } = state;
   const { isMobile } = useResponsive();
   const [activeSection, setActiveSection] = useState('Messages');
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -93,6 +108,29 @@ export default function MDT() {
             </div>
           )}
         </>
+      )}
+
+      {activeSection === 'Radio' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '10px 14px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#e2a84b', fontSize: '14px', fontWeight: 700, letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#46c971', boxShadow: '0 0 6px #46c971', animation: 'cadPulse 1.6s ease-in-out infinite' }} />
+            DISPATCH RADIO • LIVE FEED
+          </div>
+          <div className="terminal" style={{ flex: 1, overflow: 'auto', padding: '10px 14px', background: '#070d18' }}>
+            {dispatchLog.length === 0 && (
+              <div style={{ color: '#334155', textAlign: 'center', marginTop: '40px', fontSize: '14px' }}>No radio traffic yet.</div>
+            )}
+            {dispatchLog.map(e => (
+              <div key={e.id} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '3px 0', fontSize: '13px', lineHeight: 1.5 }}>
+                <span style={{ color: '#3f5878', flexShrink: 0 }}>{e.time}</span>
+                <span style={{ flexShrink: 0, minWidth: '44px', color: LOG_TONE[e.kind] || '#93a6c4', fontWeight: 700, fontSize: '11px' }}>
+                  [{LOG_LABEL[e.kind] || 'INFO'}]
+                </span>
+                <span style={{ color: e.kind === 'alert' ? '#fca5a5' : '#c4cdd6' }}>{e.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {activeSection === 'State Returns' && (

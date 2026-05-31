@@ -9,7 +9,9 @@ const initialState = {
   currentUser: null,
   currentPage: 'login',
   officers: OFFICERS,
-  calls: CALLS,
+  // Stamp each seed call with a staggered creation time (most recent first) so
+  // the live elapsed-time clocks in the console read realistically.
+  calls: CALLS.map((c, i) => ({ ...c, createdAt: Date.now() - (i * 6 + 3) * 60000 })),
   civilians: CIVILIANS,
   vehicles: VEHICLES,
   warrants: WARRANTS,
@@ -82,7 +84,7 @@ function reducer(state, action) {
     }
 
     case 'CREATE_CALL': {
-      const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), units: [] };
+      const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), createdAt: Date.now(), units: [] };
       const audit = addAuditEntry(state, `Created call ${newCall.id} (${newCall.nature})`, 'Dispatch');
       const log = addDispatchLog(state, `Call ${newCall.id} created — ${newCall.nature} (${newCall.location})`, 'call');
       return { ...state, calls: [newCall, ...state.calls], ...audit, ...log };
