@@ -60,6 +60,38 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* ── Button hover / active effects (universal) ── */
+button {
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+button:active:not(:disabled) {
+  filter: brightness(0.88);
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* ── Login logo float animation ── */
+@keyframes floatLogo {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.logo-float {
+  animation: floatLogo 3.2s ease-in-out infinite;
+}
+
 /* Table hover */
 tbody tr:hover {
   background: rgba(30, 64, 128, 0.15) !important;

@@ -64,7 +64,8 @@ export default function LoginPage() {
           <img
             src="https://cdn.ssrp.us/images/ssrp.png"
             alt="SSRP Logo"
-            style={{ height: '80px', width: 'auto', margin: '0 auto 14px', display: 'block', filter: 'drop-shadow(0 0 20px rgba(74,158,255,0.35))' }}
+            className="logo-float"
+            style={{ height: '110px', width: 'auto', margin: '0 auto 18px', display: 'block' }}
           />
           <div style={{ color: '#f1f5f9', fontSize: '26px', fontWeight: 700, letterSpacing: '2px' }}>
             SUNSHINE STATE ROLEPLAY
