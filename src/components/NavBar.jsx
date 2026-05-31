@@ -351,6 +351,7 @@ const PAGE_TITLES = {
   hub:             'Module Selection',
   console:         'Dispatch Console',
   dispatch:        'Dispatch Board',
+  fire:            'HCFR Fire / Rescue',
   mdt:             'Mobile Data Terminal',
   search:          'Records Search',
   returns:         'NCIC / DMV Returns',

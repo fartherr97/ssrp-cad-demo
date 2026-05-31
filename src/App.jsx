@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import SelectionHub from './pages/SelectionHub';
 import DispatchBoard from './pages/DispatchBoard';
 import DispatchConsole from './pages/DispatchConsole';
+import FireBoard from './pages/FireBoard';
 import MDT from './pages/MDT';
 import SearchPage from './pages/SearchPage';
 import CreateCall from './pages/CreateCall';
@@ -35,6 +36,7 @@ function CADApp() {
   const pages = {
     console: <DispatchConsole />,
     dispatch: <DispatchBoard />,
+    fire: <FireBoard />,
     mdt: <MDT />,
     search: <SearchPage />,
     createcall: <CreateCall />,

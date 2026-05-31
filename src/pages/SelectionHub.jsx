@@ -12,8 +12,8 @@ const MODULES = [
   { key: 'dmv', label: 'DMV', desc: 'Vehicle & license returns', Icon: FaIdCard, page: 'returns', color: '#2bc7d4' },
   { key: 'law', label: 'Law', desc: 'Penal code & statutes', Icon: FaGavel, page: 'penalcode', color: '#f5b740' },
   { key: 'police', label: 'Police', desc: 'Patrol CAD & mobile terminal', Icon: FaShieldHalved, page: 'dispatch', color: '#4aa3ff' },
-  { key: 'fire', label: 'Fire', desc: 'Fire & rescue operations', Icon: FaFireFlameCurved, page: 'dispatch', color: '#f0883e' },
-  { key: 'ems', label: 'EMS', desc: 'Medical response & units', Icon: FaKitMedical, page: 'dispatch', color: '#e5484d' },
+  { key: 'fire', label: 'Fire', desc: 'HCFR fire & rescue board', Icon: FaFireFlameCurved, page: 'fire', color: '#f0883e' },
+  { key: 'ems', label: 'EMS', desc: 'HCFR medical response', Icon: FaKitMedical, page: 'fire', color: '#e5484d' },
   { key: 'dispatch', label: 'Dispatch', desc: 'Console, units & call control', Icon: FaTowerBroadcast, page: 'console', color: '#b56cf0' },
   { key: 'admin', label: 'Admin', desc: 'Staff tools & administration', Icon: FaUsersGear, page: 'admin', color: '#f97316', adminOnly: true },
 ];
