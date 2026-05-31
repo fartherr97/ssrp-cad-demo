@@ -1,9 +1,8 @@
 export const DEPARTMENTS = [
-  { id: 1, name: "Arcadia Police Department", short: "ADPS", abbreviation: "APD", color: "#1a6bbf", type: "LEO", badgePrefix: "831", radioChannel: "PD-1", subdivisions: ["Patrol","K9","Traffic","SWAT","Detectives"] },
-  { id: 2, name: "Arcadia County Sheriff's Office", short: "ACSO", abbreviation: "ACSO", color: "#2e7d32", type: "LEO", badgePrefix: "SO", radioChannel: "SO-1", subdivisions: ["Patrol","Marine","Air Support","Civil"] },
-  { id: 3, name: "Arcadia Fire Department", short: "AFD", abbreviation: "AFD", color: "#c62828", type: "Fire", badgePrefix: "FD", radioChannel: "FIRE-1", subdivisions: ["Engine","Ladder","Rescue","Hazmat"] },
-  { id: 4, name: "Arcadia EMS", short: "AEMS", abbreviation: "EMS", color: "#6a1b9a", type: "EMS", badgePrefix: "MED", radioChannel: "EMS-1", subdivisions: ["ALS","BLS","Supervisor"] },
-  { id: 5, name: "State Highway Patrol", short: "SHP", abbreviation: "SHP", color: "#e65100", type: "LEO", badgePrefix: "SHP", radioChannel: "SHP-1", subdivisions: ["Patrol","Commercial Vehicle","Air"] },
+  { id: 1, name: "Tampa Police Department", short: "ADPS", abbreviation: "TPD", color: "#1a6bbf", type: "LEO", badgePrefix: "831", radioChannel: "PD-1", subdivisions: ["Patrol","K9","Traffic","SWAT","Detectives"] },
+  { id: 2, name: "Hillsborough County Sheriff's Office", short: "HCSO", abbreviation: "HCSO", color: "#2e7d32", type: "LEO", badgePrefix: "SO", radioChannel: "SO-1", subdivisions: ["Patrol","Marine","Air Support","Civil"] },
+  { id: 3, name: "Hillsborough County Fire Rescue", short: "HCFR", abbreviation: "HCFR", color: "#c62828", type: "Fire", badgePrefix: "FD", radioChannel: "FIRE-1", subdivisions: ["Engine","Ladder","Rescue","Hazmat"] },
+  { id: 4, name: "Florida Highway Patrol", short: "FHP", abbreviation: "FHP", color: "#d2b48c", type: "LEO", badgePrefix: "FHP", radioChannel: "SHP-1", subdivisions: ["Patrol","Commercial Vehicle","Air"] },
 ];
 
 export const RANKS = {

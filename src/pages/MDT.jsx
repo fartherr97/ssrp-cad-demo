@@ -204,7 +204,7 @@ export function CivilianTerminal({ civ }) {
   return (
     <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
       <div style={{ color: '#e2a84b', borderBottom: '1px solid #2a3a50', paddingBottom: '8px', marginBottom: '12px', fontSize: '12px', letterSpacing: '1px' }}>
-        *** STATE OF ARCADIA — DEPARTMENT OF MOTOR VEHICLES — NCIC RETURN ***
+        *** STATE OF FLORIDA — DEPARTMENT OF MOTOR VEHICLES — NCIC RETURN ***
       </div>
       <TermRow label="NAME" value={`${civ.lastName}, ${civ.firstName}`} valueColor="#fff" />
       <TermRow label="DATE OF BIRTH" value={civ.dob} />

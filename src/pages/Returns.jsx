@@ -43,7 +43,7 @@ export default function Returns() {
       <div>
         {/* Terminal header */}
         <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px 4px 0 0', padding: '8px 14px', color: '#4a9eff', fontSize: '12px', letterSpacing: '2px' }}>
-          STATE OF ARCADIA — NCIC/DMV QUERY TERMINAL — OFFICER: {state.currentUser?.name?.toUpperCase()}
+          STATE OF FLORIDA — NCIC/DMV QUERY TERMINAL — OFFICER: {state.currentUser?.name?.toUpperCase()}
         </div>
         <div style={{ background: '#060d1a', border: '1px solid #1e4080', borderTop: 'none', borderRadius: '0 0 4px 4px', padding: '16px', marginBottom: '16px' }}>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
