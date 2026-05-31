@@ -40,7 +40,7 @@ export default function LiveMap() {
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: isMobile ? 'calc(100vh - 50px)' : 'calc(100vh - 102px)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>LIVE MAP — ARCADIA DISPATCH</div>
+        <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>LIVE MAP • ARCADIA DISPATCH</div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px', flexWrap: 'wrap' }}>
           <LayerToggle active={showUnits} onClick={() => setShowUnits(v => !v)} label="Units" color="#22c55e" />
           <LayerToggle active={showCalls} onClick={() => setShowCalls(v => !v)} label="Calls" color="#ef4444" />
@@ -161,7 +161,7 @@ export default function LiveMap() {
               whiteSpace: 'nowrap',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}>
-              <div style={{ color: '#4a9eff', fontWeight: 700 }}>{hoveredUnit.unitId} — {hoveredUnit.name}</div>
+              <div style={{ color: '#4a9eff', fontWeight: 700 }}>{hoveredUnit.unitId} • {hoveredUnit.name}</div>
               <div style={{ color: '#94a3b8' }}>{hoveredUnit.deptShort} / {hoveredUnit.subdivision}</div>
               <div style={{ color: STATUS_COLORS[hoveredUnit.status], fontWeight: 600 }}>{hoveredUnit.status}</div>
               <div style={{ color: '#64748b' }}>{hoveredUnit.location}</div>
@@ -185,7 +185,7 @@ export default function LiveMap() {
               whiteSpace: 'nowrap',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}>
-              <div style={{ color: PRIORITY_COLORS[hoveredCall.priority], fontWeight: 700 }}>{hoveredCall.id} — P{hoveredCall.priority}</div>
+              <div style={{ color: PRIORITY_COLORS[hoveredCall.priority], fontWeight: 700 }}>{hoveredCall.id} • P{hoveredCall.priority}</div>
               <div style={{ color: '#e2e8f0' }}>{hoveredCall.nature}</div>
               <div style={{ color: '#94a3b8' }}>{hoveredCall.location}</div>
               <div style={{ color: '#64748b' }}>{hoveredCall.units.length} unit(s) assigned</div>

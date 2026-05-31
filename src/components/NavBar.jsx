@@ -125,7 +125,7 @@ export default function NavBar() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #1e3060' }}>
               <div style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg,#1e4080,#2d5fa0)', border: `2px solid ${statusColor}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>👮</div>
               <div style={{ flex: 1, lineHeight: 1.4, minWidth: 0 }}>
-                <div style={{ color: '#d1dff0', fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser.badge} — {currentUser.name}</div>
+                <div style={{ color: '#d1dff0', fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser.badge} • {currentUser.name}</div>
                 <div style={{ color: '#f97316', fontSize: '11px' }}>{currentUser.rank} · {currentUser.deptShort}</div>
               </div>
               <button onClick={() => dispatch({ type: 'LOGOUT' })} style={{ background: 'transparent', color: '#4a6a8a', border: '1px solid #1e3050', borderRadius: '4px', padding: '5px 10px', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>Sign Out</button>

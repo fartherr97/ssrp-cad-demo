@@ -98,7 +98,7 @@ export default function PenalCode() {
                   <td style={{ padding: '6px 10px' }}>
                     <span style={{ color: TYPE_COLORS[p.type], fontWeight: 700, fontSize: '12px' }}>{p.type}</span>
                   </td>
-                  <td style={{ padding: '6px 10px', color: p.fine > 0 ? '#f59e0b' : '#475569' }}>{p.fine > 0 ? `$${p.fine.toLocaleString()}` : '—'}</td>
+                  <td style={{ padding: '6px 10px', color: p.fine > 0 ? '#f59e0b' : '#475569' }}>{p.fine > 0 ? `$${p.fine.toLocaleString()}` : '•'}</td>
                   <td style={{ padding: '6px 10px', color: p.jailTime !== 'None' ? '#ef4444' : '#475569' }}>{p.jailTime}</td>
                   <td style={{ padding: '6px 10px', color: p.points > 0 ? '#f59e0b' : '#475569' }}>{p.points}</td>
                   <td style={{ padding: '6px 10px' }}>

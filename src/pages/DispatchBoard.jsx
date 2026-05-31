@@ -89,7 +89,7 @@ export default function DispatchBoard() {
                   <span style={{ background: PRIORITY_COLORS[call.priority], color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '14px', fontWeight: 700 }}>P{call.priority}</span>
                 </td>
                 <td style={{ padding: '7px 10px' }}><StatusBadge status={call.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{call.units.join(', ') || '—'}</td>
+                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{call.units.join(', ') || '•'}</td>
                 <td style={{ padding: '7px 10px', color: '#475569', fontSize: '14px' }}>{call.timestamp?.split(' ')[1]}</td>
                 <td style={{ padding: '7px 10px' }}>
                   <div style={{ display: 'flex', gap: '4px' }}>
@@ -107,7 +107,7 @@ export default function DispatchBoard() {
       {selectedCall && (
         <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '16px' }}>CALL DETAIL — {selectedCall.id}</span>
+            <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '16px' }}>CALL DETAIL • {selectedCall.id}</span>
             <button onClick={() => setSelectedCall(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '16px' }}>✕</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', fontSize: '16px' }}>
@@ -154,7 +154,7 @@ export default function DispatchBoard() {
                 </td>
                 <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{o.unitId}</td>
                 <td style={{ padding: '7px 10px' }}><StatusBadge status={o.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#f59e0b' }}>{o.callId || '—'}</td>
+                <td style={{ padding: '7px 10px', color: '#f59e0b' }}>{o.callId || '•'}</td>
                 <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{o.deptShort}</td>
                 <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{o.subdivision}</td>
                 <td style={{ padding: '7px 10px', color: '#475569' }}>{o.location}</td>

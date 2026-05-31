@@ -110,7 +110,7 @@ export default function SearchPage() {
             <Section title="ACTIVE WARRANTS">
               {results.civWarrants.map(w => (
                 <div key={w.id} style={{ background: '#1a0505', border: '1px solid #ef4444', borderRadius: '4px', padding: '12px', marginBottom: '8px', fontSize: '14px' }}>
-                  <div style={{ color: '#ef4444', fontWeight: 700, marginBottom: '6px' }}>⚠ {w.type} — {w.status}</div>
+                  <div style={{ color: '#ef4444', fontWeight: 700, marginBottom: '6px' }}>⚠ {w.type} • {w.status}</div>
                   <div style={{ color: '#fca5a5' }}>Charge: {w.charge}</div>
                   <div style={{ color: '#94a3b8', marginTop: '4px' }}>Issued by: {w.issuedBy} on {w.issuedDate}</div>
                   {w.notes && <div style={{ color: '#64748b', marginTop: '4px', fontSize: '12px' }}>{w.notes}</div>}
@@ -150,7 +150,7 @@ export default function SearchPage() {
 
           {results.civResult && results.civWarrants.length === 0 && results.civHistory.length === 0 && (
             <div style={{ color: '#22c55e', background: '#051a05', border: '1px solid #22c55e', borderRadius: '4px', padding: '12px', fontSize: '15px' }}>
-              *** SUBJECT RETURNS CLEAR — NO WARRANTS OR CRIMINAL HISTORY ***
+              *** SUBJECT RETURNS CLEAR • NO WARRANTS OR CRIMINAL HISTORY ***
             </div>
           )}
         </div>

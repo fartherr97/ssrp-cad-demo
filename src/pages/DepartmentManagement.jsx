@@ -51,7 +51,7 @@ export default function DepartmentManagement() {
             style={{ ...base, marginBottom: '0' }}
           >
             {departments.map(dept => (
-              <option key={dept.id} value={dept.id}>{dept.short} — {dept.name}</option>
+              <option key={dept.id} value={dept.id}>{dept.short} • {dept.name}</option>
             ))}
           </select>
         </div>
@@ -107,7 +107,7 @@ export default function DepartmentManagement() {
                   {[['Abbreviation', selectedDept.abbreviation || selectedDept.short],['Badge Prefix', selectedDept.badgePrefix],['Radio Channel', selectedDept.radioChannel],['Active Officers', deptOfficers.filter(o => o.status !== 'OFFDUTY').length + ' / ' + deptOfficers.length]].map(([l,v]) => (
                     <div key={l} style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '8px 10px' }}>
                       <div style={{ color: '#4a9eff', fontSize: '11px', letterSpacing: '1px', marginBottom: '4px' }}>{l}</div>
-                      <div style={{ color: '#e2e8f0' }}>{v || '—'}</div>
+                      <div style={{ color: '#e2e8f0' }}>{v || '•'}</div>
                     </div>
                   ))}
                 </div>

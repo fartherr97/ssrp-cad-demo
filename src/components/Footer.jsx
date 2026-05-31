@@ -17,7 +17,7 @@ export default function Footer() {
 
       {/* Right: copyright */}
       <span style={{ color: '#2e4060', fontSize: '12px' }}>
-        Computer Aided Dispatch — All rights reserved
+        Computer Aided Dispatch • All rights reserved
       </span>
     </div>
   );

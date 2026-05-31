@@ -128,7 +128,7 @@ export default function RecordTemplates() {
               {/* Fill form */}
               {fillMode && (
                 <div style={{ background: '#0d1f3c', border: '1px solid #22c55e', borderRadius: '6px', padding: '16px' }}>
-                  <div style={{ color: '#22c55e', fontSize: '14px', fontWeight: 700, marginBottom: '16px' }}>CREATE NEW RECORD — {selected.name}</div>
+                  <div style={{ color: '#22c55e', fontSize: '14px', fontWeight: 700, marginBottom: '16px' }}>CREATE NEW RECORD • {selected.name}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
                     {selected.fields.map(field => {
                       const v = fillValues[field.label] || '';
@@ -160,13 +160,13 @@ export default function RecordTemplates() {
                           {field.type === 'vehicle_lookup' && (
                             <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={base}>
                               <option value="">-- Select Vehicle --</option>
-                              {vehicles.map(v => <option key={v.id}>{v.plate} — {v.make} {v.model}</option>)}
+                              {vehicles.map(v => <option key={v.id}>{v.plate} • {v.make} {v.model}</option>)}
                             </select>
                           )}
                           {field.type === 'officer_lookup' && (
                             <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={base}>
                               <option value="">-- Select Officer --</option>
-                              {officers.map(o => <option key={o.id}>{o.badge} — {o.name}</option>)}
+                              {officers.map(o => <option key={o.id}>{o.badge} • {o.name}</option>)}
                             </select>
                           )}
                         </div>
@@ -174,7 +174,7 @@ export default function RecordTemplates() {
                     })}
                   </div>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
-                    <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '10px 20px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>SAVE RECORD</button>
+                    <button onClick={() => { alert('Record saved! (Demo mode • records stored in state)'); setFillMode(null); setFillValues({}); }} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '10px 20px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>SAVE RECORD</button>
                     <button onClick={() => setFillMode(null)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '10px 16px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Cancel</button>
                   </div>
                 </div>

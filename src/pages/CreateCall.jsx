@@ -119,7 +119,7 @@ export default function CreateCall() {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {officers.filter(o => o.status === 'AVAILABLE').map(o => (
                 <span key={o.id} style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', color: '#60a5fa', cursor: 'pointer' }}>
-                  {o.unitId} — {o.name}
+                  {o.unitId} • {o.name}
                 </span>
               ))}
               {officers.filter(o => o.status === 'AVAILABLE').length === 0 && (

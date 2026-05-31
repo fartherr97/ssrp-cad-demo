@@ -23,7 +23,7 @@ export default function OfficerProfile() {
 
   const commendations = [
     { id: 1, type: 'Commendation', date: '2023-09-15', from: 'Lt. Commander', note: 'Outstanding work on the Washington arrest. Demonstrated excellent tactical judgment.' },
-    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award — monthly food drive coordination.' },
+    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award • monthly food drive coordination.' },
   ];
   const complaints = [];
 
@@ -38,7 +38,7 @@ export default function OfficerProfile() {
           <div style={{ flex: 1 }}>
             <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700 }}>{myOfficer.name}</div>
             <div style={{ color: '#94a3b8', fontSize: '15px', marginTop: '4px' }}>
-              {myOfficer.rank} — {myDept?.name || 'Unknown Department'}
+              {myOfficer.rank} • {myDept?.name || 'Unknown Department'}
             </div>
             <div style={{ color: '#64748b', fontSize: '14px', marginTop: '2px' }}>
               Badge: <span style={{ color: '#60a5fa' }}>{myOfficer.badge}</span> • Unit: <span style={{ color: '#60a5fa' }}>{myOfficer.unitId}</span> • {myOfficer.subdivision}
@@ -76,8 +76,8 @@ export default function OfficerProfile() {
       {tab === 'info' && (
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
           <InfoCard title="ASSIGNMENT">
-            {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '—']].map(([k,v]) => (
-              <InfoRow key={k} label={k} value={v || '—'} />
+            {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '•']].map(([k,v]) => (
+              <InfoRow key={k} label={k} value={v || '•'} />
             ))}
           </InfoCard>
           <InfoCard title="TRANSFER REQUEST">
@@ -121,7 +121,7 @@ export default function OfficerProfile() {
                 <td style={{ padding: '7px 10px', color: '#e2e8f0' }}>{r.type}</td>
                 <td style={{ padding: '7px 10px', color: '#475569' }}>{r.date}</td>
                 <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{r.callId || '—'}</td>
+                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{r.callId || '•'}</td>
               </tr>
             ))}
             {myReports.length === 0 && <tr><td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#334155' }}>No reports filed.</td></tr>}

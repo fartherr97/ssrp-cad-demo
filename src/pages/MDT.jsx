@@ -39,7 +39,7 @@ export default function MDT() {
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
       {activeSection === 'Messages' && (
         <>
-          {/* Message list — hidden on mobile when detail is open */}
+          {/* Message list • hidden on mobile when detail is open */}
           {(!isMobile || mobileMsgView === 'list') && (
             <div style={{ width: isMobile ? '100%' : '280px', borderRight: isMobile ? 'none' : '1px solid #1e4080', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '10px 12px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#e2a84b', fontSize: '14px', fontWeight: 700, letterSpacing: '1px' }}>
@@ -67,7 +67,7 @@ export default function MDT() {
               ))}
             </div>
           )}
-          {/* Message detail — full width on mobile */}
+          {/* Message detail • full width on mobile */}
           {(!isMobile || mobileMsgView === 'detail') && (
             <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
               {isMobile && (
@@ -97,7 +97,7 @@ export default function MDT() {
 
       {activeSection === 'State Returns' && (
         <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>STATE TERMINAL — NCIC/DMV RETURNS</div>
+          <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>STATE TERMINAL • NCIC/DMV RETURNS</div>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
             <input
               value={searchQuery}
@@ -129,10 +129,10 @@ export default function MDT() {
         <div style={{ flex: 1, padding: '16px' }}>
           <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>ACTIVE ALERTS</div>
           <div style={{ background: '#1a0505', border: '1px solid #ef4444', borderRadius: '4px', padding: '12px', marginBottom: '10px', fontSize: '14px', color: '#fca5a5' }}>
-            ⚠️ BOLO — BLACK DODGE CHARGER, PLATE SUS-1109 — OWNER HAS ACTIVE WARRANT — DO NOT APPROACH WITHOUT BACKUP
+            ⚠️ BOLO • BLACK DODGE CHARGER, PLATE SUS-1109 • OWNER HAS ACTIVE WARRANT • DO NOT APPROACH WITHOUT BACKUP
           </div>
           <div style={{ background: '#1a1005', border: '1px solid #f59e0b', borderRadius: '4px', padding: '12px', fontSize: '14px', color: '#fcd34d' }}>
-            ⚠️ INCREASED ACTIVITY — RIVERSIDE DISTRICT — EXERCISE CAUTION
+            ⚠️ INCREASED ACTIVITY • RIVERSIDE DISTRICT • EXERCISE CAUTION
           </div>
         </div>
       )}
@@ -257,7 +257,7 @@ export function CivilianTerminal({ civ }) {
   return (
     <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
       <div style={{ color: '#e2a84b', borderBottom: '1px solid #2a3a50', paddingBottom: '8px', marginBottom: '12px', fontSize: '12px', letterSpacing: '1px' }}>
-        *** STATE OF FLORIDA — DEPARTMENT OF MOTOR VEHICLES — NCIC RETURN ***
+        *** STATE OF FLORIDA • DEPARTMENT OF MOTOR VEHICLES • NCIC RETURN ***
       </div>
       <TermRow label="NAME" value={`${civ.lastName}, ${civ.firstName}`} valueColor="#fff" />
       <TermRow label="DATE OF BIRTH" value={civ.dob} />
@@ -286,7 +286,7 @@ export function CivilianTerminal({ civ }) {
         </div>
       )}
       <div style={{ color: '#334155', fontSize: '11px', marginTop: '10px', borderTop: '1px solid #1e3060', paddingTop: '6px' }}>
-        RETURN GENERATED: {new Date().toLocaleString()} — ARCADIA STATE SYSTEMS
+        RETURN GENERATED: {new Date().toLocaleString()} • ARCADIA STATE SYSTEMS
       </div>
     </div>
   );
@@ -297,14 +297,14 @@ export function VehicleTerminal({ veh, civ }) {
   return (
     <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
       <div style={{ color: '#e2a84b', borderBottom: '1px solid #2a3a50', paddingBottom: '8px', marginBottom: '12px', fontSize: '12px', letterSpacing: '1px' }}>
-        *** STATE OF ARCADIA — VEHICLE REGISTRATION RETURN ***
+        *** STATE OF ARCADIA • VEHICLE REGISTRATION RETURN ***
       </div>
       <TermRow label="PLATE" value={veh.plate} valueColor="#fff" />
       <TermRow label="YEAR / MAKE / MODEL" value={`${veh.year} ${veh.make} ${veh.model}`} />
       <TermRow label="COLOR" value={veh.color} />
       <TermRow label="REGISTRATION" value={veh.regStatus} valueColor={veh.regStatus === 'VALID' ? '#22c55e' : '#ef4444'} />
       <TermRow label="REG EXPIRY" value={veh.regExpiry} />
-      <TermRow label="STOLEN" value={veh.stolen ? 'YES — BOLO' : 'NO'} valueColor={veh.stolen ? '#ef4444' : '#22c55e'} />
+      <TermRow label="STOLEN" value={veh.stolen ? 'YES • BOLO' : 'NO'} valueColor={veh.stolen ? '#ef4444' : '#22c55e'} />
       {civ && (
         <>
           <div style={{ margin: '8px 0', borderTop: '1px dashed #1e3060', paddingTop: '8px', color: '#4a9eff', fontSize: '12px', letterSpacing: '1px' }}>REGISTERED OWNER</div>

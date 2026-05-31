@@ -100,7 +100,7 @@ export default function LoginPage() {
             >
               <option value="">-- Select Officer --</option>
               {OFFICERS.map(o => (
-                <option key={o.id} value={o.id}>{o.name} ({o.badge}) — {o.deptShort}</option>
+                <option key={o.id} value={o.id}>{o.name} ({o.badge}) • {o.deptShort}</option>
               ))}
             </select>
           </div>
@@ -147,7 +147,7 @@ export default function LoginPage() {
               Sign in with Discord
             </button>
             <div style={{ color: '#2e4060', fontSize: '12px', textAlign: 'center', marginTop: '8px' }}>
-              Discord OAuth — connect your account
+              Discord OAuth • connect your account
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function LoginPage() {
           <span style={{ color: '#2e4a6a', fontSize: '12px' }}>Sunshine State Roleplay</span>
         </div>
         <span style={{ color: '#1e3050', fontSize: '12px' }}>
-          Computer Aided Dispatch — All rights reserved
+          Computer Aided Dispatch • All rights reserved
         </span>
       </div>
 

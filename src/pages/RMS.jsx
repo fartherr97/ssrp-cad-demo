@@ -225,7 +225,7 @@ export default function RMS() {
                 {penalCode.map(p => (
                   <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '3px 4px', cursor: 'pointer', color: arrestForm.charges.includes(p.name) ? '#4a9eff' : '#94a3b8', fontSize: '12px' }}>
                     <input type="checkbox" checked={arrestForm.charges.includes(p.name)} onChange={e => setA('charges', e.target.checked ? [...arrestForm.charges, p.name] : arrestForm.charges.filter(c => c !== p.name))} style={{ accentColor: '#4a9eff' }} />
-                    {p.code} — {p.name}
+                    {p.code} • {p.name}
                   </label>
                 ))}
               </div>
@@ -269,7 +269,7 @@ export default function RMS() {
             <FormField label="CHARGE">
               <select value={warrantForm.charge} onChange={e => setW('charge', e.target.value)} required style={base}>
                 <option value="">-- Select Charge --</option>
-                {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} — {p.name}</option>)}
+                {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} • {p.name}</option>)}
               </select>
             </FormField>
             <FormField label="NOTES">

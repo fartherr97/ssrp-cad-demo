@@ -18,7 +18,7 @@ export default function AdminPanel() {
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <span style={{ color: '#f59e0b', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>⚙ ADMIN PANEL</span>
-        <span style={{ color: '#475569', fontSize: '12px' }}>Restricted — Admin Access Only</span>
+        <span style={{ color: '#475569', fontSize: '12px' }}>Restricted • Admin Access Only</span>
       </div>
 
       {/* Stats row */}
@@ -149,7 +149,7 @@ export default function AdminPanel() {
                   <td style={{ padding: '7px 10px', color: '#e2e8f0' }}>{app.name}</td>
                   <td style={{ padding: '7px 10px', color: '#475569' }}>{app.appliedDate}</td>
                   <td style={{ padding: '7px 10px' }}><StatusBadge status={app.status} /></td>
-                  <td style={{ padding: '7px 10px', color: '#64748b', fontSize: '12px' }}>{app.notes || '—'}</td>
+                  <td style={{ padding: '7px 10px', color: '#64748b', fontSize: '12px' }}>{app.notes || '•'}</td>
                   <td style={{ padding: '7px 10px' }}>
                     {app.status === 'Pending' && (
                       <div style={{ display: 'flex', gap: '4px' }}>

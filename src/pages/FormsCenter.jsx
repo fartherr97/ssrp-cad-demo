@@ -60,7 +60,7 @@ export default function FormsCenter() {
                   <td style={{ padding: '9px 12px', color: '#94a3b8' }}>{r.officerBadge}</td>
                   <td style={{ padding: '9px 12px', color: '#64748b' }}>{r.date}</td>
                   <td style={{ padding: '9px 12px' }}><StatusBadge status={r.status} /></td>
-                  <td style={{ padding: '9px 12px', color: '#60a5fa' }}>{r.callId || '—'}</td>
+                  <td style={{ padding: '9px 12px', color: '#60a5fa' }}>{r.callId || '•'}</td>
                   <td style={{ padding: '9px 12px' }}>
                     <button onClick={() => setReviewReport(r)} style={smallBtn('#1e4080','#4a9eff')}>View</button>
                   </td>
@@ -117,12 +117,12 @@ export default function FormsCenter() {
 
       {/* Report detail modal */}
       {reviewReport && (
-        <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} — ${reviewReport.caseNumber}`}>
+        <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} • ${reviewReport.caseNumber}`}>
           <div style={{ fontSize: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <FieldRow label="Officer" value={reviewReport.officerBadge} />
             <FieldRow label="Date" value={reviewReport.date} />
             <FieldRow label="Status" value={<StatusBadge status={reviewReport.status} />} />
-            <FieldRow label="Call" value={reviewReport.callId || '—'} />
+            <FieldRow label="Call" value={reviewReport.callId || '•'} />
             <div style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', color: '#94a3b8', lineHeight: '1.7', fontSize: '16px' }}>
               {reviewReport.summary}
             </div>
@@ -140,7 +140,7 @@ export default function FormsCenter() {
 }
 
 /* ════════════════════════════════════════════════════
-   DOCUMENT FORM — renders like a real paper form
+   DOCUMENT FORM • renders like a real paper form
 ════════════════════════════════════════════════════ */
 function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, currentUser, civilians, officers }) {
   const { isMobile } = useResponsive();
@@ -210,12 +210,12 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
           <div style={{ borderTop: '2px solid #cbd5e1', padding: '20px 16px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px', background: '#f1f5f9' }}>
             <SigLine label="Submitting Officer Signature" />
             <SigLine label="Badge Number" value={currentUser?.badge} />
-            <SigLine label="Date / Time" value={`${today} — ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
+            <SigLine label="Date / Time" value={`${today} • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
           </div>
 
           {/* Footer */}
           <div style={{ background: '#0f2548', padding: '8px 28px', fontSize: '11px', color: '#4a6a8a', textAlign: 'center', letterSpacing: '1px' }}>
-            SUNSHINE STATE ROLEPLAY — COMPUTER AIDED DISPATCH — CONFIDENTIAL LAW ENFORCEMENT DOCUMENT
+            SUNSHINE STATE ROLEPLAY • COMPUTER AIDED DISPATCH • CONFIDENTIAL LAW ENFORCEMENT DOCUMENT
           </div>
         </div>
       </form>
@@ -303,22 +303,22 @@ function DocInput({ field, value, onChange, civilians, officers }) {
   if (field.type === 'dropdown')
     return (
       <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">— Select —</option>
+        <option value="">• Select •</option>
         {field.options?.map(o => <option key={o}>{o}</option>)}
       </select>
     );
   if (field.type === 'civilian_lookup')
     return (
       <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">— Select Civilian —</option>
+        <option value="">• Select Civilian •</option>
         {civilians.map(c => <option key={c.id}>{c.firstName} {c.lastName}</option>)}
       </select>
     );
   if (field.type === 'badge_lookup')
     return (
       <select value={value} onChange={e => onChange(e.target.value)} required={field.required} style={selectStyle}>
-        <option value="">— Select Officer —</option>
-        {officers.map(o => <option key={o.id}>{o.badge} — {o.name}</option>)}
+        <option value="">• Select Officer •</option>
+        {officers.map(o => <option key={o.id}>{o.badge} • {o.name}</option>)}
       </select>
     );
   return <input value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />;
@@ -435,7 +435,7 @@ function ReviewQueue({ reports, dispatch }) {
   const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
   return (
     <div style={{ marginTop: '18px' }}>
-      <div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '14px' }}>SUPERVISOR REVIEW QUEUE — {pending.length} pending</div>
+      <div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '14px' }}>SUPERVISOR REVIEW QUEUE • {pending.length} pending</div>
       {pending.length === 0 && <div style={{ color: '#334155', fontSize: '16px' }}>No reports pending review.</div>}
       {pending.map(r => (
         <div key={r.id} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', marginBottom: '10px' }}>
