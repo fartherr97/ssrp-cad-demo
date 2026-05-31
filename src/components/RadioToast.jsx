@@ -8,22 +8,27 @@ export default function RadioToast() {
   const { state } = useCAD();
   const { lastRadio, currentUser } = state;
   const [toast, setToast] = useState(null);
-  // Track the last broadcast we've reacted to via a ref so the effect only fires
-  // on genuinely new broadcasts (and never calls setState just to record it).
-  const seenIdRef = useRef(null);
+  // Guards which broadcast we've already surfaced, so the render-phase update
+  // below fires exactly once per new broadcast and never loops.
+  const handledRef = useRef(null);
 
   const isSender = currentUser?.role === 'dispatch';
   const radioId = lastRadio?.id ?? null;
 
-  useEffect(() => {
-    if (!radioId || radioId === seenIdRef.current) return;
-    seenIdRef.current = radioId;
-    if (isSender || !currentUser) return;
+  // Adjust state during render when a brand-new broadcast arrives (the
+  // documented React pattern for reacting to changing external state without an
+  // effect). The sender and logged-out viewers are never toasted.
+  if (radioId && radioId !== handledRef.current) {
+    handledRef.current = radioId;
+    if (!isSender && currentUser) setToast(lastRadio);
+  }
 
-    setToast(lastRadio);
+  // Auto-dismiss the visible toast after a few seconds.
+  useEffect(() => {
+    if (!toast) return undefined;
     const t = setTimeout(() => setToast(null), 6000);
     return () => clearTimeout(t);
-  }, [radioId, isSender, currentUser, lastRadio]);
+  }, [toast]);
 
   if (!toast) return null;
 
