@@ -44,11 +44,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Center */}
-        <div style={{ color: '#4a7aaa', fontSize: '13px', fontWeight: 500 }}>
-          Officer Sign In
-        </div>
-
         {/* Right: version tag */}
         <div style={{ color: '#2a4060', fontSize: '11px' }}>
           v2.4.1
@@ -71,10 +66,10 @@ export default function LoginPage() {
             alt="SSRP Logo"
             style={{ height: '80px', width: 'auto', margin: '0 auto 14px', display: 'block', filter: 'drop-shadow(0 0 20px rgba(74,158,255,0.35))' }}
           />
-          <div style={{ color: '#f1f5f9', fontSize: '26px', fontWeight: 800, letterSpacing: '3px' }}>
+          <div style={{ color: '#f1f5f9', fontSize: '26px', fontWeight: 700, letterSpacing: '2px' }}>
             SUNSHINE STATE ROLEPLAY
           </div>
-          <div style={{ color: '#4a7aaa', fontSize: '12px', letterSpacing: '3px', marginTop: '5px', textTransform: 'uppercase' }}>
+          <div style={{ color: '#4a7aaa', fontSize: '12px', letterSpacing: '2px', marginTop: '5px', textTransform: 'uppercase' }}>
             Computer Aided Dispatch
           </div>
         </div>
