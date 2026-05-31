@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCAD } from '../store/cadStore';
 
 // Pops a brief on-screen toast whenever a dispatcher broadcasts radio traffic.
@@ -8,19 +8,22 @@ export default function RadioToast() {
   const { state } = useCAD();
   const { lastRadio, currentUser } = state;
   const [toast, setToast] = useState(null);
-  const [lastId, setLastId] = useState(null);
+  // Track the last broadcast we've reacted to via a ref so the effect only fires
+  // on genuinely new broadcasts (and never calls setState just to record it).
+  const seenIdRef = useRef(null);
+
+  const isSender = currentUser?.role === 'dispatch';
+  const radioId = lastRadio?.id ?? null;
 
   useEffect(() => {
-    if (!lastRadio || lastRadio.id === lastId) return;
-    setLastId(lastRadio.id);
-    // Don't toast the sender (dispatchers broadcasting from the console).
-    if (currentUser?.role === 'dispatch') return;
-    if (!currentUser) return;
+    if (!radioId || radioId === seenIdRef.current) return;
+    seenIdRef.current = radioId;
+    if (isSender || !currentUser) return;
 
     setToast(lastRadio);
     const t = setTimeout(() => setToast(null), 6000);
     return () => clearTimeout(t);
-  }, [lastRadio, lastId, currentUser]);
+  }, [radioId, isSender, currentUser, lastRadio]);
 
   if (!toast) return null;
 
