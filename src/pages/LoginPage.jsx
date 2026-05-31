@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 
@@ -19,7 +19,7 @@ export default function LoginPage() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      fontFamily: 'Courier New, monospace',
+      fontFamily: 'Ubuntu Mono, monospace',
     }}>
       {/* Shield logo */}
       <div style={{ marginBottom: '24px', textAlign: 'center' }}>
@@ -46,7 +46,7 @@ export default function LoginPage() {
           <select
             value={selected}
             onChange={e => setSelected(e.target.value)}
-            style={{ width: '100%', background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px', fontSize: '13px', fontFamily: 'Courier New, monospace' }}
+            style={{ width: '100%', background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}
           >
             <option value="">-- Select Officer --</option>
             {OFFICERS.map(o => (
@@ -69,7 +69,7 @@ export default function LoginPage() {
             cursor: 'pointer',
             letterSpacing: '2px',
             marginBottom: '12px',
-            fontFamily: 'Courier New, monospace',
+            fontFamily: 'Ubuntu Mono, monospace',
             boxShadow: '0 0 15px rgba(74,158,255,0.2)',
           }}
         >
@@ -89,7 +89,7 @@ export default function LoginPage() {
               fontWeight: 600,
               cursor: 'pointer',
               letterSpacing: '1px',
-              fontFamily: 'Courier New, monospace',
+              fontFamily: 'Ubuntu Mono, monospace',
             }}
           >
             🎮 Sign in with Discord

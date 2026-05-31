@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -13,7 +13,7 @@ export default function AdminPanel() {
   const [accentColor, setAccentColor] = useState('#1a3a6b');
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <span style={{ color: '#f59e0b', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>⚙ ADMIN PANEL</span>
         <span style={{ color: '#475569', fontSize: '11px' }}>Restricted — Admin Access Only</span>
@@ -37,7 +37,7 @@ export default function AdminPanel() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
         {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #f59e0b' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#f59e0b' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+          <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #f59e0b' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#f59e0b' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             {t}
           </button>
         ))}
@@ -170,7 +170,7 @@ export default function AdminPanel() {
             {[['Community Name', communityName, setCommunityName], ['Logo URL', logoUrl, setLogoUrl]].map(([l, v, s]) => (
               <div key={l}>
                 <label style={{ color: '#94a3b8', fontSize: '11px', display: 'block', marginBottom: '4px' }}>{l.toUpperCase()}</label>
-                <input value={v} onChange={e => s(e.target.value)} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' }} />
+                <input value={v} onChange={e => s(e.target.value)} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' }} />
               </div>
             ))}
             <div>
@@ -180,7 +180,7 @@ export default function AdminPanel() {
                 <span style={{ color: '#94a3b8', fontSize: '12px' }}>{accentColor}</span>
               </div>
             </div>
-            <button style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '1px', marginTop: '8px' }}>
+            <button style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px', marginTop: '8px' }}>
               SAVE SETTINGS
             </button>
           </div>
@@ -190,4 +190,4 @@ export default function AdminPanel() {
   );
 }
 
-const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, borderRadius: '3px', color: c, padding: '4px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600 });
+const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, borderRadius: '3px', color: c, padding: '4px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });

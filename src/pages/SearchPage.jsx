@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { CivilianTerminal, VehicleTerminal } from './MDT';
@@ -34,7 +34,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', maxWidth: '1000px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '1000px' }}>
       <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '20px' }}>
         RECORDS SEARCH
       </div>
@@ -46,7 +46,7 @@ export default function SearchPage() {
             <button
               key={v}
               onClick={() => setSearchType(v)}
-              style={{ background: searchType === v ? '#1e4080' : 'transparent', border: `1px solid ${searchType === v ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: searchType === v ? '#4a9eff' : '#64748b', padding: '5px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}
+              style={{ background: searchType === v ? '#1e4080' : 'transparent', border: `1px solid ${searchType === v ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: searchType === v ? '#4a9eff' : '#64748b', padding: '5px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}
             >
               {l}
             </button>
@@ -58,9 +58,9 @@ export default function SearchPage() {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
             placeholder={searchType === 'name' ? 'Enter first or last name...' : searchType === 'plate' ? 'Enter plate number...' : 'Enter SSN...'}
-            style={{ flex: 1, background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '10px 12px', fontSize: '13px', fontFamily: 'Courier New, monospace' }}
+            style={{ flex: 1, background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '10px 12px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}
           />
-          <button onClick={handleSearch} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '1px' }}>
+          <button onClick={handleSearch} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>
             SEARCH
           </button>
         </div>

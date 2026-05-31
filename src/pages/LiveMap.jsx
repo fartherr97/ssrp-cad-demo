@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -35,7 +35,7 @@ export default function LiveMap() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>LIVE MAP — ARCADIA DISPATCH</div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px' }}>
@@ -234,7 +234,7 @@ export default function LiveMap() {
 
 function LayerToggle({ active, onClick, label, color }) {
   return (
-    <button onClick={onClick} style={{ background: active ? '#060d1a' : 'transparent', border: `1px solid ${active ? color : '#1e3060'}`, borderRadius: '4px', color: active ? color : '#475569', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', display: 'flex', alignItems: 'center', gap: '5px' }}>
+    <button onClick={onClick} style={{ background: active ? '#060d1a' : 'transparent', border: `1px solid ${active ? color : '#1e3060'}`, borderRadius: '4px', color: active ? color : '#475569', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', alignItems: 'center', gap: '5px' }}>
       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: active ? color : '#475569' }} />
       {label}
     </button>

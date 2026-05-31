@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -31,7 +31,7 @@ export default function DispatchBoard() {
   };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       {/* Status bar */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
         <span style={{ color: '#94a3b8', fontSize: '12px', marginRight: '4px' }}>MY STATUS:</span>
@@ -43,7 +43,7 @@ export default function DispatchBoard() {
               background: myOfficer?.status === s ? '#1e4080' : '#0d1f3c',
               border: `1px solid ${myOfficer?.status === s ? '#4a9eff' : '#1e3060'}`,
               borderRadius: '4px', color: myOfficer?.status === s ? '#4a9eff' : '#94a3b8',
-              padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600,
+              padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600,
             }}
           >
             {s}
@@ -52,7 +52,7 @@ export default function DispatchBoard() {
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
           {['ALL', 'ACTIVE', 'PENDING', 'ENRT'].map(f => (
             <button key={f} onClick={() => setStatusFilter(f)}
-              style={{ background: statusFilter === f ? '#1e4080' : '#0d1f3c', border: `1px solid ${statusFilter === f ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: statusFilter === f ? '#4a9eff' : '#64748b', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+              style={{ background: statusFilter === f ? '#1e4080' : '#0d1f3c', border: `1px solid ${statusFilter === f ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: statusFilter === f ? '#4a9eff' : '#64748b', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               {f}
             </button>
           ))}
@@ -179,7 +179,7 @@ function SectionHeader({ title, count }) {
 
 function ActionBtn({ label, color, onClick }) {
   return (
-    <button onClick={onClick} style={{ background: color, border: 'none', borderRadius: '3px', color: '#fff', padding: '3px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600 }}>
+    <button onClick={onClick} style={{ background: color, border: 'none', borderRadius: '3px', color: '#fff', padding: '3px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
       {label}
     </button>
   );

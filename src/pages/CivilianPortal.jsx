@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -43,21 +43,21 @@ export default function CivilianPortal() {
     setTab('form');
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
         <span style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>CIVILIAN PORTAL</span>
         {tab === 'list' && (
           <button onClick={() => { setTab('form'); setEditCiv(null); setCivForm(BLANK_CIV); }}
-            style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>
+            style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
             + New Character
           </button>
         )}
         {tab !== 'list' && (
           <button onClick={() => { setTab('list'); setEditCiv(null); }}
-            style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             ← Back to List
           </button>
         )}
@@ -171,7 +171,7 @@ export default function CivilianPortal() {
                 </select>
               </div>
             </div>
-            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px 24px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '2px' }}>
+            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px 24px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px' }}>
               {editCiv ? 'SAVE CHANGES' : 'CREATE CHARACTER'}
             </button>
           </div>
@@ -199,7 +199,7 @@ export default function CivilianPortal() {
                 </select>
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               ADD VEHICLE
             </button>
           </form>
@@ -217,4 +217,4 @@ function SectionLabel({ label }) {
   );
 }
 
-const sBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '5px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' });
+const sBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '5px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' });

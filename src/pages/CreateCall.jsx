@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 
 const NATURES = ['Traffic Stop','Domestic Disturbance','Suspicious Person','MVA','MVA w/ Injuries','Structure Fire','Medical Emergency','Robbery','Burglary','Assault','Shots Fired','Welfare Check','Noise Complaint','Foot Pursuit','Vehicle Pursuit','Drug Activity','Trespassing','Stolen Vehicle','Hit and Run'];
@@ -34,18 +34,18 @@ export default function CreateCall() {
 
   if (submitted) {
     return (
-      <div style={{ padding: '32px', fontFamily: 'Courier New, monospace', maxWidth: '600px' }}>
+      <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '600px' }}>
         <div style={{ background: '#051a05', border: '1px solid #22c55e', borderRadius: '6px', padding: '24px', textAlign: 'center' }}>
           <div style={{ fontSize: '36px', marginBottom: '12px' }}>✅</div>
           <div style={{ color: '#22c55e', fontSize: '18px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px' }}>CALL CREATED</div>
           <div style={{ color: '#86efac', fontSize: '14px', marginBottom: '20px' }}>Call {createdId} is now in the dispatch queue.</div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <button onClick={() => { setSubmitted(false); setForm({ nature: '', location: '', city: CITIES[0], county: COUNTIES[0], priority: '2', description: '', reportingParty: '' }); }}
-              style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Courier New, monospace' }}>
+              style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
               + Create Another
             </button>
             <button onClick={() => dispatch({ type: 'SET_PAGE', payload: 'dispatch' })}
-              style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#94a3b8', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Courier New, monospace' }}>
+              style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#94a3b8', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
               View Dispatch Board
             </button>
           </div>
@@ -55,7 +55,7 @@ export default function CreateCall() {
   }
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', maxWidth: '700px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '700px' }}>
       <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '20px' }}>CREATE NEW CALL</div>
       <form onSubmit={handleSubmit}>
         <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -74,7 +74,7 @@ export default function CreateCall() {
                     key={p} type="button"
                     onClick={() => set('priority', String(p))}
                     style={{
-                      flex: 1, padding: '8px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700,
+                      flex: 1, padding: '8px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700,
                       background: form.priority === String(p) ? (p === 1 ? '#7f1d1d' : p === 2 ? '#78350f' : '#14532d') : '#060d1a',
                       border: `1px solid ${form.priority === String(p) ? (p === 1 ? '#ef4444' : p === 2 ? '#f59e0b' : '#22c55e') : '#1e3060'}`,
                       color: form.priority === String(p) ? '#fff' : '#64748b',
@@ -126,7 +126,7 @@ export default function CreateCall() {
             </div>
           </div>
 
-          <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '2px' }}>
+          <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px' }}>
             📞 CREATE CALL
           </button>
         </div>
@@ -135,7 +135,7 @@ export default function CreateCall() {
   );
 }
 
-const inputStyle = { width: '100%', background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '13px', fontFamily: 'Courier New, monospace', boxSizing: 'border-box' };
+const inputStyle = { width: '100%', background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
 const selectStyle = { ...inputStyle };
 
 function Field({ label, children }) {

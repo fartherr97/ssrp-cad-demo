@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -69,16 +69,16 @@ export default function RMS() {
     setTowForm({ plate: '', make: '', model: '', reason: '', location: '' });
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>RECORDS MANAGEMENT SYSTEM</div>
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
         {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+          <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0d2545' : 'transparent', border: tab === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === t ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             {t}
           </button>
         ))}
@@ -89,7 +89,7 @@ export default function RMS() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ color: '#94a3b8', fontSize: '12px' }}>{criminalHistory.length} records</span>
-            <button onClick={() => setShowAddArrest(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>+ Add Arrest Record</button>
+            <button onClick={() => setShowAddArrest(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Add Arrest Record</button>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
             <thead>
@@ -125,7 +125,7 @@ export default function RMS() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ color: '#94a3b8', fontSize: '12px' }}>{warrants.filter(w => w.status === 'ACTIVE').length} active warrants</span>
-            <button onClick={() => setShowAddWarrant(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>+ Issue Warrant</button>
+            <button onClick={() => setShowAddWarrant(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Issue Warrant</button>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
             <thead>
@@ -146,7 +146,7 @@ export default function RMS() {
                   <td style={{ padding: '7px 10px' }}><StatusBadge status={w.status} /></td>
                   <td style={{ padding: '7px 10px' }}>
                     {w.status === 'ACTIVE' && (
-                      <button onClick={() => dispatch({ type: 'SERVE_WARRANT', payload: w.id })} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '3px', color: '#22c55e', padding: '3px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Mark Served</button>
+                      <button onClick={() => dispatch({ type: 'SERVE_WARRANT', payload: w.id })} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '3px', color: '#22c55e', padding: '3px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Mark Served</button>
                     )}
                   </td>
                 </tr>
@@ -161,7 +161,7 @@ export default function RMS() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ color: '#94a3b8', fontSize: '12px' }}>{towLogs.length} records</span>
-            <button onClick={() => setShowAddTow(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>+ Log Tow</button>
+            <button onClick={() => setShowAddTow(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>+ Log Tow</button>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
             <thead>
@@ -244,7 +244,7 @@ export default function RMS() {
             <FormField label="NOTES">
               <textarea value={arrestForm.notes} onChange={e => setA('notes', e.target.value)} rows={3} style={{ ...base, resize: 'vertical' }} />
             </FormField>
-            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               SUBMIT ARREST RECORD
             </button>
           </form>
@@ -275,7 +275,7 @@ export default function RMS() {
             <FormField label="NOTES">
               <textarea value={warrantForm.notes} onChange={e => setW('notes', e.target.value)} rows={3} style={{ ...base, resize: 'vertical' }} />
             </FormField>
-            <button type="submit" style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               ISSUE WARRANT
             </button>
           </form>
@@ -291,7 +291,7 @@ export default function RMS() {
                 <input value={towForm[k]} onChange={e => setT(k, e.target.value)} placeholder={ph} required={l.includes('*')} style={base} />
               </FormField>
             ))}
-            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               LOG TOW
             </button>
           </form>
@@ -313,7 +313,7 @@ function FormField({ label, children }) {
 function Modal({ title, onClose, children }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%', maxHeight: '80vh', overflowY: 'auto', fontFamily: 'Courier New, monospace' }}>
+      <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%', maxHeight: '80vh', overflowY: 'auto', fontFamily: 'Ubuntu Mono, monospace' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '13px', letterSpacing: '1px' }}>{title}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>

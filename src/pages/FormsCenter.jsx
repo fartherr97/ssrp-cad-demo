@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -33,7 +33,7 @@ export default function FormsCenter() {
   };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>REPORT CENTER</div>
 
       <TabBar tabs={tabs} active={activeTab} setActive={(t) => { setActiveTab(t); setSelectedTemplate(null); }} />
@@ -101,7 +101,7 @@ export default function FormsCenter() {
                 {selectedTemplate.fields.map(field => (
                   <ReportField key={field.id} field={field} value={formValues[field.label] || ''} onChange={v => setFormValues(fv => ({ ...fv, [field.label]: v }))} civilians={civilians} officers={officers} />
                 ))}
-                <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '2px', marginTop: '8px' }}>
+                <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px', marginTop: '8px' }}>
                   SUBMIT REPORT
                 </button>
               </div>
@@ -143,7 +143,7 @@ export default function FormsCenter() {
 }
 
 function ReportField({ field, value, onChange, civilians, officers }) {
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
   return (
     <div>
       <label style={{ color: '#94a3b8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>
@@ -219,7 +219,7 @@ function TemplateBuilder({ reportTemplates, dispatch, editTemplate, setEditTempl
     setEditTemplate(null);
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' };
 
   return (
     <div style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -275,7 +275,7 @@ function TemplateBuilder({ reportTemplates, dispatch, editTemplate, setEditTempl
               <button onClick={addField} style={{ ...smallBtn('#1e4080','#4a9eff'), padding: '6px 14px', marginLeft: 'auto' }}>+ Add Field</button>
             </div>
           </div>
-          <button onClick={handleSave} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace', letterSpacing: '1px' }}>
+          <button onClick={handleSave} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>
             SAVE TEMPLATE
           </button>
         </div>
@@ -316,7 +316,7 @@ function TabBar({ tabs, active, setActive }) {
   return (
     <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', paddingBottom: '0' }}>
       {tabs.map(t => (
-        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0d2545' : 'transparent', border: active === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: active === t ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0d2545' : 'transparent', border: active === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: active === t ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
           {labels[t] || t}
         </button>
       ))}
@@ -347,7 +347,7 @@ function Modal({ title, onClose, children }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '540px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Courier New, monospace' }}>{title}</span>
+          <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>{title}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
         </div>
         {children}
@@ -356,4 +356,4 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-const smallBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600 });
+const smallBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });

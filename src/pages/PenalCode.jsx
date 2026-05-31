@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -47,30 +47,30 @@ export default function PenalCode() {
     setForm({ category: '', code: '', name: '', type: 'Misdemeanor', fine: 0, jailTime: '', points: 0 });
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <span style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>⚖ PENAL CODE EDITOR</span>
         <span style={{ color: '#475569', fontSize: '12px' }}>{penalCode.length} charges defined</span>
         <button onClick={() => { setShowForm(true); setEditCharge(null); setForm({ category: '', code: '', name: '', type: 'Misdemeanor', fine: 0, jailTime: '', points: 0 }); }}
-          style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700, marginLeft: 'auto' }}>
+          style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700, marginLeft: 'auto' }}>
           + Add Charge
         </button>
       </div>
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search charges..." style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '6px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '200px' }} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search charges..." style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '6px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '200px' }} />
         <div style={{ display: 'flex', gap: '4px' }}>
           {['ALL','Felony','Misdemeanor','Infraction'].map(t => (
-            <button key={t} onClick={() => setFilterType(t)} style={{ background: filterType === t ? '#1e4080' : 'transparent', border: `1px solid ${filterType === t ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: filterType === t ? '#4a9eff' : '#64748b', padding: '5px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button key={t} onClick={() => setFilterType(t)} style={{ background: filterType === t ? '#1e4080' : 'transparent', border: `1px solid ${filterType === t ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: filterType === t ? '#4a9eff' : '#64748b', padding: '5px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               {t}
             </button>
           ))}
         </div>
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '6px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace' }}>
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '6px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
@@ -123,7 +123,7 @@ export default function PenalCode() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <form onSubmit={handleSave} style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Courier New, monospace' }}>{editCharge ? 'EDIT CHARGE' : 'ADD CHARGE'}</span>
+              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>{editCharge ? 'EDIT CHARGE' : 'ADD CHARGE'}</span>
               <button type="button" onClick={() => { setShowForm(false); setEditCharge(null); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -148,7 +148,7 @@ export default function PenalCode() {
                 <input type="number" value={form.points} onChange={e => setForm(f => ({ ...f, points: e.target.value }))} min={0} max={10} style={base} />
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               {editCharge ? 'SAVE CHANGES' : 'ADD CHARGE'}
             </button>
           </form>
@@ -158,4 +158,4 @@ export default function PenalCode() {
   );
 }
 
-const btn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, borderRadius: '3px', color: c, padding: '4px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600 });
+const btn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, borderRadius: '3px', color: c, padding: '4px 8px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });

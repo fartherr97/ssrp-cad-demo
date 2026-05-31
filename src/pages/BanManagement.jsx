@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -15,13 +15,13 @@ export default function BanManagement() {
     setForm({ name: '', discordId: '', reason: '', duration: 'Permanent' });
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
         <span style={{ color: '#ef4444', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>🔨 BAN MANAGEMENT</span>
-        <button onClick={() => setShowForm(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>
+        <button onClick={() => setShowForm(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
           + Issue Ban
         </button>
       </div>
@@ -63,7 +63,7 @@ export default function BanManagement() {
               <td style={{ padding: '7px 10px' }}><StatusBadge status={ban.status} /></td>
               <td style={{ padding: '7px 10px' }}>
                 {ban.status === 'Active' && (
-                  <button onClick={() => dispatch({ type: 'UNBAN_USER', payload: ban.id })} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '3px', color: '#22c55e', padding: '4px 10px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace', fontWeight: 600 }}>
+                  <button onClick={() => dispatch({ type: 'UNBAN_USER', payload: ban.id })} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '3px', color: '#22c55e', padding: '4px 10px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
                     Unban
                   </button>
                 )}
@@ -81,7 +81,7 @@ export default function BanManagement() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <form onSubmit={handleBan} style={{ background: '#0d1f3c', border: '1px solid #ef4444', borderRadius: '8px', padding: '24px', maxWidth: '480px', width: '90%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '14px', fontFamily: 'Courier New, monospace' }}>🔨 ISSUE BAN</span>
+              <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>🔨 ISSUE BAN</span>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -101,7 +101,7 @@ export default function BanManagement() {
                   {['1 Day','3 Days','7 Days','14 Days','30 Days','90 Days','Permanent'].map(d => <option key={d}>{d}</option>)}
                 </select>
               </div>
-              <button type="submit" style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+              <button type="submit" style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
                 CONFIRM BAN
               </button>
             </div>

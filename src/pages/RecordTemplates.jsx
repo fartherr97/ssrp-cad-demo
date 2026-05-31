@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 
 export default function RecordTemplates() {
@@ -11,7 +11,7 @@ export default function RecordTemplates() {
   const [fillMode, setFillMode] = useState(null);
   const [fillValues, setFillValues] = useState({});
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   const addField = () => {
     if (!newField.label) return;
@@ -47,12 +47,12 @@ export default function RecordTemplates() {
   };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', display: 'flex', gap: '16px', minHeight: 'calc(100vh - 80px)' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', gap: '16px', minHeight: 'calc(100vh - 80px)' }}>
       {/* Type list */}
       <div style={{ width: '220px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <span style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700 }}>RECORD TYPES</span>
-          <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>+ New</button>
+          <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ New</button>
         </div>
         {customRecordTypes.map(type => (
           <div key={type.id} onClick={() => { setSelected(type); setFillMode(null); }}
@@ -69,8 +69,8 @@ export default function RecordTemplates() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ color: '#4a9eff', fontSize: '15px', fontWeight: 700 }}>📁 {selected.name}</span>
-              <button onClick={() => { setTpl({ ...selected, fields: [...selected.fields] }); setShowForm(true); }} style={{ background: 'transparent', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Edit Template</button>
-              <button onClick={() => setFillMode(selected)} style={{ background: '#1e4080', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>+ New Record</button>
+              <button onClick={() => { setTpl({ ...selected, fields: [...selected.fields] }); setShowForm(true); }} style={{ background: 'transparent', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Edit Template</button>
+              <button onClick={() => setFillMode(selected)} style={{ background: '#1e4080', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ New Record</button>
             </div>
 
             {/* Field definitions */}
@@ -146,8 +146,8 @@ export default function RecordTemplates() {
                   })}
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                  <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '10px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>SAVE RECORD</button>
-                  <button onClick={() => setFillMode(null)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '10px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Cancel</button>
+                  <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '10px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>SAVE RECORD</button>
+                  <button onClick={() => setFillMode(null)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '10px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Cancel</button>
                 </div>
               </div>
             )}
@@ -164,7 +164,7 @@ export default function RecordTemplates() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <form onSubmit={handleSave} style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '560px', width: '90%', maxHeight: '85vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Courier New, monospace' }}>{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
+              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
             </div>
             <div style={{ marginBottom: '14px' }}>
@@ -201,11 +201,11 @@ export default function RecordTemplates() {
                   <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} style={{ accentColor: '#4a9eff' }} />
                   Required
                 </label>
-                <button type="button" onClick={addField} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '5px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace', marginLeft: 'auto' }}>+ Add</button>
+                <button type="button" onClick={addField} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '5px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', marginLeft: 'auto' }}>+ Add</button>
               </div>
             </div>
 
-            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               SAVE RECORD TYPE
             </button>
           </form>
@@ -215,4 +215,4 @@ export default function RecordTemplates() {
   );
 }
 
-const sBtn = () => ({ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '3px', color: '#64748b', padding: '2px 6px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Courier New, monospace' });
+const sBtn = () => ({ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '3px', color: '#64748b', padding: '2px 6px', fontSize: '10px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' });

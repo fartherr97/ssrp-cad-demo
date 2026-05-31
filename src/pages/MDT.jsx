@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -32,7 +32,7 @@ export default function MDT() {
   };
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 48px)', fontFamily: 'Courier New, monospace' }}>
+    <div style={{ display: 'flex', height: 'calc(100vh - 48px)', fontFamily: 'Ubuntu Mono, monospace' }}>
       {/* Sidebar */}
       <div style={{ width: '180px', background: '#060d1a', borderRight: '1px solid #1e4080', display: 'flex', flexDirection: 'column' }}>
         {/* My status */}
@@ -54,7 +54,7 @@ export default function MDT() {
               textAlign: 'left',
               cursor: 'pointer',
               fontSize: '12px',
-              fontFamily: 'Courier New, monospace',
+              fontFamily: 'Ubuntu Mono, monospace',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -128,9 +128,9 @@ export default function MDT() {
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && runReturn()}
                 placeholder="Enter name, SSN, or plate..."
-                style={{ flex: 1, background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 12px', fontSize: '13px', fontFamily: 'Courier New, monospace' }}
+                style={{ flex: 1, background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 12px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}
               />
-              <button onClick={runReturn} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 16px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Courier New, monospace', fontWeight: 700 }}>
+              <button onClick={runReturn} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 16px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
                 RUN RETURN
               </button>
             </div>
@@ -140,7 +140,7 @@ export default function MDT() {
                 {returnResult.civ ? (
                   <CivilianTerminal civ={returnResult.civ} />
                 ) : returnResult.veh ? null : (
-                  <div style={{ color: '#ef4444', fontFamily: 'Courier New, monospace', fontSize: '13px' }}>*** NO RECORDS FOUND FOR QUERY ***</div>
+                  <div style={{ color: '#ef4444', fontFamily: 'Ubuntu Mono, monospace', fontSize: '13px' }}>*** NO RECORDS FOUND FOR QUERY ***</div>
                 )}
                 {returnResult.veh && (
                   <VehicleTerminal veh={returnResult.veh} civ={civilians.find(c => c.id === returnResult.veh.ownerId)} />
@@ -202,7 +202,7 @@ function TermRow({ label, value, valueColor }) {
 export function CivilianTerminal({ civ }) {
   if (!civ) return null;
   return (
-    <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Courier New, monospace', marginBottom: '16px' }}>
+    <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
       <div style={{ color: '#4a9eff', borderBottom: '1px solid #1e3060', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '2px' }}>
         *** STATE OF ARCADIA — DEPARTMENT OF MOTOR VEHICLES — NCIC RETURN ***
       </div>
@@ -242,7 +242,7 @@ export function CivilianTerminal({ civ }) {
 export function VehicleTerminal({ veh, civ }) {
   if (!veh) return null;
   return (
-    <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Courier New, monospace', marginBottom: '16px' }}>
+    <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
       <div style={{ color: '#4a9eff', borderBottom: '1px solid #1e3060', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '2px' }}>
         *** STATE OF ARCADIA — VEHICLE REGISTRATION RETURN ***
       </div>

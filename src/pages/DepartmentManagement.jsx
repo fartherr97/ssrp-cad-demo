@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RANKS } from '../data/mockData';
 import StatusBadge from '../components/StatusBadge';
@@ -15,7 +15,7 @@ export default function DepartmentManagement() {
   const [subName, setSubName] = useState('');
 
   const deptOfficers = officers.filter(o => o.dept === selectedDept?.id);
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box' };
+  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
 
   const handleAddDept = (e) => {
     e.preventDefault();
@@ -35,12 +35,12 @@ export default function DepartmentManagement() {
   };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', display: 'flex', gap: '16px', minHeight: 'calc(100vh - 80px)' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', gap: '16px', minHeight: 'calc(100vh - 80px)' }}>
       {/* Department list */}
       <div style={{ width: '260px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <span style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>DEPARTMENTS</span>
-          <button onClick={() => setShowForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>+ New</button>
+          <button onClick={() => setShowForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ New</button>
         </div>
         {departments.map(dept => (
           <div
@@ -93,7 +93,7 @@ export default function DepartmentManagement() {
             <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <span style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>SUBDIVISIONS</span>
-                <button onClick={() => setShowSubForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>+ Add</button>
+                <button onClick={() => setShowSubForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ Add</button>
               </div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {(selectedDept.subdivisions || []).map(sub => (
@@ -111,8 +111,8 @@ export default function DepartmentManagement() {
               {showSubForm && (
                 <form onSubmit={handleAddSub} style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                   <input value={subName} onChange={e => setSubName(e.target.value)} placeholder="Subdivision name..." required style={{ ...base, flex: 1 }} />
-                  <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '7px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Add</button>
-                  <button type="button" onClick={() => setShowSubForm(false)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '7px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Cancel</button>
+                  <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '7px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Add</button>
+                  <button type="button" onClick={() => setShowSubForm(false)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '7px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Cancel</button>
                 </form>
               )}
             </div>
@@ -165,7 +165,7 @@ export default function DepartmentManagement() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <form onSubmit={handleAddDept} style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '24px', maxWidth: '500px', width: '90%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Courier New, monospace' }}>CREATE DEPARTMENT</span>
+              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>CREATE DEPARTMENT</span>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -186,7 +186,7 @@ export default function DepartmentManagement() {
                 <input type="color" value={deptForm.color} onChange={e => setDeptForm(f => ({ ...f, color: e.target.value }))} style={{ ...base, height: '38px', padding: '4px' }} />
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+            <button type="submit" style={{ width: '100%', background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
               CREATE DEPARTMENT
             </button>
           </form>

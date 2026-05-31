@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
@@ -14,7 +14,7 @@ export default function OfficerProfile() {
   const [transferNote, setTransferNote] = useState('');
 
   if (!myOfficer) return (
-    <div style={{ padding: '32px', fontFamily: 'Courier New, monospace', color: '#334155', textAlign: 'center' }}>
+    <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', color: '#334155', textAlign: 'center' }}>
       No officer profile found for current session.
     </div>
   );
@@ -26,7 +26,7 @@ export default function OfficerProfile() {
   const complaints = [];
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Courier New, monospace', maxWidth: '900px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '900px' }}>
       {/* Profile header */}
       <div style={{ background: `linear-gradient(135deg, #0d1f3c, ${myDept?.color || '#1e4080'}20)`, border: `1px solid ${myDept?.color || '#1e4080'}`, borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -65,7 +65,7 @@ export default function OfficerProfile() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
         {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0d2545' : 'transparent', border: tab === k ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === k ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0d2545' : 'transparent', border: tab === k ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === k ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
             {l}
           </button>
         ))}
@@ -82,20 +82,20 @@ export default function OfficerProfile() {
             {!requestingTransfer ? (
               <div>
                 <div style={{ color: '#64748b', fontSize: '12px', marginBottom: '12px' }}>Current subdivision: <span style={{ color: '#94a3b8' }}>{myOfficer.subdivision}</span></div>
-                <button onClick={() => setRequestingTransfer(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>
+                <button onClick={() => setRequestingTransfer(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
                   Request Transfer
                 </button>
               </div>
             ) : (
               <div>
                 <div style={{ color: '#94a3b8', fontSize: '11px', marginBottom: '8px' }}>REQUESTED SUBDIVISION</div>
-                <select style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box', marginBottom: '8px' }}>
+                <select style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box', marginBottom: '8px' }}>
                   {(myDept?.subdivisions || []).map(s => <option key={s}>{s}</option>)}
                 </select>
-                <textarea value={transferNote} onChange={e => setTransferNote(e.target.value)} placeholder="Reason for transfer request..." rows={3} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Courier New, monospace', width: '100%', boxSizing: 'border-box', resize: 'vertical', marginBottom: '8px' }} />
+                <textarea value={transferNote} onChange={e => setTransferNote(e.target.value)} placeholder="Reason for transfer request..." rows={3} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box', resize: 'vertical', marginBottom: '8px' }} />
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => { alert('Transfer request submitted!'); setRequestingTransfer(false); }} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '7px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Submit</button>
-                  <button onClick={() => setRequestingTransfer(false)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '7px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Courier New, monospace' }}>Cancel</button>
+                  <button onClick={() => { alert('Transfer request submitted!'); setRequestingTransfer(false); }} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '7px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Submit</button>
+                  <button onClick={() => setRequestingTransfer(false)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '7px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Cancel</button>
                 </div>
               </div>
             )}
