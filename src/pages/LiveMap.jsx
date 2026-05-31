@@ -37,7 +37,7 @@ export default function LiveMap() {
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>LIVE MAP — ARCADIA DISPATCH</div>
+        <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>LIVE MAP — ARCADIA DISPATCH</div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px' }}>
           <LayerToggle active={showUnits} onClick={() => setShowUnits(v => !v)} label="Units" color="#22c55e" />
           <LayerToggle active={showCalls} onClick={() => setShowCalls(v => !v)} label="Calls" color="#ef4444" />

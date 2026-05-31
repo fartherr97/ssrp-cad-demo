@@ -34,7 +34,7 @@ export default function FormsCenter() {
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
-      <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>REPORT CENTER</div>
+      <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>REPORT CENTER</div>
 
       <TabBar tabs={tabs} active={activeTab} setActive={(t) => { setActiveTab(t); setSelectedTemplate(null); }} />
 
@@ -50,7 +50,7 @@ export default function FormsCenter() {
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Case #','Type','Officer','Date','Status','Call','Actions'].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -146,7 +146,7 @@ function ReportField({ field, value, onChange, civilians, officers }) {
   const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
   return (
     <div>
-      <label style={{ color: '#94a3b8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>
+      <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>
         {field.label.toUpperCase()} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
       </label>
       {field.type === 'textarea' && <textarea value={value} onChange={e => onChange(e.target.value)} rows={3} required={field.required} style={{ ...base, resize: 'vertical' }} />}
@@ -224,7 +224,7 @@ function TemplateBuilder({ reportTemplates, dispatch, editTemplate, setEditTempl
   return (
     <div style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
       <div>
-        <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>EXISTING TEMPLATES</div>
+        <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>EXISTING TEMPLATES</div>
         {reportTemplates.map(t => (
           <div key={t.id} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '10px 12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
             <div>
@@ -236,7 +236,7 @@ function TemplateBuilder({ reportTemplates, dispatch, editTemplate, setEditTempl
         ))}
       </div>
       <div>
-        <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
+        <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
         <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div>
             <label style={{ color: '#94a3b8', fontSize: '11px', display: 'block', marginBottom: '4px' }}>TEMPLATE NAME</label>

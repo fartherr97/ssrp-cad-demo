@@ -68,7 +68,7 @@ export default function RecordTemplates() {
         {selected && !showForm && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{ color: '#4a9eff', fontSize: '15px', fontWeight: 700 }}>📁 {selected.name}</span>
+              <span style={{ color: '#f1f5f9', fontSize: '15px', fontWeight: 700 }}>📁 {selected.name}</span>
               <button onClick={() => { setTpl({ ...selected, fields: [...selected.fields] }); setShowForm(true); }} style={{ background: 'transparent', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Edit Template</button>
               <button onClick={() => setFillMode(selected)} style={{ background: '#1e4080', border: '1px solid #22c55e', borderRadius: '4px', color: '#22c55e', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ New Record</button>
             </div>
@@ -80,7 +80,7 @@ export default function RecordTemplates() {
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
                     {['#','Label','Type','Required'].map(h => (
-                      <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                      <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>

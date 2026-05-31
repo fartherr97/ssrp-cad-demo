@@ -56,7 +56,7 @@ export default function CreateCall() {
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '700px' }}>
-      <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '20px' }}>CREATE NEW CALL</div>
+      <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px', marginBottom: '20px' }}>CREATE NEW CALL</div>
       <form onSubmit={handleSubmit}>
         <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
@@ -141,7 +141,7 @@ const selectStyle = { ...inputStyle };
 function Field({ label, children }) {
   return (
     <div>
-      <label style={{ color: '#94a3b8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>{label}</label>
+      <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>{label}</label>
       {children}
     </div>
   );

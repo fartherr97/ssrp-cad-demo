@@ -48,7 +48,7 @@ export default function CivilianPortal() {
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-        <span style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>CIVILIAN PORTAL</span>
+        <span style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>CIVILIAN PORTAL</span>
         {tab === 'list' && (
           <button onClick={() => { setTab('form'); setEditCiv(null); setCivForm(BLANK_CIV); }}
             style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
@@ -123,7 +123,7 @@ export default function CivilianPortal() {
       {tab === 'form' && (
         <form onSubmit={handleSaveCiv}>
           <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '20px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>
+            <div style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>
               {editCiv ? 'EDIT CHARACTER' : 'CREATE CHARACTER'}
             </div>
             <SectionLabel label="PERSONAL INFORMATION" />

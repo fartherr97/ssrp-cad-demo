@@ -52,7 +52,7 @@ export default function PenalCode() {
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
-        <span style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>⚖ PENAL CODE EDITOR</span>
+        <span style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>⚖ PENAL CODE EDITOR</span>
         <span style={{ color: '#475569', fontSize: '12px' }}>{penalCode.length} charges defined</span>
         <button onClick={() => { setShowForm(true); setEditCharge(null); setForm({ category: '', code: '', name: '', type: 'Misdemeanor', fine: 0, jailTime: '', points: 0 }); }}
           style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '6px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700, marginLeft: 'auto' }}>
@@ -78,7 +78,7 @@ export default function PenalCode() {
       {/* Grouped charges */}
       {Object.entries(grouped).map(([cat, charges]) => (
         <div key={cat} style={{ marginBottom: '20px' }}>
-          <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px', borderBottom: '1px solid #1e3060', paddingBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '8px', borderBottom: '1px solid #1e3060', paddingBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             {cat}
             <span style={{ background: '#1e4080', color: '#4a9eff', borderRadius: '4px', padding: '1px 6px', fontSize: '10px' }}>{charges.length}</span>
           </div>
@@ -86,7 +86,7 @@ export default function PenalCode() {
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Code','Name','Type','Fine','Jail Time','Points','Actions'].map(h => (
-                  <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                  <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                 ))}
               </tr>
             </thead>

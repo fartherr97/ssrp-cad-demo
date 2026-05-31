@@ -74,7 +74,7 @@ export default function MDT() {
           <>
             {/* Message list */}
             <div style={{ width: '280px', borderRight: '1px solid #1e4080', overflow: 'auto' }}>
-              <div style={{ padding: '10px 12px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>
+              <div style={{ padding: '10px 12px', background: '#0a1a35', borderBottom: '1px solid #1e3060', color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>
                 INBOX ({messages.length})
               </div>
               {messages.map(msg => (
@@ -121,7 +121,7 @@ export default function MDT() {
 
         {activeSection === 'State Returns' && (
           <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-            <div style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>STATE TERMINAL — NCIC/DMV RETURNS</div>
+            <div style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>STATE TERMINAL — NCIC/DMV RETURNS</div>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
               <input
                 value={searchQuery}
@@ -152,7 +152,7 @@ export default function MDT() {
 
         {activeSection === 'Alerts' && (
           <div style={{ flex: 1, padding: '16px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>ACTIVE ALERTS</div>
+            <div style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>ACTIVE ALERTS</div>
             <div style={{ background: '#1a0505', border: '1px solid #ef4444', borderRadius: '4px', padding: '12px', marginBottom: '10px', fontSize: '12px', color: '#fca5a5' }}>
               ⚠️ BOLO — BLACK DODGE CHARGER, PLATE SUS-1109 — OWNER HAS ACTIVE WARRANT — DO NOT APPROACH WITHOUT BACKUP
             </div>
@@ -164,7 +164,7 @@ export default function MDT() {
 
         {activeSection === 'History' && (
           <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
-            <div style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>RETURN HISTORY</div>
+            <div style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>RETURN HISTORY</div>
             {[
               { time: '14:18', query: 'Plate: SUS-1109', result: 'OWNER WANTED' },
               { time: '14:02', query: 'Name: Darnell Washington', result: 'ACTIVE WARRANT' },
@@ -181,7 +181,7 @@ export default function MDT() {
 
         {activeSection === 'Saved' && (
           <div style={{ flex: 1, padding: '16px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>SAVED RETURNS</div>
+            <div style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>SAVED RETURNS</div>
             <div style={{ color: '#334155', textAlign: 'center', marginTop: '60px', fontSize: '13px' }}>No saved returns.</div>
           </div>
         )}
@@ -203,7 +203,7 @@ export function CivilianTerminal({ civ }) {
   if (!civ) return null;
   return (
     <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
-      <div style={{ color: '#4a9eff', borderBottom: '1px solid #1e3060', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '2px' }}>
+      <div style={{ color: '#e2a84b', borderBottom: '1px solid #2a3a50', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '1px' }}>
         *** STATE OF ARCADIA — DEPARTMENT OF MOTOR VEHICLES — NCIC RETURN ***
       </div>
       <TermRow label="NAME" value={`${civ.lastName}, ${civ.firstName}`} valueColor="#fff" />
@@ -243,7 +243,7 @@ export function VehicleTerminal({ veh, civ }) {
   if (!veh) return null;
   return (
     <div style={{ background: '#040a10', border: '1px solid #1e4080', borderRadius: '4px', padding: '16px', fontFamily: 'Ubuntu Mono, monospace', marginBottom: '16px' }}>
-      <div style={{ color: '#4a9eff', borderBottom: '1px solid #1e3060', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '2px' }}>
+      <div style={{ color: '#e2a84b', borderBottom: '1px solid #2a3a50', paddingBottom: '8px', marginBottom: '12px', fontSize: '11px', letterSpacing: '1px' }}>
         *** STATE OF ARCADIA — VEHICLE REGISTRATION RETURN ***
       </div>
       <TermRow label="PLATE" value={veh.plate} valueColor="#fff" />

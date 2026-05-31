@@ -166,7 +166,7 @@ export default function AdminPanel() {
       {tab === 'Settings' && (
         <div style={{ maxWidth: '500px' }}>
           <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '4px' }}>COMMUNITY SETTINGS</div>
+            <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '4px' }}>COMMUNITY SETTINGS</div>
             {[['Community Name', communityName, setCommunityName], ['Logo URL', logoUrl, setLogoUrl]].map(([l, v, s]) => (
               <div key={l}>
                 <label style={{ color: '#94a3b8', fontSize: '11px', display: 'block', marginBottom: '4px' }}>{l.toUpperCase()}</label>

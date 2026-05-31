@@ -170,7 +170,7 @@ export default function DispatchBoard() {
 function SectionHeader({ title, count }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-      <span style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '2px' }}>{title}</span>
+      <span style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>{title}</span>
       <span style={{ background: '#1e4080', color: '#4a9eff', borderRadius: '4px', padding: '1px 7px', fontSize: '11px', fontWeight: 700 }}>{count}</span>
       <div style={{ flex: 1, height: '1px', background: '#1e3060' }} />
     </div>

@@ -73,7 +73,7 @@ export default function RMS() {
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
-      <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '16px' }}>RECORDS MANAGEMENT SYSTEM</div>
+      <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px', marginBottom: '16px' }}>RECORDS MANAGEMENT SYSTEM</div>
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
@@ -95,7 +95,7 @@ export default function RMS() {
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Date','Case #','Subject','Charges','Officer','Agency','Disposition','Sentence'].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -131,7 +131,7 @@ export default function RMS() {
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Subject','Type','Charge','Issued By','Date','Status','Actions'].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -167,7 +167,7 @@ export default function RMS() {
             <thead>
               <tr style={{ background: '#0a1a35' }}>
                 {['Plate','Vehicle','Towed By','Reason','Location','Date','Status'].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -304,7 +304,7 @@ export default function RMS() {
 function FormField({ label, children }) {
   return (
     <div>
-      <label style={{ color: '#94a3b8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>{label}</label>
+      <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>{label}</label>
       {children}
     </div>
   );

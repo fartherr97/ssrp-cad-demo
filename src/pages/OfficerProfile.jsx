@@ -55,7 +55,7 @@ export default function OfficerProfile() {
             { label: 'Complaints', val: complaints.length },
           ].map(s => (
             <div key={s.label} style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '4px', padding: '8px 12px' }}>
-              <div style={{ color: '#4a9eff', fontSize: '18px', fontWeight: 700 }}>{s.val}</div>
+              <div style={{ color: '#f1f5f9', fontSize: '18px', fontWeight: 700 }}>{s.val}</div>
               <div style={{ color: '#64748b', fontSize: '10px' }}>{s.label}</div>
             </div>
           ))}
@@ -108,7 +108,7 @@ export default function OfficerProfile() {
           <thead>
             <tr style={{ background: '#0a1a35' }}>
               {['Case #','Type','Date','Status','Call'].map(h => (
-                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -132,7 +132,7 @@ export default function OfficerProfile() {
           <thead>
             <tr style={{ background: '#0a1a35' }}>
               {['Call #','Nature','Location','Priority','Status','Time'].map(h => (
-                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
               ))}
             </tr>
           </thead>

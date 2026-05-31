@@ -35,7 +35,7 @@ export default function SearchPage() {
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '1000px' }}>
-      <div style={{ color: '#4a9eff', fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '20px' }}>
+      <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px', marginBottom: '20px' }}>
         RECORDS SEARCH
       </div>
 
@@ -83,7 +83,7 @@ export default function SearchPage() {
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
                     {['Plate','Year','Make','Model','Color','Registration','Stolen'].map(h => (
-                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -123,7 +123,7 @@ export default function SearchPage() {
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
                     {['Date','Case #','Charges','Officer','Agency','Disposition','Sentence'].map(h => (
-                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -158,7 +158,7 @@ export default function SearchPage() {
 function Section({ title, children }) {
   return (
     <div style={{ marginBottom: '20px' }}>
-      <div style={{ color: '#4a9eff', fontSize: '11px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px', borderBottom: '1px solid #1e3060', paddingBottom: '6px' }}>
+      <div style={{ color: '#e2a84b', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', marginBottom: '8px', borderBottom: '1px solid #1e3060', paddingBottom: '6px' }}>
         {title}
       </div>
       {children}

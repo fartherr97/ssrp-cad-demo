@@ -42,7 +42,7 @@ export default function LoginPage() {
         </div>
 
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#94a3b8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>SELECT OFFICER (DEMO)</label>
+          <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>SELECT OFFICER (DEMO)</label>
           <select
             value={selected}
             onChange={e => setSelected(e.target.value)}

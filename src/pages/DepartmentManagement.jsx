@@ -39,7 +39,7 @@ export default function DepartmentManagement() {
       {/* Department list */}
       <div style={{ width: '260px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ color: '#4a9eff', fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>DEPARTMENTS</span>
+          <span style={{ color: '#e2a84b', fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>DEPARTMENTS</span>
           <button onClick={() => setShowForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ New</button>
         </div>
         {departments.map(dept => (
@@ -92,7 +92,7 @@ export default function DepartmentManagement() {
             {/* Subdivisions */}
             <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>SUBDIVISIONS</span>
+                <span style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>SUBDIVISIONS</span>
                 <button onClick={() => setShowSubForm(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>+ Add</button>
               </div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -119,7 +119,7 @@ export default function DepartmentManagement() {
 
             {/* Rank structure */}
             <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', marginBottom: '16px' }}>
-              <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>RANK STRUCTURE</div>
+              <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>RANK STRUCTURE</div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {(RANKS[selectedDept.type] || RANKS.LEO).map((rank, i) => (
                   <div key={rank} style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '5px 12px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -133,12 +133,12 @@ export default function DepartmentManagement() {
 
             {/* Roster */}
             <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px' }}>
-              <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>DEPARTMENT ROSTER ({deptOfficers.length})</div>
+              <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>DEPARTMENT ROSTER ({deptOfficers.length})</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                 <thead>
                   <tr style={{ background: '#0a1a35' }}>
                     {['Name','Badge','Rank','Subdivision','Status'].map(h => (
-                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '11px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
