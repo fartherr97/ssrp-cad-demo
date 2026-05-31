@@ -73,8 +73,8 @@ export default function NavBar() {
 
       {/* ── Branding bar ── */}
       <div style={{
-        background: '#07111f',
-        borderBottom: '1px solid #162540',
+        background: '#111216',
+        borderBottom: '1px solid #2a2d33',
         padding: '0 16px',
         height: '50px',
         display: 'flex',
@@ -105,7 +105,7 @@ export default function NavBar() {
         {isMobile ? (
           <button
             onClick={() => setDrawerOpen(d => !d)}
-            style={{ background: drawerOpen ? 'rgba(74,158,255,0.15)' : 'transparent', border: '1px solid #1e3050', borderRadius: '6px', color: '#4a9eff', padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, minHeight: '36px' }}
+            style={{ background: drawerOpen ? 'rgba(74,158,255,0.15)' : 'transparent', border: '1px solid #2a2d33', borderRadius: '6px', color: '#4a9eff', padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, minHeight: '36px' }}
           >
             {drawerOpen ? <FaXmark size={18} /> : <FaBars size={18} />}
           </button>
@@ -113,7 +113,7 @@ export default function NavBar() {
           currentUser && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg,#1e4080,#2d5fa0)', border: `2px solid ${statusColor}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>👮</div>
+                <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg,#2e3138,#2d5fa0)', border: `2px solid ${statusColor}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>👮</div>
                 <div style={{ lineHeight: 1.3 }}>
                   <div style={{ color: '#d1dff0', fontSize: '12px', fontWeight: 600 }}>
                     {currentUser.badge} | {currentUser.rank} | {currentUser.name}
@@ -125,7 +125,7 @@ export default function NavBar() {
               </div>
               <button
                 onClick={() => dispatch({ type: 'LOGOUT' })}
-                style={{ background: 'transparent', color: '#4a6a8a', border: '1px solid #1e3050', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer' }}
+                style={{ background: 'transparent', color: '#4a6a8a', border: '1px solid #2a2d33', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer' }}
               >
                 Sign Out
               </button>
@@ -136,16 +136,16 @@ export default function NavBar() {
 
       {/* ── Mobile drawer ── */}
       {isMobile && drawerOpen && (
-        <div style={{ background: '#07111f', borderBottom: '2px solid #0d1e3a', padding: '14px 16px', boxShadow: '0 6px 24px rgba(0,0,0,0.8)', maxHeight: 'calc(100vh - 50px)', overflowY: 'auto' }}>
+        <div style={{ background: '#111216', borderBottom: '2px solid #1c1e23', padding: '14px 16px', boxShadow: '0 6px 24px rgba(0,0,0,0.8)', maxHeight: 'calc(100vh - 50px)', overflowY: 'auto' }}>
           {/* User info */}
           {currentUser && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #1e3060' }}>
-              <div style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg,#1e4080,#2d5fa0)', border: `2px solid ${statusColor}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>👮</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #2a2d33' }}>
+              <div style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg,#2e3138,#2d5fa0)', border: `2px solid ${statusColor}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>👮</div>
               <div style={{ flex: 1, lineHeight: 1.4, minWidth: 0 }}>
                 <div style={{ color: '#d1dff0', fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser.badge} • {currentUser.name}</div>
                 <div style={{ color: '#f97316', fontSize: '11px' }}>{currentUser.rank} · {currentUser.deptShort}</div>
               </div>
-              <button onClick={() => dispatch({ type: 'LOGOUT' })} style={{ background: 'transparent', color: '#4a6a8a', border: '1px solid #1e3050', borderRadius: '4px', padding: '5px 10px', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>Sign Out</button>
+              <button onClick={() => dispatch({ type: 'LOGOUT' })} style={{ background: 'transparent', color: '#4a6a8a', border: '1px solid #2a2d33', borderRadius: '4px', padding: '5px 10px', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>Sign Out</button>
             </div>
           )}
 
@@ -157,7 +157,7 @@ export default function NavBar() {
                 <button
                   key={s}
                   onClick={() => dispatch({ type: 'SET_STATUS', payload: s })}
-                  style={{ background: myStatus === s ? '#1e4080' : 'transparent', border: `1px solid ${myStatus === s ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: myStatus === s ? '#4a9eff' : '#64748b', padding: '5px 12px', fontSize: '12px', cursor: 'pointer' }}
+                  style={{ background: myStatus === s ? '#2e3138' : 'transparent', border: `1px solid ${myStatus === s ? '#4a9eff' : '#2a2d33'}`, borderRadius: '4px', color: myStatus === s ? '#4a9eff' : '#64748b', padding: '5px 12px', fontSize: '12px', cursor: 'pointer' }}
                 >
                   {s}
                 </button>
@@ -198,7 +198,7 @@ export default function NavBar() {
           {/* Admin nav */}
           {currentUser?.role === 'admin' && (
             <>
-              <div style={{ color: '#f97316', fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '6px', borderTop: '1px solid #1e3060', paddingTop: '10px' }}>Admin</div>
+              <div style={{ color: '#f97316', fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '6px', borderTop: '1px solid #2a2d33', paddingTop: '10px' }}>Admin</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                 {ADMIN_NAV.map(item => (
                   <button
@@ -231,8 +231,8 @@ export default function NavBar() {
       {/* ── Desktop toolbar ── */}
       {!isMobile && (
         <div style={{
-          background: 'linear-gradient(180deg, #1a3a6b 0%, #152f58 100%)',
-          borderBottom: '2px solid #0d1e3a',
+          background: 'linear-gradient(180deg, #26282e 0%, #1c1e23 100%)',
+          borderBottom: '2px solid #1c1e23',
           padding: '5px 16px',
           display: 'flex',
           alignItems: 'center',

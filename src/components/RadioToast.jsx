@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 
 // Pops a brief on-screen toast whenever a dispatcher broadcasts radio traffic.
@@ -7,26 +7,20 @@ import { useCAD } from '../store/cadStore';
 export default function RadioToast() {
   const { state } = useCAD();
   const { lastRadio, currentUser } = state;
-  const [toast, setToast] = useState(null);
-  // Guards which broadcast we've already surfaced, so the render-phase update
-  // below fires exactly once per new broadcast and never loops.
-  const handledRef = useRef(null);
+  // We never copy the broadcast into local state; instead we track which
+  // broadcast id has been dismissed and derive the visible toast from the
+  // store. setState only happens inside callbacks (timer / click), which keeps
+  // us clear of both set-state-in-effect and ref-in-render lint rules.
+  const [dismissedId, setDismissedId] = useState(null);
 
   const isSender = currentUser?.role === 'dispatch';
-  const radioId = lastRadio?.id ?? null;
-
-  // Adjust state during render when a brand-new broadcast arrives (the
-  // documented React pattern for reacting to changing external state without an
-  // effect). The sender and logged-out viewers are never toasted.
-  if (radioId && radioId !== handledRef.current) {
-    handledRef.current = radioId;
-    if (!isSender && currentUser) setToast(lastRadio);
-  }
+  const toast =
+    lastRadio && lastRadio.id !== dismissedId && currentUser && !isSender ? lastRadio : null;
 
   // Auto-dismiss the visible toast after a few seconds.
   useEffect(() => {
     if (!toast) return undefined;
-    const t = setTimeout(() => setToast(null), 6000);
+    const t = setTimeout(() => setDismissedId(toast.id), 6000);
     return () => clearTimeout(t);
   }, [toast]);
 
@@ -34,7 +28,7 @@ export default function RadioToast() {
 
   return (
     <div
-      onClick={() => setToast(null)}
+      onClick={() => setDismissedId(toast.id)}
       style={{
         position: 'fixed',
         top: '64px',

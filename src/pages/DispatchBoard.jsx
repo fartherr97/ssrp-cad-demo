@@ -92,8 +92,8 @@ export default function DispatchBoard() {
           gap: '10px',
           padding: '8px 14px',
           marginBottom: '14px',
-          background: 'linear-gradient(180deg, #16294b, #0e1a33)',
-          border: '1px solid #1d375f',
+          background: 'linear-gradient(180deg, #26282e, #161357X)',
+          border: '1px solid #2e3138',
           borderRadius: '6px',
           boxShadow: '0 6px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
@@ -133,8 +133,8 @@ export default function DispatchBoard() {
               key={s}
               onClick={() => dispatch({ type: 'SET_STATUS', payload: s })}
               style={{
-                background: active ? 'rgba(47,129,247,0.16)' : '#0d1a31',
-                border: `1px solid ${active ? tone.bar : '#1d375f'}`,
+                background: active ? 'rgba(47,129,247,0.16)' : '#15161a',
+                border: `1px solid ${active ? tone.bar : '#2e3138'}`,
                 borderRadius: '4px',
                 color: active ? tone.text : '#93a6c4',
                 padding: '5px 13px',
@@ -154,8 +154,8 @@ export default function DispatchBoard() {
               key={f}
               onClick={() => setStatusFilter(f)}
               style={{
-                background: statusFilter === f ? 'rgba(47,129,247,0.16)' : '#0d1a31',
-                border: `1px solid ${statusFilter === f ? '#2f81f7' : '#1d375f'}`,
+                background: statusFilter === f ? 'rgba(47,129,247,0.16)' : '#15161a',
+                border: `1px solid ${statusFilter === f ? '#2f81f7' : '#2e3138'}`,
                 borderRadius: '4px',
                 color: statusFilter === f ? '#4aa3ff' : '#5f779b',
                 padding: '5px 11px',
@@ -171,7 +171,7 @@ export default function DispatchBoard() {
 
       {/* ── Active Calls ── */}
       <SectionHeader title="ACTIVE CALLS" count={filteredCalls.length} />
-      <div className="table-scroll" style={{ marginBottom: '24px', border: '1px solid #1d375f', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
+      <div className="table-scroll" style={{ marginBottom: '24px', border: '1px solid #2e3138', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr>
@@ -186,8 +186,8 @@ export default function DispatchBoard() {
                     letterSpacing: '0.6px',
                     textTransform: 'uppercase',
                     fontWeight: 600,
-                    background: 'linear-gradient(180deg, #16294b, #11203a)',
-                    borderBottom: '2px solid #08101f',
+                    background: 'linear-gradient(180deg, #26282e, #1c1e23)',
+                    borderBottom: '2px solid #0b0c0f',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -204,7 +204,7 @@ export default function DispatchBoard() {
                   key={call.id}
                   onClick={() => setSelectedCall(sel ? null : call)}
                   style={{
-                    background: sel ? 'rgba(47,129,247,0.14)' : idx % 2 === 0 ? '#0a1426' : '#0c1830',
+                    background: sel ? 'rgba(47,129,247,0.14)' : idx % 2 === 0 ? '#111216' : '#131418',
                     cursor: 'pointer',
                     borderLeft: `3px solid ${PRIORITY_COLORS[call.priority] || '#33415a'}`,
                   }}
@@ -264,8 +264,8 @@ export default function DispatchBoard() {
       {selectedCall && (
         <div
           style={{
-            background: 'linear-gradient(180deg, #11203a, #0d1a31)',
-            border: '1px solid #1d375f',
+            background: 'linear-gradient(180deg, #1c1e23, #15161a)',
+            border: '1px solid #2e3138',
             borderLeft: `4px solid ${PRIORITY_COLORS[selectedCall.priority] || '#33415a'}`,
             borderRadius: '6px',
             padding: '16px',
@@ -299,7 +299,7 @@ export default function DispatchBoard() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #1d375f' }}>
+          <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #2e3138' }}>
             <span style={{ color: '#5f779b', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Description: </span>
             <span style={{ color: '#93a6c4', fontSize: '13px' }}>{selectedCall.description}</span>
           </div>
@@ -308,7 +308,7 @@ export default function DispatchBoard() {
 
       {/* ── Units Roster ── */}
       <SectionHeader title="UNITS ROSTER" count={onDuty.length} />
-      <div className="table-scroll" style={{ border: '1px solid #1d375f', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
+      <div className="table-scroll" style={{ border: '1px solid #2e3138', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr>
@@ -323,8 +323,8 @@ export default function DispatchBoard() {
                     letterSpacing: '0.6px',
                     textTransform: 'uppercase',
                     fontWeight: 600,
-                    background: 'linear-gradient(180deg, #16294b, #11203a)',
-                    borderBottom: '2px solid #08101f',
+                    background: 'linear-gradient(180deg, #26282e, #1c1e23)',
+                    borderBottom: '2px solid #0b0c0f',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -341,7 +341,7 @@ export default function DispatchBoard() {
                 <tr
                   key={o.id}
                   style={{
-                    background: tone.tint !== 'transparent' ? tone.tint : idx % 2 === 0 ? '#0a1426' : '#0c1830',
+                    background: tone.tint !== 'transparent' ? tone.tint : idx % 2 === 0 ? '#111216' : '#131418',
                     borderLeft: `3px solid ${tone.bar}`,
                   }}
                 >
@@ -368,7 +368,7 @@ export default function DispatchBoard() {
 }
 
 function Divider() {
-  return <span style={{ width: '1px', height: '14px', background: '#27406a' }} />;
+  return <span style={{ width: '1px', height: '14px', background: '#33363d' }} />;
 }
 
 function SectionHeader({ title, count }) {
@@ -379,8 +379,8 @@ function SectionHeader({ title, count }) {
         alignItems: 'center',
         gap: '10px',
         padding: '6px 12px',
-        background: 'linear-gradient(180deg, #16294b, #11203a)',
-        border: '1px solid #1d375f',
+        background: 'linear-gradient(180deg, #26282e, #1c1e23)',
+        border: '1px solid #2e3138',
         borderRadius: '6px 6px 0 0',
       }}
     >

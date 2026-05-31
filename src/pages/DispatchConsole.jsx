@@ -97,8 +97,8 @@ export default function DispatchConsole() {
   };
 
   const panelStyle = {
-    background: 'linear-gradient(180deg, #11203a, #0d1a31)',
-    border: '1px solid #1d375f',
+    background: 'linear-gradient(180deg, #1c1e23, #15161a)',
+    border: '1px solid #2e3138',
     borderRadius: '6px',
     boxShadow: '0 6px 22px rgba(0,0,0,0.45)',
     display: 'flex',
@@ -117,8 +117,8 @@ export default function DispatchConsole() {
           gap: '10px',
           padding: '8px 14px',
           marginBottom: '12px',
-          background: 'linear-gradient(180deg, #16294b, #0e1a33)',
-          border: '1px solid #1d375f',
+          background: 'linear-gradient(180deg, #26282e, #161357X)',
+          border: '1px solid #2e3138',
           borderRadius: '6px',
           boxShadow: '0 6px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
@@ -176,7 +176,7 @@ export default function DispatchConsole() {
                     padding: '8px 12px',
                     cursor: 'pointer',
                     borderLeft: `4px solid ${PRIORITY_COLORS[call.priority] || '#33415a'}`,
-                    borderBottom: '1px solid #14253f',
+                    borderBottom: '1px solid #23252b',
                     background: sel ? 'rgba(47,129,247,0.14)' : 'transparent',
                   }}
                 >
@@ -219,7 +219,7 @@ export default function DispatchConsole() {
 
           {/* Selected-call control footer */}
           {selectedCall && (
-            <div style={{ borderTop: '1px solid #1d375f', padding: '10px 12px', background: '#0c1830' }}>
+            <div style={{ borderTop: '1px solid #2e3138', padding: '10px 12px', background: '#131418' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ color: '#f5b740', fontWeight: 700, fontSize: '12px' }}>
                   CALL {selectedCall.id} • CONTROL
@@ -249,7 +249,7 @@ export default function DispatchConsole() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {selectedCall.units.length === 0 && <span style={{ color: '#5f779b', fontSize: '12px' }}>None — dispatch from the units panel →</span>}
                 {selectedCall.units.map((u) => (
-                  <span key={u} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#13294a', border: '1px solid #25406e', borderRadius: '4px', padding: '2px 6px', fontSize: '12px', color: '#4aa3ff' }}>
+                  <span key={u} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#23252b', border: '1px solid #393c44', borderRadius: '4px', padding: '2px 6px', fontSize: '12px', color: '#4aa3ff' }}>
                     {u}
                     <button
                       onClick={() => dispatch({ type: 'DETACH_UNIT', payload: { callId: selectedCall.id, unitId: u } })}
@@ -272,7 +272,7 @@ export default function DispatchConsole() {
             {officers.map((o) => {
               const tone = toneFor(o.status);
               return (
-                <div key={o.id} style={{ padding: '8px 12px', borderBottom: '1px solid #14253f', borderLeft: `3px solid ${tone}` }}>
+                <div key={o.id} style={{ padding: '8px 12px', borderBottom: '1px solid #23252b', borderLeft: `3px solid ${tone}` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className="tnum" style={{ color: '#4aa3ff', fontWeight: 700, fontSize: '13px' }}>{o.unitId}</span>
                     <span style={{ color: tone, fontWeight: 600, fontSize: '13px' }}>{o.name}</span>
@@ -293,8 +293,8 @@ export default function DispatchConsole() {
                       onChange={(e) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: o.unitId, status: e.target.value } })}
                       style={{
                         marginLeft: 'auto',
-                        background: '#08101f',
-                        border: '1px solid #25406e',
+                        background: '#0b0c0f',
+                        border: '1px solid #393c44',
                         borderRadius: '4px',
                         color: '#dce6f5',
                         fontSize: '11px',
@@ -329,7 +329,7 @@ export default function DispatchConsole() {
         {/* ===== DISPATCH LOG ===== */}
         <div style={{ ...panelStyle, maxHeight: isMobile ? '420px' : 'calc(100vh - 190px)' }}>
           <PanelHead title="TX LOG" count={dispatchLog.length} />
-          <div className="terminal table-scroll" style={{ overflowY: 'auto', flex: 1, padding: '8px 10px', background: '#070d18' }}>
+          <div className="terminal table-scroll" style={{ overflowY: 'auto', flex: 1, padding: '8px 10px', background: '#0b0c0f' }}>
             {dispatchLog.map((e) => (
               <div key={e.id} style={{ display: 'flex', gap: '8px', padding: '2px 0', fontSize: '12px', lineHeight: 1.5 }}>
                 <span style={{ color: '#3f5878', flexShrink: 0 }}>{e.time}</span>
@@ -337,7 +337,7 @@ export default function DispatchConsole() {
               </div>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid #1d375f', padding: '8px 10px', display: 'flex', gap: '6px', background: '#0c1830' }}>
+          <div style={{ borderTop: '1px solid #2e3138', padding: '8px 10px', display: 'flex', gap: '6px', background: '#131418' }}>
             <span style={{ color: '#46c971', alignSelf: 'center', fontWeight: 700 }}>›</span>
             <input
               value={radio}
@@ -346,8 +346,8 @@ export default function DispatchConsole() {
               placeholder="Broadcast radio traffic…"
               style={{
                 flex: 1,
-                background: '#08101f',
-                border: '1px solid #25406e',
+                background: '#0b0c0f',
+                border: '1px solid #393c44',
                 borderRadius: '4px',
                 color: '#dce6f5',
                 fontFamily: MONO,
@@ -366,7 +366,7 @@ export default function DispatchConsole() {
 /* ── Small building blocks ── */
 
 function Divider() {
-  return <span style={{ width: '1px', height: '14px', background: '#27406a' }} />;
+  return <span style={{ width: '1px', height: '14px', background: '#33363d' }} />;
 }
 
 function Stat({ label, value, color }) {
@@ -385,8 +385,8 @@ function PanelHead({ title, count, children }) {
         alignItems: 'center',
         gap: '8px',
         padding: '6px 12px',
-        background: 'linear-gradient(180deg, #16294b, #11203a)',
-        borderBottom: '1px solid #1d375f',
+        background: 'linear-gradient(180deg, #26282e, #1c1e23)',
+        borderBottom: '1px solid #2e3138',
         borderRadius: '6px 6px 0 0',
       }}
     >
@@ -438,8 +438,8 @@ function NewCallForm({ onClose, dispatch }) {
 
   const field = {
     width: '100%',
-    background: '#08101f',
-    border: '1px solid #25406e',
+    background: '#0b0c0f',
+    border: '1px solid #393c44',
     borderRadius: '4px',
     color: '#dce6f5',
     fontFamily: MONO,
@@ -449,7 +449,7 @@ function NewCallForm({ onClose, dispatch }) {
   const lbl = { color: '#5f779b', fontSize: '10px', letterSpacing: '0.6px', textTransform: 'uppercase', display: 'block', marginBottom: '3px' };
 
   return (
-    <div style={{ padding: '10px 12px', borderBottom: '1px solid #1d375f', background: '#0c1830' }}>
+    <div style={{ padding: '10px 12px', borderBottom: '1px solid #2e3138', background: '#131418' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         <label>
           <span style={lbl}>Nature</span>
