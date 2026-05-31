@@ -38,14 +38,14 @@ export default function LoginPage() {
             <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '15px' }}>
               Sunshine State <span style={{ color: '#f97316' }}>RP</span>
             </div>
-            <div style={{ color: '#3a5a8a', fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase' }}>
+            <div style={{ color: '#3a5a8a', fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase' }}>
               Computer Aided Dispatch
             </div>
           </div>
         </div>
 
         {/* Right: version tag */}
-        <div style={{ color: '#2a4060', fontSize: '11px' }}>
+        <div style={{ color: '#2a4060', fontSize: '12px' }}>
           v2.4.1
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
           <div style={{ color: '#f1f5f9', fontSize: '26px', fontWeight: 700, letterSpacing: '2px' }}>
             SUNSHINE STATE ROLEPLAY
           </div>
-          <div style={{ color: '#4a7aaa', fontSize: '12px', letterSpacing: '2px', marginTop: '5px', textTransform: 'uppercase' }}>
+          <div style={{ color: '#4a7aaa', fontSize: '14px', letterSpacing: '2px', marginTop: '5px', textTransform: 'uppercase' }}>
             Computer Aided Dispatch
           </div>
         </div>
@@ -84,18 +84,18 @@ export default function LoginPage() {
           width: '380px',
           boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
         }}>
-          <div style={{ color: '#e2a84b', fontSize: '12px', fontWeight: 700, marginBottom: '20px', textAlign: 'center', letterSpacing: '2px' }}>
+          <div style={{ color: '#e2a84b', fontSize: '14px', fontWeight: 700, marginBottom: '20px', textAlign: 'center', letterSpacing: '2px' }}>
             OFFICER SIGN IN
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>
+            <label style={{ color: '#7a9ab8', fontSize: '12px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>
               SELECT OFFICER (DEMO)
             </label>
             <select
               value={selected}
               onChange={e => setSelected(e.target.value)}
-              style={{ width: '100%', background: '#060f1c', border: '1px solid #1e3a60', borderRadius: '5px', color: '#e2e8f0', padding: '9px 10px', fontSize: '13px' }}
+              style={{ width: '100%', background: '#060f1c', border: '1px solid #1e3a60', borderRadius: '5px', color: '#e2e8f0', padding: '9px 10px', fontSize: '15px' }}
             >
               <option value="">-- Select Officer --</option>
               {OFFICERS.map(o => (
@@ -113,7 +113,7 @@ export default function LoginPage() {
               borderRadius: '5px',
               color: '#fff',
               padding: '12px',
-              fontSize: '13px',
+              fontSize: '15px',
               fontWeight: 700,
               cursor: 'pointer',
               letterSpacing: '2px',
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 borderRadius: '5px',
                 color: '#fff',
                 padding: '11px',
-                fontSize: '13px',
+                fontSize: '15px',
                 fontWeight: 600,
                 cursor: 'pointer',
                 letterSpacing: '0.5px',
@@ -145,7 +145,7 @@ export default function LoginPage() {
               <FaDiscord size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
               Sign in with Discord
             </button>
-            <div style={{ color: '#2e4060', fontSize: '11px', textAlign: 'center', marginTop: '8px' }}>
+            <div style={{ color: '#2e4060', fontSize: '12px', textAlign: 'center', marginTop: '8px' }}>
               Discord OAuth — connect your account
             </div>
           </div>
@@ -165,9 +165,9 @@ export default function LoginPage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: '16px', width: 'auto', opacity: 0.5 }} />
-          <span style={{ color: '#2e4a6a', fontSize: '11px' }}>Sunshine State Roleplay</span>
+          <span style={{ color: '#2e4a6a', fontSize: '12px' }}>Sunshine State Roleplay</span>
         </div>
-        <span style={{ color: '#1e3050', fontSize: '11px' }}>
+        <span style={{ color: '#1e3050', fontSize: '12px' }}>
           Computer Aided Dispatch — All rights reserved
         </span>
       </div>

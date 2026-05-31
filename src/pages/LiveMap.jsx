@@ -38,7 +38,7 @@ export default function LiveMap() {
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, letterSpacing: '1px' }}>LIVE MAP — ARCADIA DISPATCH</div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '14px' }}>
           <LayerToggle active={showUnits} onClick={() => setShowUnits(v => !v)} label="Units" color="#22c55e" />
           <LayerToggle active={showCalls} onClick={() => setShowCalls(v => !v)} label="Calls" color="#ef4444" />
         </div>
@@ -90,7 +90,7 @@ export default function LiveMap() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 700,
                   color: '#fff',
                   boxShadow: `0 0 10px ${PRIORITY_COLORS[call.priority]}60`,
@@ -127,7 +127,7 @@ export default function LiveMap() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '9px',
+                  fontSize: '10px',
                   fontWeight: 700,
                   color,
                   boxShadow: `0 0 8px ${color}40`,
@@ -150,7 +150,7 @@ export default function LiveMap() {
               border: '1px solid #4a9eff',
               borderRadius: '4px',
               padding: '8px 12px',
-              fontSize: '11px',
+              fontSize: '12px',
               zIndex: 100,
               whiteSpace: 'nowrap',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
@@ -174,7 +174,7 @@ export default function LiveMap() {
               border: `1px solid ${PRIORITY_COLORS[hoveredCall.priority]}`,
               borderRadius: '4px',
               padding: '8px 12px',
-              fontSize: '11px',
+              fontSize: '12px',
               zIndex: 100,
               whiteSpace: 'nowrap',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
@@ -187,7 +187,7 @@ export default function LiveMap() {
           )}
 
           {/* Compass */}
-          <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '6px 8px', fontSize: '10px', color: '#475569' }}>
+          <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '6px 8px', fontSize: '11px', color: '#475569' }}>
             N ↑
           </div>
         </div>
@@ -195,32 +195,32 @@ export default function LiveMap() {
         {/* Legend / status panel */}
         <div style={{ width: '200px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '4px', padding: '12px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', marginBottom: '10px' }}>LEGEND</div>
+            <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '10px' }}>LEGEND</div>
             {Object.entries(STATUS_COLORS).map(([s, c]) => (
               <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                 <div style={{ width: '14px', height: '14px', background: '#0d1f3c', border: `2px solid ${c}`, borderRadius: '3px' }} />
-                <span style={{ color: '#94a3b8', fontSize: '11px' }}>{s}</span>
+                <span style={{ color: '#94a3b8', fontSize: '12px' }}>{s}</span>
               </div>
             ))}
             <div style={{ borderTop: '1px solid #1e3060', marginTop: '8px', paddingTop: '8px' }}>
               {[1,2,3].map(p => (
                 <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <div style={{ width: '14px', height: '14px', background: PRIORITY_COLORS[p], borderRadius: '50%', border: '1px solid rgba(255,255,255,0.4)' }} />
-                  <span style={{ color: '#94a3b8', fontSize: '11px' }}>Priority {p}</span>
+                  <span style={{ color: '#94a3b8', fontSize: '12px' }}>Priority {p}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '4px', padding: '12px', flex: 1, overflowY: 'auto' }}>
-            <div style={{ color: '#4a9eff', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', marginBottom: '10px' }}>ACTIVE UNITS ({officers.filter(o => o.status !== 'OFFDUTY').length})</div>
+            <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '10px' }}>ACTIVE UNITS ({officers.filter(o => o.status !== 'OFFDUTY').length})</div>
             {officers.filter(o => o.status !== 'OFFDUTY').map(o => (
               <div key={o.id} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #0f1e35' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#60a5fa', fontSize: '11px', fontWeight: 700 }}>{o.unitId}</span>
-                  <StatusBadge status={o.status} style={{ fontSize: '9px', padding: '1px 5px' }} />
+                  <span style={{ color: '#60a5fa', fontSize: '12px', fontWeight: 700 }}>{o.unitId}</span>
+                  <StatusBadge status={o.status} style={{ fontSize: '10px', padding: '1px 5px' }} />
                 </div>
-                <div style={{ color: '#64748b', fontSize: '10px' }}>{o.name}</div>
+                <div style={{ color: '#64748b', fontSize: '11px' }}>{o.name}</div>
               </div>
             ))}
           </div>
@@ -234,7 +234,7 @@ export default function LiveMap() {
 
 function LayerToggle({ active, onClick, label, color }) {
   return (
-    <button onClick={onClick} style={{ background: active ? '#060d1a' : 'transparent', border: `1px solid ${active ? color : '#1e3060'}`, borderRadius: '4px', color: active ? color : '#475569', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', alignItems: 'center', gap: '5px' }}>
+    <button onClick={onClick} style={{ background: active ? '#060d1a' : 'transparent', border: `1px solid ${active ? color : '#1e3060'}`, borderRadius: '4px', color: active ? color : '#475569', padding: '4px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', alignItems: 'center', gap: '5px' }}>
       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: active ? color : '#475569' }} />
       {label}
     </button>

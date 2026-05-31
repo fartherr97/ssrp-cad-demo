@@ -40,7 +40,7 @@ export default function StatusBadge({ status, style }) {
       display: 'inline-block',
       padding: '2px 8px',
       borderRadius: '4px',
-      fontSize: '11px',
+      fontSize: '12px',
       fontWeight: 700,
       letterSpacing: '0.05em',
       color: '#fff',

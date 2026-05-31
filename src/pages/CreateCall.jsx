@@ -38,14 +38,14 @@ export default function CreateCall() {
         <div style={{ background: '#051a05', border: '1px solid #22c55e', borderRadius: '6px', padding: '24px', textAlign: 'center' }}>
           <div style={{ fontSize: '36px', marginBottom: '12px' }}>✅</div>
           <div style={{ color: '#22c55e', fontSize: '18px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px' }}>CALL CREATED</div>
-          <div style={{ color: '#86efac', fontSize: '14px', marginBottom: '20px' }}>Call {createdId} is now in the dispatch queue.</div>
+          <div style={{ color: '#86efac', fontSize: '16px', marginBottom: '20px' }}>Call {createdId} is now in the dispatch queue.</div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <button onClick={() => { setSubmitted(false); setForm({ nature: '', location: '', city: CITIES[0], county: COUNTIES[0], priority: '2', description: '', reportingParty: '' }); }}
-              style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
+              style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 18px', cursor: 'pointer', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
               + Create Another
             </button>
             <button onClick={() => dispatch({ type: 'SET_PAGE', payload: 'dispatch' })}
-              style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#94a3b8', padding: '8px 18px', cursor: 'pointer', fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace' }}>
+              style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', color: '#94a3b8', padding: '8px 18px', cursor: 'pointer', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
               View Dispatch Board
             </button>
           </div>
@@ -113,20 +113,20 @@ export default function CreateCall() {
           </Field>
 
           <div style={{ borderTop: '1px solid #1e3060', paddingTop: '16px' }}>
-            <div style={{ color: '#4a9eff', fontSize: '11px', letterSpacing: '1px', marginBottom: '10px' }}>ASSIGN UNITS</div>
+            <div style={{ color: '#4a9eff', fontSize: '12px', letterSpacing: '1px', marginBottom: '10px' }}>ASSIGN UNITS</div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {officers.filter(o => o.status === 'AVAILABLE').map(o => (
-                <span key={o.id} style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', color: '#60a5fa', cursor: 'pointer' }}>
+                <span key={o.id} style={{ background: '#0a1a35', border: '1px solid #1e4080', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', color: '#60a5fa', cursor: 'pointer' }}>
                   {o.unitId} — {o.name}
                 </span>
               ))}
               {officers.filter(o => o.status === 'AVAILABLE').length === 0 && (
-                <span style={{ color: '#475569', fontSize: '12px' }}>No available units</span>
+                <span style={{ color: '#475569', fontSize: '14px' }}>No available units</span>
               )}
             </div>
           </div>
 
-          <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px' }}>
+          <button type="submit" style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '12px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px' }}>
             📞 CREATE CALL
           </button>
         </div>
@@ -135,13 +135,13 @@ export default function CreateCall() {
   );
 }
 
-const inputStyle = { width: '100%', background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const inputStyle = { width: '100%', background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '15px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
 const selectStyle = { ...inputStyle };
 
 function Field({ label, children }) {
   return (
     <div>
-      <label style={{ color: '#7a9ab8', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>{label}</label>
+      <label style={{ color: '#7a9ab8', fontSize: '12px', letterSpacing: '1px', display: 'block', marginBottom: '6px' }}>{label}</label>
       {children}
     </div>
   );
