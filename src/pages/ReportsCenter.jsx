@@ -29,6 +29,8 @@ const STATUS_BADGE = {
   'Denied':         BADGE.red,
 };
 
+const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
+
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
   const { reports, reportTemplates, currentUser, officers } = state;
@@ -37,13 +39,40 @@ export default function ReportsCenter() {
   const [formValues, setFormValues]             = useState({});
   const [selectedReport, setSelectedReport]     = useState(null);
   const [reportTab, setReportTab]               = useState('MINE');
+  const [savedAt, setSavedAt]                   = useState(null);
+
+  // Open a template for editing, restoring any auto-saved draft.
+  const openTemplate = (tpl) => {
+    setSelectedTemplate(tpl);
+    setSelectedReport(null);
+    let restored = {};
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY(tpl.id));
+      if (saved) restored = JSON.parse(saved);
+    } catch { /* ignore */ }
+    setFormValues(restored);
+    setSavedAt(null);
+  };
 
   useEffect(() => {
     const openName = searchParams.get('open');
     if (!openName || !reportTemplates?.length) return;
     const tpl = reportTemplates.find(t => t.name === decodeURIComponent(openName));
-    if (tpl) { setSelectedTemplate(tpl); setFormValues({}); setSelectedReport(null); }
+    if (tpl) openTemplate(tpl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, reportTemplates]);
+
+  // ── Auto-save draft as the user types (debounced) ──
+  useEffect(() => {
+    if (!selectedTemplate) return;
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY(selectedTemplate.id), JSON.stringify(formValues));
+        setSavedAt(new Date());
+      } catch { /* ignore */ }
+    }, 600);
+    return () => clearTimeout(id);
+  }, [formValues, selectedTemplate]);
 
   const isAdmin   = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const me        = officers.find(o => o.id === currentUser?.id);
@@ -62,6 +91,12 @@ export default function ReportsCenter() {
 
   const handleFormChange = (key, val) => setFormValues(prev => ({ ...prev, [key]: val }));
 
+  const closeForm = () => {
+    setSelectedTemplate(null);
+    setFormValues({});
+    setSavedAt(null);
+  };
+
   const submitReport = () => {
     if (!selectedTemplate) return;
     const caseNum = `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
@@ -79,8 +114,8 @@ export default function ReportsCenter() {
         formData: { ...formValues },
       },
     });
-    setSelectedTemplate(null);
-    setFormValues({});
+    try { localStorage.removeItem(DRAFT_KEY(selectedTemplate.id)); } catch { /* ignore */ }
+    closeForm();
     setReportTab('MINE');
   };
 
@@ -95,6 +130,56 @@ export default function ReportsCenter() {
     caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-DRAFT`,
     status: 'Draft',
   };
+
+  // ══ Full-screen editor when creating/editing a report ══
+  if (showForm) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
+        {/* Top bar */}
+        <div className="px-4 py-2 bg-app-toolbar border-b border-border-base flex items-center gap-3 shrink-0">
+          <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
+            {selectedTemplate.name}
+          </span>
+          <span className="text-[10px] text-cad-muted font-mono">
+            {me?.badge || '*'} · {me?.name || currentUser?.name}
+          </span>
+          {/* Autosave indicator */}
+          <span className="flex items-center gap-1.5 text-[10px] text-cad-muted">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            {savedAt
+              ? `Draft saved ${savedAt.toLocaleTimeString()}`
+              : 'Auto-saving draft…'}
+          </span>
+          <button className={`${xs(S_BTN_GHOST)} ml-auto`} onClick={closeForm}>
+            ✕ Discard
+          </button>
+        </div>
+
+        {/* Form (fills the page) */}
+        <FormDocWrap meta={draftMeta}>
+          <ReportDocument
+            type={selectedTemplate.name}
+            template={selectedTemplate}
+            data={formValues}
+            editable
+            onChange={handleFormChange}
+            meta={draftMeta}
+          />
+        </FormDocWrap>
+
+        {/* Bottom submit bar */}
+        <div className="px-4 py-2.5 bg-app-toolbar border-t border-border-base flex items-center gap-3 shrink-0">
+          <span className="text-[10px] text-cad-muted">
+            Changes are saved automatically as a draft until you submit.
+          </span>
+          <div className="ml-auto flex gap-2">
+            <button className={xs(S_BTN_GHOST)} onClick={closeForm}>Cancel</button>
+            <button className={xs(S_BTN_PRIMARY)} onClick={submitReport}>Submit Report</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full overflow-hidden font-ui">
@@ -119,12 +204,7 @@ export default function ReportsCenter() {
               : (t.fields?.length || 0);
             return (
               <button key={t.id}
-                onClick={() => {
-                  const tpl = reportTemplates.find(r => r.name === t.name) || t;
-                  setSelectedTemplate(tpl);
-                  setFormValues({});
-                  setSelectedReport(null);
-                }}
+                onClick={() => openTemplate(reportTemplates.find(r => r.name === t.name) || t)}
                 className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
                   isSelected
                     ? 'bg-sky-500/10 border-l-sky-500 text-sky-400'
@@ -147,7 +227,7 @@ export default function ReportsCenter() {
                 const isSelected = selectedTemplate?.id === t.id;
                 return (
                   <button key={t.id}
-                    onClick={() => { setSelectedTemplate(t); setFormValues({}); setSelectedReport(null); }}
+                    onClick={() => openTemplate(t)}
                     className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
                       isSelected
                         ? 'bg-sky-500/10 border-l-sky-500'
@@ -167,40 +247,6 @@ export default function ReportsCenter() {
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
       <div className="flex-1 flex flex-col overflow-hidden bg-[#2e2e32]">
-
-        {/* ── Creating a new report ── */}
-        {showForm && (
-          <>
-            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
-              <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
-                {selectedTemplate.name}
-              </span>
-              <span className="text-[9px] text-cad-muted font-mono">
-                {me?.badge || '*'} · {me?.name || currentUser?.name}
-              </span>
-              <div className="ml-auto flex gap-2 items-center">
-                <button className={xs(S_BTN_GHOST)} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
-                  ✕ Discard
-                </button>
-                <button className={xs(S_BTN_PRIMARY)} onClick={submitReport}>
-                  Submit Report
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-hidden flex flex-col">
-              <FormDocWrap meta={draftMeta}>
-                <ReportDocument
-                  type={selectedTemplate.name}
-                  template={selectedTemplate}
-                  data={formValues}
-                  editable
-                  onChange={handleFormChange}
-                  meta={draftMeta}
-                />
-              </FormDocWrap>
-            </div>
-          </>
-        )}
 
         {/* ── Viewing a submitted report ── */}
         {showReport && (

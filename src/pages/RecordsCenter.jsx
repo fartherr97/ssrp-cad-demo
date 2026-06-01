@@ -27,6 +27,8 @@ const STATUS_BADGE = {
   'Draft':    BADGE.gray,
 };
 
+const DRAFT_KEY = (tplId) => `ssrp_record_draft_${tplId}`;
+
 export default function RecordsCenter() {
   const { state, dispatch } = useCAD();
   const { recordTemplates, currentUser, officers } = state;
@@ -34,13 +36,39 @@ export default function RecordsCenter() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
   const [selectedRecord, setSelectedRecord]     = useState(null);
+  const [savedAt, setSavedAt]                   = useState(null);
+
+  const openTemplate = (tpl) => {
+    setSelectedTemplate(tpl);
+    setSelectedRecord(null);
+    let restored = {};
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY(tpl.id));
+      if (saved) restored = JSON.parse(saved);
+    } catch { /* ignore */ }
+    setFormValues(restored);
+    setSavedAt(null);
+  };
 
   useEffect(() => {
     const openName = searchParams.get('open');
     if (!openName || !recordTemplates?.length) return;
     const tpl = recordTemplates.find(t => t.name === decodeURIComponent(openName));
-    if (tpl) { setSelectedTemplate(tpl); setFormValues({}); setSelectedRecord(null); }
+    if (tpl) openTemplate(tpl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, recordTemplates]);
+
+  // ── Auto-save draft as the user types (debounced) ──
+  useEffect(() => {
+    if (!selectedTemplate) return;
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY(selectedTemplate.id), JSON.stringify(formValues));
+        setSavedAt(new Date());
+      } catch { /* ignore */ }
+    }, 600);
+    return () => clearTimeout(id);
+  }, [formValues, selectedTemplate]);
 
   const me = officers.find(o => o.id === currentUser?.id);
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
@@ -49,6 +77,12 @@ export default function RecordsCenter() {
   const myRecords = records.filter(r => r.officerBadge === me?.badge);
 
   const handleFormChange = (key, val) => setFormValues(prev => ({ ...prev, [key]: val }));
+
+  const closeForm = () => {
+    setSelectedTemplate(null);
+    setFormValues({});
+    setSavedAt(null);
+  };
 
   const submitRecord = () => {
     if (!selectedTemplate) return;
@@ -65,8 +99,8 @@ export default function RecordsCenter() {
         summary: Object.values(formValues).filter(v => typeof v === 'string' && v.length > 2).join(' | ').slice(0, 200) || 'Record created via CAD',
       },
     });
-    setSelectedTemplate(null);
-    setFormValues({});
+    try { localStorage.removeItem(DRAFT_KEY(selectedTemplate.id)); } catch { /* ignore */ }
+    closeForm();
   };
 
   const showForm   = selectedTemplate !== null;
@@ -77,6 +111,53 @@ export default function RecordsCenter() {
     caseNumber: `REC-${new Date().getFullYear()}-DRAFT`,
     status: 'Draft',
   };
+
+  // ══ Full-screen editor when issuing/editing a record ══
+  if (showForm) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
+        <div className="px-4 py-2 bg-app-toolbar border-b border-border-base flex items-center gap-3 shrink-0">
+          <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
+            {selectedTemplate.name}
+          </span>
+          {selectedTemplate.formCode && (
+            <span className="text-[10px] text-cad-muted font-mono">{selectedTemplate.formCode}</span>
+          )}
+          <span className="text-[10px] text-cad-muted font-mono">
+            {me?.badge || '*'} * {me?.name || currentUser?.name}
+          </span>
+          <span className="flex items-center gap-1.5 text-[10px] text-cad-muted">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            {savedAt ? `Draft saved ${savedAt.toLocaleTimeString()}` : 'Auto-saving draft…'}
+          </span>
+          <button className={`${xs(S_BTN_GHOST)} ml-auto`} onClick={closeForm}>
+            * Discard
+          </button>
+        </div>
+
+        <FormDocWrap meta={draftMeta}>
+          <ReportDocument
+            type={selectedTemplate.name}
+            template={selectedTemplate}
+            data={formValues}
+            editable
+            onChange={handleFormChange}
+            meta={draftMeta}
+          />
+        </FormDocWrap>
+
+        <div className="px-4 py-2.5 bg-app-toolbar border-t border-border-base flex items-center gap-3 shrink-0">
+          <span className="text-[10px] text-cad-muted">
+            Changes are saved automatically as a draft until you issue the record.
+          </span>
+          <div className="ml-auto flex gap-2">
+            <button className={xs(S_BTN_GHOST)} onClick={closeForm}>Cancel</button>
+            <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}>Issue Record</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const groupedTemplates = {};
   (recordTemplates || []).forEach(t => {
@@ -109,7 +190,7 @@ export default function RecordsCenter() {
                   const isSelected = selectedTemplate?.id === t.id;
                   return (
                     <button key={t.id}
-                      onClick={() => { setSelectedTemplate(t); setFormValues({}); setSelectedRecord(null); }}
+                      onClick={() => openTemplate(t)}
                       className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
                         isSelected
                           ? 'bg-sky-500/10 border-l-sky-500 text-sky-400'
@@ -140,42 +221,6 @@ export default function RecordsCenter() {
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
       <div className="flex-1 flex flex-col overflow-hidden bg-[#2e2e32]">
-
-        {showForm && (
-          <>
-            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
-              <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
-                {selectedTemplate.name}
-              </span>
-              {selectedTemplate.formCode && (
-                <span className="text-[9px] text-cad-muted font-mono">{selectedTemplate.formCode}</span>
-              )}
-              <span className="text-[9px] text-cad-muted font-mono">
-                {me?.badge || '*'} * {me?.name || currentUser?.name}
-              </span>
-              <div className="ml-auto flex gap-2 items-center">
-                <button className={xs(S_BTN_GHOST)} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
-                  * Discard
-                </button>
-                <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}>
-                  Issue Record
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-hidden flex flex-col">
-              <FormDocWrap meta={draftMeta}>
-                <ReportDocument
-                  type={selectedTemplate.name}
-                  template={selectedTemplate}
-                  data={formValues}
-                  editable
-                  onChange={handleFormChange}
-                  meta={draftMeta}
-                />
-              </FormDocWrap>
-            </div>
-          </>
-        )}
 
         {showRecord && (
           <>
