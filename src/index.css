@@ -346,13 +346,18 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   cursor: pointer;
   font-family: var(--font-ui);
   flex-shrink: 0;
-  transition: background 0.1s, color 0.1s;
+  transition: background var(--t-fast) var(--ease-soft),
+              color var(--t-fast) var(--ease-soft),
+              border-color var(--t-fast) var(--ease-soft),
+              transform var(--t-fast) var(--ease-soft);
 }
 .cad-tool-btn:hover:not(:disabled) {
   background: rgba(255,255,255,0.07);
   border-color: rgba(255,255,255,0.1);
   color: #ffffff;
+  transform: translateY(-1px);
 }
+.cad-tool-btn:active:not(:disabled) { transform: translateY(0); }
 .cad-tool-btn.active {
   background: rgba(255,255,255,0.12);
   border-color: rgba(255,255,255,0.18);
@@ -733,8 +738,9 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
 .cad-table td:last-child { border-right: none; }
 
-.cad-table tbody tr { cursor: pointer; }
+.cad-table tbody tr { cursor: pointer; transition: transform var(--t-fast) var(--ease-soft); }
 .cad-table tbody tr:hover td { background: #2c2c32 !important; }
+.cad-table tbody tr:hover { transform: translateX(2px); }
 .cad-table tbody tr.row-selected td { background: #303038 !important; border-bottom-color: #404050; box-shadow: inset 3px 0 0 var(--acc-blue-hi); }
 
 /* Priority left-border accent on calls rows */
@@ -1058,7 +1064,14 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   line-height: 1.2;
   letter-spacing: 0.2px;
   position: relative;
+  transition: background var(--t-fast) var(--ease-soft),
+              color var(--t-fast) var(--ease-soft),
+              border-color var(--t-fast) var(--ease-soft),
+              box-shadow var(--t-fast) var(--ease-soft),
+              transform var(--t-fast) var(--ease-soft),
+              filter var(--t-fast) var(--ease-soft);
 }
+.n-btn:not(:disabled):hover  { transform: translateY(-1px); }
 .n-btn:not(:disabled):active { transform: translateY(1px) scale(0.985); }
 .n-btn-sm  { padding: 5px 11px; font-size: 12px; }
 .n-btn-xs  { padding: 4px 9px;  font-size: 11px; }
@@ -1405,9 +1418,12 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   border-left: 3px solid transparent;
   border-bottom: 1px solid var(--n-border-faint);
   cursor: pointer;
+  transition: background var(--t-fast) var(--ease-soft),
+              border-color var(--t-fast) var(--ease-soft),
+              transform var(--t-fast) var(--ease-soft);
 }
-.call-card:hover { background: var(--n-bg-hover); }
-.call-card.selected { background: var(--n-bg-selected); }
+.call-card:hover { background: var(--n-bg-hover); transform: translateX(2px); }
+.call-card.selected { background: var(--n-bg-selected); transform: translateX(2px); }
 .call-card.p1 { border-left-color: var(--pr1-text); }
 .call-card.p2 { border-left-color: var(--pr2-text); }
 .call-card.p3 { border-left-color: var(--pr3-text); }
@@ -1515,6 +1531,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   from { transform: translateX(10px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
+@keyframes slideInLeft {
+  from { transform: translateX(-10px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
 @keyframes slideUp {
   from { transform: translateY(6px); opacity: 0; }
   to   { transform: translateY(0);   opacity: 1; }
@@ -1531,10 +1551,104 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   from { transform: translateY(8px); opacity: 0; }
   to   { transform: translateY(0);   opacity: 1; }
 }
+@keyframes expandDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
 /* ─── Page transition: routed content fades/slides in ─── */
 .cad-workspace > * {
   animation: pageEnter var(--t-slow) var(--ease-out);
+}
+
+/* ─── Portal & admin cards ─── */
+.portal-card-hover {
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease-soft),
+              background var(--t-fast) var(--ease-soft),
+              transform var(--t-med) var(--ease-out),
+              box-shadow var(--t-med) var(--ease-out);
+}
+.portal-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.portal-card-hover:active { transform: translateY(0); }
+
+/* Admin customization hub cards — staggered entrance */
+.son-card {
+  animation: popIn var(--t-med) var(--ease-out) both;
+}
+.son-card:nth-child(1)  { animation-delay: 0ms; }
+.son-card:nth-child(2)  { animation-delay: 30ms; }
+.son-card:nth-child(3)  { animation-delay: 60ms; }
+.son-card:nth-child(4)  { animation-delay: 90ms; }
+.son-card:nth-child(5)  { animation-delay: 120ms; }
+.son-card:nth-child(6)  { animation-delay: 150ms; }
+.son-card:nth-child(7)  { animation-delay: 180ms; }
+.son-card:nth-child(8)  { animation-delay: 210ms; }
+.son-card:nth-child(9)  { animation-delay: 240ms; }
+.son-card:nth-child(10) { animation-delay: 270ms; }
+.son-card:nth-child(11) { animation-delay: 300ms; }
+.son-card:nth-child(12) { animation-delay: 330ms; }
+.son-card:nth-child(n+13) { animation-delay: 360ms; }
+
+/* ─── Expanding sections (e.g. dept editor expand) ─── */
+.expand-section {
+  animation: expandDown var(--t-med) var(--ease-out);
+}
+
+/* ─── Record returns — slide in when they appear ─── */
+.record-return {
+  animation: slideUp var(--t-med) var(--ease-out);
+}
+
+/* ─── Search result rows — staggered entrance ─── */
+.result-row {
+  animation: slideInLeft var(--t-med) var(--ease-out) both;
+}
+
+/* ─── Inline alert banners ─── */
+.record-return-alert {
+  animation: slideDown var(--t-fast) var(--ease-out);
+}
+
+/* ─── Stat cards in portals — pop in ─── */
+.stat-card-enter {
+  animation: popIn var(--t-med) var(--ease-out) both;
+}
+
+/* ─── Two-pane slide transitions (desktop list→detail) ─── */
+.mob-list-panel {
+  transition: opacity var(--t-med) var(--ease-soft),
+              transform var(--t-med) var(--ease-soft),
+              max-width var(--t-med) var(--ease-soft),
+              padding var(--t-med) var(--ease-soft);
+  overflow: hidden;
+}
+.mob-detail-panel {
+  transition: opacity var(--t-med) var(--ease-soft),
+              transform var(--t-med) var(--ease-soft);
+}
+
+/* ─── n-tab badge pop ─── */
+.n-tab { position: relative; }
+
+/* ─── Input focus ring ─── */
+.n-input, .n-select, .n-textarea {
+  transition: border-color var(--t-fast) var(--ease-soft),
+              box-shadow var(--t-fast) var(--ease-soft),
+              background var(--t-fast) var(--ease-soft);
+}
+
+/* ─── Badge appearance ─── */
+.n-badge {
+  transition: background var(--t-fast) var(--ease-soft),
+              color var(--t-fast) var(--ease-soft);
 }
 
 /* Admin top-nav tab bar — scroll without a visible scrollbar (chevrons handle it) */
@@ -1890,8 +2004,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
   /* ─── Two-pane pages (records/reports) ─── */
   .mob-two-pane { grid-template-columns: 1fr !important; }
-  .mob-list-panel.mob-gone { display: none !important; }
-  .mob-detail-panel.mob-gone { display: none !important; }
+  .mob-list-panel.mob-gone { display: none !important; transition: none; }
+  .mob-detail-panel.mob-gone { display: none !important; transition: none; }
   .mob-back-btn { display: flex; }
 
   /* ─── Form documents ─── */

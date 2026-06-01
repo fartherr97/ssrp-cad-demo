@@ -112,10 +112,12 @@ export function SonButton({ children, onClick, variant = 'default', size, style 
         padding: size === 'sm' ? '5px 11px' : '8px 16px', fontSize: size === 'sm' ? 12 : 13,
         fontWeight: 600, borderRadius: 6, cursor: disabled ? 'default' : 'pointer',
         fontFamily: 'var(--font-ui)', whiteSpace: 'nowrap', opacity: disabled ? 0.5 : 1,
-        transition: 'filter .15s, transform .15s', ...variants[variant], ...style,
+        transition: 'filter .15s, transform .15s, box-shadow .15s', ...variants[variant], ...style,
       }}
-      onMouseEnter={e => { if (!disabled) e.currentTarget.style.filter = 'brightness(1.15)'; }}
-      onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
+      onMouseEnter={e => { if (!disabled) { e.currentTarget.style.filter = 'brightness(1.15)'; e.currentTarget.style.transform = 'translateY(-1px)'; } }}
+      onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = ''; }}
+      onMouseDown={e => { if (!disabled) e.currentTarget.style.transform = 'translateY(0)'; }}
+      onMouseUp={e => { if (!disabled) e.currentTarget.style.transform = 'translateY(-1px)'; }}
     >
       {children}
     </button>
@@ -174,9 +176,9 @@ export function SonTable({ columns, children }) {
 
 export function SonRow({ children, i = 0 }) {
   return (
-    <tr style={{ background: i % 2 ? ADMIN.rowAlt : ADMIN.row, transition: 'background .12s' }}
-      onMouseEnter={e => e.currentTarget.style.background = ADMIN.panel2}
-      onMouseLeave={e => e.currentTarget.style.background = i % 2 ? ADMIN.rowAlt : ADMIN.row}>
+    <tr style={{ background: i % 2 ? ADMIN.rowAlt : ADMIN.row, transition: 'background .14s, transform .14s' }}
+      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.panel2; e.currentTarget.style.transform = 'translateX(2px)'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = i % 2 ? ADMIN.rowAlt : ADMIN.row; e.currentTarget.style.transform = ''; }}>
       {children}
     </tr>
   );
