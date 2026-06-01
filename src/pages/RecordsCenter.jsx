@@ -4,6 +4,8 @@ import { useCAD } from '../store/cadStore';
 import { FormDocWrap, ReportDocument } from '../components/FormDocument';
 import {
   MdBadge, MdGavel, MdDirectionsCar, MdWarning, MdDescription, MdAssignment,
+  MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdCheckCircle,
+  MdShield, MdPerson, MdInventory2,
 } from 'react-icons/md';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, xs,
@@ -37,6 +39,7 @@ export default function RecordsCenter() {
   const [formValues, setFormValues]             = useState({});
   const [selectedRecord, setSelectedRecord]     = useState(null);
   const [savedAt, setSavedAt]                   = useState(null);
+  const [activeTab, setActiveTab]               = useState('Record');
 
   const openTemplate = (tpl) => {
     setSelectedTemplate(tpl);
@@ -112,47 +115,131 @@ export default function RecordsCenter() {
     status: 'Draft',
   };
 
-  // ══ Full-screen editor when issuing/editing a record ══
+  // ══ Hybrid record-writer (Record Details · paper document · Related) ══
   if (showForm) {
+    const tpl = selectedTemplate;
+    const sectionTitles = tpl.sections ? tpl.sections.map(s => s.title) : ['Details'];
+    const tabs = ['Record', ...sectionTitles];
+    const now = new Date();
+
+    const scrollTo = (title) => {
+      setActiveTab(title);
+      const sel = title === 'Record' ? '[data-doc-top]' : `[data-section="${title}"]`;
+      document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    const saveDraftNow = () => {
+      try { localStorage.setItem(DRAFT_KEY(tpl.id), JSON.stringify(formValues)); setSavedAt(new Date()); } catch { /* ignore */ }
+    };
+    const Detail = ({ label, value }) => (
+      <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
+        <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{label}</span>
+        <span className="text-[12.5px] text-slate-200">{value || '—'}</span>
+      </div>
+    );
+
     return (
-      <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
-        <div className="px-3 md:px-4 py-2 bg-app-toolbar border-b border-border-base flex flex-wrap items-center gap-x-3 gap-y-1 shrink-0">
-          <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
-            {selectedTemplate.name}
-          </span>
-          {selectedTemplate.formCode && (
-            <span className="text-[10px] text-cad-muted font-mono">{selectedTemplate.formCode}</span>
-          )}
-          <span className="text-[10px] text-cad-muted font-mono">
-            {me?.badge || '*'} * {me?.name || currentUser?.name}
-          </span>
-          <span className="flex items-center gap-1.5 text-[10px] text-cad-muted">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            {savedAt ? `Draft saved ${savedAt.toLocaleTimeString()}` : 'Auto-saving draft…'}
-          </span>
-          <button className={`${xs(S_BTN_GHOST)} ml-auto`} onClick={closeForm}>
-            * Discard
-          </button>
+      <div className="flex flex-col h-full overflow-hidden font-ui">
+
+        {/* ── Top bar: title + section tabs + autosave ── */}
+        <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 pt-2.5 pb-1.5">
+            <MdAssignment size={18} className="text-brand-bright shrink-0" />
+            <span className="text-[13px] font-bold text-white uppercase tracking-[0.4px]">Record Writing</span>
+            <span className="text-[11px] text-slate-500">{tpl.name}{tpl.formCode ? ` · ${tpl.formCode}` : ''}</span>
+            <span className="ml-auto flex items-center gap-1.5 text-[10.5px] font-semibold text-slate-400">
+              <span className={`w-1.5 h-1.5 rounded-full ${savedAt ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
+              AUTOSAVE: ON{savedAt && <span className="text-slate-600 font-normal"> · {savedAt.toLocaleTimeString()}</span>}
+            </span>
+          </div>
+          <div className="flex items-center gap-0.5 px-3 overflow-x-auto n-tabs-wrap">
+            {tabs.map(t => {
+              const on = activeTab === t;
+              return (
+                <button key={t} onClick={() => scrollTo(t)}
+                  className={`relative px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.3px] whitespace-nowrap cursor-pointer transition-colors ${on ? 'text-brand-bright' : 'text-slate-500 hover:text-slate-300'}`}>
+                  {t}
+                  {on && <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-brand" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <FormDocWrap meta={draftMeta}>
-          <ReportDocument
-            type={selectedTemplate.name}
-            template={selectedTemplate}
-            data={formValues}
-            editable
-            onChange={handleFormChange}
-            meta={draftMeta}
-          />
-        </FormDocWrap>
+        {/* ── Body: 3 columns ── */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)_300px] overflow-auto xl:overflow-hidden">
 
-        <div className="px-3 md:px-4 py-2.5 bg-app-toolbar border-t border-border-base flex flex-wrap items-center gap-x-3 gap-y-2 shrink-0">
-          <span className="text-[10px] text-cad-muted">
-            Changes are saved automatically as a draft until you issue the record.
-          </span>
-          <div className="ml-auto flex gap-2">
-            <button className={xs(S_BTN_GHOST)} onClick={closeForm}>Cancel</button>
-            <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}>Issue Record</button>
+          {/* LEFT: record details */}
+          <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
+            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Details</div>
+            <div className="px-4">
+              <Detail label="Record #" value={draftMeta.caseNumber} />
+              <Detail label="Record Type" value={tpl.name} />
+              <Detail label="Category" value={tpl.category || 'General'} />
+              <Detail label="Date / Time" value={now.toLocaleString()} />
+              <Detail label="Issuing Officer" value={`${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`} />
+              <Detail label="Status" value={<span className={BADGE.gray}>Draft</span>} />
+            </div>
+            <div className="px-2 py-3 mt-1">
+              <div className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Sections</div>
+              {sectionTitles.map(t => (
+                <button key={t} onClick={() => scrollTo(t)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-colors ${activeTab === t ? 'bg-brand/15 text-brand-bright' : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'}`}>
+                  {t}
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          {/* CENTER: info strip + paper document */}
+          <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
+            <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Category</div><div className="text-[12.5px] text-slate-200 mt-0.5">{tpl.category || 'General'}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
+            </div>
+            <FormDocWrap meta={draftMeta}>
+              <div data-doc-top />
+              <ReportDocument type={tpl.name} template={tpl} data={formValues} editable onChange={handleFormChange} meta={draftMeta} />
+            </FormDocWrap>
+          </main>
+
+          {/* RIGHT: related */}
+          <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
+            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Related Records</div>
+            <div className="p-3 flex flex-col gap-3">
+              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
+                <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Issuing Officer</div>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0"><MdShield size={18} className="text-slate-400" /></div>
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-semibold text-white truncate">{me?.name || currentUser?.name}</div>
+                    <div className="text-[10.5px] text-slate-500">#{me?.badge || currentUser?.badge} · {me?.deptShort || 'HCSO'}</div>
+                  </div>
+                </div>
+              </div>
+              {[
+                { icon: MdPerson, label: 'Subject' },
+                { icon: MdDirectionsCar, label: 'Vehicle' },
+                { icon: MdInventory2, label: 'Attachments' },
+              ].map(c => (
+                <div key={c.label} className="bg-app-card/70 border border-border-base rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-1.5"><c.icon size={13} /> {c.label}</div>
+                  <div className="text-[11.5px] text-slate-600">Link from Records search</div>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+
+        {/* ── Bottom action bar ── */}
+        <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base flex items-center flex-wrap gap-2 px-4 py-2.5">
+          <button className={xs(S_BTN_SECONDARY)} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
+          <div className="ml-auto flex flex-wrap gap-2">
+            <button className={xs(S_BTN_SECONDARY)} onClick={saveDraftNow}><MdSave size={15} /> Save Draft</button>
+            <button className={xs(S_BTN_SECONDARY)} onClick={() => window.print()}><MdPrint size={15} /> Preview PDF</button>
+            <button className={xs(S_BTN_GHOST)} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
+            <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
           </div>
         </div>
       </div>
