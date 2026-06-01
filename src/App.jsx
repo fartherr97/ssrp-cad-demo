@@ -29,6 +29,7 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
+import AdminHome from './pages/portal/AdminHome';
 // Admin (Sonoran-style customization suite)
 import AdminShell from './pages/admin/AdminShell';
 import CustomizationHub from './pages/admin/sections/CustomizationHub';
@@ -143,6 +144,9 @@ function CADApp() {
         <Route path="/bans"          element={<BanManagement />} />
         <Route path="/builder"       element={<FormBuilder />} />
         <Route path="/profile"       element={<OfficerProfile />} />
+
+        {/* ── Admin / Command portal home ── */}
+        <Route path="/portal/admin"  element={<AdminHome />} />
 
         {/* ── Civilian portal ── */}
         <Route path="/portal/civilian"    element={<CivilianHome />} />
