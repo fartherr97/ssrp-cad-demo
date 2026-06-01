@@ -3,7 +3,7 @@ import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
-  BUSINESSES
+  BUSINESSES, RECORD_TEMPLATES
 } from '../data/mockData';
 import {
   TEN_CODES, CHARGE_TYPES, BOND_TYPES, STATUTES, UNIT_STATUS_CODES,
@@ -27,6 +27,7 @@ const initialState = {
   penalCode: PENAL_CODE,
   reports: REPORTS,
   reportTemplates: REPORT_TEMPLATES,
+  recordTemplates: RECORD_TEMPLATES,
   bannedUsers: BANNED_USERS,
   auditLog: AUDIT_LOG,
   messages: MESSAGES,
@@ -318,6 +319,13 @@ function reducer(state, action) {
       const reportTemplates = state.reportTemplates.filter(t => t.id !== action.payload);
       return { ...state, reportTemplates };
     }
+
+    case 'ADD_RECORD_TEMPLATE':
+      return { ...state, recordTemplates: [...state.recordTemplates, { ...action.payload, id: `r${Date.now()}` }] };
+    case 'UPDATE_RECORD_TEMPLATE':
+      return { ...state, recordTemplates: state.recordTemplates.map(t => t.id === action.payload.id ? action.payload : t) };
+    case 'DELETE_RECORD_TEMPLATE':
+      return { ...state, recordTemplates: state.recordTemplates.filter(t => t.id !== action.payload) };
 
     case 'ADD_CHARGE': {
       const newCharge = { ...action.payload, id: state.nextId };

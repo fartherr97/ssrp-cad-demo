@@ -407,3 +407,163 @@ export const BUSINESSES = [
   },
 ];
 
+export const RECORD_TEMPLATES = [
+  {
+    id: 'r1', name: 'Hunting License', category: 'License',
+    agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
+    formCode: 'FWC-HL-001',
+    sections: [
+      { id: 's1', title: 'License Holder', style: 'blue', fields: [
+        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
+        { id: 'f3', label: 'License Number',  type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
+        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
+      ]},
+      { id: 's2', title: 'License Details', style: 'gray', fields: [
+        { id: 'f6', label: 'License Type',     type: 'dropdown', span: 2, options: ['Resident Annual','Non-Resident Annual','Resident 5-Day','Youth'] },
+        { id: 'f7', label: 'Issuing Officer',  type: 'badge_lookup', span: 2 },
+      ]},
+    ],
+  },
+  {
+    id: 'r2', name: 'Fishing License', category: 'License',
+    agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
+    formCode: 'FWC-FL-001',
+    sections: [
+      { id: 's1', title: 'License Holder', style: 'blue', fields: [
+        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
+        { id: 'f3', label: 'License Number',  type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
+        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
+      ]},
+      { id: 's2', title: 'License Details', style: 'gray', fields: [
+        { id: 'f6', label: 'License Type',    type: 'dropdown', span: 2, options: ['Freshwater','Saltwater','Combined','Youth'] },
+        { id: 'f7', label: 'Issuing Officer', type: 'badge_lookup', span: 2 },
+      ]},
+    ],
+  },
+  {
+    id: 'r3', name: 'Trespass Notice', category: 'Notice',
+    agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
+    formCode: 'HCLE-TN-001',
+    sections: [
+      { id: 's1', title: 'Subject Information', style: 'blue', fields: [
+        { id: 'f1', label: 'Subject Name',    type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
+        { id: 'f3', label: 'Notice Number',   type: 'text',            span: 2, mono: true },
+        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 2, required: true },
+      ]},
+      { id: 's2', title: 'Trespass Details', style: 'gray', fields: [
+        { id: 'f5', label: 'Property Address',          type: 'text',     span: 4, required: true },
+        { id: 'f6', label: 'Property Owner / Business', type: 'text',     span: 2 },
+        { id: 'f7', label: 'Duration',                  type: 'dropdown', span: 2, options: ['1 Year','2 Years','5 Years','Permanent'] },
+      ]},
+      { id: 's3', title: 'Reason', style: 'gray', fields: [
+        { id: 'f8', label: 'Reason for Trespass', type: 'textarea', span: 4, required: true, minRows: 3 },
+      ]},
+      { id: 's4', title: 'Issuing Officer', style: 'gray', fields: [
+        { id: 'f9', label: 'Officer Badge #', type: 'badge_lookup', span: 2 },
+      ]},
+    ],
+  },
+  {
+    id: 'r4', name: 'CCW Permit', category: 'License',
+    agency: 'FLORIDA DEPARTMENT OF AGRICULTURE AND CONSUMER SERVICES',
+    formCode: 'FDACS-CCW-001',
+    sections: [
+      { id: 's1', title: 'Permit Holder', style: 'blue', fields: [
+        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
+        { id: 'f3', label: 'Permit Number',   type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
+        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
+      ]},
+      { id: 's2', title: 'Restrictions', style: 'gray', fields: [
+        { id: 'f6', label: 'Restrictions', type: 'textarea', span: 4, minRows: 2 },
+      ]},
+    ],
+  },
+  {
+    id: 'r5', name: 'Warrant', category: 'Legal',
+    agency: 'HILLSBOROUGH COUNTY CIRCUIT COURT',
+    formCode: 'HCCC-WR-001',
+    sections: [
+      { id: 's1', title: 'Warrant Information', style: 'blue', fields: [
+        { id: 'f1', label: 'Subject Name',   type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Warrant #',      type: 'text',            span: 1, mono: true },
+        { id: 'f3', label: 'Warrant Type',   type: 'dropdown',        span: 2, required: true, options: ['Arrest Warrant','Bench Warrant','Search Warrant','Civil Warrant'] },
+        { id: 'f4', label: 'Issue Date',     type: 'date',            span: 1, required: true },
+        { id: 'f5', label: 'Issued By',      type: 'text',            span: 1, required: true },
+      ]},
+      { id: 's2', title: 'Charges', style: 'gray', fields: [
+        { id: 'f6', label: 'Charges / Statutes', type: 'textarea', span: 4, required: true, minRows: 3 },
+      ]},
+      { id: 's3', title: 'Notes', style: 'gray', fields: [
+        { id: 'f7', label: 'Additional Notes', type: 'textarea', span: 4, minRows: 2 },
+      ]},
+    ],
+  },
+  {
+    id: 'r6', name: 'Florida Traffic Citation', category: 'Citation',
+    agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
+    formCode: 'FL-UFTC-001',
+    sections: [
+      { id: 's1', title: 'Citation Information', style: 'blue', fields: [
+        { id: 'f1', label: 'Citation #',      type: 'text',            span: 1, mono: true, required: true },
+        { id: 'f2', label: 'Date / Time',     type: 'datetime',        span: 2, required: true },
+        { id: 'f3', label: 'Officer Badge #', type: 'badge_lookup',    span: 1 },
+      ]},
+      { id: 's2', title: 'Driver Information', style: 'gray', fields: [
+        { id: 'f4', label: 'Driver Name',       type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f5', label: 'DL Number',         type: 'text',            span: 1, mono: true },
+        { id: 'f6', label: 'Vehicle Plate',     type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f7', label: 'Location / Street', type: 'text',            span: 2, required: true },
+      ]},
+      { id: 's3', title: 'Violation', style: 'gray', fields: [
+        { id: 'f8', label: 'Violation / Statute', type: 'text', span: 3, required: true },
+        { id: 'f9', label: 'Fine Amount ($)',      type: 'text', span: 1, mono: true },
+      ]},
+    ],
+  },
+  {
+    id: 'r7', name: 'Firearm Registration', category: 'Registration',
+    agency: 'HILLSBOROUGH COUNTY SHERIFF\'S OFFICE',
+    formCode: 'HCSO-FR-001',
+    sections: [
+      { id: 's1', title: 'Owner Information', style: 'blue', fields: [
+        { id: 'f1', label: 'Owner Name',    type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'Date of Birth', type: 'date',            span: 1, required: true },
+      ]},
+      { id: 's2', title: 'Firearm Details', style: 'gray', fields: [
+        { id: 'f3', label: 'Make',          type: 'text', span: 2, required: true },
+        { id: 'f4', label: 'Model',         type: 'text', span: 2, required: true },
+        { id: 'f5', label: 'Serial Number', type: 'text', span: 2, mono: true, required: true },
+        { id: 'f6', label: 'Caliber',       type: 'text', span: 2, required: true },
+        { id: 'f7', label: 'Stolen',        type: 'checkbox', span: 1 },
+        { id: 'f8', label: 'Reg Date',      type: 'date', span: 1 },
+      ]},
+    ],
+  },
+  {
+    id: 'r8', name: 'License Suspension', category: 'Notice',
+    agency: 'FLORIDA DEPARTMENT OF HIGHWAY SAFETY AND MOTOR VEHICLES',
+    formCode: 'DHSMV-LS-001',
+    sections: [
+      { id: 's1', title: 'Subject Information', style: 'blue', fields: [
+        { id: 'f1', label: 'Full Name',      type: 'civilian_lookup', span: 3, required: true },
+        { id: 'f2', label: 'DL Number',      type: 'text',            span: 1, mono: true, required: true },
+        { id: 'f3', label: 'Suspension #',   type: 'text',            span: 2, mono: true },
+        { id: 'f4', label: 'Effective Date', type: 'date',            span: 1, required: true },
+        { id: 'f5', label: 'End Date',       type: 'date',            span: 1 },
+      ]},
+      { id: 's2', title: 'Suspension Details', style: 'gray', fields: [
+        { id: 'f6', label: 'Suspension Type',   type: 'dropdown', span: 2, required: true, options: ['DUI','Habitual Offender','Failure to Pay Fines','Medical','Other'] },
+        { id: 'f7', label: 'Issuing Authority', type: 'text',     span: 2 },
+        { id: 'f8', label: 'Notes',             type: 'textarea', span: 4, minRows: 2 },
+      ]},
+    ],
+  },
+];
+
