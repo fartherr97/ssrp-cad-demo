@@ -2,25 +2,14 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 
-function SSRPSeal() {
-  return (
-    <svg width="68" height="78" viewBox="0 0 68 78" fill="none" aria-hidden="true">
-      <circle cx="34" cy="40" r="32" fill="none" stroke="#7a5008" strokeWidth="1"/>
-      <circle cx="34" cy="40" r="29" fill="none" stroke="#5a3c06" strokeWidth="0.5"/>
-      <path d="M34 4L8 16v24c0 17 12 31 26 34 14-3 26-17 26-34V16L34 4z"
-        fill="#040c1c" stroke="#9a7010" strokeWidth="1.2"/>
-      <path d="M34 10L12 20v20c0 13 10 24 22 27 12-3 22-14 22-27V20L34 10z"
-        fill="rgba(13,84,146,0.22)" stroke="#0d4a80" strokeWidth="0.8"/>
-      <text x="34" y="38" textAnchor="middle" fill="#1268b0" fontSize="18" fontFamily="system-ui">★</text>
-      <text x="34" y="52" textAnchor="middle" fill="#c09018" fontSize="8" fontWeight="700"
-        fontFamily="system-ui" letterSpacing="2">SSRP</text>
-      <path id="topArc" d="M 10 40 A 24 24 0 0 1 58 40" fill="none"/>
-      <text fontSize="5.5" fontFamily="system-ui" fill="#7a5808" letterSpacing="1.2" fontWeight="600">
-        <textPath href="#topArc" startOffset="5%">SUNSHINE STATE ROLEPLAY</textPath>
-      </text>
-    </svg>
-  );
-}
+const AGENCIES = [
+  { abbr: 'TPD',     name: 'Tampa Police Dept.',      color: '#3a78cc' },
+  { abbr: 'HCSO',    name: "Hillsborough Co. Sheriff", color: '#3aaa44' },
+  { abbr: 'HCFR',    name: 'Fire Rescue',             color: '#cc3333' },
+  { abbr: 'FHP',     name: 'Highway Patrol',          color: '#c8a050' },
+  { abbr: 'FDOT',    name: 'Dept. of Transportation', color: '#dd7820' },
+  { abbr: 'CIV-OPS', name: 'Civilian Operations',     color: '#7878aa' },
+];
 
 export default function LoginPage() {
   const { dispatch } = useCAD();
@@ -32,129 +21,180 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-bg">
+    <div style={{
+      height: '100vh', overflow: 'auto',
+      background: '#020810',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexDirection: 'column', gap: 0,
+    }}>
+      {/* Top accent bar */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, background: '#0a3a6a' }} />
+
+      {/* Main login panel */}
       <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, height: 3,
-        background: 'linear-gradient(90deg, #0d5492 0%, #1878c8 35%, #b88a0a 65%, #0d5492 100%)',
-      }} />
-
-      {/* Agency bar */}
-      <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
-        {[
-          { abbr: 'TPD', name: 'Tampa Police', color: '#1060a0' },
-          { abbr: 'HCSO', name: 'Sheriff', color: '#1a6820' },
-          { abbr: 'HCFR', name: 'Fire Rescue', color: '#a02010' },
-          { abbr: 'FHP', name: 'Highway Patrol', color: '#8a6808' },
-        ].map(ag => (
-          <div key={ag.abbr} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, opacity: 0.5 }}>
-            <div style={{
-              width: 30, height: 30, borderRadius: '50%',
-              border: `1.5px solid ${ag.color}55`,
-              background: `${ag.color}11`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 7, fontWeight: 700, color: ag.color,
-              fontFamily: 'var(--font-mono)', letterSpacing: '0.5px',
-            }}>{ag.abbr}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="login-panel">
-        {/* Header */}
-        <div className="login-header">
-          <SSRPSeal />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--n-text-muted)', marginBottom: 5, fontFamily: 'var(--font-mono)' }}>
-              HILLSBOROUGH COUNTY COMMUNICATIONS
+        background: '#040c1a',
+        border: '1px solid #1a3050',
+        width: 420,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.95)',
+      }}>
+        {/* Title bar */}
+        <div style={{
+          background: '#0a1c34',
+          borderBottom: '1px solid #1a3050',
+          padding: '8px 12px',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <svg width="14" height="16" viewBox="0 0 36 42" fill="none" aria-hidden="true">
+            <path d="M18 1L2 8v16c0 9.5 7.2 17.5 16 19 8.8-1.5 16-9.5 16-19V8L18 1z"
+              fill="#030810" stroke="#5a3c06" strokeWidth="1.2"/>
+            <path d="M18 6L5 11.5v12.5c0 7.5 5.8 13.8 13 15.2 7.2-1.4 13-7.7 13-15.2V11.5L18 6z"
+              fill="rgba(10,50,110,0.3)" stroke="#0a3060" strokeWidth="0.8"/>
+            <text x="18" y="23" textAnchor="middle" fill="#0a4890" fontSize="11" fontFamily="system-ui">★</text>
+          </svg>
+          <div>
+            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: '#a07808', fontFamily: 'var(--font-mono)' }}>
+              SSRP CAD SYSTEM
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--n-gold-bright)', letterSpacing: '1px', lineHeight: 1.1 }}>
-              SSRP NEXUS CAD
-            </div>
-            <div style={{ fontSize: 10, color: 'var(--n-text-dim)', marginTop: 3, letterSpacing: '0.4px' }}>
-              Computer-Aided Dispatch System · Version 2.0
+            <div style={{ fontSize: 8, color: '#2e4258', fontFamily: 'var(--font-mono)', letterSpacing: '0.3px' }}>
+              HILLSBOROUGH COUNTY EMERGENCY COMMUNICATIONS CENTER
             </div>
           </div>
+        </div>
 
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[
-              { label: 'DISPATCH', color: 'var(--st-av-text)' },
-              { label: 'RMS', color: 'var(--st-av-text)' },
-              { label: 'MDT LINK', color: 'var(--st-av-text)' },
-            ].map(s => (
-              <div key={s.label} style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '2px 7px',
-                background: 'var(--n-bg-input)', border: '1px solid var(--n-border-faint)', borderRadius: 2,
+        {/* System status bar */}
+        <div style={{
+          display: 'flex', gap: 0, padding: '4px 10px',
+          background: '#030810', borderBottom: '1px solid #0d1e30',
+        }}>
+          {[
+            { label: 'DISPATCH', status: 'ONLINE', color: '#22cc55' },
+            { label: 'RMS',      status: 'ONLINE', color: '#22cc55' },
+            { label: 'MDT',      status: 'ONLINE', color: '#22cc55' },
+            { label: 'MAPPING',  status: 'ONLINE', color: '#22cc55' },
+          ].map((s, i) => (
+            <div key={s.label} style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              padding: '1px 10px 1px 0', marginRight: 8,
+              borderRight: i < 3 ? '1px solid #0d1e30' : 'none',
+              paddingRight: i < 3 ? 8 : 0,
+            }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: '#2e4258', letterSpacing: '0.5px' }}>
+                {s.label}
+              </span>
+              <span style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: s.color, fontWeight: 700 }}>
+                {s.status}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Agency grid */}
+        <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #0d1e30' }}>
+          <div style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: '#2e4258', letterSpacing: '0.8px', marginBottom: 7, textTransform: 'uppercase' }}>
+            PARTICIPATING AGENCIES
+          </div>
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+            {AGENCIES.map(ag => (
+              <div key={ag.abbr} style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '2px 8px',
+                background: '#030810',
+                border: `1px solid ${ag.color}30`,
               }}>
-                <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, boxShadow: `0 0 4px ${s.color}` }} />
-                <span style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', letterSpacing: '0.5px' }}>{s.label}</span>
-                <span style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: s.color, fontWeight: 600 }}>ONLINE</span>
+                <div style={{ width: 4, height: 4, background: ag.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: ag.color, fontWeight: 700, letterSpacing: '0.4px' }}>
+                  {ag.abbr}
+                </span>
+                <span style={{ fontSize: 8, color: '#2e4258' }}>{ag.name}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Body */}
-        <div className="login-body">
+        {/* Login body */}
+        <div style={{ padding: '12px 12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'var(--n-text-muted)', marginBottom: 5, fontFamily: 'var(--font-mono)' }}>
-              AUTHORIZED PERSONNEL ONLY
+            <div style={{ fontSize: 8, fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.8px', color: '#2e4258', textTransform: 'uppercase', marginBottom: 4 }}>
+              ▌ AUTHORIZED PERSONNEL ONLY
             </div>
-            <p style={{ fontSize: 11, color: 'var(--n-text-dim)', lineHeight: 1.7 }}>
-              Access is restricted to active SSRP members with a valid whitelist. All actions are monitored, logged, and subject to command review.
-            </p>
+            <div style={{ fontSize: 10, color: '#3a5070', lineHeight: 1.6 }}>
+              Access is restricted to active SSRP members with a valid whitelist.
+              All actions are logged and subject to command review.
+            </div>
           </div>
 
           <div className="n-field">
-            <label className="n-label">Select Personnel (Demo Environment)</label>
-            <select className="n-select" value={selectedUser} onChange={e => setSelectedUser(e.target.value)}>
+            <label className="n-label" style={{ marginBottom: 4 }}>Select Personnel (Demo Environment)</label>
+            <select
+              className="n-select"
+              value={selectedUser}
+              onChange={e => setSelectedUser(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: 10 }}
+            >
               {OFFICERS.map(o => (
                 <option key={o.id} value={o.id}>
-                  {o.name} — {o.badge} ({o.deptShort} · {o.rank})
+                  {o.badge} — {o.name} ({o.deptShort} · {o.rank})
                 </option>
               ))}
             </select>
           </div>
 
           <button
-            className="n-btn n-btn-primary n-btn-lg"
-            style={{ width: '100%', justifyContent: 'center', marginTop: 2, letterSpacing: '0.3px' }}
+            style={{
+              width: '100%', padding: '6px 12px', fontSize: 11, fontWeight: 600,
+              background: '#061828', color: '#80b8e0',
+              border: '1px solid #0d3a60', cursor: 'pointer',
+              fontFamily: 'var(--font-ui)', letterSpacing: '0.3px',
+              textTransform: 'uppercase',
+            }}
             onClick={handleLogin}
           >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M10 2H14V14H10V12H12V4H10V2zM3 8L7 4V7H10V9H7V12L3 8z"/>
-            </svg>
-            Access SSRP NEXUS CAD
+            ▶  Access CAD System
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ flex: 1, height: 1, background: 'var(--n-border-faint)' }} />
-            <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>OR</span>
-            <div style={{ flex: 1, height: 1, background: 'var(--n-border-faint)' }} />
+            <div style={{ flex: 1, height: 1, background: '#0d1e30' }} />
+            <span style={{ fontSize: 8, color: '#1a2a38', fontFamily: 'var(--font-mono)' }}>OR</span>
+            <div style={{ flex: 1, height: 1, background: '#0d1e30' }} />
           </div>
 
           <button
-            className="n-btn n-btn-secondary"
-            style={{ width: '100%', justifyContent: 'center', fontSize: 11, gap: 7 }}
+            style={{
+              width: '100%', padding: '5px 12px', fontSize: 10,
+              background: '#04080e', color: '#304258',
+              border: '1px solid #0d1e30', cursor: 'pointer',
+              fontFamily: 'var(--font-ui)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+            }}
             onClick={handleLogin}
           >
-            <svg width="13" height="10" viewBox="0 0 71 55" fill="#5865F2">
+            <svg width="13" height="10" viewBox="0 0 71 55" fill="#3a4870">
               <path d="M60.1 4.9A58.5 58.5 0 0045.8 1a40 40 0 00-1.8 3.7 54.1 54.1 0 00-16.1 0A40.3 40.3 0 0026.1 1 58.6 58.6 0 0011.8 4.9C1.7 19.7-1 34.1.3 48.3A59 59 0 0018 55.5a44.3 44.3 0 003.8-6.2 38.3 38.3 0 01-6-2.9l1.4-1.1a42.1 42.1 0 0036.2 0l1.5 1.1a38.1 38.1 0 01-6 2.9 44.6 44.6 0 003.8 6.2 58.7 58.7 0 0018.1-7.2C72 34 68.7 19.7 60.1 4.9zM23.7 39.8c-3.5 0-6.3-3.2-6.3-7.1s2.8-7.1 6.3-7.1c3.5 0 6.4 3.2 6.3 7.1 0 3.9-2.8 7.1-6.3 7.1zm23.6 0c-3.5 0-6.3-3.2-6.3-7.1s2.8-7.1 6.3-7.1c3.5 0 6.4 3.2 6.3 7.1 0 3.9-2.8 7.1-6.3 7.1z"/>
             </svg>
             Continue with Discord
           </button>
         </div>
 
+        {/* Footer */}
         <div style={{
-          padding: '7px 16px', borderTop: '1px solid var(--n-border-faint)',
-          background: 'var(--n-bg-root)', display: 'flex', justifyContent: 'space-between',
+          padding: '5px 12px', borderTop: '1px solid #0d1e30',
+          background: '#020810', display: 'flex', justifyContent: 'space-between',
         }}>
-          <span style={{ fontSize: 8.5, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>SSRP NEXUS CAD v2.0</span>
-          <span style={{ fontSize: 8.5, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>SECURE · AUDITED · ENCRYPTED</span>
+          <span style={{ fontSize: 8, color: '#1a2a38', fontFamily: 'var(--font-mono)' }}>
+            SSRP CAD v3.0
+          </span>
+          <span style={{ fontSize: 8, color: '#1a2a38', fontFamily: 'var(--font-mono)' }}>
+            SECURE · AUDITED · ENCRYPTED
+          </span>
         </div>
       </div>
 
-      <div style={{ fontSize: 8.5, color: 'var(--n-text-muted)', textAlign: 'center', maxWidth: 380, lineHeight: 1.7, fontFamily: 'var(--font-mono)', marginTop: 8 }}>
-        UNAUTHORIZED ACCESS IS PROHIBITED · ALL ACTIVITY IS MONITORED AND LOGGED · SSRP STAFF ONLY
+      {/* Bottom warning */}
+      <div style={{
+        marginTop: 12, fontSize: 8, color: '#1a2a38', textAlign: 'center',
+        maxWidth: 420, lineHeight: 1.8, fontFamily: 'var(--font-mono)',
+      }}>
+        UNAUTHORIZED ACCESS IS PROHIBITED · ALL ACTIVITY IS MONITORED AND LOGGED
       </div>
     </div>
   );

@@ -1,19 +1,21 @@
-import Sidebar from './Sidebar';
-import TopBar from './TopBar';
+import MenuBar from './MenuBar';
+import ActionBar from './ActionBar';
 import BottomBar from './BottomBar';
 import RadioToast from '../RadioToast';
+import { useCAD } from '../../store/cadStore';
+import { useState } from 'react';
 
-export default function AppShell({ children }) {
+export default function AppShell({ children, onCreateCall }) {
+  const { state } = useCAD();
+
   return (
-    <div className="n-shell">
-      <Sidebar />
-      <div className="n-main">
-        <TopBar />
-        <div className="n-content">
-          {children}
-        </div>
-        <BottomBar />
+    <div className="cad-shell">
+      <MenuBar />
+      <ActionBar onCreateCall={onCreateCall} />
+      <div className="cad-workspace">
+        {children}
       </div>
+      <BottomBar />
       <RadioToast />
     </div>
   );

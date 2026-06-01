@@ -1,7 +1,7 @@
+import { useState } from 'react';
 import { CADProvider, useCAD } from './store/cadStore';
 import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/LoginPage';
-import CommandDashboard from './pages/CommandDashboard';
 import DispatchCenter from './pages/DispatchCenter';
 import DispatchBoard from './pages/DispatchBoard';
 import FireOpsBoard from './pages/FireOpsBoard';
@@ -17,17 +17,19 @@ import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
 
 function CADApp() {
-  const { state } = useCAD();
+  const { state, dispatch: cadDispatch } = useCAD();
   const { currentUser, currentPage } = state;
+  const [showCreateCall, setShowCreateCall] = useState(false);
 
   if (!currentUser) return <LoginPage />;
 
   const pages = {
-    dashboard: <CommandDashboard />,
-    dispatch:  <DispatchCenter />,
+    dispatch:  <DispatchCenter showCreateForm={showCreateCall} onCloseCreate={() => setShowCreateCall(false)} />,
+    hub:       <DispatchCenter />,
     board:     <DispatchBoard />,
     fire:      <FireOpsBoard />,
     records:   <RecordsBureau />,
+    returns:   <RecordsBureau />,
     reports:   <ReportsCenter />,
     units:     <UnitManagement />,
     warrants:  <WarrantControl />,
@@ -40,8 +42,11 @@ function CADApp() {
   };
 
   return (
-    <AppShell>
-      {pages[currentPage] || <CommandDashboard />}
+    <AppShell onCreateCall={() => {
+      cadDispatch({ type: 'SET_PAGE', payload: 'dispatch' });
+      setShowCreateCall(true);
+    }}>
+      {pages[currentPage] || <DispatchCenter />}
     </AppShell>
   );
 }

@@ -1,13 +1,5 @@
 import { useCAD } from '../../store/cadStore';
 
-function Seg({ children, highlight }) {
-  return (
-    <span style={{ color: highlight ? 'var(--n-text-data)' : undefined }}>
-      {children}
-    </span>
-  );
-}
-
 export default function BottomBar() {
   const { state } = useCAD();
   const { currentUser, officers, calls, myCallId } = state;
@@ -17,42 +9,47 @@ export default function BottomBar() {
   const p1Count = calls.filter(c => c.priority === 1 && c.status !== 'CLOSED').length;
   const onDuty = officers.filter(o => o.status !== 'OFFDUTY').length;
   const available = officers.filter(o => o.status === 'AVAILABLE').length;
+  const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
 
   return (
-    <footer className="n-bottombar">
-      <Seg>CH: HILLSBOROUGH MAIN</Seg>
-      <div className="n-bottombar-sep" />
+    <footer className="cad-statusbar">
+      <span>CH: HILLSBOROUGH MAIN</span>
+      <span className="cad-statusbar-sep" />
 
-      <Seg>UNIT: <span style={{ color: 'var(--n-text-data)' }}>{me?.unitId || '—'}</span></Seg>
-      <div className="n-bottombar-sep" />
+      <span>UNIT: <span className="hi">{me?.unitId || '—'}</span></span>
+      <span className="cad-statusbar-sep" />
 
-      <Seg>CALL: <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)' }}>
+      <span>CALL: <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: myCall ? 600 : 400 }}>
         {myCall ? myCall.id : 'UNASSIGNED'}
-      </span></Seg>
-      <div className="n-bottombar-sep" />
+      </span></span>
+      <span className="cad-statusbar-sep" />
 
-      <Seg>
-        ACTIVE: <span style={{ color: 'var(--pr2-text)', fontWeight: 600 }}>
-          {calls.filter(c => c.status !== 'CLOSED').length}
-        </span>
-      </Seg>
+      <span>ACTIVE: <span className="hi">{activeCalls}</span></span>
+      <span className="cad-statusbar-sep" />
+
+      <span>PENDING: <span className="hi">{calls.filter(c => c.status === 'PENDING').length}</span></span>
+      <span className="cad-statusbar-sep" />
+
       {p1Count > 0 && (
         <>
-          <div className="n-bottombar-sep" />
-          <span style={{ color: 'var(--pr1-text)', fontWeight: 700, animation: 'pulseRed 1.5s ease-in-out infinite' }}>
-            ▲ P1 CRITICAL: {p1Count}
-          </span>
+          <span className="p1">▲ P1 CRITICAL: {p1Count}</span>
+          <span className="cad-statusbar-sep" />
         </>
       )}
-      <div className="n-bottombar-sep" />
 
-      <Seg>ON DUTY: <span style={{ color: 'var(--n-text-data)' }}>{onDuty}</span></Seg>
-      <div className="n-bottombar-sep" />
+      <span>ON DUTY: <span className="av">{onDuty}</span></span>
+      <span className="cad-statusbar-sep" />
 
-      <Seg>AVL: <span style={{ color: 'var(--st-av-text)' }}>{available}</span></Seg>
+      <span>AVAILABLE: <span className="av">{available}</span></span>
+      <span className="cad-statusbar-sep" />
 
-      <span style={{ marginLeft: 'auto', color: 'var(--n-border-strong)', userSelect: 'none' }}>
-        SSRP NEXUS CAD v2.0
+      <span>DEPT: <span className="hi">{me?.deptShort || '—'}</span></span>
+      <span className="cad-statusbar-sep" />
+
+      <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>
+
+      <span style={{ marginLeft: 'auto', color: '#1a2e44' }}>
+        SSRP CAD v3.0 · HILLSBOROUGH CO. ECC
       </span>
     </footer>
   );

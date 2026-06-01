@@ -36,9 +36,13 @@ const initialState = {
   radioSeen: 0,
   lastRadio: null,
   dispatchLog: [
-    { id: 'seed-3', time: '14:22:04', kind: 'call', text: 'Call 23-1042 created — Traffic Stop (Elm St / Route 9)' },
-    { id: 'seed-2', time: '14:22:31', kind: 'unit', text: 'Unit 831-12 attached to 23-1042' },
-    { id: 'seed-1', time: '14:35:10', kind: 'alert', text: 'BOLO issued — Black Dodge Charger, plate SUS-1109' },
+    { id: 'seed-6', time: '15:04:11', kind: 'call',   text: 'Call 26-1051 created — Road Hazard (I-275 SB / Sligh Ave)' },
+    { id: 'seed-5', time: '15:01:44', kind: 'call',   text: 'Call 26-1050 created — Theft / Shoplifting (4302 W Boy Scout Blvd)' },
+    { id: 'seed-4', time: '14:52:00', kind: 'alert',  text: 'Call 26-1048 — CARDIAC ARREST. 210 Bayshore Blvd Apt 4B. ALS required.' },
+    { id: 'seed-3', time: '14:45:22', kind: 'unit',   text: 'Unit FHP-214 dispatched to 26-1046 (MVA w/ Injuries)' },
+    { id: 'seed-2', time: '14:35:18', kind: 'unit',   text: 'Units HCFR-E11, HCFR-L7, HCFR-M3 dispatched to 26-1044 (Structure Fire)' },
+    { id: 'seed-1', time: '14:22:04', kind: 'call',   text: 'Call 26-1042 created — Traffic Stop (Elm St / Route 9)' },
+    { id: 'seed-0', time: '14:05:11', kind: 'alert',  text: 'BOLO — Black Dodge Charger plate SUS-1109. Owner has active warrant. No approach without backup.' },
   ],
 };
 
@@ -70,8 +74,7 @@ function addAuditEntry(state, action, module) {
 function reducer(state, action) {
   switch (action.type) {
     case 'LOGIN':
-      // After sign-in, drop into the selection hub where the user picks a module.
-      return { ...state, currentUser: action.payload, currentPage: 'hub' };
+      return { ...state, currentUser: action.payload, currentPage: 'dispatch' };
     case 'LOGOUT':
       return { ...state, currentUser: null, currentPage: 'login', myCallId: null };
     case 'SET_PAGE':
