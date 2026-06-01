@@ -40,10 +40,11 @@ export function PortalHeader({ icon: Icon, title, subtitle, accent = '#3a88e8', 
 
 export function StatCard({ label, value, accent = '#3a88e8', icon: Icon, hint }) {
   return (
-    <div style={{
+    <div className="stat-card-enter" style={{
       background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: 12, padding: '18px 20px', flex: 1, minWidth: 150,
       display: 'flex', flexDirection: 'column', gap: 6, position: 'relative', overflow: 'hidden',
+      transition: 'border-color var(--t-med), transform var(--t-med) var(--ease-out)',
     }}>
       <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.10 }}>
         {Icon && <Icon size={68} color={accent} />}

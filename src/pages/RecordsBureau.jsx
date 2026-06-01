@@ -131,17 +131,19 @@ export default function RecordsBureau() {
                 NO RECORDS FOUND
               </div>
             )}
-            {results.map(r => {
+            {results.map((r, idx) => {
               const isSelected = selected === r.id;
               const selStyle = {
                 padding: '6px 8px', cursor: 'pointer',
                 borderBottom: '1px solid var(--n-border-subtle)',
                 borderLeft: isSelected ? '3px solid var(--n-blue)' : '3px solid transparent',
                 background: isSelected ? 'var(--n-bg-selected)' : 'transparent',
+                transition: 'background var(--t-fast) var(--ease-soft), border-color var(--t-fast) var(--ease-soft)',
+                animationDelay: `${idx * 35}ms`,
               };
               if (searchType === 'PERSON') {
                 return (
-                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 700, fontSize: 11, color: 'var(--n-text)', fontFamily: 'var(--font-mono)' }}>
                       {r.lastName}, {r.firstName}
                     </div>
@@ -156,7 +158,7 @@ export default function RecordsBureau() {
                 );
               } else if (searchType === 'VEHICLE') {
                 return (
-                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 700, fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--n-text-data)' }}>{r.plate}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text)', marginTop: 1 }}>{r.year} {r.make} {r.model} · {r.color}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
@@ -167,7 +169,7 @@ export default function RecordsBureau() {
                 );
               } else {
                 return (
-                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 600, fontSize: 11, color: 'var(--n-text)' }}>{r.civilianName}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text-dim)', marginTop: 1 }}>{r.charge}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
