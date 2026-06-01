@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
-import { STATUS_COLORS as ST_COLOR } from '../constants/statusColors';
 import {
   S_FIELD, S_LABEL, S_SELECT, S_INPUT, S_TEXTAREA,
   S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST,
-  xs, btnHoverOn, btnHoverOff, btnActiveOn,
+  xs, btnActiveOn,
   S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
   cadStatus, CAD_STATUS_LABEL, cadCallStatus, cadPri, cadElapsed,
+  S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
 } from '../constants/styles';
 
 /* ─── Elapsed timer ─── */
@@ -94,13 +94,16 @@ export default function DispatchCenter() {
   const pendingCount = activeCalls.filter(c => c.status === 'PENDING').length;
   const unassignedCount = activeCalls.filter(c => c.units.length === 0).length;
 
+  // Status color map for unit table (runtime-dynamic, kept as style)
+  const unitStatusColor = { AVAILABLE:'#22ff66', BUSY:'#ff8822', ENRT:'#ddff33', ARRVD:'#ffee22', UNAVAILABLE:'#dd44aa', OFFDUTY:'#ff4444' };
+
   return (
-    <div className="cad-dispatch" style={{ flexDirection: 'column' }}>
+    <div className="cad-dispatch flex-col">
       {/* Mobile tab switcher */}
       <div className="mob-tab-bar">
         <button className={`mob-tab${mobileTab === 'calls' ? ' active' : ''}`} onClick={() => setMobileTab('calls')}>
           CALLS ({sortedCalls.length})
-          {p1Count > 0 && <span style={{ marginLeft: 4, color:'var(--pr1-text)' }}>▲P1</span>}
+          {p1Count > 0 && <span className="ml-1 text-red-400">▲P1</span>}
         </button>
         <button className={`mob-tab${mobileTab === 'units' ? ' active' : ''}`} onClick={() => setMobileTab('units')}>
           UNITS ({onDutyOfficers.length})
@@ -109,23 +112,23 @@ export default function DispatchCenter() {
 
       {/* CALLS GRID */}
       <div className={`cad-grid-panel calls-panel${mobileTab === 'calls' ? ' mob-active' : ''}`} style={{ flex: '55 1 0' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:6, padding:'2px 8px', background:'#020810', borderBottom:'1px solid var(--n-border-strong)', flexShrink:0, flexWrap:'wrap' }}>
-          <span style={{ fontSize:10, fontWeight:700, fontFamily:'var(--font-mono)', color:'var(--n-gold)', letterSpacing:'0.8px', textTransform:'uppercase' }}>■ ACTIVE SERVICE CALLS</span>
-          <span style={{ fontSize:10, fontFamily:'var(--font-mono)', color:'var(--n-text-muted)' }}>({sortedCalls.length})</span>
+        <div className="flex items-center gap-1.5 px-2 py-[2px] bg-app-bg border-b border-border-strong shrink-0 flex-wrap">
+          <span className="text-[10px] font-bold font-mono text-yellow-600 tracking-[0.8px] uppercase">■ ACTIVE SERVICE CALLS</span>
+          <span className="text-[10px] font-mono text-cad-muted">({sortedCalls.length})</span>
           {p1Count > 0 && (
-            <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#ff3333', fontWeight:700, marginLeft:4, animation:'pulseRed 1.5s ease-in-out infinite' }}>
+            <span className="text-[11px] font-mono text-red-400 font-bold ml-1 animate-pulse-red">
               ▲ P1:{p1Count}
             </span>
           )}
-          {pendingCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.BUSY, marginLeft:4 }}>PNDG:{pendingCount}</span>}
-          {unassignedCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.ENRT, marginLeft:4 }}>UNASN:{unassignedCount}</span>}
-          <div style={{ display:'flex', gap:2, alignItems:'center', marginLeft:'auto', flexWrap:'wrap' }}>
+          {pendingCount > 0 && <span className="text-[11px] font-mono text-amber-400 ml-1">PNDG:{pendingCount}</span>}
+          {unassignedCount > 0 && <span className="text-[11px] font-mono text-yellow-400 ml-1">UNASN:{unassignedCount}</span>}
+          <div className="flex gap-0.5 items-center ml-auto flex-wrap">
             {['ALL','PENDING','ACTIVE','ENRT','P1','P2','P3','P4'].map(f => {
               const active = callFilter === f;
               return (
                 <button key={f}
                   onClick={() => setCallFilter(f)}
-                  style={{ padding:'2px 7px', fontSize:9, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.4px', cursor:'pointer', background: active ? '#0e2848' : '#04090f', color: active ? '#80c8f0' : '#4a6a88', border:`1px solid ${active ? '#1a5090' : '#0d1e30'}`, transition:'all 0.1s' }}
+                  className={`px-[7px] py-[2px] text-[9px] font-mono font-bold tracking-[0.4px] cursor-pointer transition-all border ${active ? 'bg-sky-950 text-sky-300 border-sky-700' : 'bg-app-bg text-slate-500 border-white/[0.05]'}`}
                 >{f}</button>
               );
             })}
@@ -133,13 +136,13 @@ export default function DispatchCenter() {
           {isDispatch && (
             <button
               onClick={() => setSearchParams({ new:'1' })}
-              style={{ padding:'2px 10px', fontSize:9, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.5px', cursor:'pointer', background:'#0a2040', color:'#80c8f0', border:'1px solid #1a5090', marginLeft:4 }}
+              className="px-[10px] py-[2px] text-[9px] font-mono font-bold tracking-[0.5px] cursor-pointer bg-sky-950 text-sky-300 border border-sky-700 ml-1"
             >+ NEW CALL</button>
           )}
         </div>
 
-        <div style={{ flex:1, overflow:'auto' }}>
-          <table style={{ width:'100%', borderCollapse:'collapse', tableLayout:'fixed' }}>
+        <div className="flex-1 overflow-auto">
+          <table className="w-full border-collapse table-fixed">
             <colgroup>
               <col style={{ width:84 }} /><col style={{ width:180 }} /><col />
               <col style={{ width:110 }} /><col style={{ width:130 }} />
@@ -147,34 +150,35 @@ export default function DispatchCenter() {
               <col style={{ width:68 }} /><col style={{ width:180 }} />
             </colgroup>
             <thead>
-              <tr style={{ background:'#020810' }}>
+              <tr className="bg-app-bg">
                 {['CALL #','NATURE','LOCATION','CITY','COUNTY','PRI','STATUS','ELAPSED','UNITS'].map(h => (
-                  <th key={h} style={{ padding:'5px 8px', textAlign:'left', fontSize:9, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase', color:'#4a6a88', borderBottom:'1px solid #1a3050', whiteSpace:'nowrap', fontFamily:'var(--font-mono)', position:'sticky', top:0, zIndex:1, background:'#020810' }}>{h}</th>
+                  <th key={h} className={`${S_TABLE_TH} whitespace-nowrap z-[1]`}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {sortedCalls.length === 0 ? (
-                <tr><td colSpan={9}><div style={{ padding:'20px', textAlign:'center', color:'#334455', fontFamily:'var(--font-mono)', fontSize:11, letterSpacing:'0.5px' }}>NO ACTIVE CALLS</div></td></tr>
+                <tr><td colSpan={9}><div className="p-5 text-center text-slate-600 font-mono text-[11px] tracking-[0.5px]">NO ACTIVE CALLS</div></td></tr>
               ) : sortedCalls.map(c => {
                 const priColor = { 1:'#ff2222', 2:'#ff8822', 3:'#ddcc00', 4:'#22cc55' }[c.priority] || 'transparent';
                 return (
                 <tr
                   key={c.id}
-                  style={{ cursor:'pointer', borderLeft:`2px solid ${priColor}44`, borderBottom:'1px solid #060e18', background:'#030810', transition:'background 0.1s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background='#06101a'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background='#030810'; }}
+                  className="cursor-pointer transition-colors"
+                  style={{ borderLeft:`2px solid ${priColor}44`, borderBottom:'1px solid #060e18', background:'#030810' }}
+                  onMouseEnter={trHoverOn}
+                  onMouseLeave={trHoverOff}
                   onClick={() => navigate('/cad/' + c.id)}
                 >
-                  <td style={{ padding:'5px 8px', fontFamily:'var(--font-mono)', fontWeight:700, color:'#ffffff', fontSize:12 }}>{c.id}</td>
-                  <td style={{ padding:'5px 8px', fontWeight:600, color:'#ffffff', fontSize:13 }}>{c.nature}</td>
-                  <td style={{ padding:'5px 8px', color:'#ffffff', fontWeight:500, fontSize:12 }}>{c.location}</td>
-                  <td style={{ padding:'5px 8px', color:'#ffffff', fontSize:12 }}>{c.city}</td>
-                  <td style={{ padding:'5px 8px', color:'#cccccc', fontSize:12 }}>{c.county}</td>
-                  <td style={{ padding:'5px 8px' }}><PriBadge p={c.priority} /></td>
-                  <td style={{ padding:'5px 8px' }}><CallStatus status={c.status} /></td>
-                  <td style={{ padding:'5px 8px' }}>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span style={{ color:'#334455' }}>—</span>}</td>
-                  <td style={{ padding:'5px 8px', fontFamily:'var(--font-mono)', color: c.units.length > 0 ? '#00ee66' : '#334455', fontSize:12 }}>
+                  <td className={`${S_TABLE_TD} font-mono font-bold text-white`}>{c.id}</td>
+                  <td className={`${S_TABLE_TD} font-semibold text-white text-sm`}>{c.nature}</td>
+                  <td className={`${S_TABLE_TD} text-white font-medium`}>{c.location}</td>
+                  <td className={`${S_TABLE_TD} text-white`}>{c.city}</td>
+                  <td className={`${S_TABLE_TD} text-slate-300`}>{c.county}</td>
+                  <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
+                  <td className={S_TABLE_TD}><CallStatus status={c.status} /></td>
+                  <td className={S_TABLE_TD}>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">—</span>}</td>
+                  <td className={`${S_TABLE_TD} font-mono ${c.units.length > 0 ? 'text-green-400' : 'text-slate-600'}`}>
                     {c.units.length > 0 ? c.units.join(', ') : '—'}
                   </td>
                 </tr>
@@ -187,63 +191,64 @@ export default function DispatchCenter() {
 
       {/* UNITS GRID */}
       <div className={`cad-grid-panel units-panel${mobileTab === 'units' ? ' mob-active' : ''}`} style={{ flex: '45 1 0' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:6, padding:'2px 8px', background:'#020810', borderBottom:'1px solid var(--n-border-strong)', flexShrink:0, flexWrap:'wrap' }}>
-          <span style={{ fontSize:10, fontWeight:700, fontFamily:'var(--font-mono)', color:'var(--n-gold)', letterSpacing:'0.8px', textTransform:'uppercase' }}>■ FIELD UNITS</span>
-          <span style={{ fontSize:10, fontFamily:'var(--font-mono)', color:'var(--n-text-muted)' }}>({onDutyOfficers.length} ON DUTY)</span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.AVAILABLE, marginLeft:6 }}>
+        <div className="flex items-center gap-1.5 px-2 py-[2px] bg-app-bg border-b border-border-strong shrink-0 flex-wrap">
+          <span className="text-[10px] font-bold font-mono text-yellow-600 tracking-[0.8px] uppercase">■ FIELD UNITS</span>
+          <span className="text-[10px] font-mono text-cad-muted">({onDutyOfficers.length} ON DUTY)</span>
+          <span className="text-[11px] font-mono text-green-400 ml-1.5">
             AVL:{officers.filter(o => o.status === 'AVAILABLE').length}
           </span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.BUSY, marginLeft:6 }}>
+          <span className="text-[11px] font-mono text-red-400 ml-1.5">
             BUSY:{officers.filter(o => o.status === 'BUSY').length}
           </span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.ENRT, marginLeft:6 }}>
+          <span className="text-[11px] font-mono text-yellow-400 ml-1.5">
             ENRT:{officers.filter(o => o.status === 'ENRT').length}
           </span>
-          <div style={{ display:'flex', gap:2, alignItems:'center', marginLeft:'auto', flexWrap:'wrap' }}>
+          <div className="flex gap-0.5 items-center ml-auto flex-wrap">
             {['ALL','AVAILABLE','ENRT','BUSY','ARRVD','UNAVAILABLE'].map(f => {
               const active = unitFilter === f;
               return (
                 <button key={f}
                   onClick={() => setUnitFilter(f)}
-                  style={{ padding:'2px 7px', fontSize:9, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.4px', cursor:'pointer', background: active ? '#0e2848' : '#04090f', color: active ? '#80c8f0' : '#4a6a88', border:`1px solid ${active ? '#1a5090' : '#0d1e30'}`, transition:'all 0.1s' }}
+                  className={`px-[7px] py-[2px] text-[9px] font-mono font-bold tracking-[0.4px] cursor-pointer transition-all border ${active ? 'bg-sky-950 text-sky-300 border-sky-700' : 'bg-app-bg text-slate-500 border-white/[0.05]'}`}
                 >{f === 'UNAVAILABLE' ? 'UNAVL' : f === 'AVAILABLE' ? 'AVL' : f}</button>
               );
             })}
           </div>
         </div>
 
-        <div style={{ flex:1, overflow:'auto' }}>
-          <table style={{ width:'100%', borderCollapse:'collapse', tableLayout:'fixed' }}>
+        <div className="flex-1 overflow-auto">
+          <table className="w-full border-collapse table-fixed">
             <colgroup>
               <col style={{ width:90 }} /><col style={{ width:72 }} /><col style={{ width:84 }} />
               <col style={{ width:68 }} /><col style={{ width:200 }} /><col />
             </colgroup>
             <thead>
-              <tr style={{ background:'#020810' }}>
+              <tr className="bg-app-bg">
                 {['UNIT','STATUS','CALL #','AGENCY','LOCATION','NAME / RANK'].map(h => (
-                  <th key={h} style={{ padding:'5px 8px', textAlign:'left', fontSize:9, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase', color:'#4a6a88', borderBottom:'1px solid #1a3050', whiteSpace:'nowrap', fontFamily:'var(--font-mono)', position:'sticky', top:0, zIndex:1, background:'#020810' }}>{h}</th>
+                  <th key={h} className={`${S_TABLE_TH} whitespace-nowrap z-[1]`}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filteredUnits.length === 0 ? (
-                <tr><td colSpan={6}><div style={{ padding:'20px', textAlign:'center', color:'#334455', fontFamily:'var(--font-mono)', fontSize:11, letterSpacing:'0.5px' }}>NO UNITS MATCH FILTER</div></td></tr>
+                <tr><td colSpan={6}><div className="p-5 text-center text-slate-600 font-mono text-[11px] tracking-[0.5px]">NO UNITS MATCH FILTER</div></td></tr>
               ) : filteredUnits.map(o => (
                 <tr
                   key={o.id}
-                  style={{ cursor: o.callId ? 'pointer' : 'default', borderBottom:'1px solid #060e18', background:'#030810', transition:'background 0.1s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background='#06101a'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background='#030810'; }}
+                  className={`${o.callId ? 'cursor-pointer' : 'cursor-default'} transition-colors`}
+                  style={{ borderBottom:'1px solid #060e18', background:'#030810' }}
+                  onMouseEnter={trHoverOn}
+                  onMouseLeave={trHoverOff}
                   onClick={() => o.callId && navigate('/cad/' + o.callId)}
                 >
-                  <td style={{ padding:'5px 8px', fontFamily:'var(--font-mono)', fontWeight:700, color: ST_COLOR[o.status] || '#ffffff', fontSize:12 }}>{o.unitId}</td>
-                  <td style={{ padding:'5px 8px' }}><StatusBadge status={o.status} /></td>
-                  <td style={{ padding:'5px 8px', fontFamily:'var(--font-mono)', fontWeight:600, color: o.callId ? '#ffee44' : '#555560', fontSize:12 }}>{o.callId || '—'}</td>
-                  <td style={{ padding:'5px 8px', color:'#ffffff', fontWeight:600, fontSize:12 }}>{o.deptShort}</td>
-                  <td style={{ padding:'5px 8px', color:'#cccccc', fontSize:12 }}>{o.location}</td>
-                  <td style={{ padding:'5px 8px', color:'#ffffff', fontWeight:500, fontSize:12 }}>
+                  <td className={`${S_TABLE_TD} font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
+                  <td className={S_TABLE_TD}><StatusBadge status={o.status} /></td>
+                  <td className={`${S_TABLE_TD} font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '—'}</td>
+                  <td className={`${S_TABLE_TD} text-white font-semibold`}>{o.deptShort}</td>
+                  <td className={`${S_TABLE_TD} text-slate-300`}>{o.location}</td>
+                  <td className={`${S_TABLE_TD} text-white font-medium`}>
                     {o.name}
-                    {o.rank && <span style={{ color:'#888898', marginLeft:4 }}>· {o.rank}</span>}
+                    {o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}
                   </td>
                 </tr>
               ))}
@@ -255,7 +260,7 @@ export default function DispatchCenter() {
       {/* Create Call Modal */}
       {showCreateForm && (
         <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && closeCreate()}>
-          <div style={{ ...S_MODAL, maxWidth: 640 }}>
+          <div className={`${S_MODAL} max-w-[640px]`}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>■ CREATE NEW INCIDENT</div>
               <button
@@ -266,14 +271,14 @@ export default function DispatchCenter() {
             </div>
             <div className={S_MODAL_BODY}>
               <div className="n-grid-2">
-                <div style={S_FIELD}>
+                <div className={S_FIELD}>
                   <label className={S_LABEL}>Nature of Call *</label>
                   <select className={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
                     <option value="">Select nature...</option>
                     {CALL_NATURES.map(n => <option key={n}>{n}</option>)}
                   </select>
                 </div>
-                <div style={S_FIELD}>
+                <div className={S_FIELD}>
                   <label className={S_LABEL}>Priority</label>
                   <select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
                     <option value={1}>P1 — Critical / Life Safety</option>
@@ -284,7 +289,7 @@ export default function DispatchCenter() {
                 </div>
               </div>
               <div className="n-grid-2">
-                <div style={S_FIELD}>
+                <div className={S_FIELD}>
                   <label className={S_LABEL}>Category</label>
                   <select className={S_SELECT} value={newCall.category} onChange={e => setNewCall(p => ({ ...p, category:e.target.value }))}>
                     <option value="police">Law Enforcement</option>
@@ -293,22 +298,22 @@ export default function DispatchCenter() {
                     <option value="other">Other</option>
                   </select>
                 </div>
-                <div style={S_FIELD}>
+                <div className={S_FIELD}>
                   <label className={S_LABEL}>City</label>
                   <select className={S_SELECT} value={newCall.city} onChange={e => setNewCall(p => ({ ...p, city:e.target.value }))}>
                     {['Tampa','Brandon','Plant City','Riverview','Ruskin','Gibsonton','Temple Terrace','Unincorporated'].map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
-              <div style={S_FIELD}>
+              <div className={S_FIELD}>
                 <label className={S_LABEL}>Location / Address *</label>
                 <input className={S_INPUT} placeholder="e.g. 412 Oakwood Ave / I-275 MM 42 SB" value={newCall.location} onChange={e => setNewCall(p => ({ ...p, location:e.target.value }))} />
               </div>
-              <div style={S_FIELD}>
+              <div className={S_FIELD}>
                 <label className={S_LABEL}>Reporting Party</label>
                 <input className={S_INPUT} placeholder="911 Caller / Officer / FDOT / Dispatch..." value={newCall.reportingParty} onChange={e => setNewCall(p => ({ ...p, reportingParty:e.target.value }))} />
               </div>
-              <div style={S_FIELD}>
+              <div className={S_FIELD}>
                 <label className={S_LABEL}>Incident Narrative</label>
                 <textarea className={S_TEXTAREA} rows={3} placeholder="Describe the incident..." value={newCall.description} onChange={e => setNewCall(p => ({ ...p, description:e.target.value }))} />
               </div>
