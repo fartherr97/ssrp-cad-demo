@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
 import {
-  S_PAGE, S_TABS, tabStyle,
-  S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_FIELD, S_LABEL, S_SELECT, S_INPUT,
-  S_BTN_PRIMARY, btnHoverOn, btnHoverOff, btnActiveOn,
+  S_BTN_PRIMARY,
   BADGE, S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR,
 } from '../constants/styles';
 
@@ -45,18 +44,24 @@ export default function MDT() {
     }
   };
 
+  const TAB_BASE = 'px-3 py-2 text-[11px] font-semibold border-b-2 cursor-pointer transition-colors shrink-0';
+  const tabCls = (active) => active
+    ? `${TAB_BASE} border-sky-500 text-sky-400`
+    : `${TAB_BASE} border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600`;
+
   return (
-    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
-      <div style={S_TABS}>
+    <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
+      {/* Tab bar */}
+      <div className="flex items-end bg-app-panel border-b border-border-base shrink-0 px-1">
         {[
           { id: 'MESSAGES', label: 'Messages', badge: unread.length },
           { id: 'RADIO', label: 'Radio Log', badge: 0 },
           { id: 'QUERY', label: 'State Returns', badge: 0 },
         ].map(t => (
-          <button key={t.id} style={tabStyle(tab === t.id)} onClick={() => setTab(t.id)}>
+          <button key={t.id} className={tabCls(tab === t.id)} onClick={() => setTab(t.id)}>
             {t.label}
             {t.badge > 0 && (
-              <span style={{ marginLeft: 4, fontSize: 9, background: 'var(--pr1-bg)', color: 'var(--pr1-text)', borderRadius: 2, padding: '0 4px', fontFamily: 'var(--font-mono)' }}>
+              <span className="ml-1 text-[9px] bg-red-950 text-red-400 rounded px-1 font-mono">
                 {t.badge}
               </span>
             )}
@@ -64,58 +69,58 @@ export default function MDT() {
         ))}
       </div>
 
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+      <div className="flex-1 overflow-hidden flex">
         {/* MESSAGES */}
         {tab === 'MESSAGES' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-            <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
+          <div className="grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '260px 1fr' }}>
+            <div className={`${S_PANEL} rounded-none border-t-0 border-l-0 border-b-0 border-r-0`}>
               <div className={S_PANEL_HEADER}>
                 <div className={S_PANEL_TITLE}>Inbox</div>
-                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)' }}>{messages.length} MESSAGES</span>
+                <span className="text-[9px] font-mono text-cad-muted">{messages.length} MESSAGES</span>
               </div>
               <div className={S_PANEL_BODY}>
                 {messages.map(m => (
                   <div key={m.id}
-                    style={{
-                      margin: '3px 8px', padding: '7px 9px', borderRadius: 3, cursor: 'pointer',
-                      border: selectedMsg === m.id ? '1px solid var(--n-border-accent)' : '1px solid var(--n-border-subtle)',
-                      background: selectedMsg === m.id ? 'var(--n-bg-selected)' : !m.read ? 'var(--n-bg-elevated)' : 'var(--n-bg-card)',
-                      borderLeft: m.priority === 'HIGH' ? '3px solid var(--pr1-text)' : undefined,
-                      transition: 'border-color 0.22s, background 0.22s',
-                    }}
+                    className={`mx-2 my-[3px] px-[9px] py-[7px] rounded-[3px] cursor-pointer border transition-colors ${
+                      selectedMsg === m.id
+                        ? 'border-sky-600/60 bg-app-selected'
+                        : !m.read
+                        ? 'border-border-base bg-app-card'
+                        : 'border-border-faint bg-app-card'
+                    } ${m.priority === 'HIGH' ? 'border-l-[3px] border-l-red-400' : ''}`}
                     onClick={() => { setSelectedMsg(m.id); if (!m.read) markRead(m.id); }}>
-                    <div style={{ display: 'flex', gap: 5, marginBottom: 2, alignItems: 'center' }}>
-                      {!m.read && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--n-blue-active)', flexShrink: 0 }} />}
-                      {m.priority === 'HIGH' && <span style={{ ...BADGE.red, fontSize: 8 }}>HIGH PRI</span>}
-                      <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>
+                    <div className="flex gap-1.5 mb-0.5 items-center">
+                      {!m.read && <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />}
+                      {m.priority === 'HIGH' && <span className={`${BADGE.red} text-[8px]`}>HIGH PRI</span>}
+                      <span className="text-[9px] text-cad-muted font-mono ml-auto">
                         {m.timestamp?.split(' ')[1] || ''}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11.5, fontWeight: m.read ? 400 : 600, marginBottom: 1 }}>{m.subject}</div>
-                    <div style={{ fontSize: 10, color: 'var(--n-text-dim)' }}>From: {m.from}</div>
+                    <div className={`text-[11.5px] mb-px ${m.read ? 'font-normal' : 'font-semibold'}`}>{m.subject}</div>
+                    <div className="text-[10px] text-cad-dim">From: {m.from}</div>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
+            <div className={`${S_PANEL} rounded-none border-t-0 border-r-0 border-b-0`}>
               {!selMsg ? (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--n-text-muted)', padding: 20 }}>
-                  <span style={{ fontSize: 28, opacity: 0.2 }}>📨</span>
-                  <span style={{ fontSize: 11 }}>Select a message to read</span>
+                <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
+                  <span className="text-[28px] opacity-20">📨</span>
+                  <span className="text-[11px]">Select a message to read</span>
                 </div>
               ) : (
                 <>
-                  <div style={{ padding: '10px 14px', background: 'var(--n-bg-card)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 4, alignItems: 'center' }}>
+                  <div className="px-3.5 py-2.5 bg-app-card border-b border-border-base shrink-0">
+                    <div className="flex gap-2 mb-1 items-center">
                       {selMsg.priority === 'HIGH' && <span className={BADGE.red}>HIGH PRIORITY</span>}
                     </div>
-                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{selMsg.subject}</div>
-                    <div style={{ fontSize: 10, color: 'var(--n-text-dim)', fontFamily: 'var(--font-mono)' }}>
+                    <div className="text-[15px] font-bold mb-1">{selMsg.subject}</div>
+                    <div className="text-[10px] text-cad-dim font-mono">
                       From: {selMsg.from} → {selMsg.to} · {selMsg.timestamp}
                     </div>
                   </div>
-                  <div style={{ padding: 16, flex: 1, overflow: 'auto' }}>
-                    <div style={{ fontSize: 12.5, lineHeight: 1.8, color: 'var(--n-text)' }}>{selMsg.body}</div>
+                  <div className="p-4 flex-1 overflow-auto">
+                    <div className="text-[12.5px] leading-[1.8] text-cad-text">{selMsg.body}</div>
                   </div>
                 </>
               )}
@@ -125,23 +130,23 @@ export default function MDT() {
 
         {/* RADIO LOG */}
         {tab === 'RADIO' && (
-          <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', flex: 1 }}>
+          <div className={`${S_PANEL} rounded-none border-t-0 border-l-0 border-r-0 border-b-0 flex-1`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block', marginRight: 5 }} />
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_5px_#2fd968] mr-1.5" />
                 Dispatch Radio Log
               </div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>CH: HILLSBOROUGH MAIN</span>
+              <span className="text-[9px] text-cad-muted font-mono">CH: HILLSBOROUGH MAIN</span>
             </div>
             <div className={S_PANEL_BODY}>
               {dispatchLog.map(e => (
-                <div key={e.id} className={S_TX_ENTRY}>
+                <div key={e.id} className={`${S_TX_ENTRY} px-3 py-px`}>
                   <span className={S_TX_TIME}>{e.time}</span>
-                  <span style={{ color: TX_KIND_COLOR[e.kind] || 'var(--n-text-muted)' }}>{e.text}</span>
+                  <span className={TX_KIND_COLOR[e.kind] || 'text-slate-500'}>{e.text}</span>
                 </div>
               ))}
               {dispatchLog.length === 0 && (
-                <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No radio traffic</div>
+                <div className="p-5 text-center text-cad-muted text-[11px]">No radio traffic</div>
               )}
             </div>
           </div>
@@ -149,51 +154,48 @@ export default function MDT() {
 
         {/* STATE RETURNS */}
         {tab === 'QUERY' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
-            <div style={{ padding: '8px 12px', background: 'var(--n-bg-panel)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
-              <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8, fontFamily: 'var(--font-mono)' }}>
+          <div className="flex-1 flex flex-col gap-0 overflow-hidden">
+            <div className="px-3 py-2 bg-app-panel border-b border-border-base shrink-0">
+              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2 font-mono">
                 STATE / NCIC QUERY TERMINAL
               </div>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
-                <div style={{ ...S_FIELD, flex: '0 0 120px' }}>
+              <div className="flex gap-1.5 items-end">
+                <div className={`${S_FIELD} flex-[0_0_120px]`}>
                   <label className={S_LABEL}>Query Type</label>
                   <select className={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
                     <option value="PERSON">Person</option>
                     <option value="VEHICLE">Vehicle</option>
                   </select>
                 </div>
-                <div style={{ ...S_FIELD, flex: 1 }}>
+                <div className={`${S_FIELD} flex-1`}>
                   <label className={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
                   <input className={S_INPUT} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
                     placeholder={queryType === 'PERSON' ? 'e.g. Washington or 618-77-9901' : 'e.g. SUS-1109 or Dodge Charger'} />
                 </div>
-                <button className={S_BTN_PRIMARY} onMouseDown={btnActiveOn} onClick={runQuery}>Query</button>
+                <button className={S_BTN_PRIMARY} onClick={runQuery}>Query</button>
               </div>
             </div>
 
-            <div style={{ ...S_PANEL_BODY, flex: 1, padding: 12 }}>
+            <div className={`${S_PANEL_BODY} flex-1 p-3`}>
               {!searched ? (
-                <div style={{
-                  background: 'var(--n-bg-panel)', border: '1px solid var(--n-border)', borderRadius: 3,
-                  padding: 16, fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--n-text-dim)', lineHeight: 1.8,
-                }}>
-                  <div style={{ color: 'var(--st-av-text)', marginBottom: 8, fontWeight: 600 }}>NCIC / DMV QUERY TERMINAL ONLINE</div>
+                <div className="bg-app-panel border border-border-base rounded-[3px] p-4 font-mono text-[11.5px] text-cad-dim leading-[1.8]">
+                  <div className="text-green-400 mb-2 font-semibold">NCIC / DMV QUERY TERMINAL ONLINE</div>
                   <div>SYSTEM: SSRP STATE RECORDS BUREAU</div>
                   <div>ACCESS: AUTHORIZED PERSONNEL ONLY</div>
                   <div>CHANNEL: LAW ENFORCEMENT SECURE</div>
-                  <div style={{ marginTop: 12, color: 'var(--n-text-muted)' }}>Enter query parameters above and press QUERY or ENTER to retrieve records.</div>
-                  <div style={{ marginTop: 4, color: 'var(--n-text-muted)' }}>All queries are logged and audited.</div>
-                  <div style={{ marginTop: 12, color: 'var(--n-border-strong)' }}>{'>'} READY_</div>
+                  <div className="mt-3 text-cad-muted">Enter query parameters above and press QUERY or ENTER to retrieve records.</div>
+                  <div className="mt-1 text-cad-muted">All queries are logged and audited.</div>
+                  <div className="mt-3 text-border-strong">{'>'} READY_</div>
                 </div>
               ) : results.length === 0 ? (
-                <div style={{ background: 'var(--n-bg-panel)', border: '1px solid var(--n-border)', borderRadius: 3, padding: 16, fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--n-text-dim)' }}>
-                  <div style={{ color: 'var(--pr2-text)', marginBottom: 6 }}>QUERY COMPLETE — NO RECORDS FOUND</div>
+                <div className="bg-app-panel border border-border-base rounded-[3px] p-4 font-mono text-[11.5px] text-cad-dim">
+                  <div className="text-amber-400 mb-1.5">QUERY COMPLETE — NO RECORDS FOUND</div>
                   <div>Search terms: "{query}"</div>
-                  <div style={{ color: 'var(--n-border-strong)', marginTop: 12 }}>{'>'} READY_</div>
+                  <div className="text-border-strong mt-3">{'>'} READY_</div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--st-av-text)', marginBottom: 4, alignSelf: 'flex-start' }}>
+                <div className="flex flex-col gap-3 items-center">
+                  <div className="font-mono text-[10px] text-green-400 mb-1 self-start">
                     QUERY RETURNED {results.length} RECORD(S)
                   </div>
                   {results.map((r, i) => (

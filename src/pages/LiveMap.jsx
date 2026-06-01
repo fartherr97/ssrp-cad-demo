@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import { S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY, S_BTN_PRIMARY, S_BTN_SECONDARY, xs, btnHoverOn, btnHoverOff, S_UNIT_ROW, S_DATA } from '../constants/styles';
+import {
+  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_BTN_PRIMARY, S_BTN_SECONDARY,
+  xs,
+  S_UNIT_ROW,
+  S_DATA,
+} from '../constants/styles';
 
 const MAP_W = 800;
 const MAP_H = 560;
@@ -71,23 +77,23 @@ export default function LiveMap() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div style={{ ...S_PAGE, padding: 8, gap: 8, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', gap: 8, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+    <div className={`${S_PAGE} !p-2 !gap-2 overflow-hidden`}>
+      <div className="flex gap-2 flex-1 min-h-0 overflow-hidden">
         {/* Map */}
-        <div style={{ ...S_PANEL, flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <div className={`${S_PANEL} flex-1 relative overflow-hidden`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block' }} />
+              <span className="inline-block w-[7px] h-[7px] rounded-full bg-green-400 shadow-[0_0_5px_#2fd968] mr-1" />
               Live Situational Map
             </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div className="flex gap-2 items-center">
               {[
                 { label: 'Units', active: showUnits, toggle: () => setShowUnits(v => !v) },
                 { label: 'Calls', active: showCalls, toggle: () => setShowCalls(v => !v) },
               ].map(l => (
-                <button key={l.label}
-                  style={xs(l.active ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-                 
+                <button
+                  key={l.label}
+                  className={xs(l.active ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
                   onClick={l.toggle}>
                   {l.label}
                 </button>
@@ -95,7 +101,7 @@ export default function LiveMap() {
             </div>
           </div>
 
-          <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#050e1c' }}>
+          <div className="flex-1 relative overflow-hidden bg-[#050e1c]">
             <svg width="100%" height="100%" viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ display: 'block' }}>
               {/* Background */}
               <rect width={MAP_W} height={MAP_H} fill="#050e1c"/>
@@ -210,69 +216,69 @@ export default function LiveMap() {
         </div>
 
         {/* Right: Legend + Unit list */}
-        <div style={{ width: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="w-[220px] flex flex-col gap-2">
           {/* Legend */}
-          <div style={{ ...S_PANEL, flexShrink: 0 }}>
+          <div className={`${S_PANEL} shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Legend</div>
             </div>
-            <div style={{ padding: '8px 10px' }}>
-              <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 6 }}>Unit Status</div>
+            <div className="px-2.5 py-2">
+              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-1.5">Unit Status</div>
               {[
                 { label: 'Available', color: '#1ab858' },
                 { label: 'Responding', color: '#bca018' },
                 { label: 'On Scene', color: '#4880c8' },
                 { label: 'Off Duty', color: '#384858' },
               ].map(l => (
-                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <div key={l.label} className="flex items-center gap-1.5 mb-1">
                   <div style={{ width: 10, height: 10, borderRadius: 2, border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
-                  <span style={{ fontSize: 10, color: 'var(--n-text-dim)' }}>{l.label}</span>
+                  <span className="text-[10px] text-cad-dim">{l.label}</span>
                 </div>
               ))}
-              <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '8px 0 6px' }}>Incident Priority</div>
+              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mt-2 mb-1.5">Incident Priority</div>
               {[
                 { label: 'P1 — Critical', color: '#d83838' },
                 { label: 'P2 — High', color: '#c06828' },
                 { label: 'P3 — Medium', color: '#b09818' },
                 { label: 'P4 — Low', color: '#249848' },
               ].map(l => (
-                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <div key={l.label} className="flex items-center gap-1.5 mb-1">
                   <div style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
-                  <span style={{ fontSize: 10, color: 'var(--n-text-dim)' }}>{l.label}</span>
+                  <span className="text-[10px] text-cad-dim">{l.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Unit list */}
-          <div style={{ ...S_PANEL, flex: 1 }}>
+          <div className={`${S_PANEL} flex-1`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>On-Duty Units</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length}</span>
+              <span className="text-[9px] text-cad-muted font-mono">{onDuty.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
               {onDuty.map(o => (
                 <div key={o.id} className={S_UNIT_ROW}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor(o.status), flexShrink: 0 }} />
-                  <span style={{ ...S_DATA, minWidth: 42, fontSize: 10, color: '#6ab4d8' }}>{o.unitId}</span>
-                  <span style={{ flex: 1, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
+                  <div className="w-[6px] h-[6px] rounded-full shrink-0" style={{ background: statusColor(o.status) }} />
+                  <span className={`${S_DATA} min-w-[42px] text-[10px] text-sky-400`}>{o.unitId}</span>
+                  <span className="flex-1 text-[10px] overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Active calls list */}
-          <div style={{ ...S_PANEL, maxHeight: 160, flexShrink: 0 }}>
+          <div className={`${S_PANEL} max-h-[160px] shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Active Calls</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{activeCalls.length}</span>
+              <span className="text-[9px] text-cad-muted font-mono">{activeCalls.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
               {activeCalls.map(c => (
-                <div key={c.id} style={{ padding: '4px 8px', borderBottom: '1px solid var(--n-border-faint)', display: 'flex', gap: 5, alignItems: 'center' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: priBorderColor(c.priority) }} />
-                  <span style={{ ...S_DATA, fontSize: 9, minWidth: 52 }}>{c.id}</span>
-                  <span style={{ fontSize: 10, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--n-text-dim)' }}>{c.nature}</span>
+                <div key={c.id} className="px-2 py-1 border-b border-border-faint flex gap-1.5 items-center">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: priBorderColor(c.priority) }} />
+                  <span className={`${S_DATA} text-[9px] min-w-[52px]`}>{c.id}</span>
+                  <span className="text-[10px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-cad-dim">{c.nature}</span>
                 </div>
               ))}
             </div>
