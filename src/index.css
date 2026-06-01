@@ -109,7 +109,7 @@ html, body, #root {
 
 body {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.4;
   color: var(--n-text);
   background: var(--n-bg-root);
@@ -198,7 +198,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .cad-menubar-sub {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--n-text-muted);
   font-family: var(--font-mono);
   letter-spacing: 0.4px;
@@ -255,7 +255,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   padding: 0 10px;
   height: 100%;
   border-left: 1px solid var(--n-border-faint);
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
   color: var(--n-text-dim);
   white-space: nowrap;
@@ -804,7 +804,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .detail-title {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -973,7 +973,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .n-panel-title {
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.9px;
   text-transform: uppercase;
@@ -1005,7 +1005,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   justify-content: center;
   gap: 4px;
   padding: 3px 8px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   border: 1px solid transparent;
   white-space: nowrap;
@@ -1014,9 +1014,9 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   line-height: 1.4;
   letter-spacing: 0.1px;
 }
-.n-btn-sm  { padding: 2px 6px; font-size: 9px; }
-.n-btn-xs  { padding: 1px 4px; font-size: 9px; }
-.n-btn-lg  { padding: 4px 12px; font-size: 11px; }
+.n-btn-sm  { padding: 2px 6px; font-size: 11px; }
+.n-btn-xs  { padding: 1px 4px; font-size: 11px; }
+.n-btn-lg  { padding: 4px 12px; font-size: 13px; }
 
 .n-btn-primary   { background: #061828; color: #80b8e0; border-color: #0d3a60; }
 .n-btn-primary:not(:disabled):hover { background: #081e32; border-color: #1060a8; }
@@ -1052,8 +1052,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   border: 1px solid var(--n-border);
   color: var(--n-text);
   font-family: var(--font-ui);
-  font-size: 11px;
-  padding: 3px 6px;
+  font-size: 13px;
+  padding: 4px 7px;
   width: 100%;
   outline: none;
   line-height: 1.4;
@@ -1067,7 +1067,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
 .n-label {
   display: block;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -1086,13 +1086,13 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .n-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .n-table th {
   padding: 4px 8px;
   text-align: left;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -1107,11 +1107,11 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .n-table td {
-  padding: 4px 8px;
+  padding: 5px 8px;
   border-bottom: 1px solid var(--n-border-faint);
   color: var(--n-text);
   vertical-align: middle;
-  height: 24px;
+  height: 28px;
 }
 
 .n-table tbody tr:hover td { background: var(--n-bg-hover) !important; cursor: pointer; }
@@ -1128,14 +1128,14 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   display: inline-flex;
   align-items: center;
   padding: 0 5px;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.4px;
   border: 1px solid transparent;
   white-space: nowrap;
   text-transform: uppercase;
   font-family: var(--font-mono);
-  line-height: 14px;
+  line-height: 16px;
 }
 
 .badge-available   { background: var(--st-av-bg);   color: var(--st-av-text);   border-color: var(--st-av-border);   }
@@ -1177,8 +1177,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .n-tabs::-webkit-scrollbar { display: none; }
 
 .n-tab {
-  padding: 5px 10px;
-  font-size: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--n-text-dim);
   cursor: pointer;
@@ -1269,7 +1269,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .n-modal-title {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.8px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
   text-transform: uppercase; color: var(--n-gold); font-family: var(--font-mono);
 }
 
@@ -1300,12 +1300,12 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .call-card.p3 { border-left-color: var(--pr3-text); }
 .call-card.p4 { border-left-color: var(--pr4-text); }
 
-.call-nature { font-size: 11px; font-weight: 600; color: var(--n-text); }
-.call-meta   { font-size: 9px; color: var(--n-text-dim); font-family: var(--font-mono); }
+.call-nature { font-size: 13px; font-weight: 600; color: var(--n-text); }
+.call-meta   { font-size: 11px; color: var(--n-text-dim); font-family: var(--font-mono); }
 
 .tx-entry {
   padding: 2px 8px;
-  font-family: var(--font-mono); font-size: 9px;
+  font-family: var(--font-mono); font-size: 11px;
   border-bottom: 1px solid var(--n-border-faint);
   display: flex; gap: 6px; align-items: flex-start; line-height: 1.4;
 }
