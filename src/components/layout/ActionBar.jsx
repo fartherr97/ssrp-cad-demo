@@ -6,7 +6,7 @@ import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
   MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
-  MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdChevronRight,
+  MdDoNotDisturb, MdPowerSettingsNew, MdHome,
 } from 'react-icons/md';
 
 /* ─── Clock ─── */
@@ -50,8 +50,6 @@ function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, extr
 }
 
 /* Dropdown nav button — click to open a template picker */
-const CATEGORY_ORDER = { 'Incident': 0, 'License': 1, 'Legal': 2, 'Citation': 3, 'Notice': 4, 'Registration': 5 };
-
 function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
@@ -75,16 +73,6 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
     setOpen(o => !o);
   };
 
-  // Group items by category
-  const groups = {};
-  items.forEach(item => {
-    const cat = item.category || 'General';
-    (groups[cat] ||= []).push(item);
-  });
-  const sortedCats = Object.keys(groups).sort((a, b) =>
-    (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99)
-  );
-
   return (
     <div className="h-full shrink-0">
       <button
@@ -96,40 +84,28 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
             : 'bg-transparent border-b-2 border-transparent text-slate-500 hover:bg-white/[0.06] hover:text-slate-400'}`}
       >
         <span className="flex items-center justify-center"><IconComp size={20} /></span>
-        <span className="text-[9px] font-bold uppercase tracking-[0.5px] whitespace-nowrap leading-none flex items-center gap-[2px]">
+        <span className="text-[9px] font-bold uppercase tracking-[0.5px] whitespace-nowrap leading-none">
           {label}
-          <MdChevronRight size={10} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
         </span>
       </button>
 
       {open && (
         <div
           ref={ref}
-          className="fixed z-[200] bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden"
+          className="fixed z-[200] bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden py-1"
           style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
-          {sortedCats.map((cat, ci) => (
-            <div key={cat}>
-              {ci > 0 && <div className="h-px bg-white/[0.06] mx-2" />}
-              <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold uppercase tracking-[0.7px] text-slate-500">
-                {cat}
-              </div>
-              {groups[cat].map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    navigate(item.route);
-                    setOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] text-white hover:bg-white/[0.07] transition-colors cursor-pointer border-none bg-transparent"
-                >
-                  <span className="font-medium">{item.name}</span>
-                  {item.formCode && (
-                    <span className="ml-auto text-[9px] font-mono text-slate-600 shrink-0">{item.formCode}</span>
-                  )}
-                </button>
-              ))}
-            </div>
+          {items.map(item => (
+            <button
+              key={item.id}
+              onClick={() => {
+                navigate(item.route);
+                setOpen(false);
+              }}
+              className="w-full flex items-center px-3 py-2 text-left text-[12px] font-medium text-white hover:bg-white/[0.07] transition-colors cursor-pointer border-none bg-transparent"
+            >
+              {item.name}
+            </button>
           ))}
           {items.length === 0 && (
             <div className="px-4 py-3 text-[11px] text-slate-600 italic">No templates yet</div>
