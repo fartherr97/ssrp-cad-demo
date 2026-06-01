@@ -158,10 +158,12 @@ function PanicBtn({ onClick }) {
       onClick={onClick}
       data-tour="panic"
       title="PANIC * broadcast officer-in-distress to all units"
-      className="flex flex-col items-center justify-center gap-1 px-2.5 py-1 min-w-[54px] h-full shrink-0 border-none cursor-pointer transition-all font-ui bg-red-600/90 hover:bg-red-500 text-white animate-pulse-red"
+      className="group flex items-center justify-center px-2 h-full shrink-0 border-none cursor-pointer bg-transparent font-ui"
     >
-      <MdSos size={19} />
-      <span className="text-[9px] font-extrabold uppercase tracking-[0.5px] whitespace-nowrap leading-none">PANIC</span>
+      <span className="flex flex-col items-center justify-center gap-0.5 px-2.5 py-1 rounded-md bg-red-600 group-hover:bg-red-500 text-white animate-pulse-red transition-colors">
+        <MdSos size={18} />
+        <span className="text-[8px] font-extrabold uppercase tracking-[0.5px] whitespace-nowrap leading-none">PANIC</span>
+      </span>
     </button>
   );
 }
