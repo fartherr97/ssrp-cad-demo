@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD,
@@ -9,7 +10,6 @@ import {
   BADGE,
   S_DATA,
   S_UNIT_ROW,
-  S_CALL_CARD,
 } from '../constants/styles';
 
 function PriBadge({ p }) {
@@ -44,107 +44,111 @@ export default function FireOpsBoard() {
   ];
 
   return (
-    <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
+    <div className={`${S_PAGE} !p-4 lg:!p-5 overflow-hidden !gap-4 lg:!gap-5`}>
       {/* Header stats */}
-      <div className="flex gap-5 items-center px-2.5 py-[5px] bg-app-panel border-b border-border-base shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-base">🔥</span>
+      <div className="flex flex-wrap gap-4 lg:gap-6 items-center px-4 py-3 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 shrink-0">
+        <div className="flex items-center gap-3">
+          <DeptTag code="HCFR" />
           <div>
-            <div className="text-[11px] font-bold text-red-700 tracking-[0.3px]">HCFR OPERATIONS</div>
-            <div className="text-[9px] text-cad-muted tracking-[0.5px]">HILLSBOROUGH COUNTY FIRE RESCUE</div>
+            <div className="text-[13px] font-bold text-orange-400 tracking-[0.3px]">HCFR Operations</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">Hillsborough County Fire Rescue</div>
           </div>
         </div>
         {[
-          { label: 'ACTIVE', value: fireCalls.length, colorClass: 'text-orange-400' },
-          { label: 'P1 INCIDENTS', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
-          { label: 'APPARATUS ON DUTY', value: fireUnits.length, colorClass: 'text-cad-data' },
-          { label: 'AVAILABLE', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-green-400' },
+          { label: 'Active', value: fireCalls.length, colorClass: 'text-orange-400' },
+          { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
+          { label: 'Apparatus On Duty', value: fireUnits.length, colorClass: 'text-white' },
+          { label: 'Available', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-emerald-400' },
         ].map(s => (
-          <div key={s.label} className="flex flex-col items-center gap-px pl-3 border-l border-border-base">
-            <span className={`font-mono text-[15px] font-bold ${s.colorClass}`}>{s.value}</span>
-            <span className="text-[8px] text-cad-muted tracking-[0.6px] uppercase">{s.label}</span>
+          <div key={s.label} className="flex flex-col gap-1 pl-4 border-l border-border-base">
+            <span className={`font-extrabold text-[24px] leading-none tabular-nums ${s.colorClass}`}>{s.value}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">{s.label}</span>
           </div>
         ))}
       </div>
 
-      <div className="split-3 p-2">
+      <div className="split-3 flex-1 min-h-0 gap-4 lg:gap-5">
         {/* Fire Incidents */}
         <div className={S_PANEL}>
           <div className={S_PANEL_HEADER}>
-            <div className={`${S_PANEL_TITLE} !text-red-700`}>Active Incidents</div>
-            <span className="text-[9px] text-cad-muted font-mono">{fireCalls.length}</span>
+            <div className={S_PANEL_TITLE}>Active Incidents</div>
+            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 text-[11px] font-bold leading-none">{fireCalls.length}</span>
           </div>
-          <div className={S_PANEL_BODY}>
+          <div className={`${S_PANEL_BODY} p-2.5 gap-2`}>
             {fireCalls.length === 0 ? (
-              <div className="p-6 text-center text-cad-muted text-[11px]">No active fire/EMS incidents</div>
-            ) : fireCalls.sort((a,b) => a.priority - b.priority).map(c => (
-              <div
-                key={c.id}
-                className={S_CALL_CARD(c.priority, selectedCall === c.id)}
-                onClick={() => setSelectedCall(c.id)}
-              >
-                <div className="flex gap-1.5 mb-[3px] items-center">
-                  <PriBadge p={c.priority} />
-                  <span className={`${S_DATA} text-[10px]`}>{c.id}</span>
-                  <span className={`${c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.fire : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray} ml-auto text-[8px]`}>
-                    {c.status}
-                  </span>
+              <div className="p-8 text-center text-slate-600 text-[12px]">No active fire/EMS incidents</div>
+            ) : fireCalls.sort((a,b) => a.priority - b.priority).map(c => {
+              const on = selectedCall === c.id;
+              const priLeft = { 1:'border-l-red-500', 2:'border-l-orange-500', 3:'border-l-yellow-500', 4:'border-l-emerald-500' }[c.priority] || 'border-l-border-base';
+              return (
+                <div
+                  key={c.id}
+                  className={`rounded-xl border border-l-[3px] p-3 cursor-pointer transition-all backdrop-blur-sm ${priLeft} ${on ? 'bg-brand/15 border-brand/40' : 'bg-app-card/70 border-border-base hover:bg-white/[0.05]'}`}
+                  onClick={() => setSelectedCall(c.id)}
+                >
+                  <div className="flex gap-1.5 mb-1.5 items-center">
+                    <PriBadge p={c.priority} />
+                    <span className={`${S_DATA} text-[10px]`}>{c.id}</span>
+                    <span className={`${c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.fire : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray} ml-auto`}>
+                      {c.status}
+                    </span>
+                  </div>
+                  <div className="text-[13px] font-semibold text-white mb-0.5">{c.nature}</div>
+                  <div className="text-[11.5px] text-slate-400">{c.location}</div>
+                  <div className={`text-[10px] font-mono mt-1 ${c.units.length > 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                    {c.units.length > 0 ? c.units.join(', ') : 'No apparatus'}
+                  </div>
                 </div>
-                <div className="text-[12px] font-semibold text-cad-text mb-0.5">{c.nature}</div>
-                <div className="text-[11px] text-cad-muted">{c.location}</div>
-                <div className="text-[10px] text-cad-muted mt-[3px]">
-                  {c.units.length > 0 ? c.units.join(', ') : 'No apparatus'}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Incident Detail */}
         <div className={S_PANEL}>
           {!selCall ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2.5 text-cad-muted p-6">
-              <span className="text-[40px] opacity-30">🔥</span>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-600 p-6">
+              <span className="text-[48px] opacity-25">🔥</span>
               <div className="text-center">
-                <div className="text-[12px] font-medium text-cad-dim mb-[3px]">No incident selected</div>
-                <div className="text-[10px]">Select an incident from the queue</div>
+                <div className="text-[13px] font-semibold text-slate-400 mb-1">No incident selected</div>
+                <div className="text-[11px] text-slate-600">Select an incident from the queue</div>
               </div>
             </div>
           ) : (
             <>
               <div className={S_PANEL_HEADER}>
                 <div>
-                  <div className={`${S_PANEL_TITLE} !text-red-700`}>
+                  <div className="text-[12px] font-bold uppercase tracking-[0.7px] text-slate-200">
                     <span className={S_DATA}>{selCall.id}</span> · {selCall.nature}
                   </div>
-                  <div className="text-[9px] text-cad-muted font-mono mt-px">{selCall.timestamp}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">{selCall.timestamp}</div>
                 </div>
                 <PriBadge p={selCall.priority} />
               </div>
-              <div className={`${S_PANEL_BODY} p-3`}>
-                <div className={`${S_CARD} mb-2.5 border-l-[3px] border-l-red-700`}>
-                  <div className={`${S_LABEL} mb-[3px]`}>Incident Location</div>
-                  <div className="text-[13px] font-semibold">{selCall.location}</div>
-                  <div className="text-[11px] text-cad-dim">{selCall.city}, {selCall.county}</div>
+              <div className={`${S_PANEL_BODY} p-4 gap-4`}>
+                <div className={`${S_CARD} border-l-[3px] border-l-orange-500`}>
+                  <div className={S_LABEL}>Incident Location</div>
+                  <div className="text-[13px] font-semibold text-white">{selCall.location}</div>
+                  <div className="text-[11.5px] text-slate-400">{selCall.city}, {selCall.county}</div>
                 </div>
 
-                <div className={`${S_CARD} mb-2.5`}>
-                  <div className={`${S_LABEL} mb-1.5`}>Incident Description</div>
-                  <div className="text-[11.5px] leading-relaxed">{selCall.description}</div>
+                <div className={S_CARD}>
+                  <div className={S_LABEL}>Incident Description</div>
+                  <div className="text-[12.5px] text-slate-300 leading-relaxed">{selCall.description}</div>
                 </div>
 
-                <div className={`${S_CARD} mb-2.5`}>
-                  <div className={`${S_LABEL} mb-1.5`}>Assigned Apparatus ({selCall.units.length})</div>
+                <div className={S_CARD}>
+                  <div className={S_LABEL}>Assigned Apparatus ({selCall.units.length})</div>
                   {selCall.units.length === 0 ? (
-                    <div className="text-[11px] text-cad-muted">No apparatus on scene</div>
+                    <div className="text-[11.5px] text-slate-500">No apparatus on scene</div>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
                       {selCall.units.map(uid => {
                         const off = officers.find(o => o.unitId === uid);
                         return (
-                          <div key={uid} className="flex items-center gap-1.5 bg-app-card border border-red-900/60 rounded-[3px] px-2 py-[3px]">
-                            <span className="text-red-700 text-[10px] font-mono">{uid}</span>
-                            {off && <span className="text-[10px] text-cad-dim">{off.name}</span>}
+                          <div key={uid} className="flex items-center gap-1.5 bg-app-elevated border border-border-base rounded-lg px-2.5 py-1.5">
+                            <span className="text-orange-400 text-[11px] font-mono font-bold">{uid}</span>
+                            {off && <span className="text-[11px] text-slate-300">{off.name}</span>}
                           </div>
                         );
                       })}
@@ -161,7 +165,7 @@ export default function FireOpsBoard() {
                   </button>
                 )}
 
-                <div className="flex gap-1.5 mt-2">
+                <div className="flex gap-1.5">
                   <button
                     className={sm(S_BTN_SECONDARY)}
                     onClick={() => dispatch({ type: 'CLOSE_CALL', payload: selCall.id }) || setSelectedCall(null)}>
@@ -176,28 +180,28 @@ export default function FireOpsBoard() {
         {/* Apparatus Roster */}
         <div className={S_PANEL}>
           <div className={S_PANEL_HEADER}>
-            <div className={`${S_PANEL_TITLE} !text-red-700`}>Apparatus Status</div>
+            <div className={S_PANEL_TITLE}>Apparatus Status</div>
           </div>
           <div className={S_PANEL_BODY}>
             {APPARATUS_TYPES.map(ap => (
               ap.units.length > 0 && (
                 <div key={ap.label}>
-                  <div className="px-2 py-[3px] text-[9px] font-bold uppercase tracking-[0.5px] text-orange-900 border-b border-border-faint">
+                  <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-[0.7px] text-orange-400 bg-app-bg/40 border-b border-border-faint">
                     {ap.icon} {ap.label} ({ap.units.length})
                   </div>
                   {ap.units.map(o => (
                     <div key={o.id} className={S_UNIT_ROW}>
-                      <div className={`w-[7px] h-[7px] rounded-full shrink-0 ${
-                        o.status === 'AVAILABLE' ? 'bg-green-400' :
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${
+                        o.status === 'AVAILABLE' ? 'bg-emerald-400' :
                         o.status === 'ENRT' ? 'bg-amber-400' :
-                        o.status === 'ARRVD' ? 'bg-cyan-400' : 'bg-red-400'
+                        o.status === 'ARRVD' ? 'bg-emerald-400' : 'bg-red-400'
                       }`} />
-                      <span className={`${S_DATA} min-w-[40px] text-[10px] text-orange-700`}>{o.unitId}</span>
+                      <span className={`${S_DATA} min-w-[44px] text-[10px] text-orange-400`}>{o.unitId}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[11px] overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</div>
-                        <div className="text-[9px] text-cad-muted font-mono">{o.rank}</div>
+                        <div className="text-[11.5px] text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</div>
+                        <div className="text-[9.5px] text-slate-500 font-mono">{o.rank}</div>
                       </div>
-                      <span className={`${o.status === 'AVAILABLE' ? BADGE.available : o.status === 'ENRT' ? BADGE.enrt : o.status === 'ARRVD' ? BADGE.arrvd : BADGE.busy} text-[8px]`}>
+                      <span className={o.status === 'AVAILABLE' ? BADGE.available : o.status === 'ENRT' ? BADGE.enrt : o.status === 'ARRVD' ? BADGE.arrvd : BADGE.busy}>
                         {o.status}
                       </span>
                     </div>
@@ -206,7 +210,7 @@ export default function FireOpsBoard() {
               )
             ))}
             {fireUnits.length === 0 && (
-              <div className="p-5 text-center text-cad-muted text-[11px]">
+              <div className="p-8 text-center text-slate-600 text-[12px]">
                 No HCFR units on duty
               </div>
             )}

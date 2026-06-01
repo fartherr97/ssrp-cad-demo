@@ -77,13 +77,13 @@ export default function LiveMap() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div className={`${S_PAGE} !p-2 !gap-2 overflow-hidden`}>
-      <div className="flex gap-2 flex-1 min-h-0 overflow-hidden">
+    <div className={`${S_PAGE} !p-4 lg:!p-5 !gap-4 lg:!gap-5 overflow-hidden`}>
+      <div className="flex gap-4 lg:gap-5 flex-1 min-h-0 overflow-hidden">
         {/* Map */}
         <div className={`${S_PANEL} flex-1 relative overflow-hidden`}>
           <div className={S_PANEL_HEADER}>
-            <div className={S_PANEL_TITLE}>
-              <span className="inline-block w-[7px] h-[7px] rounded-full bg-green-400 shadow-[0_0_5px_#2fd968] mr-1" />
+            <div className={`${S_PANEL_TITLE} flex items-center`}>
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] mr-1.5" />
               Live Situational Map
             </div>
             <div className="flex gap-2 items-center">
@@ -101,10 +101,10 @@ export default function LiveMap() {
             </div>
           </div>
 
-          <div className="flex-1 relative overflow-hidden bg-[#050e1c]">
+          <div className="flex-1 relative overflow-hidden bg-app-bg">
             <svg width="100%" height="100%" viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ display: 'block' }}>
               {/* Background */}
-              <rect width={MAP_W} height={MAP_H} fill="#050e1c"/>
+              <rect width={MAP_W} height={MAP_H} fill="#0a1626"/>
 
               {/* Grid lines */}
               {Array.from({ length: 20 }, (_, i) => (
@@ -216,35 +216,35 @@ export default function LiveMap() {
         </div>
 
         {/* Right: Legend + Unit list */}
-        <div className="w-[220px] flex flex-col gap-2">
+        <div className="w-[240px] flex flex-col gap-4 lg:gap-5">
           {/* Legend */}
           <div className={`${S_PANEL} shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Legend</div>
             </div>
-            <div className="px-2.5 py-2">
-              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-1.5">Unit Status</div>
+            <div className="px-4 py-3">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">Unit Status</div>
               {[
                 { label: 'Available', color: '#1ab858' },
                 { label: 'Responding', color: '#bca018' },
                 { label: 'On Scene', color: '#4880c8' },
                 { label: 'Off Duty', color: '#384858' },
               ].map(l => (
-                <div key={l.label} className="flex items-center gap-1.5 mb-1">
+                <div key={l.label} className="flex items-center gap-2 mb-1.5">
                   <div style={{ width: 10, height: 10, borderRadius: 2, border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
-                  <span className="text-[10px] text-cad-dim">{l.label}</span>
+                  <span className="text-[11px] text-slate-300">{l.label}</span>
                 </div>
               ))}
-              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mt-2 mb-1.5">Incident Priority</div>
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mt-3 mb-2">Incident Priority</div>
               {[
                 { label: 'P1 * Critical', color: '#d83838' },
                 { label: 'P2 * High', color: '#c06828' },
                 { label: 'P3 * Medium', color: '#b09818' },
                 { label: 'P4 * Low', color: '#249848' },
               ].map(l => (
-                <div key={l.label} className="flex items-center gap-1.5 mb-1">
+                <div key={l.label} className="flex items-center gap-2 mb-1.5">
                   <div style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
-                  <span className="text-[10px] text-cad-dim">{l.label}</span>
+                  <span className="text-[11px] text-slate-300">{l.label}</span>
                 </div>
               ))}
             </div>
@@ -254,31 +254,31 @@ export default function LiveMap() {
           <div className={`${S_PANEL} flex-1`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>On-Duty Units</div>
-              <span className="text-[9px] text-cad-muted font-mono">{onDuty.length}</span>
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{onDuty.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
               {onDuty.map(o => (
                 <div key={o.id} className={S_UNIT_ROW}>
-                  <div className="w-[6px] h-[6px] rounded-full shrink-0" style={{ background: statusColor(o.status) }} />
-                  <span className={`${S_DATA} min-w-[42px] text-[10px] text-sky-400`}>{o.unitId}</span>
-                  <span className="flex-1 text-[10px] overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</span>
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: statusColor(o.status) }} />
+                  <span className={`${S_DATA} min-w-[44px] text-[10px] text-brand-bright`}>{o.unitId}</span>
+                  <span className="flex-1 text-[11px] text-slate-300 overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Active calls list */}
-          <div className={`${S_PANEL} max-h-[160px] shrink-0`}>
+          <div className={`${S_PANEL} max-h-[180px] shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Active Calls</div>
-              <span className="text-[9px] text-cad-muted font-mono">{activeCalls.length}</span>
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{activeCalls.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
               {activeCalls.map(c => (
-                <div key={c.id} className="px-2 py-1 border-b border-border-faint flex gap-1.5 items-center">
+                <div key={c.id} className="px-4 py-2 border-b border-border-faint flex gap-2 items-center hover:bg-white/[0.03] transition-colors">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: priBorderColor(c.priority) }} />
-                  <span className={`${S_DATA} text-[9px] min-w-[52px]`}>{c.id}</span>
-                  <span className="text-[10px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-cad-dim">{c.nature}</span>
+                  <span className={`${S_DATA} text-[10px] min-w-[56px]`}>{c.id}</span>
+                  <span className="text-[11px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-slate-300">{c.nature}</span>
                 </div>
               ))}
             </div>
