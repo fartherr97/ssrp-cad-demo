@@ -25,7 +25,6 @@ export const PORTALS = {
       { Icon: MdDescription,  label: 'Forms',     route: '/forms'     },
       { Icon: MdPhoneAndroid, label: 'MDT',       route: '/mdt'       },
       { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
-      { Icon: MdPeopleAlt,    label: 'Civilians', route: '/civilians' },
       { Icon: MdMap,          label: 'Map',       route: '/map'       },
     ],
   },
@@ -55,9 +54,10 @@ export const PORTALS = {
   },
 
   admin: {
-    id: 'admin', label: 'Admin / Command', color: '#c09010', landing: '/cad',
+    id: 'admin', label: 'Admin / Command', color: '#c09010', landing: '/portal/admin',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
+      { Icon: MdHome,         label: 'Home',      route: '/portal/admin' },
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
       { Icon: MdSearch,       label: 'Search',    route: '/search'    },
       { Icon: MdDescription,  label: 'Forms',     route: '/forms'     },
