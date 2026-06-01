@@ -64,7 +64,7 @@ export default function BanManagement() {
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.7px] mb-2.5">
               Issue New Ban
             </div>
-            <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
               <div className={S_FIELD}><label className={S_LABEL}>Username *</label><input className={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Discord ID *</label><input className={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Duration</label>
@@ -97,11 +97,11 @@ export default function BanManagement() {
             <div className={S_PANEL_TITLE}>Ban Registry</div>
             <span className="text-[9px] text-cad-muted font-mono">{filtered.length} RECORDS</span>
           </div>
-          <div className={`${S_PANEL_BODY} overflow-y-auto`}>
+          <div className={`${S_PANEL_BODY} overflow-auto`}>
             {filtered.length === 0 ? (
               <div className="p-6 text-center text-cad-muted text-[11px]">No bans matching filter</div>
             ) : (
-              <table className={S_TABLE}>
+              <table className={`${S_TABLE} min-w-[760px]`}>
                 <thead>
                   <tr>
                     {['Status','Username','Discord ID','Duration','Issued By','Date','Reason','Actions'].map(h => (

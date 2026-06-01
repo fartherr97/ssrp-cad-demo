@@ -143,8 +143,8 @@ export default function OfficerProfile() {
         )}
 
         {tab === 'reports' && (
-          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-            <table className="w-full border-collapse text-sm">
+          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-auto backdrop-blur-sm">
+            <table className="w-full min-w-[560px] border-collapse text-sm">
               <THead cols={['Case #','Type','Date','Status','Call']} />
               <tbody>
                 {myReports.map((r, i) => (
@@ -163,8 +163,8 @@ export default function OfficerProfile() {
         )}
 
         {tab === 'calls' && (
-          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-            <table className="w-full border-collapse text-sm">
+          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-auto backdrop-blur-sm">
+            <table className="w-full min-w-[640px] border-collapse text-sm">
               <THead cols={['Call #','Nature','Location','Priority','Status','Time']} />
               <tbody>
                 {myCallHistory.map((c, i) => (
