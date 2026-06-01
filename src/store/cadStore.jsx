@@ -58,6 +58,22 @@ const initialState = {
   loginPageConfig: LOGIN_PAGE_CONFIG,
   accountRestrictions: ACCOUNT_RESTRICTIONS,
   discordPresence: DISCORD_PRESENCE,
+  // ─── Auto license-suspension engine (configurable in Admin) ───
+  licensePointsConfig: {
+    enabled: true,
+    threshold: 12,
+    suspensionDays: 90,
+    resetAfterSuspend: true,
+    schedule: [
+      { id: 'v1', label: 'Speeding (1–15 over)',   points: 3 },
+      { id: 'v2', label: 'Speeding (16+ over)',    points: 4 },
+      { id: 'v3', label: 'Running Red Light',      points: 4 },
+      { id: 'v4', label: 'Improper Lane Change',   points: 2 },
+      { id: 'v5', label: 'Reckless Driving',       points: 6 },
+      { id: 'v6', label: 'No Insurance',           points: 5 },
+      { id: 'v7', label: 'DUI',                    points: 12 },
+    ],
+  },
   myCallId: null,
   nextId: 1000,
   // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
@@ -275,6 +291,51 @@ function reducer(state, action) {
       const { key, value } = action.payload;
       const audit = addAuditEntry(state, `Updated ${key} configuration`, 'Customization');
       return { ...state, [key]: value, ...audit };
+    }
+
+    case 'ADD_LICENSE_POINTS': {
+      // Accumulate points on a driver; auto-suspend once the configured
+      // threshold is reached (per the Auto License Suspend admin settings).
+      const cfg = state.licensePointsConfig || {};
+      const { civilianId, points, reason } = action.payload;
+      const civ = state.civilians.find(c => c.id === civilianId);
+      let suspended = false;
+      let expiry = null;
+      const civilians = state.civilians.map(c => {
+        if (c.id !== civilianId) return c;
+        const newPoints = (c.licensePoints || 0) + Number(points || 0);
+        if (cfg.enabled && newPoints >= cfg.threshold && c.dlStatus !== 'SUSPENDED') {
+          suspended = true;
+          expiry = new Date(Date.now() + (cfg.suspensionDays || 0) * 86400000).toISOString().slice(0, 10);
+          return {
+            ...c,
+            licensePoints: cfg.resetAfterSuspend ? 0 : newPoints,
+            dlStatus: 'SUSPENDED',
+            dlExpiry: expiry,
+            suspendedUntil: expiry,
+          };
+        }
+        return { ...c, licensePoints: newPoints };
+      });
+      const name = civ ? `${civ.firstName} ${civ.lastName}` : 'Driver';
+      const audit = addAuditEntry(
+        state,
+        `${points} pts → ${name}${reason ? ` (${reason})` : ''}${suspended ? ' · AUTO-SUSPENDED' : ''}`,
+        'License Points'
+      );
+      const log = suspended
+        ? addDispatchLog(state, `LICENSE AUTO-SUSPENDED · ${name} reached ${cfg.threshold} pts · ${cfg.suspensionDays}-day suspension`, 'alert')
+        : {};
+      return { ...state, civilians, ...audit, ...log };
+    }
+    case 'RESET_LICENSE_POINTS': {
+      const civilians = state.civilians.map(c => c.id === action.payload ? { ...c, licensePoints: 0 } : c);
+      return { ...state, civilians, ...addAuditEntry(state, 'License points reset to 0', 'License Points') };
+    }
+    case 'LIFT_SUSPENSION': {
+      const civilians = state.civilians.map(c =>
+        c.id === action.payload ? { ...c, dlStatus: 'ACTIVE', licensePoints: 0, suspendedUntil: null } : c);
+      return { ...state, civilians, ...addAuditEntry(state, 'License suspension lifted (reinstated)', 'License Points') };
     }
     case 'ADMIN_ADD': {
       const { key, item } = action.payload;

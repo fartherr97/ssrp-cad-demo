@@ -40,6 +40,7 @@ import CustomRecords from './pages/admin/sections/CustomRecords';
 import Departments from './pages/admin/sections/Departments';
 import TenCodes from './pages/admin/sections/TenCodes';
 import Statutes from './pages/admin/sections/Statutes';
+import LicensePoints from './pages/admin/sections/LicensePoints';
 import Logs from './pages/admin/sections/Logs';
 import InGame from './pages/admin/sections/InGame';
 import DiscordIntegration from './pages/admin/sections/DiscordIntegration';
@@ -117,6 +118,7 @@ function CADApp() {
           <Route path="departments"        element={<Departments />} />
           <Route path="ten-codes"          element={<TenCodes />} />
           <Route path="statutes"           element={<Statutes />} />
+          <Route path="license-points"     element={<LicensePoints />} />
           <Route path="logs"               element={<Logs />} />
           <Route path="in-game"            element={<InGame />} />
           <Route path="discord"            element={<DiscordIntegration />} />

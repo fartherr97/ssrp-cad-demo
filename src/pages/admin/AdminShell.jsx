@@ -5,7 +5,7 @@ import {
   MdPeople, MdFingerprint, MdVpnKey, MdBrush, MdInventory2, MdShield,
   MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
   MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
-  MdHome, MdLogout, MdChevronLeft, MdChevronRight,
+  MdHome, MdLogout, MdChevronLeft, MdChevronRight, MdRemoveModerator,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -23,6 +23,7 @@ const GROUPS = [
     { icon: MdShield,            label: 'Departments',    route: '/admin/departments' },
     { icon: MdFormatListNumbered,label: '10-Codes',       route: '/admin/ten-codes' },
     { icon: MdGavel,             label: 'Statutes',       route: '/admin/statutes' },
+    { icon: MdRemoveModerator,   label: 'Auto Suspend',   route: '/admin/license-points' },
   ],
   [
     { icon: MdHistory,         label: 'Logs',          route: '/admin/logs' },

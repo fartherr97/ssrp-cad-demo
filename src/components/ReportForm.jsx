@@ -94,14 +94,43 @@ function buildAutofill(kind, rec, fields, civilians) {
   return out;
 }
 
-function LookupField({ f, kind, value, sectionFields, onChange, onBulk }) {
+function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) {
   const { state } = useCAD();
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState(null);
   const ref = useRef(null);
   const boxRef = useRef(null);
 
-  const results = open ? searchData(kind, value, state) : [];
+  // A civilian already chosen in this section (used to scope vehicle results).
+  const sectionCiv = (() => {
+    const cf = sectionFields.find(ff => ff.type === 'civilian_lookup');
+    const val = (data?.[cf?.id] || '').trim().toLowerCase();
+    if (!val) return null;
+    return (state.civilians || []).find(c => `${c.firstName} ${c.lastName}`.toLowerCase() === val) || null;
+  })();
+
+  // Build results — vehicle lookup is scoped to the section's civilian when one
+  // is selected (their registered vehicles first), but still allows any plate.
+  let results = [];
+  let ownerIds = new Set();
+  if (open) {
+    if (kind === 'vehicle') {
+      const all = state.vehicles || [];
+      const q = (value || '').trim().toLowerCase();
+      const ownerVeh = sectionCiv ? all.filter(v => v.ownerId === sectionCiv.id) : [];
+      ownerIds = new Set(ownerVeh.map(v => v.id));
+      const match = (v) => v.plate?.toLowerCase().includes(q) || `${v.year} ${v.make} ${v.model}`.toLowerCase().includes(q);
+      if (!q) {
+        results = (ownerVeh.length ? ownerVeh : all).slice(0, 8);
+      } else {
+        const ownerM = ownerVeh.filter(match);
+        const globalM = searchData('vehicle', value, state).filter(v => !ownerIds.has(v.id));
+        results = [...ownerM, ...globalM].slice(0, 8);
+      }
+    } else {
+      results = searchData(kind, value, state);
+    }
+  }
 
   const place = () => {
     if (ref.current) {
@@ -118,17 +147,28 @@ function LookupField({ f, kind, value, sectionFields, onChange, onBulk }) {
   }, [open]);
 
   const pick = (rec) => {
-    const updates = buildAutofill(kind, rec, sectionFields, state.civilians);
-    // Guarantee the triggering field gets the primary identifier.
-    if (kind === 'civilian') updates[f.id] = `${rec.firstName} ${rec.lastName}`;
-    if (kind === 'vehicle')  updates[f.id] = rec.plate;
-    if (kind === 'officer')  updates[f.id] = String(rec.badge || rec.name);
+    let updates;
+    if (kind === 'vehicle') {
+      updates = buildAutofill('vehicle', rec, sectionFields, state.civilians);
+      // Back-fill the registered owner into the section's person fields.
+      const owner = (state.civilians || []).find(c => c.id === rec.ownerId);
+      if (owner) updates = { ...buildAutofill('civilian', owner, sectionFields, state.civilians), ...updates };
+      updates[f.id] = rec.plate;
+    } else if (kind === 'civilian') {
+      updates = buildAutofill('civilian', rec, sectionFields, state.civilians);
+      updates[f.id] = `${rec.firstName} ${rec.lastName}`;
+    } else {
+      updates = buildAutofill('officer', rec, sectionFields, state.civilians);
+      updates[f.id] = String(rec.badge || rec.name);
+    }
     onBulk ? onBulk(updates) : Object.entries(updates).forEach(([k, v]) => onChange(k, v));
     setOpen(false);
   };
 
   const KindIcon = kind === 'civilian' ? MdPerson : kind === 'vehicle' ? MdDirectionsCar : MdShield;
-  const placeholder = kind === 'civilian' ? 'Search person…' : kind === 'vehicle' ? 'Search plate / vehicle…' : 'Search officer / badge…';
+  const placeholder = kind === 'civilian' ? 'Search person…'
+    : kind === 'vehicle' ? (sectionCiv ? `Search ${sectionCiv.firstName}'s vehicles or any plate…` : 'Search plate / vehicle…')
+    : 'Search officer / badge…';
 
   return (
     <>
@@ -156,7 +196,10 @@ function LookupField({ f, kind, value, sectionFields, onChange, onBulk }) {
                   <div className="text-[10.5px] text-slate-500 font-mono">DOB {rec.dob} · DL {rec.dlNumber}</div>
                 </>)}
                 {kind === 'vehicle' && (<>
-                  <div className="text-[12.5px] font-semibold text-white truncate font-mono">{rec.plate}</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[12.5px] font-semibold text-white truncate font-mono">{rec.plate}</span>
+                    {ownerIds.has(rec.id) && <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[8px] font-bold tracking-[0.4px]">REGISTERED</span>}
+                  </div>
                   <div className="text-[10.5px] text-slate-500">{rec.year} {rec.make} {rec.model} · {rec.color}</div>
                 </>)}
                 {kind === 'officer' && (<>
@@ -206,7 +249,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
           {value || <span className="text-slate-600">—</span>}
         </div>
       ) : lookupKind ? (
-        <LookupField f={f} kind={lookupKind} value={value} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
+        <LookupField f={f} kind={lookupKind} value={value} data={data} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
       ) : isNarr ? (
         <textarea className={S_TEXTAREA} rows={f.minRows || 4}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
