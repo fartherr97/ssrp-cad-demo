@@ -1,294 +1,447 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { FormDocWrap, ReportDocument } from '../components/FormDocument';
+import {
+  MdDirectionsCar, MdGavel, MdPerson, MdReport,
+  MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
+} from 'react-icons/md';
+
+const TEMPLATE_ICONS = {
+  'Traffic Stop':      MdDirectionsCar,
+  'Use of Force':      MdGavel,
+  'Arrest Report':     MdPerson,
+  'Incident Report':   MdReport,
+  'Field Interview':   MdRecordVoiceOver,
+  'Supplement Report': MdNote,
+};
+
+const BUILTIN_NAMES = Object.keys(TEMPLATE_ICONS);
+
+const STATUS_CLS = {
+  'Submitted':      'badge-blue',
+  'Approved':       'badge-green',
+  'Pending Review': 'badge-orange',
+  'Denied':         'badge-red',
+};
 
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
-  const { reports, reportTemplates, currentUser, officers, civilians } = state;
+  const { reports, reportTemplates, currentUser, officers } = state;
+  const navigate = useNavigate();
 
-  const [tab, setTab] = useState('ALL');
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [showCreate, setShowCreate] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues]             = useState({});
+  const [selectedReport, setSelectedReport]     = useState(null);
+  const [reportTab, setReportTab]               = useState('MINE');
 
-  const isAdmin = currentUser?.role === 'admin';
-  const me = officers.find(o => o.id === currentUser?.id);
-
+  const isAdmin   = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
+  const me        = officers.find(o => o.id === currentUser?.id);
   const myReports = reports.filter(r => r.officerBadge === me?.badge);
-  const pendingReview = reports.filter(r => r.status === 'Pending Review');
+  const pendingReports = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
 
   const displayedReports =
-    tab === 'MY REPORTS' ? myReports :
-    tab === 'PENDING' ? pendingReview :
-    tab === 'APPROVED' ? reports.filter(r => r.status === 'Approved') :
+    reportTab === 'MINE'    ? myReports :
+    reportTab === 'PENDING' ? pendingReports :
     reports;
 
   const selReport = selectedReport ? reports.find(r => r.id === selectedReport) : null;
 
-  const handleFormChange = (key, val) => {
-    setFormValues(prev => ({ ...prev, [key]: val }));
+  const builtinTpls = reportTemplates.filter(t => BUILTIN_NAMES.includes(t.name));
+  const customTpls  = reportTemplates.filter(t => !BUILTIN_NAMES.includes(t.name));
+
+  const handleFormChange = (key, val) => setFormValues(prev => ({ ...prev, [key]: val }));
+
+  const applySignature = () => {
+    if (currentUser?.signature) {
+      setFormValues(fv => ({ ...fv, _officerSig: currentUser.signature }));
+    }
   };
 
   const submitReport = () => {
     if (!selectedTemplate) return;
+    const caseNum = `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
     dispatch({
       type: 'ADD_REPORT',
       payload: {
         type: selectedTemplate.name,
-        caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
+        caseNumber: caseNum,
         officerBadge: me?.badge || currentUser?.badge || '—',
         callId: formValues.callId || null,
         civilianId: null,
-        summary: formValues.narrative || formValues.f10 || formValues.f4 || Object.values(formValues).filter(v => typeof v === 'string' && v.length > 10).join(' | ').slice(0, 200),
-        formData: formValues,
+        summary: formValues.narrative || formValues.f10 || formValues.f4 || formValues.f8 ||
+          Object.values(formValues).filter(v => typeof v === 'string' && v.length > 10).join(' | ').slice(0, 200) ||
+          'Report submitted via CAD',
+        formData: { ...formValues },
       },
     });
-    setShowCreate(false);
     setSelectedTemplate(null);
     setFormValues({});
-    setTab('MY REPORTS');
+    setReportTab('MINE');
   };
 
   const reviewReport = (id, status) => {
     dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id, status } });
   };
 
-  const statusColor = {
-    'Submitted':     'badge-blue',
-    'Approved':      'badge-green',
-    'Pending Review':'badge-orange',
+  const showForm   = selectedTemplate !== null;
+  const showReport = !showForm && selReport !== null;
+  const hasSig     = !!currentUser?.signature;
+  const sigApplied = !!formValues._officerSig;
+
+  const draftMeta = {
+    caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-DRAFT`,
+    status: 'Draft',
+    officerSig:  formValues._officerSig || null,
+    supervisorSig: null,
+    onApplySig:  hasSig && !sigApplied ? applySignature : null,
   };
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
-      <div className="mob-two-pane" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100%', overflow: 'hidden', fontFamily: 'var(--font-ui)' }}>
 
-        {/* ── LEFT: Report list ─────────────────────────────────────── */}
-        <div className={`mob-list-panel${(showCreate || selectedReport) ? ' mob-gone' : ''}`} style={{
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
-          borderRight: '2px solid var(--n-border)', background: 'var(--n-bg-base)',
-        }}>
-          {/* Header */}
-          <div style={{
-            padding: '5px 8px', background: 'var(--n-bg-toolbar)',
-            borderBottom: '1px solid var(--n-border)', display: 'flex',
-            alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
-          }}>
-            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text)' }}>
-              Reports
-            </span>
-            <button
-              className="n-btn n-btn-primary n-btn-xs"
-              onClick={() => { setShowCreate(true); setSelectedReport(null); setSelectedTemplate(null); setFormValues({}); }}>
-              + File Report
-            </button>
-          </div>
+      {/* ══ LEFT: Template picker ══════════════════════════════════ */}
+      <div style={{
+        width: 230, flexShrink: 0, display: 'flex', flexDirection: 'column',
+        borderRight: '1px solid var(--n-border)', background: 'var(--n-bg-toolbar)', overflow: 'hidden',
+      }}>
+        {/* Header */}
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text)' }}>File New Report</div>
+          <div style={{ fontSize: 10, color: 'var(--n-text-muted)', marginTop: 2 }}>Select a report type to begin</div>
+        </div>
 
-          {/* Tabs */}
-          <div style={{
-            display: 'flex', borderBottom: '1px solid var(--n-border)', flexShrink: 0,
-            background: 'var(--n-bg-card)',
-          }}>
-            {['ALL', 'MY REPORTS', 'PENDING', 'APPROVED'].map(t => (
-              <button key={t}
-                onClick={() => setTab(t)}
+        {/* Template list */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 6px' }}>
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', padding: '4px 6px 8px' }}>Standard Reports</div>
+
+          {(builtinTpls.length > 0 ? builtinTpls : BUILTIN_NAMES.map((n, i) => ({ id: `builtin-${i}`, name: n, fields: [] }))).map(t => {
+            const IconComp = TEMPLATE_ICONS[t.name] || MdDescription;
+            const isSelected = selectedTemplate?.id === t.id;
+            const fieldCount = t.sections
+              ? t.sections.reduce((a, s) => a + s.fields.length, 0)
+              : (t.fields?.length || 0);
+            return (
+              <button key={t.id}
+                onClick={() => {
+                  const tpl = reportTemplates.find(r => r.name === t.name) || t;
+                  setSelectedTemplate(tpl);
+                  setFormValues({});
+                  setSelectedReport(null);
+                }}
                 style={{
-                  flex: 1, padding: '4px 2px', border: 'none', cursor: 'pointer',
-                  fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px',
-                  background: tab === t ? 'var(--n-bg-selected)' : 'transparent',
-                  color: tab === t ? 'var(--n-text)' : 'var(--n-text-muted)',
-                  borderBottom: tab === t ? '2px solid var(--n-blue)' : '2px solid transparent',
-                }}>
-                {t}
-                {t === 'PENDING' && pendingReview.length > 0 && (
-                  <span style={{ marginLeft: 2, fontSize: 8, background: 'var(--pr2-bg)', color: 'var(--pr2-text)', padding: '0 3px', fontFamily: 'var(--font-mono)' }}>
-                    {pendingReview.length}
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '9px 8px', marginBottom: 2, textAlign: 'left', cursor: 'pointer',
+                  background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
+                  border: 'none',
+                  borderLeft: `3px solid ${isSelected ? '#3b82f6' : 'transparent'}`,
+                  color: isSelected ? '#60a5fa' : 'var(--n-text)',
+                  transition: 'background 0.1s',
+                }}
+                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <IconComp size={17} style={{ flexShrink: 0, opacity: 0.75 }} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, lineHeight: 1.3, color: isSelected ? '#60a5fa' : 'var(--n-text)' }}>{t.name}</div>
+                  {fieldCount > 0 && <div style={{ fontSize: 9, color: 'var(--n-text-muted)', marginTop: 1 }}>{fieldCount} fields</div>}
+                </div>
+              </button>
+            );
+          })}
+
+          {customTpls.length > 0 && (
+            <>
+              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', padding: '12px 6px 8px' }}>Custom Forms</div>
+              {customTpls.map(t => {
+                const isSelected = selectedTemplate?.id === t.id;
+                return (
+                  <button key={t.id}
+                    onClick={() => { setSelectedTemplate(t); setFormValues({}); setSelectedReport(null); }}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '9px 8px', marginBottom: 2, textAlign: 'left', cursor: 'pointer',
+                      background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
+                      border: 'none',
+                      borderLeft: `3px solid ${isSelected ? '#3b82f6' : 'transparent'}`,
+                      transition: 'background 0.1s',
+                    }}
+                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <MdAssignment size={17} style={{ flexShrink: 0, opacity: 0.75, color: isSelected ? '#60a5fa' : 'var(--n-text-muted)' }} />
+                    <div style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, color: isSelected ? '#60a5fa' : 'var(--n-text)' }}>{t.name}</div>
+                  </button>
+                );
+              })}
+            </>
+          )}
+        </div>
+
+        {/* Signature status */}
+        <div style={{ padding: '10px 12px', borderTop: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', marginBottom: 6 }}>My Signature</div>
+          {hasSig ? (
+            <>
+              <div style={{ background: '#fff', padding: '4px 8px', border: '1px solid #374151', marginBottom: 4 }}>
+                <img src={currentUser.signature} alt="signature" style={{ height: 28, objectFit: 'contain', display: 'block' }} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 9, color: '#22c55e' }}>✓ Signature on file</span>
+                <button onClick={() => navigate('/profile?tab=signature')} style={{ fontSize: 9, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Edit</button>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div style={{ fontSize: 10, color: 'var(--n-text-muted)', marginBottom: 4 }}>No signature on file</div>
+              <button onClick={() => navigate('/profile')} style={{ fontSize: 10, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                Set up in Profile →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ══ CENTER: Document area ══════════════════════════════════ */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#2e2e32' }}>
+
+        {/* ── Creating a new report ── */}
+        {showForm && (
+          <>
+            <div style={{
+              padding: '6px 12px', background: 'var(--n-bg-toolbar)',
+              borderBottom: '1px solid var(--n-border)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {selectedTemplate.name}
+              </span>
+              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                {me?.badge || '—'} · {me?.name || currentUser?.name}
+              </span>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+                {hasSig && !sigApplied && (
+                  <button className="n-btn n-btn-secondary n-btn-xs" onClick={applySignature} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    ✍ Apply Signature
+                  </button>
+                )}
+                {sigApplied && (
+                  <span style={{ fontSize: 10, color: '#22c55e', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    ✓ Signed
                   </span>
                 )}
-              </button>
-            ))}
-          </div>
-
-          {/* List */}
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            {displayedReports.length === 0 ? (
-              <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No reports</div>
-            ) : displayedReports.map(r => (
-              <div key={r.id}
-                onClick={() => { setSelectedReport(r.id); setShowCreate(false); }}
-                style={{
-                  padding: '6px 8px', cursor: 'pointer',
-                  borderBottom: '1px solid var(--n-border-subtle)',
-                  borderLeft: selectedReport === r.id ? '3px solid var(--n-blue)' : '3px solid transparent',
-                  background: selectedReport === r.id ? 'var(--n-bg-selected)' : 'transparent',
-                }}>
-                <div style={{ display: 'flex', gap: 5, marginBottom: 2, alignItems: 'center' }}>
-                  <span className={`n-badge ${statusColor[r.status] || 'badge-gray'}`} style={{ fontSize: 8 }}>{r.status}</span>
-                  <span style={{ fontSize: 8, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>{r.date}</span>
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 1, color: 'var(--n-text)' }}>{r.type}</div>
-                <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{r.caseNumber}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── RIGHT: Form document view ─────────────────────────────── */}
-        <div className={`mob-detail-panel${(!showCreate && !selectedReport) ? ' mob-gone' : ''}`} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#3a3a3a' }}>
-          {/* Mobile back button */}
-          <button className="mob-back-btn" onClick={() => { setShowCreate(false); setSelectedReport(null); setSelectedTemplate(null); }}>
-            ← Back to Reports
-          </button>
-
-          {/* Template picker */}
-          {showCreate && !selectedTemplate && (
-            <div style={{ flex: 1, overflow: 'auto', padding: 24, background: 'var(--n-bg-base)' }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: 16,
-              }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Select Report Type
-                </div>
-                <button className="n-btn n-btn-ghost n-btn-sm" onClick={() => setShowCreate(false)}>✕ Cancel</button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                {reportTemplates.map(t => (
-                  <button key={t.id}
-                    onClick={() => { setSelectedTemplate(t); setFormValues({}); }}
-                    style={{
-                      background: 'var(--n-bg-card)', border: '1px solid var(--n-border)',
-                      padding: '14px 16px', textAlign: 'left', cursor: 'pointer',
-                      borderLeft: '4px solid var(--n-blue)',
-                      fontFamily: 'var(--font-ui)',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--n-bg-elevated)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--n-bg-card)'; }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--n-text)', marginBottom: 4 }}>{t.name}</div>
-                    <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                      {t.sections
-                        ? `${t.sections.reduce((a, s) => a + s.fields.length, 0)} fields · ${t.sections.length} sections`
-                        : `${t.fields?.length || 0} fields`}
-                    </div>
+                {!hasSig && (
+                  <button onClick={() => navigate('/profile')} style={{ fontSize: 10, color: '#6b7280', background: 'none', border: '1px solid #374151', cursor: 'pointer', padding: '3px 8px' }}>
+                    Set up signature
                   </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Editable form document */}
-          {showCreate && selectedTemplate && (
-            <>
-              {/* Toolbar */}
-              <div style={{
-                padding: '5px 10px', background: 'var(--n-bg-toolbar)',
-                borderBottom: '1px solid var(--n-border)', display: 'flex',
-                alignItems: 'center', gap: 8, flexShrink: 0,
-              }}>
-                <button className="n-btn n-btn-secondary n-btn-xs" onClick={() => setSelectedTemplate(null)}>
-                  ← Templates
-                </button>
-                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Filing: {selectedTemplate.name} · Badge: {me?.badge || '—'}
-                </span>
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-                  <button className="n-btn n-btn-ghost n-btn-xs" onClick={() => setShowCreate(false)}>Cancel</button>
-                  <button className="n-btn n-btn-primary n-btn-xs" onClick={submitReport}>Submit Report</button>
-                </div>
-              </div>
-              {/* Document */}
-              <div style={{ flex: 1, overflow: 'auto', background: '#3a3a3a' }}>
-                <FormDocWrap>
-                  <ReportDocument
-                    type={selectedTemplate.name}
-                    template={selectedTemplate}
-                    data={formValues}
-                    editable
-                    onChange={handleFormChange}
-                    meta={{ caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-XXXX`, status: 'Draft' }}
-                  />
-                </FormDocWrap>
-              </div>
-            </>
-          )}
-
-          {/* Empty state */}
-          {!showCreate && !selReport && (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'center', gap: 12, color: '#888', padding: 24, background: '#3a3a3a',
-            }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.4">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: '#aaa', marginBottom: 4 }}>No report selected</div>
-                <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Select a report or file a new one
-                </div>
-              </div>
-              <button className="n-btn n-btn-primary n-btn-xs" onClick={() => setShowCreate(true)}>File New Report</button>
-            </div>
-          )}
-
-          {/* Submitted report viewer */}
-          {!showCreate && selReport && (
-            <>
-              {/* Review toolbar */}
-              <div style={{
-                padding: '5px 10px', background: 'var(--n-bg-toolbar)',
-                borderBottom: '1px solid var(--n-border)', display: 'flex',
-                alignItems: 'center', gap: 8, flexShrink: 0,
-              }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  {selReport.type}
-                </span>
-                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                  {selReport.caseNumber} · {selReport.date}
-                </span>
-                <span className={`n-badge ${statusColor[selReport.status] || 'badge-gray'}`} style={{ fontSize: 9 }}>
-                  {selReport.status}
-                </span>
-                {isAdmin && (
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 5 }}>
-                    {selReport.status !== 'Approved' && (
-                      <button className="n-btn n-btn-success n-btn-xs" onClick={() => reviewReport(selReport.id, 'Approved')}>
-                        Approve
-                      </button>
-                    )}
-                    {selReport.status === 'Submitted' && (
-                      <button className="n-btn n-btn-warning n-btn-xs" onClick={() => reviewReport(selReport.id, 'Pending Review')}>
-                        Flag for Review
-                      </button>
-                    )}
-                    {selReport.status !== 'Submitted' && (
-                      <button className="n-btn n-btn-secondary n-btn-xs" onClick={() => reviewReport(selReport.id, 'Submitted')}>
-                        Reset
-                      </button>
-                    )}
-                  </div>
                 )}
+                <button className="n-btn n-btn-ghost n-btn-xs" onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
+                  ✕ Discard
+                </button>
+                <button className="n-btn n-btn-primary n-btn-xs" onClick={submitReport}>
+                  Submit Report
+                </button>
               </div>
-              {/* Document */}
-              <div style={{ flex: 1, overflow: 'auto', background: '#3a3a3a' }}>
-                <FormDocWrap>
-                  <ReportDocument
-                    type={selReport.type}
-                    template={reportTemplates.find(t => t.name === selReport.type)}
-                    data={selReport.formData || {
-                      f10: selReport.summary,
-                      f4: selReport.summary,
-                      f8: selReport.summary,
-                    }}
-                    editable={false}
-                    meta={{ caseNumber: selReport.caseNumber, status: selReport.status }}
-                  />
-                </FormDocWrap>
+            </div>
+            <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+              <FormDocWrap meta={draftMeta}>
+                <ReportDocument
+                  type={selectedTemplate.name}
+                  template={selectedTemplate}
+                  data={formValues}
+                  editable
+                  onChange={handleFormChange}
+                  meta={draftMeta}
+                />
+              </FormDocWrap>
+            </div>
+          </>
+        )}
+
+        {/* ── Viewing a submitted report ── */}
+        {showReport && (
+          <>
+            <div style={{
+              padding: '6px 12px', background: 'var(--n-bg-toolbar)',
+              borderBottom: '1px solid var(--n-border)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {selReport.type}
+              </span>
+              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                {selReport.caseNumber} · {selReport.date}
+              </span>
+              <span className={`n-badge ${STATUS_CLS[selReport.status] || 'badge-gray'}`} style={{ fontSize: 9 }}>
+                {selReport.status}
+              </span>
+              {isAdmin && (
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                  {selReport.status !== 'Approved' && (
+                    <button className="n-btn n-btn-success n-btn-xs" onClick={() => reviewReport(selReport.id, 'Approved')}>
+                      Approve
+                    </button>
+                  )}
+                  {selReport.status === 'Submitted' && (
+                    <button className="n-btn n-btn-warning n-btn-xs" onClick={() => reviewReport(selReport.id, 'Pending Review')}>
+                      Flag for Review
+                    </button>
+                  )}
+                  {selReport.status !== 'Submitted' && (
+                    <button className="n-btn n-btn-secondary n-btn-xs" onClick={() => reviewReport(selReport.id, 'Submitted')}>
+                      Reset
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+              <FormDocWrap meta={{
+                caseNumber: selReport.caseNumber,
+                status: selReport.status,
+                officerSig: selReport.formData?._officerSig || null,
+                supervisorSig: selReport.status === 'Approved' ? 'APPROVED' : null,
+              }}>
+                <ReportDocument
+                  type={selReport.type}
+                  template={reportTemplates.find(t => t.name === selReport.type)}
+                  data={selReport.formData || { f10: selReport.summary, f4: selReport.summary, f8: selReport.summary }}
+                  editable={false}
+                  meta={{ caseNumber: selReport.caseNumber, status: selReport.status }}
+                />
+              </FormDocWrap>
+            </div>
+          </>
+        )}
+
+        {/* ── Empty state ── */}
+        {!showForm && !showReport && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#666', padding: 40 }}>
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.3">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#888', marginBottom: 6 }}>No report open</div>
+              <div style={{ fontSize: 11, color: '#555', maxWidth: 260, lineHeight: 1.5 }}>
+                Select a report type from the left panel to start filing, or choose an existing report from the list on the right.
               </div>
-            </>
-          )}
+            </div>
+            {!hasSig && (
+              <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 4, padding: '10px 16px', fontSize: 11, color: '#60a5fa', textAlign: 'center', maxWidth: 280 }}>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>✍ Set up your signature</div>
+                <div style={{ color: '#4b7aaa', marginBottom: 8 }}>Apply your saved signature to reports with one click — like DocuSign.</div>
+                <button onClick={() => navigate('/profile')} style={{ fontSize: 11, color: '#3b82f6', background: 'none', border: '1px solid #3b82f6', cursor: 'pointer', padding: '4px 12px' }}>
+                  Go to Profile →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ══ RIGHT: Report queue ═══════════════════════════════════ */}
+      <div style={{
+        width: 270, flexShrink: 0, display: 'flex', flexDirection: 'column',
+        borderLeft: '1px solid var(--n-border)', background: 'var(--n-bg-toolbar)', overflow: 'hidden',
+      }}>
+        {/* Header + stats */}
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text)' }}>Reports</span>
+            <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)' }}>{reports.length} total</span>
+          </div>
+          <div style={{ display: 'flex', gap: 4 }}>
+            {[
+              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: '#3b82f6' },
+              { label: 'Pending',   count: pendingReports.length,                                  color: '#f59e0b' },
+              { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: '#22c55e' },
+            ].map(s => (
+              <div key={s.label} style={{ flex: 1, background: 'var(--n-bg-card)', border: `1px solid ${s.color}22`, padding: '4px 6px', textAlign: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: s.color }}>{s.count}</div>
+                <div style={{ fontSize: 8, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
+          {[
+            { id: 'MINE', label: 'My Reports', count: myReports.length },
+            { id: 'PENDING', label: 'Pending', count: pendingReports.length },
+            ...(isAdmin ? [{ id: 'ALL', label: 'All', count: reports.length }] : []),
+          ].map(t => (
+            <button key={t.id}
+              onClick={() => setReportTab(t.id)}
+              style={{
+                flex: 1, padding: '5px 4px', border: 'none', cursor: 'pointer',
+                fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px',
+                background: reportTab === t.id ? 'var(--n-bg-selected)' : 'transparent',
+                color: reportTab === t.id ? 'var(--n-text)' : 'var(--n-text-muted)',
+                borderBottom: reportTab === t.id ? '2px solid var(--n-blue)' : '2px solid transparent',
+                fontFamily: 'var(--font-ui)',
+              }}>
+              {t.label}
+              {t.count > 0 && reportTab !== t.id && (
+                <span style={{ marginLeft: 3, fontSize: 8, background: 'var(--n-bg-elevated)', color: 'var(--n-text-muted)', padding: '0 3px' }}>
+                  {t.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Report list */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          {displayedReports.length === 0 ? (
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No reports</div>
+          ) : displayedReports.map(r => (
+            <div key={r.id}
+              onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); }}
+              style={{
+                padding: '8px 10px', cursor: 'pointer',
+                borderBottom: '1px solid var(--n-border-subtle)',
+                borderLeft: selectedReport === r.id ? '3px solid var(--n-blue)' : '3px solid transparent',
+                background: selectedReport === r.id ? 'var(--n-bg-selected)' : 'transparent',
+              }}
+              onMouseEnter={e => { if (selectedReport !== r.id) e.currentTarget.style.background = 'var(--n-bg-hover)'; }}
+              onMouseLeave={e => { if (selectedReport !== r.id) e.currentTarget.style.background = 'transparent'; }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                <span className={`n-badge ${STATUS_CLS[r.status] || 'badge-gray'}`} style={{ fontSize: 8 }}>{r.status}</span>
+                <span style={{ fontSize: 8, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>{r.date}</span>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--n-text)', marginBottom: 2, lineHeight: 1.2 }}>{r.type}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{r.caseNumber}</span>
+                {r.formData?._officerSig && <span style={{ fontSize: 9, color: '#22c55e' }}>✍</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Admin action bar for selected report */}
+        {isAdmin && selReport && selReport.status !== 'Approved' && (
+          <div style={{ padding: '8px 10px', borderTop: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
+            <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+              Review: {selReport.caseNumber}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button className="n-btn n-btn-success n-btn-xs" style={{ flex: 1 }}
+                onClick={() => reviewReport(selReport.id, 'Approved')}>
+                Approve
+              </button>
+              {selReport.status === 'Submitted' && (
+                <button className="n-btn n-btn-warning n-btn-xs" style={{ flex: 1 }}
+                  onClick={() => reviewReport(selReport.id, 'Pending Review')}>
+                  Flag
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

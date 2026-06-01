@@ -42,7 +42,7 @@ export default function Returns() {
   const { isMobile } = useResponsive();
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 260px', gap: '14px', maxWidth: '1100px' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 260px', gap: '14px', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
       <div>
         {/* Terminal header */}
         <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '7px 14px', color: '#3b82f6', fontSize: '11px', letterSpacing: '2px', fontWeight: 700 }}>

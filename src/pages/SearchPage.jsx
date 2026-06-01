@@ -71,7 +71,7 @@ export default function SearchPage() {
     <div style={{
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
-      height: `calc(100vh - ${isMobile ? 42 : 70}px)`,
+      height: '100%',
       fontFamily: MONO,
       background: '#080b12',
       overflow: 'hidden',

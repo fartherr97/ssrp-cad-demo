@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 
 function Clock() {
@@ -17,23 +18,23 @@ function Clock() {
 }
 
 const NAV_ITEMS = [
-  { page: 'dispatch',  label: 'CAD'       },
-  { page: 'records',   label: 'Search'    },
-  { page: 'returns',   label: 'Returns'   },
-  { page: 'reports',   label: 'Forms'     },
-  { page: 'map',       label: 'Live Map'  },
-  { page: 'board',     label: 'Board'     },
-  { page: 'units',     label: 'Units'     },
-  { page: 'warrants',  label: 'Warrants'  },
-  { page: 'civilian',  label: 'Civilians' },
-  { page: 'mdt',       label: 'MDT'       },
+  { route: '/cad',       label: 'CAD'       },
+  { route: '/search',    label: 'Search'    },
+  { route: '/returns',   label: 'Returns'   },
+  { route: '/forms',     label: 'Forms'     },
+  { route: '/map',       label: 'Live Map'  },
+  { route: '/board',     label: 'Board'     },
+  { route: '/units',     label: 'Units'     },
+  { route: '/warrants',  label: 'Warrants'  },
+  { route: '/civilians', label: 'Civilians' },
+  { route: '/mdt',       label: 'MDT'       },
 ];
 
 const ADMIN_ITEMS = [
-  { page: 'admin',       label: 'Admin'   },
-  { page: 'penal',       label: 'Penal'   },
-  { page: 'bans',        label: 'Bans'    },
-  { page: 'formbuilder', label: 'Builder' },
+  { route: '/admin',   label: 'Admin'   },
+  { route: '/penal',   label: 'Penal'   },
+  { route: '/bans',    label: 'Bans'    },
+  { route: '/builder', label: 'Builder' },
 ];
 
 const STATUS_COLORS = {
@@ -47,7 +48,9 @@ const STATUS_COLORS = {
 
 export default function MenuBar() {
   const { state, dispatch } = useCAD();
-  const { currentPage, currentUser, officers, calls, myCallId } = state;
+  const { currentUser, officers, calls, myCallId } = state;
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const me = officers.find(o => o.id === currentUser?.id);
@@ -59,10 +62,12 @@ export default function MenuBar() {
   const p1Count = calls.filter(c => c.priority === 1 && c.status !== 'CLOSED').length;
   const myCall = myCallId ? calls.find(c => c.id === myCallId) : null;
 
-  const go = (page) => { dispatch({ type: 'SET_PAGE', payload: page }); setMobileOpen(false); };
+  const go = (route) => { navigate(route); setMobileOpen(false); };
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
 
   const navItems = isAdmin ? [...NAV_ITEMS, ...ADMIN_ITEMS] : NAV_ITEMS;
+
+  const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
 
   return (
     <>
@@ -84,12 +89,12 @@ export default function MenuBar() {
         <nav className="cad-nav">
           {navItems.map(item => (
             <button
-              key={item.page}
-              className={`cad-nav-item${currentPage === item.page ? ' active' : ''}`}
-              onClick={() => go(item.page)}
+              key={item.route}
+              className={`cad-nav-item${isActive(item.route) ? ' active' : ''}`}
+              onClick={() => go(item.route)}
             >
               {item.label}
-              {item.page === 'dispatch' && p1Count > 0 && (
+              {item.route === '/cad' && p1Count > 0 && (
                 <span style={{
                   marginLeft: 4, padding: '0 3px', fontSize: 7, fontFamily: 'var(--font-mono)',
                   background: 'var(--pr1-bg)', color: 'var(--pr1-text)',
@@ -203,7 +208,7 @@ export default function MenuBar() {
             <button
               className="cad-mobile-nav-item"
               style={{ color: '#80c8f0', borderBottom: '1px solid var(--n-border)', fontWeight: 600 }}
-              onClick={() => { go('dispatch'); setMobileOpen(false); }}
+              onClick={() => go('/cad?new=1')}
             >
               + Create Call
             </button>
@@ -212,12 +217,12 @@ export default function MenuBar() {
           {/* Nav links */}
           {navItems.map(item => (
             <button
-              key={item.page}
-              className={`cad-mobile-nav-item${currentPage === item.page ? ' active' : ''}`}
-              onClick={() => go(item.page)}
+              key={item.route}
+              className={`cad-mobile-nav-item${isActive(item.route) ? ' active' : ''}`}
+              onClick={() => go(item.route)}
             >
               {item.label}
-              {item.page === 'dispatch' && p1Count > 0 && (
+              {item.route === '/cad' && p1Count > 0 && (
                 <span style={{ marginLeft: 8, padding: '1px 5px', fontSize: 9, background: 'var(--pr1-bg)', color: 'var(--pr1-text)', fontWeight: 700 }}>
                   P1: {p1Count}
                 </span>

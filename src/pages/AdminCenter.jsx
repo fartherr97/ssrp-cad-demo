@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 
 export default function AdminCenter() {
   const { state, dispatch } = useCAD();
+  const navigate = useNavigate();
   const { officers, activeSessions, auditLog, departments, whitelistApps, customRecordTypes, currentUser } = state;
   const [tab, setTab] = useState('USERS');
   const [deptForm, setDeptForm] = useState({ name:'',short:'',abbreviation:'',color:'#1060a0',type:'LEO',badgePrefix:'',radioChannel:'' });
@@ -79,7 +81,7 @@ export default function AdminCenter() {
                       <td>
                         <div style={{ display: 'flex', gap: 4 }}>
                           <button className="n-btn n-btn-secondary n-btn-xs">Edit</button>
-                          <button className="n-btn n-btn-danger n-btn-xs" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'bans' })}>Ban</button>
+                          <button className="n-btn n-btn-danger n-btn-xs" onClick={() => navigate('/bans')}>Ban</button>
                         </div>
                       </td>
                     </tr>

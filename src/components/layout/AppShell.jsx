@@ -1,16 +1,14 @@
-import MenuBar from './MenuBar';
+import { useNavigate } from 'react-router-dom';
 import ActionBar from './ActionBar';
 import BottomBar from './BottomBar';
 import RadioToast from '../RadioToast';
-import { useCAD } from '../../store/cadStore';
-import { useState } from 'react';
 
-export default function AppShell({ children, onCreateCall }) {
-  const { state } = useCAD();
+export default function AppShell({ children }) {
+  const navigate = useNavigate();
+  const onCreateCall = () => navigate('/cad?new=1');
 
   return (
     <div className="cad-shell">
-      <MenuBar />
       <ActionBar onCreateCall={onCreateCall} />
       <div className="cad-workspace">
         {children}

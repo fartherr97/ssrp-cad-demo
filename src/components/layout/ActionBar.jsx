@@ -1,28 +1,41 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
+import { STATUS_COLORS } from '../../constants/statusColors';
+import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
+import {
+  MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
+  MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
+  MdDoNotDisturb, MdPowerSettingsNew,
+} from 'react-icons/md';
 
-/* ─── SVG icon helpers ─── */
-const Icon = ({ d, size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
-  </svg>
-);
+/* ─── Clock ─── */
+function Clock() {
+  const [time, setTime] = useState('');
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      const p = n => String(n).padStart(2, '0');
+      setTime(`${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', padding: '0 14px', height: '100%',
+      borderLeft: '1px solid #1a3050', fontFamily: 'var(--font-mono)',
+      fontSize: 12, fontWeight: 600, color: '#60a0cc', letterSpacing: '0.3px',
+      flexShrink: 0, whiteSpace: 'nowrap',
+    }}>
+      {time}
+    </div>
+  );
+}
 
-const ICONS = {
-  cad:      ['M3 3h18v4H3z', 'M3 10h18v4H3z', 'M3 17h18v4H3z'],
-  search:   'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z',
-  returns:  ['M1 4v6h6', 'M23 20v-6h-6', 'M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15'],
-  forms:    ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
-  map:      ['M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z', 'M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z'],
-  board:    ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
-  mycall:   ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z'],
-  newcall:  ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z', 'M19 3v6', 'M22 6h-6'],
-  assign:   ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M19 8v6', 'M22 11h-6'],
-  assist:   ['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M23 21v-2a4 4 0 0 0-3-3.87', 'M16 3.13a4 4 0 0 1 0 7.75'],
-  primary:  ['M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'],
-  signout:  ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
-};
-
-function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} }) {
+/* Primary icon+label tool button */
+function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, style = {} }) {
   return (
     <button
       className={`cad-tool-btn${active ? ' active' : ''}`}
@@ -31,105 +44,155 @@ function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} 
       title={title || label}
       style={style}
     >
-      <span className="cad-tool-icon">
-        <Icon d={ICONS[iconKey]} size={15} />
-      </span>
+      <span className="cad-tool-icon"><IconComp size={20} /></span>
       <span className="cad-tool-label">{label}</span>
     </button>
   );
 }
 
+/* Status square button — same shape as ToolBtn but uses the status color when active */
+function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
+  const isActive = myStatus === status;
+  const color = STATUS_COLORS[status];
+  return (
+    <button
+      onClick={onClick}
+      title={`Set status: ${status}`}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: 4, padding: '4px 10px',
+        minWidth: 54, height: '100%',
+        background: isActive ? `${color}1a` : 'transparent',
+        border: 'none',
+        borderTop: `2px solid transparent`,
+        borderBottom: `2px solid ${isActive ? color : 'transparent'}`,
+        color: isActive ? color : '#4a6080',
+        cursor: 'pointer', flexShrink: 0, transition: 'background 0.1s, color 0.1s',
+        fontFamily: 'var(--font-ui)',
+      }}
+      onMouseEnter={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+          e.currentTarget.style.color = '#7090b0';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = '#4a6080';
+        }
+      }}
+    >
+      <IconComp size={19} color={isActive ? color : undefined} />
+      <span style={{
+        fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
+        letterSpacing: '0.5px', whiteSpace: 'nowrap', lineHeight: 1,
+      }}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
+
+const STATUS_BTNS = [
+  { status: 'AVAILABLE',   label: 'AVL',   Icon: MdCheckCircle      },
+  { status: 'ENRT',        label: 'ENRT',  Icon: MdDirectionsCar    },
+  { status: 'BUSY',        label: 'BUSY',  Icon: MdWarningAmber     },
+  { status: 'ARRVD',       label: 'ARRVD', Icon: MdLocationOn       },
+  { status: 'UNAVAILABLE', label: 'UNAVL', Icon: MdDoNotDisturb     },
+  { status: 'OFFDUTY',     label: 'OFD',   Icon: MdPowerSettingsNew },
+];
+
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
-  const { currentPage, currentUser, officers, calls, myCallId } = state;
+  const { currentUser, officers, calls, myCallId } = state;
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const me = officers.find(o => o.id === currentUser?.id);
+  const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
+
+  const me      = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
-  const myCall = myCallId ? calls.find(c => c.id === myCallId) : null;
-  const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
+  const myCall  = myCallId ? calls.find(c => c.id === myCallId) : null;
 
-  const go = (page) => dispatch({ type: 'SET_PAGE', payload: page });
+  const go      = (route) => navigate(route);
+  const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
 
-  const assignSelf = () => {
-    if (!me || !myCall) return;
-    dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
-  };
-
-  const STATUS_BTNS = [
-    { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available', color: '#22ff66' },
-    { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt',      color: '#aaff33' },
-    { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy',      color: '#ff8822' },
-    { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd',     color: '#ffee22' },
-    { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl',     color: '#dd44aa' },
-    { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty',   color: '#cc3333' },
-  ];
-
-  const activeStatusColor = STATUS_BTNS.find(s => s.status === myStatus)?.color || '#cc3333';
-
   return (
-    <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+    <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'stretch', gap: 0, overflowX: 'auto' }}>
 
-      {/* My call indicator */}
+      {/* ── Brand + active portal ── */}
       <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-        justifyContent: 'center', padding: '0 10px', height: '100%',
-        borderRight: '1px solid #0d1e32', flexShrink: 0, minWidth: 100,
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '0 14px', height: '100%',
+        borderRight: '1px solid #253a5e', background: '#0e2040', flexShrink: 0,
       }}>
-        <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.5px', textTransform: 'uppercase' }}>My Call</span>
-        <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, color: myCall ? '#66ddff' : '#334455', lineHeight: 1.2 }}>
-          {myCall ? myCall.id : 'UNASSIGNED'}
-        </span>
-        {myCall && (
-          <span style={{ fontSize: 8, color: '#44779a', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {myCall.nature}
-          </span>
-        )}
-      </div>
-
-      {/* ── Nav group ── */}
-      <ToolBtn iconKey="cad"     label="CAD"     onClick={() => go('dispatch')} active={currentPage === 'dispatch'} />
-      <ToolBtn iconKey="search"  label="Search"  onClick={() => go('records')}  active={currentPage === 'records'}  />
-      <ToolBtn iconKey="returns" label="Returns" onClick={() => go('returns')}  active={currentPage === 'returns'}  />
-      <ToolBtn iconKey="forms"   label="Forms"   onClick={() => go('reports')}  active={currentPage === 'reports'}  />
-      <ToolBtn iconKey="map"     label="Map"     onClick={() => go('map')}      active={currentPage === 'map'}      />
-      <ToolBtn iconKey="board"   label="Board"   onClick={() => go('board')}    active={currentPage === 'board'}    />
-
-      <div className="cad-tool-sep" />
-
-      {/* ── Call actions ── */}
-      {isDispatch && (
-        <ToolBtn iconKey="newcall" label="New Call" onClick={onCreateCall} />
-      )}
-      <ToolBtn iconKey="mycall"  label="My Call"    onClick={() => myCall && go('dispatch')} disabled={!myCall} />
-      <ToolBtn iconKey="assign"  label="Assign Self" onClick={assignSelf} disabled={!myCall || !me} />
-      <ToolBtn iconKey="assist"  label="Assist"      onClick={() => {}} />
-      <ToolBtn iconKey="primary" label="Primary"     onClick={() => {}} />
-
-      <div className="cad-tool-sep" />
-
-      {/* ── Status buttons ── */}
-      <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1, padding: '0 4px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: 6, borderRight: '1px solid #0d1e32', marginRight: 4, height: 38 }}>
-          <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.4px', textTransform: 'uppercase' }}>Status</span>
-          <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700, color: activeStatusColor }}>{STATUS_BTNS.find(s => s.status === myStatus)?.label || '—'}</span>
+        <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
+          style={{ width: 28, height: 28, flexShrink: 0, objectFit: 'contain' }} />
+        <div style={{ lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010' }}>Sunshine State RP</div>
+          <div style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
+            color: portal.color,
+          }}>
+            {portal.label}
+          </div>
         </div>
-        {STATUS_BTNS.map(s => (
-          <button
-            key={s.status}
-            className={`cad-status-btn ${myStatus === s.status ? s.cls : ''}`}
-            style={{ height: 28, padding: '0 7px', fontSize: 9 }}
-            onClick={() => setStatus(s.status)}
-            title={`Set status: ${s.status}`}
-          >
-            {s.label}
-          </button>
-        ))}
       </div>
 
-      {/* ── Sign out ── far right */}
-      <div style={{ marginLeft: 'auto', borderLeft: '1px solid #0d1e32' }}>
-        <ToolBtn iconKey="signout" label="Sign Out" onClick={() => dispatch({ type: 'LOGOUT' })} />
+      {/* ── Portal nav ── */}
+      {portal.nav.map(item => (
+        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+          onClick={() => go(item.route)} active={isActive(item.route)} />
+      ))}
+
+      {/* ── Admin extras ── */}
+      {portal.adminNav && (
+        <>
+          <div className="cad-tool-sep" />
+          {portal.adminNav.map(item => (
+            <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+              onClick={() => go(item.route)} active={isActive(item.route)} />
+          ))}
+        </>
+      )}
+
+      {/* ── Call actions (dispatch / field roles) ── */}
+      {(portal.showNewCall || portal.showCalls) && <div className="cad-tool-sep" />}
+      {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
+      {portal.showCalls && (
+        <>
+          <ToolBtn Icon={MdPhone} label="My Call"
+            onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
+          <ToolBtn Icon={MdPersonAdd} label="Assign" onClick={() => {
+            if (me && myCall) dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
+          }} disabled={!myCall || !me} />
+        </>
+      )}
+
+      {/* ── Field-status buttons ── */}
+      {portal.showStatus && (
+        <>
+          <div className="cad-tool-sep" />
+          {STATUS_BTNS.map(s => (
+            <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
+              status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
+          ))}
+        </>
+      )}
+
+      {/* ── Far right: clock + profile + sign out ── */}
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
+        <Clock />
+        <ToolBtn Icon={MdAccountCircle} label="Profile"
+          onClick={() => go('/profile')} active={isActive('/profile')}
+          title="My Profile & Signature"
+          style={{ borderLeft: '1px solid #1a3050' }} />
+        <ToolBtn Icon={MdLogout} label="Sign Out"
+          onClick={() => dispatch({ type: 'LOGOUT' })}
+          style={{ borderLeft: '1px solid #1a3050' }} />
       </div>
     </div>
   );
