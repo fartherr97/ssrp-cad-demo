@@ -221,7 +221,7 @@ export default function RecordsBureau() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-5 flex flex-col items-center">
+              <div className="flex-1 overflow-y-auto p-5 flex flex-col items-start">
 
                 {/* RETURN tab — NCIC-style record return */}
                 {tab === 'RETURN' && selCiv && (

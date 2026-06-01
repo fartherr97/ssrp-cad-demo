@@ -183,8 +183,8 @@ export const S_STAT_SUB   = 'text-[10px] text-slate-500';
 
 // ─── Record rows ───────────────────────────────────────────
 
-export const S_RECORD_RETURN        = 'flex items-start gap-3 p-2.5 border-b border-border-faint cursor-pointer hover:bg-app-hover transition-colors';
-export const S_RECORD_RETURN_HEADER = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-0.5';
+export const S_RECORD_RETURN        = 'flex flex-col w-full max-w-[680px] bg-black/20 border border-border-base rounded-md overflow-hidden';
+export const S_RECORD_RETURN_HEADER = 'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 px-4 pt-3 pb-2';
 export const S_RECORD_RETURN_MAIN   = 'text-[13px] font-semibold text-slate-200';
 export const S_RECORD_RETURN_SUB    = 'text-[11px] text-slate-500';
 
