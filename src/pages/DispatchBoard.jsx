@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_BTN_PRIMARY, S_BTN_GHOST, S_BTN_SUCCESS,
@@ -22,12 +23,12 @@ function StatusBadge({ status }) {
   return <span className={map[status] || BADGE.gray}>{status}</span>;
 }
 
-// Tab button style helper (replaces removed tabStyle)
+// Tab pill style helper — blue accent when active
 const tabCls = (active) =>
-  `px-[10px] py-[3px] text-[9px] font-mono font-bold cursor-pointer border transition-all ${
+  `px-3 py-1 rounded-lg text-[11px] font-semibold cursor-pointer border transition-all ${
     active
-      ? 'bg-sky-950 text-sky-300 border-sky-700'
-      : 'bg-app-bg text-slate-500 border-white/[0.05] hover:text-slate-300'
+      ? 'bg-brand/15 text-brand-bright border-brand/40'
+      : 'bg-white/[0.03] text-slate-400 border-border-base hover:bg-white/[0.07] hover:text-slate-200'
   }`;
 
 export default function DispatchBoard() {
@@ -56,39 +57,42 @@ export default function DispatchBoard() {
 
   const TABS = ['ALL', 'PENDING', 'ACTIVE', 'ENRT'];
 
-  // Unit status dot color (runtime dynamic * kept in style)
+  // Unit status dot color (runtime dynamic · kept in style)
   const dotColor = (status) => ({
-    AVAILABLE: '#22dd66',
-    BUSY:      '#ff4444',
-    ENRT:      '#ddcc00',
-    ARRVD:     '#22ccff',
-  }[status] || '#556677');
+    AVAILABLE: '#4ade80',
+    BUSY:      '#f87171',
+    ENRT:      '#a78bfa',
+    ARRVD:     '#34d399',
+  }[status] || '#5d6f88');
+
+  // Priority left-accent for table rows
+  const priLeft = { 1: '#f87171', 2: '#fb923c', 3: '#facc15', 4: '#4ade80' };
 
   return (
-    <div className={`${S_PAGE} !p-0 !overflow-hidden !gap-0`}>
+    <div className={`${S_PAGE} !p-4 lg:!p-5 !gap-4 lg:!gap-5 !overflow-hidden`}>
       {/* My status bar */}
-      <div className="flex items-center gap-2 px-[10px] py-[5px] bg-app-panel border-b border-border-base shrink-0">
-        <span className="text-[9px] text-cad-muted font-mono uppercase tracking-[0.6px]">
-          MY STATUS:
+      <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shrink-0">
+        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.7px]">
+          My Status
         </span>
         {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (
           <button key={s}
-            className={`${xs(myStatus === s ? S_BTN_PRIMARY : S_BTN_GHOST)} font-mono tracking-[0.3px]`}
+            className={xs(myStatus === s ? S_BTN_PRIMARY : S_BTN_GHOST)}
             onClick={() => setMyStatus(s)}>{s}</button>
         ))}
         <div className="w-px h-[18px] bg-border-base mx-1" />
-        <span className="text-[9px] text-cad-muted font-mono">
-          UNIT: <span className="text-cad-data">{me?.unitId || '*'}</span>
-          {myCall && <> · CALL: <span className="text-yellow-300">{myCall.id} * {myCall.nature}</span></>}
+        <span className="text-[11px] text-slate-500 font-mono">
+          UNIT: <span className="text-brand-bright">{me?.unitId || '—'}</span>
+          {myCall && <> · CALL: <span className="text-brand-bright">{myCall.id} · {myCall.nature}</span></>}
         </span>
       </div>
 
-      <div className="grid gap-2 flex-1 min-h-0 p-2 overflow-hidden" style={{ gridTemplateColumns: '1fr 280px' }}>
+      <div className="grid gap-4 lg:gap-5 flex-1 min-h-0 overflow-hidden" style={{ gridTemplateColumns: '1fr 300px' }}>
         {/* Call table */}
         <div className={S_PANEL}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Active Calls</div>
-            <div className="flex gap-0.5">
+            <div className="flex gap-1.5 ml-auto flex-wrap">
               {TABS.map(t => (
                 <button key={t}
                   className={tabCls(filter === t)}
@@ -100,7 +104,7 @@ export default function DispatchBoard() {
           </div>
           <div className={S_PANEL_BODY}>
             {filtered.length === 0 ? (
-              <div className="p-6 text-center text-cad-muted text-[11px]">No calls matching filter</div>
+              <div className="p-8 text-center text-slate-600 text-[12px]">No calls matching filter</div>
             ) : (
               <table className={S_TABLE}>
                 <thead>
@@ -113,25 +117,26 @@ export default function DispatchBoard() {
                 <tbody>
                   {filtered.sort((a,b) => a.priority - b.priority).map(c => (
                     <tr key={c.id}
-                      className="cursor-pointer transition-all"
+                      className="cursor-pointer transition-colors"
                       style={{
-                        background: selectedCall === c.id ? 'var(--n-bg-selected)' : '',
-                        boxShadow: selectedCall === c.id ? 'inset 2px 0 0 var(--acc-blue-hi)' : '',
-                        borderLeft: c.priority === 1 ? '2px solid var(--pr1-text)' : '',
+                        background: selectedCall === c.id ? 'rgba(61,130,240,0.12)' : '',
+                        boxShadow: selectedCall === c.id ? 'inset 2px 0 0 #3d82f0' : '',
+                        borderLeft: `3px solid ${priLeft[c.priority] || 'transparent'}`,
                       }}
-                      onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
+                      onMouseEnter={selectedCall === c.id ? undefined : trHoverOn}
+                      onMouseLeave={selectedCall === c.id ? undefined : trHoverOff}
                       onClick={() => setSelectedCall(c.id)}>
                       <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
                       <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
-                      <td className={`${S_TABLE_TD} font-medium`}>{c.nature}</td>
-                      <td className={`${S_TABLE_TD} text-cad-dim max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap`}>{c.location}</td>
-                      <td className={`${S_TABLE_TD} text-cad-dim text-[11px]`}>{c.city}</td>
+                      <td className={`${S_TABLE_TD} font-medium text-slate-200`}>{c.nature}</td>
+                      <td className={`${S_TABLE_TD} text-slate-400 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap`}>{c.location}</td>
+                      <td className={`${S_TABLE_TD} text-slate-400 text-[11px]`}>{c.city}</td>
                       <td className={S_TABLE_TD}><span className={cadCallStatus(c.status)}>{c.status}</span></td>
-                      <td className={`${S_TABLE_TD} font-mono text-[10px] ${c.units.length > 0 ? 'text-cad-text' : 'text-amber-400'}`}>
+                      <td className={`${S_TABLE_TD} font-mono text-[10px] ${c.units.length > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
                       </td>
-                      <td className={`${S_TABLE_TD} font-mono text-[10px] text-cad-dim`}>
-                        {c.timestamp?.split(' ')[1] || '*'}
+                      <td className={`${S_TABLE_TD} font-mono text-[10px] text-slate-500`}>
+                        {c.timestamp?.split(' ')[1] || '—'}
                       </td>
                     </tr>
                   ))}
@@ -142,15 +147,15 @@ export default function DispatchBoard() {
 
           {/* Call detail strip */}
           {selCall && (
-            <div className="border-t border-border-base px-3 py-2 bg-app-card shrink-0">
+            <div className="border-t border-border-faint px-4 py-3 bg-app-card/70 shrink-0">
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <div className="text-xs font-semibold mb-0.5">
-                    {selCall.nature} * <span className="text-cad-dim font-normal">{selCall.location}, {selCall.city}</span>
+                  <div className="text-[13px] font-semibold text-white mb-0.5">
+                    {selCall.nature} <span className="text-slate-400 font-normal">· {selCall.location}, {selCall.city}</span>
                   </div>
-                  <div className="text-[11px] text-cad-dim leading-[1.5]">{selCall.description}</div>
-                  <div className="text-[10px] text-cad-muted font-mono mt-[3px]">
-                    Reporting Party: {selCall.reportingParty || '*'} · {selCall.timestamp}
+                  <div className="text-[11.5px] text-slate-400 leading-[1.5]">{selCall.description}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-1">
+                    Reporting Party: {selCall.reportingParty || '—'} · {selCall.timestamp}
                   </div>
                 </div>
                 {me && !selCall.units.includes(me.unitId) && (
@@ -167,28 +172,28 @@ export default function DispatchBoard() {
         <div className={S_PANEL}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Unit Roster</div>
-            <span className="text-[9px] text-cad-muted font-mono">{onDuty.length} ON</span>
+            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{onDuty.length} ON</span>
           </div>
           <div className={S_PANEL_BODY}>
             {onDuty.map(o => {
               const assignedCall = o.callId ? calls.find(c => c.id === o.callId) : null;
               return (
                 <div key={o.id} className={S_UNIT_ROW}>
-                  <div className="w-[7px] h-[7px] rounded-full shrink-0" style={{ background: dotColor(o.status) }} />
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: dotColor(o.status) }} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex gap-[5px] items-center">
+                    <div className="flex gap-1.5 items-center">
                       <span className={`${S_DATA} text-[10px]`}>{o.unitId}</span>
                       <StatusBadge status={o.status} />
                     </div>
-                    <div className="text-[10.5px] text-cad-text overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="text-[11px] text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap mt-0.5">
                       {o.name}
                     </div>
-                    <div className="text-[9px] text-cad-muted font-mono">
-                      {o.deptShort} · {o.badge}
+                    <div className="flex items-center gap-1.5 text-[9px] text-slate-500 font-mono mt-0.5">
+                      <DeptTag code={o.deptShort} /> · {o.badge}
                     </div>
                     {assignedCall && (
-                      <div className="text-[9px] text-yellow-300 font-mono">
-                        {assignedCall.id} * {assignedCall.nature}
+                      <div className="text-[9px] text-brand-bright font-mono mt-0.5">
+                        {assignedCall.id} · {assignedCall.nature}
                       </div>
                     )}
                   </div>

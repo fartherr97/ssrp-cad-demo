@@ -44,15 +44,15 @@ export default function MDT() {
     }
   };
 
-  const TAB_BASE = 'px-3 py-2 text-[11px] font-semibold border-b-2 cursor-pointer transition-colors shrink-0';
+  const TAB_BASE = 'relative px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-[0.4px] cursor-pointer transition-colors shrink-0';
   const tabCls = (active) => active
-    ? `${TAB_BASE} border-sky-500 text-sky-400`
-    : `${TAB_BASE} border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600`;
+    ? `${TAB_BASE} text-brand-bright`
+    : `${TAB_BASE} text-slate-500 hover:text-slate-300`;
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Tab bar */}
-      <div className="flex items-end bg-app-panel border-b border-border-base shrink-0 px-1">
+      <div className="flex items-end gap-0.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0 px-2 pt-1">
         {[
           { id: 'MESSAGES', label: 'Messages', badge: unread.length },
           { id: 'RADIO', label: 'Radio Log', badge: 0 },
@@ -61,10 +61,11 @@ export default function MDT() {
           <button key={t.id} className={tabCls(tab === t.id)} onClick={() => setTab(t.id)}>
             {t.label}
             {t.badge > 0 && (
-              <span className="ml-1 text-[9px] bg-red-950 text-red-400 rounded px-1 font-mono">
+              <span className="ml-1.5 text-[9px] bg-red-500/20 text-red-400 rounded-full px-1.5 py-0.5 font-mono">
                 {t.badge}
               </span>
             )}
+            {tab === t.id && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
           </button>
         ))}
       </div>
@@ -81,16 +82,16 @@ export default function MDT() {
               <div className={S_PANEL_BODY}>
                 {messages.map(m => (
                   <div key={m.id}
-                    className={`mx-2 my-[3px] px-[9px] py-[7px] rounded-[3px] cursor-pointer border transition-colors ${
+                    className={`mx-2 my-[3px] px-3 py-2.5 rounded-lg cursor-pointer border transition-colors ${
                       selectedMsg === m.id
-                        ? 'border-sky-600/60 bg-app-selected'
+                        ? 'border-brand/40 bg-brand/15'
                         : !m.read
-                        ? 'border-border-base bg-app-card'
-                        : 'border-border-faint bg-app-card'
+                        ? 'border-border-base bg-white/[0.03] hover:bg-white/[0.06]'
+                        : 'border-border-faint bg-white/[0.02] hover:bg-white/[0.05]'
                     } ${m.priority === 'HIGH' ? 'border-l-[3px] border-l-red-400' : ''}`}
                     onClick={() => { setSelectedMsg(m.id); if (!m.read) markRead(m.id); }}>
                     <div className="flex gap-1.5 mb-0.5 items-center">
-                      {!m.read && <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />}
+                      {!m.read && <span className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />}
                       {m.priority === 'HIGH' && <span className={`${BADGE.red} text-[8px]`}>HIGH PRI</span>}
                       <span className="text-[9px] text-cad-muted font-mono ml-auto">
                         {m.timestamp?.split(' ')[1] || ''}
@@ -110,7 +111,7 @@ export default function MDT() {
                 </div>
               ) : (
                 <>
-                  <div className="px-3.5 py-2.5 bg-app-card border-b border-border-base shrink-0">
+                  <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint shrink-0">
                     <div className="flex gap-2 mb-1 items-center">
                       {selMsg.priority === 'HIGH' && <span className={BADGE.red}>HIGH PRIORITY</span>}
                     </div>
@@ -155,8 +156,8 @@ export default function MDT() {
         {/* STATE RETURNS */}
         {tab === 'QUERY' && (
           <div className="flex-1 flex flex-col gap-0 overflow-hidden">
-            <div className="px-3 py-2 bg-app-panel border-b border-border-base shrink-0">
-              <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2 font-mono">
+            <div className="px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.7px] mb-2">
                 STATE / NCIC QUERY TERMINAL
               </div>
               <div className="flex gap-1.5 items-end">
@@ -178,7 +179,7 @@ export default function MDT() {
 
             <div className={`${S_PANEL_BODY} flex-1 p-3`}>
               {!searched ? (
-                <div className="bg-app-panel border border-border-base rounded-[3px] p-4 font-mono text-[11.5px] text-cad-dim leading-[1.8]">
+                <div className="bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm p-4 font-mono text-[11.5px] text-cad-dim leading-[1.8]">
                   <div className="text-green-400 mb-2 font-semibold">NCIC / DMV QUERY TERMINAL ONLINE</div>
                   <div>SYSTEM: SSRP STATE RECORDS BUREAU</div>
                   <div>ACCESS: AUTHORIZED PERSONNEL ONLY</div>
@@ -188,7 +189,7 @@ export default function MDT() {
                   <div className="mt-3 text-border-strong">{'>'} READY_</div>
                 </div>
               ) : results.length === 0 ? (
-                <div className="bg-app-panel border border-border-base rounded-[3px] p-4 font-mono text-[11.5px] text-cad-dim">
+                <div className="bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm p-4 font-mono text-[11.5px] text-cad-dim">
                   <div className="text-amber-400 mb-1.5">QUERY COMPLETE * NO RECORDS FOUND</div>
                   <div>Search terms: "{query}"</div>
                   <div className="text-border-strong mt-3">{'>'} READY_</div>

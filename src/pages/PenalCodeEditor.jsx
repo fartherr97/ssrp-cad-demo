@@ -60,7 +60,7 @@ export default function PenalCodeEditor() {
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Header */}
-      <div className="flex gap-2.5 items-center px-2.5 py-1.5 bg-app-panel border-b border-border-base shrink-0">
+      <div className="flex gap-2.5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
         <input className={`${S_INPUT} !w-[200px] text-[11px]`} placeholder="Search codes or names..." value={filter} onChange={e => setFilter(e.target.value)} />
         <select className={`${S_SELECT} !w-[130px] text-[10px]`} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="ALL">All Types</option>

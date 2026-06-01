@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { DeptTag } from '../constants/deptLogos.jsx';
 import {
-  S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD,
   S_SELECT, S_LABEL,
   S_BTN_PRIMARY, S_BTN_SECONDARY,
+  S_STAT, S_STAT_LABEL, S_STAT_VALUE,
   xs,
   S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
   BADGE,
@@ -42,37 +44,39 @@ export default function UnitManagement() {
   const DEPTS = ['ALL', ...departments.map(d => d.abbreviation)];
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col gap-0">
-      {/* Header */}
-      <div className="flex items-center gap-5 px-2.5 py-1.5 bg-app-panel border-b border-border-base shrink-0">
-        {[
-          { label: 'ON DUTY', value: onDuty, colorClass: 'text-cad-data' },
-          { label: 'AVAILABLE', value: available, colorClass: 'text-green-400' },
-          { label: 'RESPONDING', value: responding, colorClass: 'text-amber-400' },
-          { label: 'OFF DUTY', value: officers.length - onDuty, colorClass: 'text-cad-muted' },
-        ].map(s => (
-          <div key={s.label} className="flex flex-col items-center">
-            <span className={`font-mono text-[15px] font-bold leading-none ${s.colorClass}`}>{s.value}</span>
-            <span className="text-[8px] text-cad-muted tracking-[0.6px] uppercase">{s.label}</span>
-          </div>
-        ))}
-        <div className="ml-auto flex gap-1.5">
-          <select className={`${S_SELECT} !w-[110px] !text-[10px]`} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
+    <div className="flex flex-col flex-1 overflow-hidden p-4 lg:p-5 gap-4 lg:gap-5">
+      {/* Header — stat widgets + filters */}
+      <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1 min-w-[280px]">
+          {[
+            { label: 'On Duty', value: onDuty, color: '#ffffff' },
+            { label: 'Available', value: available, color: '#4ade80' },
+            { label: 'Responding', value: responding, color: '#fbbf24' },
+            { label: 'Off Duty', value: officers.length - onDuty, color: '#94a3b8' },
+          ].map(s => (
+            <div key={s.label} className={S_STAT}>
+              <span className={S_STAT_LABEL}>{s.label}</span>
+              <span className={S_STAT_VALUE} style={{ color: s.color }}>{s.value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 ml-auto">
+          <select className={`${S_SELECT} !w-[130px]`} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
             {DEPTS.map(d => <option key={d}>{d}</option>)}
           </select>
-          <select className={`${S_SELECT} !w-[110px] !text-[10px]`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <select className={`${S_SELECT} !w-[150px]`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             {STATUSES.map(s => <option key={s}>{s}</option>)}
           </select>
         </div>
       </div>
 
-      <div className="grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '1fr 280px' }}>
+      <div className="grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 300px' }}>
         {/* Roster table */}
-        <div className={`${S_PANEL} rounded-none border-t-0 border-l-0 border-b-0 border-r-0`}>
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Unit Roster</div>
-            <span className="text-[9px] text-cad-muted font-mono">
-              {filtered.length} RECORDS
+            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">
+              {filtered.length}
             </span>
           </div>
           <div className={S_PANEL_BODY}>
@@ -101,14 +105,14 @@ export default function UnitManagement() {
                     <td className={`${S_TABLE_TD} font-medium`}>{o.name}</td>
                     <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{o.badge}</span></td>
                     <td className={S_TABLE_TD}>
-                      <span className={`${BADGE.blue} text-[9px]`}>{o.deptShort}</span>
+                      <DeptTag code={o.deptShort} />
                     </td>
                     <td className={`${S_TABLE_TD} text-[11px] text-cad-dim`}>{o.subdivision}</td>
                     <td className={`${S_TABLE_TD} text-[11px] text-cad-dim`}>{o.rank}</td>
                     <td className={S_TABLE_TD}>
                       {o.callId
                         ? <span className={`${S_DATA} text-[10px]`}>{o.callId}</span>
-                        : <span className="text-cad-muted text-[10px]">*</span>
+                        : <span className="text-cad-muted text-[10px]">—</span>
                       }
                     </td>
                     {isAdmin && (
@@ -133,7 +137,7 @@ export default function UnitManagement() {
         </div>
 
         {/* Detail panel */}
-        <div className={`${S_PANEL} rounded-none border-t-0 border-r-0 border-b-0`}>
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           {!selOfficer ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.25">
@@ -147,51 +151,51 @@ export default function UnitManagement() {
                 <div className={S_PANEL_TITLE}>Unit Profile</div>
                 <StatusBadge status={selOfficer.status} />
               </div>
-              <div className={`${S_PANEL_BODY} p-3`}>
+              <div className={`${S_PANEL_BODY} p-4 gap-3`}>
                 {/* Avatar / Name */}
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-app-card border border-border-base flex items-center justify-center text-base text-cad-dim shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-app-elevated border border-border-base flex items-center justify-center text-base font-bold text-slate-300 shrink-0">
                     {selOfficer.name.charAt(0)}
                   </div>
-                  <div>
-                    <div className="text-[13px] font-bold">{selOfficer.name}</div>
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-bold text-white truncate">{selOfficer.name}</div>
                     <div className={`${S_DATA} text-[10px]`}>{selOfficer.badge}</div>
                   </div>
                 </div>
 
-                <div className={`${S_CARD} mb-2`}>
-                  <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">Assignment</div>
+                <div className={S_CARD}>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.7px] mb-2">Assignment</div>
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Unit ID</span><span className={S_DETAIL_VALUE_MONO}>{selOfficer.unitId}</span></div>
-                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Department</span><span className={S_DETAIL_VALUE}>{selOfficer.deptShort}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Department</span><span className={S_DETAIL_VALUE}><DeptTag code={selOfficer.deptShort} /></span></div>
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Division</span><span className={S_DETAIL_VALUE}>{selOfficer.subdivision}</span></div>
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Rank</span><span className={S_DETAIL_VALUE}>{selOfficer.rank}</span></div>
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Role</span><span className={S_DETAIL_VALUE}>{selOfficer.role}</span></div>
                 </div>
 
-                <div className={`${S_CARD} mb-2`}>
-                  <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">Current Status</div>
+                <div className={S_CARD}>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.7px] mb-2">Current Status</div>
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Assigned Call</span>
-                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '*'}</span>
+                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
                   </div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Location</span>
-                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '*'}</span>
+                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
                   </div>
                 </div>
 
                 {selCall && (
-                  <div className={`${S_CARD} border-sky-700/50`}>
-                    <div className="text-[9px] text-amber-400 uppercase tracking-[0.7px] mb-1.5">Active Call</div>
-                    <div className="font-semibold mb-[3px]">{selCall.nature}</div>
-                    <div className="text-[11px] text-cad-dim">{selCall.location}, {selCall.city}</div>
+                  <div className={`${S_CARD} !border-brand/40 bg-brand/[0.07]`}>
+                    <div className="text-[10px] text-brand-bright uppercase tracking-[0.7px] font-bold mb-1.5">Active Call</div>
+                    <div className="font-semibold text-white mb-[3px]">{selCall.nature}</div>
+                    <div className="text-[11px] text-slate-400">{selCall.location}, {selCall.city}</div>
                     <div className={`${S_DATA} text-[10px] mt-1`}>{selCall.id}</div>
                   </div>
                 )}
 
                 {isAdmin && (
-                  <div className="mt-2.5">
+                  <div className="mt-1">
                     <div className={`${S_LABEL} mb-1.5`}>Set Status</div>
                     <div className="flex flex-wrap gap-1">
                       {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (

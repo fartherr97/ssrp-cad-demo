@@ -136,7 +136,7 @@ export default function ReportsCenter() {
     return (
       <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
         {/* Top bar */}
-        <div className="px-4 py-2 bg-app-toolbar border-b border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-3 shrink-0">
           <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
             {selectedTemplate.name}
           </span>
@@ -168,7 +168,7 @@ export default function ReportsCenter() {
         </FormDocWrap>
 
         {/* Bottom submit bar */}
-        <div className="px-4 py-2.5 bg-app-toolbar border-t border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base flex items-center gap-3 shrink-0">
           <span className="text-[10px] text-cad-muted">
             Changes are saved automatically as a draft until you submit.
           </span>
@@ -185,10 +185,10 @@ export default function ReportsCenter() {
     <div className="flex h-full overflow-hidden font-ui">
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-[230px] shrink-0 flex flex-col border-r border-border-base bg-app-toolbar overflow-hidden">
+      <div className="w-[230px] shrink-0 flex flex-col border-r border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden">
         {/* Header */}
-        <div className="px-3 py-2 border-b border-border-base shrink-0">
-          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">File New Report</div>
+        <div className="px-4 py-3 border-b border-border-faint shrink-0">
+          <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">File New Report</div>
           <div className="text-[10px] text-cad-muted mt-0.5">Select a report type to begin</div>
         </div>
 
@@ -205,15 +205,15 @@ export default function ReportsCenter() {
             return (
               <button key={t.id}
                 onClick={() => openTemplate(reportTemplates.find(r => r.name === t.name) || t)}
-                className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
+                className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 rounded-lg text-left cursor-pointer border-l-[3px] transition-colors ${
                   isSelected
-                    ? 'bg-sky-500/10 border-l-sky-500 text-sky-400'
+                    ? 'bg-brand/15 border-l-brand text-brand-bright'
                     : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.04]'
                 }`}
               >
                 <IconComp size={17} className="shrink-0 opacity-75" />
                 <div className="min-w-0">
-                  <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-sky-400' : 'font-medium text-cad-text'}`}>{t.name}</div>
+                  <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-brand-bright' : 'font-medium text-cad-text'}`}>{t.name}</div>
                   {fieldCount > 0 && <div className="text-[9px] text-cad-muted mt-px">{fieldCount} fields</div>}
                 </div>
               </button>
@@ -228,14 +228,14 @@ export default function ReportsCenter() {
                 return (
                   <button key={t.id}
                     onClick={() => openTemplate(t)}
-                    className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
+                    className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 rounded-lg text-left cursor-pointer border-l-[3px] transition-colors ${
                       isSelected
-                        ? 'bg-sky-500/10 border-l-sky-500'
+                        ? 'bg-brand/15 border-l-brand'
                         : 'bg-transparent border-l-transparent hover:bg-white/[0.04]'
                     }`}
                   >
-                    <MdAssignment size={17} className={`shrink-0 opacity-75 ${isSelected ? 'text-sky-400' : 'text-cad-muted'}`} />
-                    <div className={`text-[12px] ${isSelected ? 'font-bold text-sky-400' : 'font-medium text-cad-text'}`}>{t.name}</div>
+                    <MdAssignment size={17} className={`shrink-0 opacity-75 ${isSelected ? 'text-brand-bright' : 'text-cad-muted'}`} />
+                    <div className={`text-[12px] ${isSelected ? 'font-bold text-brand-bright' : 'font-medium text-cad-text'}`}>{t.name}</div>
                   </button>
                 );
               })}
@@ -251,7 +251,7 @@ export default function ReportsCenter() {
         {/* ── Viewing a submitted report ── */}
         {showReport && (
           <>
-            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
+            <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-2.5 shrink-0">
               <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selReport.type}
               </span>
@@ -319,29 +319,29 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ RIGHT: Report queue ═══════════════════════════════════ */}
-      <div className="w-[270px] shrink-0 flex flex-col border-l border-border-base bg-app-toolbar overflow-hidden">
+      <div className="w-[270px] shrink-0 flex flex-col border-l border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden">
         {/* Header + stats */}
-        <div className="px-3 py-2 border-b border-border-base shrink-0">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">Reports</span>
+        <div className="px-3 py-3 border-b border-border-faint shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">Reports</span>
             <span className="text-[9px] font-mono text-cad-muted">{reports.length} total</span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {[
-              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: 'text-sky-500', border: 'border-sky-500/10' },
-              { label: 'Pending',   count: pendingReports.length,                                  color: 'text-amber-500', border: 'border-amber-500/10' },
-              { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: 'text-green-500', border: 'border-green-500/10' },
+              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: 'text-brand-bright', border: 'border-brand/20' },
+              { label: 'Pending',   count: pendingReports.length,                                  color: 'text-amber-400', border: 'border-amber-500/20' },
+              { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: 'text-green-400', border: 'border-green-500/20' },
             ].map(s => (
-              <div key={s.label} className={`flex-1 bg-app-card border ${s.border} px-1.5 py-1 text-center`}>
+              <div key={s.label} className={`flex-1 bg-app-card/70 border ${s.border} rounded-lg px-1.5 py-1.5 text-center`}>
                 <div className={`text-[14px] font-bold ${s.color}`}>{s.count}</div>
-                <div className="text-[8px] text-cad-muted uppercase tracking-[0.3px]">{s.label}</div>
+                <div className="text-[8px] text-cad-muted uppercase tracking-[0.3px] mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-border-base shrink-0 bg-app-card">
+        <div className="flex border-b border-border-faint shrink-0">
           {[
             { id: 'MINE', label: 'My Reports', count: myReports.length },
             { id: 'PENDING', label: 'Pending', count: pendingReports.length },
@@ -349,17 +349,18 @@ export default function ReportsCenter() {
           ].map(t => (
             <button key={t.id}
               onClick={() => setReportTab(t.id)}
-              className={`flex-1 py-1.5 px-1 border-none cursor-pointer text-[9px] font-bold uppercase tracking-[0.4px] font-ui transition-colors border-b-2 ${
+              className={`relative flex-1 py-2 px-1 border-none cursor-pointer text-[9px] font-bold uppercase tracking-[0.4px] font-ui transition-colors ${
                 reportTab === t.id
-                  ? 'bg-app-selected text-cad-text border-b-sky-500'
-                  : 'bg-transparent text-cad-muted border-b-transparent hover:text-cad-text'
+                  ? 'text-brand-bright'
+                  : 'bg-transparent text-cad-muted hover:text-cad-text'
               }`}>
               {t.label}
               {t.count > 0 && reportTab !== t.id && (
-                <span className="ml-0.5 text-[8px] bg-app-elevated text-cad-muted px-0.5">
+                <span className="ml-0.5 text-[8px] bg-app-elevated text-cad-muted px-1 py-0.5 rounded">
                   {t.count}
                 </span>
               )}
+              {reportTab === t.id && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
             </button>
           ))}
         </div>
@@ -373,8 +374,8 @@ export default function ReportsCenter() {
               onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); }}
               className={`px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedReport === r.id
-                  ? 'border-l-sky-500 bg-app-selected'
-                  : 'border-l-transparent bg-transparent hover:bg-app-hover'
+                  ? 'border-l-brand bg-brand/10'
+                  : 'border-l-transparent bg-transparent hover:bg-white/[0.04]'
               }`}
             >
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -391,7 +392,7 @@ export default function ReportsCenter() {
 
         {/* Admin action bar for selected report */}
         {isAdmin && selReport && selReport.status !== 'Approved' && (
-          <div className="px-2.5 py-2 border-t border-border-base shrink-0 bg-app-card">
+          <div className="px-2.5 py-2.5 border-t border-border-faint shrink-0 bg-app-card/60">
             <div className="text-[9px] text-cad-muted uppercase tracking-[0.5px] mb-1.5">
               Review: {selReport.caseNumber}
             </div>

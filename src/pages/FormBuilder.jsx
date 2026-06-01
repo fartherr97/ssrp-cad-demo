@@ -27,7 +27,7 @@ const SECTION_STYLES = [
 
 const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
-const LABEL_CLS = 'block text-[8px] uppercase tracking-[0.5px] text-cad-muted mb-0.5 font-ui';
+const LABEL_CLS = 'block text-[9px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1 font-ui';
 
 function blankTemplate() {
   return {
@@ -51,7 +51,7 @@ const BLANK_NEW_FIELD = { label: '', type: 'text', span: 1, required: false, mon
 /* ── Add-field inline form ──────────────────────────────────────── */
 function AddFieldForm({ value, onChange, onAdd, onCancel }) {
   return (
-    <div className="mt-1.5 p-2 bg-app-card border border-sky-700">
+    <div className="mt-1.5 p-2 bg-app-card border border-brand/40 rounded-lg">
       <div className="grid gap-1.5 mb-1.5" style={{ gridTemplateColumns: '1fr 140px 70px' }}>
         <div>
           <label className={LABEL_CLS}>Field Label *</label>
@@ -92,7 +92,7 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
       )}
       <div className="flex items-center justify-between">
         <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
-          <input type="checkbox" checked={value.required} onChange={e => onChange(v => ({ ...v, required: e.target.checked }))} className="accent-sky-700" />
+          <input type="checkbox" checked={value.required} onChange={e => onChange(v => ({ ...v, required: e.target.checked }))} className="accent-brand" />
           Required
         </label>
         <div className="flex gap-1.5">
@@ -107,7 +107,7 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
 /* ── Expanded field editor ──────────────────────────────────────── */
 function FieldEditor({ field, onChange }) {
   return (
-    <div className="p-2 bg-app-bg border border-sky-700 border-t-0 grid grid-cols-2 gap-2">
+    <div className="p-2 bg-app-bg border border-brand/40 border-t-0 rounded-b-lg grid grid-cols-2 gap-2">
       <div>
         <label className={LABEL_CLS}>Label</label>
         <input className={`${S_INPUT} box-border`} value={field.label || ''} onChange={e => onChange({ label: e.target.value })} />
@@ -137,12 +137,12 @@ function FieldEditor({ field, onChange }) {
 
       <div className="flex items-center gap-4 pt-1">
         <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
-          <input type="checkbox" checked={!!field.required} onChange={e => onChange({ required: e.target.checked })} className="accent-sky-700" />
+          <input type="checkbox" checked={!!field.required} onChange={e => onChange({ required: e.target.checked })} className="accent-brand" />
           Required
         </label>
         {field.type !== 'checkbox' && field.type !== 'textarea' && field.type !== 'dropdown' && (
           <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
-            <input type="checkbox" checked={!!field.mono} onChange={e => onChange({ mono: e.target.checked })} className="accent-sky-700" />
+            <input type="checkbox" checked={!!field.mono} onChange={e => onChange({ mono: e.target.checked })} className="accent-brand" />
             Monospace
           </label>
         )}
@@ -171,12 +171,12 @@ function SectionEditor({
   onUpdateField, onDeleteField, onMoveFieldUp, onMoveFieldDown,
   onSetExpanded, onStartAdd, onCancelAdd, onNewFieldChange, onAddField,
 }) {
-  const dotColor = section.style === 'blue' ? '#1a3a6a' : section.style === 'dark' ? '#444' : '#aaa';
+  const dotColor = section.style === 'blue' ? '#3d82f0' : section.style === 'dark' ? '#444' : '#aaa';
 
   return (
-    <div className="border border-border-base mb-2.5">
+    <div className="border border-border-base rounded-xl mb-2.5 overflow-hidden">
       {/* Section header bar */}
-      <div className="px-2 py-1.5 bg-app-card border-b border-border-base flex items-center gap-1.5">
+      <div className="px-2.5 py-2 bg-app-card/60 border-b border-border-faint flex items-center gap-1.5">
         <div className="w-2.5 h-2.5 rounded-full shrink-0 border border-white/15" style={{ background: dotColor }} />
         <input
           className={`${S_INPUT} flex-1 !text-[11px] font-semibold min-w-0 box-border`}
@@ -209,7 +209,7 @@ function SectionEditor({
           return (
             <div key={field.id} className="mb-0.5">
               <div
-                className={`flex items-center gap-1 px-1.5 py-1 cursor-pointer border ${isExpanded ? 'bg-app-selected border-sky-700' : 'bg-app-card border-white/[0.06] hover:bg-app-hover'}`}
+                className={`flex items-center gap-1 px-1.5 py-1 cursor-pointer border ${isExpanded ? 'bg-brand/15 border-brand/40 rounded-t-lg' : 'bg-app-card border-white/[0.06] rounded-lg hover:bg-app-hover'}`}
                 onClick={() => onSetExpanded(isExpanded ? null : { sectionId: section.id, fieldId: field.id })}
               >
                 <span className="text-[8px] text-cad-muted font-mono w-3.5 text-right shrink-0">{fIdx + 1}</span>
@@ -393,9 +393,9 @@ export default function FormBuilder() {
       <div className="grid flex-1 min-h-0 overflow-hidden" style={{ gridTemplateColumns: '260px 1fr', gap: 0 }}>
 
         {/* ── LEFT: Template list ───────────────────────────────── */}
-        <div className="flex flex-col overflow-hidden border-r-2 border-border-base bg-app-bg">
-          <div className="px-2 py-1.5 bg-app-card border-b border-border-base flex items-center justify-between shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-cad-text">
+        <div className="flex flex-col overflow-hidden border-r border-border-base bg-app-toolbar/80 backdrop-blur-md">
+          <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint flex items-center justify-between shrink-0">
+            <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">
               Form Builder
             </span>
             {isAdmin && (
@@ -407,7 +407,7 @@ export default function FormBuilder() {
             {reportTemplates.map(t => (
               <div key={t.id}
                 onClick={() => startEdit(t)}
-                className={`px-2 py-1.5 cursor-pointer border-b border-white/[0.05] border-l-[3px] flex items-center gap-1.5 transition-colors ${editing?.id === t.id ? 'border-l-sky-500 bg-app-selected' : 'border-l-transparent hover:bg-app-hover'}`}>
+                className={`px-2 py-1.5 cursor-pointer border-b border-white/[0.05] border-l-[3px] flex items-center gap-1.5 transition-colors ${editing?.id === t.id ? 'border-l-brand bg-brand/10' : 'border-l-transparent hover:bg-white/[0.04]'}`}>
                 <div className="flex-1 min-w-0">
                   <div className="text-[11px] font-semibold text-cad-text mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
                     {t.name}
@@ -452,13 +452,13 @@ export default function FormBuilder() {
           ) : (
             <>
               {/* Toolbar */}
-              <div className="px-2.5 py-1.5 bg-app-card border-b border-border-base flex items-center gap-2 shrink-0">
-                <div className="flex gap-0">
+              <div className="px-3 py-2 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-2 shrink-0">
+                <div className="flex gap-1 p-0.5 bg-app-bg/60 rounded-lg border border-border-faint">
                   {['edit', 'preview'].map(tab => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.4px] border cursor-pointer transition-colors ${activeTab === tab ? 'bg-app-selected text-cad-text border-border-base' : 'bg-transparent text-cad-muted border-border-base'}`}
+                      className={`px-3 py-1 text-[9px] font-bold uppercase tracking-[0.4px] rounded-md cursor-pointer transition-colors ${activeTab === tab ? 'bg-brand/15 text-brand-bright' : 'bg-transparent text-cad-muted hover:text-cad-text'}`}
                     >
                       {tab}
                     </button>
@@ -481,8 +481,8 @@ export default function FormBuilder() {
               {activeTab === 'edit' && (
                 <div className="flex-1 overflow-y-auto p-3 pl-4">
                   {/* Template metadata */}
-                  <div className="bg-app-card border border-border-base p-2.5 mb-3">
-                    <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted mb-2">
+                  <div className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm p-3 mb-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-400 mb-2.5">
                       Template Settings
                     </div>
                     <div className="grid grid-cols-2 gap-2">

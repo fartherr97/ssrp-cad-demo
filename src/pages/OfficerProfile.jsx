@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
-
-const INPUT_CLS = 'w-full bg-app-input border border-border-base text-cad-text px-2.5 py-2 text-sm box-border';
-const BLUE_BTN = 'bg-sky-950 border border-sky-700 text-sky-400 px-4 py-2 text-sm cursor-pointer font-semibold rounded';
-const GHOST_BTN = 'bg-white/5 border border-border-base text-cad-dim px-4 py-2 text-sm cursor-pointer rounded';
+import { DeptTag } from '../constants/deptLogos.jsx';
+import {
+  S_SELECT, S_TEXTAREA, S_BTN_PRIMARY, S_BTN_SECONDARY,
+} from '../constants/styles';
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
@@ -35,37 +35,37 @@ export default function OfficerProfile() {
   const accentColor = myDept?.color || '#3b82f6';
 
   return (
-    <div className="p-4 h-full overflow-auto box-border">
+    <div className="flex-1 overflow-auto p-4 lg:p-5 box-border">
       {/* Profile header */}
       <div
-        className="bg-app-card p-4 mb-4 max-w-[900px]"
-        style={{ border: `1px solid ${accentColor}40`, borderLeft: `3px solid ${accentColor}` }}
+        className="bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 p-5 mb-5 max-w-[900px]"
+        style={{ borderLeft: `3px solid ${accentColor}` }}
       >
         <div className="flex items-center gap-4">
           <div
-            className="w-14 h-14 bg-app-input flex items-center justify-center text-lg font-extrabold shrink-0 tracking-widest"
+            className="w-14 h-14 rounded-xl bg-app-elevated flex items-center justify-center text-lg font-extrabold shrink-0 tracking-widest"
             style={{ border: `2px solid ${accentColor}`, color: accentColor }}
           >
             {initials}
           </div>
-          <div className="flex-1">
-            <div className="text-slate-50 text-lg font-bold tracking-wide">{myOfficer.name}</div>
-            <div className="text-slate-400 text-sm mt-0.5">
-              {myOfficer.rank} &bull; {myDept?.name || 'Unknown Department'}
+          <div className="flex-1 min-w-0">
+            <div className="text-white text-lg font-bold tracking-[-0.2px]">{myOfficer.name}</div>
+            <div className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5">
+              {myOfficer.rank} &bull; {myDept?.short ? <DeptTag code={myDept.short} /> : (myDept?.name || 'Unknown Department')}
             </div>
-            <div className="text-slate-600 text-xs mt-0.5">
-              Badge: <span className="text-sky-400">{myOfficer.badge}</span>
-              &nbsp;&bull;&nbsp;Unit: <span className="text-sky-400">{myOfficer.unitId}</span>
+            <div className="text-slate-500 text-xs mt-1">
+              Badge: <span className="text-brand-bright font-semibold">{myOfficer.badge}</span>
+              &nbsp;&bull;&nbsp;Unit: <span className="text-brand-bright font-semibold">{myOfficer.unitId}</span>
               &nbsp;&bull;&nbsp;{myOfficer.subdivision}
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right shrink-0">
             <StatusBadge status={myOfficer.status} />
             {myOfficer.callId && <div className="text-amber-400 text-xs mt-1.5">On Call: {myOfficer.callId}</div>}
           </div>
         </div>
         <div
-          className="grid gap-2 mt-3.5"
+          className="grid gap-2.5 mt-4"
           style={{ gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)' }}
         >
           {[
@@ -74,27 +74,28 @@ export default function OfficerProfile() {
             { label: 'Commendations', val: commendations.length },
             { label: 'Complaints', val: complaints.length },
           ].map(s => (
-            <div key={s.label} className="bg-app-input border border-border-subtle px-3 py-2">
-              <div className="text-slate-50 text-lg font-bold">{s.val}</div>
-              <div className="text-slate-600 text-[11px] mt-0.5">{s.label}</div>
+            <div key={s.label} className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-3.5 py-3">
+              <div className="text-white text-2xl font-extrabold leading-none">{s.val}</div>
+              <div className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.6px] mt-1.5">{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-0.5 border-b border-border-base mb-3.5 max-w-[900px]">
+      <div className="flex gap-0.5 border-b border-border-faint mb-4 max-w-[900px] overflow-x-auto n-tabs-wrap">
         {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
-            className={`border border-b-0 px-3.5 py-1.5 text-xs cursor-pointer tracking-wide transition-colors ${
+            className={`relative px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.4px] whitespace-nowrap cursor-pointer transition-colors ${
               tab === k
-                ? 'bg-app-elevated border-sky-700 text-sky-500'
-                : 'bg-transparent border-transparent text-slate-600 hover:text-cad-dim'
+                ? 'text-brand-bright'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             {l}
+            {tab === k && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
           </button>
         ))}
       </div>
@@ -113,15 +114,15 @@ export default function OfficerProfile() {
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
               {!requestingTransfer ? (
                 <div>
-                  <div className="text-slate-600 text-sm mb-3">Current subdivision: <span className="text-slate-400">{myOfficer.subdivision}</span></div>
-                  <button onClick={() => setRequestingTransfer(true)} className={BLUE_BTN}>
+                  <div className="text-slate-500 text-sm mb-3">Current subdivision: <span className="text-slate-300">{myOfficer.subdivision}</span></div>
+                  <button onClick={() => setRequestingTransfer(true)} className={S_BTN_PRIMARY}>
                     Request Transfer
                   </button>
                 </div>
               ) : (
                 <div>
-                  <div className="text-slate-400 text-[11px] tracking-widest mb-1.5">REQUESTED SUBDIVISION</div>
-                  <select className={`${INPUT_CLS} mb-2`}>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Requested Subdivision</div>
+                  <select className={`${S_SELECT} mb-2`}>
                     {(myDept?.subdivisions || []).map(s => <option key={s}>{s}</option>)}
                   </select>
                   <textarea
@@ -129,11 +130,11 @@ export default function OfficerProfile() {
                     onChange={e => setTransferNote(e.target.value)}
                     placeholder="Reason for transfer request..."
                     rows={3}
-                    className={`${INPUT_CLS} resize-y mb-2`}
+                    className={`${S_TEXTAREA} mb-2`}
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => setRequestingTransfer(false)} className={BLUE_BTN}>Submit</button>
-                    <button onClick={() => setRequestingTransfer(false)} className={GHOST_BTN}>Cancel</button>
+                    <button onClick={() => setRequestingTransfer(false)} className={S_BTN_PRIMARY}>Submit</button>
+                    <button onClick={() => setRequestingTransfer(false)} className={S_BTN_SECONDARY}>Cancel</button>
                   </div>
                 </div>
               )}
@@ -142,16 +143,16 @@ export default function OfficerProfile() {
         )}
 
         {tab === 'reports' && (
-          <div className="table-scroll">
+          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
             <table className="w-full border-collapse text-sm">
               <THead cols={['Case #','Type','Date','Status','Call']} />
               <tbody>
                 {myReports.map((r, i) => (
-                  <tr key={r.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
+                  <tr key={r.id} className={i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}>
                     <TD blue>{r.caseNumber}</TD>
                     <TD>{r.type}</TD>
                     <TD muted>{r.date}</TD>
-                    <td className="px-2.5 py-1.5"><StatusBadge status={r.status} /></td>
+                    <td className="px-3 py-2 border-b border-border-faint"><StatusBadge status={r.status} /></td>
                     <TD blue>{r.callId || '*'}</TD>
                   </tr>
                 ))}
@@ -162,21 +163,21 @@ export default function OfficerProfile() {
         )}
 
         {tab === 'calls' && (
-          <div className="table-scroll">
+          <div className="table-scroll bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
             <table className="w-full border-collapse text-sm">
               <THead cols={['Call #','Nature','Location','Priority','Status','Time']} />
               <tbody>
                 {myCallHistory.map((c, i) => (
-                  <tr key={c.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
+                  <tr key={c.id} className={i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}>
                     <TD blue>{c.id}</TD>
                     <TD>{c.nature}</TD>
                     <TD muted>{c.location}</TD>
-                    <td className="px-2.5 py-1.5">
-                      <span className={`font-bold text-xs ${['text-red-500','text-orange-500','text-yellow-500'][c.priority-1] || 'text-slate-300'}`}>
+                    <td className="px-3 py-2 border-b border-border-faint">
+                      <span className={`font-bold text-xs ${['text-red-400','text-orange-400','text-yellow-400'][c.priority-1] || 'text-slate-300'}`}>
                         P{c.priority}
                       </span>
                     </td>
-                    <td className="px-2.5 py-1.5"><StatusBadge status={c.status} /></td>
+                    <td className="px-3 py-2 border-b border-border-faint"><StatusBadge status={c.status} /></td>
                     <TD muted small>{c.timestamp}</TD>
                   </tr>
                 ))}
@@ -189,17 +190,17 @@ export default function OfficerProfile() {
         {tab === 'commendations' && (
           <div>
             {commendations.map(c => (
-              <div key={c.id} className="bg-green-950 border border-green-900 border-l-[3px] border-l-green-500 px-3.5 py-3.5 mb-2">
+              <div key={c.id} className="bg-emerald-500/[0.07] border border-emerald-500/25 rounded-xl border-l-[3px] border-l-emerald-500 px-4 py-3.5 mb-2.5 backdrop-blur-sm">
                 <div className="flex justify-between mb-1.5">
-                  <span className="text-green-400 font-bold text-sm">{c.type.toUpperCase()}</span>
-                  <span className="text-slate-600 text-[11px]">{c.date}</span>
+                  <span className="text-emerald-400 font-bold text-sm">{c.type.toUpperCase()}</span>
+                  <span className="text-slate-500 text-[11px]">{c.date}</span>
                 </div>
-                <div className="text-slate-600 text-[11px] tracking-wide mb-1">FROM: {c.from.toUpperCase()}</div>
-                <div className="text-slate-400 text-sm leading-relaxed">{c.note}</div>
+                <div className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.5px] mb-1">From: {c.from}</div>
+                <div className="text-slate-300 text-sm leading-relaxed">{c.note}</div>
               </div>
             ))}
             {complaints.length === 0 && commendations.length > 0 && (
-              <div className="text-green-800 text-sm mt-2.5 bg-green-950 border border-green-900 px-3 py-2">NO COMPLAINTS ON RECORD</div>
+              <div className="text-emerald-400/80 text-sm mt-1 bg-emerald-500/[0.07] border border-emerald-500/25 rounded-xl px-4 py-3 backdrop-blur-sm">NO COMPLAINTS ON RECORD</div>
             )}
           </div>
         )}
@@ -210,10 +211,10 @@ export default function OfficerProfile() {
 
 function InfoCard({ title, accentColor, children }) {
   return (
-    <div className="bg-app-card border border-border-subtle px-4 py-3.5">
+    <div className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-4 py-3.5">
       <div
-        className="text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5"
-        style={{ color: accentColor || '#3b82f6' }}
+        className="text-[10px] font-bold uppercase tracking-[0.9px] mb-3 border-b border-border-faint pb-2"
+        style={{ color: accentColor || '#3d82f0' }}
       >
         {title}
       </div>
@@ -224,9 +225,9 @@ function InfoCard({ title, accentColor, children }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="flex justify-between mb-1.5 text-sm">
-      <span className="text-slate-600">{label}</span>
-      <span className="text-slate-300">{value}</span>
+    <div className="flex justify-between gap-3 mb-1.5 text-sm">
+      <span className="text-slate-500 shrink-0">{label}</span>
+      <span className="text-slate-300 text-right">{value}</span>
     </div>
   );
 }
@@ -234,9 +235,9 @@ function InfoRow({ label, value }) {
 function THead({ cols }) {
   return (
     <thead>
-      <tr className="bg-app-input">
+      <tr>
         {cols.map(h => (
-          <th key={h} className="px-2.5 py-1.5 text-left text-slate-500 text-[11px] font-bold tracking-wide border-b border-border-subtle whitespace-nowrap">{h}</th>
+          <th key={h} className="px-3 py-2.5 text-left text-slate-500 text-[10px] font-bold uppercase tracking-[0.7px] bg-app-bg/60 backdrop-blur-sm border-b border-border-base whitespace-nowrap sticky top-0">{h}</th>
         ))}
       </tr>
     </thead>
@@ -245,7 +246,7 @@ function THead({ cols }) {
 
 function TD({ children, blue, muted, small }) {
   return (
-    <td className={`px-2.5 py-1.5 ${blue ? 'text-sky-400 font-bold' : muted ? 'text-slate-500' : 'text-slate-300'} ${small ? 'text-[11px]' : 'text-sm'}`}>
+    <td className={`px-3 py-2 border-b border-border-faint ${blue ? 'text-brand-bright font-bold' : muted ? 'text-slate-500' : 'text-slate-300'} ${small ? 'text-[11px]' : 'text-sm'}`}>
       {children}
     </td>
   );

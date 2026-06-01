@@ -7,7 +7,7 @@ import {
   S_FIELD, S_DATA, trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
 
-const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y min-h-[60px]';
+const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[60px] focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
 
 export default function BanManagement() {
   const { state, dispatch } = useCAD();
@@ -34,7 +34,7 @@ export default function BanManagement() {
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Header */}
-      <div className="flex gap-5 items-center px-2.5 py-1.5 bg-app-panel border-b border-border-base shrink-0">
+      <div className="flex gap-5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
         {[
           { label: 'TOTAL BANS', value: bannedUsers.length, cls: 'text-cad-text' },
           { label: 'ACTIVE', value: active, cls: 'text-red-400' },
@@ -61,7 +61,7 @@ export default function BanManagement() {
         {/* Issue form (inline) */}
         {showForm && (
           <div className={`${S_CARD} shrink-0`}>
-            <div className="text-[9px] text-yellow-600 uppercase tracking-[0.7px] mb-2.5">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.7px] mb-2.5">
               Issue New Ban
             </div>
             <div className="grid grid-cols-2 gap-2 mb-2">

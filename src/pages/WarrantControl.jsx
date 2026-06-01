@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import {
-  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  BADGE, S_PAGE, S_PANEL_HEADER, S_PANEL_TITLE,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
-  S_BTN_DANGER, S_BTN_GHOST, S_BTN_SUCCESS, S_INPUT, S_SELECT, S_LABEL, S_FIELD,
+  S_BTN_DANGER, S_BTN_GHOST, S_BTN_SUCCESS, S_INPUT, S_SELECT, S_LABEL, S_FIELD, S_TEXTAREA,
+  S_STAT, S_STAT_LABEL, S_STAT_VALUE,
   S_DATA, S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
   S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
   trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
-
-const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y min-h-[60px]';
 
 export default function WarrantControl() {
   const { state, dispatch } = useCAD();
@@ -53,22 +52,24 @@ export default function WarrantControl() {
   };
 
   return (
-    <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
-      {/* Header */}
-      <div className="flex gap-5 items-center px-2.5 py-1.5 bg-app-panel border-b border-border-base shrink-0">
-        {[
-          { label: 'ACTIVE', value: activeCount, cls: 'text-red-400' },
-          { label: 'SERVED', value: warrants.filter(w => w.status === 'SERVED').length, cls: 'text-green-400' },
-          { label: 'TOTAL', value: warrants.length, cls: 'text-cad-data' },
-        ].map(s => (
-          <div key={s.label} className="flex flex-col items-center">
-            <span className={`font-mono text-[15px] font-bold ${s.cls}`}>{s.value}</span>
-            <span className="text-[8px] text-cad-muted tracking-[0.6px] uppercase">{s.label}</span>
-          </div>
-        ))}
-        <div className="ml-auto flex gap-1.5">
+    <div className={`${S_PAGE} overflow-hidden`}>
+      {/* Header — stat widgets + actions */}
+      <div className="flex flex-wrap gap-3 items-center shrink-0">
+        <div className="grid grid-cols-3 gap-3 flex-1 min-w-[240px]">
+          {[
+            { label: 'Active', value: activeCount, color: '#f87171' },
+            { label: 'Served', value: warrants.filter(w => w.status === 'SERVED').length, color: '#4ade80' },
+            { label: 'Total', value: warrants.length, color: '#ffffff' },
+          ].map(s => (
+            <div key={s.label} className={S_STAT}>
+              <span className={S_STAT_LABEL}>{s.label}</span>
+              <span className={S_STAT_VALUE} style={{ color: s.color }}>{s.value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="ml-auto flex gap-2 items-center">
           {['ALL','ACTIVE','SERVED'].map(f => (
-            <button key={f} className={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
+            <button key={f} className={sm(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
           <button className={sm(S_BTN_DANGER)} onClick={() => setShowIssue(true)}>
@@ -77,12 +78,12 @@ export default function WarrantControl() {
         </div>
       </div>
 
-      <div className="grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '1fr 300px' }}>
+      <div className="grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
         {/* Warrant Table */}
-        <div className="flex flex-col border-r border-border-base overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Warrant Registry</div>
-            <span className="text-[9px] text-cad-muted font-mono">{filtered.length} WARRANTS</span>
+            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{filtered.length}</span>
           </div>
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
@@ -119,7 +120,7 @@ export default function WarrantControl() {
         </div>
 
         {/* Detail Panel */}
-        <div className="flex flex-col overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           {!selWarrant ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25">
