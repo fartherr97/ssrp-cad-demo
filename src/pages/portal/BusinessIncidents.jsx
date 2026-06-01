@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { MdAssignment, MdBusiness, MdInfo } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { PortalPage, PortalHeader, StatCard, PortalCard } from './PortalKit';
-import { S_BTN_PRIMARY, BADGE, btnHoverOn, btnHoverOff } from '../../constants/styles';
+import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
 
-const ACCENT = '#44aacc';
+const ACCENT = 'cyan';
 
 export default function BusinessIncidents() {
   const { state } = useCAD();
@@ -18,11 +18,11 @@ export default function BusinessIncidents() {
     return (
       <PortalPage>
         <PortalHeader icon={MdAssignment} title="Business Incidents" subtitle="Incidents filed against your business by law enforcement." accent={ACCENT} />
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: '44px 24px' }}>
-          <div style={{ fontSize: 14, color: 'rgba(180,200,230,0.6)', marginBottom: 18 }}>
+        <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
+          <div className="text-sm text-slate-400 mb-[18px]">
             You need to register a business before you can view incidents.
           </div>
-          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/portal/my-business')}>
+          <button className={`${S_BTN_PRIMARY} inline-flex items-center gap-1.5`} onClick={() => navigate('/portal/my-business')}>
             <MdBusiness size={16} /> Register your business
           </button>
         </PortalCard>
@@ -49,67 +49,59 @@ export default function BusinessIncidents() {
         accent={ACCENT}
       />
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 22 }}>
+      <div className="flex gap-3.5 flex-wrap mb-[22px]">
         <StatCard label="Total Incidents" value={incidents.length} accent={ACCENT} icon={MdAssignment} hint="All records" />
-        <StatCard label="Open" value={openCount} accent={openCount > 0 ? '#f5a93b' : ACCENT} icon={MdAssignment} hint={openCount > 0 ? 'Active investigations' : 'None open'} />
-        <StatCard label="Closed" value={closedCount} accent="#2fd968" icon={MdAssignment} hint="Resolved" />
+        <StatCard label="Open" value={openCount} accent={openCount > 0 ? 'amber' : ACCENT} icon={MdAssignment} hint={openCount > 0 ? 'Active investigations' : 'None open'} />
+        <StatCard label="Closed" value={closedCount} accent="green" icon={MdAssignment} hint="Resolved" />
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
+      <div className="flex gap-1.5 mb-[18px] flex-wrap">
         {['ALL', 'Open', 'Closed'].map(t => (
-          <button key={t}
+          <button
+            key={t}
             onClick={() => setFilter(t)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              padding: '6px 14px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--n-radius-sm)',
-              cursor: 'pointer', border: '1px solid transparent', transition: 'all 0.14s',
-              background: filter === t ? ACCENT : 'rgba(255,255,255,0.05)',
-              color: filter === t ? '#fff' : 'rgba(200,220,240,0.7)',
-              borderColor: filter === t ? 'transparent' : 'rgba(255,255,255,0.12)',
-            }}>
+            className={`inline-flex items-center justify-center px-3.5 py-1.5 text-sm font-semibold rounded cursor-pointer border transition-all ${
+              filter === t
+                ? 'bg-cyan-400 text-white border-transparent'
+                : 'bg-white/5 text-slate-300 border-white/[0.12]'
+            }`}
+          >
             {t} ({COUNTS[t]})
           </button>
         ))}
       </div>
 
       {/* Read-only note */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18,
-        fontSize: 12, color: 'rgba(160,185,215,0.6)',
-      }}>
-        <MdInfo size={15} color="rgba(160,185,215,0.6)" />
+      <div className="flex items-center gap-2 mb-[18px] text-xs text-slate-400">
+        <MdInfo size={15} className="text-slate-400 shrink-0" />
         Incidents are filed by law enforcement and cannot be added or edited here.
       </div>
 
       {filtered.length === 0 ? (
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: '44px 24px' }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 14, margin: '0 auto 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-          }}>
-            <MdAssignment size={30} color={ACCENT} />
+        <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
+          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
+            <MdAssignment size={30} className="text-cyan-400" />
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', marginBottom: 6 }}>
+          <div className="text-[15px] font-bold text-slate-100 mb-1.5">
             {filter === 'ALL' ? 'No incidents on record' : `No ${filter.toLowerCase()} incidents`}
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(180,200,230,0.6)' }}>
+          <div className="text-sm text-slate-400">
             {filter === 'ALL' ? 'Your business has a clean record.' : 'Try a different filter.'}
           </div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 14 }}>
+        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
           {filtered.map(inc => (
-            <PortalCard key={inc.id} accent={inc.status === 'Open' ? '#f5a93b' : ACCENT}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', lineHeight: 1.25 }}>{inc.type}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(160,185,215,0.6)', marginTop: 3 }}>{inc.date}</div>
+            <PortalCard key={inc.id} accent={inc.status === 'Open' ? 'amber' : ACCENT}>
+              <div className="flex justify-between items-start gap-2.5 mb-2">
+                <div className="min-w-0">
+                  <div className="text-[15px] font-bold text-slate-100 leading-tight">{inc.type}</div>
+                  <div className="text-xs text-slate-400 mt-[3px]">{inc.date}</div>
                 </div>
-                <span style={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
+                <span className={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
               </div>
-              <div style={{ fontSize: 13, color: 'rgba(200,215,235,0.75)', lineHeight: 1.5 }}>{inc.summary}</div>
+              <div className="text-sm text-slate-300 leading-relaxed">{inc.summary}</div>
             </PortalCard>
           ))}
         </div>

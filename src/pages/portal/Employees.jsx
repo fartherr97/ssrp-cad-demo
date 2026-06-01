@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { MdGroup, MdAdd, MdDelete, MdBusiness } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
 
-const ACCENT = '#44aacc';
+const ACCENT = 'cyan';
 const ROLES = ['Manager', 'Employee', 'Driver', 'Security', 'Dispatcher'];
 const BLANK = { name: '', role: 'Employee', phone: '', since: '' };
 
@@ -22,11 +22,11 @@ export default function Employees() {
     return (
       <PortalPage>
         <PortalHeader icon={MdGroup} title="Employees" subtitle="Manage your business staff roster." accent={ACCENT} />
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: '44px 24px' }}>
-          <div style={{ fontSize: 14, color: 'rgba(180,200,230,0.6)', marginBottom: 18 }}>
+        <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
+          <div className="text-sm text-slate-400 mb-[18px]">
             You need to register a business before you can manage employees.
           </div>
-          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/portal/my-business')}>
+          <button className={`${S_BTN_PRIMARY} inline-flex items-center gap-1.5`} onClick={() => navigate('/portal/my-business')}>
             <MdBusiness size={16} /> Register your business
           </button>
         </PortalCard>
@@ -50,39 +50,39 @@ export default function Employees() {
         subtitle={`Staff roster for ${myBiz.name}`}
         accent={ACCENT}
         action={(
-          <button style={{ ...S_BTN_PRIMARY, display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => setAdding(v => !v)}>
+          <button className={`${S_BTN_PRIMARY} flex items-center gap-1.5`} onClick={() => setAdding(v => !v)}>
             <MdAdd size={18} /> Add Employee
           </button>
         )}
       />
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 22 }}>
+      <div className="flex gap-3.5 flex-wrap mb-[22px]">
         <StatCard label="Total Employees" value={myBiz.employees.length} accent={ACCENT} icon={MdGroup} hint="On the roster" />
       </div>
 
       {adding && (
-        <PortalCard accent={ACCENT} style={{ marginBottom: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+        <PortalCard accent={ACCENT} className="mb-5">
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <div>
-              <label style={PORTAL_LABEL}>Name</label>
-              <input style={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="Full name" />
+              <label className={PORTAL_LABEL}>Name</label>
+              <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="Full name" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Role</label>
-              <select style={PORTAL_INPUT} value={form.role} onChange={set('role')}>
+              <label className={PORTAL_LABEL}>Role</label>
+              <select className={PORTAL_INPUT} value={form.role} onChange={set('role')}>
                 {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Phone</label>
-              <input style={PORTAL_INPUT} value={form.phone} onChange={set('phone')} placeholder="555-0000" />
+              <label className={PORTAL_LABEL}>Phone</label>
+              <input className={PORTAL_INPUT} value={form.phone} onChange={set('phone')} placeholder="555-0000" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Since</label>
-              <input type="date" style={PORTAL_INPUT} value={form.since} onChange={set('since')} />
+              <label className={PORTAL_LABEL}>Since</label>
+              <input type="date" className={PORTAL_INPUT} value={form.since} onChange={set('since')} />
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+          <div className="flex justify-end gap-2.5 mt-[18px]">
             <button className={sm(S_BTN_SECONDARY)} onClick={() => { setForm(BLANK); setAdding(false); }}>Cancel</button>
             <button className={sm(S_BTN_SUCCESS)} disabled={!canSubmit} onClick={addEmployee}>Add Employee</button>
           </div>
@@ -90,41 +90,39 @@ export default function Employees() {
       )}
 
       {myBiz.employees.length === 0 ? (
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: '44px 24px' }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 14, margin: '0 auto 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-          }}>
-            <MdGroup size={30} color={ACCENT} />
+        <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
+          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
+            <MdGroup size={30} className="text-cyan-400" />
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', marginBottom: 6 }}>No employees yet</div>
-          <div style={{ fontSize: 13, color: 'rgba(180,200,230,0.6)' }}>Use “Add Employee” to build your roster.</div>
+          <div className="text-[15px] font-bold text-slate-100 mb-1.5">No employees yet</div>
+          <div className="text-sm text-slate-400">Use "Add Employee" to build your roster.</div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
+        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
           {myBiz.employees.map(emp => (
             <PortalCard key={emp.id} accent={ACCENT}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6' }}>{emp.name}</div>
-                  <span style={{
-                    display: 'inline-block', marginTop: 6, fontSize: 11, fontWeight: 700, padding: '2px 9px', borderRadius: 999,
-                    background: `${ACCENT}22`, color: ACCENT, border: `1px solid ${ACCENT}55`,
-                  }}>{emp.role}</span>
+              <div className="flex justify-between items-start gap-2.5">
+                <div className="min-w-0">
+                  <div className="text-[15px] font-bold text-slate-100">{emp.name}</div>
+                  <span className="inline-block mt-1.5 text-[11px] font-bold px-[9px] py-0.5 rounded-full bg-cyan-400/[0.13] text-cyan-400 border border-cyan-400/30">
+                    {emp.role}
+                  </span>
                 </div>
-                <button style={{ ...sm(S_BTN_DANGER), display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } })}>
+                <button
+                  className={`${sm(S_BTN_DANGER)} flex items-center gap-1`}
+                  onClick={() => dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } })}
+                >
                   <MdDelete size={16} /> Remove
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: 24, marginTop: 14, fontSize: 12 }}>
+              <div className="flex gap-6 mt-3.5 text-xs">
                 <div>
-                  <div style={{ color: 'rgba(150,175,205,0.5)', fontSize: 10, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Phone</div>
-                  <div style={{ color: '#dce6f0', marginTop: 2 }}>{emp.phone || '—'}</div>
+                  <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Phone</div>
+                  <div className="text-slate-200 mt-0.5">{emp.phone || '—'}</div>
                 </div>
                 <div>
-                  <div style={{ color: 'rgba(150,175,205,0.5)', fontSize: 10, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Since</div>
-                  <div style={{ color: '#dce6f0', marginTop: 2 }}>{emp.since || '—'}</div>
+                  <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Since</div>
+                  <div className="text-slate-200 mt-0.5">{emp.since || '—'}</div>
                 </div>
               </div>
             </PortalCard>

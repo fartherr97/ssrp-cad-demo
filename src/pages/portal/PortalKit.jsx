@@ -40,12 +40,11 @@ export function PortalHeader({ icon: Icon, title, subtitle, accent = '#3a88e8', 
 
 export function StatCard({ label, value, accent = '#3a88e8', icon: Icon, hint }) {
   return (
-    <div style={{
+    <div className="stat-card-enter" style={{
       background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: 12, padding: '18px 20px', flex: 1, minWidth: 150,
       display: 'flex', flexDirection: 'column', gap: 6, position: 'relative', overflow: 'hidden',
       transition: 'border-color var(--t-med), transform var(--t-med) var(--ease-out)',
-      animation: 'slideUp 0.22s cubic-bezier(0.4,0,0.2,1) both',
     }}>
       <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.10 }}>
         {Icon && <Icon size={68} color={accent} />}
@@ -61,24 +60,14 @@ export function PortalCard({ children, accent, style = {}, onClick, hover }) {
   return (
     <div
       onClick={onClick}
+      className={hover ? 'portal-card-hover' : ''}
       style={{
         background: 'rgba(255,255,255,0.035)',
         border: `1px solid ${accent ? accent + '44' : 'rgba(255,255,255,0.08)'}`,
         borderRadius: 12, padding: 20,
         ...(accent ? { borderLeft: `3px solid ${accent}` } : {}),
-        ...(hover ? { cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s' } : {}),
         ...style,
       }}
-      {...(hover ? {
-        onMouseEnter: e => {
-          e.currentTarget.style.borderColor = accent ? `${accent}88` : 'rgba(255,255,255,0.18)';
-          e.currentTarget.style.transform = 'translateY(-2px)';
-        },
-        onMouseLeave: e => {
-          e.currentTarget.style.borderColor = accent ? `${accent}44` : 'rgba(255,255,255,0.08)';
-          e.currentTarget.style.transform = '';
-        },
-      } : {})}
     >
       {children}
     </div>
@@ -105,13 +94,6 @@ export function Field({ label, value, mono }) {
   );
 }
 
-export const PORTAL_INPUT = {
-  width: '100%', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 6, color: '#e6eef6', padding: '10px 12px', fontSize: 14,
-  fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
-};
+export const PORTAL_INPUT = 'w-full bg-black/25 border border-white/[0.12] rounded px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-sky-700 transition-colors';
 
-export const PORTAL_LABEL = {
-  display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.5px',
-  textTransform: 'uppercase', color: 'rgba(160,185,215,0.6)', marginBottom: 6,
-};
+export const PORTAL_LABEL = 'block text-[11px] font-bold tracking-[0.5px] uppercase text-slate-400 mb-1.5';

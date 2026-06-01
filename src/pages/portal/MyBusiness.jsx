@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdBusiness, MdEdit } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, BADGE, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
-
-const ACCENT = '#44aacc';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, BADGE, sm } from '../../constants/styles';
 
 const BLANK = { name: '', type: '', owner: '', ein: '', phone: '', address: '' };
 
@@ -33,36 +31,36 @@ export default function MyBusiness() {
           icon={MdBusiness}
           title="Register Business"
           subtitle="Register your business with the city to access the self-service portal."
-          accent={ACCENT}
+          accent="#44aacc"
         />
-        <PortalCard accent={ACCENT}>
+        <PortalCard accent="#44aacc">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             <div>
-              <label style={PORTAL_LABEL}>Business Name</label>
-              <input style={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="e.g. Bayshore Auto & Towing" />
+              <label className={PORTAL_LABEL}>Business Name</label>
+              <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="e.g. Bayshore Auto & Towing" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Business Type</label>
-              <input style={PORTAL_INPUT} value={form.type} onChange={set('type')} placeholder="e.g. Automotive / Towing" />
+              <label className={PORTAL_LABEL}>Business Type</label>
+              <input className={PORTAL_INPUT} value={form.type} onChange={set('type')} placeholder="e.g. Automotive / Towing" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Owner</label>
-              <input style={PORTAL_INPUT} value={form.owner} onChange={set('owner')} placeholder="Owner full name" />
+              <label className={PORTAL_LABEL}>Owner</label>
+              <input className={PORTAL_INPUT} value={form.owner} onChange={set('owner')} placeholder="Owner full name" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>EIN</label>
-              <input style={{ ...PORTAL_INPUT, fontFamily: 'var(--font-mono)' }} value={form.ein} onChange={set('ein')} placeholder="FL-00-0000000" />
+              <label className={PORTAL_LABEL}>EIN</label>
+              <input className={`${PORTAL_INPUT} font-mono`} value={form.ein} onChange={set('ein')} placeholder="FL-00-0000000" />
             </div>
             <div>
-              <label style={PORTAL_LABEL}>Phone</label>
-              <input style={PORTAL_INPUT} value={form.phone} onChange={set('phone')} placeholder="555-0000" />
+              <label className={PORTAL_LABEL}>Phone</label>
+              <input className={PORTAL_INPUT} value={form.phone} onChange={set('phone')} placeholder="555-0000" />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={PORTAL_LABEL}>Address</label>
-              <input style={PORTAL_INPUT} value={form.address} onChange={set('address')} placeholder="Street, City" />
+              <label className={PORTAL_LABEL}>Address</label>
+              <input className={PORTAL_INPUT} value={form.address} onChange={set('address')} placeholder="Street, City" />
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+          <div className="flex justify-end mt-5">
             <button className={S_BTN_PRIMARY} disabled={!canSubmit} onClick={register}>
               Register Business
             </button>
@@ -88,44 +86,44 @@ export default function MyBusiness() {
         icon={MdBusiness}
         title="My Business"
         subtitle="Your registered business profile."
-        accent={ACCENT}
+        accent="#44aacc"
         action={!editing && (
-          <button style={{ ...sm(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 6 }} onClick={startEdit}>
+          <button className={`${sm(S_BTN_SECONDARY)} flex items-center gap-1.5`} onClick={startEdit}>
             <MdEdit size={16} /> Edit
           </button>
         )}
       />
 
-      <PortalCard accent={ACCENT}>
+      <PortalCard accent="#44aacc">
         {editing ? (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
               <div>
-                <label style={PORTAL_LABEL}>Business Name</label>
-                <input style={PORTAL_INPUT} value={form.name} onChange={set('name')} />
+                <label className={PORTAL_LABEL}>Business Name</label>
+                <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} />
               </div>
               <div>
-                <label style={PORTAL_LABEL}>Business Type</label>
-                <input style={PORTAL_INPUT} value={form.type} onChange={set('type')} />
+                <label className={PORTAL_LABEL}>Business Type</label>
+                <input className={PORTAL_INPUT} value={form.type} onChange={set('type')} />
               </div>
               <div>
-                <label style={PORTAL_LABEL}>Owner</label>
-                <input style={PORTAL_INPUT} value={form.owner} onChange={set('owner')} />
+                <label className={PORTAL_LABEL}>Owner</label>
+                <input className={PORTAL_INPUT} value={form.owner} onChange={set('owner')} />
               </div>
               <div>
-                <label style={PORTAL_LABEL}>EIN</label>
-                <input style={{ ...PORTAL_INPUT, fontFamily: 'var(--font-mono)' }} value={form.ein} onChange={set('ein')} />
+                <label className={PORTAL_LABEL}>EIN</label>
+                <input className={`${PORTAL_INPUT} font-mono`} value={form.ein} onChange={set('ein')} />
               </div>
               <div>
-                <label style={PORTAL_LABEL}>Phone</label>
-                <input style={PORTAL_INPUT} value={form.phone} onChange={set('phone')} />
+                <label className={PORTAL_LABEL}>Phone</label>
+                <input className={PORTAL_INPUT} value={form.phone} onChange={set('phone')} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={PORTAL_LABEL}>Address</label>
-                <input style={PORTAL_INPUT} value={form.address} onChange={set('address')} />
+                <label className={PORTAL_LABEL}>Address</label>
+                <input className={PORTAL_INPUT} value={form.address} onChange={set('address')} />
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+            <div className="flex justify-end gap-2.5 mt-5">
               <button className={sm(S_BTN_SECONDARY)} onClick={() => setEditing(false)}>Cancel</button>
               <button className={sm(S_BTN_SUCCESS)} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
             </div>
@@ -140,10 +138,10 @@ export default function MyBusiness() {
             <Field label="Address" value={myBiz.address} />
             <Field label="License" value={myBiz.license} mono />
             <Field label="License Expiry" value={myBiz.licenseExpiry} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', color: 'rgba(160,185,215,0.5)' }}>Status</span>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-slate-500">Status</span>
               <span>
-                <span style={myBiz.status === 'ACTIVE' ? BADGE.green : BADGE.gray}>{myBiz.status}</span>
+                <span className={myBiz.status === 'ACTIVE' ? BADGE.green : BADGE.gray}>{myBiz.status}</span>
               </span>
             </div>
           </div>

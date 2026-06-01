@@ -8,7 +8,7 @@ import {
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { BADGE } from '../../constants/styles';
 
-const ACCENT = '#9090cc';
+const ACCENT = 'violet';
 
 const DL_BADGE = {
   ACTIVE:    BADGE.green,
@@ -48,55 +48,47 @@ export default function CivilianHome() {
       />
 
       {myWarrants.length > 0 && (
-        <PortalCard accent="#ff5454" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#ff545422', border: '1px solid #ff545455',
-          }}>
-            <MdWarning size={26} color="#ff5454" />
+        <PortalCard accent="red" className="mb-5 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-red-400/10 border border-red-400/30">
+            <MdWarning size={26} className="text-red-400" />
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#ff8080' }}>
+          <div className="flex-1">
+            <div className="text-[15px] font-extrabold text-red-300">
               {myWarrants.length} active warrant{myWarrants.length !== 1 ? 's' : ''} on your record{myWarrants.length !== 1 ? 's' : ''}
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,180,180,0.75)', marginTop: 3 }}>
+            <div className="text-xs text-red-300/75 mt-[3px]">
               {myWarrants.map(w => `${w.civilianName} — ${w.charge}`).join('  •  ')}
             </div>
           </div>
         </PortalCard>
       )}
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 }}>
+      <div className="flex gap-3.5 flex-wrap mb-7">
         <StatCard label="My Characters"  value={myChars.length}    accent={ACCENT}   icon={MdPerson} />
         <StatCard label="My Vehicles"    value={myVehicles.length} accent={ACCENT}   icon={MdDirectionsCar} />
-        <StatCard label="Valid Licenses" value={validLicenses}     accent="#2fd968"  icon={MdBadge} />
+        <StatCard label="Valid Licenses" value={validLicenses}     accent="green"    icon={MdBadge} />
         <StatCard
           label="Active Warrants"
           value={myWarrants.length}
-          accent={myWarrants.length > 0 ? '#ff5454' : ACCENT}
+          accent={myWarrants.length > 0 ? 'red' : ACCENT}
           icon={MdWarning}
           hint={myWarrants.length > 0 ? 'Action required' : 'All clear'}
         />
       </div>
 
       <SectionTitle accent={ACCENT}>Quick Actions</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14, marginBottom: 30 }}>
+      <div className="grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
         {QUICK.map(q => (
-          <PortalCard key={q.route} accent={ACCENT} hover onClick={() => navigate(q.route)} style={{ cursor: 'pointer' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-              }}>
-                <q.icon size={24} color={ACCENT} />
+          <PortalCard key={q.route} accent={ACCENT} hover onClick={() => navigate(q.route)}>
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-400/10 border border-violet-400/30">
+                <q.icon size={24} className="text-violet-400" />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6' }}>{q.title}</div>
-                <div style={{ fontSize: 12, color: 'rgba(160,185,215,0.6)', marginTop: 2 }}>{q.desc}</div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[15px] font-bold text-slate-100">{q.title}</div>
+                <div className="text-xs text-slate-400 mt-0.5">{q.desc}</div>
               </div>
-              <MdChevronRight size={22} color="rgba(160,185,215,0.4)" />
+              <MdChevronRight size={22} className="text-slate-500 shrink-0" />
             </div>
           </PortalCard>
         ))}
@@ -105,24 +97,24 @@ export default function CivilianHome() {
       <SectionTitle accent={ACCENT}>My Characters</SectionTitle>
       {myChars.length === 0 ? (
         <PortalCard accent={ACCENT}>
-          <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)' }}>
+          <div className="text-sm text-slate-400">
             You haven't registered any characters yet. Head to{' '}
-            <span style={{ color: ACCENT, fontWeight: 600 }}>My Characters</span> to get started.
+            <span className="text-violet-400 font-semibold">My Characters</span> to get started.
           </div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+        <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
           {myChars.map(c => (
-            <PortalCard key={c.id} accent={ACCENT} hover onClick={() => navigate('/portal/characters')} style={{ cursor: 'pointer' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                  <MdPerson size={22} color={ACCENT} />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6' }}>{c.firstName} {c.lastName}</div>
-                    <div style={{ fontSize: 11, color: 'rgba(160,185,215,0.55)' }}>DOB {c.dob}</div>
+            <PortalCard key={c.id} accent={ACCENT} hover onClick={() => navigate('/portal/characters')}>
+              <div className="flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <MdPerson size={22} className="text-violet-400 shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
+                    <div className="text-[11px] text-slate-500">DOB {c.dob}</div>
                   </div>
                 </div>
-                <span style={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>
+                <span className={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>
               </div>
             </PortalCard>
           ))}

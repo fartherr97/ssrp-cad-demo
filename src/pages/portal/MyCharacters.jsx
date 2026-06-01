@@ -2,9 +2,7 @@ import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
-
-const ACCENT = '#9090cc';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
 
 const DL_BADGE = {
   ACTIVE:    BADGE.green,
@@ -79,38 +77,38 @@ export default function MyCharacters() {
         icon={MdPerson}
         title="My Characters"
         subtitle="Register and manage the identities tied to your account."
-        accent={ACCENT}
+        accent="#9090cc"
         action={
           !showForm && (
             <button className={S_BTN_PRIMARY} onClick={openNew}>
-              <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
+              <MdAdd size={18} /> Register Character
             </button>
           )
         }
       />
 
       {showForm && (
-        <PortalCard accent={ACCENT} style={{ marginBottom: 22 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#e6eef6' }}>
+        <PortalCard accent="#9090cc" style={{ marginBottom: 22 }}>
+          <div className="flex justify-between items-center mb-[18px]">
+            <div className="text-[15px] font-extrabold text-slate-100">
               {editingId != null ? 'Edit Character' : 'Register New Character'}
             </div>
             <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
-              <MdClose size={16} style={{ marginRight: 4 }} /> Cancel
+              <MdClose size={16} /> Cancel
             </button>
           </div>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
               {FORM_FIELDS.map(f => (
                 <div key={f.key}>
-                  <label style={PORTAL_LABEL}>{f.label}</label>
+                  <label className={PORTAL_LABEL}>{f.label}</label>
                   {f.type === 'select' ? (
-                    <select style={PORTAL_INPUT} value={form[f.key]} onChange={e => setField(f.key, e.target.value)}>
+                    <select className={PORTAL_INPUT} value={form[f.key]} onChange={e => setField(f.key, e.target.value)}>
                       {f.options.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
                     <input
-                      style={PORTAL_INPUT}
+                      className={PORTAL_INPUT}
                       type={f.type}
                       value={form[f.key]}
                       onChange={e => setField(f.key, e.target.value)}
@@ -119,11 +117,11 @@ export default function MyCharacters() {
                 </div>
               ))}
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={PORTAL_LABEL}>Address</label>
-                <input style={PORTAL_INPUT} type="text" value={form.address} onChange={e => setField('address', e.target.value)} />
+                <label className={PORTAL_LABEL}>Address</label>
+                <input className={PORTAL_INPUT} type="text" value={form.address} onChange={e => setField('address', e.target.value)} />
               </div>
             </div>
-            <div style={{ marginTop: 18, display: 'flex', gap: 10 }}>
+            <div className="flex gap-2.5 mt-[18px]">
               <button type="submit" className={S_BTN_PRIMARY}>
                 {editingId != null ? 'Save Changes' : 'Register Character'}
               </button>
@@ -133,38 +131,36 @@ export default function MyCharacters() {
       )}
 
       {myChars.length === 0 && !showForm ? (
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: 48 }}>
-          <MdPerson size={48} color="rgba(144,144,204,0.4)" />
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', marginTop: 12 }}>No characters yet</div>
-          <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)', marginTop: 6 }}>
-            Register your first character to get started.
+        <PortalCard accent="#9090cc">
+          <div className="text-center p-12">
+            <MdPerson size={48} color="rgba(144,144,204,0.4)" />
+            <div className="text-[15px] font-bold text-slate-100 mt-3">No characters yet</div>
+            <div className="text-sm text-slate-400 mt-1.5">
+              Register your first character to get started.
+            </div>
+            <button className={`${S_BTN_PRIMARY} mt-[18px]`} onClick={openNew}>
+              <MdAdd size={18} /> Register Character
+            </button>
           </div>
-          <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onClick={openNew}>
-            <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
-          </button>
         </PortalCard>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: 14 }}>
           {myChars.map(c => (
-            <PortalCard key={c.id} accent={ACCENT}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-                  }}>
-                    <MdPerson size={22} color={ACCENT} />
+            <PortalCard key={c.id} accent="#9090cc">
+              <div className="flex justify-between items-start gap-2.5 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-400/10 border border-violet-400/30">
+                    <MdPerson size={22} color="#9090cc" />
                   </div>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: '#e6eef6' }}>{c.firstName} {c.lastName}</div>
-                    <span style={{ ...(DL_BADGE[c.dlStatus] || BADGE.gray), marginTop: 4 }}>
+                    <div className="text-base font-extrabold text-slate-100">{c.firstName} {c.lastName}</div>
+                    <span className={`${DL_BADGE[c.dlStatus] || BADGE.gray} mt-1`}>
                       DL {c.dlStatus || 'N/A'}
                     </span>
                   </div>
                 </div>
                 <button className={sm(S_BTN_SECONDARY)} onClick={() => openEdit(c)}>
-                  <MdEdit size={15} style={{ marginRight: 4 }} /> Edit
+                  <MdEdit size={15} /> Edit
                 </button>
               </div>
 
@@ -178,7 +174,7 @@ export default function MyCharacters() {
               </div>
 
               {c.flags?.length > 0 && (
-                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <div className="mt-3.5 flex items-center gap-2 flex-wrap">
                   <MdWarning size={16} color="#f5a93b" />
                   {c.flags.map(fl => (
                     <span key={fl} className={BADGE.orange}>{fl}</span>

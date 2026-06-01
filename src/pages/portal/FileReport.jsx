@@ -5,9 +5,9 @@ import {
   MdPlace, MdDescription, MdCategory,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, btnHoverOn, btnHoverOff } from '../../constants/styles';
+import { S_BTN_PRIMARY } from '../../constants/styles';
 
-const ACCENT = '#9090cc';
+const ACCENT = 'violet';
 
 const REPORT_TYPES = [
   'Theft',
@@ -82,34 +82,26 @@ export default function FileReport() {
       />
 
       {submitted ? (
-        <PortalCard accent="#2fd968" style={{ textAlign: 'center', padding: '44px 24px' }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: 16, margin: '0 auto 18px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#2fd96822', border: '1px solid #2fd96855',
-          }}>
-            <MdCheckCircle size={36} color="#2fd968" />
+        <PortalCard accent="green" className="text-center px-6 py-[44px]">
+          <div className="w-16 h-16 rounded-[16px] mx-auto mb-[18px] flex items-center justify-center bg-green-400/10 border border-green-400/30">
+            <MdCheckCircle size={36} className="text-green-400" />
           </div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+          <div className="text-[19px] font-extrabold text-white mb-2">
             Report submitted
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(180,200,230,0.65)', maxWidth: 460, margin: '0 auto 22px', lineHeight: 1.5 }}>
+          <div className="text-sm text-slate-400 max-w-[460px] mx-auto mb-[22px] leading-relaxed">
             Your report has been received and forwarded to law enforcement for review.
             Keep your case number for reference.
           </div>
-          <div style={{
-            display: 'inline-block', background: 'rgba(0,0,0,0.25)',
-            border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10,
-            padding: '14px 26px', marginBottom: 24,
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(160,185,215,0.55)' }}>
+          <div className="inline-block bg-black/25 border border-white/[0.12] rounded-[10px] px-[26px] py-3.5 mb-6">
+            <div className="text-[10px] font-bold tracking-[0.8px] uppercase text-slate-400">
               Case Number
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: '#2fd968', fontFamily: 'var(--font-mono)', letterSpacing: '1px', marginTop: 4 }}>
+            <div className="text-2xl font-extrabold text-green-400 font-mono tracking-[1px] mt-1">
               {submitted.caseNumber}
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, maxWidth: 560, margin: '0 auto 26px', textAlign: 'left' }}>
+          <div className="grid gap-4 max-w-[560px] mx-auto mb-[26px] text-left" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
             <Field label="Report Type" value={submitted.reportType} />
             <Field label="Filed By" value={submitted.filedBy} />
             <Field label="Incident Date" value={submitted.incidentDate} />
@@ -120,43 +112,43 @@ export default function FileReport() {
           </div>
         </PortalCard>
       ) : myChars.length === 0 ? (
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: 48 }}>
-          <MdReportProblem size={48} color="rgba(144,144,204,0.4)" />
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', marginTop: 12 }}>No characters yet</div>
-          <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)', marginTop: 6 }}>
+        <PortalCard accent={ACCENT} className="text-center p-12">
+          <MdReportProblem size={48} className="text-violet-400/40 mx-auto" />
+          <div className="text-[15px] font-bold text-slate-100 mt-3">No characters yet</div>
+          <div className="text-sm text-slate-400 mt-1.5">
             Register a character before filing a report.
           </div>
         </PortalCard>
       ) : (
         <PortalCard accent={ACCENT}>
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+            <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
               <div>
-                <label style={PORTAL_LABEL}><MdCategory size={13} style={{ verticalAlign: '-2px', marginRight: 5 }} />Report Type</label>
-                <select style={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
+                <label className={PORTAL_LABEL}><MdCategory size={13} className="inline align-[-2px] mr-[5px]" />Report Type</label>
+                <select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
                   {REPORT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={PORTAL_LABEL}><MdPerson size={13} style={{ verticalAlign: '-2px', marginRight: 5 }} />Filing As</label>
-                <select style={PORTAL_INPUT} value={form.filerId} onChange={e => setField('filerId', e.target.value)} required>
+                <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>
+                <select className={PORTAL_INPUT} value={form.filerId} onChange={e => setField('filerId', e.target.value)} required>
                   {myChars.map(c => (
                     <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label style={PORTAL_LABEL}><MdEventNote size={13} style={{ verticalAlign: '-2px', marginRight: 5 }} />Incident Date</label>
-                <input style={PORTAL_INPUT} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} required />
+                <label className={PORTAL_LABEL}><MdEventNote size={13} className="inline align-[-2px] mr-[5px]" />Incident Date</label>
+                <input className={PORTAL_INPUT} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} required />
               </div>
               <div>
-                <label style={PORTAL_LABEL}><MdPlace size={13} style={{ verticalAlign: '-2px', marginRight: 5 }} />Location</label>
-                <input style={PORTAL_INPUT} type="text" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="Street, City" required />
+                <label className={PORTAL_LABEL}><MdPlace size={13} className="inline align-[-2px] mr-[5px]" />Location</label>
+                <input className={PORTAL_INPUT} type="text" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="Street, City" required />
               </div>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={PORTAL_LABEL}><MdDescription size={13} style={{ verticalAlign: '-2px', marginRight: 5 }} />Description</label>
+              <div className="col-span-full">
+                <label className={PORTAL_LABEL}><MdDescription size={13} className="inline align-[-2px] mr-[5px]" />Description</label>
                 <textarea
-                  style={{ ...PORTAL_INPUT, minHeight: 130, resize: 'vertical', fontFamily: 'var(--font-ui)' }}
+                  className={`${PORTAL_INPUT} min-h-[130px] resize-y`}
                   value={form.description}
                   onChange={e => setField('description', e.target.value)}
                   placeholder="Describe what happened, including any details that may help (descriptions, times, items involved)…"
@@ -164,7 +156,7 @@ export default function FileReport() {
                 />
               </div>
             </div>
-            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="mt-5 flex justify-end">
               <button type="submit" className={S_BTN_PRIMARY} disabled={!canSubmit}>
                 Submit Report
               </button>

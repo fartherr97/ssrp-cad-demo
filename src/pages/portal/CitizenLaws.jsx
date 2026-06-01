@@ -41,67 +41,90 @@ export default function CitizenLaws() {
       />
 
       {/* Controls */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
-          <MdSearch size={18} color="rgba(160,185,215,0.5)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+      <div className="flex gap-3 mb-5 flex-wrap">
+        <div className="relative flex-1 min-w-[240px]">
+          <MdSearch
+            size={18}
+            color="rgba(160,185,215,0.5)"
+            style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}
+          />
           <input
-            style={{ ...PORTAL_INPUT, paddingLeft: 38 }}
+            className={`${PORTAL_INPUT} pl-[38px]`}
             placeholder="Search laws by name, code, or category…"
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div className="flex gap-1.5">
           {['ALL', 'Felony', 'Misdemeanor', 'Infraction'].map(t => (
-            <button key={t}
+            <button
+              key={t}
               onClick={() => setTypeFilter(t)}
+              className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded border cursor-pointer transition-all select-none"
               style={{
                 background: typeFilter === t ? (TYPE_COLOR[t] || accent) : 'rgba(255,255,255,0.05)',
                 color: typeFilter === t ? '#fff' : 'rgba(200,220,240,0.7)',
-                border: '1px solid ' + (typeFilter === t ? 'transparent' : 'rgba(255,255,255,0.12)'),
-              }}>
+                borderColor: typeFilter === t ? 'transparent' : 'rgba(255,255,255,0.12)',
+              }}
+            >
               {t}
             </button>
           ))}
         </div>
       </div>
 
-      <div style={{ fontSize: 12, color: 'rgba(150,175,205,0.5)', marginBottom: 14 }}>{total} statute{total !== 1 ? 's' : ''} shown</div>
+      <div className="text-xs text-slate-500 mb-3.5">{total} statute{total !== 1 ? 's' : ''} shown</div>
 
       {Object.keys(categories).length === 0 && (
-        <div style={{ textAlign: 'center', padding: 60, color: 'rgba(150,175,205,0.4)', fontSize: 14 }}>
+        <div className="text-center py-[60px] text-slate-500 text-sm">
           No statutes match your search.
         </div>
       )}
 
       {Object.entries(categories).map(([category, laws]) => (
-        <div key={category} style={{ marginBottom: 26 }}>
-          <div style={{
-            fontSize: 13, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase',
-            color: accent, marginBottom: 12, paddingBottom: 6, borderBottom: '1px solid rgba(255,255,255,0.08)',
-          }}>
+        <div key={category} className="mb-[26px]">
+          <div
+            className="text-sm font-bold tracking-[0.6px] uppercase mb-3 pb-1.5 border-b border-white/[0.08]"
+            style={{ color: accent }}
+          >
             {category}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: 12 }}>
             {laws.map(law => (
-              <div key={law.id} style={{
-                background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)',
-                borderLeft: `3px solid ${TYPE_COLOR[law.type] || accent}`,
-                borderRadius: 10, padding: '14px 16px',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#e6eef6', lineHeight: 1.25 }}>{law.name}</div>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999, whiteSpace: 'nowrap',
-                    background: `${TYPE_COLOR[law.type] || accent}22`, color: TYPE_COLOR[law.type] || accent,
-                    border: `1px solid ${TYPE_COLOR[law.type] || accent}55`,
-                  }}>{law.type}</span>
+              <div
+                key={law.id}
+                className="bg-white/[0.035] border border-white/[0.08] rounded-[10px] px-4 py-3.5"
+                style={{ borderLeft: `3px solid ${TYPE_COLOR[law.type] || accent}` }}
+              >
+                <div className="flex justify-between items-start gap-2.5 mb-2">
+                  <div className="text-sm font-bold text-slate-100 leading-tight">{law.name}</div>
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap border"
+                    style={{
+                      background: `${TYPE_COLOR[law.type] || accent}22`,
+                      color: TYPE_COLOR[law.type] || accent,
+                      borderColor: `${TYPE_COLOR[law.type] || accent}55`,
+                    }}
+                  >
+                    {law.type}
+                  </span>
                 </div>
-                <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'rgba(160,185,215,0.7)', marginBottom: 10 }}>{law.code}</div>
-                <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
-                  <div><span style={{ color: 'rgba(150,175,205,0.5)' }}>Fine: </span><span style={{ color: '#2fd968', fontWeight: 600 }}>${law.fine?.toLocaleString() || 0}</span></div>
-                  <div><span style={{ color: 'rgba(150,175,205,0.5)' }}>Jail: </span><span style={{ color: '#f5a93b', fontWeight: 600 }}>{law.jailTime || '—'}</span></div>
-                  {law.points != null && <div><span style={{ color: 'rgba(150,175,205,0.5)' }}>Pts: </span><span style={{ color: '#ff5454', fontWeight: 600 }}>{law.points}</span></div>}
+                <div className="text-[11px] font-mono text-slate-400 mb-2.5">{law.code}</div>
+                <div className="flex gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-500">Fine: </span>
+                    <span className="text-green-400 font-semibold">${law.fine?.toLocaleString() || 0}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">Jail: </span>
+                    <span className="text-amber-400 font-semibold">{law.jailTime || '—'}</span>
+                  </div>
+                  {law.points != null && (
+                    <div>
+                      <span className="text-slate-500">Pts: </span>
+                      <span className="text-red-400 font-semibold">{law.points}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

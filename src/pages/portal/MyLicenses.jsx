@@ -2,30 +2,15 @@ import { useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdBadge, MdDriveEta, MdGppGood, MdInfoOutline, MdPerson } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field } from './PortalKit';
-import { BADGE } from '../../constants/styles';
-
-const ACCENT = '#9090cc';
-
-function statusBadge(status) {
-  switch (status) {
-    case 'ACTIVE': return BADGE.green;
-    case 'SUSPENDED': return BADGE.red;
-    case 'EXPIRED': return BADGE.orange;
-    default: return BADGE.gray;
-  }
-}
+import { BADGE, statusBadge } from '../../constants/styles';
 
 function LicenseBlock({ icon: Icon, title, status, rows }) {
   return (
-    <div style={{
-      flex: 1, minWidth: 240,
-      background: 'rgba(0,0,0,0.18)', border: '1px solid rgba(255,255,255,0.07)',
-      borderRadius: 10, padding: 16,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Icon size={20} color={ACCENT} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#e6eef6' }}>{title}</span>
+    <div className="flex-1 min-w-[240px] bg-black/[0.18] border border-white/[0.07] rounded-[10px] p-4">
+      <div className="flex items-center justify-between gap-2.5 mb-3.5">
+        <div className="flex items-center gap-2">
+          <Icon size={20} color="#9090cc" />
+          <span className="text-sm font-bold text-slate-100">{title}</span>
         </div>
         <span className={statusBadge(status)}>{status || 'NONE'}</span>
       </div>
@@ -46,41 +31,36 @@ export default function MyLicenses() {
         icon={MdBadge}
         title="My Licenses"
         subtitle="View driver licenses and weapon permits for your characters."
-        accent={ACCENT}
+        accent="#9090cc"
       />
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20,
-        fontSize: 12, color: 'rgba(160,185,215,0.6)',
-      }}>
-        <MdInfoOutline size={16} color={ACCENT} />
+      <div className="flex items-center gap-2 mb-5 text-xs text-slate-400">
+        <MdInfoOutline size={16} color="#9090cc" />
         Licenses are issued and managed by the state. Contact your local DMV office to renew.
       </div>
 
       {myChars.length === 0 ? (
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: 48 }}>
-          <MdBadge size={48} color="rgba(144,144,204,0.4)" />
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', marginTop: 12 }}>No characters yet</div>
-          <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)', marginTop: 6 }}>
-            Register a character to view its licenses.
+        <PortalCard accent="#9090cc">
+          <div className="text-center p-12">
+            <MdBadge size={48} color="rgba(144,144,204,0.4)" />
+            <div className="text-[15px] font-bold text-slate-100 mt-3">No characters yet</div>
+            <div className="text-sm text-slate-400 mt-1.5">
+              Register a character to view its licenses.
+            </div>
           </div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="flex flex-col gap-4">
           {myChars.map(c => (
-            <PortalCard key={c.id} accent={ACCENT}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-                }}>
-                  <MdPerson size={22} color={ACCENT} />
+            <PortalCard key={c.id} accent="#9090cc">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-400/10 border border-violet-400/30">
+                  <MdPerson size={22} color="#9090cc" />
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#e6eef6' }}>{c.firstName} {c.lastName}</div>
+                <div className="text-base font-extrabold text-slate-100">{c.firstName} {c.lastName}</div>
               </div>
 
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <div className="flex gap-3.5 flex-wrap">
                 <LicenseBlock
                   icon={MdDriveEta}
                   title="Driver License"

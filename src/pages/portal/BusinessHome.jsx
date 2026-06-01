@@ -5,9 +5,9 @@ import {
   MdCheckCircle, MdBusiness, MdMenuBook,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
-import { S_BTN_PRIMARY, BADGE, btnHoverOn, btnHoverOff } from '../../constants/styles';
+import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
 
-const ACCENT = '#44aacc';
+const ACCENT = 'cyan';
 
 const QUICK_ACTIONS = [
   { to: '/portal/my-business', icon: MdBusiness,    title: 'My Business',  desc: 'View & edit your business profile' },
@@ -30,18 +30,14 @@ export default function BusinessHome() {
           subtitle="Register your business to access the self-service dashboard."
           accent={ACCENT}
         />
-        <PortalCard accent={ACCENT} style={{ textAlign: 'center', padding: '48px 24px' }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: 16, margin: '0 auto 18px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-          }}>
-            <MdStore size={34} color={ACCENT} />
+        <PortalCard accent={ACCENT} className="text-center p-12">
+          <div className="w-16 h-16 rounded-[16px] mx-auto mb-[18px] flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
+            <MdStore size={34} className="text-cyan-400" />
           </div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+          <div className="text-lg font-extrabold text-white mb-2">
             Welcome — let's get you set up
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(180,200,230,0.6)', maxWidth: 440, margin: '0 auto 22px', lineHeight: 1.5 }}>
+          <div className="text-sm text-slate-400 max-w-[440px] mx-auto mb-[22px] leading-relaxed">
             You don't have a registered business yet. Register one to manage your profile,
             employees, and track incidents filed by law enforcement.
           </div>
@@ -67,27 +63,23 @@ export default function BusinessHome() {
         accent={ACCENT}
       />
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 }}>
+      <div className="flex gap-3.5 flex-wrap mb-7">
         <StatCard label="Employees" value={myBiz.employees.length} accent={ACCENT} icon={MdGroup} hint="On the roster" />
-        <StatCard label="Open Incidents" value={openIncidents} accent={openIncidents > 0 ? '#ff5454' : ACCENT} icon={MdAssignment} hint={openIncidents > 0 ? 'Require attention' : 'All clear'} />
-        <StatCard label="License" value={myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'} accent={myBiz.status === 'ACTIVE' ? '#2fd968' : '#f5a93b'} icon={MdReceiptLong} hint={`Expires ${myBiz.licenseExpiry}`} />
-        <StatCard label="Business Status" value={myBiz.status} accent={myBiz.status === 'ACTIVE' ? '#2fd968' : '#f5a93b'} icon={MdCheckCircle} hint="Operating status" />
+        <StatCard label="Open Incidents" value={openIncidents} accent={openIncidents > 0 ? 'red' : ACCENT} icon={MdAssignment} hint={openIncidents > 0 ? 'Require attention' : 'All clear'} />
+        <StatCard label="License" value={myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdReceiptLong} hint={`Expires ${myBiz.licenseExpiry}`} />
+        <StatCard label="Business Status" value={myBiz.status} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdCheckCircle} hint="Operating status" />
       </div>
 
       <SectionTitle accent={ACCENT}>Quick Actions</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 30 }}>
+      <div className="grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
         {QUICK_ACTIONS.map(a => (
-          <PortalCard key={a.to} accent={ACCENT} hover onClick={() => navigate(a.to)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: `${ACCENT}1f`, border: `1px solid ${ACCENT}55`,
-            }}>
-              <a.icon size={24} color={ACCENT} />
+          <PortalCard key={a.to} accent={ACCENT} hover onClick={() => navigate(a.to)} className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
+              <a.icon size={24} className="text-cyan-400" />
             </div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6' }}>{a.title}</div>
-              <div style={{ fontSize: 12, color: 'rgba(170,195,225,0.55)', marginTop: 2 }}>{a.desc}</div>
+            <div className="min-w-0">
+              <div className="text-[15px] font-bold text-slate-100">{a.title}</div>
+              <div className="text-xs text-slate-400 mt-0.5">{a.desc}</div>
             </div>
           </PortalCard>
         ))}
@@ -96,21 +88,18 @@ export default function BusinessHome() {
       <SectionTitle accent={ACCENT}>Recent Incidents</SectionTitle>
       <PortalCard accent={ACCENT}>
         {recentIncidents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 24, color: 'rgba(150,175,205,0.5)', fontSize: 13 }}>
+          <div className="text-center p-6 text-slate-500 text-sm">
             No incidents on record.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="flex flex-col">
             {recentIncidents.map((inc, idx) => (
-              <div key={inc.id} style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
-                borderTop: idx === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)',
-              }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#e6eef6' }}>{inc.type}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(160,185,215,0.6)', marginTop: 2 }}>{inc.date}</div>
+              <div key={inc.id} className={`flex items-center gap-3 py-3 ${idx !== 0 ? 'border-t border-white/[0.06]' : ''}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-slate-100">{inc.type}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{inc.date}</div>
                 </div>
-                <span style={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
+                <span className={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
               </div>
             ))}
           </div>
