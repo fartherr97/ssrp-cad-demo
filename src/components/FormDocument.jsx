@@ -2,10 +2,16 @@
 
 import React, { useState } from 'react';
 
+export const FormMetaContext = React.createContext({});
+
 /* ── Primitives ──────────────────────────────────────────────────── */
 
-export function FormDocWrap({ children }) {
-  return <div className="form-doc-wrap"><div className="form-doc">{children}</div></div>;
+export function FormDocWrap({ children, meta = {} }) {
+  return (
+    <FormMetaContext.Provider value={meta}>
+      <div className="form-doc-wrap"><div className="form-doc">{children}</div></div>
+    </FormMetaContext.Provider>
+  );
 }
 
 export function FormDocHeader({ agency = 'HILLSBOROUGH COUNTY SHERIFF\'S OFFICE', title, subtitle, caseNo, status }) {
@@ -195,14 +201,43 @@ export function FormCheckboxes({ label, items, values = {}, onChange, editable }
 
 /* Signature row */
 export function FormSignatureRow({ slots }) {
+  const meta = React.useContext(FormMetaContext);
+  const { officerSig, supervisorSig, onApplySig } = meta;
+
   return (
-    <div style={{ display: 'flex', borderBottom: '1px solid #ccc', minHeight: 48 }}>
-      {slots.map((s, i) => (
-        <div key={i} style={{ flex: 1, borderRight: i < slots.length - 1 ? '1px solid #ccc' : 'none', padding: '4px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          <div style={{ borderBottom: '1px solid #000', marginBottom: 2, minHeight: 20 }} />
-          <div style={{ fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#555', fontWeight: 700 }}>{s}</div>
-        </div>
-      ))}
+    <div style={{ display: 'flex', borderBottom: '1px solid #ccc', minHeight: 64 }}>
+      {slots.map((s, i) => {
+        const isOfficer = i === 0;
+        const isSupervisor = i === 1;
+        const sig = isOfficer ? officerSig : isSupervisor ? supervisorSig : null;
+        return (
+          <div key={i} style={{ flex: 1, borderRight: i < slots.length - 1 ? '1px solid #ccc' : 'none', padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+            {sig && typeof sig === 'string' && sig.startsWith('data:') ? (
+              <img src={sig} alt="signature" style={{ height: 40, objectFit: 'contain', objectPosition: 'left bottom', marginBottom: 4 }} />
+            ) : sig === 'APPROVED' ? (
+              <div style={{ fontSize: 9, fontWeight: 700, color: '#006600', letterSpacing: '0.5px', marginBottom: 6, fontFamily: 'Courier New, monospace' }}>
+                DIGITALLY APPROVED
+              </div>
+            ) : isOfficer && onApplySig ? (
+              <button
+                onClick={onApplySig}
+                type="button"
+                style={{
+                  background: '#003399', color: '#fff', border: 'none',
+                  padding: '4px 12px', fontSize: 9, cursor: 'pointer',
+                  fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
+                  marginBottom: 6, alignSelf: 'flex-start', fontFamily: 'Arial, sans-serif',
+                }}
+              >
+                ▶ Click to Apply Signature
+              </button>
+            ) : (
+              <div style={{ borderBottom: '1px solid #000', marginBottom: 6, minHeight: 28 }} />
+            )}
+            <div style={{ fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#555', fontWeight: 700, fontFamily: 'Arial, sans-serif' }}>{s}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

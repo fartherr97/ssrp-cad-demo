@@ -5,7 +5,7 @@ import {
   MdDashboard, MdSearch, MdRefresh, MdDescription, MdMap, MdGridView,
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid,
   MdAdminPanelSettings, MdMenuBook, MdBlock, MdBuild,
-  MdAddCall, MdPhone, MdPersonAdd, MdLogout,
+  MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew,
 } from 'react-icons/md';
@@ -227,16 +227,24 @@ export default function ActionBar({ onCreateCall }) {
           ON DUTY: <span style={{ color: '#22cc55', fontWeight: 600, marginLeft: 4 }}>{onDuty}</span>
         </div>
 
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px',
-          borderLeft: '1px solid #1a3050', fontSize: 11, fontFamily: 'var(--font-mono)',
-          color: '#5070a0', whiteSpace: 'nowrap',
-        }}>
+        <button
+          onClick={() => go('/profile')}
+          title="My Profile & Signature"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px',
+            borderLeft: '1px solid #1a3050', fontSize: 11, fontFamily: 'var(--font-mono)',
+            color: '#5070a0', whiteSpace: 'nowrap', background: 'none', border: 'none',
+            cursor: 'pointer', height: '100%',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'none'}
+        >
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: activeStatusColor, flexShrink: 0 }} />
           <span style={{ color: '#7090a8' }}>{me?.badge || '—'}</span>
           <span style={{ color: '#3a5060' }}>·</span>
           <span style={{ color: '#5080a0' }}>{me?.deptShort || '—'}</span>
-        </div>
+          {currentUser?.signature && <span style={{ color: '#22c55e', fontSize: 10, marginLeft: 2 }}>✍</span>}
+        </button>
 
         <Clock />
 

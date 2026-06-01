@@ -17,6 +17,7 @@ import BanManagement from './pages/BanManagement';
 import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
 import FormBuilder from './pages/FormBuilder';
+import OfficerProfile from './pages/OfficerProfile';
 
 function AuthShell() {
   const { state } = useCAD();
@@ -55,6 +56,7 @@ function CADApp() {
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />
         <Route path="/builder"       element={<FormBuilder />} />
+        <Route path="/profile"       element={<OfficerProfile />} />
         <Route path="*"              element={<Navigate to="/cad" replace />} />
       </Route>
     </Routes>

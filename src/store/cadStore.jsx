@@ -77,6 +77,8 @@ function reducer(state, action) {
       return { ...state, currentUser: action.payload, currentPage: 'dispatch' };
     case 'LOGOUT':
       return { ...state, currentUser: null, currentPage: 'login', myCallId: null };
+    case 'SET_SIGNATURE':
+      return { ...state, currentUser: { ...state.currentUser, signature: action.payload } };
     case 'SET_PAGE':
       return { ...state, currentPage: action.payload };
 
