@@ -188,6 +188,19 @@ export const S_RECORD_RETURN_HEADER = 'flex items-center gap-1.5 text-[10px] fon
 export const S_RECORD_RETURN_MAIN   = 'text-[13px] font-semibold text-slate-200';
 export const S_RECORD_RETURN_SUB    = 'text-[11px] text-slate-500';
 
+// NCIC terminal teletype aesthetics — must remain as style objects
+const FONT_MONO = '"Courier New"';
+export const S_RECORD_RETURN_ALERT      = { padding: '6px 14px', background: '#c41818', color: '#fff', fontFamily: `${FONT_MONO}, monospace`, fontSize: 11, fontWeight: 700, letterSpacing: '0.4px' };
+export const S_RECORD_RETURN_ALERT_WARN = { ...S_RECORD_RETURN_ALERT, background: '#c4621a' };
+export const S_RECORD_RETURN_BODY       = { padding: '14px 16px 16px', lineHeight: 1.9, color: '#aeb9c8' };
+export const S_RECORD_RETURN_SECTION    = { color: '#eaf1f9', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', margin: '15px 0 4px', fontSize: 12.5 };
+export const S_RECORD_RETURN_LINE       = { fontSize: 12.5, lineHeight: 1.75 };
+export const S_RECORD_RETURN_KEY        = { color: '#7e8ea3', fontWeight: 400, marginRight: 7 };
+export const S_RECORD_RETURN_VAL        = { background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 };
+export const S_RECORD_RETURN_FLAG       = { display: 'inline-block', background: '#c41818', color: '#fff', fontWeight: 700, padding: '2px 8px', fontSize: 10, letterSpacing: '0.5px', borderRadius: 3, marginRight: 4 };
+export const S_RECORD_RETURN_FLAG_WARN  = { ...S_RECORD_RETURN_FLAG, background: '#c4621a' };
+export const S_RECORD_RETURN_FOOTER     = { fontSize: 10, marginTop: 14, color: '#5a6678', letterSpacing: '0.3px' };
+
 export const S_DETAIL_ROW        = 'flex items-start gap-3 py-1.5 border-b border-border-faint last:border-0';
 export const S_DETAIL_LABEL      = 'text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 w-24 shrink-0 pt-0.5';
 export const S_DETAIL_VALUE      = 'text-[13px] text-slate-200 flex-1';
@@ -197,6 +210,13 @@ export const S_DETAIL_VALUE_MONO = 'text-[13px] text-slate-200 flex-1 font-mono'
 // ─── Form document ─────────────────────────────────────────
 
 export const S_FORM_DOC_WRAP    = 'flex flex-col flex-1 overflow-hidden bg-app-bg';
+// Paper document (white background, print-fidelity) — must remain style objects
+export const S_FORM_DOC         = { background: '#ffffff', color: '#000000', fontFamily: "'Arial', 'Helvetica', sans-serif", fontSize: 11, width: '100%', maxWidth: 800, border: '1px solid #888', boxShadow: '0 6px 28px rgba(0,0,0,0.7)', flexShrink: 0 };
+const _S_FORM_DOC_ALERT         = { padding: '5px 10px', fontSize: 9, fontWeight: 700, letterSpacing: '0.4px', textTransform: 'uppercase', borderBottom: '1px solid #000', display: 'flex', gap: 12 };
+export const S_FORM_DOC_FOOTER_S   = { padding: '4px 10px', fontSize: 7.5, color: '#666', textAlign: 'center', background: '#f4f4f4', borderTop: '1px solid #ccc', letterSpacing: '0.2px' };
+export const S_FORM_DOC_ALERT_RED    = { ..._S_FORM_DOC_ALERT, background: '#cc0000', color: '#fff' };
+export const S_FORM_DOC_ALERT_ORANGE = { ..._S_FORM_DOC_ALERT, background: '#cc5500', color: '#fff' };
+export const S_FORM_DOC_ALERT_YELLOW = { ..._S_FORM_DOC_ALERT, background: '#ccaa00', color: '#000' };
 export const S_FORM_DOC_HEADER  = 'flex items-center gap-2 px-4 py-3 bg-app-card border-b border-border-strong shrink-0';
 export const S_FORM_DOC_BODY    = 'flex-1 overflow-y-auto p-4 flex flex-col gap-4';
 export const S_FORM_DOC_SECTION = 'flex flex-col gap-2 p-3 bg-app-panel border border-border-base rounded';
