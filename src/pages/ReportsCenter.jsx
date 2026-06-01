@@ -5,6 +5,8 @@ import { FormDocWrap, ReportDocument } from '../components/FormDocument';
 import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
+  MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdSend,
+  MdInventory2, MdPhone, MdShield,
 } from 'react-icons/md';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST,

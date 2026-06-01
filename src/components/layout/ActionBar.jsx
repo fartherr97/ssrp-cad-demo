@@ -51,6 +51,9 @@ function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMou
   );
 }
 
+/* Only one nav dropdown may be open at a time (prevents overlap). */
+let __navDropdownCloser = null;
+
 /* Dropdown nav button — hover to open a template picker */
 function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour }) {
   const [open, setOpen] = useState(false);
@@ -64,11 +67,19 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
   const place = () => {
     if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
-      setCoords({ left: r.left, top: r.bottom + 6 });
+      setCoords({ left: r.left, top: r.bottom + 4 });
     }
   };
-  const openMenu = () => { clearTimeout(closeTimer.current); place(); setOpen(true); };
-  const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(false), 60); };
+  const doClose = () => { setOpen(false); if (__navDropdownCloser === setOpen) __navDropdownCloser = null; };
+  const openMenu = () => {
+    clearTimeout(closeTimer.current);
+    // Immediately close any other open dropdown so two can't overlap.
+    if (__navDropdownCloser && __navDropdownCloser !== setOpen) __navDropdownCloser(false);
+    __navDropdownCloser = setOpen;
+    place();
+    setOpen(true);
+  };
+  const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 25); };
 
   return (
     <div className="relative" data-tour={dataTour} onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
@@ -272,8 +283,10 @@ export default function ActionBar() {
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           className="w-8 h-8 lg:w-9 lg:h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
         <div className="leading-[1.15] whitespace-nowrap">
-          <div className="text-[14px] lg:text-[15px] font-extrabold tracking-[-0.3px] text-white">SSRP CAD</div>
-          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Sunshine State RP</div>
+          <div className="text-[13px] lg:text-[14px] font-extrabold tracking-[-0.2px] text-white">Computer Aided Dispatch</div>
+          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">
+            Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
+          </div>
         </div>
       </div>
 

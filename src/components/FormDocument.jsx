@@ -144,14 +144,16 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
 /* Gray section divider bar */
 export function FormSection({ title, dark, blue }) {
   return (
-    <div style={{
-      padding: '2px 6px',
-      background: blue ? '#1a3a6a' : dark ? '#333' : '#d0d0d0',
-      color: blue || dark ? '#fff' : '#000',
-      fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.7px',
-      borderBottom: '1px solid #888', borderTop: '1px solid #888',
-      flexShrink: 0,
-    }}>
+    <div
+      data-section={title}
+      style={{
+        padding: '2px 6px',
+        background: blue ? '#1a3a6a' : dark ? '#333' : '#d0d0d0',
+        color: blue || dark ? '#fff' : '#000',
+        fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.7px',
+        borderBottom: '1px solid #888', borderTop: '1px solid #888',
+        flexShrink: 0, scrollMarginTop: 8,
+      }}>
       {title}
     </div>
   );

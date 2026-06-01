@@ -63,7 +63,7 @@ function SectionCard({ title, count, action, onAction, children, className = '' 
 function QuickAction({ Icon, label, onClick }) {
   return (
     <button onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold text-slate-200 bg-white/[0.03] hover:bg-white/[0.07] border border-border-base hover:border-border-strong cursor-pointer transition-all">
+      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] font-normal text-slate-200 bg-white/[0.03] hover:bg-white/[0.07] border border-border-base hover:border-border-strong cursor-pointer transition-all">
       <Icon size={17} className="text-brand-bright shrink-0" />
       <span className="text-left">{label}</span>
     </button>

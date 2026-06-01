@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
+import { MdSos, MdCampaign, MdClose } from 'react-icons/md';
 
 export default function RadioToast() {
   const { state } = useCAD();
   const { lastRadio, currentUser } = state;
-  const [dismissedId, setDismissedId] = useState(null);
+  // Baseline to the radio that already exists when this mounts, so a stale
+  // alert can't re-appear after switching portals/users (fresh mount won't
+  // re-show an old broadcast — only genuinely new ones).
+  const [dismissedId, setDismissedId] = useState(() => lastRadio?.id ?? null);
 
-  const isSender = currentUser?.role === 'dispatch';
-  // Panic alerts broadcast to everyone (including dispatch); normal radio
-  // traffic still hides for the dispatcher who sent it.
+  const isSender = currentUser?.portal === 'dispatch';
+  // Panic alerts broadcast to everyone (incl. dispatch); normal radio traffic
+  // still hides for the dispatcher who sent it.
   const visible = lastRadio && lastRadio.id !== dismissedId && currentUser &&
     (lastRadio.panic || !isSender);
   const toast = visible ? lastRadio : null;
@@ -21,45 +25,31 @@ export default function RadioToast() {
 
   if (!toast) return null;
 
-  if (toast.panic) {
-    return (
-      <div
-        onClick={() => setDismissedId(toast.id)}
-        className="fixed bottom-20 right-5 z-[1000] bg-[rgba(40,4,4,0.97)] border border-red-600/60 border-l-[4px] border-l-red-500 rounded-lg px-4 py-3 min-w-[280px] max-w-[400px] shadow-[0_4px_28px_rgba(220,0,0,0.4)] animate-slide-in-right cursor-pointer animate-pulse-red"
-      >
-        <div className="flex items-center gap-1.5 mb-1">
-          <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_theme(colors.red.500)] shrink-0" />
-          <span className="text-[10px] font-extrabold tracking-[1px] uppercase text-red-400 font-mono">
-            🚨 PANIC ALERT
-          </span>
-          <span className="ml-auto text-red-300/70 text-[10px] font-mono">
-            {toast.time}
-          </span>
-        </div>
-        <div className="text-white text-[12px] font-bold leading-[1.5] font-mono">
-          {toast.text}
-        </div>
-      </div>
-    );
-  }
+  const panic = !!toast.panic;
 
   return (
     <div
       onClick={() => setDismissedId(toast.id)}
-      className="fixed bottom-20 right-5 z-[1000] bg-[rgba(4,16,32,0.95)] border border-sky-700/40 border-l-[3px] border-l-sky-500 rounded-lg px-4 py-3 min-w-[260px] max-w-[380px] shadow-[0_4px_24px_rgba(0,0,0,0.4)] animate-slide-in-right cursor-pointer"
+      className={`group fixed bottom-10 right-5 z-[1500] flex items-start gap-3 px-4 py-3 rounded-xl backdrop-blur-md cursor-pointer min-w-[280px] max-w-[400px] animate-slide-in-right border border-l-[4px] shadow-2xl
+        ${panic
+          ? 'bg-red-950/90 border-red-500/50 border-l-red-500 shadow-red-900/40 animate-pulse-red'
+          : 'bg-app-card/95 border-border-strong border-l-brand shadow-black/50'}`}
     >
-      <div className="flex items-center gap-1.5 mb-1">
-        <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shadow-[0_0_6px_theme(colors.sky.500)] shrink-0" />
-        <span className="text-[9px] font-bold tracking-[0.8px] uppercase text-sky-400 font-mono">
-          DISPATCH RADIO
-        </span>
-        <span className="ml-auto text-cad-muted text-[10px] font-mono">
-          {toast.time}
-        </span>
+      <span className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 ${panic ? 'bg-red-500/20 text-red-300' : 'bg-brand/15 text-brand-bright'}`}>
+        {panic ? <MdSos size={18} /> : <MdCampaign size={18} />}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className={`text-[10px] font-extrabold uppercase tracking-[0.8px] ${panic ? 'text-red-400' : 'text-brand-bright'}`}>
+            {panic ? 'Panic Alert' : 'Dispatch Radio'}
+          </span>
+          <span className="ml-auto text-[10px] font-mono text-slate-500">{toast.time}</span>
+        </div>
+        <div className={`text-[12px] leading-[1.5] ${panic ? 'text-white font-semibold' : 'text-slate-200'}`}>
+          {toast.text}
+        </div>
       </div>
-      <div className="text-cad-text text-[11.5px] leading-[1.5] font-mono">
-        {toast.text}
-      </div>
+      <MdClose size={15} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
     </div>
   );
 }
