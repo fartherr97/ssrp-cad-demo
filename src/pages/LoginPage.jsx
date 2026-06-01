@@ -3,34 +3,90 @@ import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 
+/* ── Role SVG icons ── */
+const IconAdmin = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.07 4.93A10 10 0 1 0 4.93 19.07 10 10 0 0 0 19.07 4.93z" />
+    <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+  </svg>
+);
+
+const IconLEO = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2L3 5v6c0 5.25 3.75 10.15 9 11.25C17.25 21.15 21 16.25 21 11V5l-9-3z" />
+    <path d="M12 7l1.5 3 3.5.5-2.5 2.5.6 3.5L12 15l-3.1 1.5.6-3.5L7 10.5l3.5-.5L12 7z" />
+  </svg>
+);
+
+const IconCivilian = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const IconBusiness = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="1" />
+    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+    <line x1="12" y1="12" x2="12" y2="17" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+  </svg>
+);
+
+const IconFire = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17h2a2.5 2.5 0 0 0 2.5-2.5c0-1.5-.5-2-1-3a4 4 0 0 0-.5-2.5c-.5 1-1 1.5-1.5 2-1-1-1.5-2-1.5-3.5C9 8.5 8 10 8 12c0 .5 0 1.5.5 2.5z" />
+    <path d="M12 3c-1.2 5.4-4 6.5-4 10a7 7 0 1 0 14 0c0-4-3-7-5-9-1 2-2 3-5 1z" />
+    <path d="M12 19v2M10 21h4" />
+  </svg>
+);
+
+const IconDispatch = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+  </svg>
+);
+
+const ROLE_ICONS = {
+  admin: IconAdmin,
+  leo: IconLEO,
+  civilian: IconCivilian,
+  business: IconBusiness,
+  fire: IconFire,
+  dispatch: IconDispatch,
+};
+
 const ROLES = [
   {
-    id: 'admin', label: 'Admin', icon: '⚙', route: '/admin',
+    id: 'admin', label: 'Admin', route: '/admin',
     color: '#c09010', bg: 'rgba(160,120,8,0.12)', border: 'rgba(160,120,8,0.35)',
     deptShorts: ['TPD'],
   },
   {
-    id: 'leo', label: 'Law Enforcement', icon: '⭐', route: '/cad',
+    id: 'leo', label: 'Law Enforcement', route: '/cad',
     color: '#3a88e8', bg: 'rgba(58,136,232,0.12)', border: 'rgba(58,136,232,0.35)',
     deptShorts: ['TPD', 'HCSO', 'FHP'],
   },
   {
-    id: 'civilian', label: 'Civilian', icon: '👤', route: '/civilians',
+    id: 'civilian', label: 'Civilian', route: '/civilians',
     color: '#9090cc', bg: 'rgba(144,144,204,0.12)', border: 'rgba(144,144,204,0.35)',
     deptShorts: [],
   },
   {
-    id: 'business', label: 'Business', icon: '🏢', route: '/civilians',
+    id: 'business', label: 'Business', route: '/civilians',
     color: '#44aacc', bg: 'rgba(68,170,204,0.12)', border: 'rgba(68,170,204,0.35)',
     deptShorts: [],
   },
   {
-    id: 'fire', label: 'Fire & EMS', icon: '🔥', route: '/fire',
+    id: 'fire', label: 'Fire & EMS', route: '/fire',
     color: '#e04020', bg: 'rgba(224,64,32,0.12)', border: 'rgba(224,64,32,0.35)',
     deptShorts: ['HCFR'],
   },
   {
-    id: 'dispatch', label: 'Dispatch', icon: '📡', route: '/cad',
+    id: 'dispatch', label: 'Dispatch', route: '/cad',
     color: '#3aaa44', bg: 'rgba(58,170,68,0.12)', border: 'rgba(58,170,68,0.35)',
     deptShorts: ['FDOT'],
   },
@@ -238,45 +294,50 @@ export default function LoginPage() {
                 display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
                 gap: 10, width: '100%',
               }}>
-                {ROLES.map(role => (
-                  <button
-                    key={role.id}
-                    onClick={() => handleRoleSelect(role)}
-                    disabled={!!loading}
-                    style={{
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', justifyContent: 'center',
-                      gap: 10, padding: '20px 12px',
-                      background: loading === role.id ? role.bg : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${loading === role.id ? role.border : 'rgba(255,255,255,0.08)'}`,
-                      borderRadius: 10, cursor: 'pointer',
-                      transition: 'all 0.15s',
-                      opacity: loading && loading !== role.id ? 0.4 : 1,
-                    }}
-                    onMouseEnter={e => {
-                      if (!loading) {
-                        e.currentTarget.style.background = role.bg;
-                        e.currentTarget.style.borderColor = role.border;
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (!loading) {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                        e.currentTarget.style.transform = '';
-                      }
-                    }}
-                  >
-                    <span style={{ fontSize: 28, lineHeight: 1 }}>{role.icon}</span>
-                    <span style={{
-                      fontSize: 13, fontWeight: 700, color: loading === role.id ? role.color : 'rgba(200,220,240,0.85)',
-                      textAlign: 'center', lineHeight: 1.2,
-                    }}>
-                      {loading === role.id ? 'Loading...' : role.label}
-                    </span>
-                  </button>
-                ))}
+                {ROLES.map(role => {
+                  const RoleIcon = ROLE_ICONS[role.id];
+                  const isActive = loading === role.id;
+                  return (
+                    <button
+                      key={role.id}
+                      onClick={() => handleRoleSelect(role)}
+                      disabled={!!loading}
+                      style={{
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 12, padding: '22px 12px',
+                        background: isActive ? role.bg : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${isActive ? role.border : 'rgba(255,255,255,0.08)'}`,
+                        borderRadius: 10, cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        opacity: loading && !isActive ? 0.4 : 1,
+                      }}
+                      onMouseEnter={e => {
+                        if (!loading) {
+                          e.currentTarget.style.background = role.bg;
+                          e.currentTarget.style.borderColor = role.border;
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!loading) {
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                          e.currentTarget.style.transform = '';
+                        }
+                      }}
+                    >
+                      <RoleIcon color={isActive ? role.color : 'rgba(180,210,240,0.6)'} />
+                      <span style={{
+                        fontSize: 13, fontWeight: 700,
+                        color: isActive ? role.color : 'rgba(200,220,240,0.85)',
+                        textAlign: 'center', lineHeight: 1.2,
+                      }}>
+                        {isActive ? 'Loading...' : role.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
               <div style={{
