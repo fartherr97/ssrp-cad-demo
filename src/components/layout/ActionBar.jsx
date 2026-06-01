@@ -6,7 +6,7 @@ import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
   MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
-  MdDoNotDisturb, MdPowerSettingsNew, MdHome,
+  MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdGpsFixed,
 } from 'react-icons/md';
 
 /* ─── Clock ─── */
@@ -161,7 +161,7 @@ const STATUS_BTNS = [
 
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, calls, myCallId, reportTemplates, recordTemplates } = state;
+  const { currentUser, officers, calls, myCallId, reportTemplates, recordTemplates, selfDispatch } = state;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -240,7 +240,21 @@ export default function ActionBar({ onCreateCall }) {
 
       {/* ── Call actions ── */}
       {(portal.showNewCall || portal.showCalls) && <div className="w-px bg-[#1a3050] self-stretch shrink-0" />}
-      {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
+
+      {/* Self-dispatch toggle (field portals that can't normally create calls) */}
+      {portal.showCalls && !portal.showNewCall && (
+        <ToolBtn Icon={MdGpsFixed} label="Self-Disp" active={selfDispatch}
+          title={selfDispatch
+            ? 'Self-dispatch ON * you can create your own calls and self-assign'
+            : 'Enable self-dispatch * create your own calls / traffic stops'}
+          onClick={() => dispatch({ type: 'TOGGLE_SELF_DISPATCH' })} />
+      )}
+
+      {/* New Call * always for dispatch/admin, unlocked by self-dispatch for field units */}
+      {(portal.showNewCall || (portal.showCalls && selfDispatch)) && (
+        <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />
+      )}
+
       {portal.showCalls && (
         <>
           <ToolBtn Icon={MdPhone} label="My Call"

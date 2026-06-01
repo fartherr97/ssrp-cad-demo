@@ -16,6 +16,7 @@ const initialState = {
   currentUser: null,
   currentPage: 'login',
   discordConnected: false,
+  selfDispatch: false,
   officers: OFFICERS,
   // Stamp each seed call with a staggered creation time (most recent first) so
   // the live elapsed-time clocks in the console read realistically.
@@ -104,14 +105,16 @@ function reducer(state, action) {
   switch (action.type) {
     case 'CONNECT_DISCORD':
       return { ...state, discordConnected: true };
+    case 'TOGGLE_SELF_DISPATCH':
+      return { ...state, selfDispatch: !state.selfDispatch };
     case 'LOGIN':
       return { ...state, currentUser: action.payload, currentPage: 'dispatch', discordConnected: true };
     case 'EXIT_TO_HOME':
       // Return to the portal-selection screen * drop the active role but keep
       // the Discord connection so the role grid is shown immediately.
-      return { ...state, currentUser: null, currentPage: 'login', myCallId: null, discordConnected: true };
+      return { ...state, currentUser: null, currentPage: 'login', myCallId: null, selfDispatch: false, discordConnected: true };
     case 'LOGOUT':
-      return { ...state, currentUser: null, currentPage: 'login', myCallId: null, discordConnected: false };
+      return { ...state, currentUser: null, currentPage: 'login', myCallId: null, selfDispatch: false, discordConnected: false };
     case 'SET_SIGNATURE':
       return { ...state, currentUser: { ...state.currentUser, signature: action.payload } };
     case 'SET_PAGE':
