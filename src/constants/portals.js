@@ -15,8 +15,7 @@ import {
  *   landing:     route to navigate to right after login
  */
 export const PORTALS = {
-  leo: {
-    id: 'leo', label: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
+  leo:      { id: 'leo',      label: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
@@ -53,7 +52,7 @@ export const PORTALS = {
   },
 
   admin: {
-    id: 'admin', label: 'Admin / Command', color: '#c09010', landing: '/admin',
+    id: 'admin', label: 'Administration', color: '#c09010', landing: '/admin',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
