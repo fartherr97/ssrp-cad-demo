@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
@@ -84,7 +84,7 @@ export default function OfficerProfile() {
 
       {/* Tabs */}
       <div className="flex gap-0.5 border-b border-border-base mb-3.5 max-w-[900px]">
-        {[['info','My Info'],['signature','Signature'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
+        {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -139,10 +139,6 @@ export default function OfficerProfile() {
               )}
             </InfoCard>
           </div>
-        )}
-
-        {tab === 'signature' && (
-          <SignatureTab currentUser={currentUser} dispatch={dispatch} />
         )}
 
         {tab === 'reports' && (
@@ -205,148 +201,6 @@ export default function OfficerProfile() {
             {complaints.length === 0 && commendations.length > 0 && (
               <div className="text-green-800 text-sm mt-2.5 bg-green-950 border border-green-900 px-3 py-2">NO COMPLAINTS ON RECORD</div>
             )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function SignatureTab({ currentUser, dispatch }) {
-  const canvasRef = useRef(null);
-  const [drawing, setDrawing] = useState(false);
-  const [hasMark, setHasMark] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const getPos = (e, canvas) => {
-    const rect = canvas.getBoundingClientRect();
-    const pt = e.touches ? e.touches[0] : e;
-    return {
-      x: (pt.clientX - rect.left) * (canvas.width / rect.width),
-      y: (pt.clientY - rect.top) * (canvas.height / rect.height),
-    };
-  };
-
-  const startDraw = (e) => {
-    e.preventDefault();
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getPos(e, canvas);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-    setDrawing(true);
-    setHasMark(true);
-    setSaved(false);
-  };
-
-  const draw = (e) => {
-    if (!drawing) return;
-    e.preventDefault();
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getPos(e, canvas);
-    ctx.strokeStyle = '#1a1a2e';
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-  };
-
-  const stopDraw = () => setDrawing(false);
-
-  const clear = () => {
-    const canvas = canvasRef.current;
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    setHasMark(false);
-    setSaved(false);
-  };
-
-  const save = () => {
-    if (!hasMark) return;
-    const dataUrl = canvasRef.current.toDataURL('image/png');
-    dispatch({ type: 'SET_SIGNATURE', payload: dataUrl });
-    setSaved(true);
-  };
-
-  const remove = () => {
-    dispatch({ type: 'SET_SIGNATURE', payload: null });
-    clear();
-  };
-
-  return (
-    <div className="grid grid-cols-2 gap-5 items-start">
-      <div className="bg-app-card border border-border-subtle p-4">
-        <div className="text-sky-500 text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5">
-          SET UP YOUR SIGNATURE
-        </div>
-        <div className="text-slate-500 text-xs mb-2.5">
-          Draw your signature below using your mouse or touchscreen. This will be applied to official reports.
-        </div>
-        <div className="relative mb-2.5">
-          <canvas
-            ref={canvasRef}
-            width={480}
-            height={140}
-            className="border border-border-strong cursor-crosshair block w-full"
-            style={{ background: '#fff', height: 140, touchAction: 'none' }}
-            onMouseDown={startDraw}
-            onMouseMove={draw}
-            onMouseUp={stopDraw}
-            onMouseLeave={stopDraw}
-            onTouchStart={startDraw}
-            onTouchMove={draw}
-            onTouchEnd={stopDraw}
-          />
-          {!hasMark && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-sm italic">
-              Sign here...
-            </div>
-          )}
-          <div className="absolute bottom-2 left-3 right-3 border-b border-gray-300 pointer-events-none" />
-        </div>
-        <div className="flex gap-2">
-          <button onClick={clear} className={GHOST_BTN}>Clear</button>
-          <button onClick={save} disabled={!hasMark} className={`${BLUE_BTN} disabled:opacity-50 disabled:cursor-default`}>
-            Save Signature
-          </button>
-        </div>
-        {saved && <div className="text-green-400 text-xs mt-2">✓ Signature saved successfully.</div>}
-      </div>
-
-      <div className="bg-app-card border border-border-subtle p-4">
-        <div className="text-sky-500 text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5">
-          SIGNATURE ON FILE
-        </div>
-        {currentUser?.signature ? (
-          <>
-            <div className="text-slate-500 text-xs mb-2.5">
-              Your saved signature will automatically appear in all official reports.
-            </div>
-            <div className="bg-white border border-border-strong px-4 py-3 mb-3 block min-w-full box-border">
-              <img src={currentUser.signature} alt="Saved signature" className="h-20 object-contain block" />
-            </div>
-            <div className="flex gap-2 items-center">
-              <span className="text-green-400 text-xs">✓ Active</span>
-              <button onClick={remove} className="ml-auto bg-white/5 border border-red-900 text-red-400 px-4 py-2 text-sm cursor-pointer rounded">Remove</button>
-            </div>
-            <div className="mt-3.5 bg-app-input border border-border-subtle border-l-[3px] border-l-sky-700 p-3">
-              <div className="text-slate-600 text-[10px] tracking-widest uppercase mb-1">Preview on form</div>
-              <div className="bg-white border border-gray-300 p-2 flex flex-col gap-1">
-                <img src={currentUser.signature} alt="signature" className="h-10 object-contain object-left" />
-                <div className="text-[8px] text-gray-500 uppercase tracking-wide border-t border-gray-300 pt-0.5">
-                  Officer Signature / Badge #
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="text-slate-600 text-sm text-center py-5">
-            <div className="text-3xl mb-2 opacity-30">✍</div>
-            No signature on file.<br />
-            <span className="text-xs">Draw your signature on the left and click "Save Signature".</span>
           </div>
         )}
       </div>

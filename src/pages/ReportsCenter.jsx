@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { FormDocWrap, ReportDocument } from '../components/FormDocument';
 import {
@@ -32,8 +31,6 @@ const STATUS_BADGE = {
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
   const { reports, reportTemplates, currentUser, officers } = state;
-  const navigate = useNavigate();
-
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
   const [selectedReport, setSelectedReport]     = useState(null);
@@ -55,12 +52,6 @@ export default function ReportsCenter() {
   const customTpls  = reportTemplates.filter(t => !BUILTIN_NAMES.includes(t.name));
 
   const handleFormChange = (key, val) => setFormValues(prev => ({ ...prev, [key]: val }));
-
-  const applySignature = () => {
-    if (currentUser?.signature) {
-      setFormValues(fv => ({ ...fv, _officerSig: currentUser.signature }));
-    }
-  };
 
   const submitReport = () => {
     if (!selectedTemplate) return;
@@ -90,15 +81,10 @@ export default function ReportsCenter() {
 
   const showForm   = selectedTemplate !== null;
   const showReport = !showForm && selReport !== null;
-  const hasSig     = !!currentUser?.signature;
-  const sigApplied = !!formValues._officerSig;
 
   const draftMeta = {
     caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-DRAFT`,
     status: 'Draft',
-    officerSig:  formValues._officerSig || null,
-    supervisorSig: null,
-    onApplySig:  hasSig && !sigApplied ? applySignature : null,
   };
 
   return (
@@ -168,28 +154,6 @@ export default function ReportsCenter() {
           )}
         </div>
 
-        {/* Signature status */}
-        <div className="px-3 py-2.5 border-t border-border-base shrink-0 bg-app-card">
-          <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted mb-1.5">My Signature</div>
-          {hasSig ? (
-            <>
-              <div className="bg-white px-2 py-1 border border-slate-700 mb-1">
-                <img src={currentUser.signature} alt="signature" className="h-7 object-contain block" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] text-green-500">✓ Signature on file</span>
-                <button onClick={() => navigate('/profile?tab=signature')} className="text-[9px] text-sky-500 bg-transparent border-none cursor-pointer p-0">Edit</button>
-              </div>
-            </>
-          ) : (
-            <div>
-              <div className="text-[10px] text-cad-muted mb-1">No signature on file</div>
-              <button onClick={() => navigate('/profile')} className="text-[10px] text-sky-500 bg-transparent border-none cursor-pointer p-0">
-                Set up in Profile →
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
@@ -206,21 +170,6 @@ export default function ReportsCenter() {
                 {me?.badge || '*'} · {me?.name || currentUser?.name}
               </span>
               <div className="ml-auto flex gap-2 items-center">
-                {hasSig && !sigApplied && (
-                  <button className={`${xs(S_BTN_SECONDARY)} flex items-center gap-1`} onClick={applySignature}>
-                    ✍ Apply Signature
-                  </button>
-                )}
-                {sigApplied && (
-                  <span className="text-[10px] text-green-400 flex items-center gap-1">
-                    ✓ Signed
-                  </span>
-                )}
-                {!hasSig && (
-                  <button onClick={() => navigate('/profile')} className="text-[10px] text-slate-500 bg-transparent border border-slate-700 cursor-pointer px-2 py-0.5">
-                    Set up signature
-                  </button>
-                )}
                 <button className={xs(S_BTN_GHOST)} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
                   ✕ Discard
                 </button>
@@ -281,8 +230,6 @@ export default function ReportsCenter() {
               <FormDocWrap meta={{
                 caseNumber: selReport.caseNumber,
                 status: selReport.status,
-                officerSig: selReport.formData?._officerSig || null,
-                supervisorSig: selReport.status === 'Approved' ? 'APPROVED' : null,
               }}>
                 <ReportDocument
                   type={selReport.type}
@@ -312,15 +259,6 @@ export default function ReportsCenter() {
                 Select a report type from the left panel to start filing, or choose an existing report from the list on the right.
               </div>
             </div>
-            {!hasSig && (
-              <div className="bg-sky-500/[0.08] border border-sky-500/20 rounded p-2.5 px-4 text-[11px] text-sky-400 text-center max-w-[280px]">
-                <div className="font-semibold mb-1">✍ Set up your signature</div>
-                <div className="text-sky-700 mb-2">Apply your saved signature to reports with one click * like DocuSign.</div>
-                <button onClick={() => navigate('/profile')} className="text-[11px] text-sky-500 bg-transparent border border-sky-500 cursor-pointer px-3 py-1">
-                  Go to Profile →
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -391,7 +329,6 @@ export default function ReportsCenter() {
               <div className="text-[12px] font-semibold text-cad-text mb-0.5 leading-[1.2]">{r.type}</div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[9px] text-cad-muted font-mono">{r.caseNumber}</span>
-                {r.formData?._officerSig && <span className="text-[9px] text-green-400">✍</span>}
               </div>
             </div>
           ))}
