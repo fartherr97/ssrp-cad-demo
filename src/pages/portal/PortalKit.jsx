@@ -4,11 +4,12 @@
 export function PortalPage({ children }) {
   return (
     <div style={{
+      flex: 1, width: '100%', minWidth: 0,
       height: '100%', overflow: 'auto', boxSizing: 'border-box',
-      padding: '28px 32px', fontFamily: 'var(--font-ui)',
+      padding: '28px 40px', fontFamily: 'var(--font-ui)',
       background: 'radial-gradient(ellipse at 20% -10%, rgba(40,90,170,0.10) 0%, transparent 55%), var(--n-bg-app)',
     }}>
-      <div style={{ maxWidth: 1180, margin: '0 auto' }}>{children}</div>
+      {children}
     </div>
   );
 }
