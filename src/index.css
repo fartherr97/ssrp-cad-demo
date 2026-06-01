@@ -189,12 +189,12 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 }
 
 .cad-menubar-agency {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  text-transform: none;
   color: var(--n-gold-bright);
-  font-family: var(--font-mono);
+  font-family: 'Ubuntu', var(--font-ui), sans-serif;
 }
 
 .cad-menubar-sub {
@@ -1647,27 +1647,18 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   .cad-shell { position: relative; }
 
   /* ─── MenuBar ─── */
-  .cad-menubar { height: 44px; min-height: 44px; }
-  .cad-menubar-sub { display: none; }
+  .cad-menubar { height: 48px; min-height: 48px; }
+  .cad-menubar-agency { font-size: 12px; letter-spacing: 0.2px; font-family: 'Ubuntu', var(--font-ui), sans-serif; }
+  .cad-menubar-sub { font-size: 9px; }
   .cad-nav { display: none; }
   .cad-mobile-toggle { display: flex; }
 
-  /* Hide most stats; keep clock */
+  /* Hide stats; hide clock (phone has one) */
   .cad-menubar-stat { display: none; }
-  .cad-clock { font-size: 11px; padding: 0 8px; }
+  .cad-clock { display: none; }
 
-  /* ─── ActionBar ─── */
-  .cad-actionbar {
-    height: auto;
-    min-height: 36px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 4px;
-  }
-  .cad-actionbar::-webkit-scrollbar { display: none; }
-  .cad-action-btn { height: 28px; padding: 0 10px; font-size: 10px; }
-  .cad-status-btn { height: 28px; padding: 0 8px; font-size: 9px; }
+  /* ─── ActionBar — hidden on mobile; controls live in drawer ─── */
+  .cad-actionbar { display: none; }
 
   /* ─── Status bar ─── */
   .cad-statusbar {
