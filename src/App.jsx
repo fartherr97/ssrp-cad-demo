@@ -13,7 +13,6 @@ import UnitManagement from './pages/UnitManagement';
 import WarrantControl from './pages/WarrantControl';
 import CivilianRegistry from './pages/CivilianRegistry';
 import PenalCodeEditor from './pages/PenalCodeEditor';
-import AdminCenter from './pages/AdminCenter';
 import BanManagement from './pages/BanManagement';
 import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
@@ -30,6 +29,39 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
+// Admin (Sonoran-style customization suite)
+import AdminShell from './pages/admin/AdminShell';
+import CustomizationHub from './pages/admin/sections/CustomizationHub';
+import Accounts from './pages/admin/sections/Accounts';
+import Identifiers from './pages/admin/sections/Identifiers';
+import PermissionKeys from './pages/admin/sections/PermissionKeys';
+import CustomRecords from './pages/admin/sections/CustomRecords';
+import Departments from './pages/admin/sections/Departments';
+import TenCodes from './pages/admin/sections/TenCodes';
+import Statutes from './pages/admin/sections/Statutes';
+import Logs from './pages/admin/sections/Logs';
+import InGame from './pages/admin/sections/InGame';
+import DiscordIntegration from './pages/admin/sections/DiscordIntegration';
+import Limits from './pages/admin/sections/Limits';
+import WipeRecords from './pages/admin/sections/WipeRecords';
+import CommunityId from './pages/admin/sections/CommunityId';
+import Authenticate from './pages/admin/sections/Authenticate';
+import Transfer from './pages/admin/sections/Transfer';
+import CommunityInfo from './pages/admin/sections/CommunityInfo';
+import Geographical from './pages/admin/sections/Geographical';
+import StatusCodes from './pages/admin/sections/StatusCodes';
+import LoginPageEditor from './pages/admin/sections/LoginPageEditor';
+import QuickLinks from './pages/admin/sections/QuickLinks';
+import NotificationTones from './pages/admin/sections/NotificationTones';
+import Emails from './pages/admin/sections/Emails';
+import Restrictions from './pages/admin/sections/Restrictions';
+import DiscordPresence from './pages/admin/sections/DiscordPresence';
+import Servers from './pages/admin/sections/Servers';
+import Addresses from './pages/admin/sections/Addresses';
+import LookupTypes from './pages/admin/sections/LookupTypes';
+import ToneBoard from './pages/admin/sections/ToneBoard';
+import RapidIQ from './pages/admin/sections/RapidIQ';
+import InfernoPagers from './pages/admin/sections/InfernoPagers';
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -74,7 +106,39 @@ function CADApp() {
         <Route path="/warrants"      element={<WarrantControl />} />
         <Route path="/civilians"     element={<CivilianRegistry />} />
         <Route path="/mdt"           element={<MDT />} />
-        <Route path="/admin"         element={<AdminCenter />} />
+        <Route path="/admin" element={<AdminShell />}>
+          <Route index                     element={<CustomizationHub />} />
+          <Route path="accounts"           element={<Accounts />} />
+          <Route path="identifiers"        element={<Identifiers />} />
+          <Route path="permission-keys"    element={<PermissionKeys />} />
+          <Route path="custom-records"     element={<CustomRecords />} />
+          <Route path="departments"        element={<Departments />} />
+          <Route path="ten-codes"          element={<TenCodes />} />
+          <Route path="statutes"           element={<Statutes />} />
+          <Route path="logs"               element={<Logs />} />
+          <Route path="in-game"            element={<InGame />} />
+          <Route path="discord"            element={<DiscordIntegration />} />
+          <Route path="limits"             element={<Limits />} />
+          <Route path="wipe"               element={<WipeRecords />} />
+          <Route path="community-id"       element={<CommunityId />} />
+          <Route path="authenticate"       element={<Authenticate />} />
+          <Route path="transfer"           element={<Transfer />} />
+          <Route path="community-info"     element={<CommunityInfo />} />
+          <Route path="geographical"       element={<Geographical />} />
+          <Route path="status-codes"       element={<StatusCodes />} />
+          <Route path="login-page"         element={<LoginPageEditor />} />
+          <Route path="quick-links"        element={<QuickLinks />} />
+          <Route path="notification-tones" element={<NotificationTones />} />
+          <Route path="emails"             element={<Emails />} />
+          <Route path="restrictions"       element={<Restrictions />} />
+          <Route path="discord-presence"   element={<DiscordPresence />} />
+          <Route path="servers"            element={<Servers />} />
+          <Route path="addresses"          element={<Addresses />} />
+          <Route path="lookup-types"       element={<LookupTypes />} />
+          <Route path="tone-board"         element={<ToneBoard />} />
+          <Route path="rapidiq"            element={<RapidIQ />} />
+          <Route path="inferno-pagers"     element={<InfernoPagers />} />
+        </Route>
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />
         <Route path="/builder"       element={<FormBuilder />} />

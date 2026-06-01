@@ -5,6 +5,12 @@ import {
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
   BUSINESSES
 } from '../data/mockData';
+import {
+  TEN_CODES, CHARGE_TYPES, BOND_TYPES, STATUTES, UNIT_STATUS_CODES,
+  ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
+  ADMIN_SERVERS, LOOKUP_TYPES, ADMIN_ADDRESSES, COMMUNITY_CONFIG,
+  GEO_SETTINGS, LOGIN_PAGE_CONFIG, ACCOUNT_RESTRICTIONS, DISCORD_PRESENCE,
+} from '../data/adminData';
 
 const initialState = {
   currentUser: null,
@@ -29,6 +35,24 @@ const initialState = {
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
   businesses: BUSINESSES,
+  // ─── Admin customization config ───
+  tenCodes: TEN_CODES,
+  chargeTypes: CHARGE_TYPES,
+  bondTypes: BOND_TYPES,
+  statutes: STATUTES,
+  unitStatusCodes: UNIT_STATUS_CODES,
+  adminAccounts: ADMIN_ACCOUNTS,
+  permissionKeys: PERMISSION_KEYS,
+  quickLinks: QUICK_LINKS,
+  notificationTones: NOTIFICATION_TONES,
+  adminServers: ADMIN_SERVERS,
+  lookupTypes: LOOKUP_TYPES,
+  adminAddresses: ADMIN_ADDRESSES,
+  communityConfig: COMMUNITY_CONFIG,
+  geoSettings: GEO_SETTINGS,
+  loginPageConfig: LOGIN_PAGE_CONFIG,
+  accountRestrictions: ACCOUNT_RESTRICTIONS,
+  discordPresence: DISCORD_PRESENCE,
   myCallId: null,
   nextId: 1000,
   // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
@@ -209,6 +233,41 @@ function reducer(state, action) {
       const newReport = { ...action.payload, id: state.nextId, status: 'Submitted', date: new Date().toLocaleDateString() };
       const audit = addAuditEntry(state, `Submitted ${newReport.type} report`, 'Reports');
       return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, ...audit };
+    }
+
+    /* ─── Generic admin-customization CRUD ───
+       key  = the state slice (e.g. 'tenCodes', 'statutes', 'quickLinks')
+       These let every Sonoran-style editor share one consistent API. */
+    case 'ADMIN_SET': {
+      // Replace a whole config object/value (single-record editors).
+      const { key, value } = action.payload;
+      const audit = addAuditEntry(state, `Updated ${key} configuration`, 'Customization');
+      return { ...state, [key]: value, ...audit };
+    }
+    case 'ADMIN_ADD': {
+      const { key, item } = action.payload;
+      const newItem = { ...item, id: state.nextId };
+      const audit = addAuditEntry(state, `Added entry to ${key}`, 'Customization');
+      return { ...state, [key]: [...(state[key] || []), newItem], nextId: state.nextId + 1, ...audit };
+    }
+    case 'ADMIN_UPDATE': {
+      const { key, item } = action.payload;
+      return { ...state, [key]: state[key].map(x => x.id === item.id ? { ...x, ...item } : x) };
+    }
+    case 'ADMIN_REMOVE': {
+      const { key, id } = action.payload;
+      const audit = addAuditEntry(state, `Removed entry from ${key}`, 'Customization');
+      return { ...state, [key]: state[key].filter(x => x.id !== id), ...audit };
+    }
+    case 'ADMIN_REORDER': {
+      // Move a list item up (-1) or down (+1).
+      const { key, id, dir } = action.payload;
+      const list = [...state[key]];
+      const idx = list.findIndex(x => x.id === id);
+      const swap = idx + dir;
+      if (idx < 0 || swap < 0 || swap >= list.length) return state;
+      [list[idx], list[swap]] = [list[swap], list[idx]];
+      return { ...state, [key]: list };
     }
 
     /* ─── Business portal ─── */
