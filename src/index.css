@@ -1537,6 +1537,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   animation: pageEnter var(--t-slow) var(--ease-out);
 }
 
+/* Admin top-nav tab bar — scroll without a visible scrollbar (chevrons handle it) */
+.admin-tabbar { scrollbar-width: none; -ms-overflow-style: none; }
+.admin-tabbar::-webkit-scrollbar { height: 0; width: 0; }
+
 /* ─── Honor reduced-motion preference ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

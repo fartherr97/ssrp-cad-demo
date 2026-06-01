@@ -24,8 +24,8 @@ export const ADMIN = {
 export function AdminContent({ children }) {
   return (
     <div style={{
-      flex: 1, minWidth: 0, height: '100%', overflow: 'auto',
-      background: ADMIN.bg, padding: 18, boxSizing: 'border-box',
+      flex: 1, minWidth: 0, minHeight: 0, width: '100%', overflow: 'auto',
+      background: ADMIN.bg, padding: 22, boxSizing: 'border-box',
       fontFamily: 'var(--font-ui)',
     }}>
       {children}
