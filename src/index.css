@@ -1345,6 +1345,11 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
    ANIMATIONS
    ════════════════════════════════════════ */
 
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
 @keyframes slideInRight {
   from { transform: translateX(10px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }

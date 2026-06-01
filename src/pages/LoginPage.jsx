@@ -40,6 +40,7 @@ export default function LoginPage() {
       background: 'radial-gradient(ellipse at 30% 10%, #0f2060 0%, #0a1535 30%, #050c1e 60%, #020810 100%)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', padding: '24px 16px', position: 'relative', overflow: 'hidden',
+      fontFamily: "'Ubuntu', sans-serif",
     }}>
       {/* Stars / depth layer */}
       <div style={STAR_STYLE} />
@@ -63,7 +64,7 @@ export default function LoginPage() {
           alt="SSRP"
           style={{
             width: 110, height: 110, marginBottom: 20,
-            filter: 'drop-shadow(0 0 28px rgba(80,140,255,0.5))',
+            animation: 'floatY 3s ease-in-out infinite',
           }}
         />
 
@@ -77,7 +78,7 @@ export default function LoginPage() {
           <span style={{ fontSize: 11 }}>⚡</span>
           <span style={{
             fontSize: 10, fontWeight: 700, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: '#e89a40', fontFamily: 'var(--font-ui)',
+            textTransform: 'uppercase', color: '#e89a40', fontFamily: "'Ubuntu', sans-serif",
           }}>
             Emergency Dispatch System
           </span>
@@ -87,7 +88,7 @@ export default function LoginPage() {
         <div style={{
           fontSize: 28, fontWeight: 800, color: '#ffffff', textAlign: 'center',
           letterSpacing: '-0.3px', lineHeight: 1.15, marginBottom: 6,
-          fontFamily: 'var(--font-ui)',
+          fontFamily: "'Ubuntu', sans-serif",
         }}>
           Sunshine State Roleplay
         </div>
@@ -95,7 +96,7 @@ export default function LoginPage() {
         {/* Subtitle */}
         <div style={{
           fontSize: 17, fontWeight: 600, color: '#4db8ff', textAlign: 'center',
-          marginBottom: 10, fontFamily: 'var(--font-ui)',
+          marginBottom: 10, fontFamily: "'Ubuntu', sans-serif",
         }}>
           Computer Aided Dispatch
         </div>
@@ -104,7 +105,7 @@ export default function LoginPage() {
         <div style={{
           fontSize: 13, color: 'rgba(180,200,230,0.55)', textAlign: 'center',
           lineHeight: 1.6, marginBottom: 28, maxWidth: 340,
-          fontFamily: 'var(--font-ui)',
+          fontFamily: "'Ubuntu', sans-serif",
         }}>
           Dispatch operations for TPD, HCSO, FHP, HCFR, and FDOT.
           All activity is logged and subject to command review.
@@ -115,7 +116,7 @@ export default function LoginPage() {
           <div style={{
             fontSize: 10, fontWeight: 600, letterSpacing: '0.8px',
             textTransform: 'uppercase', color: 'rgba(150,180,220,0.6)',
-            marginBottom: 6, fontFamily: 'var(--font-ui)',
+            marginBottom: 6, fontFamily: "'Ubuntu', sans-serif",
           }}>
             Select Personnel · Demo Environment
           </div>
@@ -127,7 +128,7 @@ export default function LoginPage() {
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 8, color: '#c8daf0',
-              fontSize: 13, fontFamily: 'var(--font-ui)',
+              fontSize: 13, fontFamily: "'Ubuntu', sans-serif",
               outline: 'none', cursor: 'pointer', appearance: 'none',
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2360a0cc'/%3E%3C/svg%3E")`,
               backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
@@ -149,7 +150,7 @@ export default function LoginPage() {
             width: '100%', padding: '14px', fontSize: 15, fontWeight: 700,
             background: loading ? 'rgba(220,120,20,0.6)' : 'linear-gradient(135deg, #e87820 0%, #d06010 100%)',
             color: '#ffffff', border: 'none', borderRadius: 8, cursor: 'pointer',
-            fontFamily: 'var(--font-ui)', letterSpacing: '0.3px',
+            fontFamily: "'Ubuntu', sans-serif", letterSpacing: '0.3px',
             boxShadow: '0 4px 24px rgba(220,100,20,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             marginBottom: 10, transition: 'opacity 0.15s',
@@ -175,7 +176,7 @@ export default function LoginPage() {
             background: 'rgba(255,255,255,0.05)',
             color: 'rgba(180,210,240,0.8)', cursor: 'pointer',
             border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8,
-            fontFamily: 'var(--font-ui)',
+            fontFamily: "'Ubuntu', sans-serif",
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             marginBottom: 28, transition: 'background 0.15s',
           }}
@@ -202,7 +203,7 @@ export default function LoginPage() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: ag.color, flexShrink: 0 }} />
               <span style={{
                 fontSize: 11, fontWeight: 700, color: ag.color,
-                fontFamily: 'var(--font-ui)', letterSpacing: '0.4px',
+                fontFamily: "'Ubuntu', sans-serif", letterSpacing: '0.4px',
               }}>
                 {ag.abbr}
               </span>
@@ -213,7 +214,7 @@ export default function LoginPage() {
         {/* Version footer */}
         <div style={{
           marginTop: 24, fontSize: 10, color: 'rgba(100,140,180,0.35)',
-          textAlign: 'center', fontFamily: 'var(--font-ui)', letterSpacing: '0.3px',
+          textAlign: 'center', fontFamily: "'Ubuntu', sans-serif", letterSpacing: '0.3px',
         }}>
           SSRP CAD v3.0 · Hillsborough County ECC · All rights reserved
         </div>
