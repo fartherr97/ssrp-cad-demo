@@ -54,14 +54,26 @@ const CATEGORY_ORDER = { 'Incident': 0, 'License': 1, 'Legal': 2, 'Citation': 3,
 
 function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
+  const btnRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
-    const handler = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const handler = e => {
+      if (!ref.current?.contains(e.target) && !btnRef.current?.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
+
+  const toggle = () => {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 2 });
+    }
+    setOpen(o => !o);
+  };
 
   // Group items by category
   const groups = {};
@@ -74,9 +86,10 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
   );
 
   return (
-    <div ref={ref} className="relative h-full shrink-0">
+    <div className="h-full shrink-0">
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={toggle}
         className={`flex flex-col items-center justify-center gap-[3px] px-2.5 py-1 min-w-[58px] h-full border-none cursor-pointer transition-all font-ui
           ${active || open
             ? 'bg-sky-500/15 border-b-2 border-sky-400 text-sky-200'
@@ -91,8 +104,9 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
 
       {open && (
         <div
-          className="absolute top-full left-0 z-[200] mt-0.5 bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden"
-          style={{ animation: 'dropdownFadeIn 0.13s ease-out' }}
+          ref={ref}
+          className="fixed z-[200] bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden"
+          style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
           {sortedCats.map((cat, ci) => (
             <div key={cat}>
