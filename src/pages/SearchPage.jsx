@@ -3,8 +3,6 @@ import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu', sans-serif";
-
 const SEARCH_TABS = ['PERSON', 'VEHICLE', 'PHONE', 'INCIDENT'];
 
 const RECORD_TABS = [
@@ -20,9 +18,9 @@ export default function SearchPage() {
   const { isMobile } = useResponsive();
   const [searchTab,   setSearchTab]   = useState('PERSON');
   const [query,       setQuery]       = useState('');
-  const [results,     setResults]     = useState([]);  // list of civilian matches
-  const [selected,    setSelected]    = useState(null); // selected civilian
-  const [selectedVeh, setSelectedVeh] = useState(null); // selected vehicle
+  const [results,     setResults]     = useState([]);
+  const [selected,    setSelected]    = useState(null);
+  const [selectedVeh, setSelectedVeh] = useState(null);
   const [recordTab,   setRecordTab]   = useState('SUMMARY');
   const [mobilePanel, setMobilePanel] = useState('search');
 
@@ -68,19 +66,17 @@ export default function SearchPage() {
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: isMobile ? 'column' : 'row',
-      height: '100%',
-      fontFamily: MONO,
-      background: '#080b12',
-      overflow: 'hidden',
-    }}>
+    <div
+      className="h-full overflow-hidden bg-[#080b12] font-mono"
+      style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+    >
 
       {isMobile && (
-        <div style={{ display: 'flex', borderBottom: '1px solid #141720', background: '#0d1117', flexShrink: 0 }}>
+        <div className="flex border-b border-[#141720] bg-[#0d1117] shrink-0">
           {[['search', 'SEARCH'], ['record', 'RECORD'], ['activity', 'ACTIVITY']].map(([v, l]) => (
-            <button key={v} onClick={() => setMobilePanel(v)} style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: mobilePanel === v ? '2px solid #1d4ed8' : '2px solid transparent', color: mobilePanel === v ? '#93c5fd' : '#4b5563', padding: '10px 4px', fontSize: '11px', fontWeight: mobilePanel === v ? 700 : 500, letterSpacing: '0.5px', cursor: 'pointer', fontFamily: MONO }}>
+            <button key={v} onClick={() => setMobilePanel(v)}
+              className={`flex-1 bg-transparent border-none py-2.5 px-1 text-[11px] tracking-[0.5px] cursor-pointer font-mono
+                ${mobilePanel === v ? 'border-b-2 border-blue-700 text-sky-300 font-bold' : 'border-b-2 border-transparent text-[#4b5563] font-medium'}`}>
               {l}
             </button>
           ))}
@@ -88,48 +84,40 @@ export default function SearchPage() {
       )}
 
       {/* ── LEFT: Search panel ── */}
-      <div style={{
-        background: '#09090f',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        ...(isMobile ? {
-          display: mobilePanel === 'search' ? 'flex' : 'none',
-          flex: 1,
-        } : {
-          display: 'flex',
-          width: '260px',
-          flexShrink: 0,
-          borderRight: '1px solid #141720',
-        }),
-      }}>
+      <div
+        className="bg-[#09090f] flex-col overflow-hidden"
+        style={{
+          ...(isMobile ? {
+            display: mobilePanel === 'search' ? 'flex' : 'none',
+            flex: 1,
+          } : {
+            display: 'flex',
+            width: 260,
+            flexShrink: 0,
+            borderRight: '1px solid #141720',
+          }),
+        }}
+      >
         {/* Panel header */}
-        <div style={{ padding: '8px 10px', borderBottom: '1px solid #141720', background: '#0d1117' }}>
-          <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px' }}>Search</div>
+        <div className="px-2.5 py-2 border-b border-[#141720] bg-[#0d1117]">
+          <div className="text-[#374151] text-[10px] tracking-[1.5px] uppercase mb-1.5">Search</div>
           {/* Search type tabs */}
-          <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
+          <div className="flex gap-0.5 mb-2">
             {SEARCH_TABS.map(t => (
               <button
                 key={t}
                 onClick={() => setSearchTab(t)}
-                style={{
-                  flex: 1,
-                  background: searchTab === t ? '#1e3a5f' : 'transparent',
-                  border: `1px solid ${searchTab === t ? '#1d4ed8' : '#1a1e2c'}`,
-                  borderRadius: '2px',
-                  color: searchTab === t ? '#93c5fd' : '#374151',
-                  padding: '3px 2px',
-                  fontSize: '9px',
-                  fontWeight: 700,
-                  letterSpacing: '0.5px',
-                  cursor: 'pointer',
-                }}
+                className={`flex-1 rounded-sm py-[3px] px-0.5 text-[9px] font-bold tracking-[0.5px] cursor-pointer border transition-colors
+                  ${searchTab === t
+                    ? 'bg-[#1e3a5f] border-blue-700 text-sky-300'
+                    : 'bg-transparent border-[#1a1e2c] text-[#374151]'}`}
               >
                 {t}
               </button>
             ))}
           </div>
           {/* Search input */}
-          <div style={{ display: 'flex', gap: '4px' }}>
+          <div className="flex gap-1">
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
@@ -140,36 +128,27 @@ export default function SearchPage() {
                 searchTab === 'PHONE'    ? 'Phone number...'        :
                                           'Incident number...'
               }
-              style={{
-                flex: 1,
-                background: '#06070c',
-                border: '1px solid #1a1e2c',
-                borderRadius: '2px',
-                color: '#d1d5db',
-                padding: '5px 7px',
-                fontSize: '11px',
-                fontFamily: MONO,
-              }}
+              className="flex-1 bg-[#06070c] border border-[#1a1e2c] rounded-sm text-slate-300 py-[5px] px-[7px] text-[11px] font-mono outline-none"
             />
             <button
               onClick={runSearch}
-              style={{ background: '#1e3a5f', border: '1px solid #1d4ed8', borderRadius: '2px', color: '#93c5fd', padding: '5px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+              className="bg-[#1e3a5f] border border-blue-700 rounded-sm text-sky-300 px-2 py-[5px] text-[11px] font-bold cursor-pointer"
             >
               GO
             </button>
           </div>
           <button
             onClick={runSearch}
-            style={{ width: '100%', background: '#0d1117', border: '1px solid #1a1e2c', borderRadius: '2px', color: '#374151', padding: '4px', fontSize: '10px', cursor: 'pointer', marginTop: '4px' }}
+            className="w-full mt-1 bg-[#0d1117] border border-[#1a1e2c] rounded-sm text-[#374151] py-1 text-[10px] cursor-pointer"
           >
             Narrow Search
           </button>
         </div>
 
         {/* Results */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto">
           {results.length === 0 && query && (
-            <div style={{ padding: '12px 10px', color: '#dc2626', fontSize: '11px' }}>
+            <div className="px-2.5 py-3 text-red-600 text-[11px]">
               *** NO RECORDS FOUND ***
             </div>
           )}
@@ -177,29 +156,21 @@ export default function SearchPage() {
             <div
               key={civ.id}
               onClick={() => selectCiv(civ)}
+              className="px-2.5 py-2 cursor-pointer border-b border-[#141720] hover:bg-[#0d1117] transition-colors"
               style={{
-                padding: '8px 10px',
-                cursor: 'pointer',
-                borderBottom: '1px solid #141720',
                 borderLeft: `3px solid ${selected?.id === civ.id ? '#1d4ed8' : 'transparent'}`,
                 background: selected?.id === civ.id ? '#0f172a' : 'transparent',
               }}
-              onMouseEnter={e => { if (selected?.id !== civ.id) e.currentTarget.style.background = '#0d1117'; }}
-              onMouseLeave={e => { if (selected?.id !== civ.id) e.currentTarget.style.background = 'transparent'; }}
             >
-              <div style={{ color: selected?.id === civ.id ? '#e2e8f0' : '#9ca3af', fontSize: '12px', fontWeight: 600 }}>
+              <div className={`text-[12px] font-semibold ${selected?.id === civ.id ? 'text-slate-200' : 'text-[#9ca3af]'}`}>
                 {civ.firstName} {civ.lastName}
               </div>
-              <div style={{ color: '#374151', fontSize: '10px', marginTop: '2px' }}>
-                DOB: {civ.dob}
-              </div>
-              <div style={{ color: '#374151', fontSize: '10px' }}>
-                SSN: ***-**-{(civ.ssn || '').slice(-4)}
-              </div>
+              <div className="text-[#374151] text-[10px] mt-0.5">DOB: {civ.dob}</div>
+              <div className="text-[#374151] text-[10px]">SSN: ***-**-{(civ.ssn || '').slice(-4)}</div>
               {civ.flags?.length > 0 && (
-                <div style={{ marginTop: '3px', display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+                <div className="mt-[3px] flex gap-[3px] flex-wrap">
                   {civ.flags.map(f => (
-                    <span key={f} style={{ background: '#450a0a', color: '#f87171', border: '1px solid #991b1b', borderRadius: '2px', fontSize: '9px', padding: '0 4px', fontWeight: 700 }}>
+                    <span key={f} className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-1 font-bold">
                       {f}
                     </span>
                   ))}
@@ -210,10 +181,10 @@ export default function SearchPage() {
         </div>
 
         {/* Bottom actions */}
-        <div style={{ padding: '6px 8px', borderTop: '1px solid #141720', display: 'flex', gap: '4px' }}>
+        <div className="px-2 py-1.5 border-t border-[#141720] flex gap-1">
           <button
             onClick={() => { setQuery(''); setResults([]); setSelected(null); setSelectedVeh(null); }}
-            style={{ flex: 1, background: '#0d1117', border: '1px solid #1a1e2c', borderRadius: '2px', color: '#374151', padding: '4px', fontSize: '10px', cursor: 'pointer' }}
+            className="flex-1 bg-[#0d1117] border border-[#1a1e2c] rounded-sm text-[#374151] py-1 text-[10px] cursor-pointer"
           >
             Clear
           </button>
@@ -221,31 +192,36 @@ export default function SearchPage() {
       </div>
 
       {/* ── CENTER: Record workspace ── */}
-      <div style={{ flexDirection: 'column', overflow: 'hidden', minWidth: 0, ...(isMobile ? { display: mobilePanel === 'record' ? 'flex' : 'none', flex: 1 } : { display: 'flex', flex: 1 }) }}>
+      <div
+        className="flex-col overflow-hidden min-w-0"
+        style={isMobile
+          ? { display: mobilePanel === 'record' ? 'flex' : 'none', flex: 1 }
+          : { display: 'flex', flex: 1 }}
+      >
         {!selected ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px', color: '#1f2937' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>RECORDS SEARCH</div>
-            <div style={{ fontSize: '11px' }}>Enter a name, SSN, or plate to begin a search</div>
+          <div className="flex-1 flex items-center justify-center flex-col gap-2.5 text-[#1f2937]">
+            <div className="text-[13px] font-bold tracking-[1px]">RECORDS SEARCH</div>
+            <div className="text-[11px]">Enter a name, SSN, or plate to begin a search</div>
           </div>
         ) : (
           <>
             {/* Record header */}
-            <div style={{ background: '#0d1117', borderBottom: '1px solid #141720', padding: '8px 14px', flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#1a1e2c', border: '1px solid #374151', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ color: '#6b7280', fontSize: '14px' }}>👤</span>
+            <div className="bg-[#0d1117] border-b border-[#141720] px-3.5 py-2 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-[#1a1e2c] border border-[#374151] flex items-center justify-center shrink-0">
+                  <span className="text-[#6b7280] text-[14px]">👤</span>
                 </div>
                 <div>
-                  <div style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '16px', letterSpacing: '0.3px', fontFamily: 'Ubuntu, sans-serif' }}>
+                  <div className="text-slate-200 font-bold text-[16px] tracking-[0.3px]">
                     {selected.firstName} {selected.lastName}
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '1px' }}>
-                    <span style={{ color: '#374151', fontSize: '11px' }}>DOB: <span style={{ color: '#9ca3af' }}>{selected.dob}</span></span>
-                    <span style={{ color: '#374151', fontSize: '11px' }}>SSN: <span style={{ color: '#9ca3af' }}>{selected.ssn}</span></span>
+                  <div className="flex gap-2.5 mt-px">
+                    <span className="text-[#374151] text-[11px]">DOB: <span className="text-[#9ca3af]">{selected.dob}</span></span>
+                    <span className="text-[#374151] text-[11px]">SSN: <span className="text-[#9ca3af]">{selected.ssn}</span></span>
                   </div>
                 </div>
                 {activeWarrants.length > 0 && (
-                  <span style={{ marginLeft: 'auto', background: '#450a0a', color: '#f87171', border: '1px solid #991b1b', borderRadius: '2px', padding: '2px 8px', fontSize: '11px', fontWeight: 700 }}>
+                  <span className="ml-auto bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm px-2 py-0.5 text-[11px] font-bold">
                     WANTED — {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
                   </span>
                 )}
@@ -253,24 +229,15 @@ export default function SearchPage() {
             </div>
 
             {/* Record tabs */}
-            <div style={{ background: '#090b10', borderBottom: '1px solid #141720', display: 'flex', flexShrink: 0, overflowX: 'auto' }}>
+            <div className="bg-[#090b10] border-b border-[#141720] flex shrink-0 overflow-x-auto">
               {RECORD_TABS.map(t => (
                 <button
                   key={t}
                   onClick={() => setRecordTab(t)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: recordTab === t ? '2px solid #1d4ed8' : '2px solid transparent',
-                    color: recordTab === t ? '#93c5fd' : '#374151',
-                    padding: '7px 12px',
-                    fontSize: '11px',
-                    fontWeight: recordTab === t ? 700 : 500,
-                    letterSpacing: '0.5px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                  }}
+                  className={`bg-transparent border-none py-[7px] px-3 text-[11px] tracking-[0.5px] cursor-pointer whitespace-nowrap shrink-0
+                    ${recordTab === t
+                      ? 'border-b-2 border-blue-700 text-sky-300 font-bold'
+                      : 'border-b-2 border-transparent text-[#374151] font-medium'}`}
                 >
                   {t}
                 </button>
@@ -278,7 +245,7 @@ export default function SearchPage() {
             </div>
 
             {/* Tab content */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px' }}>
+            <div className="flex-1 overflow-y-auto px-3.5 py-3">
 
               {recordTab === 'SUMMARY' && (
                 <SummaryTab civ={selected} civVehicles={civVehicles} activeWarrants={activeWarrants} />
@@ -297,7 +264,7 @@ export default function SearchPage() {
               )}
 
               {['DETAILS','ADDRESSES','CONTACTS','ASSOCIATES','CITATIONS','PROPERTY','REPORTS'].includes(recordTab) && (
-                <div style={{ color: '#1f2937', textAlign: 'center', paddingTop: '40px', fontSize: '12px' }}>
+                <div className="text-[#1f2937] text-center pt-10 text-[12px]">
                   {recordTab} data not available in demo
                 </div>
               )}
@@ -307,57 +274,39 @@ export default function SearchPage() {
       </div>
 
       {/* ── RIGHT: Location + Activity ── */}
-      <div style={{
-        flexDirection: 'column',
-        overflow: 'hidden',
-        background: '#09090f',
-        ...(isMobile ? {
-          display: mobilePanel === 'activity' ? 'flex' : 'none',
-          flex: 1,
-        } : {
-          display: 'flex',
-          width: '320px',
-          flexShrink: 0,
-          borderLeft: '1px solid #141720',
-        }),
-      }}>
+      <div
+        className="flex-col overflow-hidden bg-[#09090f]"
+        style={isMobile
+          ? { display: mobilePanel === 'activity' ? 'flex' : 'none', flex: 1 }
+          : { display: 'flex', width: 320, flexShrink: 0, borderLeft: '1px solid #141720' }}
+      >
         {/* Map placeholder */}
         <PanelHead title="LOCATION" />
-        <div style={{
-          height: '200px',
-          background: '#0b0f18',
-          borderBottom: '1px solid #141720',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
+        <div className="h-[200px] bg-[#0b0f18] border-b border-[#141720] flex items-center justify-center shrink-0 relative overflow-hidden">
           {/* Fake map grid */}
-          <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
+          <div className="absolute inset-0 opacity-15">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: `${i * 14}%`, height: '1px', background: '#1d4ed8' }} />
+              <div key={i} className="absolute left-0 right-0 h-px bg-blue-700" style={{ top: `${i * 14}%` }} />
             ))}
             {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${i * 11}%`, width: '1px', background: '#1d4ed8' }} />
+              <div key={i} className="absolute top-0 bottom-0 w-px bg-blue-700" style={{ left: `${i * 11}%` }} />
             ))}
           </div>
           {selected?.address ? (
-            <div style={{ textAlign: 'center', zIndex: 1 }}>
-              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6', border: '2px solid #fff', margin: '0 auto 6px', boxShadow: '0 0 8px #3b82f6' }} />
-              <div style={{ color: '#9ca3af', fontSize: '10px', fontFamily: MONO }}>{selected.address}</div>
+            <div className="text-center z-[1]">
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white mx-auto mb-1.5 shadow-[0_0_8px_theme(colors.blue.500)]" />
+              <div className="text-[#9ca3af] text-[10px] font-mono">{selected.address}</div>
             </div>
           ) : (
-            <span style={{ color: '#1f2937', fontSize: '11px' }}>No location data</span>
+            <span className="text-[#1f2937] text-[11px]">No location data</span>
           )}
         </div>
 
         {/* Recent activity */}
         <PanelHead title="RECENT ACTIVITY" />
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto">
           {civHistory.length === 0 && civWarrants.length === 0 ? (
-            <div style={{ padding: '12px 10px', color: '#1f2937', fontSize: '11px' }}>No recent activity on record.</div>
+            <div className="px-2.5 py-3 text-[#1f2937] text-[11px]">No recent activity on record.</div>
           ) : (
             <>
               {civWarrants.map(w => (
@@ -390,11 +339,10 @@ export default function SearchPage() {
 
 function SummaryTab({ civ, civVehicles, activeWarrants }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className="flex flex-col gap-3">
       {/* Top 3-column grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+      <div className="grid grid-cols-3 gap-2.5">
 
-        {/* Personal Information */}
         <FieldCard title="PERSONAL INFORMATION">
           <InfoRow label="Full Name"       value={`${civ.firstName} ${civ.lastName}`} />
           <InfoRow label="DOB"             value={`${civ.dob} (${age(civ.dob)})`} />
@@ -408,32 +356,28 @@ function SummaryTab({ civ, civVehicles, activeWarrants }) {
           <InfoRow label="DL Expiry"       value={civ.dlExpiry} />
         </FieldCard>
 
-        {/* Address */}
         <FieldCard title="ADDRESS(ES)">
-          <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '0.5px', marginBottom: '4px' }}>Primary Address</div>
-          <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: 1.6 }}>{civ.address || 'N/A'}</div>
+          <div className="text-[#374151] text-[10px] tracking-[0.5px] mb-1">Primary Address</div>
+          <div className="text-slate-300 text-[12px] leading-[1.6]">{civ.address || 'N/A'}</div>
           {civ.phone && (
             <>
-              <div style={{ borderTop: '1px solid #141720', marginTop: '10px', paddingTop: '8px', color: '#374151', fontSize: '10px', letterSpacing: '0.5px', marginBottom: '4px' }}>
-                Phone
-              </div>
-              <div style={{ color: '#d1d5db', fontSize: '12px' }}>{civ.phone}</div>
+              <div className="border-t border-[#141720] mt-2.5 pt-2 text-[#374151] text-[10px] tracking-[0.5px] mb-1">Phone</div>
+              <div className="text-slate-300 text-[12px]">{civ.phone}</div>
             </>
           )}
         </FieldCard>
 
-        {/* Additional Information */}
         <FieldCard title="ADDITIONAL INFORMATION">
           <InfoRow label="Citizenship"   value="United States" />
           <InfoRow label="Occupation"    value="Unknown" />
           <InfoRow label="Employer"      value="N/A" />
           <InfoRow label="DL Class"      value={civ.dlClass || 'C'} />
           {civ.flags?.length > 0 && (
-            <div style={{ marginTop: '6px' }}>
-              <div style={{ color: '#374151', fontSize: '10px', marginBottom: '4px' }}>Cautions</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+            <div className="mt-1.5">
+              <div className="text-[#374151] text-[10px] mb-1">Cautions</div>
+              <div className="flex flex-wrap gap-[3px]">
                 {civ.flags.map(f => (
-                  <span key={f} style={{ background: '#450a0a', color: '#f87171', border: '1px solid #991b1b', borderRadius: '2px', fontSize: '9px', padding: '1px 5px', fontWeight: 700 }}>
+                  <span key={f} className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-[5px] py-px font-bold">
                     {f}
                   </span>
                 ))}
@@ -444,51 +388,43 @@ function SummaryTab({ civ, civVehicles, activeWarrants }) {
       </div>
 
       {/* Photo + Warrants + BOLOs row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 1fr', gap: '10px' }}>
-        {/* Photo */}
+      <div className="grid gap-2.5" style={{ gridTemplateColumns: '140px 1fr 1fr' }}>
         <FieldCard title="PHOTO">
-          <div style={{
-            height: '100px', background: '#0d1117', border: '1px solid #1a1e2c',
-            borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ color: '#374151', fontSize: '28px' }}>👤</span>
+          <div className="h-[100px] bg-[#0d1117] border border-[#1a1e2c] rounded-sm flex items-center justify-center">
+            <span className="text-[#374151] text-[28px]">👤</span>
           </div>
         </FieldCard>
 
-        {/* Active Warrants */}
         <FieldCard title={`ACTIVE WARRANTS (${activeWarrants.length})`}>
           {activeWarrants.length === 0 ? (
-            <div style={{ color: '#374151', fontSize: '11px', padding: '4px 0' }}>None</div>
+            <div className="text-[#374151] text-[11px] py-1">None</div>
           ) : (
             activeWarrants.map(w => (
-              <div key={w.id} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #141720' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '2px' }}>
-                  <span style={{ color: '#93c5fd', fontSize: '11px', fontWeight: 700 }}>WARRANT # {w.id}</span>
-                  <span style={{ color: '#374151', fontSize: '10px', marginLeft: 'auto' }}>{w.issuedDate}</span>
+              <div key={w.id} className="mb-2 pb-2 border-b border-[#141720]">
+                <div className="flex gap-2 items-center mb-0.5">
+                  <span className="text-sky-300 text-[11px] font-bold">WARRANT # {w.id}</span>
+                  <span className="text-[#374151] text-[10px] ml-auto">{w.issuedDate}</span>
                 </div>
-                <div style={{ color: '#fca5a5', fontSize: '11px' }}>{w.charge}</div>
-                <div style={{ color: '#374151', fontSize: '10px', marginTop: '2px' }}>Issued by: {w.issuedBy}</div>
-                <span style={{ background: '#450a0a', color: '#f87171', border: '1px solid #991b1b', borderRadius: '2px', fontSize: '9px', padding: '0 5px', fontWeight: 700 }}>
-                  FELONY
-                </span>
+                <div className="text-[#fca5a5] text-[11px]">{w.charge}</div>
+                <div className="text-[#374151] text-[10px] mt-0.5">Issued by: {w.issuedBy}</div>
+                <span className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-[5px] font-bold">FELONY</span>
               </div>
             ))
           )}
         </FieldCard>
 
-        {/* BOLOs */}
         <FieldCard title="ACTIVE BOLOs / LOCATIONS (0)">
-          <div style={{ color: '#374151', fontSize: '11px', padding: '4px 0' }}>No active BOLOs or lookout notices.</div>
+          <div className="text-[#374151] text-[11px] py-1">No active BOLOs or lookout notices.</div>
         </FieldCard>
       </div>
 
       {/* Recent Incidents table */}
       <FieldCard title="RECENT INCIDENTS">
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+        <table className="w-full border-collapse text-[11px]">
           <thead>
             <tr>
               {['DATE / TIME', 'INCIDENT #', 'TYPE', 'LOCATION', 'DISPOSITION'].map(h => (
-                <th key={h} style={{ padding: '5px 8px', textAlign: 'left', color: '#374151', fontSize: '10px', letterSpacing: '0.6px', borderBottom: '1px solid #141720', whiteSpace: 'nowrap' }}>
+                <th key={h} className="px-2 py-[5px] text-left text-[#374151] text-[10px] tracking-[0.6px] border-b border-[#141720] whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -496,15 +432,15 @@ function SummaryTab({ civ, civVehicles, activeWarrants }) {
           </thead>
           <tbody>
             {civVehicles.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: '10px 8px', color: '#1f2937', textAlign: 'center' }}>No incidents on file</td></tr>
+              <tr><td colSpan={5} className="px-2 py-2.5 text-[#1f2937] text-center">No incidents on file</td></tr>
             ) : (
               civVehicles.slice(0, 5).map((v, i) => (
-                <tr key={v.id} style={{ background: i % 2 === 0 ? '#0b0d14' : 'transparent' }}>
-                  <td style={{ padding: '4px 8px', color: '#374151' }}>—</td>
-                  <td style={{ padding: '4px 8px', color: '#93c5fd' }}>{v.plate}</td>
-                  <td style={{ padding: '4px 8px', color: '#9ca3af' }}>Vehicle on file</td>
-                  <td style={{ padding: '4px 8px', color: '#6b7280' }}>—</td>
-                  <td style={{ padding: '4px 8px' }}><StatusBadge status={v.regStatus} /></td>
+                <tr key={v.id} className={i % 2 === 0 ? 'bg-[#0b0d14]' : ''}>
+                  <td className="px-2 py-1 text-[#374151]">—</td>
+                  <td className="px-2 py-1 text-sky-300">{v.plate}</td>
+                  <td className="px-2 py-1 text-[#9ca3af]">Vehicle on file</td>
+                  <td className="px-2 py-1 text-[#6b7280]">—</td>
+                  <td className="px-2 py-1"><StatusBadge status={v.regStatus} /></td>
                 </tr>
               ))
             )}
@@ -518,31 +454,31 @@ function SummaryTab({ civ, civVehicles, activeWarrants }) {
 function HistoryTab({ civHistory }) {
   if (civHistory.length === 0) {
     return (
-      <div style={{ padding: '12px', background: '#052e16', border: '1px solid #166534', borderRadius: '3px', color: '#4ade80', fontSize: '12px', fontFamily: MONO }}>
+      <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
         *** SUBJECT RETURNS CLEAR — NO CRIMINAL HISTORY ON FILE ***
       </div>
     );
   }
   return (
     <div className="table-scroll">
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+      <table className="w-full border-collapse text-[12px]">
         <thead>
-          <tr style={{ background: '#0d1117' }}>
+          <tr className="bg-[#0d1117]">
             {['DATE', 'CASE #', 'CHARGES', 'OFFICER', 'AGENCY', 'DISPOSITION', 'SENTENCE'].map(h => (
-              <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#374151', fontSize: '10px', letterSpacing: '0.7px', borderBottom: '1px solid #141720', whiteSpace: 'nowrap' }}>{h}</th>
+              <th key={h} className="px-2.5 py-1.5 text-left text-[#374151] text-[10px] tracking-[0.7px] border-b border-[#141720] whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {civHistory.map((h, i) => (
-            <tr key={h.id} style={{ background: i % 2 === 0 ? '#090b10' : '#0b0d14' }}>
-              <td style={{ padding: '5px 10px', color: '#6b7280' }}>{h.date}</td>
-              <td style={{ padding: '5px 10px', color: '#93c5fd', fontWeight: 700 }}>{h.caseNumber}</td>
-              <td style={{ padding: '5px 10px', color: '#e2e8f0', maxWidth: '200px' }}>{Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}</td>
-              <td style={{ padding: '5px 10px', color: '#6b7280' }}>{h.officerBadge}</td>
-              <td style={{ padding: '5px 10px', color: '#6b7280' }}>{h.agency}</td>
-              <td style={{ padding: '5px 10px' }}><StatusBadge status={h.disposition} /></td>
-              <td style={{ padding: '5px 10px', color: '#6b7280' }}>{h.sentence}</td>
+            <tr key={h.id} className={i % 2 === 0 ? 'bg-[#090b10]' : 'bg-[#0b0d14]'}>
+              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.date}</td>
+              <td className="px-2.5 py-[5px] text-sky-300 font-bold">{h.caseNumber}</td>
+              <td className="px-2.5 py-[5px] text-slate-200 max-w-[200px]">{Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}</td>
+              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.officerBadge}</td>
+              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.agency}</td>
+              <td className="px-2.5 py-[5px]"><StatusBadge status={h.disposition} /></td>
+              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.sentence}</td>
             </tr>
           ))}
         </tbody>
@@ -554,26 +490,28 @@ function HistoryTab({ civHistory }) {
 function WarrantsTab({ civWarrants }) {
   if (civWarrants.length === 0) {
     return (
-      <div style={{ padding: '12px', background: '#052e16', border: '1px solid #166534', borderRadius: '3px', color: '#4ade80', fontSize: '12px', fontFamily: MONO }}>
+      <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
         *** SUBJECT RETURNS CLEAR — NO ACTIVE WARRANTS ***
       </div>
     );
   }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div className="flex flex-col gap-2">
       {civWarrants.map(w => (
-        <div key={w.id} style={{ background: '#0d1117', border: `1px solid ${w.status === 'ACTIVE' ? '#991b1b' : '#1a1e2c'}`, borderRadius: '3px', padding: '12px' }}>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: '#93c5fd', fontWeight: 700, fontSize: '12px' }}>WARRANT #{w.id}</span>
+        <div key={w.id} className="bg-[#0d1117] rounded-sm px-3 py-3"
+          style={{ border: `1px solid ${w.status === 'ACTIVE' ? '#991b1b' : '#1a1e2c'}` }}
+        >
+          <div className="flex gap-2.5 items-center mb-1.5">
+            <span className="text-sky-300 font-bold text-[12px]">WARRANT #{w.id}</span>
             <StatusBadge status={w.status} />
-            <span style={{ marginLeft: 'auto', color: '#374151', fontSize: '11px' }}>{w.issuedDate}</span>
+            <span className="ml-auto text-[#374151] text-[11px]">{w.issuedDate}</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '11px' }}>
+          <div className="grid grid-cols-2 gap-1.5 text-[11px]">
             <InfoRow label="Type"     value={w.type} />
             <InfoRow label="Charge"   value={w.charge} valueColor="#fca5a5" />
             <InfoRow label="Issued By" value={w.issuedBy} />
           </div>
-          {w.notes && <div style={{ marginTop: '6px', color: '#4b5563', fontSize: '11px' }}>{w.notes}</div>}
+          {w.notes && <div className="mt-1.5 text-[#4b5563] text-[11px]">{w.notes}</div>}
         </div>
       ))}
     </div>
@@ -582,29 +520,29 @@ function WarrantsTab({ civWarrants }) {
 
 function VehiclesTab({ civVehicles }) {
   if (civVehicles.length === 0) {
-    return <div style={{ color: '#1f2937', fontSize: '12px' }}>No vehicles registered to this subject.</div>;
+    return <div className="text-[#1f2937] text-[12px]">No vehicles registered to this subject.</div>;
   }
   return (
     <div className="table-scroll">
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+      <table className="w-full border-collapse text-[12px]">
         <thead>
-          <tr style={{ background: '#0d1117' }}>
+          <tr className="bg-[#0d1117]">
             {['PLATE', 'YEAR', 'MAKE', 'MODEL', 'COLOR', 'REG STATUS', 'STOLEN', 'FLAGS'].map(h => (
-              <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#374151', fontSize: '10px', letterSpacing: '0.7px', borderBottom: '1px solid #141720', whiteSpace: 'nowrap' }}>{h}</th>
+              <th key={h} className="px-2.5 py-1.5 text-left text-[#374151] text-[10px] tracking-[0.7px] border-b border-[#141720] whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {civVehicles.map((v, i) => (
-            <tr key={v.id} style={{ background: i % 2 === 0 ? '#090b10' : '#0b0d14' }}>
-              <td style={{ padding: '5px 10px', color: '#93c5fd', fontWeight: 700 }}>{v.plate}</td>
-              <td style={{ padding: '5px 10px', color: '#6b7280' }}>{v.year}</td>
-              <td style={{ padding: '5px 10px', color: '#9ca3af' }}>{v.make}</td>
-              <td style={{ padding: '5px 10px', color: '#9ca3af' }}>{v.model}</td>
-              <td style={{ padding: '5px 10px', color: '#9ca3af' }}>{v.color}</td>
-              <td style={{ padding: '5px 10px' }}><StatusBadge status={v.regStatus} /></td>
-              <td style={{ padding: '5px 10px' }}><StatusBadge status={v.stolen ? 'ACTIVE' : 'VALID'} /></td>
-              <td style={{ padding: '5px 10px', color: '#374151' }}>{v.flags?.join(', ') || '—'}</td>
+            <tr key={v.id} className={i % 2 === 0 ? 'bg-[#090b10]' : 'bg-[#0b0d14]'}>
+              <td className="px-2.5 py-[5px] text-sky-300 font-bold">{v.plate}</td>
+              <td className="px-2.5 py-[5px] text-[#6b7280]">{v.year}</td>
+              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.make}</td>
+              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.model}</td>
+              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.color}</td>
+              <td className="px-2.5 py-[5px]"><StatusBadge status={v.regStatus} /></td>
+              <td className="px-2.5 py-[5px]"><StatusBadge status={v.stolen ? 'ACTIVE' : 'VALID'} /></td>
+              <td className="px-2.5 py-[5px] text-[#374151]">{v.flags?.join(', ') || '—'}</td>
             </tr>
           ))}
         </tbody>
@@ -617,17 +555,7 @@ function VehiclesTab({ civVehicles }) {
 
 function PanelHead({ title }) {
   return (
-    <div style={{
-      padding: '5px 10px',
-      background: '#0d1117',
-      borderBottom: '1px solid #141720',
-      color: '#374151',
-      fontSize: '10px',
-      letterSpacing: '1.5px',
-      textTransform: 'uppercase',
-      fontWeight: 700,
-      flexShrink: 0,
-    }}>
+    <div className="px-2.5 py-[5px] bg-[#0d1117] border-b border-[#141720] text-[#374151] text-[10px] tracking-[1.5px] uppercase font-bold shrink-0">
       {title}
     </div>
   );
@@ -635,11 +563,11 @@ function PanelHead({ title }) {
 
 function FieldCard({ title, children }) {
   return (
-    <div style={{ background: '#0d1117', border: '1px solid #141720', borderRadius: '2px', overflow: 'hidden' }}>
-      <div style={{ padding: '4px 8px', background: '#0b0f18', borderBottom: '1px solid #141720', color: '#374151', fontSize: '9px', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 700 }}>
+    <div className="bg-[#0d1117] border border-[#141720] rounded-sm overflow-hidden">
+      <div className="px-2 py-1 bg-[#0b0f18] border-b border-[#141720] text-[#374151] text-[9px] tracking-[1px] uppercase font-bold">
         {title}
       </div>
-      <div style={{ padding: '8px 8px' }}>
+      <div className="p-2">
         {children}
       </div>
     </div>
@@ -648,8 +576,8 @@ function FieldCard({ title, children }) {
 
 function InfoRow({ label, value, valueColor }) {
   return (
-    <div style={{ display: 'flex', gap: '6px', marginBottom: '3px', fontSize: '11px' }}>
-      <span style={{ color: '#374151', minWidth: '100px', flexShrink: 0 }}>{label}</span>
+    <div className="flex gap-1.5 mb-[3px] text-[11px]">
+      <span className="text-[#374151] min-w-[100px] shrink-0">{label}</span>
       <span style={{ color: valueColor || '#d1d5db' }}>{value || 'N/A'}</span>
     </div>
   );
@@ -657,11 +585,11 @@ function InfoRow({ label, value, valueColor }) {
 
 function ActivityRow({ time, label, detail, color }) {
   return (
-    <div style={{ padding: '6px 10px', borderBottom: '1px solid #141720', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-      <span style={{ color: '#1f2937', fontSize: '10px', flexShrink: 0, fontFamily: MONO }}>{time}</span>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ color, fontSize: '11px', fontWeight: 700 }}>{label}</div>
-        <div style={{ color: '#374151', fontSize: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{detail}</div>
+    <div className="px-2.5 py-1.5 border-b border-[#141720] flex gap-2 items-baseline">
+      <span className="text-[#1f2937] text-[10px] shrink-0 font-mono">{time}</span>
+      <div className="min-w-0">
+        <div className="text-[11px] font-bold" style={{ color }}>{label}</div>
+        <div className="text-[#374151] text-[10px] overflow-hidden text-ellipsis whitespace-nowrap">{detail}</div>
       </div>
     </div>
   );

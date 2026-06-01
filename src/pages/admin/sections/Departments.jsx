@@ -27,19 +27,20 @@ export default function Departments() {
       {/* Persistent Unit Groups */}
       <AdminPanel center title="Persistent Unit Groups" subtitle="These groups always appear in dispatch, even when no units are assigned.">
         {groups.length === 0
-          ? <div style={{ color: ADMIN.textMute, fontSize: 12, marginBottom: 12 }}>No persistent groups configured.</div>
+          ? <div className="text-[12px] mb-3" style={{ color: ADMIN.textMute }}>No persistent groups configured.</div>
           : (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            <div className="flex flex-wrap gap-2 mb-3">
               {groups.map(g => (
-                <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`, borderRadius: 7 }}>
-                  <span style={{ color: ADMIN.text, fontSize: 13 }}>{g.name}</span>
+                <div key={g.id} className="flex items-center gap-2 px-3 py-1.5 rounded-[7px]"
+                  style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.border}` }}>
+                  <span className="text-[13px]" style={{ color: ADMIN.text }}>{g.name}</span>
                   <SonIconBtn icon={MdDelete} danger onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'persistentGroups', id: g.id } })} />
                 </div>
               ))}
             </div>
           )}
-        <div style={{ display: 'flex', gap: 8, border: `1px dashed ${ADMIN.borderHi}`, borderRadius: 8, padding: 14 }}>
-          <div style={{ flex: 1 }}>
+        <div className="flex gap-2 rounded-lg p-[14px]" style={{ border: `1px dashed ${ADMIN.borderHi}` }}>
+          <div className="flex-1">
             <label style={SON_LABEL}>Group Name</label>
             <input style={SON_INPUT} placeholder="e.g. SWAT Element" value={groupName}
               onChange={e => setGroupName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addGroup()} />
@@ -55,22 +56,22 @@ export default function Departments() {
         right={<SonSearch value={query} onChange={setQuery} placeholder="Search agencies…" />}
       >
         {filtered.length === 0 ? <EmptyState>No agencies match.</EmptyState> : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 14 }}>
+          <div className="grid gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))' }}>
             {filtered.map(d => {
               const open = expanded === d.id;
               return (
-                <div key={d.id} style={{ background: ADMIN.bg, border: `1px solid ${ADMIN.border}`, borderRadius: 8, padding: 16 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div key={d.id} className="rounded-lg p-4" style={{ background: ADMIN.bg, border: `1px solid ${ADMIN.border}` }}>
+                  <div className="flex items-center gap-2 mb-3">
                     <SonBadge color={ADMIN.blue}>Agency</SonBadge>
                     <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} depts</SonBadge>
-                    <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                    <div className="ml-auto flex gap-1.5">
                       <SonIconBtn icon={MdDelete} danger title="Delete agency"
                         onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'departments', id: d.id } })} />
                       <SonIconBtn icon={open ? MdExpandMore : MdChevronRight} title="Expand"
                         onClick={() => setExpanded(open ? null : d.id)} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gap: 10 }}>
+                  <div className="grid gap-[10px]">
                     <div>
                       <label style={SON_LABEL}>Name</label>
                       <input style={SON_INPUT} value={d.name} onChange={e => updateDept(d, { name: e.target.value })} />
@@ -80,7 +81,7 @@ export default function Departments() {
                       <input style={SON_INPUT} value={d.short} onChange={e => updateDept(d, { short: e.target.value })} />
                     </div>
                     {open && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div className="expand-section grid grid-cols-2 gap-[10px]">
                         <div>
                           <label style={SON_LABEL}>Type</label>
                           <input style={SON_INPUT} value={d.type} onChange={e => updateDept(d, { type: e.target.value })} />
@@ -89,7 +90,7 @@ export default function Departments() {
                           <label style={SON_LABEL}>Radio Channel</label>
                           <input style={SON_INPUT} value={d.radioChannel || ''} onChange={e => updateDept(d, { radioChannel: e.target.value })} />
                         </div>
-                        <div style={{ gridColumn: 'span 2' }}>
+                        <div className="col-span-2">
                           <label style={SON_LABEL}>Sub-departments (comma separated)</label>
                           <input style={SON_INPUT} value={(d.subdivisions || []).join(', ')}
                             onChange={e => updateDept(d, { subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
@@ -102,7 +103,7 @@ export default function Departments() {
             })}
           </div>
         )}
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           <SonButton variant="red" onClick={() => dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '' } })}>
             <MdAdd size={16} /> Add Agency
           </SonButton>

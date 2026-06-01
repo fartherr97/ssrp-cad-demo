@@ -31,43 +31,43 @@ export default function FormsCenter() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
+    <div className="p-3.5 font-ui">
       {/* Header */}
-      <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px' }}>
-        <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>REPORT CENTER</span>
+      <div className="bg-[#0b0d14] border border-[#1e2533] border-b-0 px-3.5 py-2">
+        <span className="text-slate-100 text-[12px] font-bold tracking-[1.5px]">REPORT CENTER</span>
       </div>
-      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px' }}>
+      <div className="bg-[#0d1117] border border-[#1e2533] p-3.5">
         <TabBar tabs={tabs} active={activeTab} setActive={(t) => { setActiveTab(t); setSelectedTemplate(null); }} />
 
         {/* Submitted Reports */}
         {activeTab === 'submitted' && (
-          <div style={{ marginTop: '14px' }}>
-            <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <StatusSummary label="Total" count={reports.length} color="#3b82f6" />
-              <StatusSummary label="Pending" count={reports.filter(r => r.status === 'Submitted').length} color="#fbbf24" />
-              <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length} color="#22c55e" />
-              <StatusSummary label="Review" count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
+          <div className="mt-3.5">
+            <div className="mb-3 flex gap-2 flex-wrap">
+              <StatusSummary label="Total"    count={reports.length}                                            color="#3b82f6" />
+              <StatusSummary label="Pending"  count={reports.filter(r => r.status === 'Submitted').length}     color="#fbbf24" />
+              <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length}      color="#22c55e" />
+              <StatusSummary label="Review"   count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
             </div>
             <div className="table-scroll">
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <table className="w-full border-collapse text-[13px]">
                 <thead>
-                  <tr style={{ background: '#0b0d14' }}>
+                  <tr className="bg-[#0b0d14]">
                     {['Case #','Type','Officer','Date','Status','Call','Actions'].map(h => (
-                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533', whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} className="px-2.5 py-[7px] text-left text-[#6b7280] text-[11px] font-bold tracking-[0.6px] border-b border-[#1e2533] whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {reports.map((r, i) => (
-                    <tr key={r.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
-                      <td style={{ padding: '7px 10px', color: '#60a5fa', fontWeight: 700 }}>{r.caseNumber}</td>
-                      <td style={{ padding: '7px 10px', color: '#d1d5db' }}>{r.type}</td>
-                      <td style={{ padding: '7px 10px', color: '#9ca3af' }}>{r.officerBadge}</td>
-                      <td style={{ padding: '7px 10px', color: '#4b5563' }}>{r.date}</td>
-                      <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
-                      <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{r.callId || '—'}</td>
-                      <td style={{ padding: '7px 10px' }}>
-                        <button onClick={() => setReviewReport(r)} style={aBtn('#0c1a2e','#3b82f6')}>View</button>
+                    <tr key={r.id} className={i % 2 === 0 ? 'bg-[#0d1117]' : 'bg-[#111218]'}>
+                      <td className="px-2.5 py-[7px] text-blue-400 font-bold">{r.caseNumber}</td>
+                      <td className="px-2.5 py-[7px] text-slate-300">{r.type}</td>
+                      <td className="px-2.5 py-[7px] text-[#9ca3af]">{r.officerBadge}</td>
+                      <td className="px-2.5 py-[7px] text-[#4b5563]">{r.date}</td>
+                      <td className="px-2.5 py-[7px]"><StatusBadge status={r.status} /></td>
+                      <td className="px-2.5 py-[7px] text-blue-400">{r.callId || '—'}</td>
+                      <td className="px-2.5 py-[7px]">
+                        <button onClick={() => setReviewReport(r)} className="bg-[#0c1a2e] border border-blue-500 text-blue-500 px-2.5 py-1 text-[12px] cursor-pointer font-semibold font-ui">View</button>
                       </td>
                     </tr>
                   ))}
@@ -79,19 +79,18 @@ export default function FormsCenter() {
 
         {/* Create Report */}
         {activeTab === 'create' && (
-          <div style={{ marginTop: '14px' }}>
+          <div className="mt-3.5">
             {!selectedTemplate ? (
               <>
-                <div style={{ color: '#9ca3af', fontSize: '13px', marginBottom: '12px' }}>Select a report template to begin:</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+                <div className="text-[#9ca3af] text-[13px] mb-3">Select a report template to begin:</div>
+                <div className="grid gap-2.5" style={{ gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))' }}>
                   {reportTemplates.map(t => (
-                    <div key={t.id} onClick={() => { setSelectedTemplate(t); setFormValues({}); }}
-                      style={{ background: '#090b10', border: '1px solid #1e2533', padding: '16px', cursor: 'pointer', borderLeft: '3px solid #3b82f6' }}
-                      onMouseEnter={e => e.currentTarget.style.borderColor = '#3b82f6'}
-                      onMouseLeave={e => e.currentTarget.style.borderLeftColor = '#3b82f6'}
+                    <div key={t.id}
+                      onClick={() => { setSelectedTemplate(t); setFormValues({}); }}
+                      className="bg-[#090b10] border border-[#1e2533] border-l-[3px] border-l-blue-500 p-4 cursor-pointer hover:border-blue-500 transition-colors"
                     >
-                      <div style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>{t.name}</div>
-                      <div style={{ color: '#4b5563', fontSize: '11px' }}>{t.fields.length} fields</div>
+                      <div className="text-blue-500 font-bold text-[13px] mb-1">{t.name}</div>
+                      <div className="text-[#4b5563] text-[11px]">{t.fields.length} fields</div>
                     </div>
                   ))}
                 </div>
@@ -124,18 +123,24 @@ export default function FormsCenter() {
         {/* Report detail modal */}
         {reviewReport && (
           <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} — ${reviewReport.caseNumber}`}>
-            <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="text-[13px] flex flex-col gap-2">
               <FieldRow label="Officer" value={reviewReport.officerBadge} />
-              <FieldRow label="Date" value={reviewReport.date} />
-              <FieldRow label="Status" value={<StatusBadge status={reviewReport.status} />} />
-              <FieldRow label="Call" value={reviewReport.callId || '—'} />
-              <div style={{ background: '#090b10', border: '1px solid #1f2937', padding: '12px', color: '#9ca3af', lineHeight: '1.6', fontSize: '13px' }}>
+              <FieldRow label="Date"    value={reviewReport.date} />
+              <FieldRow label="Status"  value={<StatusBadge status={reviewReport.status} />} />
+              <FieldRow label="Call"    value={reviewReport.callId || '—'} />
+              <div className="bg-[#090b10] border border-[#1f2937] p-3 text-[#9ca3af] leading-[1.6] text-[13px]">
                 {reviewReport.summary}
               </div>
               {isAdmin && reviewReport.status === 'Submitted' && (
-                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                  <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Approved' } }); setReviewReport(null); }} style={{ ...aBtn('#052e16','#22c55e'), padding: '7px 16px', flex: 1, fontSize: '13px' }}>Approve</button>
-                  <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Denied' } }); setReviewReport(null); }} style={{ ...aBtn('#450a0a','#ef4444'), padding: '7px 16px', flex: 1, fontSize: '13px' }}>Deny</button>
+                <div className="flex gap-2 mt-1">
+                  <button
+                    onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Approved' } }); setReviewReport(null); }}
+                    className="flex-1 bg-[#052e16] border border-green-500 text-green-500 py-[7px] px-4 text-[13px] font-semibold cursor-pointer font-ui"
+                  >Approve</button>
+                  <button
+                    onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Denied' } }); setReviewReport(null); }}
+                    className="flex-1 bg-[#450a0a] border border-red-500 text-red-500 py-[7px] px-4 text-[13px] font-semibold cursor-pointer font-ui"
+                  >Deny</button>
                 </div>
               )}
             </div>
@@ -170,14 +175,14 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
   return (
     <div>
       {/* CAD-UI toolbar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
-        <button onClick={onBack} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>Back</button>
-        <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '12px', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+      <div className="flex items-center gap-2.5 mb-3 flex-wrap">
+        <button onClick={onBack} className="bg-[#090b10] border border-[#1e2533] text-[#9ca3af] px-3 py-[5px] text-[12px] cursor-pointer font-ui">Back</button>
+        <span className="text-amber-400 font-bold text-[12px] font-ui tracking-[1px]">{template.name.toUpperCase()}</span>
+        <div className="ml-auto flex gap-2">
           {!isMobile && (
-            <button onClick={() => window.print()} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#60a5fa', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>Print</button>
+            <button onClick={() => window.print()} className="bg-[#090b10] border border-[#1e2533] text-blue-400 px-3 py-[5px] text-[12px] cursor-pointer font-ui">Print</button>
           )}
-          <button form="docform" type="submit" style={{ background: '#0f2548', border: '2px solid #1a1a2e', color: '#ffffff', padding: '5px 18px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: DOC_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+          <button form="docform" type="submit" className="bg-[#0f2548] border-2 border-[#1a1a2e] text-white px-[18px] py-[5px] text-[12px] font-bold cursor-pointer uppercase tracking-[1.5px]" style={{ fontFamily: DOC_FONT }}>
             SUBMIT REPORT
           </button>
         </div>
@@ -185,14 +190,9 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
 
       <form id="docform" onSubmit={onSubmit}>
         <div style={{
-          background: FIELD_BG,
-          color: '#0a0a1a',
-          border: '2px solid #1a1a2e',
-          maxWidth: '900px',
-          margin: '0 auto',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-          fontFamily: DOC_FONT,
-          overflow: 'hidden',
+          background: FIELD_BG, color: '#0a0a1a', border: '2px solid #1a1a2e',
+          maxWidth: 900, margin: '0 auto', boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          fontFamily: DOC_FONT, overflow: 'hidden',
         }}>
           {/* HEADER */}
           <div style={{ background: '#0f2548', display: 'flex', alignItems: 'stretch', borderBottom: '3px solid #1a1a2e' }}>
@@ -431,60 +431,63 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
   };
 
   return (
-    <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+    <div className="mt-3.5 grid gap-4" style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
       <div>
-        <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>EXISTING TEMPLATES</div>
+        <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-2.5">EXISTING TEMPLATES</div>
         {reportTemplates.map(t => (
-          <div key={t.id} style={{ background: '#090b10', border: '1px solid #1e2533', padding: '9px 12px', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+          <div key={t.id} className="bg-[#090b10] border border-[#1e2533] px-3 py-[9px] mb-1.5 flex justify-between items-center text-[13px]">
             <div>
-              <span style={{ color: '#d1d5db' }}>{t.name}</span>
-              <span style={{ color: '#374151', marginLeft: '10px', fontSize: '11px' }}>{t.fields.length} fields</span>
+              <span className="text-slate-300">{t.name}</span>
+              <span className="text-[#374151] ml-2.5 text-[11px]">{t.fields.length} fields</span>
             </div>
-            <button onClick={() => setTpl({ ...t })} style={aBtn('#0c1a2e','#3b82f6')}>Edit</button>
+            <button onClick={() => setTpl({ ...t })} className="bg-[#0c1a2e] border border-blue-500 text-blue-500 px-2.5 py-1 text-[12px] cursor-pointer font-semibold font-ui">Edit</button>
           </div>
         ))}
       </div>
       <div>
-        <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
-        <div style={{ background: '#090b10', border: '1px solid #1e2533', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-2.5">{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
+        <div className="bg-[#090b10] border border-[#1e2533] p-4 flex flex-col gap-2.5">
           <div>
-            <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>TEMPLATE NAME</label>
-            <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} style={inputBase} />
+            <label className="text-[#6b7280] text-[11px] tracking-[1px] block mb-1">TEMPLATE NAME</label>
+            <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} className="w-full bg-[#090b10] border border-[#1e2533] text-slate-300 px-2.5 py-[7px] text-[13px] font-ui box-border outline-none" />
           </div>
           <div>
-            <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', marginBottom: '6px' }}>FIELDS ({tpl.fields.length})</div>
+            <div className="text-[#6b7280] text-[11px] tracking-[1px] mb-1.5">FIELDS ({tpl.fields.length})</div>
             {tpl.fields.map((f, idx) => (
-              <div key={f.id} style={{ background: '#0d1117', border: '1px solid #1f2937', padding: '7px 10px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
-                <span style={{ color: '#374151' }}>{idx + 1}.</span>
-                <span style={{ color: '#d1d5db', flex: 1 }}>{f.label}</span>
-                <span style={{ color: '#3b82f6', fontSize: '10px' }}>[{f.type}]</span>
-                {f.required && <span style={{ color: '#ef4444', fontSize: '10px' }}>*</span>}
-                <button onClick={() => moveField(idx, -1)} style={sBtn}>^</button>
-                <button onClick={() => moveField(idx, 1)} style={sBtn}>v</button>
-                <button onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} style={{ ...sBtn, background: '#450a0a', color: '#ef4444', border: '1px solid #991b1b' }}>X</button>
+              <div key={f.id} className="bg-[#0d1117] border border-[#1f2937] px-2.5 py-[7px] mb-1 flex items-center gap-1.5 text-[13px]">
+                <span className="text-[#374151]">{idx + 1}.</span>
+                <span className="text-slate-300 flex-1">{f.label}</span>
+                <span className="text-blue-500 text-[10px]">[{f.type}]</span>
+                {f.required && <span className="text-red-500 text-[10px]">*</span>}
+                <button onClick={() => moveField(idx, -1)} className="bg-[#0b0d14] border border-[#1f2937] text-[#4b5563] px-1.5 py-px text-[11px] cursor-pointer font-ui">^</button>
+                <button onClick={() => moveField(idx, 1)} className="bg-[#0b0d14] border border-[#1f2937] text-[#4b5563] px-1.5 py-px text-[11px] cursor-pointer font-ui">v</button>
+                <button onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} className="bg-[#450a0a] border border-[#991b1b] text-red-500 px-1.5 py-px text-[11px] cursor-pointer font-ui">X</button>
               </div>
             ))}
           </div>
-          <div style={{ background: '#0d1117', border: '1px dashed #1e2533', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px' }}>ADD FIELD</div>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label" style={{ ...inputBase, flex: 2 }} />
-              <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))} style={{ ...inputBase, flex: 1 }}>
+          <div className="bg-[#0d1117] border border-dashed border-[#1e2533] p-2.5 flex flex-col gap-1.5">
+            <div className="text-[#6b7280] text-[11px] tracking-[1px]">ADD FIELD</div>
+            <div className="flex gap-1.5">
+              <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label"
+                className="bg-[#090b10] border border-[#1e2533] text-slate-300 px-2.5 py-[7px] text-[13px] font-ui box-border outline-none" style={{ flex: 2 }} />
+              <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))}
+                className="bg-[#090b10] border border-[#1e2533] text-slate-300 px-2.5 py-[7px] text-[13px] font-ui box-border outline-none" style={{ flex: 1 }}>
                 {['text','textarea','dropdown','checkbox','date','datetime','badge_lookup','civilian_lookup'].map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             {newField.type === 'dropdown' && (
-              <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)" style={inputBase} />
+              <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)"
+                className="w-full bg-[#090b10] border border-[#1e2533] text-slate-300 px-2.5 py-[7px] text-[13px] font-ui box-border outline-none" />
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '13px', cursor: 'pointer' }}>
-                <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} style={{ accentColor: '#3b82f6' }} />
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 text-[#9ca3af] text-[13px] cursor-pointer">
+                <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} className="accent-blue-500" />
                 Required
               </label>
-              <button onClick={addField} style={{ ...blueBtn, marginLeft: 'auto', fontSize: '11px', padding: '4px 10px' }}>+ Add Field</button>
+              <button onClick={addField} className="ml-auto bg-[#0c1a2e] border border-blue-500 text-blue-500 px-2.5 py-1 text-[11px] font-bold cursor-pointer font-ui">+ Add Field</button>
             </div>
           </div>
-          <button onClick={handleSave} style={{ ...blueBtn, padding: '9px', fontSize: '13px', letterSpacing: '1px', width: '100%', textAlign: 'center' }}>
+          <button onClick={handleSave} className="w-full text-center bg-[#0c1a2e] border border-blue-500 text-blue-500 py-[9px] text-[13px] font-bold cursor-pointer font-ui tracking-[1px]">
             SAVE TEMPLATE
           </button>
         </div>
@@ -496,23 +499,23 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
 function ReviewQueue({ reports, dispatch }) {
   const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
   return (
-    <div style={{ marginTop: '14px' }}>
-      <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px' }}>SUPERVISOR REVIEW QUEUE — {pending.length} pending</div>
-      {pending.length === 0 && <div style={{ color: '#374151', fontSize: '14px' }}>No reports pending review.</div>}
+    <div className="mt-3.5">
+      <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-3">SUPERVISOR REVIEW QUEUE — {pending.length} pending</div>
+      {pending.length === 0 && <div className="text-[#374151] text-[14px]">No reports pending review.</div>}
       {pending.map(r => (
-        <div key={r.id} style={{ background: '#090b10', border: '1px solid #1e2533', padding: '12px', marginBottom: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div key={r.id} className="bg-[#090b10] border border-[#1e2533] p-3 mb-2">
+          <div className="flex justify-between items-center mb-1.5">
             <div>
-              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px' }}>{r.caseNumber}</span>
-              <span style={{ color: '#9ca3af', marginLeft: '12px', fontSize: '12px' }}>{r.type}</span>
-              <span style={{ color: '#4b5563', marginLeft: '12px', fontSize: '11px' }}>Officer: {r.officerBadge}</span>
+              <span className="text-blue-500 font-bold text-[13px]">{r.caseNumber}</span>
+              <span className="text-[#9ca3af] ml-3 text-[12px]">{r.type}</span>
+              <span className="text-[#4b5563] ml-3 text-[11px]">Officer: {r.officerBadge}</span>
             </div>
             <StatusBadge status={r.status} />
           </div>
-          <div style={{ color: '#4b5563', fontSize: '12px', marginBottom: '8px' }}>{r.summary}</div>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Approved' } })} style={{ ...aBtn('#052e16','#22c55e'), padding: '5px 14px' }}>Approve</button>
-            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Denied' } })} style={{ ...aBtn('#450a0a','#ef4444'), padding: '5px 14px' }}>Deny</button>
+          <div className="text-[#4b5563] text-[12px] mb-2">{r.summary}</div>
+          <div className="flex gap-1.5">
+            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Approved' } })} className="bg-[#052e16] border border-green-500 text-green-500 px-3.5 py-[5px] text-[12px] font-semibold cursor-pointer font-ui">Approve</button>
+            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Denied' } })} className="bg-[#450a0a] border border-red-500 text-red-500 px-3.5 py-[5px] text-[12px] font-semibold cursor-pointer font-ui">Deny</button>
           </div>
         </div>
       ))}
@@ -524,9 +527,13 @@ function ReviewQueue({ reports, dispatch }) {
 function TabBar({ tabs, active, setActive }) {
   const labels = { submitted: 'Submitted Reports', create: 'Create Report', builder: 'Form Builder', review: 'Review Queue' };
   return (
-    <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', overflowX: 'auto' }}>
+    <div className="flex gap-0.5 border-b border-[#1f2937] overflow-x-auto">
       {tabs.map(t => (
-        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0f172a' : 'transparent', border: active === t ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: active === t ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>
+        <button key={t} onClick={() => setActive(t)}
+          className={`border-b-0 px-3.5 py-1.5 text-[12px] cursor-pointer font-ui transition-colors
+            ${active === t
+              ? 'bg-[#0f172a] border border-blue-500 text-blue-500'
+              : 'bg-transparent border border-transparent text-[#4b5563]'}`}>
           {labels[t] || t}
         </button>
       ))}
@@ -536,37 +543,32 @@ function TabBar({ tabs, active, setActive }) {
 
 function StatusSummary({ label, count, color }) {
   return (
-    <div style={{ background: '#090b10', border: `1px solid ${color}25`, padding: '7px 14px', textAlign: 'center', minWidth: '70px' }}>
-      <div style={{ color, fontSize: '20px', fontWeight: 700 }}>{count}</div>
-      <div style={{ color: '#4b5563', fontSize: '11px' }}>{label}</div>
+    <div className="bg-[#090b10] px-3.5 py-[7px] text-center min-w-[70px]" style={{ border: `1px solid ${color}25` }}>
+      <div className="text-[20px] font-bold" style={{ color }}>{count}</div>
+      <div className="text-[#4b5563] text-[11px]">{label}</div>
     </div>
   );
 }
 
 function FieldRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', gap: '10px' }}>
-      <span style={{ color: '#3b82f6', fontSize: '12px', minWidth: '70px' }}>{label}:</span>
-      <span style={{ color: '#9ca3af', fontSize: '13px' }}>{value}</span>
+    <div className="flex gap-2.5">
+      <span className="text-blue-500 text-[12px] min-w-[70px]">{label}:</span>
+      <span className="text-[#9ca3af] text-[13px]">{value}</span>
     </div>
   );
 }
 
 function Modal({ title, onClose, children }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '540px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '18px' }}>X</button>
+    <div className="fixed inset-0 bg-black/75 z-[2000] flex items-center justify-center">
+      <div className="bg-[#0d1117] border border-[#1e2533] p-[22px] max-w-[540px] w-[90%] max-h-[80vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-blue-500 font-bold text-[13px] font-ui">{title}</span>
+          <button onClick={onClose} className="bg-none border-none text-[#4b5563] cursor-pointer text-[18px]">X</button>
         </div>
         {children}
       </div>
     </div>
   );
 }
-
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
-const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '4px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 });
-const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

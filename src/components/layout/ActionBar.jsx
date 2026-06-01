@@ -23,47 +23,33 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', padding: '0 14px', height: '100%',
-      borderLeft: '1px solid #1a3050', fontFamily: 'var(--font-mono)',
-      fontSize: 12, fontWeight: 600, color: '#60a0cc', letterSpacing: '0.3px',
-      flexShrink: 0, whiteSpace: 'nowrap',
-    }}>
+    <div className="flex items-center px-3.5 h-full border-l border-[#1a3050] font-mono text-[12px] font-semibold text-sky-400/80 tracking-[0.3px] shrink-0 whitespace-nowrap">
       {time}
     </div>
   );
 }
 
 /* Primary icon+label tool button */
-function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, style = {} }) {
+function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, extraClass = '' }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       title={title || label}
-      style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: 3, padding: '4px 10px',
-        minWidth: 54, height: '100%',
-        background: active ? 'rgba(47,127,232,0.15)' : 'transparent',
-        border: 'none',
-        borderBottom: `2px solid ${active ? 'var(--acc-blue-hi)' : 'transparent'}`,
-        color: active ? '#a0c8f0' : '#4a6080',
-        cursor: disabled ? 'not-allowed' : 'pointer', flexShrink: 0,
-        transition: 'background 0.1s, color 0.1s', fontFamily: 'var(--font-ui)',
-        opacity: disabled ? 0.4 : 1,
-        ...style,
-      }}
-      onMouseEnter={e => { if (!active && !disabled) { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#7090b0'; } }}
-      onMouseLeave={e => { if (!active && !disabled) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#4a6080'; } }}
+      className={`flex flex-col items-center justify-center gap-[3px] px-2.5 py-1 min-w-[54px] h-full shrink-0 border-none cursor-pointer transition-all font-ui
+        ${active
+          ? 'bg-sky-500/15 border-b-2 border-sky-400 text-sky-200'
+          : 'bg-transparent border-b-2 border-transparent text-slate-500 hover:bg-white/[0.06] hover:text-slate-400'}
+        ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
+        ${extraClass}`}
     >
-      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconComp size={20} /></span>
-      <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', lineHeight: 1 }}>{label}</span>
+      <span className="flex items-center justify-center"><IconComp size={20} /></span>
+      <span className="text-[9px] font-bold uppercase tracking-[0.5px] whitespace-nowrap leading-none">{label}</span>
     </button>
   );
 }
 
-/* Status square button — same shape as ToolBtn but uses the status color when active */
+/* Status square button — uses the status color when active */
 function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
   const isActive = myStatus === status;
   const color = STATUS_COLORS[status];
@@ -71,36 +57,16 @@ function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
     <button
       onClick={onClick}
       title={`Set status: ${status}`}
-      style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: 4, padding: '4px 10px',
-        minWidth: 54, height: '100%',
-        background: isActive ? `${color}1a` : 'transparent',
-        border: 'none',
-        borderTop: `2px solid transparent`,
-        borderBottom: `2px solid ${isActive ? color : 'transparent'}`,
-        color: isActive ? color : '#4a6080',
-        cursor: 'pointer', flexShrink: 0, transition: 'background 0.1s, color 0.1s',
-        fontFamily: 'var(--font-ui)',
-      }}
-      onMouseEnter={e => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-          e.currentTarget.style.color = '#7090b0';
-        }
-      }}
-      onMouseLeave={e => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.color = '#4a6080';
-        }
-      }}
+      className={`flex flex-col items-center justify-center gap-1 px-2.5 py-1 min-w-[54px] h-full shrink-0 border-none cursor-pointer transition-all font-ui
+        ${isActive ? 'border-b-2' : 'bg-transparent border-b-2 border-transparent text-slate-500 hover:bg-white/[0.06] hover:text-slate-400'}`}
+      style={isActive ? {
+        background: `${color}1a`,
+        borderBottom: `2px solid ${color}`,
+        color: color,
+      } : undefined}
     >
       <IconComp size={19} color={isActive ? color : undefined} />
-      <span style={{
-        fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
-        letterSpacing: '0.5px', whiteSpace: 'nowrap', lineHeight: 1,
-      }}>
+      <span className="text-[9px] font-bold uppercase tracking-[0.5px] whitespace-nowrap leading-none">
         {label}
       </span>
     </button>
@@ -134,26 +100,21 @@ export default function ActionBar({ onCreateCall }) {
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
 
   return (
-    <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'stretch', gap: 0, overflowX: 'auto' }}>
+    <div className="cad-actionbar flex items-stretch gap-0 overflow-x-auto">
 
       {/* ── Brand + active portal ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '0 14px', height: '100%',
-        borderRight: '1px solid #253a5e', background: '#0e2040', flexShrink: 0,
-      }}>
+      <div className="flex items-center gap-2.5 px-3.5 h-full border-r border-[#253a5e] bg-[#0e2040] shrink-0">
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
-          style={{ width: 28, height: 28, flexShrink: 0, objectFit: 'contain' }} />
-        <div style={{ lineHeight: 1.25, whiteSpace: 'nowrap' }}>
-          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-0.2px' }}>
-            <span style={{ color: '#ffffff' }}>Sunshine State </span>
-            <span style={{ color: '#f2800d' }}>RP</span>
+          className="w-7 h-7 shrink-0 object-contain" />
+        <div className="leading-[1.25] whitespace-nowrap">
+          <div className="text-[13px] font-extrabold tracking-[-0.2px]">
+            <span className="text-white">Sunshine State </span>
+            <span className="text-[#f2800d]">RP</span>
           </div>
-          <div style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase',
-            color: portal.color, marginTop: 1,
-            transition: 'color 0.2s',
-          }}>
+          <div
+            className="text-[9px] font-bold tracking-[0.8px] uppercase mt-px transition-colors"
+            style={{ color: portal.color }}
+          >
             {portal.label}
           </div>
         </div>
@@ -168,7 +129,7 @@ export default function ActionBar({ onCreateCall }) {
       {/* ── Admin extras ── */}
       {portal.adminNav && (
         <>
-          <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />
+          <div className="w-px bg-[#1a3050] self-stretch shrink-0" />
           {portal.adminNav.map(item => (
             <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
               onClick={() => go(item.route)} active={isActive(item.route)} />
@@ -177,7 +138,7 @@ export default function ActionBar({ onCreateCall }) {
       )}
 
       {/* ── Call actions (dispatch / field roles) ── */}
-      {(portal.showNewCall || portal.showCalls) && <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />}
+      {(portal.showNewCall || portal.showCalls) && <div className="w-px bg-[#1a3050] self-stretch shrink-0" />}
       {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
       {portal.showCalls && (
         <>
@@ -192,7 +153,7 @@ export default function ActionBar({ onCreateCall }) {
       {/* ── Field-status buttons ── */}
       {portal.showStatus && (
         <>
-          <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />
+          <div className="w-px bg-[#1a3050] self-stretch shrink-0" />
           {STATUS_BTNS.map(s => (
             <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
               status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
@@ -201,15 +162,15 @@ export default function ActionBar({ onCreateCall }) {
       )}
 
       {/* ── Far right: clock + profile + sign out ── */}
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
+      <div className="ml-auto flex items-stretch shrink-0">
         <Clock />
         <ToolBtn Icon={MdAccountCircle} label="Profile"
           onClick={() => go('/profile')} active={isActive('/profile')}
           title="My Profile & Signature"
-          style={{ borderLeft: '1px solid #1a3050' }} />
+          extraClass="border-l border-[#1a3050]" />
         <ToolBtn Icon={MdLogout} label="Sign Out"
           onClick={() => dispatch({ type: 'LOGOUT' })}
-          style={{ borderLeft: '1px solid #1a3050' }} />
+          extraClass="border-l border-[#1a3050]" />
       </div>
     </div>
   );

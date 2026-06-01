@@ -42,16 +42,15 @@ function AdminTab({ item, active, onClick }) {
     <button
       onClick={onClick}
       title={item.label}
+      className={`flex items-center gap-2 h-full px-[15px] whitespace-nowrap cursor-pointer border-none text-[13px] tracking-[0.2px] shrink-0 transition-all duration-[140ms]
+        ${active
+          ? 'font-bold border-b-2'
+          : 'font-medium border-b-2 border-transparent hover:border-b-2'}`}
       style={{
-        display: 'flex', alignItems: 'center', gap: 8, height: '100%',
-        padding: '0 15px', whiteSpace: 'nowrap', cursor: 'pointer',
         background: active ? ADMIN.panel2 : 'transparent',
-        border: 'none',
-        borderBottom: `2px solid ${active ? ADMIN.red : 'transparent'}`,
+        borderBottomColor: active ? ADMIN.red : undefined,
         color: active ? '#fff' : ADMIN.textDim,
-        fontSize: 13, fontWeight: active ? 700 : 500, fontFamily: 'var(--font-ui)',
-        letterSpacing: '0.2px', flexShrink: 0,
-        transition: 'background .14s, color .14s, border-color .14s',
+        fontFamily: 'var(--font-ui)',
       }}
       onMouseEnter={e => { if (!active) { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; } }}
       onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; } }}
@@ -84,40 +83,33 @@ export default function AdminShell() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', height: '100%', background: ADMIN.bg, minWidth: 0 }}>
+    <div className="flex flex-col flex-1 w-full h-full min-w-0" style={{ background: ADMIN.bg }}>
 
       {/* ── Top nav bar ── */}
-      <div style={{
-        display: 'flex', alignItems: 'stretch', height: 56, flexShrink: 0,
-        background: ADMIN.panel, borderBottom: `1px solid ${ADMIN.border}`,
-      }}>
+      <div className="flex items-stretch h-14 shrink-0" style={{ background: ADMIN.panel, borderBottom: `1px solid ${ADMIN.border}` }}>
+
         {/* Brand */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 11, padding: '0 18px', flexShrink: 0,
-          borderRight: `1px solid ${ADMIN.border}`, background: '#000',
-        }}>
+        <div className="flex items-center gap-[11px] px-[18px] shrink-0 bg-black" style={{ borderRight: `1px solid ${ADMIN.border}` }}>
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
-            style={{ width: 26, height: 26, objectFit: 'contain' }} />
-          <div style={{ lineHeight: 1.2, whiteSpace: 'nowrap' }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px' }}>Admin Panel</div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: ADMIN.red }}>{community}</div>
+            className="w-[26px] h-[26px] object-contain" />
+          <div className="leading-[1.2] whitespace-nowrap">
+            <div className="text-[13px] font-extrabold text-white tracking-[-0.2px]">Admin Panel</div>
+            <div className="text-[10px] font-bold tracking-[0.5px] uppercase" style={{ color: ADMIN.red }}>{community}</div>
           </div>
         </div>
 
         {/* Scroll-left affordance */}
         <button onClick={() => scrollBy(-260)} title="Scroll left"
-          style={{ flexShrink: 0, width: 30, background: 'transparent', border: 'none', borderRight: `1px solid ${ADMIN.border}`, color: ADMIN.textMute, cursor: 'pointer' }}>
+          className="shrink-0 w-[30px] bg-transparent border-none cursor-pointer"
+          style={{ borderRight: `1px solid ${ADMIN.border}`, color: ADMIN.textMute }}>
           <MdChevronLeft size={20} />
         </button>
 
         {/* Section tabs (scrollable) */}
-        <div ref={scrollRef} onWheel={onWheel} style={{
-          display: 'flex', alignItems: 'stretch', overflowX: 'auto', flex: 1, minWidth: 0,
-          scrollbarWidth: 'none', msOverflowStyle: 'none',
-        }}>
+        <div ref={scrollRef} className="admin-tabbar flex items-stretch overflow-x-auto flex-1 min-w-0" onWheel={onWheel}>
           {GROUPS.map((group, gi) => (
-            <div key={gi} style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
-              {gi > 0 && <div style={{ width: 1, background: ADMIN.border, margin: '12px 0', flexShrink: 0 }} />}
+            <div key={gi} className="flex items-stretch shrink-0">
+              {gi > 0 && <div className="w-px my-3 shrink-0" style={{ background: ADMIN.border }} />}
               {group.map(item => (
                 <AdminTab key={item.route} item={item} active={isActive(item)} onClick={() => navigate(item.route)} />
               ))}
@@ -127,32 +119,31 @@ export default function AdminShell() {
 
         {/* Scroll-right affordance */}
         <button onClick={() => scrollBy(260)} title="Scroll right"
-          style={{ flexShrink: 0, width: 30, background: 'transparent', border: 'none', borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textMute, cursor: 'pointer' }}>
+          className="shrink-0 w-[30px] bg-transparent border-none cursor-pointer"
+          style={{ borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textMute }}>
           <MdChevronRight size={20} />
         </button>
 
         {/* Right actions */}
-        <div style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0, borderLeft: `1px solid ${ADMIN.border}` }}>
-          <button onClick={() => navigate('/cad')} title="Back to CAD"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', cursor: 'pointer',
-              background: 'transparent', border: 'none', color: ADMIN.textDim,
-              fontSize: 13, fontWeight: 600, fontFamily: 'var(--font-ui)', whiteSpace: 'nowrap',
-              transition: 'background .14s, color .14s',
-            }}
+        <div className="flex items-stretch shrink-0" style={{ borderLeft: `1px solid ${ADMIN.border}` }}>
+          <button
+            onClick={() => navigate('/cad')}
+            title="Back to CAD"
+            className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
+            style={{ color: ADMIN.textDim }}
             onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}>
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}
+          >
             <MdArrowBack size={17} /> Exit to CAD
           </button>
-          <button onClick={() => dispatch({ type: 'LOGOUT' })} title="Sign Out"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', cursor: 'pointer',
-              background: 'transparent', border: 'none', borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textDim,
-              fontSize: 13, fontWeight: 600, fontFamily: 'var(--font-ui)', whiteSpace: 'nowrap',
-              transition: 'background .14s, color .14s',
-            }}
+          <button
+            onClick={() => dispatch({ type: 'LOGOUT' })}
+            title="Sign Out"
+            className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
+            style={{ borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textDim }}
             onMouseEnter={e => { e.currentTarget.style.background = `${ADMIN.red}22`; e.currentTarget.style.color = ADMIN.redHi; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}>
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}
+          >
             <MdLogout size={17} /> Sign Out
           </button>
         </div>

@@ -1,71 +1,96 @@
-/* Shared building blocks for the citizen-facing (Civilian / Business) portals.
-   Spacious, card-based, vibrant — matches the login-page aesthetic. */
+/* Shared building blocks for the citizen-facing (Civilian / Business) portals. */
+
+const ACCENT_HEX = {
+  sky:    '#3a88e8',
+  cyan:   '#44aacc',
+  violet: '#9090cc',
+  green:  '#2fd968',
+  amber:  '#f5a93b',
+  red:    '#ff5454',
+};
+const ACCENT_TEXT = {
+  sky:    'text-sky-400',
+  cyan:   'text-cyan-400',
+  violet: 'text-violet-400',
+  green:  'text-green-400',
+  amber:  'text-amber-400',
+  red:    'text-red-400',
+};
+const ACCENT_BG = {
+  sky:    'bg-sky-500/10',
+  cyan:   'bg-cyan-400/10',
+  violet: 'bg-violet-400/10',
+  green:  'bg-green-400/10',
+  amber:  'bg-amber-400/10',
+  red:    'bg-red-400/10',
+};
+const ACCENT_BORDER = {
+  sky:    'border-sky-500/30',
+  cyan:   'border-cyan-400/30',
+  violet: 'border-violet-400/30',
+  green:  'border-green-400/30',
+  amber:  'border-amber-400/30',
+  red:    'border-red-400/30',
+};
+
+function resolveHex(accent) {
+  return ACCENT_HEX[accent] || accent || '#3a88e8';
+}
 
 export function PortalPage({ children }) {
   return (
-    <div style={{
-      flex: 1, width: '100%', minWidth: 0,
-      height: '100%', overflow: 'auto', boxSizing: 'border-box',
-      padding: '28px 40px', fontFamily: 'var(--font-ui)',
-      background: 'radial-gradient(ellipse at 20% -10%, rgba(40,90,170,0.10) 0%, transparent 55%), var(--n-bg-app)',
-    }}>
+    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-10 py-7 font-ui"
+      style={{ background: 'radial-gradient(ellipse at 20% -10%, rgba(40,90,170,0.10) 0%, transparent 55%), var(--n-bg-app)' }}
+    >
       {children}
     </div>
   );
 }
 
-export function PortalHeader({ icon: Icon, title, subtitle, accent = '#3a88e8', action }) {
+export function PortalHeader({ icon: Icon, title, subtitle, accent = 'sky', action }) {
+  const hex = resolveHex(accent);
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24,
-      paddingBottom: 18, borderBottom: '1px solid rgba(255,255,255,0.08)',
-    }}>
+    <div className="flex items-center gap-4 mb-6 pb-[18px] border-b border-white/[0.08]">
       {Icon && (
-        <div style={{
-          width: 52, height: 52, borderRadius: 12, flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: `${accent}1f`, border: `1px solid ${accent}55`,
-        }}>
-          <Icon size={28} color={accent} />
+        <div
+          className={`w-[52px] h-[52px] rounded-xl shrink-0 flex items-center justify-center ${ACCENT_BG[accent] || ''} ${ACCENT_BORDER[accent] ? `border ${ACCENT_BORDER[accent]}` : ''}`}
+          style={!ACCENT_BG[accent] ? { background: `${hex}1f`, border: `1px solid ${hex}55` } : undefined}
+        >
+          <Icon size={28} color={hex} />
         </div>
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', lineHeight: 1.1 }}>{title}</div>
-        {subtitle && <div style={{ fontSize: 13, color: 'rgba(180,200,230,0.55)', marginTop: 3 }}>{subtitle}</div>}
+      <div className="flex-1 min-w-0">
+        <div className="text-[22px] font-extrabold text-white tracking-[-0.3px] leading-tight">{title}</div>
+        {subtitle && <div className="text-[13px] text-slate-300/55 mt-0.5">{subtitle}</div>}
       </div>
       {action}
     </div>
   );
 }
 
-export function StatCard({ label, value, accent = '#3a88e8', icon: Icon, hint }) {
+export function StatCard({ label, value, accent = 'sky', icon: Icon, hint }) {
+  const hex = resolveHex(accent);
   return (
-    <div className="stat-card-enter" style={{
-      background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 12, padding: '18px 20px', flex: 1, minWidth: 150,
-      display: 'flex', flexDirection: 'column', gap: 6, position: 'relative', overflow: 'hidden',
-      transition: 'border-color var(--t-med), transform var(--t-med) var(--ease-out)',
-    }}>
-      <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.10 }}>
-        {Icon && <Icon size={68} color={accent} />}
+    <div className="stat-card-enter animate-slide-up bg-white/[0.035] border border-white/[0.08] rounded-xl px-5 py-[18px] flex-1 min-w-[150px] flex flex-col gap-1.5 relative overflow-hidden transition-[border-color,transform]">
+      <div className="absolute top-[-10px] right-[-10px] opacity-10">
+        {Icon && <Icon size={68} color={hex} />}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(170,195,225,0.6)' }}>{label}</div>
-      <div style={{ fontSize: 30, fontWeight: 800, color: accent, lineHeight: 1 }}>{value}</div>
-      {hint && <div style={{ fontSize: 11, color: 'rgba(150,175,205,0.5)' }}>{hint}</div>}
+      <div className="text-[11px] font-bold tracking-[0.8px] uppercase text-slate-300/60">{label}</div>
+      <div className="text-[30px] font-extrabold leading-none" style={{ color: hex }}>{value}</div>
+      {hint && <div className="text-[11px] text-slate-300/50">{hint}</div>}
     </div>
   );
 }
 
-export function PortalCard({ children, accent, style = {}, onClick, hover }) {
+export function PortalCard({ children, accent, style = {}, onClick, hover, className = '' }) {
+  const hex = accent ? resolveHex(accent) : null;
   return (
     <div
       onClick={onClick}
-      className={hover ? 'portal-card-hover' : ''}
+      className={`bg-white/[0.035] rounded-xl p-5 ${hover ? 'portal-card-hover cursor-pointer' : ''} ${className}`}
       style={{
-        background: 'rgba(255,255,255,0.035)',
-        border: `1px solid ${accent ? accent + '44' : 'rgba(255,255,255,0.08)'}`,
-        borderRadius: 12, padding: 20,
-        ...(accent ? { borderLeft: `3px solid ${accent}` } : {}),
+        border: `1px solid ${hex ? hex + '44' : 'rgba(255,255,255,0.08)'}`,
+        ...(hex ? { borderLeft: `3px solid ${hex}` } : {}),
         ...style,
       }}
     >
@@ -74,12 +99,13 @@ export function PortalCard({ children, accent, style = {}, onClick, hover }) {
   );
 }
 
-export function SectionTitle({ children, accent = '#3a88e8' }) {
+export function SectionTitle({ children, accent = 'sky' }) {
+  const hex = resolveHex(accent);
   return (
-    <div style={{
-      fontSize: 13, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase',
-      color: accent, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8,
-    }}>
+    <div
+      className="text-[13px] font-bold tracking-[0.6px] uppercase mb-3.5 flex items-center gap-2"
+      style={{ color: hex }}
+    >
       {children}
     </div>
   );
@@ -87,9 +113,9 @@ export function SectionTitle({ children, accent = '#3a88e8' }) {
 
 export function Field({ label, value, mono }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', color: 'rgba(160,185,215,0.5)' }}>{label}</span>
-      <span style={{ fontSize: 14, color: '#dce6f0', fontFamily: mono ? 'var(--font-mono)' : 'var(--font-ui)' }}>{value || '—'}</span>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-slate-300/50">{label}</span>
+      <span className={`text-[14px] text-slate-200 ${mono ? 'font-mono' : ''}`}>{value || '—'}</span>
     </div>
   );
 }

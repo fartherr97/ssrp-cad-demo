@@ -3,7 +3,6 @@ import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu', sans-serif";
 const PR = { 1: '#dc2626', 2: '#ea580c', 3: '#ca8a04', 4: '#16a34a' };
 const UNIT_STATUSES = ['AVAILABLE', 'ENRT', 'ARRVD', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
 const UNIT_COLOR = { AVAILABLE: '#4ade80', ENRT: '#fbbf24', ARRVD: '#c084fc', ONSCENE: '#c084fc', BUSY: '#fb923c', UNAVAILABLE: '#f87171', OFFDUTY: '#374151' };
@@ -69,38 +68,34 @@ export default function DispatchConsole() {
   };
 
   return (
-    <div style={{ height: `calc(100vh - ${isMobile ? 42 : 70}px)`, display: 'flex', flexDirection: 'column', fontFamily: MONO, background: '#080b12', overflow: 'hidden' }}>
+    <div
+      className="flex flex-col font-mono bg-[#080b12] overflow-hidden"
+      style={{ height: `calc(100vh - ${isMobile ? 42 : 70}px)` }}
+    >
 
       {/* ── Header strip ── */}
-      <div style={{
-        background: '#0d1117',
-        borderBottom: '1px solid #141720',
-        padding: '6px 12px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        flexWrap: 'wrap',
-        flexShrink: 0,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
-          <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '11px', letterSpacing: '1px' }}>DISPATCH CONSOLE</span>
+      <div className="bg-[#0d1117] border-b border-[#141720] px-3 py-1.5 flex items-center gap-3 flex-wrap shrink-0">
+        <div className="flex items-center gap-[5px]">
+          <span className="w-[7px] h-[7px] rounded-full bg-green-500 shadow-[0_0_6px_theme(colors.green.500)]" />
+          <span className="text-amber-400 font-bold text-[11px] tracking-[1px]">DISPATCH CONSOLE</span>
         </div>
         <Pipe />
-        <span style={{ color: '#374151', fontSize: '11px' }}>OPER: <span style={{ color: '#9ca3af' }}>{currentUser?.name || '—'}</span></span>
+        <span className="text-[#374151] text-[11px]">OPER: <span className="text-[#9ca3af]">{currentUser?.name || '—'}</span></span>
         <Pipe />
         <StatChip label="CALLS"       value={activeCalls.length} color="#fbbf24" />
         <StatChip label="UNASSIGNED"  value={pending}            color={pending > 0 ? '#f87171' : '#374151'} />
         <StatChip label="ON-DUTY"     value={onDuty.length}      color="#4ade80" />
         <StatChip label="AVAIL"       value={available.length}   color="#93c5fd" />
-        <div style={{ marginLeft: 'auto', color: '#1d4ed8', fontWeight: 700, fontSize: '13px', letterSpacing: '0.5px' }}>{clock}</div>
+        <div className="ml-auto text-blue-700 font-bold text-[13px] tracking-[0.5px]">{clock}</div>
       </div>
 
       {/* Mobile tab bar */}
       {isMobile && (
-        <div style={{ display: 'flex', borderBottom: '1px solid #141720', background: '#0d1117', flexShrink: 0 }}>
+        <div className="flex border-b border-[#141720] bg-[#0d1117] shrink-0">
           {[['calls', 'CALLS'], ['units', 'UNITS'], ['log', 'TX LOG']].map(([v, l]) => (
-            <button key={v} onClick={() => setMobileTab(v)} style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: mobileTab === v ? '2px solid #fbbf24' : '2px solid transparent', color: mobileTab === v ? '#fbbf24' : '#4b5563', padding: '8px 4px', fontSize: '11px', fontWeight: mobileTab === v ? 700 : 500, letterSpacing: '0.5px', cursor: 'pointer', fontFamily: MONO }}>
+            <button key={v} onClick={() => setMobileTab(v)}
+              className={`flex-1 bg-transparent border-none py-2 px-1 text-[11px] tracking-[0.5px] cursor-pointer font-mono
+                ${mobileTab === v ? 'border-b-2 border-amber-400 text-amber-400 font-bold' : 'border-b-2 border-transparent text-[#4b5563] font-medium'}`}>
               {l}
             </button>
           ))}
@@ -108,24 +103,23 @@ export default function DispatchConsole() {
       )}
 
       {/* ── 3-column workspace ── */}
-      <div style={{
-        flex: 1,
-        display: isMobile ? 'flex' : 'grid',
-        ...(isMobile ? { flexDirection: 'column' } : { gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.9fr)' }),
-        gap: '0',
-        minHeight: 0,
-        overflow: 'hidden',
-      }}>
+      <div
+        className="flex-1 min-h-0 overflow-hidden"
+        style={{
+          display: isMobile ? 'flex' : 'grid',
+          ...(isMobile ? { flexDirection: 'column' } : { gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.9fr)' }),
+        }}
+      >
 
         {/* ===== CALL QUEUE ===== */}
-        <div style={{ display: !isMobile || mobileTab === 'calls' ? 'flex' : 'none', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
+        <div className={`${!isMobile || mobileTab === 'calls' ? 'flex' : 'hidden'} flex-col border-r border-[#141720] min-h-0 overflow-hidden`}>
           <ColHead title="CALL QUEUE" count={activeCalls.length}>
             <HdrBtn active={showNew} onClick={() => setShowNew(v => !v)}>
               {showNew ? 'Cancel' : '+ New Call'}
             </HdrBtn>
           </ColHead>
           {showNew && <NewCallForm onClose={() => setShowNew(false)} dispatch={dispatch} />}
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div className="flex-1 overflow-y-auto">
             {activeCalls.length === 0 && <Empty>No active calls.</Empty>}
             {activeCalls.map(call => {
               const sel = call.id === selectedCallId;
@@ -133,31 +127,27 @@ export default function DispatchConsole() {
                 <div
                   key={call.id}
                   onClick={() => setSelectedCallId(sel ? null : call.id)}
+                  className={`px-2.5 py-2 cursor-pointer border-b border-[#141720] hover:bg-[#0d1117] transition-colors`}
                   style={{
-                    padding: '8px 10px',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid #141720',
                     borderLeft: `3px solid ${PR[call.priority] || '#1a1e2c'}`,
                     background: sel ? '#0f172a' : 'transparent',
                   }}
-                  onMouseEnter={e => { if (!sel) e.currentTarget.style.background = '#0d1117'; }}
-                  onMouseLeave={e => { if (!sel) e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                    <span style={{
-                      background: '#0d1117', color: PR[call.priority], border: `1px solid ${PR[call.priority]}44`,
-                      borderRadius: '2px', padding: '0 4px', fontSize: '10px', fontWeight: 700,
-                    }}>P{call.priority}</span>
-                    <span style={{ color: '#4ade80', fontWeight: 700, fontSize: '12px' }}>{call.id}</span>
-                    <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '12px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{call.nature}</span>
-                    <span style={{ color: elapsedColor(call.createdAt, now, call.units.length > 0), fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className="rounded-sm px-1 text-[10px] font-bold bg-[#0d1117]"
+                      style={{ color: PR[call.priority], border: `1px solid ${PR[call.priority]}44` }}
+                    >P{call.priority}</span>
+                    <span className="text-green-400 font-bold text-[12px]">{call.id}</span>
+                    <span className="text-slate-200 font-semibold text-[12px] flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{call.nature}</span>
+                    <span className="font-mono text-[11px] font-bold shrink-0" style={{ color: elapsedColor(call.createdAt, now, call.units.length > 0) }}>
                       {fmtElapsed(call.createdAt, now)}
                     </span>
                     <StatusBadge status={call.status} />
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                    <span style={{ color: '#6b7280', fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{call.location}</span>
-                    <span style={{ color: call.units.length ? '#93c5fd' : '#dc2626', fontSize: '11px', flexShrink: 0, marginLeft: '6px' }}>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[#6b7280] text-[11px] overflow-hidden text-ellipsis whitespace-nowrap">{call.location}</span>
+                    <span className={`text-[11px] shrink-0 ml-1.5 ${call.units.length ? 'text-sky-300' : 'text-red-600'}`}>
                       {call.units.length ? call.units.join(', ') : 'UNASSIGNED'}
                     </span>
                   </div>
@@ -168,15 +158,15 @@ export default function DispatchConsole() {
 
           {/* Selected call control */}
           {selectedCall && (
-            <div style={{ borderTop: '1px solid #141720', padding: '8px 10px', background: '#0d1117', flexShrink: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700 }}>
+            <div className="border-t border-[#141720] px-2.5 py-2 bg-[#0d1117] shrink-0">
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-amber-400 text-[11px] font-bold">
                   CALL {selectedCall.id}
-                  <span style={{ color: elapsedColor(selectedCall.createdAt, now, selectedCall.units.length > 0), marginLeft: '6px' }}>
+                  <span className="ml-1.5 font-mono" style={{ color: elapsedColor(selectedCall.createdAt, now, selectedCall.units.length > 0) }}>
                     {fmtElapsed(selectedCall.createdAt, now)}
                   </span>
                 </span>
-                <div style={{ display: 'flex', gap: '4px' }}>
+                <div className="flex gap-1">
                   <MiniBtn bg="#0f2451" onClick={() => dispatch({ type: 'UPDATE_CALL', payload: { id: selectedCall.id, status: 'ACTIVE' } })}>
                     Set Active
                   </MiniBtn>
@@ -185,16 +175,16 @@ export default function DispatchConsole() {
                   </MiniBtn>
                 </div>
               </div>
-              <div style={{ color: '#4b5563', fontSize: '11px', marginBottom: '5px' }}>{selectedCall.description}</div>
-              <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '4px' }}>Attached Units</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {selectedCall.units.length === 0 && <span style={{ color: '#374151', fontSize: '11px' }}>None — dispatch from units panel</span>}
+              <div className="text-[#4b5563] text-[11px] mb-[5px]">{selectedCall.description}</div>
+              <div className="text-[#374151] text-[10px] tracking-[0.5px] uppercase mb-1">Attached Units</div>
+              <div className="flex flex-wrap gap-1">
+                {selectedCall.units.length === 0 && <span className="text-[#374151] text-[11px]">None — dispatch from units panel</span>}
                 {selectedCall.units.map(u => (
-                  <span key={u} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#0f172a', border: '1px solid #1a1e2c', borderRadius: '2px', padding: '1px 6px', fontSize: '11px', color: '#93c5fd' }}>
+                  <span key={u} className="inline-flex items-center gap-1 bg-[#0f172a] border border-[#1a1e2c] rounded-sm px-1.5 py-px text-[11px] text-sky-300">
                     {u}
                     <button
                       onClick={() => dispatch({ type: 'DETACH_UNIT', payload: { callId: selectedCall.id, unitId: u } })}
-                      style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '12px', padding: 0, lineHeight: 1 }}
+                      className="bg-none border-none text-red-400 cursor-pointer text-[12px] p-0 leading-none"
                     >
                       ×
                     </button>
@@ -206,25 +196,25 @@ export default function DispatchConsole() {
         </div>
 
         {/* ===== UNITS PANEL ===== */}
-        <div style={{ display: !isMobile || mobileTab === 'units' ? 'flex' : 'none', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
+        <div className={`${!isMobile || mobileTab === 'units' ? 'flex' : 'hidden'} flex-col border-r border-[#141720] min-h-0 overflow-hidden`}>
           <ColHead title="UNITS" count={onDuty.length} />
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div className="flex-1 overflow-y-auto">
             {officers.map(o => (
-              <div key={o.id} style={{ padding: '7px 10px', borderBottom: '1px solid #141720', borderLeft: `3px solid ${uc(o.status)}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ color: '#93c5fd', fontWeight: 700, fontSize: '12px' }}>{o.unitId}</span>
-                  <span style={{ color: uc(o.status), fontWeight: 600, fontSize: '12px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
-                  <span style={{ color: '#374151', fontSize: '10px', flexShrink: 0 }}>{o.deptShort}</span>
+              <div key={o.id} className="px-2.5 py-[7px] border-b border-[#141720]" style={{ borderLeft: `3px solid ${uc(o.status)}` }}>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-sky-300 font-bold text-[12px]">{o.unitId}</span>
+                  <span className="font-semibold text-[12px] flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: uc(o.status) }}>{o.name}</span>
+                  <span className="text-[#374151] text-[10px] shrink-0">{o.deptShort}</span>
                   <StatusBadge status={o.status} />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '5px', flexWrap: 'wrap' }}>
-                  <span style={{ color: o.callId ? '#fbbf24' : '#374151', fontSize: '10px', flex: 1, minWidth: 0 }}>
+                <div className="flex items-center gap-1.5 mt-[5px] flex-wrap">
+                  <span className={`text-[10px] flex-1 min-w-0 ${o.callId ? 'text-amber-400' : 'text-[#374151]'}`}>
                     {o.callId ? `On Call: ${o.callId}` : 'Unassigned'}
                   </span>
                   <select
                     value={UNIT_STATUSES.includes(o.status) ? o.status : ''}
                     onChange={e => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: o.unitId, status: e.target.value } })}
-                    style={{ background: '#06070c', border: '1px solid #1a1e2c', borderRadius: '2px', color: '#9ca3af', fontSize: '10px', padding: '1px 4px', fontFamily: MONO }}
+                    className="bg-[#06070c] border border-[#1a1e2c] rounded-sm text-[#9ca3af] text-[10px] px-1 py-px font-mono"
                   >
                     {!UNIT_STATUSES.includes(o.status) && <option value="">{o.status}</option>}
                     {UNIT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -232,12 +222,7 @@ export default function DispatchConsole() {
                   <button
                     disabled={!selectedCall || selectedCall.units.includes(o.unitId)}
                     onClick={() => dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall.id, unitId: o.unitId } })}
-                    style={{
-                      background: '#0f2451', border: '1px solid #1d4ed8', borderRadius: '2px',
-                      color: '#93c5fd', padding: '1px 7px', fontSize: '10px', fontWeight: 600, cursor: 'pointer',
-                      opacity: !selectedCall || selectedCall.units.includes(o.unitId) ? 0.35 : 1,
-                      fontFamily: MONO,
-                    }}
+                    className="bg-[#0f2451] border border-[#1d4ed8] rounded-sm text-sky-300 px-[7px] py-px text-[10px] font-semibold cursor-pointer font-mono disabled:opacity-35"
                   >
                     Dispatch
                   </button>
@@ -248,30 +233,30 @@ export default function DispatchConsole() {
         </div>
 
         {/* ===== TX LOG ===== */}
-        <div style={{ display: !isMobile || mobileTab === 'log' ? 'flex' : 'none', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+        <div className={`${!isMobile || mobileTab === 'log' ? 'flex' : 'hidden'} flex-col min-h-0 overflow-hidden`}>
           <ColHead title="TX LOG" count={dispatchLog.length} />
-          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', background: '#06070c' }}>
+          <div className="flex-1 overflow-y-auto px-2.5 py-2 bg-[#06070c]">
             {dispatchLog.length === 0 && <Empty>No radio traffic.</Empty>}
             {dispatchLog.map(e => (
-              <div key={e.id} style={{ display: 'flex', gap: '6px', padding: '2px 0', fontSize: '11px', lineHeight: 1.5 }}>
-                <span style={{ color: '#1f2937', flexShrink: 0 }}>{e.time}</span>
-                <span style={{ color: LOG_COLOR[e.kind] || '#374151', fontWeight: 700, fontSize: '10px', flexShrink: 0, minWidth: '38px' }}>
+              <div key={e.id} className="flex gap-1.5 py-0.5 text-[11px] leading-[1.5]">
+                <span className="text-[#1f2937] shrink-0">{e.time}</span>
+                <span className="font-bold text-[10px] shrink-0 min-w-[38px]" style={{ color: LOG_COLOR[e.kind] || '#374151' }}>
                   [{LOG_TAG[e.kind] || 'INFO'}]
                 </span>
                 <span style={{ color: e.kind === 'alert' ? '#fca5a5' : '#6b7280' }}>{e.text}</span>
               </div>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid #141720', padding: '6px 8px', display: 'flex', gap: '6px', background: '#0d1117', flexShrink: 0 }}>
-            <span style={{ color: '#4ade80', alignSelf: 'center', fontWeight: 700, flexShrink: 0 }}>›</span>
+          <div className="border-t border-[#141720] px-2 py-1.5 flex gap-1.5 bg-[#0d1117] shrink-0">
+            <span className="text-green-400 self-center font-bold shrink-0">›</span>
             <input
               value={radio}
               onChange={e => setRadio(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') sendRadio(); }}
               placeholder="Broadcast radio traffic…"
-              style={{ flex: 1, background: '#06070c', border: '1px solid #1a1e2c', borderRadius: '2px', color: '#d1d5db', fontFamily: MONO, fontSize: '12px', padding: '4px 7px' }}
+              className="flex-1 bg-[#06070c] border border-[#1a1e2c] rounded-sm text-slate-300 font-mono text-[12px] px-[7px] py-1"
             />
-            <button onClick={sendRadio} style={{ background: '#0f2451', border: '1px solid #1d4ed8', borderRadius: '2px', color: '#93c5fd', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', fontFamily: MONO }}>Send</button>
+            <button onClick={sendRadio} className="bg-[#0f2451] border border-[#1d4ed8] rounded-sm text-sky-300 px-2.5 py-1 text-[11px] font-bold cursor-pointer font-mono">Send</button>
           </div>
         </div>
       </div>
@@ -281,11 +266,13 @@ export default function DispatchConsole() {
 
 /* ── Helper components ── */
 
-function Pipe() { return <span style={{ width: '1px', height: '12px', background: '#1a1e2c', flexShrink: 0 }} />; }
+function Pipe() {
+  return <span className="w-px h-3 bg-[#1a1e2c] shrink-0" />;
+}
 
 function StatChip({ label, value, color }) {
   return (
-    <span style={{ fontSize: '11px', color: '#374151' }}>
+    <span className="text-[11px] text-[#374151]">
       {label} <span style={{ color, fontWeight: 700 }}>{value}</span>
     </span>
   );
@@ -293,13 +280,10 @@ function StatChip({ label, value, color }) {
 
 function ColHead({ title, count, children }) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 10px',
-      background: '#0d1117', borderBottom: '1px solid #141720', flexShrink: 0,
-    }}>
-      <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px' }}>{title}</span>
-      <span style={{ background: 'rgba(0,0,0,0.4)', color: '#93c5fd', border: '1px solid #1d4ed844', borderRadius: '10px', padding: '0 6px', fontSize: '10px', fontWeight: 700 }}>{count}</span>
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>{children}</div>
+    <div className="flex items-center gap-1.5 px-2.5 py-[5px] bg-[#0d1117] border-b border-[#141720] shrink-0">
+      <span className="text-amber-400 text-[11px] font-bold tracking-[0.8px]">{title}</span>
+      <span className="bg-black/40 text-sky-300 border border-[#1d4ed844] rounded-[10px] px-1.5 text-[10px] font-bold">{count}</span>
+      <div className="ml-auto flex gap-1">{children}</div>
     </div>
   );
 }
@@ -308,7 +292,10 @@ function HdrBtn({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      style={{ background: active ? '#450a0a' : '#0f172a', border: `1px solid ${active ? '#dc2626' : '#1a1e2c'}`, borderRadius: '2px', color: active ? '#f87171' : '#6b7280', padding: '2px 8px', fontSize: '10px', fontWeight: 600, cursor: 'pointer', fontFamily: MONO }}
+      className={`rounded-sm px-2 py-px text-[10px] font-semibold cursor-pointer font-mono border
+        ${active
+          ? 'bg-[#450a0a] border-red-600 text-red-400'
+          : 'bg-[#0f172a] border-[#1a1e2c] text-[#6b7280]'}`}
     >
       {children}
     </button>
@@ -317,14 +304,17 @@ function HdrBtn({ active, onClick, children }) {
 
 function MiniBtn({ bg, onClick, children }) {
   return (
-    <button onClick={onClick} style={{ background: bg, border: 'none', borderRadius: '2px', color: '#d1d5db', padding: '2px 8px', fontSize: '10px', fontWeight: 600, cursor: 'pointer', fontFamily: MONO, whiteSpace: 'nowrap' }}>
+    <button onClick={onClick}
+      className="border-none rounded-sm text-slate-300 px-2 py-px text-[10px] font-semibold cursor-pointer font-mono whitespace-nowrap"
+      style={{ background: bg }}
+    >
       {children}
     </button>
   );
 }
 
 function Empty({ children }) {
-  return <div style={{ padding: '14px', textAlign: 'center', color: '#1f2937', fontSize: '12px' }}>{children}</div>;
+  return <div className="p-3.5 text-center text-[#1f2937] text-[12px]">{children}</div>;
 }
 
 function NewCallForm({ onClose, dispatch }) {
@@ -337,40 +327,37 @@ function NewCallForm({ onClose, dispatch }) {
     onClose();
   };
 
-  const inp = {
-    width: '100%', background: '#06070c', border: '1px solid #1a1e2c', borderRadius: '2px',
-    color: '#d1d5db', fontFamily: MONO, fontSize: '11px', padding: '4px 6px',
-  };
-  const lbl = { color: '#374151', fontSize: '9px', letterSpacing: '0.7px', textTransform: 'uppercase', display: 'block', marginBottom: '3px' };
+  const inpCls = "w-full bg-[#06070c] border border-[#1a1e2c] rounded-sm text-slate-300 font-mono text-[11px] px-1.5 py-1";
+  const lblCls = "text-[#374151] text-[9px] tracking-[0.7px] uppercase block mb-[3px]";
 
   return (
-    <div style={{ padding: '8px 10px', borderBottom: '1px solid #141720', background: '#0d1117', flexShrink: 0 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-        <label><span style={lbl}>Nature</span>
-          <select value={form.nature} onChange={e => set('nature', e.target.value)} style={inp}>
+    <div className="px-2.5 py-2 border-b border-[#141720] bg-[#0d1117] shrink-0">
+      <div className="grid grid-cols-2 gap-1.5">
+        <label><span className={lblCls}>Nature</span>
+          <select value={form.nature} onChange={e => set('nature', e.target.value)} className={inpCls}>
             {NATURES.map(n => <option key={n} value={n}>{n}</option>)}
           </select>
         </label>
-        <label><span style={lbl}>Priority</span>
-          <select value={form.priority} onChange={e => set('priority', e.target.value)} style={inp}>
+        <label><span className={lblCls}>Priority</span>
+          <select value={form.priority} onChange={e => set('priority', e.target.value)} className={inpCls}>
             <option value={1}>P1 — Emergency</option><option value={2}>P2 — Urgent</option>
             <option value={3}>P3 — Routine</option><option value={4}>P4 — Non-urgent</option>
           </select>
         </label>
-        <label style={{ gridColumn: '1 / -1' }}><span style={lbl}>Location *</span>
-          <input value={form.location} onChange={e => set('location', e.target.value)} style={inp} placeholder="e.g. 412 Oakwood Ave, Tampa" />
+        <label className="col-span-2"><span className={lblCls}>Location *</span>
+          <input value={form.location} onChange={e => set('location', e.target.value)} className={inpCls} placeholder="e.g. 412 Oakwood Ave, Tampa" />
         </label>
-        <label><span style={lbl}>City</span>
-          <input value={form.city} onChange={e => set('city', e.target.value)} style={inp} />
+        <label><span className={lblCls}>City</span>
+          <input value={form.city} onChange={e => set('city', e.target.value)} className={inpCls} />
         </label>
-        <label><span style={lbl}>Reporting Party</span>
-          <input value={form.reportingParty} onChange={e => set('reportingParty', e.target.value)} style={inp} />
+        <label><span className={lblCls}>Reporting Party</span>
+          <input value={form.reportingParty} onChange={e => set('reportingParty', e.target.value)} className={inpCls} />
         </label>
-        <label style={{ gridColumn: '1 / -1' }}><span style={lbl}>Description</span>
-          <input value={form.description} onChange={e => set('description', e.target.value)} style={inp} placeholder="Brief details..." />
+        <label className="col-span-2"><span className={lblCls}>Description</span>
+          <input value={form.description} onChange={e => set('description', e.target.value)} className={inpCls} placeholder="Brief details..." />
         </label>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', marginTop: '6px' }}>
+      <div className="flex justify-end gap-1 mt-1.5">
         <MiniBtn bg="#1a1e2c" onClick={onClose}>Cancel</MiniBtn>
         <MiniBtn bg="#052e16" onClick={submit}>Create Call</MiniBtn>
       </div>

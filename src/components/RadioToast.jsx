@@ -20,35 +20,18 @@ export default function RadioToast() {
   return (
     <div
       onClick={() => setDismissedId(toast.id)}
-      style={{
-        position: 'fixed', bottom: 80, right: 20, zIndex: 1000,
-        background: 'rgba(4,16,32,0.95)', border: '1px solid rgba(30,100,180,0.4)',
-        borderLeft: '3px solid var(--n-blue-active)', borderRadius: 8,
-        padding: '12px 16px', minWidth: 260, maxWidth: 380,
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-        animation: 'slideInRight 0.15s ease-out',
-        cursor: 'pointer',
-      }}
+      className="fixed bottom-20 right-5 z-[1000] bg-[rgba(4,16,32,0.95)] border border-sky-700/40 border-l-[3px] border-l-sky-500 rounded-lg px-4 py-3 min-w-[260px] max-w-[380px] shadow-[0_4px_24px_rgba(0,0,0,0.4)] animate-slide-in-right cursor-pointer"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-        <span style={{
-          width: 6, height: 6, borderRadius: '50%',
-          background: 'var(--n-blue-active)',
-          boxShadow: '0 0 6px var(--n-blue-active)',
-          flexShrink: 0,
-        }} />
-        <span style={{
-          fontSize: 9, fontWeight: 700, letterSpacing: '0.8px',
-          textTransform: 'uppercase', color: 'var(--n-blue-active)',
-          fontFamily: 'var(--font-mono)',
-        }}>
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shadow-[0_0_6px_theme(colors.sky.500)] shrink-0" />
+        <span className="text-[9px] font-bold tracking-[0.8px] uppercase text-sky-400 font-mono">
           DISPATCH RADIO
         </span>
-        <span style={{ marginLeft: 'auto', color: 'var(--n-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>
+        <span className="ml-auto text-cad-muted text-[10px] font-mono">
           {toast.time}
         </span>
       </div>
-      <div style={{ color: 'var(--n-text)', fontSize: 11.5, lineHeight: 1.5, fontFamily: 'var(--font-mono)' }}>
+      <div className="text-cad-text text-[11.5px] leading-[1.5] font-mono">
         {toast.text}
       </div>
     </div>

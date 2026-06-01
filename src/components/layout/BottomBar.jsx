@@ -20,7 +20,7 @@ export default function BottomBar() {
       <span>UNIT: <span className={S_STATUSBAR_HI}>{me?.unitId || '—'}</span></span>
       <span className={S_STATUSBAR_SEP} />
 
-      <span>CALL: <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: myCall ? 600 : 400 }}>
+      <span>CALL: <span className={myCall ? 'text-amber-400 font-semibold' : 'text-cad-muted'}>
         {myCall ? myCall.id : 'UNASSIGNED'}
       </span></span>
       <span className={S_STATUSBAR_SEP} />
@@ -49,7 +49,7 @@ export default function BottomBar() {
 
       <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>
 
-      <span style={{ marginLeft: 'auto', color: '#1a2e44' }}>
+      <span className="ml-auto text-[#1a2e44]">
         SSRP CAD v3.0 · HILLSBOROUGH CO. ECC
       </span>
     </footer>

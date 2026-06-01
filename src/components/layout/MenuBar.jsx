@@ -15,7 +15,7 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--n-text-data)', letterSpacing: '0.4px', padding: '0 10px', flexShrink: 0 }}>
+    <span className="font-mono text-[11px] font-semibold text-cad-data tracking-[0.4px] px-2.5 shrink-0">
       {time}
     </span>
   );
@@ -41,13 +41,24 @@ const ADMIN_ITEMS = [
   { route: '/builder', label: 'Builder' },
 ];
 
-const STATUS_COLORS = {
-  AVAILABLE:   '#22cc55',
-  BUSY:        '#dd8800',
-  ENRT:        '#ddcc00',
-  ARRVD:       '#aa22dd',
-  UNAVAILABLE: '#aa22dd',
-  OFFDUTY:     '#cc2222',
+/* Map status to a Tailwind dot color class */
+const STATUS_DOT_COLOR = {
+  AVAILABLE:   'bg-green-400',
+  BUSY:        'bg-amber-500',
+  ENRT:        'bg-yellow-400',
+  ARRVD:       'bg-violet-400',
+  UNAVAILABLE: 'bg-violet-400',
+  OFFDUTY:     'bg-red-600',
+};
+
+/* Map status to Tailwind classes for the mobile status button (active state) */
+const STATUS_BTN_ACTIVE = {
+  AVAILABLE:   'border-green-400 bg-green-400/[0.13] text-green-400',
+  BUSY:        'border-amber-500 bg-amber-500/[0.13] text-amber-500',
+  ENRT:        'border-yellow-400 bg-yellow-400/[0.13] text-yellow-400',
+  ARRVD:       'border-violet-400 bg-violet-400/[0.13] text-violet-400',
+  UNAVAILABLE: 'border-violet-400 bg-violet-400/[0.13] text-violet-400',
+  OFFDUTY:     'border-red-500 bg-red-500/[0.13] text-red-500',
 };
 
 export default function MenuBar() {
@@ -75,84 +86,67 @@ export default function MenuBar() {
 
   return (
     <>
-      <div style={{
-        height: 'var(--menubar-h, 36px)', minHeight: 'var(--menubar-h, 36px)',
-        display: 'flex', alignItems: 'center', background: 'var(--n-bg-toolbar)',
-        borderBottom: '1px solid var(--n-border-strong)', flexShrink: 0, userSelect: 'none',
-        padding: 0, gap: 0, overflowX: 'hidden',
-      }}>
+      <div className="h-[var(--menubar-h,36px)] min-h-[var(--menubar-h,36px)] flex items-center bg-app-toolbar border-b border-border-strong shrink-0 select-none p-0 gap-0 overflow-x-hidden">
         {/* Branding */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          padding: '0 12px', height: '100%', borderRight: '1px solid var(--n-border)',
-          background: 'var(--n-bg-card)', flexShrink: 0,
-        }}>
+        <div className="flex items-center gap-[7px] px-3 h-full border-r border-border-base bg-app-card shrink-0">
           <img
             src="https://cdn.ssrp.us/images/ssrp.png"
             alt="SSRP"
-            style={{ width: 22, height: 22, flexShrink: 0, objectFit: 'contain' }}
+            className="w-[22px] h-[22px] shrink-0 object-contain"
           />
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--n-gold)', letterSpacing: '0.4px', lineHeight: 1.2 }}>Sunshine State RP</div>
-            <div style={{ fontSize: 8, color: 'var(--n-text-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', lineHeight: 1.3 }}>CAD · ECC</div>
+            <div className="text-[10px] font-bold text-gold tracking-[0.4px] leading-[1.2]">Sunshine State RP</div>
+            <div className="text-[8px] text-cad-muted tracking-[0.5px] uppercase leading-[1.3]">CAD · ECC</div>
           </div>
         </div>
 
         {/* Desktop navigation */}
-        <nav style={{ display: 'flex', alignItems: 'stretch', height: '100%', flex: 1, overflow: 'hidden' }}>
+        <nav className="flex items-stretch h-full flex-1 overflow-hidden">
           {navItems.map(item => {
             const active = isActive(item.route);
             return (
-            <button
-              key={item.route}
-              onClick={() => go(item.route)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '0 11px',
-                height: '100%', background: active ? 'rgba(47,127,232,0.12)' : 'transparent',
-                border: 'none', borderBottom: `2px solid ${active ? 'var(--acc-blue-hi)' : 'transparent'}`,
-                color: active ? '#c0d8f0' : 'var(--n-text-dim)', cursor: 'pointer', flexShrink: 0,
-                fontSize: 11, fontWeight: active ? 700 : 500, letterSpacing: '0.2px',
-                transition: 'background 0.1s, color 0.1s', whiteSpace: 'nowrap',
-                fontFamily: 'var(--font-ui)',
-              }}
-              onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'var(--n-text)'; } }}
-              onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--n-text-dim)'; } }}
-            >
-              {item.label}
-              {item.route === '/cad' && p1Count > 0 && (
-                <span style={{
-                  marginLeft: 4, padding: '0 3px', fontSize: 7, fontFamily: 'var(--font-mono)',
-                  background: 'var(--pr1-bg)', color: 'var(--pr1-text)',
-                  border: '1px solid var(--pr1-border)', fontWeight: 700, lineHeight: '12px',
-                }}>
-                  {p1Count}
-                </span>
-              )}
-            </button>
-          );
+              <button
+                key={item.route}
+                onClick={() => go(item.route)}
+                className={`flex items-center gap-1 px-[11px] h-full border-none shrink-0 text-[11px] tracking-[0.2px] transition-colors whitespace-nowrap font-ui cursor-pointer
+                  ${active
+                    ? 'bg-app-selected border-b-2 border-sky-600 text-white font-bold'
+                    : 'bg-transparent border-b-2 border-transparent text-cad-dim font-medium hover:bg-white/[0.06] hover:text-cad-text'}`}
+              >
+                {item.label}
+                {item.route === '/cad' && p1Count > 0 && (
+                  <span className="ml-1 px-[3px] text-[7px] font-mono bg-red-950 text-red-400 border border-red-900 font-bold leading-[12px]">
+                    {p1Count}
+                  </span>
+                )}
+              </button>
+            );
           })}
         </nav>
 
         {/* Right: desktop stats + clock, then hamburger (always last) */}
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 0, marginLeft: 'auto', flexShrink: 0 }}>
+        <div className="flex items-stretch gap-0 ml-auto shrink-0">
           {p1Count > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--pr1-text)', animation: 'pulseRed 1.5s ease-in-out infinite', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>
+            <div className="flex items-center px-2.5 text-[9px] font-mono text-red-400 animate-pulse-red border-l border-border-base shrink-0">
               ▲ P1: {p1Count}
             </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>ACTIVE: <span style={{ color: 'var(--n-text-data)', marginLeft: 4 }}>{activeCalls}</span></div>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>ON DUTY: <span style={{ color: 'var(--n-text-data)', marginLeft: 4 }}>{onDuty}</span></div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLORS[myStatus] || '#2e4258', flexShrink: 0 }} />
-            <span style={{ color: 'var(--n-text-dim)' }}>{me?.badge || '—'} · {me?.deptShort || '—'}</span>
+          <div className="flex items-center px-2.5 text-[9px] font-mono text-cad-muted border-l border-border-base shrink-0">
+            ACTIVE: <span className="text-cad-data ml-1">{activeCalls}</span>
+          </div>
+          <div className="flex items-center px-2.5 text-[9px] font-mono text-cad-muted border-l border-border-base shrink-0">
+            ON DUTY: <span className="text-cad-data ml-1">{onDuty}</span>
+          </div>
+          <div className="flex items-center gap-[5px] px-2.5 text-[9px] font-mono text-cad-muted border-l border-border-base shrink-0">
+            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT_COLOR[myStatus] || 'bg-[#2e4258]'}`} />
+            <span className="text-cad-dim">{me?.badge || '—'} · {me?.deptShort || '—'}</span>
           </div>
           <Clock />
           {/* Hamburger — lives here so it's always on the far right */}
           <button
-            className="cad-mobile-toggle"
+            className="cad-mobile-toggle border-l border-border-strong ml-0"
             onClick={() => setMobileOpen(o => !o)}
             aria-label="Open navigation"
-            style={{ borderLeft: '1px solid var(--n-border-strong)', marginLeft: 0 }}
           >
             {mobileOpen ? (
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
@@ -175,10 +169,10 @@ export default function MenuBar() {
 
           {/* Drawer header */}
           <div className="cad-mobile-nav-header">
-            <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ width: 22, height: 22 }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#c8a050', letterSpacing: '0.3px' }}>Sunshine State RP</div>
-              <div style={{ fontSize: 9, color: 'var(--n-text-muted)' }}>
+            <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-[22px] h-[22px]" />
+            <div className="flex-1">
+              <div className="text-[11px] font-bold text-[#c8a050] tracking-[0.3px]">Sunshine State RP</div>
+              <div className="text-[9px] text-cad-muted">
                 {me?.name} · {me?.badge} · {me?.deptShort}
               </div>
             </div>
@@ -186,28 +180,20 @@ export default function MenuBar() {
           </div>
 
           {/* My call indicator */}
-          <div style={{
-            padding: '8px 14px', background: '#040c18',
-            borderBottom: '1px solid var(--n-border-faint)',
-            fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)',
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}>
+          <div className="flex items-center gap-1.5 px-3.5 py-2 bg-[#040c18] border-b border-border-faint text-[11px] font-mono text-cad-muted">
             <span>MY CALL:</span>
-            <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: 700 }}>
+            <span className={`font-bold ${myCall ? 'text-amber-400' : 'text-cad-muted'}`}>
               {myCall ? myCall.id : 'UNASSIGNED'}
             </span>
-            {myCall && <span style={{ color: 'var(--n-text-dim)', fontSize: 10 }}>· {myCall.nature}</span>}
+            {myCall && <span className="text-cad-dim text-[10px]">· {myCall.nature}</span>}
           </div>
 
           {/* Status quick-set */}
-          <div style={{
-            padding: '8px 14px', background: '#040c18',
-            borderBottom: '1px solid var(--n-border)',
-          }}>
-            <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <div className="px-3.5 py-2 bg-[#040c18] border-b border-border-base">
+            <div className="text-[9px] font-mono text-cad-muted mb-1.5 uppercase tracking-[0.5px]">
               Set Status
             </div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+            <div className="flex gap-[5px] flex-wrap">
               {[
                 { status: 'AVAILABLE',   label: 'AVL'   },
                 { status: 'ENRT',        label: 'ENRT'  },
@@ -216,20 +202,15 @@ export default function MenuBar() {
                 { status: 'UNAVAILABLE', label: 'UNAVL' },
                 { status: 'OFFDUTY',     label: 'OFD'   },
               ].map(s => {
-                const isActive = myStatus === s.status;
-                const color = STATUS_COLORS[s.status] || '#556677';
+                const active = myStatus === s.status;
                 return (
                   <button
                     key={s.status}
                     onClick={() => setStatus(s.status)}
-                    style={{
-                      height: 32, padding: '0 12px', fontSize: 10,
-                      fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
-                      border: `1px solid ${isActive ? color : 'var(--n-border)'}`,
-                      borderRadius: 3, cursor: 'pointer',
-                      background: isActive ? `${color}22` : 'var(--n-bg-card)',
-                      color: isActive ? color : 'var(--n-text-muted)',
-                    }}
+                    className={`h-8 px-3 text-[10px] font-mono font-bold tracking-[0.5px] uppercase rounded-[3px] cursor-pointer border transition-colors
+                      ${active
+                        ? STATUS_BTN_ACTIVE[s.status] || 'border-sky-500 bg-sky-500/[0.13] text-sky-400'
+                        : 'border-border-base bg-app-card text-cad-muted'}`}
                   >
                     {s.label}
                   </button>
@@ -241,8 +222,7 @@ export default function MenuBar() {
           {/* Create call (dispatch only) */}
           {isDispatch && (
             <button
-              className="cad-mobile-nav-item"
-              style={{ color: '#80c8f0', borderBottom: '1px solid var(--n-border)', fontWeight: 600 }}
+              className="cad-mobile-nav-item text-sky-300 border-b border-border-base font-semibold"
               onClick={() => go('/cad?new=1')}
             >
               + Create Call
@@ -258,7 +238,7 @@ export default function MenuBar() {
             >
               {item.label}
               {item.route === '/cad' && p1Count > 0 && (
-                <span style={{ marginLeft: 8, padding: '1px 5px', fontSize: 9, background: 'var(--pr1-bg)', color: 'var(--pr1-text)', fontWeight: 700 }}>
+                <span className="ml-2 px-[5px] py-px text-[9px] bg-red-950 text-red-400 font-bold">
                   P1: {p1Count}
                 </span>
               )}
@@ -266,19 +246,14 @@ export default function MenuBar() {
           ))}
 
           {/* Live stats */}
-          <div style={{
-            padding: '8px 14px', background: '#030810',
-            borderTop: '1px solid var(--n-border)',
-            display: 'flex', gap: 16, fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)',
-          }}>
-            <span>ACTIVE: <span style={{ color: 'var(--n-text-data)' }}>{activeCalls}</span></span>
-            <span>ON DUTY: <span style={{ color: '#22cc55' }}>{onDuty}</span></span>
+          <div className="flex gap-4 px-3.5 py-2 bg-[#030810] border-t border-border-base text-[10px] font-mono text-cad-muted">
+            <span>ACTIVE: <span className="text-cad-data">{activeCalls}</span></span>
+            <span>ON DUTY: <span className="text-green-400">{onDuty}</span></span>
           </div>
 
           {/* Sign out */}
           <button
-            className="cad-mobile-nav-item"
-            style={{ color: 'var(--n-text-muted)', background: '#030810' }}
+            className="cad-mobile-nav-item text-cad-muted bg-[#030810]"
             onClick={() => { dispatch({ type: 'LOGOUT' }); setMobileOpen(false); }}
           >
             Sign Out

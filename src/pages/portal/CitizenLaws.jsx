@@ -12,7 +12,8 @@ const TYPE_COLOR = {
 export default function CitizenLaws() {
   const { state } = useCAD();
   const { penalCode, currentUser } = state;
-  const accent = currentUser?.portal === 'business' ? '#44aacc' : '#9090cc';
+  const accent = currentUser?.portal === 'business' ? 'cyan' : 'violet';
+  const accentHex = currentUser?.portal === 'business' ? '#44aacc' : '#9090cc';
 
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
@@ -62,7 +63,7 @@ export default function CitizenLaws() {
               onClick={() => setTypeFilter(t)}
               className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded border cursor-pointer transition-all select-none"
               style={{
-                background: typeFilter === t ? (TYPE_COLOR[t] || accent) : 'rgba(255,255,255,0.05)',
+                background: typeFilter === t ? (TYPE_COLOR[t] || accentHex) : 'rgba(255,255,255,0.05)',
                 color: typeFilter === t ? '#fff' : 'rgba(200,220,240,0.7)',
                 borderColor: typeFilter === t ? 'transparent' : 'rgba(255,255,255,0.12)',
               }}
@@ -85,7 +86,7 @@ export default function CitizenLaws() {
         <div key={category} className="mb-[26px]">
           <div
             className="text-sm font-bold tracking-[0.6px] uppercase mb-3 pb-1.5 border-b border-white/[0.08]"
-            style={{ color: accent }}
+            style={{ color: accentHex }}
           >
             {category}
           </div>
@@ -94,16 +95,16 @@ export default function CitizenLaws() {
               <div
                 key={law.id}
                 className="bg-white/[0.035] border border-white/[0.08] rounded-[10px] px-4 py-3.5"
-                style={{ borderLeft: `3px solid ${TYPE_COLOR[law.type] || accent}` }}
+                style={{ borderLeft: `3px solid ${TYPE_COLOR[law.type] || accentHex}` }}
               >
                 <div className="flex justify-between items-start gap-2.5 mb-2">
                   <div className="text-sm font-bold text-slate-100 leading-tight">{law.name}</div>
                   <span
                     className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap border"
                     style={{
-                      background: `${TYPE_COLOR[law.type] || accent}22`,
-                      color: TYPE_COLOR[law.type] || accent,
-                      borderColor: `${TYPE_COLOR[law.type] || accent}55`,
+                      background: `${TYPE_COLOR[law.type] || accentHex}22`,
+                      color: TYPE_COLOR[law.type] || accentHex,
+                      borderColor: `${TYPE_COLOR[law.type] || accentHex}55`,
                     }}
                   >
                     {law.type}
