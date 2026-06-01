@@ -53,7 +53,7 @@ const CALL_NATURES = [
 
 export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
-  const { calls, officers, currentUser } = state;
+  const { calls, officers, currentUser, selfDispatch } = state;
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -69,6 +69,9 @@ export default function DispatchCenter() {
   const closeCreate = () => setSearchParams({});
 
   const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
+  // Field officers don't need the full unit roster by default * it only appears
+  // for dispatchers/admin, or once a field unit turns on self-dispatch.
+  const showUnits = isDispatch || selfDispatch;
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
   const filteredCalls = callFilter === 'ALL'
@@ -105,9 +108,11 @@ export default function DispatchCenter() {
           CALLS ({sortedCalls.length})
           {p1Count > 0 && <span className="ml-1 text-red-400">▲P1</span>}
         </button>
-        <button className={`mob-tab${mobileTab === 'units' ? ' active' : ''}`} onClick={() => setMobileTab('units')}>
-          UNITS ({onDutyOfficers.length})
-        </button>
+        {showUnits && (
+          <button className={`mob-tab${mobileTab === 'units' ? ' active' : ''}`} onClick={() => setMobileTab('units')}>
+            UNITS ({onDutyOfficers.length})
+          </button>
+        )}
       </div>
 
       {/* CALLS GRID */}
@@ -190,6 +195,7 @@ export default function DispatchCenter() {
       </div>
 
       {/* UNITS GRID */}
+      {showUnits && (
       <div className={`cad-grid-panel units-panel${mobileTab === 'units' ? ' mob-active' : ''}`} style={{ flex: '45 1 0' }}>
         <div className="flex items-center gap-1.5 px-2 py-[2px] bg-app-bg border-b border-border-strong shrink-0 flex-wrap">
           <span className="text-[10px] font-bold font-mono text-yellow-600 tracking-[0.8px] uppercase">■ FIELD UNITS</span>
@@ -256,6 +262,7 @@ export default function DispatchCenter() {
           </table>
         </div>
       </div>
+      )}
 
       {/* Create Call Modal */}
       {showCreateForm && (

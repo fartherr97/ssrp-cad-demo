@@ -194,6 +194,25 @@ function reducer(state, action) {
     }
     case 'MARK_RADIO_SEEN':
       return { ...state, radioSeen: state.radioCount };
+
+    case 'PANIC': {
+      const { unit, name, location, officerId } = action.payload || {};
+      const text = `OFFICER PANIC * ${unit || 'UNIT'}${name ? ` (${name})` : ''} * ${location || 'LOCATION UNKNOWN'} * ALL UNITS RESPOND`;
+      const log = addDispatchLog(state, `[PANIC] ${text}`, 'alert');
+      // Flag the officer so the unit roster can highlight them.
+      const officers = state.officers.map(o => o.id === officerId ? { ...o, panic: true } : o);
+      return {
+        ...state,
+        ...log,
+        officers,
+        radioCount: state.radioCount + 1,
+        lastRadio: { text, time: nowTime(), id: `${Date.now()}`, panic: true },
+      };
+    }
+    case 'CLEAR_PANIC': {
+      const officers = state.officers.map(o => o.id === action.payload ? { ...o, panic: false } : o);
+      return { ...state, officers };
+    }
     case 'SET_MY_CALL':
       return { ...state, myCallId: action.payload };
 

@@ -7,15 +7,41 @@ export default function RadioToast() {
   const [dismissedId, setDismissedId] = useState(null);
 
   const isSender = currentUser?.role === 'dispatch';
-  const toast = lastRadio && lastRadio.id !== dismissedId && currentUser && !isSender ? lastRadio : null;
+  // Panic alerts broadcast to everyone (including dispatch); normal radio
+  // traffic still hides for the dispatcher who sent it.
+  const visible = lastRadio && lastRadio.id !== dismissedId && currentUser &&
+    (lastRadio.panic || !isSender);
+  const toast = visible ? lastRadio : null;
 
   useEffect(() => {
     if (!toast) return undefined;
-    const t = setTimeout(() => setDismissedId(toast.id), 6000);
+    const t = setTimeout(() => setDismissedId(toast.id), toast.panic ? 10000 : 6000);
     return () => clearTimeout(t);
   }, [toast]);
 
   if (!toast) return null;
+
+  if (toast.panic) {
+    return (
+      <div
+        onClick={() => setDismissedId(toast.id)}
+        className="fixed bottom-20 right-5 z-[1000] bg-[rgba(40,4,4,0.97)] border border-red-600/60 border-l-[4px] border-l-red-500 rounded-lg px-4 py-3 min-w-[280px] max-w-[400px] shadow-[0_4px_28px_rgba(220,0,0,0.4)] animate-slide-in-right cursor-pointer animate-pulse-red"
+      >
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_theme(colors.red.500)] shrink-0" />
+          <span className="text-[10px] font-extrabold tracking-[1px] uppercase text-red-400 font-mono">
+            🚨 PANIC ALERT
+          </span>
+          <span className="ml-auto text-red-300/70 text-[10px] font-mono">
+            {toast.time}
+          </span>
+        </div>
+        <div className="text-white text-[12px] font-bold leading-[1.5] font-mono">
+          {toast.text}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
