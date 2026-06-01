@@ -96,7 +96,7 @@ function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
 }
 
 const STATUS_COLORS = {
-  AVAILABLE: '#22ff66', ENRT: '#aaff33', BUSY: '#ff8822',
+  AVAILABLE: '#22ff66', ENRT: '#ffd700', BUSY: '#ff8822',
   ARRVD: '#ffee22', UNAVAILABLE: '#dd44aa', OFFDUTY: '#cc3333',
 };
 
