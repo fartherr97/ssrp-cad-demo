@@ -144,7 +144,11 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
 function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   const [collapsed, setCollapsed] = useState(false);
   const [showAddField, setShowAddField] = useState(false);
+  const fieldTimer = useRef(null);
   const styleObj = SECTION_STYLES.find(s => s.key === section.style) || SECTION_STYLES[0];
+
+  const openFieldMenu  = () => { clearTimeout(fieldTimer.current); setShowAddField(true); };
+  const closeFieldMenu = () => { fieldTimer.current = setTimeout(() => setShowAddField(false), 120); };
 
   const addField = (type) => {
     const newField = { id: uid(), label: '', type, span: 2 };
@@ -217,9 +221,9 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           ))}
 
           {/* Add field */}
-          <div className="relative mt-2">
+          <div className="relative mt-2" onMouseEnter={openFieldMenu} onMouseLeave={closeFieldMenu}>
             <button
-              onClick={() => setShowAddField(o => !o)}
+              onClick={() => (showAddField ? setShowAddField(false) : openFieldMenu())}
               className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-[0.4px] cursor-pointer border-dashed transition-colors"
               style={{ background: 'transparent', border: `1px dashed ${ADMIN.border}`, color: ADMIN.textMute }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = ADMIN.blue; e.currentTarget.style.color = ADMIN.blue; }}
@@ -229,15 +233,15 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
             </button>
             {showAddField && (
               <div className="absolute bottom-full left-0 mb-1 z-[100] p-2 rounded-lg shadow-2xl grid grid-cols-4 gap-1 min-w-[280px]"
-                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}` }}>
+                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}`, animation: 'dropdownFadeIn 0.13s ease-out' }}>
                 {FIELD_TYPES.map(ft => {
                   const Icon = ft.icon;
                   return (
                     <button key={ft.type} onClick={() => addField(ft.type)}
-                      className="flex flex-col items-center gap-1 p-2 rounded-md cursor-pointer border-none text-[10px] font-semibold transition-colors"
-                      style={{ background: ADMIN.panel, color: ADMIN.textDim }}
-                      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = ADMIN.panel; e.currentTarget.style.color = ADMIN.textDim; }}
+                      className="flex flex-col items-center gap-1 p-2 rounded-md cursor-pointer border-none text-[10px] font-semibold"
+                      style={{ background: ADMIN.panel, color: ADMIN.textDim, transition: 'all 0.1s ease-out' }}
+                      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.4)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = ADMIN.panel; e.currentTarget.style.color = ADMIN.textDim; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <Icon size={16} color={ADMIN.blue} />
                       {ft.label}
@@ -258,6 +262,10 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(template)));
   const [showPremade, setShowPremade] = useState(false);
   const premadeRef = useRef(null);
+  const premadeTimer = useRef(null);
+
+  const openPremade  = () => { clearTimeout(premadeTimer.current); setShowPremade(true); };
+  const closePremade = () => { premadeTimer.current = setTimeout(() => setShowPremade(false), 120); };
 
   const up = (patch) => setDraft(d => ({ ...d, ...patch }));
 
@@ -358,19 +366,19 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
           <SonButton onClick={addSection} size="sm">
             <MdAdd size={15} /> Add Custom Section
           </SonButton>
-          <div className="relative" ref={premadeRef}>
-            <SonButton onClick={() => setShowPremade(o => !o)} size="sm">
+          <div className="relative" ref={premadeRef} onMouseEnter={openPremade} onMouseLeave={closePremade}>
+            <SonButton onClick={() => (showPremade ? setShowPremade(false) : openPremade())} size="sm">
               <MdAdd size={15} /> Add Premade Section <MdExpandMore size={14} />
             </SonButton>
             {showPremade && (
-              <div className="absolute top-full left-0 mt-1 z-[100] min-w-[220px] rounded-lg overflow-hidden shadow-2xl"
-                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}` }}>
+              <div className="absolute top-full left-0 mt-1 z-[100] min-w-[220px] rounded-lg p-1 shadow-2xl"
+                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}`, animation: 'dropdownFadeIn 0.13s ease-out' }}>
                 {PREMADE_SECTIONS.map(ps => (
                   <button key={ps.key} onClick={() => addPremade(ps)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-left border-none cursor-pointer text-[12px] transition-colors"
-                    style={{ background: 'transparent', color: ADMIN.text }}
-                    onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left border-none cursor-pointer text-[12px]"
+                    style={{ background: 'transparent', color: ADMIN.text, transition: 'all 0.1s ease-out' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.4)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                   >
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: SECTION_STYLES.find(s => s.key === ps.style)?.color || '#333' }} />
                     {ps.title}

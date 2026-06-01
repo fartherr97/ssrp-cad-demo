@@ -102,7 +102,7 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
       {open && (
         <div
           ref={ref}
-          className="fixed z-[200] bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden py-1"
+          className="fixed z-[200] bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] py-1 px-1"
           style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
           {items.map(item => (
@@ -112,7 +112,7 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
                 navigate(item.route);
                 setOpen(false);
               }}
-              className="w-full flex items-center px-3 py-2 text-left text-[12px] font-medium text-white hover:bg-white/[0.07] transition-colors cursor-pointer border-none bg-transparent"
+              className="w-full flex items-center px-2.5 py-2 rounded text-left text-[12px] font-medium text-white bg-transparent border-none cursor-pointer transition-all duration-100 hover:-translate-y-px hover:bg-white/[0.08] hover:shadow-md hover:shadow-black/40"
             >
               {item.name}
             </button>
