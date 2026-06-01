@@ -47,7 +47,7 @@ export default function RecordTemplates() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
       {/* Mobile: dropdown selector */}
       {isMobile && (
         <div style={{ marginBottom: '12px' }}>
@@ -193,7 +193,7 @@ export default function RecordTemplates() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
           <form onSubmit={handleSave} style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '540px', width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu Mono, monospace' }}>{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
+              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu, sans-serif' }}>{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '16px' }}>X</button>
             </div>
             <div style={{ marginBottom: '12px' }}>
@@ -244,8 +244,8 @@ export default function RecordTemplates() {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
-const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '6px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };
-const greenBtn = { background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
-const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
+const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '6px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };
+const greenBtn = { background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
+const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

@@ -39,7 +39,7 @@ export default function CreateCall() {
 
   if (submitted) {
     return (
-      <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '540px' }}>
+      <div style={{ padding: '32px', fontFamily: 'Ubuntu, sans-serif', maxWidth: '540px' }}>
         <div style={{ background: '#052e16', border: '1px solid #166534', borderLeft: '3px solid #22c55e', padding: '24px' }}>
           <div style={{ color: '#22c55e', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px' }}>CALL CREATED</div>
           <div style={{ color: '#86efac', fontSize: '15px', marginBottom: '20px' }}>Call {createdId} is now in the dispatch queue.</div>
@@ -59,7 +59,7 @@ export default function CreateCall() {
   }
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '700px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu, sans-serif', maxWidth: '700px' }}>
       {/* Header strip */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>CREATE NEW CALL</span>
@@ -83,7 +83,7 @@ export default function CreateCall() {
                     key={p} type="button"
                     onClick={() => set('priority', String(p))}
                     style={{
-                      flex: 1, padding: '8px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700, fontSize: '13px',
+                      flex: 1, padding: '8px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700, fontSize: '13px',
                       background: form.priority === String(p) ? PR_BG[p] : '#090b10',
                       border: `1px solid ${form.priority === String(p) ? PR_COLORS[p] : '#1e2533'}`,
                       color: form.priority === String(p) ? PR_COLORS[p] : '#4b5563',
@@ -135,7 +135,7 @@ export default function CreateCall() {
             </div>
           </div>
 
-          <button type="submit" style={{ background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '11px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '2px' }}>
+          <button type="submit" style={{ background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '11px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '2px' }}>
             CREATE CALL FOR SERVICE
           </button>
         </div>
@@ -144,10 +144,10 @@ export default function CreateCall() {
   );
 }
 
-const inputStyle = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '8px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const inputStyle = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '8px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
 const selectStyle = { ...inputStyle };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '8px 18px', cursor: 'pointer', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
-const ghostBtn = { background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '8px 18px', cursor: 'pointer', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '8px 18px', cursor: 'pointer', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
+const ghostBtn = { background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '8px 18px', cursor: 'pointer', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' };
 
 function Field({ label, children }) {
   return (

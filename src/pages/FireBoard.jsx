@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = 'Ubuntu Mono, monospace';
+const MONO = 'Ubuntu, sans-serif';
 
 // HCFR livery — fire-rescue red.
 const FIRE_RED = '#e5484d';

@@ -4,7 +4,7 @@
 
 /* ============================================================
    Sunshine State RP CAD - base / theme tokens
-   FONT: Ubuntu + Ubuntu Mono (loaded in index.html) - DO NOT CHANGE
+   FONT: Ubuntu (loaded in index.html) - DO NOT CHANGE
    ============================================================ */
 
 :root {
@@ -61,7 +61,7 @@
     inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 
   --font-sans: 'Ubuntu', system-ui, sans-serif;
-  --font-mono: 'Ubuntu Mono', ui-monospace, monospace;
+  --font-mono: 'Ubuntu', system-ui, sans-serif;
 }
 
 *,
@@ -196,7 +196,7 @@ button:disabled {
   filter: none;
 }
 
-/* ── Ubuntu Mono for terminal / NCIC readout sections ── */
+/* ── Ubuntu for terminal / NCIC readout sections ── */
 .terminal,
 .terminal * {
   font-family: var(--font-mono) !important;

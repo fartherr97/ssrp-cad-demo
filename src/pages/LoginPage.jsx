@@ -41,7 +41,7 @@ export default function LoginPage() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151', fontSize: '11px', fontFamily: "'Ubuntu Mono', monospace" }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151', fontSize: '11px', fontFamily: "'Ubuntu', sans-serif" }}>
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }} />
           DISPATCH NET ONLINE
         </div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
                 Secure Sign In
               </span>
             </div>
-            <div style={{ color: '#374151', fontSize: '11px', marginBottom: '24px', fontFamily: "'Ubuntu Mono', monospace" }}>
+            <div style={{ color: '#374151', fontSize: '11px', marginBottom: '24px', fontFamily: "'Ubuntu', sans-serif" }}>
               AUTHORIZED PERSONNEL ONLY
             </div>
 
@@ -145,7 +145,7 @@ export default function LoginPage() {
             </button>
 
             <div style={{ borderTop: '1px solid #1a1e2c', marginTop: '20px', paddingTop: '14px' }}>
-              <div style={{ color: '#1f2937', fontSize: '11px', fontFamily: "'Ubuntu Mono', monospace", lineHeight: 1.7 }}>
+              <div style={{ color: '#1f2937', fontSize: '11px', fontFamily: "'Ubuntu', sans-serif", lineHeight: 1.7 }}>
                 <div>SYSTEM: SSRP CAD v2.4</div>
                 <div>JURISDICTION: HILLSBOROUGH COUNTY, FL</div>
                 <div>ENCRYPTION: TLS 1.3</div>
@@ -165,7 +165,7 @@ export default function LoginPage() {
         alignItems: 'center',
         justifyContent: 'space-between',
         flexShrink: 0,
-        fontFamily: "'Ubuntu Mono', monospace",
+        fontFamily: "'Ubuntu', sans-serif",
       }}>
         <span style={{ color: '#1f2937', fontSize: '10px' }}>Sunshine State Roleplay • Computer Aided Dispatch</span>
         <span style={{ color: '#1f2937', fontSize: '10px' }}>All rights reserved</span>

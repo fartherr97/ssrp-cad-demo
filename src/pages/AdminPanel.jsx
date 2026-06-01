@@ -15,7 +15,7 @@ export default function AdminPanel() {
   const { isMobile } = useResponsive();
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
       {/* Page header */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '2px' }}>ADMIN PANEL</span>
@@ -41,7 +41,7 @@ export default function AdminPanel() {
         {/* Tabs */}
         <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px' }}>
           {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0f172a' : 'transparent', border: tab === t ? '1px solid #fbbf24' : '1px solid transparent', borderBottom: 'none', color: tab === t ? '#fbbf24' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
+            <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0f172a' : 'transparent', border: tab === t ? '1px solid #fbbf24' : '1px solid transparent', borderBottom: 'none', color: tab === t ? '#fbbf24' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>
               {t}
             </button>
           ))}
@@ -159,10 +159,10 @@ export default function AdminPanel() {
                 <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>CAD ACCENT COLOR</label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input type="color" value={accentColor} onChange={e => setAccentColor(e.target.value)} style={{ background: '#090b10', border: '1px solid #1e2533', padding: '4px', width: '50px', height: '34px', cursor: 'pointer' }} />
-                  <span style={{ color: '#9ca3af', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}>{accentColor}</span>
+                  <span style={{ color: '#9ca3af', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' }}>{accentColor}</span>
                 </div>
               </div>
-              <button style={{ background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px', marginTop: '4px' }}>
+              <button style={{ background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px', marginTop: '4px' }}>
                 SAVE SETTINGS
               </button>
             </div>
@@ -185,5 +185,5 @@ function THead({ cols, gold }) {
   );
 }
 
-const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '3px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });
-const inputStyle = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '3px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 });
+const inputStyle = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };

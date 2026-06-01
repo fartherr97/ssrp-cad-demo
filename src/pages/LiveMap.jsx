@@ -38,7 +38,7 @@ export default function LiveMap() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div style={{ padding: '12px', fontFamily: 'Ubuntu Mono, monospace', height: isMobile ? 'calc(100vh - 50px)' : 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '12px', fontFamily: 'Ubuntu, sans-serif', height: isMobile ? 'calc(100vh - 50px)' : 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column' }}>
       {/* Header bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', background: '#0b0d14', border: '1px solid #1e2533', padding: '7px 12px' }}>
         <div style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>LIVE MAP &bull; HILLSBOROUGH COUNTY DISPATCH</div>
@@ -245,7 +245,7 @@ export default function LiveMap() {
 
 function LayerToggle({ active, onClick, label, color }) {
   return (
-    <button onClick={onClick} style={{ background: active ? '#090b10' : 'transparent', border: `1px solid ${active ? color : '#1e2533'}`, color: active ? color : '#374151', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', display: 'flex', alignItems: 'center', gap: '5px' }}>
+    <button onClick={onClick} style={{ background: active ? '#090b10' : 'transparent', border: `1px solid ${active ? color : '#1e2533'}`, color: active ? color : '#374151', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', display: 'flex', alignItems: 'center', gap: '5px' }}>
       <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: active ? color : '#374151' }} />
       {label}
     </button>

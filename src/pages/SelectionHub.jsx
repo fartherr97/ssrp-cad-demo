@@ -117,7 +117,7 @@ export default function SelectionHub() {
       {/* Body */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 20px' }}>
         <div style={{ marginBottom: '28px', textAlign: 'center' }}>
-          <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', fontFamily: "'Ubuntu Mono', monospace" }}>
+          <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', fontFamily: "'Ubuntu', sans-serif" }}>
             Hillsborough County, FL — Integrated CAD/RMS
           </div>
           <div style={{ color: '#e2e8f0', fontSize: '22px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
@@ -139,7 +139,7 @@ export default function SelectionHub() {
 
         <div style={{ marginTop: '28px', display: 'flex', gap: '24px', flexWrap: 'wrap', justifyContent: 'center' }}>
           {['Tampa Police Department', 'Hillsborough County Sheriff\'s Office', 'Florida Highway Patrol', 'Hillsborough County Fire Rescue'].map(d => (
-            <span key={d} style={{ color: '#1e3a5f', fontSize: '11px', fontFamily: "'Ubuntu Mono', monospace" }}>{d}</span>
+            <span key={d} style={{ color: '#1e3a5f', fontSize: '11px', fontFamily: "'Ubuntu', sans-serif" }}>{d}</span>
           ))}
         </div>
       </div>
@@ -155,7 +155,7 @@ export default function SelectionHub() {
         justifyContent: 'center',
         flexShrink: 0,
       }}>
-        <span style={{ color: '#1f2937', fontSize: '10px', fontFamily: "'Ubuntu Mono', monospace" }}>
+        <span style={{ color: '#1f2937', fontSize: '10px', fontFamily: "'Ubuntu', sans-serif" }}>
           Sunshine State Roleplay • Computer Aided Dispatch
         </span>
       </div>
@@ -204,7 +204,7 @@ function ModuleTile({ module, onClick }) {
         <span style={{ display: 'block', color: '#374151', fontSize: '11px', marginTop: '2px' }}>
           {desc}
         </span>
-        <span style={{ display: 'block', color: color + '99', fontSize: '10px', marginTop: '3px', fontFamily: "'Ubuntu Mono', monospace", letterSpacing: '0.5px' }}>
+        <span style={{ display: 'block', color: color + '99', fontSize: '10px', marginTop: '3px', fontFamily: "'Ubuntu', sans-serif", letterSpacing: '0.5px' }}>
           {dept}
         </span>
       </span>

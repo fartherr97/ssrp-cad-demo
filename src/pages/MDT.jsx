@@ -3,7 +3,7 @@ import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
 
-const MONO = "'Ubuntu Mono', monospace";
+const MONO = "'Ubuntu', sans-serif";
 
 const SIDEBAR_ITEMS = ['Messages', 'Radio', 'Alerts', 'State Returns', 'History', 'Saved'];
 
@@ -307,7 +307,7 @@ function TermRow({ label, value, valueColor }) {
 export function CivilianTerminal({ civ }) {
   if (!civ) return null;
   return (
-    <div style={{ background: '#06070c', border: '1px solid #1a1e2c', borderTop: '2px solid #1d4ed8', borderRadius: '3px', padding: '14px', fontFamily: "'Ubuntu Mono', monospace", marginBottom: '14px' }}>
+    <div style={{ background: '#06070c', border: '1px solid #1a1e2c', borderTop: '2px solid #1d4ed8', borderRadius: '3px', padding: '14px', fontFamily: "'Ubuntu', sans-serif", marginBottom: '14px' }}>
       <div style={{ color: '#374151', borderBottom: '1px solid #141720', paddingBottom: '6px', marginBottom: '10px', fontSize: '10px', letterSpacing: '1.5px' }}>
         *** STATE OF FLORIDA — FL DEPT OF LAW ENFORCEMENT — NCIC RETURN ***
       </div>
@@ -343,7 +343,7 @@ export function CivilianTerminal({ civ }) {
 export function VehicleTerminal({ veh, civ }) {
   if (!veh) return null;
   return (
-    <div style={{ background: '#06070c', border: '1px solid #1a1e2c', borderTop: '2px solid #1d4ed8', borderRadius: '3px', padding: '14px', fontFamily: "'Ubuntu Mono', monospace", marginBottom: '14px' }}>
+    <div style={{ background: '#06070c', border: '1px solid #1a1e2c', borderTop: '2px solid #1d4ed8', borderRadius: '3px', padding: '14px', fontFamily: "'Ubuntu', sans-serif", marginBottom: '14px' }}>
       <div style={{ color: '#374151', borderBottom: '1px solid #141720', paddingBottom: '6px', marginBottom: '10px', fontSize: '10px', letterSpacing: '1.5px' }}>
         *** STATE OF FLORIDA — DHSMV — VEHICLE REGISTRATION RETURN ***
       </div>

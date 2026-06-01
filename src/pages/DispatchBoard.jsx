@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu Mono', monospace";
+const MONO = "'Ubuntu', sans-serif";
 
 const PR_COLOR = { 1: '#dc2626', 2: '#ea580c', 3: '#ca8a04', 4: '#16a34a' };
 const PR_BG    = { 1: '#450a0a', 2: '#431407', 3: '#422006', 4: '#052e16' };

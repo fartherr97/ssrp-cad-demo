@@ -42,7 +42,7 @@ export default function Returns() {
   const { isMobile } = useResponsive();
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 260px', gap: '14px', maxWidth: '1100px' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 260px', gap: '14px', maxWidth: '1100px' }}>
       <div>
         {/* Terminal header */}
         <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '7px 14px', color: '#3b82f6', fontSize: '11px', letterSpacing: '2px', fontWeight: 700 }}>
@@ -51,23 +51,23 @@ export default function Returns() {
         <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px', marginBottom: '14px' }}>
           <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
             {[['plate','PLATE QUERY'],['name','NAME / SSN QUERY']].map(([v,l]) => (
-              <button key={v} onClick={() => setType(v)} style={{ background: type === v ? '#0f172a' : 'transparent', border: `1px solid ${type === v ? '#3b82f6' : '#1f2937'}`, color: type === v ? '#3b82f6' : '#4b5563', padding: '5px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px', fontWeight: 600 }}>
+              <button key={v} onClick={() => setType(v)} style={{ background: type === v ? '#0f172a' : 'transparent', border: `1px solid ${type === v ? '#3b82f6' : '#1f2937'}`, color: type === v ? '#3b82f6' : '#4b5563', padding: '5px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px', fontWeight: 600 }}>
                 {l}
               </button>
             ))}
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <div style={{ flex: 1, fontFamily: 'Ubuntu Mono, monospace', color: '#22c55e', fontSize: '14px', background: '#090b10', border: '1px solid #166534', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ flex: 1, fontFamily: 'Ubuntu, sans-serif', color: '#22c55e', fontSize: '14px', background: '#090b10', border: '1px solid #166534', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ color: '#3b82f6' }}>{'>'}</span>
               <input
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && runQuery()}
                 placeholder={type === 'plate' ? 'Enter plate (e.g. ABC-1234)...' : 'Enter name or SSN...'}
-                style={{ background: 'transparent', border: 'none', color: '#22c55e', flex: 1, fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', outline: 'none' }}
+                style={{ background: 'transparent', border: 'none', color: '#22c55e', flex: 1, fontSize: '14px', fontFamily: 'Ubuntu, sans-serif', outline: 'none' }}
               />
             </div>
-            <button onClick={runQuery} style={{ background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '8px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>
+            <button onClick={runQuery} style={{ background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '8px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px' }}>
               SUBMIT
             </button>
           </div>
@@ -80,7 +80,7 @@ export default function Returns() {
         )}
 
         {result && !result.civ && !result.veh && (
-          <div style={{ background: '#090b10', border: '1px solid #991b1b', borderLeft: '3px solid #ef4444', padding: '14px', fontFamily: 'Ubuntu Mono, monospace', color: '#ef4444', fontSize: '14px' }}>
+          <div style={{ background: '#090b10', border: '1px solid #991b1b', borderLeft: '3px solid #ef4444', padding: '14px', fontFamily: 'Ubuntu, sans-serif', color: '#ef4444', fontSize: '14px' }}>
             *** NO RECORDS FOUND FOR QUERY: &quot;{query}&quot; ***<br />
             <span style={{ color: '#374151', fontSize: '11px' }}>Query returned no matching records in state database.</span>
           </div>

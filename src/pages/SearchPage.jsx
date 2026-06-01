@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useResponsive } from '../hooks/useResponsive';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu Mono', monospace";
+const MONO = "'Ubuntu', sans-serif";
 
 const SEARCH_TABS = ['PERSON', 'VEHICLE', 'PHONE', 'INCIDENT'];
 
@@ -16,12 +17,14 @@ export default function SearchPage() {
   const { state } = useCAD();
   const { civilians, vehicles, warrants, criminalHistory } = state;
 
+  const { isMobile } = useResponsive();
   const [searchTab,   setSearchTab]   = useState('PERSON');
   const [query,       setQuery]       = useState('');
   const [results,     setResults]     = useState([]);  // list of civilian matches
   const [selected,    setSelected]    = useState(null); // selected civilian
   const [selectedVeh, setSelectedVeh] = useState(null); // selected vehicle
   const [recordTab,   setRecordTab]   = useState('SUMMARY');
+  const [mobilePanel, setMobilePanel] = useState('search');
 
   const runSearch = () => {
     const q = query.trim().toUpperCase();
@@ -34,6 +37,7 @@ export default function SearchPage() {
       setResults(found);
       setSelected(found[0] || null);
       setSelectedVeh(null);
+      if (isMobile && found.length > 0) setMobilePanel('record');
     } else if (searchTab === 'VEHICLE') {
       const found = vehicles.filter(v => v.plate.toUpperCase().includes(q));
       if (found.length > 0) {
@@ -41,6 +45,7 @@ export default function SearchPage() {
         const owner = civilians.find(c => c.id === found[0].ownerId);
         setSelected(owner || null);
         setResults(owner ? [owner] : []);
+        if (isMobile) setMobilePanel('record');
       } else {
         setResults([]);
         setSelected(null);
@@ -53,6 +58,7 @@ export default function SearchPage() {
     setSelected(civ);
     setSelectedVeh(null);
     setRecordTab('SUMMARY');
+    if (isMobile) setMobilePanel('record');
   };
 
   const civWarrants  = selected ? warrants.filter(w => w.civilianId === selected.id)           : [];
@@ -64,21 +70,37 @@ export default function SearchPage() {
   return (
     <div style={{
       display: 'flex',
-      height: 'calc(100vh - 70px)',
+      flexDirection: isMobile ? 'column' : 'row',
+      height: `calc(100vh - ${isMobile ? 42 : 70}px)`,
       fontFamily: MONO,
       background: '#080b12',
       overflow: 'hidden',
     }}>
 
+      {isMobile && (
+        <div style={{ display: 'flex', borderBottom: '1px solid #141720', background: '#0d1117', flexShrink: 0 }}>
+          {[['search', 'SEARCH'], ['record', 'RECORD'], ['activity', 'ACTIVITY']].map(([v, l]) => (
+            <button key={v} onClick={() => setMobilePanel(v)} style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: mobilePanel === v ? '2px solid #1d4ed8' : '2px solid transparent', color: mobilePanel === v ? '#93c5fd' : '#4b5563', padding: '10px 4px', fontSize: '11px', fontWeight: mobilePanel === v ? 700 : 500, letterSpacing: '0.5px', cursor: 'pointer', fontFamily: MONO }}>
+              {l}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── LEFT: Search panel ── */}
       <div style={{
-        width: '260px',
-        flexShrink: 0,
         background: '#09090f',
-        borderRight: '1px solid #141720',
-        display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        ...(isMobile ? {
+          display: mobilePanel === 'search' ? 'flex' : 'none',
+          flex: 1,
+        } : {
+          display: 'flex',
+          width: '260px',
+          flexShrink: 0,
+          borderRight: '1px solid #141720',
+        }),
       }}>
         {/* Panel header */}
         <div style={{ padding: '8px 10px', borderBottom: '1px solid #141720', background: '#0d1117' }}>
@@ -199,7 +221,7 @@ export default function SearchPage() {
       </div>
 
       {/* ── CENTER: Record workspace ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+      <div style={{ flexDirection: 'column', overflow: 'hidden', minWidth: 0, ...(isMobile ? { display: mobilePanel === 'record' ? 'flex' : 'none', flex: 1 } : { display: 'flex', flex: 1 }) }}>
         {!selected ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px', color: '#1f2937' }}>
             <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1px' }}>RECORDS SEARCH</div>
@@ -286,13 +308,18 @@ export default function SearchPage() {
 
       {/* ── RIGHT: Location + Activity ── */}
       <div style={{
-        width: '320px',
-        flexShrink: 0,
-        borderLeft: '1px solid #141720',
-        display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
         background: '#09090f',
+        ...(isMobile ? {
+          display: mobilePanel === 'activity' ? 'flex' : 'none',
+          flex: 1,
+        } : {
+          display: 'flex',
+          width: '320px',
+          flexShrink: 0,
+          borderLeft: '1px solid #141720',
+        }),
       }}>
         {/* Map placeholder */}
         <PanelHead title="LOCATION" />

@@ -43,7 +43,7 @@ export default function RadioToast() {
         boxShadow: '0 8px 28px rgba(0,0,0,0.7)',
         padding: '8px 10px',
         cursor: 'pointer',
-        fontFamily: "'Ubuntu Mono', monospace",
+        fontFamily: "'Ubuntu', sans-serif",
         animation: 'radioToastIn 0.2s ease-out',
       }}
     >

@@ -16,11 +16,11 @@ export default function BanManagement() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
       {/* Header */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <span style={{ color: '#ef4444', fontSize: '12px', fontWeight: 700, letterSpacing: '2px' }}>BAN MANAGEMENT</span>
-        <button onClick={() => setShowForm(true)} style={{ background: '#450a0a', border: '1px solid #ef4444', color: '#ef4444', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700, marginLeft: 'auto' }}>
+        <button onClick={() => setShowForm(true)} style={{ background: '#450a0a', border: '1px solid #ef4444', color: '#ef4444', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700, marginLeft: 'auto' }}>
           + Issue Ban
         </button>
       </div>
@@ -64,7 +64,7 @@ export default function BanManagement() {
                   <td style={{ padding: '7px 10px' }}><StatusBadge status={ban.status} /></td>
                   <td style={{ padding: '7px 10px' }}>
                     {ban.status === 'Active' && (
-                      <button onClick={() => dispatch({ type: 'UNBAN_USER', payload: ban.id })} style={{ background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
+                      <button onClick={() => dispatch({ type: 'UNBAN_USER', payload: ban.id })} style={{ background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 }}>
                         Unban
                       </button>
                     )}
@@ -84,7 +84,7 @@ export default function BanManagement() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <form onSubmit={handleBan} style={{ background: '#0d1117', border: '1px solid #991b1b', padding: '22px', maxWidth: '480px', width: '90%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu Mono, monospace' }}>ISSUE BAN</span>
+              <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu, sans-serif' }}>ISSUE BAN</span>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '16px' }}>X</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -104,7 +104,7 @@ export default function BanManagement() {
                   {['1 Day','3 Days','7 Days','14 Days','30 Days','90 Days','Permanent'].map(d => <option key={d}>{d}</option>)}
                 </select>
               </div>
-              <button type="submit" style={{ background: '#450a0a', border: '1px solid #ef4444', color: '#ef4444', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px', marginTop: '4px' }}>
+              <button type="submit" style={{ background: '#450a0a', border: '1px solid #ef4444', color: '#ef4444', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px', marginTop: '4px' }}>
                 CONFIRM BAN
               </button>
             </div>
@@ -115,4 +115,4 @@ export default function BanManagement() {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };

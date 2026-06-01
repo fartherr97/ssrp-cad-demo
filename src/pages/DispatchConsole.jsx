@@ -3,7 +3,7 @@ import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu Mono', monospace";
+const MONO = "'Ubuntu', sans-serif";
 const PR = { 1: '#dc2626', 2: '#ea580c', 3: '#ca8a04', 4: '#16a34a' };
 const UNIT_STATUSES = ['AVAILABLE', 'ENRT', 'ARRVD', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
 const UNIT_COLOR = { AVAILABLE: '#4ade80', ENRT: '#fbbf24', ARRVD: '#c084fc', ONSCENE: '#c084fc', BUSY: '#fb923c', UNAVAILABLE: '#f87171', OFFDUTY: '#374151' };
@@ -53,6 +53,7 @@ export default function DispatchConsole() {
   const [selectedCallId, setSelectedCallId] = useState(null);
   const [radio, setRadio] = useState('');
   const [showNew, setShowNew] = useState(false);
+  const [mobileTab, setMobileTab] = useState('calls');
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
   const selectedCall = activeCalls.find(c => c.id === selectedCallId) || null;
@@ -68,7 +69,7 @@ export default function DispatchConsole() {
   };
 
   return (
-    <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', fontFamily: MONO, background: '#080b12', overflow: 'hidden' }}>
+    <div style={{ height: `calc(100vh - ${isMobile ? 42 : 70}px)`, display: 'flex', flexDirection: 'column', fontFamily: MONO, background: '#080b12', overflow: 'hidden' }}>
 
       {/* ── Header strip ── */}
       <div style={{
@@ -95,18 +96,29 @@ export default function DispatchConsole() {
         <div style={{ marginLeft: 'auto', color: '#1d4ed8', fontWeight: 700, fontSize: '13px', letterSpacing: '0.5px' }}>{clock}</div>
       </div>
 
+      {/* Mobile tab bar */}
+      {isMobile && (
+        <div style={{ display: 'flex', borderBottom: '1px solid #141720', background: '#0d1117', flexShrink: 0 }}>
+          {[['calls', 'CALLS'], ['units', 'UNITS'], ['log', 'TX LOG']].map(([v, l]) => (
+            <button key={v} onClick={() => setMobileTab(v)} style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: mobileTab === v ? '2px solid #fbbf24' : '2px solid transparent', color: mobileTab === v ? '#fbbf24' : '#4b5563', padding: '8px 4px', fontSize: '11px', fontWeight: mobileTab === v ? 700 : 500, letterSpacing: '0.5px', cursor: 'pointer', fontFamily: MONO }}>
+              {l}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── 3-column workspace ── */}
       <div style={{
         flex: 1,
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.9fr)',
+        display: isMobile ? 'flex' : 'grid',
+        ...(isMobile ? { flexDirection: 'column' } : { gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.9fr)' }),
         gap: '0',
         minHeight: 0,
         overflow: 'hidden',
       }}>
 
         {/* ===== CALL QUEUE ===== */}
-        <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ display: !isMobile || mobileTab === 'calls' ? 'flex' : 'none', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
           <ColHead title="CALL QUEUE" count={activeCalls.length}>
             <HdrBtn active={showNew} onClick={() => setShowNew(v => !v)}>
               {showNew ? 'Cancel' : '+ New Call'}
@@ -194,7 +206,7 @@ export default function DispatchConsole() {
         </div>
 
         {/* ===== UNITS PANEL ===== */}
-        <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ display: !isMobile || mobileTab === 'units' ? 'flex' : 'none', flexDirection: 'column', borderRight: '1px solid #141720', minHeight: 0, overflow: 'hidden' }}>
           <ColHead title="UNITS" count={onDuty.length} />
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {officers.map(o => (
@@ -236,7 +248,7 @@ export default function DispatchConsole() {
         </div>
 
         {/* ===== TX LOG ===== */}
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ display: !isMobile || mobileTab === 'log' ? 'flex' : 'none', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
           <ColHead title="TX LOG" count={dispatchLog.length} />
           <div className="terminal" style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', background: '#06070c' }}>
             {dispatchLog.length === 0 && <Empty>No radio traffic.</Empty>}

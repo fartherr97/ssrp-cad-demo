@@ -16,7 +16,7 @@ export default function OfficerProfile() {
   const { isMobile } = useResponsive();
 
   if (!myOfficer) return (
-    <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', color: '#4b5563', textAlign: 'center' }}>
+    <div style={{ padding: '32px', fontFamily: 'Ubuntu, sans-serif', color: '#4b5563', textAlign: 'center' }}>
       No officer profile found for current session.
     </div>
   );
@@ -31,7 +31,7 @@ export default function OfficerProfile() {
   const accentColor = myDept?.color || '#3b82f6';
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '900px' }}>
+    <div style={{ padding: '16px', fontFamily: 'Ubuntu, sans-serif', maxWidth: '900px' }}>
       {/* Profile header */}
       <div style={{ background: '#0d1117', border: `1px solid ${accentColor}40`, borderLeft: `3px solid ${accentColor}`, padding: '16px 20px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -72,7 +72,7 @@ export default function OfficerProfile() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px' }}>
         {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0f172a' : 'transparent', border: tab === k ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: tab === k ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '0.5px' }}>
+          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0f172a' : 'transparent', border: tab === k ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: tab === k ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '0.5px' }}>
             {l}
           </button>
         ))}
@@ -212,6 +212,6 @@ function TD({ children, blue, muted, small }) {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 };
-const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 };
+const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = "'Ubuntu Mono', monospace";
+const MONO = "'Ubuntu', sans-serif";
 const TABS = ['Criminal History', 'Warrants', 'Tow/Impound', 'Field Contacts', 'Custom Records'];
 
 const inp = {

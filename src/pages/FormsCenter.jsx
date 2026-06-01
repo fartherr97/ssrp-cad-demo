@@ -31,7 +31,7 @@ export default function FormsCenter() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
       {/* Header */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px' }}>
         <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>REPORT CENTER</span>
@@ -171,11 +171,11 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
     <div>
       {/* CAD-UI toolbar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
-        <button onClick={onBack} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Back</button>
-        <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
+        <button onClick={onBack} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>Back</button>
+        <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '12px', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
           {!isMobile && (
-            <button onClick={() => window.print()} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#60a5fa', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Print</button>
+            <button onClick={() => window.print()} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#60a5fa', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>Print</button>
           )}
           <button form="docform" type="submit" style={{ background: '#0f2548', border: '2px solid #1a1a2e', color: '#ffffff', padding: '5px 18px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: DOC_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
             SUBMIT REPORT
@@ -526,7 +526,7 @@ function TabBar({ tabs, active, setActive }) {
   return (
     <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937' }}>
       {tabs.map(t => (
-        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0f172a' : 'transparent', border: active === t ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: active === t ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
+        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0f172a' : 'transparent', border: active === t ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: active === t ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>
           {labels[t] || t}
         </button>
       ))}
@@ -557,7 +557,7 @@ function Modal({ title, onClose, children }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '540px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}>{title}</span>
+          <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' }}>{title}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '18px' }}>X</button>
         </div>
         {children}
@@ -566,7 +566,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
-const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '4px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });
-const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
+const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '4px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 });
+const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

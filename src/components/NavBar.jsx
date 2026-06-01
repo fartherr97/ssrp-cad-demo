@@ -284,7 +284,7 @@ export default function NavBar() {
             </>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #1a1e2c', fontFamily: "'Ubuntu Mono', monospace" }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #1a1e2c', fontFamily: "'Ubuntu', sans-serif" }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
             <span style={{ color: '#1d4ed8', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>{clock}</span>
             <span style={{ color: '#374151', fontSize: '11px', marginLeft: 'auto' }}>Dispatch Net Online</span>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useResponsive } from '../hooks/useResponsive';
 
 function useClock() {
   const [now, setNow] = useState(() => new Date());
@@ -26,6 +27,8 @@ export default function Footer() {
   const { state, dispatch } = useCAD();
   const { currentUser, officers } = state;
   const { time, date } = useClock();
+  const { isMobile } = useResponsive();
+  if (isMobile) return null;
   const go = page => dispatch({ type: 'SET_PAGE', payload: page });
 
   const myOfficer = officers.find(o => o.id === currentUser?.id);
@@ -45,7 +48,7 @@ export default function Footer() {
       display: 'flex',
       alignItems: 'stretch',
       zIndex: 900,
-      fontFamily: "'Ubuntu Mono', monospace",
+      fontFamily: "'Ubuntu', sans-serif",
       overflow: 'hidden',
     }}>
       {/* Left: action buttons */}

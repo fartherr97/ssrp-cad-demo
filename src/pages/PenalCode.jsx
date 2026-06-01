@@ -48,7 +48,7 @@ export default function PenalCode() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
       {/* Header */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>PENAL CODE EDITOR</span>
@@ -66,7 +66,7 @@ export default function PenalCode() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search charges..." style={{ ...inputBase, width: '200px' }} />
           <div style={{ display: 'flex', gap: '4px' }}>
             {['ALL','Felony','Misdemeanor','Infraction'].map(t => (
-              <button key={t} onClick={() => setFilterType(t)} style={{ background: filterType === t ? TYPE_BG[t] || '#0f172a' : 'transparent', border: `1px solid ${filterType === t ? TYPE_COLORS[t] || '#3b82f6' : '#1f2937'}`, color: filterType === t ? TYPE_COLORS[t] || '#3b82f6' : '#4b5563', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
+              <button key={t} onClick={() => setFilterType(t)} style={{ background: filterType === t ? TYPE_BG[t] || '#0f172a' : 'transparent', border: `1px solid ${filterType === t ? TYPE_COLORS[t] || '#3b82f6' : '#1f2937'}`, color: filterType === t ? TYPE_COLORS[t] || '#3b82f6' : '#4b5563', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 }}>
                 {t}
               </button>
             ))}
@@ -162,6 +162,6 @@ export default function PenalCode() {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
-const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '3px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
+const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '3px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 });
