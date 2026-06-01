@@ -122,7 +122,7 @@ export default function DispatchCenter() {
           </div>
           <div className="cad-grid-actions">
             {isDispatch && (
-              <button className="cad-action-btn btn-create" style={{ height:18, fontSize:10 }} onClick={() => setSearchParams({ new:'1' })}>
+              <button className="cad-action-btn btn-create" onClick={() => setSearchParams({ new:'1' })}>
                 + NEW CALL
               </button>
             )}

@@ -103,12 +103,9 @@ export default function IncidentDetail() {
         flexShrink:0, minHeight:52,
       }}>
         <button
+          className="n-btn n-btn-secondary"
           onClick={() => navigate('/cad')}
-          style={{
-            background:'transparent', border:'1px solid #1a3050', color:'#6090b0',
-            padding:'4px 12px', fontSize:11, fontFamily:'var(--font-mono)',
-            cursor:'pointer', display:'flex', alignItems:'center', gap:6, flexShrink:0,
-          }}
+          style={{ flexShrink:0 }}
         >
           ← CAD
         </button>
@@ -132,12 +129,9 @@ export default function IncidentDetail() {
 
         {isDispatch && (
           <button
+            className="n-btn n-btn-danger"
             onClick={closeCall}
-            style={{
-              background:'#1a0000', border:'1px solid #440000', color:'#ff4444',
-              padding:'6px 16px', fontSize:11, fontFamily:'var(--font-mono)',
-              fontWeight:700, cursor:'pointer', flexShrink:0,
-            }}
+            style={{ flexShrink:0 }}
           >
             CLOSE CALL
           </button>
