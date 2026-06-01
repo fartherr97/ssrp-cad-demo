@@ -76,7 +76,7 @@ export default function RecordsBureau() {
           <div className="px-2 py-1.5 border-b border-border-base flex gap-1 shrink-0">
             {SEARCH_TYPES.map(t => (
               <button key={t}
-                className={`${xs(searchType === t ? S_BTN_PRIMARY : S_BTN_SECONDARY)} flex-1`}
+                className={`${xs(searchType === t ? S_BTN_PRIMARY : S_BTN_SECONDARY)} flex-1 justify-center`}
                 onClick={() => { setSearchType(t); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}>
                 {t}
               </button>
