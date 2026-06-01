@@ -91,9 +91,9 @@ export default function AdminShell() {
           </div>
         </div>
 
-        {/* Scroll-left affordance */}
+        {/* Scroll-left affordance (desktop only) */}
         <button onClick={() => scrollBy(-260)} title="Scroll left"
-          className="shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
+          className="hidden md:block shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
           <MdChevronLeft size={20} className="mx-auto" />
         </button>
 
@@ -109,9 +109,9 @@ export default function AdminShell() {
           ))}
         </nav>
 
-        {/* Scroll-right affordance */}
+        {/* Scroll-right affordance (desktop only) */}
         <button onClick={() => scrollBy(260)} title="Scroll right"
-          className="shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
+          className="hidden md:block shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
           <MdChevronRight size={20} className="mx-auto" />
         </button>
 
@@ -120,16 +120,16 @@ export default function AdminShell() {
           <button
             onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
             title="Exit to Home * choose another portal"
-            className="flex items-center gap-2 my-2 px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 transition-all duration-[140ms]"
+            className="flex items-center gap-2 my-2 px-3 lg:px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 transition-all duration-[140ms]"
           >
-            <MdHome size={17} /> Exit to Home
+            <MdHome size={17} /> <span className="hidden lg:inline">Exit to Home</span>
           </button>
           <button
             onClick={() => dispatch({ type: 'LOGOUT' })}
             title="Sign Out"
-            className="flex items-center gap-2 my-2 px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-[140ms]"
+            className="flex items-center gap-2 my-2 px-3 lg:px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-[140ms]"
           >
-            <MdLogout size={17} /> Sign Out
+            <MdLogout size={17} /> <span className="hidden lg:inline">Sign Out</span>
           </button>
         </div>
       </div>

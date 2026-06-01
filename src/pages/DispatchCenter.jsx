@@ -113,7 +113,6 @@ export default function DispatchCenter() {
   const [priFilter, setPriFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [unitFilter, setUnitFilter] = useState('ALL');
-  const [mobileTab, setMobileTab] = useState('calls');
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -166,22 +165,10 @@ export default function DispatchCenter() {
   // ════════════════════════════════════════════
   return (
     <div className="flex-1 overflow-auto p-4 lg:p-5">
-      {/* Mobile tab switcher */}
-      <div className="mob-tab-bar rounded-lg overflow-hidden border border-border-base mb-3">
-        <button className={`mob-tab${mobileTab === 'calls' ? ' active' : ''}`} onClick={() => setMobileTab('calls')}>
-          CALLS ({sortedCalls.length}){p1Count > 0 && <span className="ml-1 text-red-400">▲P1</span>}
-        </button>
-        {showUnits && (
-          <button className={`mob-tab${mobileTab === 'units' ? ' active' : ''}`} onClick={() => setMobileTab('units')}>
-            UNITS ({onDutyOfficers.length})
-          </button>
-        )}
-      </div>
-
       <div className="grid gap-4 lg:gap-5 grid-cols-1 xl:grid-cols-[clamp(220px,17vw,260px)_minmax(0,1fr)_clamp(280px,21vw,340px)]">
 
         {/* ─────────── LEFT RAIL ─────────── */}
-        <aside className="hidden xl:flex flex-col gap-4">
+        <aside className="flex flex-col gap-4 order-2 xl:order-none">
           {/* Quick actions */}
           <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
             <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5 px-1">Quick Actions</div>
@@ -252,11 +239,10 @@ export default function DispatchCenter() {
         </aside>
 
         {/* ─────────── CENTER ─────────── */}
-        <div className="flex flex-col gap-4 lg:gap-5 min-w-0">
+        <div className="flex flex-col gap-4 lg:gap-5 min-w-0 order-1 xl:order-none">
           {/* Active calls */}
           <SectionCard title="Active Calls" count={sortedCalls.length}
-            action="View All" onAction={() => navigate('/board')}
-            className={mobileTab === 'calls' ? '' : 'max-md:hidden'}>
+            action="View All" onAction={() => navigate('/board')}>
             <div className="overflow-auto max-h-[min(46vh,520px)]">
               <table className="w-full border-collapse">
                 <thead>
@@ -298,8 +284,7 @@ export default function DispatchCenter() {
           {/* Field units */}
           {showUnits && (
             <SectionCard title="Field Units" count={onDutyOfficers.length}
-              action="View All" onAction={() => navigate('/units')}
-              className={mobileTab === 'units' ? '' : 'max-md:hidden'}>
+              action="View All" onAction={() => navigate('/units')}>
               <div className="overflow-auto max-h-[min(40vh,460px)]">
                 <table className="w-full border-collapse">
                   <thead>
@@ -337,7 +322,7 @@ export default function DispatchCenter() {
         </div>
 
         {/* ─────────── RIGHT RAIL ─────────── */}
-        <aside className="hidden xl:flex flex-col gap-4">
+        <aside className="flex flex-col gap-4 order-3 xl:order-none">
           {/* Status overview */}
           <div className="flex flex-col gap-3 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
             <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">Status Overview</div>

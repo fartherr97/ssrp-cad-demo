@@ -253,9 +253,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 @media (max-width: 768px) {
   .cad-shell { position: relative; }
 
-  /* Hide action bar; show mobile toggle */
-  .cad-actionbar    { display: none; }
-  .cad-mobile-toggle { display: flex; }
+  /* Action bar stays visible — it reflows to brand + hamburger + user chip
+     (handled responsively inside the ActionBar component). */
 
   /* Dispatch layout becomes column */
   .cad-dispatch { flex-direction: column; }

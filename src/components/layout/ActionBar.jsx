@@ -8,6 +8,7 @@ import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
+  MdMenu, MdClose,
 } from 'react-icons/md';
 
 /* ─── Clock (date over time) ─── */
@@ -235,6 +236,7 @@ export default function ActionBar() {
   const { currentUser, officers, reportTemplates, recordTemplates } = state;
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
   const me       = officers.find(o => o.id === currentUser?.id);
@@ -242,6 +244,9 @@ export default function ActionBar() {
 
   const go       = (route) => navigate(route);
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
+
+  // Close the mobile drawer whenever the route changes
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const dropdownItems = (kind) => {
     if (kind === 'reports') {
@@ -263,17 +268,17 @@ export default function ActionBar() {
     <div className="cad-actionbar flex items-center gap-1 px-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
 
       {/* ── Brand ── */}
-      <div className="flex items-center gap-2.5 pr-4 mr-1 border-r border-border-base shrink-0 select-none">
+      <div className="flex items-center gap-2.5 pr-3 lg:pr-4 mr-1 lg:border-r border-border-base shrink-0 select-none">
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
-          className="w-9 h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
+          className="w-8 h-8 lg:w-9 lg:h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
         <div className="leading-[1.15] whitespace-nowrap">
-          <div className="text-[15px] font-extrabold tracking-[-0.3px] text-white">SSRP CAD</div>
+          <div className="text-[14px] lg:text-[15px] font-extrabold tracking-[-0.3px] text-white">SSRP CAD</div>
           <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Sunshine State RP</div>
         </div>
       </div>
 
-      {/* ── Portal nav ── */}
-      <nav className="flex items-center gap-0.5 overflow-x-auto n-tabs-wrap">
+      {/* ── Desktop portal nav ── */}
+      <nav className="hidden lg:flex items-center gap-0.5 overflow-x-auto n-tabs-wrap">
         {navItems.map(item =>
           item.dropdown ? (
             <DropdownNav key={item.route} Icon={item.Icon} label={item.label}
@@ -286,13 +291,44 @@ export default function ActionBar() {
         )}
       </nav>
 
-      {/* ── Far right: clock + user ── */}
+      {/* ── Far right: clock + user + mobile menu ── */}
       <div className="ml-auto flex items-center shrink-0 pl-2">
-        <Clock />
-        <div className="w-px h-8 bg-border-base mx-1" />
+        <div className="hidden md:flex"><Clock /></div>
+        <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
+        {/* Hamburger (mobile/tablet) */}
+        <button onClick={() => setMobileOpen(o => !o)}
+          className="lg:hidden flex items-center justify-center w-10 h-10 ml-1 rounded-lg text-slate-300 hover:bg-white/[0.06] cursor-pointer transition-colors"
+          aria-label="Menu">
+          {mobileOpen ? <MdClose size={22} /> : <MdMenu size={22} />}
+        </button>
       </div>
+
+      {/* ── Mobile nav drawer ── */}
+      {mobileOpen && createPortal(
+        <div className="lg:hidden fixed inset-0 z-[2500]">
+          <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div
+            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 p-2.5 max-h-[78vh] overflow-auto"
+            style={{ top: 'var(--actionbar-h)', animation: 'expandDown 0.16s ease-out' }}
+          >
+            <div className="px-1.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.7px] text-slate-600">Navigation</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {navItems.map(item => {
+                const on = isActive(item.route);
+                return (
+                  <button key={item.route} onClick={() => go(item.route)}
+                    className={`flex items-center gap-2.5 px-3 py-3 rounded-lg text-[13px] font-semibold cursor-pointer transition-all border ${on ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-white/[0.03] border-border-base text-slate-300 hover:bg-white/[0.06]'}`}>
+                    <item.Icon size={19} className="shrink-0" /> {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
