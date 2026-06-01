@@ -131,11 +131,15 @@ export default function ActionBar({ onCreateCall }) {
       }}>
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           style={{ width: 28, height: 28, flexShrink: 0, objectFit: 'contain' }} />
-        <div style={{ lineHeight: 1.15, whiteSpace: 'nowrap' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010' }}>Sunshine State RP</div>
+        <div style={{ lineHeight: 1.25, whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-0.2px' }}>
+            <span style={{ color: '#ffffff' }}>Sunshine State </span>
+            <span style={{ color: '#f2800d' }}>RP</span>
+          </div>
           <div style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
-            color: portal.color,
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase',
+            color: portal.color, marginTop: 1,
+            transition: 'color 0.2s',
           }}>
             {portal.label}
           </div>
