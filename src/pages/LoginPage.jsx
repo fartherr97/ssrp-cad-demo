@@ -113,16 +113,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Center label */}
-        <div style={{
-          marginLeft: 24, paddingLeft: 24,
-          borderLeft: '1px solid rgba(255,255,255,0.1)',
-          fontSize: 13, color: 'rgba(180,210,240,0.5)',
-          letterSpacing: '0.3px',
-        }}>
-          NEXUS CAD v2.0 · Hillsborough County ECC
-        </div>
-
         {/* Right — status dots */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 20 }}>
           {[
