@@ -283,10 +283,10 @@ export default function ActionBar() {
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           className="w-8 h-8 lg:w-9 lg:h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
         <div className="leading-[1.15] whitespace-nowrap">
-          <div className="text-[13px] lg:text-[14px] font-extrabold tracking-[-0.2px] text-white">Computer Aided Dispatch</div>
-          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">
+          <div className="text-[15px] lg:text-[16px] font-extrabold tracking-[-0.3px] text-white">
             Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
           </div>
+          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Computer Aided Dispatch</div>
         </div>
       </div>
 

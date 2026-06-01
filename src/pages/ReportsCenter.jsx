@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
-import { FormDocWrap, ReportDocument } from '../components/FormDocument';
+import ReportForm from '../components/ReportForm';
 import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
@@ -219,10 +219,9 @@ export default function ReportsCenter() {
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
-            <FormDocWrap meta={draftMeta}>
-              <div data-doc-top />
-              <ReportDocument type={tpl.name} template={tpl} data={formValues} editable onChange={handleFormChange} meta={draftMeta} />
-            </FormDocWrap>
+            <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
+              <ReportForm template={tpl} data={formValues} onChange={handleFormChange} />
+            </div>
           </main>
 
           {/* RIGHT: related records */}
@@ -342,7 +341,7 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col overflow-hidden bg-[#2e2e32]">
+      <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col overflow-hidden bg-app-bg/20">
 
         {/* ── Viewing a submitted report ── */}
         {showReport && (
@@ -377,19 +376,16 @@ export default function ReportsCenter() {
                 </div>
               )}
             </div>
-            <div className="flex-1 overflow-auto p-4 px-5">
-              <FormDocWrap meta={{
-                caseNumber: selReport.caseNumber,
-                status: selReport.status,
-              }}>
-                <ReportDocument
-                  type={selReport.type}
-                  template={reportTemplates.find(t => t.name === selReport.type)}
-                  data={selReport.formData || { f10: selReport.summary, f4: selReport.summary, f8: selReport.summary }}
-                  editable={false}
-                  meta={{ caseNumber: selReport.caseNumber, status: selReport.status }}
-                />
-              </FormDocWrap>
+            <div className="flex-1 overflow-auto p-4 lg:p-6 bg-app-bg/30">
+              {(() => {
+                const t = reportTemplates.find(t => t.name === selReport.type);
+                if (t && selReport.formData) return <ReportForm template={t} data={selReport.formData} readOnly />;
+                return (
+                  <div className="max-w-[1100px] mx-auto bg-app-card/70 border border-border-base rounded-xl p-4 text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed">
+                    {selReport.summary || 'No details on file.'}
+                  </div>
+                );
+              })()}
             </div>
           </>
         )}
