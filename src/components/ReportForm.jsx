@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 
@@ -216,9 +216,163 @@ function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) 
   );
 }
 
+/* ── Charge type badge colours ── */
+const CHARGE_TYPE_STYLE = {
+  Felony:     { bg: 'rgba(239,68,68,0.15)',   color: '#f87171', border: 'rgba(239,68,68,0.35)' },
+  Misdemeanor:{ bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24', border: 'rgba(245,158,11,0.35)' },
+  Infraction: { bg: 'rgba(148,163,184,0.12)', color: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+};
+
+function ChargesField({ f, value, onChange, readOnly }) {
+  const { state } = useCAD();
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
+  const ref = useRef(null);
+  const boxRef = useRef(null);
+
+  const charges = Array.isArray(value) ? value : [];
+  const penalCode = state.penalCode || [];
+
+  const filtered = penalCode
+    .filter(p => !charges.some(c => c.id === p.id))
+    .filter(p => {
+      if (!query.trim()) return true;
+      const q = query.toLowerCase();
+      return p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+    })
+    .slice(0, 10);
+
+  const place = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 400) });
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => {
+      if (!ref.current?.contains(e.target) && !boxRef.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  const addCharge = (charge) => {
+    onChange(f.id, [...charges, { id: charge.id, code: charge.code, name: charge.name, type: charge.type, fine: charge.fine, jailTime: charge.jailTime }]);
+    setQuery('');
+  };
+
+  const removeCharge = (id) => onChange(f.id, charges.filter(c => c.id !== id));
+
+  const typeStyle = (t) => CHARGE_TYPE_STYLE[t] || CHARGE_TYPE_STYLE.Infraction;
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* Selected charges */}
+      {charges.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          {charges.map((c) => {
+            const ts = typeStyle(c.type);
+            return (
+              <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+                style={{ background: ts.bg, borderColor: ts.border }}>
+                <MdGavel size={13} style={{ color: ts.color, flexShrink: 0 }} />
+                <div className="flex-1 min-w-0">
+                  <span className="text-[12px] font-semibold text-white">{c.name}</span>
+                  <span className="ml-2 text-[10px] font-mono text-slate-400">{c.code}</span>
+                </div>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }}>
+                  {c.type}
+                </span>
+                {c.fine > 0 && <span className="text-[9px] text-slate-500 shrink-0">${c.fine.toLocaleString()}</span>}
+                {c.jailTime !== 'None' && <span className="text-[9px] text-slate-500 shrink-0">{c.jailTime}</span>}
+                {!readOnly && (
+                  <button type="button" onClick={() => removeCharge(c.id)}
+                    className="w-5 h-5 rounded flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 cursor-pointer border-none bg-transparent transition-colors shrink-0">
+                    <MdClose size={13} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Search input */}
+      {!readOnly && (
+        <div ref={ref} className="relative">
+          <MdGavel size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
+          <input
+            className={`${S_INPUT} pl-9 pr-3`}
+            placeholder="Search penal code — name, code, or category…"
+            value={query}
+            onChange={e => { setQuery(e.target.value); place(); setOpen(true); }}
+            onFocus={() => { place(); setOpen(true); }}
+          />
+        </div>
+      )}
+
+      {readOnly && charges.length === 0 && (
+        <div className="text-[12px] text-slate-600 px-1">No charges added.</div>
+      )}
+
+      {/* Dropdown */}
+      {open && coords && createPortal(
+        <div ref={boxRef}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[320px] overflow-auto"
+          style={{ left: coords.left, top: coords.top, width: coords.width, animation: 'dropdownFadeIn 0.12s ease-out' }}>
+          {filtered.length === 0 && (
+            <div className="px-3 py-3 text-[12px] text-slate-500 text-center">No charges match "{query}"</div>
+          )}
+          {filtered.map(p => {
+            const ts = typeStyle(p.type);
+            return (
+              <button key={p.id} type="button" onMouseDown={(e) => { e.preventDefault(); addCharge(p); setOpen(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left cursor-pointer transition-colors hover:bg-white/[0.07]">
+                <MdGavel size={15} className="text-slate-500 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[12.5px] font-semibold text-white">{p.name}</span>
+                    <span className="text-[10px] font-mono text-slate-400">{p.code}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500">{p.category}{p.fine > 0 ? ` · $${p.fine.toLocaleString()} fine` : ''}{p.jailTime !== 'None' ? ` · ${p.jailTime}` : ''}</div>
+                </div>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                  style={{ background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }}>
+                  {p.type}
+                </span>
+                <MdAdd size={14} className="text-brand-bright shrink-0" />
+              </button>
+            );
+          })}
+        </div>,
+        document.body,
+      )}
+    </div>
+  );
+}
+
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
+
+  // Charges — full-width multi-select from penal code
+  if (f.type === 'charges') {
+    return (
+      <div className={`flex flex-col sm:col-span-2 lg:col-span-4`}>
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+          <MdGavel size={12} />
+          {f.label || 'Charges'}{f.required && <span className="text-red-400"> *</span>}
+          {!readOnly && (
+            <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">PENAL CODE</span>
+          )}
+        </label>
+        <ChargesField f={f} value={value} onChange={onChange} readOnly={readOnly} />
+      </div>
+    );
+  }
 
   // Checkbox — compact toggle row
   if (f.type === 'checkbox') {

@@ -8,7 +8,7 @@ import {
   MdAdd, MdDelete, MdContentCopy, MdSearch, MdArrowUpward, MdArrowDownward,
   MdTextFields, MdCalendarToday, MdCheckBox, MdListAlt, MdNotes, MdBadge,
   MdPerson, MdChevronRight, MdExpandMore, MdDragIndicator, MdClose,
-  MdDescription, MdDirectionsCar,
+  MdDescription, MdDirectionsCar, MdGavel,
 } from 'react-icons/md';
 
 /* ─── Field type catalog ─── */
@@ -22,6 +22,7 @@ const FIELD_TYPES = [
   { type: 'civilian_lookup', icon: MdPerson,       label: 'Civilian'      },
   { type: 'badge_lookup',    icon: MdBadge,        label: 'Officer Badge' },
   { type: 'vehicle_lookup',  icon: MdDirectionsCar,label: 'Vehicle'       },
+  { type: 'charges',         icon: MdGavel,        label: 'Charges'       },
 ];
 
 /* ─── Premade section templates ─── */

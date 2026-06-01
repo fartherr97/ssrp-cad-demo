@@ -131,6 +131,12 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
+        id: "s2b", title: "Charges / Violations", style: "gray",
+        fields: [
+          { id: "f11", label: "Charges", type: "charges", span: 4 },
+        ],
+      },
+      {
         id: "s3", title: "Narrative", style: "gray",
         fields: [
           { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
@@ -200,7 +206,7 @@ export const REPORT_TEMPLATES = [
       {
         id: "s3", title: "Charges", style: "gray",
         fields: [
-          { id: "f5", label: "Charges / Statutes", type: "textarea", span: 4, required: true, minRows: 3 },
+          { id: "f5", label: "Charges", type: "charges", span: 4, required: true },
         ],
       },
       {

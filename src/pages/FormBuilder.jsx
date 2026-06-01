@@ -18,6 +18,7 @@ const FIELD_TYPES = [
   { value: 'badge_lookup',    label: 'Officer Lookup' },
   { value: 'civilian_lookup', label: 'Civilian Lookup' },
   { value: 'vehicle_lookup',  label: 'Vehicle Lookup' },
+  { value: 'charges',         label: 'Charges (Penal Code)' },
 ];
 
 const SECTION_STYLES = [

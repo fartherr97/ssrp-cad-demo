@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import ReportForm from '../components/ReportForm';
+import { downloadReportPDF } from '../components/ReportPDF';
 import {
   MdBadge, MdGavel, MdDirectionsCar, MdWarning, MdDescription, MdAssignment,
   MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdCheckCircle,
@@ -40,6 +41,7 @@ export default function RecordsCenter() {
   const [selectedRecord, setSelectedRecord]     = useState(null);
   const [savedAt, setSavedAt]                   = useState(null);
   const [activeTab, setActiveTab]               = useState('Record');
+  const [pdfLoading, setPdfLoading]             = useState(false);
 
   const openTemplate = (tpl) => {
     setSelectedTemplate(tpl);
@@ -129,6 +131,18 @@ export default function RecordsCenter() {
     };
     const saveDraftNow = () => {
       try { localStorage.setItem(DRAFT_KEY(tpl.id), JSON.stringify(formValues)); setSavedAt(new Date()); } catch { /* ignore */ }
+    };
+    const exportPDF = async () => {
+      setPdfLoading(true);
+      try {
+        await downloadReportPDF(tpl, formValues, {
+          caseNumber: draftMeta.caseNumber,
+          status: 'Draft',
+          dateTime: now.toLocaleString(),
+          officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
+          agency: me?.deptShort || 'HCSO',
+        });
+      } finally { setPdfLoading(false); }
     };
     const Detail = ({ label, value }) => (
       <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
@@ -237,7 +251,9 @@ export default function RecordsCenter() {
           <button className={xs(S_BTN_SECONDARY)} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
           <div className="ml-auto flex flex-wrap gap-2">
             <button className={xs(S_BTN_SECONDARY)} onClick={saveDraftNow}><MdSave size={15} /> Save Draft</button>
-            <button className={xs(S_BTN_SECONDARY)} onClick={() => window.print()}><MdPrint size={15} /> Preview PDF</button>
+            <button className={xs(S_BTN_SECONDARY)} onClick={exportPDF} disabled={pdfLoading}>
+              <MdPrint size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
+            </button>
             <button className={xs(S_BTN_GHOST)} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
             <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
           </div>
