@@ -1,6 +1,7 @@
 /* PDF-style government form document components */
 
 import React, { useState } from 'react';
+import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
 
 export const FormMetaContext = React.createContext({});
 
@@ -692,13 +693,35 @@ export function ReportDocument({ type, template, data, editable, onChange, meta 
 }
 
 /* ── NCIC-style Record Return ─────────────────────────────────── */
+const RETURN_ICON = { PERSON: MdPerson, VEHICLE: MdDirectionsCar, WARRANT: MdGavel };
+
+function ReturnHeader({ type, title }) {
+  const Icon = RETURN_ICON[type] || MdPerson;
+  return (
+    <div className="record-return-header">
+      <Icon size={18} />
+      <span>{title}</span>
+    </div>
+  );
+}
+
+function ReturnFooter() {
+  return (
+    <div className="record-return-footer">
+      END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
+    </div>
+  );
+}
+
 export function RecordReturn({ type, subject, data }) {
-  const line = (key, val) => val ? (
+  const line = (key, val) => (val !== undefined && val !== null && val !== '') ? (
     <div className="record-return-line" key={key}>
       <span className="record-return-key">{key}</span>
       <span className="record-return-val">{val}</span>
     </div>
   ) : null;
+
+  const now = new Date().toLocaleString();
 
   if (type === 'PERSON' && data) {
     const flags = data.flags || [];
@@ -706,51 +729,51 @@ export function RecordReturn({ type, subject, data }) {
     const dlSusp = data.dlStatus === 'SUSPENDED';
     return (
       <div className="record-return">
-        <div className="record-return-header">
-          <span>FCIC/NCIC — PERSON RECORD RETURN</span>
-          <span>{new Date().toLocaleString()}</span>
-        </div>
+        <ReturnHeader type="PERSON" title={`DR — Name: ${data.firstName} ${data.lastName}`} />
         {hasWarrant && (
-          <div style={{ padding: '4px 10px', background: '#cc0000', color: '#fff', fontSize: 10, fontWeight: 700, fontFamily: 'Courier New', letterSpacing: '0.5px' }}>
-            *** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***
-          </div>
+          <div className="record-return-alert">*** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***</div>
         )}
         {dlSusp && (
-          <div style={{ padding: '4px 10px', background: '#cc5500', color: '#fff', fontSize: 10, fontWeight: 700, fontFamily: 'Courier New', letterSpacing: '0.5px' }}>
-            *** DRIVER LICENSE SUSPENDED — NO VALID DL ***
-          </div>
+          <div className="record-return-alert warn">*** DRIVER LICENSE SUSPENDED — NO VALID DL ***</div>
         )}
         <div className="record-return-body">
-          <div className="record-return-section">SUBJECT IDENTIFICATION</div>
-          {line('NAME', `${data.lastName}, ${data.firstName}`)}
-          {line('DOB', data.dob)}
-          {line('SEX', data.gender)}
-          {line('RACE/ETHNICITY', data.ethnicity)}
-          {line('HEIGHT', data.height)}
-          {line('WEIGHT', data.weight)}
-          {line('HAIR', data.hair)}
-          {line('EYES', data.eyes)}
-          <div className="record-return-section">IDENTIFIERS</div>
+          <div className="record-return-section">Query Data</div>
+          {line('Query Type', 'Driver / Person')}
+          {line('Source', 'FCIC / NCIC')}
+          {line('Returned', now)}
+
+          <div className="record-return-section">Driver Details</div>
+          {line('Name', `${data.firstName} ${data.lastName}`)}
+          {line('Gender', data.gender)}
+          {line('Race', data.ethnicity)}
+          {line('Date of Birth', data.dob)}
+          {line('Height', data.height)}
+          {line('Weight', data.weight)}
+          {line('Hair Color', data.hair)}
+          {line('Eye Color', data.eyes)}
           {line('SSN', data.ssn)}
-          {line('ADDRESS', data.address)}
-          {line('PHONE', data.phone)}
-          <div className="record-return-section">DRIVER LICENSE</div>
-          {line('DL NUMBER', data.dlNumber)}
-          {line('DL CLASS', data.dlClass)}
-          {line('DL STATUS', data.dlStatus)}
-          {line('DL EXPIRY', data.dlExpiry)}
+
+          <div className="record-return-section">Address Information</div>
+          {line('Residence', data.address)}
+          {line('Phone', data.phone)}
+
+          <div className="record-return-section">Driver License</div>
+          {line('DL Number', data.dlNumber)}
+          {line('DL Class', data.dlClass)}
+          {line('DL Status', data.dlStatus)}
+          {line('DL Expiry', data.dlExpiry)}
+          {line('Weapon Permit', data.weaponPermit)}
+
           {flags.length > 0 && (
             <>
-              <div className="record-return-section">FLAGS / ALERTS</div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '3px 0' }}>
+              <div className="record-return-section">Flags / Alerts</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
                 {flags.map(f => <span key={f} className="record-return-flag">{f}</span>)}
                 {dlSusp && <span className="record-return-flag warn">DL SUSPENDED</span>}
               </div>
             </>
           )}
-          <div style={{ fontSize: 9, marginTop: 10, color: '#666', fontFamily: 'Courier New', letterSpacing: '0.3px' }}>
-            END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
-          </div>
+          <ReturnFooter />
         </div>
       </div>
     );
@@ -759,41 +782,40 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'VEHICLE' && data) {
     return (
       <div className="record-return">
-        <div className="record-return-header">
-          <span>FCIC/NCIC — VEHICLE RECORD RETURN</span>
-          <span>{new Date().toLocaleString()}</span>
-        </div>
+        <ReturnHeader type="VEHICLE" title={`VR — Plate: ${data.plate}`} />
         {data.stolen && (
-          <div style={{ padding: '4px 10px', background: '#cc0000', color: '#fff', fontSize: 10, fontWeight: 700, fontFamily: 'Courier New', letterSpacing: '0.5px' }}>
-            *** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***
-          </div>
+          <div className="record-return-alert">*** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***</div>
         )}
         {subject && subject.flags?.includes('WARRANT') && (
-          <div style={{ padding: '4px 10px', background: '#cc5500', color: '#fff', fontSize: 10, fontWeight: 700, fontFamily: 'Courier New', letterSpacing: '0.5px' }}>
-            *** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***
-          </div>
+          <div className="record-return-alert warn">*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>
         )}
         <div className="record-return-body">
-          <div className="record-return-section">VEHICLE REGISTRATION</div>
-          {line('PLATE', data.plate)}
-          {line('STATE', 'FLORIDA')}
-          {line('YEAR', String(data.year))}
-          {line('MAKE', data.make)}
-          {line('MODEL', data.model)}
-          {line('COLOR', data.color)}
-          {line('REG STATUS', data.regStatus)}
-          {line('REG EXPIRY', data.regExpiry)}
-          {line('STOLEN', data.stolen ? 'YES — REPORTED STOLEN' : 'NO')}
+          <div className="record-return-section">Query Data</div>
+          {line('Query Type', 'Vehicle / Plate')}
+          {line('Source', 'FCIC / NCIC')}
+          {line('Returned', now)}
+
+          <div className="record-return-section">Vehicle Registration</div>
+          {line('Plate', data.plate)}
+          {line('State', 'Florida')}
+          {line('Year', String(data.year))}
+          {line('Make', data.make)}
+          {line('Model', data.model)}
+          {line('Color', data.color)}
+          {line('Registration', data.regStatus)}
+          {line('Reg Expiry', data.regExpiry)}
+          {line('Stolen', data.stolen ? 'YES — REPORTED STOLEN' : 'No')}
+
           {subject && (
             <>
-              <div className="record-return-section">REGISTERED OWNER</div>
-              {line('NAME', `${subject.lastName}, ${subject.firstName}`)}
-              {line('DOB', subject.dob)}
-              {line('ADDRESS', subject.address)}
-              {line('PHONE', subject.phone)}
-              {line('DL STATUS', subject.dlStatus)}
+              <div className="record-return-section">Registered Owner</div>
+              {line('Name', `${subject.firstName} ${subject.lastName}`)}
+              {line('Date of Birth', subject.dob)}
+              {line('Residence', subject.address)}
+              {line('Phone', subject.phone)}
+              {line('DL Status', subject.dlStatus)}
               {subject.flags?.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '3px 0', marginTop: 2 }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
                   {subject.flags.map(f => <span key={f} className="record-return-flag">{f}</span>)}
                 </div>
               )}
@@ -801,15 +823,13 @@ export function RecordReturn({ type, subject, data }) {
           )}
           {data.flags?.length > 0 && (
             <>
-              <div className="record-return-section">VEHICLE FLAGS</div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '3px 0' }}>
+              <div className="record-return-section">Vehicle Flags</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
                 {data.flags.map(f => <span key={f} className="record-return-flag warn">{f}</span>)}
               </div>
             </>
           )}
-          <div style={{ fontSize: 9, marginTop: 10, color: '#666', fontFamily: 'Courier New', letterSpacing: '0.3px' }}>
-            END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
-          </div>
+          <ReturnFooter />
         </div>
       </div>
     );
@@ -818,27 +838,25 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'WARRANT' && data) {
     return (
       <div className="record-return">
-        <div className="record-return-header">
-          <span>FCIC/NCIC — WARRANT RETURN</span>
-          <span>{new Date().toLocaleString()}</span>
-        </div>
+        <ReturnHeader type="WARRANT" title={`WR — Subject: ${data.civilianName}`} />
         {data.status === 'ACTIVE' && (
-          <div style={{ padding: '4px 10px', background: '#cc0000', color: '#fff', fontSize: 10, fontWeight: 700, fontFamily: 'Courier New', letterSpacing: '0.5px' }}>
-            *** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***
-          </div>
+          <div className="record-return-alert">*** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***</div>
         )}
         <div className="record-return-body">
-          <div className="record-return-section">WARRANT INFORMATION</div>
-          {line('STATUS', data.status)}
-          {line('TYPE', data.type)}
-          {line('SUBJECT', data.civilianName)}
-          {line('CHARGE', data.charge)}
-          {line('ISSUED BY', data.issuedBy)}
-          {line('ISSUE DATE', data.issuedDate)}
-          {data.notes && line('NOTES', data.notes)}
-          <div style={{ fontSize: 9, marginTop: 10, color: '#666', fontFamily: 'Courier New', letterSpacing: '0.3px' }}>
-            END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
-          </div>
+          <div className="record-return-section">Query Data</div>
+          {line('Query Type', 'Warrant')}
+          {line('Source', 'FCIC / NCIC')}
+          {line('Returned', now)}
+
+          <div className="record-return-section">Warrant Information</div>
+          {line('Status', data.status)}
+          {line('Type', data.type)}
+          {line('Subject', data.civilianName)}
+          {line('Charge', data.charge)}
+          {line('Issued By', data.issuedBy)}
+          {line('Issue Date', data.issuedDate)}
+          {line('Notes', data.notes)}
+          <ReturnFooter />
         </div>
       </div>
     );

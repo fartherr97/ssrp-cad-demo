@@ -2261,72 +2261,102 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .form-doc-alert.yellow { background: #ccaa00; color: #000; }
 
 /* ─── Record return (NCIC-style) ─── */
+/* ─── NCIC/DMV teletype-style record return (dark console) ─── */
 .record-return {
-  background: #ffffff;
-  color: #000;
-  font-family: 'Courier New', monospace;
-  font-size: 11px;
-  max-width: 760px;
+  background: #0b0c10;
+  color: #aeb9c8;
+  font-family: var(--font-mono), 'Courier New', monospace;
+  font-size: 12.5px;
+  max-width: 840px;
   width: 100%;
-  border: 1px solid #888;
-  box-shadow: 0 6px 28px rgba(0,0,0,0.7);
+  border: 1px solid #1d2531;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
   flex-shrink: 0;
 }
 
 .record-return-header {
-  background: #000;
-  color: #fff;
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  padding: 5px 10px;
-  letter-spacing: 0.5px;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(90deg, #1d4f8c 0%, #143257 100%);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid #2b3f5e;
 }
+.record-return-header svg { flex-shrink: 0; opacity: 0.95; }
+
+.record-return-alert {
+  padding: 6px 14px;
+  background: #c41818;
+  color: #fff;
+  font-family: var(--font-mono), 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.record-return-alert.warn { background: #c4621a; }
 
 .record-return-body {
-  padding: 8px 10px;
-  line-height: 1.8;
-  color: #000;
+  padding: 14px 16px 16px;
+  line-height: 1.9;
+  color: #aeb9c8;
 }
 
 .record-return-section {
+  color: #eaf1f9;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 8px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid #000;
-  font-size: 10px;
-  padding-bottom: 1px;
+  letter-spacing: 0.6px;
+  margin: 15px 0 4px;
+  font-size: 12.5px;
+  border: none;
+  padding: 0;
 }
+.record-return-section:first-child { margin-top: 0; }
+.record-return-section::before { content: "*** "; color: #4f7bb0; }
+.record-return-section::after  { content: " ***"; color: #4f7bb0; }
 
 .record-return-line {
-  display: flex;
-  gap: 4px;
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 12.5px;
+  line-height: 1.75;
 }
 
 .record-return-key {
-  font-weight: 700;
-  min-width: 140px;
-  flex-shrink: 0;
-  color: #000;
+  color: #7e8ea3;
+  font-weight: 400;
+  margin-right: 7px;
 }
+.record-return-key::after { content: ":"; }
 
 .record-return-val {
-  color: #000;
+  background: rgba(58,136,232,0.18);
+  color: #dfe9f5;
+  padding: 0 5px;
+  border-radius: 2px;
 }
 
 .record-return-flag {
-  background: #cc0000;
+  display: inline-block;
+  background: #c41818;
   color: #fff;
   font-weight: 700;
-  padding: 1px 6px;
-  font-size: 9px;
+  padding: 2px 8px;
+  font-size: 10px;
   letter-spacing: 0.5px;
+  border-radius: 3px;
   margin-right: 4px;
 }
+.record-return-flag.warn { background: #c4621a; }
 
-.record-return-flag.warn { background: #cc5500; }
+.record-return-footer {
+  font-size: 10px;
+  margin-top: 14px;
+  color: #5a6678;
+  letter-spacing: 0.3px;
+}

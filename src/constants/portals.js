@@ -1,7 +1,6 @@
 import {
   MdDashboard, MdSearch, MdDescription, MdMap, MdGridView,
-  MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid,
-  MdAdminPanelSettings, MdMenuBook, MdBlock, MdBuild,
+  MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdAssignment,
 } from 'react-icons/md';
@@ -54,7 +53,7 @@ export const PORTALS = {
   },
 
   admin: {
-    id: 'admin', label: 'Admin / Command', color: '#c09010', landing: '/cad',
+    id: 'admin', label: 'Admin / Command', color: '#c09010', landing: '/admin',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
@@ -66,12 +65,6 @@ export const PORTALS = {
       { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
       { Icon: MdPeopleAlt,    label: 'Civilians', route: '/civilians' },
       { Icon: MdPhoneAndroid, label: 'MDT',       route: '/mdt'       },
-    ],
-    adminNav: [
-      { Icon: MdAdminPanelSettings, label: 'Admin',   route: '/admin'   },
-      { Icon: MdMenuBook,           label: 'Penal',   route: '/penal'   },
-      { Icon: MdBlock,              label: 'Bans',    route: '/bans'    },
-      { Icon: MdBuild,              label: 'Builder', route: '/builder' },
     ],
   },
 
