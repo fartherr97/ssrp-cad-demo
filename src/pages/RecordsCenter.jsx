@@ -162,7 +162,7 @@ export default function RecordsCenter() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-auto p-4 px-5">
+            <div className="flex-1 overflow-hidden flex flex-col">
               <FormDocWrap meta={draftMeta}>
                 <ReportDocument
                   type={selectedTemplate.name}
@@ -199,7 +199,7 @@ export default function RecordsCenter() {
                 </div>
               )}
             </div>
-            <div className="flex-1 overflow-auto p-4 px-5">
+            <div className="flex-1 overflow-hidden flex flex-col">
               <FormDocWrap meta={{ caseNumber: selRecord.recordNumber, status: selRecord.status }}>
                 <ReportDocument
                   type={selRecord.type}

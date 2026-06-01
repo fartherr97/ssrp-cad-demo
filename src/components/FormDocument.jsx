@@ -19,7 +19,9 @@ export const FormMetaContext = React.createContext({});
 export function FormDocWrap({ children, meta = {} }) {
   return (
     <FormMetaContext.Provider value={meta}>
-      <div className={S_FORM_DOC_WRAP}><div style={S_FORM_DOC}>{children}</div></div>
+      <div className={S_FORM_DOC_WRAP}>
+        <div style={S_FORM_DOC}>{children}</div>
+      </div>
     </FormMetaContext.Provider>
   );
 }
@@ -77,7 +79,7 @@ export function FormDocHeader({ agency = 'HILLSBOROUGH COUNTY SHERIFF\'S OFFICE'
 /* A horizontal row that holds one or more FormCells */
 export function FormRow({ children, style }) {
   return (
-    <div style={{ display: 'flex', borderBottom: '1px solid #ccc', minHeight: 36, ...style }}>
+    <div style={{ display: 'flex', borderBottom: '1px solid #ccc', minHeight: 48, ...style }}>
       {children}
     </div>
   );
@@ -87,50 +89,53 @@ export function FormRow({ children, style }) {
 export function FormCell({ label, value, onChange, type = 'text', options = [], mono, colSpan = 1, required, editable, style }) {
   const flex = colSpan;
   const labelStyle = {
-    display: 'block', fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px',
-    color: '#555', marginBottom: 2, fontFamily: 'Arial, sans-serif', fontWeight: 700,
+    display: 'block', fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.5px',
+    color: '#666', marginBottom: 3, fontFamily: 'Arial, sans-serif', fontWeight: 700, lineHeight: 1,
   };
   const valueStyle = {
     fontFamily: mono ? 'Courier New, monospace' : 'inherit',
-    fontSize: 11, color: '#000', minHeight: 14, lineHeight: 1.3,
+    fontSize: 12, color: '#000', minHeight: 16, lineHeight: 1.3,
   };
   const inputStyle = {
     width: '100%', border: 'none', outline: 'none', background: 'transparent',
     fontFamily: mono ? 'Courier New, monospace' : 'Arial, sans-serif',
-    fontSize: 11, color: '#000', padding: 0, lineHeight: 1.3,
+    fontSize: 12, color: '#000', padding: 0, lineHeight: 1.3, cursor: 'text',
   };
 
   return (
-    <div style={{
-      flex, borderRight: '1px solid #ccc', padding: '3px 5px',
-      display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-      minWidth: 0, overflow: 'hidden',
-      ':last-child': { borderRight: 'none' },
-      ...style,
-    }}>
+    <div
+      style={{
+        flex, borderRight: '1px solid #ccc', padding: '5px 7px',
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+        minWidth: 0, overflow: 'hidden', transition: 'background 0.1s',
+        ...style,
+      }}
+      onMouseEnter={editable ? e => { e.currentTarget.style.background = '#fffde7'; } : undefined}
+      onMouseLeave={editable ? e => { e.currentTarget.style.background = ''; } : undefined}
+    >
       <span style={labelStyle}>{label}{required && <span style={{ color: '#cc0000' }}> *</span>}</span>
       {editable ? (
         type === 'textarea' ? (
           <textarea
-            style={{ ...inputStyle, resize: 'none', height: 60, overflowY: 'auto' }}
+            style={{ ...inputStyle, resize: 'none', height: 72, overflowY: 'auto' }}
             value={value || ''}
             onChange={e => onChange && onChange(e.target.value)}
           />
         ) : type === 'dropdown' ? (
-          <select style={{ ...inputStyle, cursor: 'pointer' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
-            <option value="">*</option>
+          <select style={{ ...inputStyle, cursor: 'pointer', appearance: 'auto' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
+            <option value="">—</option>
             {options.map(o => <option key={o}>{o}</option>)}
           </select>
         ) : (
           <input
-            type={type === 'datetime' ? 'datetime-local' : 'text'}
+            type={type === 'datetime' ? 'datetime-local' : type === 'date' ? 'date' : type === 'number' ? 'number' : 'text'}
             style={inputStyle}
             value={value || ''}
             onChange={e => onChange && onChange(e.target.value)}
           />
         )
       ) : (
-        <span style={valueStyle}>{value || <span style={{ color: '#aaa' }}>*</span>}</span>
+        <span style={valueStyle}>{value || <span style={{ color: '#bbb' }}>—</span>}</span>
       )}
     </div>
   );
@@ -155,27 +160,27 @@ export function FormSection({ title, dark, blue }) {
 /* Wide narrative text block */
 export function FormNarrative({ label = 'NARRATIVE', value, onChange, editable, minRows = 5 }) {
   return (
-    <div style={{ borderBottom: '1px solid #ccc', padding: '3px 5px' }}>
-      <div style={{ fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#555', marginBottom: 3, fontWeight: 700 }}>
+    <div style={{ borderBottom: '1px solid #ccc', padding: '5px 7px', background: editable ? '#fffde7' : undefined, transition: 'background 0.1s' }}>
+      <div style={{ fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#666', marginBottom: 4, fontWeight: 700 }}>
         {label}
       </div>
       {editable ? (
         <textarea
           style={{
             width: '100%', border: 'none', outline: 'none', background: 'transparent',
-            fontFamily: 'Courier New, monospace', fontSize: 11, color: '#000',
-            resize: 'none', padding: 0, lineHeight: 1.6,
-            minHeight: minRows * 18,
+            fontFamily: 'Courier New, monospace', fontSize: 12, color: '#000',
+            resize: 'vertical', padding: 0, lineHeight: 1.7,
+            minHeight: minRows * 20,
           }}
           value={value || ''}
           onChange={e => onChange && onChange(e.target.value)}
         />
       ) : (
         <div style={{
-          fontFamily: 'Courier New, monospace', fontSize: 11, color: '#000',
-          lineHeight: 1.6, minHeight: minRows * 18, whiteSpace: 'pre-wrap',
+          fontFamily: 'Courier New, monospace', fontSize: 12, color: '#000',
+          lineHeight: 1.7, minHeight: minRows * 20, whiteSpace: 'pre-wrap',
         }}>
-          {value || <span style={{ color: '#aaa' }}>No narrative on file.</span>}
+          {value || <span style={{ color: '#bbb' }}>No narrative on file.</span>}
         </div>
       )}
     </div>

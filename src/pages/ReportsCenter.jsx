@@ -187,7 +187,7 @@ export default function ReportsCenter() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-auto p-4 px-5">
+            <div className="flex-1 overflow-hidden flex flex-col">
               <FormDocWrap meta={draftMeta}>
                 <ReportDocument
                   type={selectedTemplate.name}

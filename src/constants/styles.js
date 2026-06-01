@@ -209,9 +209,9 @@ export const S_DETAIL_VALUE_MONO = 'text-[13px] text-slate-200 flex-1 font-mono'
 
 // ─── Form document ─────────────────────────────────────────
 
-export const S_FORM_DOC_WRAP    = 'flex flex-col flex-1 overflow-hidden bg-app-bg';
+export const S_FORM_DOC_WRAP    = 'flex-1 overflow-auto bg-[#2e2e32] p-5';
 // Paper document (white background, print-fidelity) * must remain style objects
-export const S_FORM_DOC         = { background: '#ffffff', color: '#000000', fontFamily: "'Arial', 'Helvetica', sans-serif", fontSize: 11, width: '100%', maxWidth: 800, border: '1px solid #888', boxShadow: '0 6px 28px rgba(0,0,0,0.7)', flexShrink: 0 };
+export const S_FORM_DOC         = { background: '#ffffff', color: '#000000', fontFamily: "'Arial', 'Helvetica', sans-serif", fontSize: 11, width: '100%', border: '1px solid #888', boxShadow: '0 6px 28px rgba(0,0,0,0.7)' };
 const _S_FORM_DOC_ALERT         = { padding: '5px 10px', fontSize: 9, fontWeight: 700, letterSpacing: '0.4px', textTransform: 'uppercase', borderBottom: '1px solid #000', display: 'flex', gap: 12 };
 export const S_FORM_DOC_FOOTER_S   = { padding: '4px 10px', fontSize: 7.5, color: '#666', textAlign: 'center', background: '#f4f4f4', borderTop: '1px solid #ccc', letterSpacing: '0.2px' };
 export const S_FORM_DOC_ALERT_RED    = { ..._S_FORM_DOC_ALERT, background: '#cc0000', color: '#fff' };
