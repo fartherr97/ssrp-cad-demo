@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
+import {
+  MdDashboard, MdSearch, MdRefresh, MdDescription, MdMap, MdGridView,
+  MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid,
+  MdAdminPanelSettings, MdMenuBook, MdBlock, MdBuild,
+  MdAddCall, MdPhone, MdPersonAdd, MdLogout,
+  MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
+  MdDoNotDisturb, MdPowerSettingsNew,
+} from 'react-icons/md';
 
 /* ─── Clock ─── */
 function Clock() {
@@ -27,28 +35,8 @@ function Clock() {
   );
 }
 
-/* ─── SVG icon helpers ─── */
-const Icon = ({ d, size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
-  </svg>
-);
-
-const ICONS = {
-  cad:      ['M3 3h18v4H3z', 'M3 10h18v4H3z', 'M3 17h18v4H3z'],
-  search:   'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z',
-  returns:  ['M1 4v6h6', 'M23 20v-6h-6', 'M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15'],
-  forms:    ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
-  map:      ['M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z', 'M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z'],
-  board:    ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
-  newcall:  ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z', 'M19 3v6', 'M22 6h-6'],
-  mycall:   ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z'],
-  assign:   ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M19 8v6', 'M22 11h-6'],
-  signout:  ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
-};
-
 /* Primary icon+label tool button */
-function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} }) {
+function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, style = {} }) {
   return (
     <button
       className={`cad-tool-btn${active ? ' active' : ''}`}
@@ -57,31 +45,8 @@ function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} 
       title={title || label}
       style={style}
     >
-      <span className="cad-tool-icon"><Icon d={ICONS[iconKey]} size={18} /></span>
+      <span className="cad-tool-icon"><IconComp size={20} /></span>
       <span className="cad-tool-label">{label}</span>
-    </button>
-  );
-}
-
-/* Secondary text-only nav button (for extra pages) */
-function NavBtn({ label, active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex', alignItems: 'center', padding: '0 10px', height: '100%',
-        fontSize: 11, fontWeight: active ? 600 : 400,
-        color: active ? '#a0c8e8' : '#5070a0',
-        background: active ? '#0d2040' : 'none',
-        borderBottom: `2px solid ${active ? '#1060a8' : 'transparent'}`,
-        borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-        cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'var(--font-ui)',
-        flexShrink: 0, transition: 'none',
-      }}
-      onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#8090b8'; }}
-      onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#5070a0'; }}
-    >
-      {label}
     </button>
   );
 }
@@ -92,35 +57,35 @@ const STATUS_COLORS = {
 };
 
 const STATUS_BTNS = [
-  { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available' },
-  { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt'      },
-  { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy'      },
-  { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd'     },
-  { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl'     },
-  { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty'   },
+  { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available', Icon: MdCheckCircle      },
+  { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt',      Icon: MdDirectionsCar    },
+  { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy',      Icon: MdWarningAmber     },
+  { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd',     Icon: MdLocationOn       },
+  { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl',     Icon: MdDoNotDisturb     },
+  { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty',   Icon: MdPowerSettingsNew },
 ];
 
 const PRIMARY_NAV = [
-  { iconKey: 'cad',     label: 'CAD',     route: '/cad'     },
-  { iconKey: 'search',  label: 'Search',  route: '/search'  },
-  { iconKey: 'returns', label: 'Returns', route: '/returns' },
-  { iconKey: 'forms',   label: 'Forms',   route: '/forms'   },
-  { iconKey: 'map',     label: 'Map',     route: '/map'     },
-  { iconKey: 'board',   label: 'Board',   route: '/board'   },
+  { Icon: MdDashboard,   label: 'CAD',     route: '/cad'     },
+  { Icon: MdSearch,      label: 'Search',  route: '/search'  },
+  { Icon: MdRefresh,     label: 'Returns', route: '/returns' },
+  { Icon: MdDescription, label: 'Forms',   route: '/forms'   },
+  { Icon: MdMap,         label: 'Map',     route: '/map'     },
+  { Icon: MdGridView,    label: 'Board',   route: '/board'   },
 ];
 
 const SECONDARY_NAV = [
-  { label: 'Units',     route: '/units'     },
-  { label: 'Warrants',  route: '/warrants'  },
-  { label: 'Civilians', route: '/civilians' },
-  { label: 'MDT',       route: '/mdt'       },
+  { Icon: MdGroups,      label: 'Units',     route: '/units'     },
+  { Icon: MdGavel,       label: 'Warrants',  route: '/warrants'  },
+  { Icon: MdPeopleAlt,   label: 'Civilians', route: '/civilians' },
+  { Icon: MdPhoneAndroid,label: 'MDT',       route: '/mdt'       },
 ];
 
 const ADMIN_NAV = [
-  { label: 'Admin',   route: '/admin'   },
-  { label: 'Penal',   route: '/penal'   },
-  { label: 'Bans',    route: '/bans'    },
-  { label: 'Builder', route: '/builder' },
+  { Icon: MdAdminPanelSettings, label: 'Admin',   route: '/admin'   },
+  { Icon: MdMenuBook,           label: 'Penal',   route: '/penal'   },
+  { Icon: MdBlock,              label: 'Bans',    route: '/bans'    },
+  { Icon: MdBuild,              label: 'Builder', route: '/builder' },
 ];
 
 export default function ActionBar({ onCreateCall }) {
@@ -152,11 +117,11 @@ export default function ActionBar({ onCreateCall }) {
       {/* ── Brand ── */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '0 12px', height: '100%',
+        padding: '0 14px', height: '100%',
         borderRight: '1px solid #253a5e', background: '#0e2040', flexShrink: 0,
       }}>
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
-          style={{ width: 24, height: 24, flexShrink: 0, objectFit: 'contain' }} />
+          style={{ width: 28, height: 28, flexShrink: 0, objectFit: 'contain' }} />
         <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
           Sunshine State RP
         </div>
@@ -166,27 +131,43 @@ export default function ActionBar({ onCreateCall }) {
       {PRIMARY_NAV.map(item => (
         <ToolBtn
           key={item.route}
-          iconKey={item.iconKey}
+          Icon={item.Icon}
           label={item.label}
           onClick={() => go(item.route)}
           active={isActive(item.route)}
         />
       ))}
 
-      {/* ── Secondary text nav ── */}
-      <div style={{ display: 'flex', alignItems: 'stretch', borderLeft: '1px solid #1a3050', borderRight: '1px solid #1a3050' }}>
-        {SECONDARY_NAV.map(item => (
-          <NavBtn key={item.route} label={item.label} active={isActive(item.route)} onClick={() => go(item.route)} />
-        ))}
-        {isAdmin && ADMIN_NAV.map(item => (
-          <NavBtn key={item.route} label={item.label} active={isActive(item.route)} onClick={() => go(item.route)} />
-        ))}
-      </div>
+      <div className="cad-tool-sep" />
+
+      {/* ── Secondary icon nav ── */}
+      {SECONDARY_NAV.map(item => (
+        <ToolBtn
+          key={item.route}
+          Icon={item.Icon}
+          label={item.label}
+          onClick={() => go(item.route)}
+          active={isActive(item.route)}
+        />
+      ))}
+
+      {/* ── Admin icon nav ── */}
+      {isAdmin && ADMIN_NAV.map(item => (
+        <ToolBtn
+          key={item.route}
+          Icon={item.Icon}
+          label={item.label}
+          onClick={() => go(item.route)}
+          active={isActive(item.route)}
+        />
+      ))}
+
+      <div className="cad-tool-sep" />
 
       {/* ── Call actions ── */}
-      {isDispatch && <ToolBtn iconKey="newcall" label="New Call" onClick={onCreateCall} />}
-      <ToolBtn iconKey="mycall" label="My Call" onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
-      <ToolBtn iconKey="assign" label="Assign Self" onClick={() => {
+      {isDispatch && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
+      <ToolBtn Icon={MdPhone} label="My Call" onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
+      <ToolBtn Icon={MdPersonAdd} label="Assign" onClick={() => {
         if (me && myCall) dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
       }} disabled={!myCall || !me} />
 
@@ -259,7 +240,7 @@ export default function ActionBar({ onCreateCall }) {
 
         <Clock />
 
-        <ToolBtn iconKey="signout" label="Sign Out" onClick={() => dispatch({ type: 'LOGOUT' })} style={{ borderLeft: '1px solid #0d1e32' }} />
+        <ToolBtn Icon={MdLogout} label="Sign Out" onClick={() => dispatch({ type: 'LOGOUT' })} style={{ borderLeft: '1px solid #0d1e32' }} />
       </div>
     </div>
   );

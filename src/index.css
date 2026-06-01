@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,7 +80,7 @@
 
   /* ─── Layout dimensions ─── */
   --menubar-h:   0px;
-  --actionbar-h: 52px;
+  --actionbar-h: 64px;
   --statusbar-h: 20px;
   --detail-w:    292px;
 
@@ -95,7 +97,7 @@
   --n-shadow-sm: 0 1px 4px rgba(0,0,0,0.7);
 
   /* ─── Fonts: functional/utilitarian ─── */
-  --font-ui:   'Segoe UI', 'Tahoma', 'Arial', system-ui, sans-serif;
+  --font-ui:   'Ubuntu', 'Segoe UI', 'Tahoma', 'Arial', system-ui, sans-serif;
   --font-mono: 'Courier New', 'Lucida Console', 'Consolas', monospace;
 }
 
@@ -295,58 +297,54 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   overflow-x: auto;
 }
 
-/* Icon-style toolbar buttons (ImperialCAD-style) */
+/* Icon-style toolbar buttons */
 .cad-tool-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 4px 10px;
-  min-width: 60px;
-  height: 50px;
+  gap: 5px;
+  padding: 4px 12px;
+  min-width: 64px;
+  height: 62px;
   background: transparent;
   border: 1px solid transparent;
-  color: #b8d0e8;
+  color: #8aabcc;
   cursor: pointer;
   font-family: var(--font-ui);
   flex-shrink: 0;
-  transition: none;
+  transition: background 0.1s, color 0.1s;
 }
 .cad-tool-btn:hover:not(:disabled) {
-  background: #234070;
-  border-color: #2a5090;
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.1);
   color: #ffffff;
 }
 .cad-tool-btn.active {
-  background: #1a3868;
-  border-color: #3070c0;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.18);
   color: #ffffff;
 }
 .cad-tool-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.28;
   cursor: default;
-}
-.cad-tool-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
 }
 .cad-tool-label {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
   line-height: 1;
+  font-family: 'Ubuntu', var(--font-ui);
 }
 .cad-tool-sep {
   width: 1px;
-  height: 38px;
-  background: #2a4060;
-  margin: 0 4px;
+  height: 44px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 2px;
   flex-shrink: 0;
+  align-self: center;
 }
 
 .cad-action-sep {
