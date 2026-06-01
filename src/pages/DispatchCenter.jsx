@@ -225,7 +225,7 @@ export default function DispatchCenter() {
             <thead>
               <tr className="bg-app-bg">
                 {['UNIT','STATUS','CALL #','AGENCY','LOCATION','NAME / RANK'].map(h => (
-                  <th key={h} className={`${S_TABLE_TH} !px-3.5 whitespace-nowrap z-[1]`}>{h}</th>
+                  <th key={h} className={`${S_TABLE_TH} !px-3.5 !text-center whitespace-nowrap z-[1]`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -241,12 +241,12 @@ export default function DispatchCenter() {
                   onMouseLeave={trHoverOff}
                   onClick={() => o.callId && navigate('/cad/' + o.callId)}
                 >
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2`}><StatusBadge status={o.status} /></td>
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '*'}</td>
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-white font-semibold`}>{o.deptShort}</td>
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-slate-300`}>{o.location}</td>
-                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-white font-medium`}>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center`}><StatusBadge status={o.status} /></td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '*'}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center text-white font-semibold`}>{o.deptShort}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center text-slate-300`}>{o.location}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 !text-center text-white font-medium`}>
                     {o.name}
                     {o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}
                   </td>
