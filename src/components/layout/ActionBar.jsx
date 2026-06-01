@@ -25,8 +25,8 @@ function Clock() {
   }, []);
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', padding: '0 12px', height: '100%',
-      borderLeft: '1px solid #253a5e', fontFamily: 'var(--font-mono)',
+      display: 'flex', alignItems: 'center', padding: '0 14px', height: '100%',
+      borderLeft: '1px solid #1a3050', fontFamily: 'var(--font-mono)',
       fontSize: 12, fontWeight: 600, color: '#60a0cc', letterSpacing: '0.3px',
       flexShrink: 0, whiteSpace: 'nowrap',
     }}>
@@ -51,18 +51,62 @@ function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, styl
   );
 }
 
+/* Status square button — same shape as ToolBtn but uses the status color when active */
+function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
+  const isActive = myStatus === status;
+  const color = STATUS_COLORS[status];
+  return (
+    <button
+      onClick={onClick}
+      title={`Set status: ${status}`}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: 4, padding: '4px 10px',
+        minWidth: 54, height: '100%',
+        background: isActive ? `${color}1a` : 'transparent',
+        border: 'none',
+        borderTop: `2px solid transparent`,
+        borderBottom: `2px solid ${isActive ? color : 'transparent'}`,
+        color: isActive ? color : '#4a6080',
+        cursor: 'pointer', flexShrink: 0, transition: 'background 0.1s, color 0.1s',
+        fontFamily: 'var(--font-ui)',
+      }}
+      onMouseEnter={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+          e.currentTarget.style.color = '#7090b0';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = '#4a6080';
+        }
+      }}
+    >
+      <IconComp size={19} color={isActive ? color : undefined} />
+      <span style={{
+        fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
+        letterSpacing: '0.5px', whiteSpace: 'nowrap', lineHeight: 1,
+      }}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
 const STATUS_COLORS = {
   AVAILABLE: '#22ff66', ENRT: '#aaff33', BUSY: '#ff8822',
   ARRVD: '#ffee22', UNAVAILABLE: '#dd44aa', OFFDUTY: '#cc3333',
 };
 
 const STATUS_BTNS = [
-  { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available', Icon: MdCheckCircle      },
-  { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt',      Icon: MdDirectionsCar    },
-  { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy',      Icon: MdWarningAmber     },
-  { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd',     Icon: MdLocationOn       },
-  { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl',     Icon: MdDoNotDisturb     },
-  { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty',   Icon: MdPowerSettingsNew },
+  { status: 'AVAILABLE',   label: 'AVL',   Icon: MdCheckCircle      },
+  { status: 'ENRT',        label: 'ENRT',  Icon: MdDirectionsCar    },
+  { status: 'BUSY',        label: 'BUSY',  Icon: MdWarningAmber     },
+  { status: 'ARRVD',       label: 'ARRVD', Icon: MdLocationOn       },
+  { status: 'UNAVAILABLE', label: 'UNAVL', Icon: MdDoNotDisturb     },
+  { status: 'OFFDUTY',     label: 'OFD',   Icon: MdPowerSettingsNew },
 ];
 
 const PRIMARY_NAV = [
@@ -75,10 +119,10 @@ const PRIMARY_NAV = [
 ];
 
 const SECONDARY_NAV = [
-  { Icon: MdGroups,      label: 'Units',     route: '/units'     },
-  { Icon: MdGavel,       label: 'Warrants',  route: '/warrants'  },
-  { Icon: MdPeopleAlt,   label: 'Civilians', route: '/civilians' },
-  { Icon: MdPhoneAndroid,label: 'MDT',       route: '/mdt'       },
+  { Icon: MdGroups,       label: 'Units',     route: '/units'     },
+  { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
+  { Icon: MdPeopleAlt,    label: 'Civilians', route: '/civilians' },
+  { Icon: MdPhoneAndroid, label: 'MDT',       route: '/mdt'       },
 ];
 
 const ADMIN_NAV = [
@@ -94,22 +138,15 @@ export default function ActionBar({ onCreateCall }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const me = officers.find(o => o.id === currentUser?.id);
+  const me      = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
-  const myCall = myCallId ? calls.find(c => c.id === myCallId) : null;
+  const myCall  = myCallId ? calls.find(c => c.id === myCallId) : null;
   const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin    = currentUser?.role === 'admin';
 
-  const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
-  const onDuty = officers.filter(o => o.status !== 'OFFDUTY').length;
-  const p1Count = calls.filter(c => c.priority === 1 && c.status !== 'CLOSED').length;
-
-  const go = (route) => navigate(route);
+  const go      = (route) => navigate(route);
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
-
-  const activeStatusColor = STATUS_COLORS[myStatus] || '#cc3333';
-  const activeStatusLabel = STATUS_BTNS.find(s => s.status === myStatus)?.label || '—';
 
   return (
     <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'stretch', gap: 0, overflowX: 'auto' }}>
@@ -127,128 +164,54 @@ export default function ActionBar({ onCreateCall }) {
         </div>
       </div>
 
-      {/* ── Primary icon nav ── */}
+      {/* ── Primary nav ── */}
       {PRIMARY_NAV.map(item => (
-        <ToolBtn
-          key={item.route}
-          Icon={item.Icon}
-          label={item.label}
-          onClick={() => go(item.route)}
-          active={isActive(item.route)}
-        />
+        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+          onClick={() => go(item.route)} active={isActive(item.route)} />
       ))}
 
       <div className="cad-tool-sep" />
 
-      {/* ── Secondary icon nav ── */}
+      {/* ── Secondary nav ── */}
       {SECONDARY_NAV.map(item => (
-        <ToolBtn
-          key={item.route}
-          Icon={item.Icon}
-          label={item.label}
-          onClick={() => go(item.route)}
-          active={isActive(item.route)}
-        />
+        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+          onClick={() => go(item.route)} active={isActive(item.route)} />
       ))}
 
-      {/* ── Admin icon nav ── */}
+      {/* ── Admin nav ── */}
       {isAdmin && ADMIN_NAV.map(item => (
-        <ToolBtn
-          key={item.route}
-          Icon={item.Icon}
-          label={item.label}
-          onClick={() => go(item.route)}
-          active={isActive(item.route)}
-        />
+        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+          onClick={() => go(item.route)} active={isActive(item.route)} />
       ))}
 
       <div className="cad-tool-sep" />
 
       {/* ── Call actions ── */}
       {isDispatch && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
-      <ToolBtn Icon={MdPhone} label="My Call" onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
+      <ToolBtn Icon={MdPhone} label="My Call"
+        onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
       <ToolBtn Icon={MdPersonAdd} label="Assign" onClick={() => {
         if (me && myCall) dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
       }} disabled={!myCall || !me} />
 
       <div className="cad-tool-sep" />
 
-      {/* ── My Call display ── */}
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-        justifyContent: 'center', padding: '0 10px', height: '100%',
-        borderRight: '1px solid #1a3050', flexShrink: 0, minWidth: 90,
-      }}>
-        <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: '#3a5878', letterSpacing: '0.4px' }}>MY CALL</span>
-        <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', fontWeight: 700, color: myCall ? '#66ddff' : '#283848', lineHeight: 1.2 }}>
-          {myCall ? myCall.id : 'NONE'}
-        </span>
-      </div>
+      {/* ── Status buttons — same square style, colored when active ── */}
+      {STATUS_BTNS.map(s => (
+        <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
+          status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
+      ))}
 
-      {/* ── Status ── */}
-      <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: 2, padding: '0 6px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: 8, borderRight: '1px solid #1a3050', marginRight: 4, height: 40 }}>
-          <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: '#3a5878', letterSpacing: '0.3px' }}>STATUS</span>
-          <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', fontWeight: 700, color: activeStatusColor }}>{activeStatusLabel}</span>
-        </div>
-        {STATUS_BTNS.map(s => (
-          <button
-            key={s.status}
-            className={`cad-status-btn ${myStatus === s.status ? s.cls : ''}`}
-            style={{ height: 26, padding: '0 8px', fontSize: 10 }}
-            onClick={() => setStatus(s.status)}
-            title={`Set status: ${s.status}`}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Right: stats + clock + sign out ── */}
+      {/* ── Far right: clock + profile + sign out ── */}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
-
-        {p1Count > 0 && (
-          <div style={{
-            display: 'flex', alignItems: 'center', padding: '0 10px',
-            borderLeft: '1px solid #1a3050',
-            fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700,
-            color: '#ff3333', animation: 'pulseRed 1.5s ease-in-out infinite',
-            whiteSpace: 'nowrap',
-          }}>
-            ▲ P1: {p1Count}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', borderLeft: '1px solid #1a3050', fontSize: 11, fontFamily: 'var(--font-mono)', color: '#5070a0', whiteSpace: 'nowrap' }}>
-          ACTIVE: <span style={{ color: '#4890c0', fontWeight: 600, marginLeft: 4 }}>{activeCalls}</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', borderLeft: '1px solid #1a3050', fontSize: 11, fontFamily: 'var(--font-mono)', color: '#5070a0', whiteSpace: 'nowrap' }}>
-          ON DUTY: <span style={{ color: '#22cc55', fontWeight: 600, marginLeft: 4 }}>{onDuty}</span>
-        </div>
-
-        <button
-          onClick={() => go('/profile')}
-          title="My Profile & Signature"
-          style={{
-            display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px',
-            borderLeft: '1px solid #1a3050', fontSize: 11, fontFamily: 'var(--font-mono)',
-            color: '#5070a0', whiteSpace: 'nowrap', background: 'none', border: 'none',
-            cursor: 'pointer', height: '100%',
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: activeStatusColor, flexShrink: 0 }} />
-          <span style={{ color: '#7090a8' }}>{me?.badge || '—'}</span>
-          <span style={{ color: '#3a5060' }}>·</span>
-          <span style={{ color: '#5080a0' }}>{me?.deptShort || '—'}</span>
-          {currentUser?.signature && <span style={{ color: '#22c55e', fontSize: 10, marginLeft: 2 }}>✍</span>}
-        </button>
-
         <Clock />
-
-        <ToolBtn Icon={MdLogout} label="Sign Out" onClick={() => dispatch({ type: 'LOGOUT' })} style={{ borderLeft: '1px solid #0d1e32' }} />
+        <ToolBtn Icon={MdAccountCircle} label="Profile"
+          onClick={() => go('/profile')} active={isActive('/profile')}
+          title="My Profile & Signature"
+          style={{ borderLeft: '1px solid #1a3050' }} />
+        <ToolBtn Icon={MdLogout} label="Sign Out"
+          onClick={() => dispatch({ type: 'LOGOUT' })}
+          style={{ borderLeft: '1px solid #1a3050' }} />
       </div>
     </div>
   );
