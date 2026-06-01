@@ -132,22 +132,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right — status dots + connect */}
+        {/* Right — connect */}
         <div className="ml-auto flex items-center gap-3 sm:gap-5">
-          {/* Status dots — hidden on small screens */}
-          <div className="hidden sm:flex items-center gap-5">
-            {[
-              { label: 'CAD', color: '#22ff66' },
-              { label: 'MDT', color: '#22ff66' },
-              { label: 'RADIO', color: '#22ff66' },
-            ].map(s => (
-              <div key={s.label} className="flex items-center gap-1.5">
-                <div className="w-[7px] h-[7px] rounded-full" style={{ background: s.color, boxShadow: `0 0 6px ${s.color}` }} />
-                <span className="text-[11px] font-semibold text-[rgba(180,210,240,0.5)] tracking-[0.5px]">{s.label}</span>
-              </div>
-            ))}
-          </div>
-
           {!connected && (
             <button
               onClick={handleConnect}

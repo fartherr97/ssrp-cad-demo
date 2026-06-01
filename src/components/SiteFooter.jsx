@@ -28,16 +28,6 @@ export default function SiteFooter() {
             </span>
           ))}
         </div>
-
-        {/* Status */}
-        <div className="flex gap-5 items-center">
-          <span className="text-[11px] text-[rgba(120,160,200,0.4)]">
-            CAD: <span className="text-[#22ff66]">Online</span>
-          </span>
-          <span className="text-[11px] text-[rgba(120,160,200,0.4)]">
-            MDT: <span className="text-[#22ff66]">Online</span>
-          </span>
-        </div>
       </div>
     </footer>
   );
