@@ -121,9 +121,8 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
                     navigate(item.route);
                     setOpen(false);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] text-slate-300 hover:bg-white/[0.07] hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] text-white hover:bg-white/[0.07] transition-colors cursor-pointer border-none bg-transparent"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500/60 shrink-0" />
                   <span className="font-medium">{item.name}</span>
                   {item.formCode && (
                     <span className="ml-auto text-[9px] font-mono text-slate-600 shrink-0">{item.formCode}</span>
