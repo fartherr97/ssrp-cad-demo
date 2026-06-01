@@ -155,6 +155,7 @@ function PanicBtn({ onClick }) {
   return (
     <button
       onClick={onClick}
+      data-tour="panic"
       title="PANIC * broadcast officer-in-distress to all units"
       className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 min-w-[58px] h-full shrink-0 border-none cursor-pointer transition-all font-ui bg-red-600/90 hover:bg-red-500 text-white animate-pulse-red"
     >
@@ -291,7 +292,7 @@ export default function ActionBar({ onCreateCall }) {
       )}
 
       {/* ── Far right ── */}
-      <div className="ml-auto flex items-stretch shrink-0">
+      <div className="ml-auto flex items-stretch shrink-0" data-tour="account">
         {portal.showStatus && (
           <PanicBtn onClick={() => dispatch({
             type: 'PANIC',

@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ActionBar from './ActionBar';
 import RadioToast from '../RadioToast';
 import SiteFooter from '../SiteFooter';
+import GuidedTour from '../GuidedTour';
 
 export default function AppShell({ children }) {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function AppShell({ children }) {
       </div>
       <SiteFooter />
       <RadioToast />
+      {!inAdmin && <GuidedTour />}
     </div>
   );
 }
