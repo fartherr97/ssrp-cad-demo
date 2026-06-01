@@ -76,7 +76,7 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
   };
 
   const openMenu = () => { clearTimeout(closeTimer.current); place(); setOpen(true); };
-  const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(false), 120); };
+  const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(false), 40); };
   const toggle = () => { if (open) setOpen(false); else openMenu(); };
 
   return (
