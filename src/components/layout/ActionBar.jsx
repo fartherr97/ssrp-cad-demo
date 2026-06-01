@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
+import { STATUS_COLORS } from '../../constants/statusColors';
 import {
   MdDashboard, MdSearch, MdRefresh, MdDescription, MdMap, MdGridView,
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid,
@@ -95,10 +96,6 @@ function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
   );
 }
 
-const STATUS_COLORS = {
-  AVAILABLE: '#22ff66', ENRT: '#ffd700', BUSY: '#ff3333',
-  ARRVD: '#22ccff', UNAVAILABLE: '#cc44ff', OFFDUTY: '#888888',
-};
 
 const STATUS_BTNS = [
   { status: 'AVAILABLE',   label: 'AVL',   Icon: MdCheckCircle      },

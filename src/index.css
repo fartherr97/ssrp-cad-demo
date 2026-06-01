@@ -51,18 +51,19 @@
   --n-blue-active: #1060a8;
   --n-blue-bg:     #040c1c;
 
-  /* ─── Status colors: traditional CAD ─── */
+  /* ─── Status colors ─── */
   /* Green = Available */
-  --st-av-bg:   #002208; --st-av-border:   #004810; --st-av-text:   #22cc55;
-  /* Orange = Busy */
-  --st-busy-bg: #1c0e00; --st-busy-border: #3c2200; --st-busy-text: #dd8800;
+  --st-av-bg:   #001a06; --st-av-border:   #004010; --st-av-text:   #22ff66;
   /* Yellow = En Route */
-  --st-enrt-bg: #1e1c00; --st-enrt-border: #3c3800; --st-enrt-text: #ddcc00;
-  /* Gray = Off Duty / Red text */
-  --st-od-bg:   #0e0000; --st-od-border:   #280000; --st-od-text:   #cc2222;
-  /* Purple = Unavailable / Arrived */
-  --st-unav-bg: #120018; --st-unav-border: #280030; --st-unav-text: #aa22dd;
-  --st-arv-bg:  #120018; --st-arv-border:  #280030; --st-arv-text:  #aa22dd;
+  --st-enrt-bg: #1a1400; --st-enrt-border: #3d3000; --st-enrt-text: #ffd700;
+  /* Red = Busy */
+  --st-busy-bg: #1a0000; --st-busy-border: #3d0000; --st-busy-text: #ff3333;
+  /* Cyan = Arrived */
+  --st-arv-bg:  #001a1f; --st-arv-border:  #003d4d; --st-arv-text:  #22ccff;
+  /* Purple = Unavailable */
+  --st-unav-bg: #180022; --st-unav-border: #3d0055; --st-unav-text: #cc44ff;
+  /* Gray = Off Duty */
+  --st-od-bg:   #141414; --st-od-border:   #2e2e2e; --st-od-text:   #888888;
 
   /* ─── Priority levels ─── */
   --pr1-bg: #150000; --pr1-border: #3a0000; --pr1-text: #ff2222;

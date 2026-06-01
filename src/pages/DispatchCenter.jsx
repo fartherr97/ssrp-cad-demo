@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { STATUS_COLORS as ST_COLOR } from '../constants/statusColors';
 
 /* ─── Elapsed timer ─── */
 function Elapsed({ createdAt }) {
@@ -36,10 +37,6 @@ function PriBadge({ p }) {
   return <span className={`cad-pri p${p}`}>P{p}</span>;
 }
 
-const ST_COLOR = {
-  AVAILABLE:'#22ff66', ENRT:'#ddff33', BUSY:'#ff8822',
-  ARRVD:'#ffee22', UNAVAILABLE:'#dd44aa', OFFDUTY:'#ff4444',
-};
 
 const CALL_NATURES = [
   'Traffic Stop','Suspicious Person','Suspicious Vehicle','Domestic Disturbance',
@@ -116,8 +113,8 @@ export default function DispatchCenter() {
               ▲ P1:{p1Count}
             </span>
           )}
-          {pendingCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#ff8822', marginLeft:4 }}>PNDG:{pendingCount}</span>}
-          {unassignedCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#ffee22', marginLeft:4 }}>UNASN:{unassignedCount}</span>}
+          {pendingCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.BUSY, marginLeft:4 }}>PNDG:{pendingCount}</span>}
+          {unassignedCount > 0 && <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.ENRT, marginLeft:4 }}>UNASN:{unassignedCount}</span>}
           <div className="cad-grid-filters">
             {['ALL','PENDING','ACTIVE','ENRT','P1','P2','P3','P4'].map(f => (
               <button key={f} className={`cad-filter-btn${callFilter === f ? ' active' : ''}`} onClick={() => setCallFilter(f)}>{f}</button>
@@ -180,13 +177,13 @@ export default function DispatchCenter() {
         <div className="cad-grid-titlebar">
           <span className="cad-grid-title">■ FIELD UNITS</span>
           <span className="cad-grid-count">({onDutyOfficers.length} ON DUTY)</span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#22ff66', marginLeft:6 }}>
+          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.AVAILABLE, marginLeft:6 }}>
             AVL:{officers.filter(o => o.status === 'AVAILABLE').length}
           </span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#ff8822', marginLeft:6 }}>
+          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.BUSY, marginLeft:6 }}>
             BUSY:{officers.filter(o => o.status === 'BUSY').length}
           </span>
-          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#ddff33', marginLeft:6 }}>
+          <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:ST_COLOR.ENRT, marginLeft:6 }}>
             ENRT:{officers.filter(o => o.status === 'ENRT').length}
           </span>
           <div className="cad-grid-filters">
