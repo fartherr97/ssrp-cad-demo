@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { FormDocWrap, DynamicFormDoc } from '../components/FormDocument';
+import {
+  S_PAGE,
+  S_INPUT, S_SELECT,
+  S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST,
+  sm, xs, btnHoverOn, btnHoverOff, btnActiveOn,
+} from '../constants/styles';
 
 const FIELD_TYPES = [
   { value: 'text',            label: 'Text' },
@@ -57,7 +63,7 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
         <div>
           <label style={LABEL_STYLE}>Field Label *</label>
           <input
-            className="n-input" style={{ width: '100%', boxSizing: 'border-box' }}
+            style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }}
             value={value.label}
             onChange={e => onChange(v => ({ ...v, label: e.target.value }))}
             placeholder="e.g. Date / Time"
@@ -67,14 +73,14 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
         </div>
         <div>
           <label style={LABEL_STYLE}>Type</label>
-          <select className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={value.type} onChange={e => onChange(v => ({ ...v, type: e.target.value }))}>
+          <select style={{ ...S_SELECT, width: '100%', boxSizing: 'border-box' }} value={value.type} onChange={e => onChange(v => ({ ...v, type: e.target.value }))}>
             {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
         {value.type !== 'checkbox' && value.type !== 'textarea' ? (
           <div>
             <label style={LABEL_STYLE}>Span (cols)</label>
-            <select className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={value.span} onChange={e => onChange(v => ({ ...v, span: parseInt(e.target.value) }))}>
+            <select style={{ ...S_SELECT, width: '100%', boxSizing: 'border-box' }} value={value.span} onChange={e => onChange(v => ({ ...v, span: parseInt(e.target.value) }))}>
               {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
           </div>
@@ -84,7 +90,7 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
         <div style={{ marginBottom: 6 }}>
           <label style={LABEL_STYLE}>Options (comma-separated)</label>
           <input
-            className="n-input" style={{ width: '100%', boxSizing: 'border-box' }}
+            style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }}
             value={value.options}
             onChange={e => onChange(v => ({ ...v, options: e.target.value }))}
             placeholder="Option A, Option B, Option C"
@@ -97,8 +103,8 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
           Required
         </label>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button className="n-btn n-btn-ghost n-btn-xs" onClick={onCancel}>Cancel</button>
-          <button className="n-btn n-btn-primary n-btn-xs" onClick={onAdd} disabled={!value.label.trim()}>Add Field</button>
+          <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onCancel}>Cancel</button>
+          <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onAdd} disabled={!value.label.trim()}>Add Field</button>
         </div>
       </div>
     </div>
@@ -115,11 +121,11 @@ function FieldEditor({ field, onChange }) {
     }}>
       <div>
         <label style={LABEL_STYLE}>Label</label>
-        <input className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={field.label || ''} onChange={e => onChange({ label: e.target.value })} />
+        <input style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }} value={field.label || ''} onChange={e => onChange({ label: e.target.value })} />
       </div>
       <div>
         <label style={LABEL_STYLE}>Field Type</label>
-        <select className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={field.type || 'text'} onChange={e => onChange({ type: e.target.value })}>
+        <select style={{ ...S_SELECT, width: '100%', boxSizing: 'border-box' }} value={field.type || 'text'} onChange={e => onChange({ type: e.target.value })}>
           {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
       </div>
@@ -127,7 +133,7 @@ function FieldEditor({ field, onChange }) {
       {field.type !== 'checkbox' && field.type !== 'textarea' && (
         <div>
           <label style={LABEL_STYLE}>Column Span (1–4)</label>
-          <select className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={field.span || 1} onChange={e => onChange({ span: parseInt(e.target.value) })}>
+          <select style={{ ...S_SELECT, width: '100%', boxSizing: 'border-box' }} value={field.span || 1} onChange={e => onChange({ span: parseInt(e.target.value) })}>
             {[1,2,3,4].map(n => <option key={n} value={n}>{n} column{n > 1 ? 's' : ''}</option>)}
           </select>
         </div>
@@ -136,7 +142,7 @@ function FieldEditor({ field, onChange }) {
       {field.type === 'textarea' && (
         <div>
           <label style={LABEL_STYLE}>Min Rows</label>
-          <input type="number" className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} min={2} max={20} value={field.minRows || 4} onChange={e => onChange({ minRows: parseInt(e.target.value) || 4 })} />
+          <input type="number" style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }} min={2} max={20} value={field.minRows || 4} onChange={e => onChange({ minRows: parseInt(e.target.value) || 4 })} />
         </div>
       )}
 
@@ -157,7 +163,7 @@ function FieldEditor({ field, onChange }) {
         <div style={{ gridColumn: '1 / -1' }}>
           <label style={LABEL_STYLE}>Options (comma-separated)</label>
           <input
-            className="n-input" style={{ width: '100%', boxSizing: 'border-box' }}
+            style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }}
             value={Array.isArray(field.options) ? field.options.join(', ') : (field.options || '')}
             onChange={e => onChange({ options: e.target.value.split(',').map(o => o.trim()).filter(Boolean) })}
             placeholder="Option 1, Option 2, Option 3"
@@ -187,23 +193,21 @@ function SectionEditor({
       }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: dotColor, flexShrink: 0, border: '1px solid rgba(255,255,255,0.15)' }} />
         <input
-          className="n-input"
-          style={{ flex: 1, fontSize: 11, fontWeight: 600, minWidth: 0, boxSizing: 'border-box' }}
+          style={{ ...S_INPUT, flex: 1, fontSize: 11, fontWeight: 600, minWidth: 0, boxSizing: 'border-box' }}
           value={section.title}
           onChange={e => onSetProp('title', e.target.value)}
           placeholder="Section title"
         />
         <select
-          className="n-input"
-          style={{ width: 72, fontSize: 9, boxSizing: 'border-box' }}
+          style={{ ...S_SELECT, width: 72, fontSize: 9, boxSizing: 'border-box' }}
           value={section.style || 'gray'}
           onChange={e => onSetProp('style', e.target.value)}
         >
           {SECTION_STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button className="n-btn n-btn-ghost n-btn-xs" onClick={onMoveUp}  disabled={sIdx === 0}                style={{ padding: '1px 4px', fontSize: 9 }}>↑</button>
-        <button className="n-btn n-btn-ghost n-btn-xs" onClick={onMoveDown} disabled={sIdx === totalSections - 1} style={{ padding: '1px 4px', fontSize: 9 }}>↓</button>
-        <button className="n-btn n-btn-ghost n-btn-xs" onClick={onDelete}   style={{ padding: '1px 4px', fontSize: 9, color: 'var(--pr1-text)' }}>✕</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onMoveUp}  disabled={sIdx === 0}>↑</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onMoveDown} disabled={sIdx === totalSections - 1}>↓</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onDelete}>✕</button>
       </div>
 
       {/* Fields */}
@@ -239,9 +243,9 @@ function SectionEditor({
                   <span style={{ fontSize: 8, color: 'var(--n-text-dim)', fontFamily: 'var(--font-mono)', width: 16, flexShrink: 0 }}>×{field.span || 1}</span>
                 )}
                 <div style={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-                  <button className="n-btn n-btn-ghost n-btn-xs" onClick={e => { e.stopPropagation(); onMoveFieldUp(section.id, fIdx); }} disabled={fIdx === 0} style={{ padding: '1px 3px', fontSize: 9 }}>↑</button>
-                  <button className="n-btn n-btn-ghost n-btn-xs" onClick={e => { e.stopPropagation(); onMoveFieldDown(section.id, fIdx); }} disabled={fIdx === section.fields.length - 1} style={{ padding: '1px 3px', fontSize: 9 }}>↓</button>
-                  <button className="n-btn n-btn-ghost n-btn-xs" onClick={e => { e.stopPropagation(); onDeleteField(section.id, field.id); }} style={{ padding: '1px 3px', fontSize: 9, color: 'var(--pr1-text)' }}>✕</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldUp(section.id, fIdx); }} disabled={fIdx === 0}>↑</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldDown(section.id, fIdx); }} disabled={fIdx === section.fields.length - 1}>↓</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onDeleteField(section.id, field.id); }}>✕</button>
                 </div>
               </div>
               {isExpanded && (
@@ -262,7 +266,7 @@ function SectionEditor({
             onCancel={onCancelAdd}
           />
         ) : (
-          <button className="n-btn n-btn-ghost n-btn-xs" style={{ marginTop: 4, fontSize: 9 }} onClick={onStartAdd}>
+          <button style={{ ...xs(S_BTN_GHOST), marginTop: 4, fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onStartAdd}>
             + Add Field
           </button>
         )}
@@ -404,7 +408,7 @@ export default function FormBuilder() {
   }));
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* ── LEFT: Template list ───────────────────────────────── */}
@@ -421,7 +425,7 @@ export default function FormBuilder() {
               Form Builder
             </span>
             {isAdmin && (
-              <button className="n-btn n-btn-primary n-btn-xs" onClick={startNew}>+ New</button>
+              <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={startNew}>+ New</button>
             )}
           </div>
 
@@ -448,8 +452,8 @@ export default function FormBuilder() {
                 </div>
                 {isAdmin && t.id >= 7 && (
                   <button
-                    className="n-btn n-btn-ghost n-btn-xs"
-                    style={{ fontSize: 8, color: 'var(--pr1-text)', padding: '1px 5px', flexShrink: 0 }}
+                    style={{ ...xs(S_BTN_GHOST), fontSize: 8, color: 'var(--pr1-text)', padding: '1px 5px', flexShrink: 0 }}
+                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
                     onClick={e => deleteTemplate(t.id, e)}
                   >
                     ✕
@@ -481,7 +485,7 @@ export default function FormBuilder() {
                 </div>
               </div>
               {isAdmin && (
-                <button className="n-btn n-btn-primary n-btn-xs" onClick={startNew}>Create New Template</button>
+                <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={startNew}>Create New Template</button>
               )}
             </div>
           ) : (
@@ -514,9 +518,9 @@ export default function FormBuilder() {
                   {editing.name || 'Untitled'}{!editing.id ? ' — unsaved' : ''}
                 </span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <button className="n-btn n-btn-ghost n-btn-xs" onClick={() => setEditing(null)}>Cancel</button>
+                  <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>Cancel</button>
                   {isAdmin && (
-                    <button className="n-btn n-btn-primary n-btn-xs" onClick={saveTemplate}>
+                    <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={saveTemplate}>
                       {editing.id ? 'Save Changes' : 'Create Template'}
                     </button>
                   )}
@@ -534,21 +538,20 @@ export default function FormBuilder() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       <div>
                         <label style={LABEL_STYLE}>Template Name *</label>
-                        <input className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={editing.name || ''} onChange={e => setTplProp('name', e.target.value)} />
+                        <input style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }} value={editing.name || ''} onChange={e => setTplProp('name', e.target.value)} />
                       </div>
                       <div>
                         <label style={LABEL_STYLE}>Form Code (optional)</label>
-                        <input className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={editing.formCode || ''} onChange={e => setTplProp('formCode', e.target.value)} placeholder="e.g. TPD-TS-001" />
+                        <input style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }} value={editing.formCode || ''} onChange={e => setTplProp('formCode', e.target.value)} placeholder="e.g. TPD-TS-001" />
                       </div>
                       <div style={{ gridColumn: '1 / -1' }}>
                         <label style={LABEL_STYLE}>Agency Header</label>
-                        <input className="n-input" style={{ width: '100%', boxSizing: 'border-box' }} value={editing.agency || ''} onChange={e => setTplProp('agency', e.target.value)} />
+                        <input style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }} value={editing.agency || ''} onChange={e => setTplProp('agency', e.target.value)} />
                       </div>
                       <div style={{ gridColumn: '1 / -1' }}>
                         <label style={LABEL_STYLE}>Signature Slots (comma-separated)</label>
                         <input
-                          className="n-input"
-                          style={{ width: '100%', boxSizing: 'border-box' }}
+                          style={{ ...S_INPUT, width: '100%', boxSizing: 'border-box' }}
                           value={Array.isArray(editing.signatureSlots) ? editing.signatureSlots.join(', ') : (editing.signatureSlots || '')}
                           onChange={e => setTplProp('signatureSlots', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                           placeholder="Officer Signature / Badge #, Supervisor Signature, Date"
@@ -584,8 +587,8 @@ export default function FormBuilder() {
                   ))}
 
                   <button
-                    className="n-btn n-btn-secondary n-btn-sm"
-                    style={{ width: '100%', marginTop: 4, boxSizing: 'border-box' }}
+                    style={{ ...sm(S_BTN_SECONDARY), width: '100%', marginTop: 4, boxSizing: 'border-box' }}
+                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
                     onClick={addSection}
                   >
                     + Add Section

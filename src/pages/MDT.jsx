@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
+import {
+  S_PAGE, S_TABS, tabStyle,
+  S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_FIELD, S_LABEL, S_SELECT, S_INPUT,
+  S_BTN_PRIMARY, btnHoverOn, btnHoverOff, btnActiveOn,
+  BADGE, S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR,
+} from '../constants/styles';
 
 export default function MDT() {
   const { state, dispatch } = useCAD();
@@ -39,14 +46,14 @@ export default function MDT() {
   };
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
-      <div className="n-tabs">
+    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
+      <div style={S_TABS}>
         {[
           { id: 'MESSAGES', label: 'Messages', badge: unread.length },
           { id: 'RADIO', label: 'Radio Log', badge: 0 },
           { id: 'QUERY', label: 'State Returns', badge: 0 },
         ].map(t => (
-          <button key={t.id} className={`n-tab${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+          <button key={t.id} style={tabStyle(tab === t.id)} onClick={() => setTab(t.id)}>
             {t.label}
             {t.badge > 0 && (
               <span style={{ marginLeft: 4, fontSize: 9, background: 'var(--pr1-bg)', color: 'var(--pr1-text)', borderRadius: 2, padding: '0 4px', fontFamily: 'var(--font-mono)' }}>
@@ -61,25 +68,25 @@ export default function MDT() {
         {/* MESSAGES */}
         {tab === 'MESSAGES' && (
           <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-            <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-              <div className="n-panel-header">
-                <div className="n-panel-title">Inbox</div>
+            <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
+              <div style={S_PANEL_HEADER}>
+                <div style={S_PANEL_TITLE}>Inbox</div>
                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)' }}>{messages.length} MESSAGES</span>
               </div>
-              <div className="n-panel-body scroll-y">
+              <div style={S_PANEL_BODY}>
                 {messages.map(m => (
                   <div key={m.id}
-                    className="n-card n-card-hover"
                     style={{
                       margin: '3px 8px', padding: '7px 9px', borderRadius: 3, cursor: 'pointer',
                       border: selectedMsg === m.id ? '1px solid var(--n-border-accent)' : '1px solid var(--n-border-subtle)',
                       background: selectedMsg === m.id ? 'var(--n-bg-selected)' : !m.read ? 'var(--n-bg-elevated)' : 'var(--n-bg-card)',
                       borderLeft: m.priority === 'HIGH' ? '3px solid var(--pr1-text)' : undefined,
+                      transition: 'border-color 0.22s, background 0.22s',
                     }}
                     onClick={() => { setSelectedMsg(m.id); if (!m.read) markRead(m.id); }}>
                     <div style={{ display: 'flex', gap: 5, marginBottom: 2, alignItems: 'center' }}>
                       {!m.read && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--n-blue-active)', flexShrink: 0 }} />}
-                      {m.priority === 'HIGH' && <span className="n-badge badge-red" style={{ fontSize: 8 }}>HIGH PRI</span>}
+                      {m.priority === 'HIGH' && <span style={{ ...BADGE.red, fontSize: 8 }}>HIGH PRI</span>}
                       <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>
                         {m.timestamp?.split(' ')[1] || ''}
                       </span>
@@ -90,7 +97,7 @@ export default function MDT() {
                 ))}
               </div>
             </div>
-            <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
+            <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
               {!selMsg ? (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--n-text-muted)', padding: 20 }}>
                   <span style={{ fontSize: 28, opacity: 0.2 }}>📨</span>
@@ -100,7 +107,7 @@ export default function MDT() {
                 <>
                   <div style={{ padding: '10px 14px', background: 'var(--n-bg-card)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
                     <div style={{ display: 'flex', gap: 8, marginBottom: 4, alignItems: 'center' }}>
-                      {selMsg.priority === 'HIGH' && <span className="n-badge badge-red">HIGH PRIORITY</span>}
+                      {selMsg.priority === 'HIGH' && <span style={BADGE.red}>HIGH PRIORITY</span>}
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{selMsg.subject}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text-dim)', fontFamily: 'var(--font-mono)' }}>
@@ -118,19 +125,19 @@ export default function MDT() {
 
         {/* RADIO LOG */}
         {tab === 'RADIO' && (
-          <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', flex: 1 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">
+          <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', flex: 1 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block', marginRight: 5 }} />
                 Dispatch Radio Log
               </div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>CH: HILLSBOROUGH MAIN</span>
             </div>
-            <div className="n-panel-body scroll-y">
+            <div style={S_PANEL_BODY}>
               {dispatchLog.map(e => (
-                <div key={e.id} className="tx-entry">
-                  <span className="tx-time">{e.time}</span>
-                  <span className={`tx-kind-${e.kind}`}>{e.text}</span>
+                <div key={e.id} style={S_TX_ENTRY}>
+                  <span style={S_TX_TIME}>{e.time}</span>
+                  <span style={{ color: TX_KIND_COLOR[e.kind] || 'var(--n-text-muted)' }}>{e.text}</span>
                 </div>
               ))}
               {dispatchLog.length === 0 && (
@@ -148,23 +155,23 @@ export default function MDT() {
                 STATE / NCIC QUERY TERMINAL
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
-                <div className="n-field" style={{ flex: '0 0 120px' }}>
-                  <label className="n-label">Query Type</label>
-                  <select className="n-select" value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
+                <div style={{ ...S_FIELD, flex: '0 0 120px' }}>
+                  <label style={S_LABEL}>Query Type</label>
+                  <select style={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
                     <option value="PERSON">Person</option>
                     <option value="VEHICLE">Vehicle</option>
                   </select>
                 </div>
-                <div className="n-field" style={{ flex: 1 }}>
-                  <label className="n-label">{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
-                  <input className="n-input" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
+                <div style={{ ...S_FIELD, flex: 1 }}>
+                  <label style={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
+                  <input style={S_INPUT} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
                     placeholder={queryType === 'PERSON' ? 'e.g. Washington or 618-77-9901' : 'e.g. SUS-1109 or Dodge Charger'} />
                 </div>
-                <button className="n-btn n-btn-primary" onClick={runQuery}>Query</button>
+                <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={runQuery}>Query</button>
               </div>
             </div>
 
-            <div className="n-panel-body scroll-y" style={{ flex: 1, padding: 12 }}>
+            <div style={{ ...S_PANEL_BODY, flex: 1, padding: 12 }}>
               {!searched ? (
                 <div style={{
                   background: 'var(--n-bg-panel)', border: '1px solid var(--n-border)', borderRadius: 3,

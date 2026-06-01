@@ -19,9 +19,16 @@ export default function RadioToast() {
 
   return (
     <div
-      className="radio-toast anim-slide-in"
       onClick={() => setDismissedId(toast.id)}
-      style={{ cursor: 'pointer' }}
+      style={{
+        position: 'fixed', bottom: 80, right: 20, zIndex: 1000,
+        background: 'rgba(4,16,32,0.95)', border: '1px solid rgba(30,100,180,0.4)',
+        borderLeft: '3px solid var(--n-blue-active)', borderRadius: 8,
+        padding: '12px 16px', minWidth: 260, maxWidth: 380,
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        animation: 'slideInRight 0.15s ease-out',
+        cursor: 'pointer',
+      }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
         <span style={{

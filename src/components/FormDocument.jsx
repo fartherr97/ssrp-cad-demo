@@ -2,6 +2,15 @@
 
 import React, { useState } from 'react';
 import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
+import {
+  S_RECORD_RETURN, S_RECORD_RETURN_HEADER, S_RECORD_RETURN_ALERT, S_RECORD_RETURN_ALERT_WARN,
+  S_RECORD_RETURN_BODY, S_RECORD_RETURN_SECTION, S_RECORD_RETURN_LINE,
+  S_RECORD_RETURN_KEY, S_RECORD_RETURN_VAL,
+  S_RECORD_RETURN_FOOTER, S_RECORD_RETURN_FLAG, S_RECORD_RETURN_FLAG_WARN,
+  S_FORM_DOC_WRAP, S_FORM_DOC,
+  S_FORM_DOC_FOOTER_S,
+  S_FORM_DOC_ALERT_RED, S_FORM_DOC_ALERT_ORANGE, S_FORM_DOC_ALERT_YELLOW,
+} from '../constants/styles';
 
 export const FormMetaContext = React.createContext({});
 
@@ -10,7 +19,7 @@ export const FormMetaContext = React.createContext({});
 export function FormDocWrap({ children, meta = {} }) {
   return (
     <FormMetaContext.Provider value={meta}>
-      <div className="form-doc-wrap"><div className="form-doc">{children}</div></div>
+      <div style={S_FORM_DOC_WRAP}><div style={S_FORM_DOC}>{children}</div></div>
     </FormMetaContext.Provider>
   );
 }
@@ -246,7 +255,7 @@ export function FormSignatureRow({ slots }) {
 /* Form footer */
 export function FormDocFooter({ left, right }) {
   return (
-    <div className="form-doc-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div style={{ ...S_FORM_DOC_FOOTER_S, display: 'flex', justifyContent: 'space-between' }}>
       <span>{left}</span>
       <span>SSRP CAD SYSTEM — HILLSBOROUGH COUNTY</span>
       <span>{right}</span>
@@ -256,7 +265,8 @@ export function FormDocFooter({ left, right }) {
 
 /* ── Alert/Flag bar ────────────────────────────────────────────── */
 export function FormAlert({ text, level = 'red' }) {
-  return <div className={`form-doc-alert ${level}`}><span>⚠</span>{text}</div>;
+  const alertStyle = level === 'red' ? S_FORM_DOC_ALERT_RED : level === 'orange' ? S_FORM_DOC_ALERT_ORANGE : S_FORM_DOC_ALERT_YELLOW;
+  return <div style={alertStyle}><span>⚠</span>{text}</div>;
 }
 
 /* ── Specific document layouts ────────────────────────────────── */
@@ -698,7 +708,7 @@ const RETURN_ICON = { PERSON: MdPerson, VEHICLE: MdDirectionsCar, WARRANT: MdGav
 function ReturnHeader({ type, title }) {
   const Icon = RETURN_ICON[type] || MdPerson;
   return (
-    <div className="record-return-header">
+    <div style={S_RECORD_RETURN_HEADER}>
       <Icon size={18} />
       <span>{title}</span>
     </div>
@@ -707,7 +717,7 @@ function ReturnHeader({ type, title }) {
 
 function ReturnFooter() {
   return (
-    <div className="record-return-footer">
+    <div style={S_RECORD_RETURN_FOOTER}>
       END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
     </div>
   );
@@ -715,9 +725,9 @@ function ReturnFooter() {
 
 export function RecordReturn({ type, subject, data }) {
   const line = (key, val) => (val !== undefined && val !== null && val !== '') ? (
-    <div className="record-return-line" key={key}>
-      <span className="record-return-key">{key}</span>
-      <span className="record-return-val">{val}</span>
+    <div style={S_RECORD_RETURN_LINE} key={key}>
+      <span style={S_RECORD_RETURN_KEY}>{key}: </span>
+      <span style={S_RECORD_RETURN_VAL}>{val}</span>
     </div>
   ) : null;
 
@@ -728,21 +738,25 @@ export function RecordReturn({ type, subject, data }) {
     const hasWarrant = flags.includes('WARRANT');
     const dlSusp = data.dlStatus === 'SUSPENDED';
     return (
-      <div className="record-return">
+      <div style={S_RECORD_RETURN}>
         <ReturnHeader type="PERSON" title={`DR — Name: ${data.firstName} ${data.lastName}`} />
         {hasWarrant && (
-          <div className="record-return-alert">*** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***</div>
         )}
         {dlSusp && (
-          <div className="record-return-alert warn">*** DRIVER LICENSE SUSPENDED — NO VALID DL ***</div>
+          <div style={S_RECORD_RETURN_ALERT_WARN}>*** DRIVER LICENSE SUSPENDED — NO VALID DL ***</div>
         )}
-        <div className="record-return-body">
-          <div className="record-return-section">Query Data</div>
+        <div style={S_RECORD_RETURN_BODY}>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Query Data<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Query Type', 'Driver / Person')}
           {line('Source', 'FCIC / NCIC')}
           {line('Returned', now)}
 
-          <div className="record-return-section">Driver Details</div>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Driver Details<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Name', `${data.firstName} ${data.lastName}`)}
           {line('Gender', data.gender)}
           {line('Race', data.ethnicity)}
@@ -753,11 +767,15 @@ export function RecordReturn({ type, subject, data }) {
           {line('Eye Color', data.eyes)}
           {line('SSN', data.ssn)}
 
-          <div className="record-return-section">Address Information</div>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Address Information<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Residence', data.address)}
           {line('Phone', data.phone)}
 
-          <div className="record-return-section">Driver License</div>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Driver License<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('DL Number', data.dlNumber)}
           {line('DL Class', data.dlClass)}
           {line('DL Status', data.dlStatus)}
@@ -766,10 +784,12 @@ export function RecordReturn({ type, subject, data }) {
 
           {flags.length > 0 && (
             <>
-              <div className="record-return-section">Flags / Alerts</div>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Flags / Alerts<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
-                {flags.map(f => <span key={f} className="record-return-flag">{f}</span>)}
-                {dlSusp && <span className="record-return-flag warn">DL SUSPENDED</span>}
+                {flags.map(f => <span key={f} style={S_RECORD_RETURN_FLAG}>{f}</span>)}
+                {dlSusp && <span style={S_RECORD_RETURN_FLAG_WARN}>DL SUSPENDED</span>}
               </div>
             </>
           )}
@@ -781,21 +801,25 @@ export function RecordReturn({ type, subject, data }) {
 
   if (type === 'VEHICLE' && data) {
     return (
-      <div className="record-return">
+      <div style={S_RECORD_RETURN}>
         <ReturnHeader type="VEHICLE" title={`VR — Plate: ${data.plate}`} />
         {data.stolen && (
-          <div className="record-return-alert">*** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***</div>
         )}
         {subject && subject.flags?.includes('WARRANT') && (
-          <div className="record-return-alert warn">*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>
+          <div style={S_RECORD_RETURN_ALERT_WARN}>*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>
         )}
-        <div className="record-return-body">
-          <div className="record-return-section">Query Data</div>
+        <div style={S_RECORD_RETURN_BODY}>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Query Data<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Query Type', 'Vehicle / Plate')}
           {line('Source', 'FCIC / NCIC')}
           {line('Returned', now)}
 
-          <div className="record-return-section">Vehicle Registration</div>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Vehicle Registration<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Plate', data.plate)}
           {line('State', 'Florida')}
           {line('Year', String(data.year))}
@@ -808,7 +832,9 @@ export function RecordReturn({ type, subject, data }) {
 
           {subject && (
             <>
-              <div className="record-return-section">Registered Owner</div>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Registered Owner<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
               {line('Name', `${subject.firstName} ${subject.lastName}`)}
               {line('Date of Birth', subject.dob)}
               {line('Residence', subject.address)}
@@ -816,16 +842,18 @@ export function RecordReturn({ type, subject, data }) {
               {line('DL Status', subject.dlStatus)}
               {subject.flags?.length > 0 && (
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
-                  {subject.flags.map(f => <span key={f} className="record-return-flag">{f}</span>)}
+                  {subject.flags.map(f => <span key={f} style={S_RECORD_RETURN_FLAG}>{f}</span>)}
                 </div>
               )}
             </>
           )}
           {data.flags?.length > 0 && (
             <>
-              <div className="record-return-section">Vehicle Flags</div>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Vehicle Flags<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 0' }}>
-                {data.flags.map(f => <span key={f} className="record-return-flag warn">{f}</span>)}
+                {data.flags.map(f => <span key={f} style={S_RECORD_RETURN_FLAG_WARN}>{f}</span>)}
               </div>
             </>
           )}
@@ -837,18 +865,22 @@ export function RecordReturn({ type, subject, data }) {
 
   if (type === 'WARRANT' && data) {
     return (
-      <div className="record-return">
+      <div style={S_RECORD_RETURN}>
         <ReturnHeader type="WARRANT" title={`WR — Subject: ${data.civilianName}`} />
         {data.status === 'ACTIVE' && (
-          <div className="record-return-alert">*** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***</div>
         )}
-        <div className="record-return-body">
-          <div className="record-return-section">Query Data</div>
+        <div style={S_RECORD_RETURN_BODY}>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Query Data<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Query Type', 'Warrant')}
           {line('Source', 'FCIC / NCIC')}
           {line('Returned', now)}
 
-          <div className="record-return-section">Warrant Information</div>
+          <div style={S_RECORD_RETURN_SECTION}>
+            <span style={{color:'#4f7bb0'}}>*** </span>Warrant Information<span style={{color:'#4f7bb0'}}> ***</span>
+          </div>
           {line('Status', data.status)}
           {line('Type', data.type)}
           {line('Subject', data.civilianName)}

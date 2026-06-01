@@ -14,7 +14,11 @@ function Clock() {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return <span className="cad-clock">{time}</span>;
+  return (
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--n-text-data)', letterSpacing: '0.4px', padding: '0 10px', flexShrink: 0 }}>
+      {time}
+    </span>
+  );
 }
 
 const NAV_ITEMS = [
@@ -71,27 +75,48 @@ export default function MenuBar() {
 
   return (
     <>
-      <div className="cad-menubar">
+      <div style={{
+        height: 'var(--menubar-h, 36px)', minHeight: 'var(--menubar-h, 36px)',
+        display: 'flex', alignItems: 'center', background: 'var(--n-bg-toolbar)',
+        borderBottom: '1px solid var(--n-border-strong)', flexShrink: 0, userSelect: 'none',
+        padding: 0, gap: 0, overflowX: 'hidden',
+      }}>
         {/* Branding */}
-        <div className="cad-menubar-brand">
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 7,
+          padding: '0 12px', height: '100%', borderRight: '1px solid var(--n-border)',
+          background: 'var(--n-bg-card)', flexShrink: 0,
+        }}>
           <img
             src="https://cdn.ssrp.us/images/ssrp.png"
             alt="SSRP"
             style={{ width: 22, height: 22, flexShrink: 0, objectFit: 'contain' }}
           />
           <div>
-            <div className="cad-menubar-agency">Sunshine State RP</div>
-            <div className="cad-menubar-sub">CAD · ECC</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--n-gold)', letterSpacing: '0.4px', lineHeight: 1.2 }}>Sunshine State RP</div>
+            <div style={{ fontSize: 8, color: 'var(--n-text-muted)', letterSpacing: '0.5px', textTransform: 'uppercase', lineHeight: 1.3 }}>CAD · ECC</div>
           </div>
         </div>
 
         {/* Desktop navigation */}
-        <nav className="cad-nav">
-          {navItems.map(item => (
+        <nav style={{ display: 'flex', alignItems: 'stretch', height: '100%', flex: 1, overflow: 'hidden' }}>
+          {navItems.map(item => {
+            const active = isActive(item.route);
+            return (
             <button
               key={item.route}
-              className={`cad-nav-item${isActive(item.route) ? ' active' : ''}`}
               onClick={() => go(item.route)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 4, padding: '0 11px',
+                height: '100%', background: active ? 'rgba(47,127,232,0.12)' : 'transparent',
+                border: 'none', borderBottom: `2px solid ${active ? 'var(--acc-blue-hi)' : 'transparent'}`,
+                color: active ? '#c0d8f0' : 'var(--n-text-dim)', cursor: 'pointer', flexShrink: 0,
+                fontSize: 11, fontWeight: active ? 700 : 500, letterSpacing: '0.2px',
+                transition: 'background 0.1s, color 0.1s', whiteSpace: 'nowrap',
+                fontFamily: 'var(--font-ui)',
+              }}
+              onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'var(--n-text)'; } }}
+              onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--n-text-dim)'; } }}
             >
               {item.label}
               {item.route === '/cad' && p1Count > 0 && (
@@ -104,24 +129,24 @@ export default function MenuBar() {
                 </span>
               )}
             </button>
-          ))}
+          );
+          })}
         </nav>
 
         {/* Right: desktop stats + clock, then hamburger (always last) */}
-        <div className="cad-menubar-right">
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: 0, marginLeft: 'auto', flexShrink: 0 }}>
           {p1Count > 0 && (
-            <div className="cad-menubar-stat" style={{ color: 'var(--pr1-text)', animation: 'pulseRed 1.5s ease-in-out infinite' }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--pr1-text)', animation: 'pulseRed 1.5s ease-in-out infinite', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>
               ▲ P1: {p1Count}
             </div>
           )}
-          <div className="cad-menubar-stat">ACTIVE: <span className="val">{activeCalls}</span></div>
-          <div className="cad-menubar-stat">ON DUTY: <span className="val">{onDuty}</span></div>
-          <div className="cad-menubar-stat" style={{ borderLeft: '1px solid var(--n-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>ACTIVE: <span style={{ color: 'var(--n-text-data)', marginLeft: 4 }}>{activeCalls}</span></div>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>ON DUTY: <span style={{ color: 'var(--n-text-data)', marginLeft: 4 }}>{onDuty}</span></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px', fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', borderLeft: '1px solid var(--n-border)', flexShrink: 0 }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLORS[myStatus] || '#2e4258', flexShrink: 0 }} />
             <span style={{ color: 'var(--n-text-dim)' }}>{me?.badge || '—'} · {me?.deptShort || '—'}</span>
           </div>
           <Clock />
-
           {/* Hamburger — lives here so it's always on the far right */}
           <button
             className="cad-mobile-toggle"
@@ -184,22 +209,32 @@ export default function MenuBar() {
             </div>
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
               {[
-                { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available' },
-                { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt'      },
-                { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy'      },
-                { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd'     },
-                { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl'     },
-                { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty'   },
-              ].map(s => (
-                <button
-                  key={s.status}
-                  className={`cad-status-btn ${myStatus === s.status ? s.cls : ''}`}
-                  style={{ height: 32, padding: '0 12px', fontSize: 10 }}
-                  onClick={() => setStatus(s.status)}
-                >
-                  {s.label}
-                </button>
-              ))}
+                { status: 'AVAILABLE',   label: 'AVL'   },
+                { status: 'ENRT',        label: 'ENRT'  },
+                { status: 'BUSY',        label: 'BUSY'  },
+                { status: 'ARRVD',       label: 'ARRVD' },
+                { status: 'UNAVAILABLE', label: 'UNAVL' },
+                { status: 'OFFDUTY',     label: 'OFD'   },
+              ].map(s => {
+                const isActive = myStatus === s.status;
+                const color = STATUS_COLORS[s.status] || '#556677';
+                return (
+                  <button
+                    key={s.status}
+                    onClick={() => setStatus(s.status)}
+                    style={{
+                      height: 32, padding: '0 12px', fontSize: 10,
+                      fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
+                      border: `1px solid ${isActive ? color : 'var(--n-border)'}`,
+                      borderRadius: 3, cursor: 'pointer',
+                      background: isActive ? `${color}22` : 'var(--n-bg-card)',
+                      color: isActive ? color : 'var(--n-text-muted)',
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

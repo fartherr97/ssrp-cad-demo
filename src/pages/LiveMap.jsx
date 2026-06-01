@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY, S_BTN_PRIMARY, S_BTN_SECONDARY, xs, btnHoverOn, btnHoverOff, S_UNIT_ROW, S_DATA } from '../constants/styles';
 
 const MAP_W = 800;
 const MAP_H = 560;
@@ -70,12 +71,12 @@ export default function LiveMap() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div className="n-page" style={{ padding: 8, gap: 8, overflow: 'hidden' }}>
+    <div style={{ ...S_PAGE, padding: 8, gap: 8, overflow: 'hidden' }}>
       <div style={{ display: 'flex', gap: 8, flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {/* Map */}
-        <div className="n-panel" style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-          <div className="n-panel-header">
-            <div className="n-panel-title">
+        <div style={{ ...S_PANEL, flex: 1, position: 'relative', overflow: 'hidden' }}>
+          <div style={S_PANEL_HEADER}>
+            <div style={S_PANEL_TITLE}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block' }} />
               Live Situational Map
             </div>
@@ -85,7 +86,8 @@ export default function LiveMap() {
                 { label: 'Calls', active: showCalls, toggle: () => setShowCalls(v => !v) },
               ].map(l => (
                 <button key={l.label}
-                  className={`n-btn n-btn-xs ${l.active ? 'n-btn-primary' : 'n-btn-secondary'}`}
+                  style={xs(l.active ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
+                  onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
                   onClick={l.toggle}>
                   {l.label}
                 </button>
@@ -210,9 +212,9 @@ export default function LiveMap() {
         {/* Right: Legend + Unit list */}
         <div style={{ width: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* Legend */}
-          <div className="n-panel" style={{ flexShrink: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Legend</div>
+          <div style={{ ...S_PANEL, flexShrink: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Legend</div>
             </div>
             <div style={{ padding: '8px 10px' }}>
               <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 6 }}>Unit Status</div>
@@ -243,16 +245,16 @@ export default function LiveMap() {
           </div>
 
           {/* Unit list */}
-          <div className="n-panel" style={{ flex: 1 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">On-Duty Units</div>
+          <div style={{ ...S_PANEL, flex: 1 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>On-Duty Units</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length}</span>
             </div>
-            <div className="n-panel-body scroll-y">
+            <div style={S_PANEL_BODY}>
               {onDuty.map(o => (
-                <div key={o.id} className="unit-row">
+                <div key={o.id} style={S_UNIT_ROW}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor(o.status), flexShrink: 0 }} />
-                  <span className="n-data" style={{ minWidth: 42, fontSize: 10, color: '#6ab4d8' }}>{o.unitId}</span>
+                  <span style={{ ...S_DATA, minWidth: 42, fontSize: 10, color: '#6ab4d8' }}>{o.unitId}</span>
                   <span style={{ flex: 1, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
                 </div>
               ))}
@@ -260,16 +262,16 @@ export default function LiveMap() {
           </div>
 
           {/* Active calls list */}
-          <div className="n-panel" style={{ maxHeight: 160, flexShrink: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Active Calls</div>
+          <div style={{ ...S_PANEL, maxHeight: 160, flexShrink: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Active Calls</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{activeCalls.length}</span>
             </div>
-            <div className="n-panel-body scroll-y">
+            <div style={S_PANEL_BODY}>
               {activeCalls.map(c => (
                 <div key={c.id} style={{ padding: '4px 8px', borderBottom: '1px solid var(--n-border-faint)', display: 'flex', gap: 5, alignItems: 'center' }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: priBorderColor(c.priority) }} />
-                  <span className="n-data" style={{ fontSize: 9, minWidth: 52 }}>{c.id}</span>
+                  <span style={{ ...S_DATA, fontSize: 9, minWidth: 52 }}>{c.id}</span>
                   <span style={{ fontSize: 10, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--n-text-dim)' }}>{c.nature}</span>
                 </div>
               ))}

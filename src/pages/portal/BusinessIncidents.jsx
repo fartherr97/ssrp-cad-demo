@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MdAssignment, MdBusiness, MdInfo } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { PortalPage, PortalHeader, StatCard, PortalCard } from './PortalKit';
+import { S_BTN_PRIMARY, BADGE, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#44aacc';
 
@@ -21,7 +22,7 @@ export default function BusinessIncidents() {
           <div style={{ fontSize: 14, color: 'rgba(180,200,230,0.6)', marginBottom: 18 }}>
             You need to register a business before you can view incidents.
           </div>
-          <button className="n-btn n-btn-primary" onClick={() => navigate('/portal/my-business')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/portal/my-business')}>
             <MdBusiness size={16} /> Register your business
           </button>
         </PortalCard>
@@ -59,11 +60,13 @@ export default function BusinessIncidents() {
         {['ALL', 'Open', 'Closed'].map(t => (
           <button key={t}
             onClick={() => setFilter(t)}
-            className="n-btn"
             style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              padding: '6px 14px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--n-radius-sm)',
+              cursor: 'pointer', border: '1px solid transparent', transition: 'all 0.14s',
               background: filter === t ? ACCENT : 'rgba(255,255,255,0.05)',
               color: filter === t ? '#fff' : 'rgba(200,220,240,0.7)',
-              border: '1px solid ' + (filter === t ? 'transparent' : 'rgba(255,255,255,0.12)'),
+              borderColor: filter === t ? 'transparent' : 'rgba(255,255,255,0.12)',
             }}>
             {t} ({COUNTS[t]})
           </button>
@@ -104,7 +107,7 @@ export default function BusinessIncidents() {
                   <div style={{ fontSize: 15, fontWeight: 700, color: '#e6eef6', lineHeight: 1.25 }}>{inc.type}</div>
                   <div style={{ fontSize: 12, color: 'rgba(160,185,215,0.6)', marginTop: 3 }}>{inc.date}</div>
                 </div>
-                <span className={`n-badge ${inc.status === 'Open' ? 'badge-orange' : 'badge-gray'}`}>{inc.status}</span>
+                <span style={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
               </div>
               <div style={{ fontSize: 13, color: 'rgba(200,215,235,0.75)', lineHeight: 1.5 }}>{inc.summary}</div>
             </PortalCard>

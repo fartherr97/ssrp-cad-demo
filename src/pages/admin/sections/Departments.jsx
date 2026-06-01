@@ -80,7 +80,7 @@ export default function Departments() {
                       <input style={SON_INPUT} value={d.short} onChange={e => updateDept(d, { short: e.target.value })} />
                     </div>
                     {open && (
-                      <div className="expand-section" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                         <div>
                           <label style={SON_LABEL}>Type</label>
                           <input style={SON_INPUT} value={d.type} onChange={e => updateDept(d, { type: e.target.value })} />

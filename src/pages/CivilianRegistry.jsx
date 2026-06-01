@@ -1,5 +1,17 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import {
+  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_CARD, cardHoverOn, cardHoverOff,
+  S_INPUT, S_SELECT, S_LABEL, S_FIELD,
+  S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER,
+  sm, btnHoverOn, btnHoverOff, btnActiveOn,
+  S_TABS, tabStyle,
+  S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
+  BADGE,
+  S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
+  S_DATA,
+} from '../constants/styles';
 
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
@@ -47,18 +59,18 @@ export default function CivilianRegistry() {
   };
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* LEFT: Civilian List */}
-        <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-          <div className="n-panel-header">
-            <div className="n-panel-title">Civilian Registry</div>
-            <button className="n-btn n-btn-primary n-btn-xs" onClick={() => setShowCreate(true)}>+ New</button>
+        <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
+          <div style={S_PANEL_HEADER}>
+            <div style={S_PANEL_TITLE}>Civilian Registry</div>
+            <button style={sm(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowCreate(true)}>+ New</button>
           </div>
           <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
-            <input className="n-input" placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} />
+            <input style={S_INPUT} placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <div className="n-panel-body scroll-y">
+          <div style={S_PANEL_BODY}>
             <div style={{ fontSize: 9, color: 'var(--n-text-muted)', padding: '5px 10px 2px', letterSpacing: '0.5px' }}>
               {filtered.length} RECORDS
             </div>
@@ -67,22 +79,24 @@ export default function CivilianRegistry() {
               return (
                 <div
                   key={c.id}
-                  className="n-card n-card-hover"
                   style={{
+                    ...S_CARD,
                     margin: '3px 8px', padding: '7px 9px', borderRadius: 3, cursor: 'pointer',
                     border: selected === c.id ? '1px solid var(--n-border-accent)' : '1px solid var(--n-border-subtle)',
                     background: selected === c.id ? 'var(--n-bg-selected)' : 'var(--n-bg-card)',
                   }}
+                  onMouseEnter={cardHoverOn}
+                  onMouseLeave={cardHoverOff}
                   onClick={() => { setSelected(c.id); setTab('INFO'); }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
                     <div style={{ fontWeight: 600, fontSize: 12, flex: 1 }}>{c.firstName} {c.lastName}</div>
-                    {hasWarrant && <span className="n-badge badge-red" style={{ fontSize: 8 }}>WARRANT</span>}
+                    {hasWarrant && <span style={{ ...BADGE.red, fontSize: 8 }}>WARRANT</span>}
                   </div>
-                  <div className="n-data" style={{ fontSize: 9 }}>DOB: {c.dob} · {c.gender}</div>
+                  <div style={{ ...S_DATA, fontSize: 9 }}>DOB: {c.dob} · {c.gender}</div>
                   <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap' }}>
                     {c.flags?.filter(f => f !== 'WARRANT').map(f => (
-                      <span key={f} className={`n-badge ${f === 'VIOLENT' ? 'badge-fire' : 'badge-orange'}`} style={{ fontSize: 8 }}>{f}</span>
+                      <span key={f} style={{ ...(f === 'VIOLENT' ? BADGE.fire : BADGE.orange), fontSize: 8 }}>{f}</span>
                     ))}
                   </div>
                 </div>
@@ -92,7 +106,7 @@ export default function CivilianRegistry() {
         </div>
 
         {/* RIGHT: Detail */}
-        <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
+        <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
           {!selCiv ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--n-text-muted)', padding: 24 }}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.2">
@@ -102,7 +116,7 @@ export default function CivilianRegistry() {
                 <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--n-text-dim)', marginBottom: 3 }}>No civilian selected</div>
                 <div style={{ fontSize: 10 }}>Select a record or create a new civilian</div>
               </div>
-              <button className="n-btn n-btn-primary" onClick={() => setShowCreate(true)}>Create New Civilian</button>
+              <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowCreate(true)}>Create New Civilian</button>
             </div>
           ) : (
             <>
@@ -114,23 +128,23 @@ export default function CivilianRegistry() {
                       DOB: {selCiv.dob} · {selCiv.gender} · {selCiv.ethnicity}
                     </div>
                     <div style={{ display: 'flex', gap: 4, marginTop: 5 }}>
-                      {civWarrants.length > 0 && <span className="n-badge badge-red">ACTIVE WARRANT</span>}
-                      {selCiv.dlStatus === 'SUSPENDED' && <span className="n-badge badge-orange">DL SUSPENDED</span>}
+                      {civWarrants.length > 0 && <span style={BADGE.red}>ACTIVE WARRANT</span>}
+                      {selCiv.dlStatus === 'SUSPENDED' && <span style={BADGE.orange}>DL SUSPENDED</span>}
                       {selCiv.flags?.filter(f => f !== 'WARRANT').map(f => (
-                        <span key={f} className={`n-badge ${f === 'VIOLENT' ? 'badge-fire' : 'badge-orange'}`}>{f}</span>
+                        <span key={f} style={f === 'VIOLENT' ? BADGE.fire : BADGE.orange}>{f}</span>
                       ))}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 5 }}>
-                    <button className="n-btn n-btn-secondary n-btn-sm" onClick={() => setShowAddVeh(true)}>+ Vehicle</button>
-                    <button className="n-btn n-btn-danger n-btn-sm" onClick={() => deleteCiv(selCiv.id)}>Delete</button>
+                    <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAddVeh(true)}>+ Vehicle</button>
+                    <button style={sm(S_BTN_DANGER)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => deleteCiv(selCiv.id)}>Delete</button>
                   </div>
                 </div>
               </div>
 
-              <div className="n-tabs">
+              <div style={S_TABS}>
                 {['INFO','VEHICLES','FLAGS'].map(t => (
-                  <button key={t} className={`n-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
+                  <button key={t} style={tabStyle(tab === t)} onClick={() => setTab(t)}>
                     {t}
                     {t === 'VEHICLES' && civVehicles.length > 0 && (
                       <span style={{ marginLeft: 4, fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-dim)' }}>({civVehicles.length})</span>
@@ -139,31 +153,31 @@ export default function CivilianRegistry() {
                 ))}
               </div>
 
-              <div className="n-panel-body scroll-y" style={{ padding: 14 }}>
+              <div style={{ ...S_PANEL_BODY, padding: 14 }}>
                 {tab === 'INFO' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div className="n-card">
+                    <div style={S_CARD}>
                       <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Personal</div>
-                      <div className="detail-row"><span className="detail-label">Height</span><span className="detail-value">{selCiv.height}</span></div>
-                      <div className="detail-row"><span className="detail-label">Weight</span><span className="detail-value">{selCiv.weight}</span></div>
-                      <div className="detail-row"><span className="detail-label">Hair</span><span className="detail-value">{selCiv.hair}</span></div>
-                      <div className="detail-row"><span className="detail-label">Eyes</span><span className="detail-value">{selCiv.eyes}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Height</span><span style={S_DETAIL_VALUE}>{selCiv.height}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Weight</span><span style={S_DETAIL_VALUE}>{selCiv.weight}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Hair</span><span style={S_DETAIL_VALUE}>{selCiv.hair}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Eyes</span><span style={S_DETAIL_VALUE}>{selCiv.eyes}</span></div>
                     </div>
-                    <div className="n-card">
+                    <div style={S_CARD}>
                       <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Identification</div>
-                      <div className="detail-row"><span className="detail-label">SSN</span><span className="detail-value-mono">{selCiv.ssn}</span></div>
-                      <div className="detail-row"><span className="detail-label">Phone</span><span className="detail-value-mono">{selCiv.phone}</span></div>
-                      <div className="detail-row"><span className="detail-label">Address</span><span className="detail-value">{selCiv.address}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>SSN</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.ssn}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Phone</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.phone}</span></div>
+                      <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Address</span><span style={S_DETAIL_VALUE}>{selCiv.address}</span></div>
                     </div>
-                    <div className="n-card" style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ ...S_CARD, gridColumn: '1 / -1' }}>
                       <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Driver License</div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                        <div className="detail-row"><span className="detail-label">DL Number</span><span className="detail-value-mono">{selCiv.dlNumber}</span></div>
-                        <div className="detail-row"><span className="detail-label">Class</span><span className="detail-value">{selCiv.dlClass}</span></div>
-                        <div className="detail-row"><span className="detail-label">Status</span>
-                          <span className={`n-badge ${selCiv.dlStatus === 'ACTIVE' ? 'badge-green' : 'badge-red'}`}>{selCiv.dlStatus}</span>
+                        <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>DL Number</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.dlNumber}</span></div>
+                        <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Class</span><span style={S_DETAIL_VALUE}>{selCiv.dlClass}</span></div>
+                        <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Status</span>
+                          <span style={selCiv.dlStatus === 'ACTIVE' ? BADGE.green : BADGE.red}>{selCiv.dlStatus}</span>
                         </div>
-                        <div className="detail-row"><span className="detail-label">Expiry</span><span className="detail-value-mono">{selCiv.dlExpiry}</span></div>
+                        <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Expiry</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.dlExpiry}</span></div>
                       </div>
                     </div>
                   </div>
@@ -175,14 +189,14 @@ export default function CivilianRegistry() {
                       <div style={{ textAlign: 'center', padding: 24, color: 'var(--n-text-muted)', fontSize: 11 }}>
                         No vehicles registered
                         <br />
-                        <button className="n-btn n-btn-primary" style={{ marginTop: 10 }} onClick={() => setShowAddVeh(true)}>Add Vehicle</button>
+                        <button style={{ ...S_BTN_PRIMARY, marginTop: 10 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAddVeh(true)}>Add Vehicle</button>
                       </div>
                     ) : civVehicles.map(v => (
-                      <div key={v.id} className="n-card">
+                      <div key={v.id} style={S_CARD}>
                         <div style={{ display: 'flex', gap: 8, marginBottom: 4, alignItems: 'center' }}>
-                          <span className="n-data" style={{ fontSize: 14, fontWeight: 700 }}>{v.plate}</span>
-                          <span className={`n-badge ${v.regStatus === 'VALID' ? 'badge-green' : 'badge-red'}`}>{v.regStatus}</span>
-                          {v.stolen && <span className="n-badge badge-red">STOLEN</span>}
+                          <span style={{ ...S_DATA, fontSize: 14, fontWeight: 700 }}>{v.plate}</span>
+                          <span style={v.regStatus === 'VALID' ? BADGE.green : BADGE.red}>{v.regStatus}</span>
+                          {v.stolen && <span style={BADGE.red}>STOLEN</span>}
                         </div>
                         <div style={{ fontSize: 12 }}>{v.year} {v.make} {v.model} · {v.color}</div>
                         <div style={{ fontSize: 10, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 3 }}>
@@ -194,15 +208,15 @@ export default function CivilianRegistry() {
                 )}
 
                 {tab === 'FLAGS' && (
-                  <div className="n-card">
+                  <div style={S_CARD}>
                     <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>System Flags</div>
                     {selCiv.flags?.length === 0 && civWarrants.length === 0 ? (
                       <div style={{ fontSize: 11, color: 'var(--n-text-muted)' }}>No flags on record</div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {civWarrants.length > 0 && <span className="n-badge badge-red" style={{ display: 'inline-flex', width: 'fit-content' }}>ACTIVE WARRANT ({civWarrants.length})</span>}
+                        {civWarrants.length > 0 && <span style={{ ...BADGE.red, display: 'inline-flex', width: 'fit-content' }}>ACTIVE WARRANT ({civWarrants.length})</span>}
                         {selCiv.flags?.map(f => (
-                          <span key={f} className={`n-badge ${f === 'VIOLENT' ? 'badge-fire' : f === 'WARRANT' ? 'badge-red' : 'badge-orange'}`} style={{ display: 'inline-flex', width: 'fit-content' }}>{f}</span>
+                          <span key={f} style={{ ...(f === 'VIOLENT' ? BADGE.fire : f === 'WARRANT' ? BADGE.red : BADGE.orange), display: 'inline-flex', width: 'fit-content' }}>{f}</span>
                         ))}
                       </div>
                     )}
@@ -216,34 +230,34 @@ export default function CivilianRegistry() {
 
       {/* Create Civilian Modal */}
       {showCreate && (
-        <div className="n-overlay" onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
-          <div className="n-modal n-modal-wide" style={{ maxWidth: 600 }}>
-            <div className="n-modal-header">
-              <div className="n-modal-title">Create Civilian Record</div>
-              <button className="n-btn n-btn-ghost n-btn-sm" onClick={() => setShowCreate(false)}>✕</button>
+        <div style={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
+          <div style={{ ...S_MODAL, maxWidth: 600 }}>
+            <div style={S_MODAL_HEADER}>
+              <div style={S_MODAL_TITLE}>Create Civilian Record</div>
+              <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setShowCreate(false)}>✕</button>
             </div>
-            <div className="n-modal-body">
+            <div style={S_MODAL_BODY}>
               <div className="n-grid-2">
-                <div className="n-field"><label className="n-label">First Name *</label><input className="n-input" value={form.firstName} onChange={e => setForm(p => ({...p, firstName: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Last Name *</label><input className="n-input" value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Date of Birth</label><input className="n-input" type="date" value={form.dob} onChange={e => setForm(p => ({...p, dob: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Gender</label><select className="n-select" value={form.gender} onChange={e => setForm(p => ({...p, gender: e.target.value}))}><option>Male</option><option>Female</option><option>Non-Binary</option></select></div>
-                <div className="n-field"><label className="n-label">Ethnicity</label><select className="n-select" value={form.ethnicity} onChange={e => setForm(p => ({...p, ethnicity: e.target.value}))}><option>White</option><option>Black</option><option>Hispanic</option><option>Asian</option><option>Other</option></select></div>
-                <div className="n-field"><label className="n-label">Hair Color</label><input className="n-input" value={form.hair} onChange={e => setForm(p => ({...p, hair: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Eye Color</label><input className="n-input" value={form.eyes} onChange={e => setForm(p => ({...p, eyes: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Height</label><input className="n-input" value={form.height} onChange={e => setForm(p => ({...p, height: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Phone</label><input className="n-input" value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">SSN</label><input className="n-input" placeholder="XXX-XX-XXXX" value={form.ssn} onChange={e => setForm(p => ({...p, ssn: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>First Name *</label><input style={S_INPUT} value={form.firstName} onChange={e => setForm(p => ({...p, firstName: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Last Name *</label><input style={S_INPUT} value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Date of Birth</label><input style={S_INPUT} type="date" value={form.dob} onChange={e => setForm(p => ({...p, dob: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Gender</label><select style={S_SELECT} value={form.gender} onChange={e => setForm(p => ({...p, gender: e.target.value}))}><option>Male</option><option>Female</option><option>Non-Binary</option></select></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Ethnicity</label><select style={S_SELECT} value={form.ethnicity} onChange={e => setForm(p => ({...p, ethnicity: e.target.value}))}><option>White</option><option>Black</option><option>Hispanic</option><option>Asian</option><option>Other</option></select></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Hair Color</label><input style={S_INPUT} value={form.hair} onChange={e => setForm(p => ({...p, hair: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Eye Color</label><input style={S_INPUT} value={form.eyes} onChange={e => setForm(p => ({...p, eyes: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Height</label><input style={S_INPUT} value={form.height} onChange={e => setForm(p => ({...p, height: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Phone</label><input style={S_INPUT} value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>SSN</label><input style={S_INPUT} placeholder="XXX-XX-XXXX" value={form.ssn} onChange={e => setForm(p => ({...p, ssn: e.target.value}))} /></div>
               </div>
-              <div className="n-field"><label className="n-label">Home Address</label><input className="n-input" value={form.address} onChange={e => setForm(p => ({...p, address: e.target.value}))} /></div>
+              <div style={S_FIELD}><label style={S_LABEL}>Home Address</label><input style={S_INPUT} value={form.address} onChange={e => setForm(p => ({...p, address: e.target.value}))} /></div>
               <div className="n-grid-2">
-                <div className="n-field"><label className="n-label">DL Number</label><input className="n-input" value={form.dlNumber} onChange={e => setForm(p => ({...p, dlNumber: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">DL Status</label><select className="n-select" value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></select></div>
+                <div style={S_FIELD}><label style={S_LABEL}>DL Number</label><input style={S_INPUT} value={form.dlNumber} onChange={e => setForm(p => ({...p, dlNumber: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>DL Status</label><select style={S_SELECT} value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></select></div>
               </div>
             </div>
-            <div className="n-modal-footer">
-              <button className="n-btn n-btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
-              <button className="n-btn n-btn-primary" onClick={createCivilian} disabled={!form.firstName || !form.lastName}>Create Record</button>
+            <div style={S_MODAL_FOOTER}>
+              <button style={S_BTN_SECONDARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowCreate(false)}>Cancel</button>
+              <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={createCivilian} disabled={!form.firstName || !form.lastName}>Create Record</button>
             </div>
           </div>
         </div>
@@ -251,26 +265,26 @@ export default function CivilianRegistry() {
 
       {/* Add Vehicle Modal */}
       {showAddVeh && selCiv && (
-        <div className="n-overlay" onClick={e => e.target === e.currentTarget && setShowAddVeh(false)}>
-          <div className="n-modal">
-            <div className="n-modal-header">
-              <div className="n-modal-title">Register Vehicle — {selCiv.firstName} {selCiv.lastName}</div>
-              <button className="n-btn n-btn-ghost n-btn-sm" onClick={() => setShowAddVeh(false)}>✕</button>
+        <div style={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowAddVeh(false)}>
+          <div style={S_MODAL}>
+            <div style={S_MODAL_HEADER}>
+              <div style={S_MODAL_TITLE}>Register Vehicle — {selCiv.firstName} {selCiv.lastName}</div>
+              <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setShowAddVeh(false)}>✕</button>
             </div>
-            <div className="n-modal-body">
+            <div style={S_MODAL_BODY}>
               <div className="n-grid-2">
-                <div className="n-field"><label className="n-label">License Plate *</label><input className="n-input" placeholder="e.g. ABC-1234" value={vehForm.plate} onChange={e => setVehForm(p => ({...p, plate: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Year</label><input className="n-input" placeholder="2023" value={vehForm.year} onChange={e => setVehForm(p => ({...p, year: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Make *</label><input className="n-input" placeholder="Ford" value={vehForm.make} onChange={e => setVehForm(p => ({...p, make: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Model</label><input className="n-input" placeholder="F-150" value={vehForm.model} onChange={e => setVehForm(p => ({...p, model: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Color</label><input className="n-input" value={vehForm.color} onChange={e => setVehForm(p => ({...p, color: e.target.value}))} /></div>
-                <div className="n-field"><label className="n-label">Reg. Status</label><select className="n-select" value={vehForm.regStatus} onChange={e => setVehForm(p => ({...p, regStatus: e.target.value}))}><option value="VALID">VALID</option><option value="EXPIRED">EXPIRED</option><option value="SUSPENDED">SUSPENDED</option></select></div>
+                <div style={S_FIELD}><label style={S_LABEL}>License Plate *</label><input style={S_INPUT} placeholder="e.g. ABC-1234" value={vehForm.plate} onChange={e => setVehForm(p => ({...p, plate: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Year</label><input style={S_INPUT} placeholder="2023" value={vehForm.year} onChange={e => setVehForm(p => ({...p, year: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Make *</label><input style={S_INPUT} placeholder="Ford" value={vehForm.make} onChange={e => setVehForm(p => ({...p, make: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Model</label><input style={S_INPUT} placeholder="F-150" value={vehForm.model} onChange={e => setVehForm(p => ({...p, model: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Color</label><input style={S_INPUT} value={vehForm.color} onChange={e => setVehForm(p => ({...p, color: e.target.value}))} /></div>
+                <div style={S_FIELD}><label style={S_LABEL}>Reg. Status</label><select style={S_SELECT} value={vehForm.regStatus} onChange={e => setVehForm(p => ({...p, regStatus: e.target.value}))}><option value="VALID">VALID</option><option value="EXPIRED">EXPIRED</option><option value="SUSPENDED">SUSPENDED</option></select></div>
               </div>
-              <div className="n-field"><label className="n-label">Reg. Expiry Date</label><input className="n-input" type="date" value={vehForm.regExpiry} onChange={e => setVehForm(p => ({...p, regExpiry: e.target.value}))} /></div>
+              <div style={S_FIELD}><label style={S_LABEL}>Reg. Expiry Date</label><input style={S_INPUT} type="date" value={vehForm.regExpiry} onChange={e => setVehForm(p => ({...p, regExpiry: e.target.value}))} /></div>
             </div>
-            <div className="n-modal-footer">
-              <button className="n-btn n-btn-secondary" onClick={() => setShowAddVeh(false)}>Cancel</button>
-              <button className="n-btn n-btn-primary" onClick={addVehicle} disabled={!vehForm.plate || !vehForm.make}>Register Vehicle</button>
+            <div style={S_MODAL_FOOTER}>
+              <button style={S_BTN_SECONDARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAddVeh(false)}>Cancel</button>
+              <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={addVehicle} disabled={!vehForm.plate || !vehForm.make}>Register Vehicle</button>
             </div>
           </div>
         </div>

@@ -253,7 +253,7 @@ export default function SearchPage() {
             </div>
 
             {/* Record tabs */}
-            <div className="tab-scroll" style={{ background: '#090b10', borderBottom: '1px solid #141720', display: 'flex', flexShrink: 0 }}>
+            <div style={{ background: '#090b10', borderBottom: '1px solid #141720', display: 'flex', flexShrink: 0, overflowX: 'auto' }}>
               {RECORD_TABS.map(t => (
                 <button
                   key={t}

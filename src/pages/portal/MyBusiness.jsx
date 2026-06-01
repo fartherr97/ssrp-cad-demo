@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdBusiness, MdEdit } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, BADGE, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#44aacc';
 
@@ -62,7 +63,7 @@ export default function MyBusiness() {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-            <button className="n-btn n-btn-primary" disabled={!canSubmit} onClick={register}>
+            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!canSubmit} onClick={register}>
               Register Business
             </button>
           </div>
@@ -89,7 +90,7 @@ export default function MyBusiness() {
         subtitle="Your registered business profile."
         accent={ACCENT}
         action={!editing && (
-          <button className="n-btn n-btn-secondary" onClick={startEdit} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button style={{ ...sm(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={startEdit}>
             <MdEdit size={16} /> Edit
           </button>
         )}
@@ -125,8 +126,8 @@ export default function MyBusiness() {
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
-              <button className="n-btn n-btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
-              <button className="n-btn n-btn-success" disabled={!form.name.trim()} onClick={save}>Save Changes</button>
+              <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setEditing(false)}>Cancel</button>
+              <button style={sm(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
             </div>
           </>
         ) : (
@@ -142,7 +143,7 @@ export default function MyBusiness() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', color: 'rgba(160,185,215,0.5)' }}>Status</span>
               <span>
-                <span className={`n-badge ${myBiz.status === 'ACTIVE' ? 'badge-green' : 'badge-gray'}`}>{myBiz.status}</span>
+                <span style={myBiz.status === 'ACTIVE' ? BADGE.green : BADGE.gray}>{myBiz.status}</span>
               </span>
             </div>
           </div>

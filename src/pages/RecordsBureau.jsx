@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
+import {
+  BADGE,
+  S_RECORD_RETURN, S_RECORD_RETURN_HEADER, S_RECORD_RETURN_BODY,
+  S_RECORD_RETURN_SECTION, S_RECORD_RETURN_FLAG, S_RECORD_RETURN_FLAG_WARN,
+  xs, btnHoverOn, btnHoverOff, btnActiveOn,
+  S_BTN_PRIMARY, S_BTN_SECONDARY,
+} from '../constants/styles';
 
 function FlagBadge({ flag }) {
-  const map = { WARRANT: 'badge-red', CAUTION: 'badge-orange', VIOLENT: 'badge-fire' };
-  return <span className={`n-badge ${map[flag] || 'badge-gray'}`}>{flag}</span>;
+  const map = { WARRANT: BADGE.red, CAUTION: BADGE.orange, VIOLENT: BADGE.fire };
+  return <span style={map[flag] || BADGE.gray}>{flag}</span>;
 }
 
 export default function RecordsBureau() {
@@ -60,7 +67,7 @@ export default function RecordsBureau() {
   const activeTabs = selCiv ? personTabs : selVeh ? vehTabs : ['RETURN'];
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div style={{ flex: 1, overflow: 'hidden', padding: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
       <div className="mob-two-pane" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* ── LEFT: Query panel ─────────────────────────────────────── */}
@@ -81,8 +88,8 @@ export default function RecordsBureau() {
           <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--n-border)', display: 'flex', gap: 4, flexShrink: 0 }}>
             {SEARCH_TYPES.map(t => (
               <button key={t}
-                className={`n-btn n-btn-xs ${searchType === t ? 'n-btn-primary' : 'n-btn-secondary'}`}
-                style={{ flex: 1 }}
+                style={{ ...xs(searchType === t ? S_BTN_PRIMARY : S_BTN_SECONDARY), flex: 1 }}
+                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
                 onClick={() => { setSearchType(t); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}>
                 {t}
               </button>
@@ -97,8 +104,7 @@ export default function RecordsBureau() {
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
               <input
-                className="n-input"
-                style={{ flex: 1, fontSize: 11 }}
+                style={{ flex: 1, fontSize: 11, background: 'var(--n-bg-input)', border: '1px solid var(--n-border)', borderRadius: 'var(--n-radius-sm)', color: 'var(--n-text)', padding: '6px 9px', outline: 'none', boxSizing: 'border-box' }}
                 placeholder={
                   searchType === 'PERSON' ? 'e.g. Washington' :
                   searchType === 'VEHICLE' ? 'e.g. SUS-1109' : 'e.g. possession'
@@ -107,7 +113,10 @@ export default function RecordsBureau() {
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && doSearch()}
               />
-              <button className="n-btn n-btn-primary n-btn-xs" onClick={doSearch} style={{ flexShrink: 0, padding: '0 8px' }}>
+              <button
+                style={{ ...xs(S_BTN_PRIMARY), flexShrink: 0, padding: '0 8px' }}
+                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                onClick={doSearch}>
                 RUN
               </button>
             </div>
@@ -140,10 +149,11 @@ export default function RecordsBureau() {
                 background: isSelected ? 'var(--n-bg-selected)' : 'transparent',
                 transition: 'background var(--t-fast) var(--ease-soft), border-color var(--t-fast) var(--ease-soft)',
                 animationDelay: `${idx * 35}ms`,
+                animation: 'slideInLeft 0.22s cubic-bezier(0.4,0,0.2,1) both',
               };
               if (searchType === 'PERSON') {
                 return (
-                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 700, fontSize: 11, color: 'var(--n-text)', fontFamily: 'var(--font-mono)' }}>
                       {r.lastName}, {r.firstName}
                     </div>
@@ -152,29 +162,29 @@ export default function RecordsBureau() {
                     </div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap' }}>
                       {r.flags?.map(f => <FlagBadge key={f} flag={f} />)}
-                      {r.dlStatus === 'SUSPENDED' && <span className="n-badge badge-orange">DL SUSP</span>}
+                      {r.dlStatus === 'SUSPENDED' && <span style={BADGE.orange}>DL SUSP</span>}
                     </div>
                   </div>
                 );
               } else if (searchType === 'VEHICLE') {
                 return (
-                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 700, fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--n-text-data)' }}>{r.plate}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text)', marginTop: 1 }}>{r.year} {r.make} {r.model} · {r.color}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
-                      {r.stolen && <span className="n-badge badge-red">STOLEN</span>}
-                      {r.regStatus !== 'VALID' && <span className="n-badge badge-orange">REG {r.regStatus}</span>}
+                      {r.stolen && <span style={BADGE.red}>STOLEN</span>}
+                      {r.regStatus !== 'VALID' && <span style={BADGE.orange}>REG {r.regStatus}</span>}
                     </div>
                   </div>
                 );
               } else {
                 return (
-                  <div key={r.id} className="result-row" style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <div key={r.id} style={selStyle} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div style={{ fontWeight: 600, fontSize: 11, color: 'var(--n-text)' }}>{r.civilianName}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text-dim)', marginTop: 1 }}>{r.charge}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
-                      <span className={`n-badge ${r.status === 'ACTIVE' ? 'badge-red' : 'badge-green'}`}>{r.status}</span>
-                      <span className="n-badge badge-gray">{r.type}</span>
+                      <span style={r.status === 'ACTIVE' ? BADGE.red : BADGE.green}>{r.status}</span>
+                      <span style={BADGE.gray}>{r.type}</span>
                     </div>
                   </div>
                 );
@@ -259,29 +269,35 @@ export default function RecordsBureau() {
                         NO CRIMINAL HISTORY ON FILE
                       </div>
                     ) : civHistory.map(h => (
-                      <div key={h.id} className="record-return" style={{ marginBottom: 12 }}>
-                        <div className="record-return-header">
+                      <div key={h.id} style={{ ...S_RECORD_RETURN, marginBottom: 12 }}>
+                        <div style={S_RECORD_RETURN_HEADER}>
                           <span>CRIMINAL HISTORY ENTRY — {h.caseNumber}</span>
                           <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{h.date}</span>
                         </div>
-                        <div className="record-return-body">
-                          <div className="record-return-section">CASE INFORMATION</div>
-                          <div className="record-return-line"><span className="record-return-key">CASE NUMBER</span><span className="record-return-val">{h.caseNumber}</span></div>
-                          <div className="record-return-line"><span className="record-return-key">DATE</span><span className="record-return-val">{h.date}</span></div>
-                          <div className="record-return-line"><span className="record-return-key">DISPOSITION</span><span className="record-return-val">{h.disposition}</span></div>
-                          <div className="record-return-line"><span className="record-return-key">AGENCY</span><span className="record-return-val">{h.agency}</span></div>
-                          <div className="record-return-line"><span className="record-return-key">OFFICER BADGE</span><span className="record-return-val">{h.officerBadge}</span></div>
-                          {h.sentence && <div className="record-return-line"><span className="record-return-key">SENTENCE</span><span className="record-return-val">{h.sentence}</span></div>}
-                          <div className="record-return-section">CHARGES</div>
+                        <div style={S_RECORD_RETURN_BODY}>
+                          <div style={S_RECORD_RETURN_SECTION}>
+                            <span style={{color:'#4f7bb0'}}>*** </span>CASE INFORMATION<span style={{color:'#4f7bb0'}}> ***</span>
+                          </div>
+                          <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>CASE NUMBER: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.caseNumber}</span></div>
+                          <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>DATE: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.date}</span></div>
+                          <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>DISPOSITION: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.disposition}</span></div>
+                          <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>AGENCY: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.agency}</span></div>
+                          <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>OFFICER BADGE: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.officerBadge}</span></div>
+                          {h.sentence && <div style={{ fontSize: 12.5, lineHeight: 1.75 }}><span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>SENTENCE: </span><span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{h.sentence}</span></div>}
+                          <div style={S_RECORD_RETURN_SECTION}>
+                            <span style={{color:'#4f7bb0'}}>*** </span>CHARGES<span style={{color:'#4f7bb0'}}> ***</span>
+                          </div>
                           {h.charges?.map((c, i) => (
-                            <div key={i} className="record-return-line">
-                              <span className="record-return-key">CHARGE {i + 1}</span>
-                              <span className="record-return-val">{c}</span>
+                            <div key={i} style={{ fontSize: 12.5, lineHeight: 1.75 }}>
+                              <span style={{ color: '#7e8ea3', fontWeight: 400, marginRight: 7 }}>CHARGE {i + 1}: </span>
+                              <span style={{ background: 'rgba(58,136,232,0.18)', color: '#dfe9f5', padding: '0 5px', borderRadius: 2 }}>{c}</span>
                             </div>
                           ))}
                           {h.notes && (
                             <>
-                              <div className="record-return-section">NOTES</div>
+                              <div style={S_RECORD_RETURN_SECTION}>
+                                <span style={{color:'#4f7bb0'}}>*** </span>NOTES<span style={{color:'#4f7bb0'}}> ***</span>
+                              </div>
                               <div style={{ fontSize: 12, fontFamily: 'var(--font-mono), Courier New', lineHeight: 1.6, color: '#aeb9c8' }}>{h.notes}</div>
                             </>
                           )}
@@ -323,29 +339,29 @@ export default function RecordsBureau() {
 
                 {/* Vehicle FLAGS tab */}
                 {tab === 'FLAGS' && selVeh && (
-                  <div className="record-return" style={{ width: '100%', maxWidth: 760 }}>
-                    <div className="record-return-header">
+                  <div style={{ ...S_RECORD_RETURN, width: '100%', maxWidth: 760 }}>
+                    <div style={S_RECORD_RETURN_HEADER}>
                       <span>VEHICLE FLAGS — {selVeh.plate}</span>
                       <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{new Date().toLocaleString()}</span>
                     </div>
-                    <div className="record-return-body">
+                    <div style={S_RECORD_RETURN_BODY}>
                       {!selVeh.stolen && selVeh.flags?.length === 0 && !vehWarrants.some(w => w.status === 'ACTIVE') ? (
                         <div style={{ color: '#666', fontSize: 11 }}>NO FLAGS ON FILE</div>
                       ) : (
                         <>
                           {selVeh.stolen && (
                             <div style={{ marginBottom: 6 }}>
-                              <span className="record-return-flag">STOLEN VEHICLE</span>
+                              <span style={S_RECORD_RETURN_FLAG}>STOLEN VEHICLE</span>
                             </div>
                           )}
                           {vehWarrants.some(w => w.status === 'ACTIVE') && (
                             <div style={{ marginBottom: 6 }}>
-                              <span className="record-return-flag">OWNER HAS ACTIVE WARRANT</span>
+                              <span style={S_RECORD_RETURN_FLAG}>OWNER HAS ACTIVE WARRANT</span>
                             </div>
                           )}
                           {selVeh.flags?.map(f => (
                             <div key={f} style={{ marginBottom: 6 }}>
-                              <span className="record-return-flag warn">{f}</span>
+                              <span style={S_RECORD_RETURN_FLAG_WARN}>{f}</span>
                             </div>
                           ))}
                         </>

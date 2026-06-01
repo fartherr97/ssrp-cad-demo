@@ -77,8 +77,7 @@ export function SonCard({ icon: Icon, title, desc, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="son-card"
-      style={{
+      style={{ animation: 'popIn 0.22s cubic-bezier(0.16,1,0.3,1) both',
         textAlign: 'left', background: ADMIN.panel, border: `1px solid ${ADMIN.border}`,
         borderRadius: 8, padding: '20px 22px', cursor: 'pointer',
         display: 'flex', flexDirection: 'column', gap: 28, minHeight: 120,

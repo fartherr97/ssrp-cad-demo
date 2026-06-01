@@ -2,16 +2,16 @@ import { useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdBadge, MdDriveEta, MdGppGood, MdInfoOutline, MdPerson } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field } from './PortalKit';
+import { BADGE } from '../../constants/styles';
 
 const ACCENT = '#9090cc';
 
 function statusBadge(status) {
   switch (status) {
-    case 'ACTIVE': return 'badge-green';
-    case 'SUSPENDED': return 'badge-red';
-    case 'EXPIRED': return 'badge-orange';
-    case 'NONE': return 'badge-gray';
-    default: return 'badge-gray';
+    case 'ACTIVE': return BADGE.green;
+    case 'SUSPENDED': return BADGE.red;
+    case 'EXPIRED': return BADGE.orange;
+    default: return BADGE.gray;
   }
 }
 
@@ -27,7 +27,7 @@ function LicenseBlock({ icon: Icon, title, status, rows }) {
           <Icon size={20} color={ACCENT} />
           <span style={{ fontSize: 13, fontWeight: 700, color: '#e6eef6' }}>{title}</span>
         </div>
-        <span className={`n-badge ${statusBadge(status)}`}>{status || 'NONE'}</span>
+        <span style={statusBadge(status)}>{status || 'NONE'}</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {rows.map(r => <Field key={r.label} label={r.label} value={r.value} mono={r.mono} />)}

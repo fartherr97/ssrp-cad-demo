@@ -40,11 +40,12 @@ export function PortalHeader({ icon: Icon, title, subtitle, accent = '#3a88e8', 
 
 export function StatCard({ label, value, accent = '#3a88e8', icon: Icon, hint }) {
   return (
-    <div className="stat-card-enter" style={{
+    <div style={{
       background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: 12, padding: '18px 20px', flex: 1, minWidth: 150,
       display: 'flex', flexDirection: 'column', gap: 6, position: 'relative', overflow: 'hidden',
       transition: 'border-color var(--t-med), transform var(--t-med) var(--ease-out)',
+      animation: 'slideUp 0.22s cubic-bezier(0.4,0,0.2,1) both',
     }}>
       <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.10 }}>
         {Icon && <Icon size={68} color={accent} />}
@@ -60,14 +61,24 @@ export function PortalCard({ children, accent, style = {}, onClick, hover }) {
   return (
     <div
       onClick={onClick}
-      className={hover ? 'portal-card-hover' : ''}
       style={{
         background: 'rgba(255,255,255,0.035)',
         border: `1px solid ${accent ? accent + '44' : 'rgba(255,255,255,0.08)'}`,
         borderRadius: 12, padding: 20,
         ...(accent ? { borderLeft: `3px solid ${accent}` } : {}),
+        ...(hover ? { cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s' } : {}),
         ...style,
       }}
+      {...(hover ? {
+        onMouseEnter: e => {
+          e.currentTarget.style.borderColor = accent ? `${accent}88` : 'rgba(255,255,255,0.18)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        },
+        onMouseLeave: e => {
+          e.currentTarget.style.borderColor = accent ? `${accent}44` : 'rgba(255,255,255,0.08)';
+          e.currentTarget.style.transform = '';
+        },
+      } : {})}
     >
       {children}
     </div>

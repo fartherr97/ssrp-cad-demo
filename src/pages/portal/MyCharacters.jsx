@@ -2,13 +2,14 @@ import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#9090cc';
 
 const DL_BADGE = {
-  ACTIVE:    'badge-green',
-  SUSPENDED: 'badge-red',
-  EXPIRED:   'badge-orange',
+  ACTIVE:    BADGE.green,
+  SUSPENDED: BADGE.red,
+  EXPIRED:   BADGE.orange,
 };
 
 const EMPTY_FORM = {
@@ -81,7 +82,7 @@ export default function MyCharacters() {
         accent={ACCENT}
         action={
           !showForm && (
-            <button className="n-btn n-btn-primary" onClick={openNew}>
+            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
             </button>
           )
@@ -94,7 +95,7 @@ export default function MyCharacters() {
             <div style={{ fontSize: 15, fontWeight: 800, color: '#e6eef6' }}>
               {editingId != null ? 'Edit Character' : 'Register New Character'}
             </div>
-            <button className="n-btn n-btn-secondary" onClick={closeForm}>
+            <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={closeForm}>
               <MdClose size={16} style={{ marginRight: 4 }} /> Cancel
             </button>
           </div>
@@ -123,7 +124,7 @@ export default function MyCharacters() {
               </div>
             </div>
             <div style={{ marginTop: 18, display: 'flex', gap: 10 }}>
-              <button type="submit" className="n-btn n-btn-primary">
+              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}>
                 {editingId != null ? 'Save Changes' : 'Register Character'}
               </button>
             </div>
@@ -138,7 +139,7 @@ export default function MyCharacters() {
           <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)', marginTop: 6 }}>
             Register your first character to get started.
           </div>
-          <button className="n-btn n-btn-primary" style={{ marginTop: 18 }} onClick={openNew}>
+          <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
             <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
           </button>
         </PortalCard>
@@ -157,12 +158,12 @@ export default function MyCharacters() {
                   </div>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: '#e6eef6' }}>{c.firstName} {c.lastName}</div>
-                    <span className={`n-badge ${DL_BADGE[c.dlStatus] || 'badge-gray'}`} style={{ marginTop: 4 }}>
+                    <span style={{ ...(DL_BADGE[c.dlStatus] || BADGE.gray), marginTop: 4 }}>
                       DL {c.dlStatus || 'N/A'}
                     </span>
                   </div>
                 </div>
-                <button className="n-btn n-btn-secondary" onClick={() => openEdit(c)}>
+                <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => openEdit(c)}>
                   <MdEdit size={15} style={{ marginRight: 4 }} /> Edit
                 </button>
               </div>
@@ -180,7 +181,7 @@ export default function MyCharacters() {
                 <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <MdWarning size={16} color="#f5a93b" />
                   {c.flags.map(fl => (
-                    <span key={fl} className="n-badge badge-orange">{fl}</span>
+                    <span key={fl} style={BADGE.orange}>{fl}</span>
                   ))}
                 </div>
               )}

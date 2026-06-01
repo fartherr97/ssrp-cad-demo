@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL, S_BTN_SECONDARY, S_BTN_DANGER, sm, btnHoverOn, btnHoverOff, S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR } from '../constants/styles';
 
 function Elapsed({ createdAt }) {
   const [elapsed, setElapsed] = useState('');
@@ -17,22 +18,19 @@ function Elapsed({ createdAt }) {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [createdAt]);
-  return <span className={`elapsed ${cls}`}>{elapsed}</span>;
+  return <span style={cadElapsed(cls)}>{elapsed}</span>;
 }
 
 function PriBadge({ p }) {
-  return <span className={`cad-pri p${p}`}>P{p}</span>;
+  return <span style={cadPri(p)}>P{p}</span>;
 }
 
 function CallStatusBadge({ status }) {
-  const cls = { PENDING:'pending', ACTIVE:'active', ENRT:'enrt', CLOSED:'closed' }[status] || 'closed';
-  return <span className={`cad-call-status ${cls}`}>{status}</span>;
+  return <span style={cadCallStatus(status)}>{status}</span>;
 }
 
 function StatusBadge({ status }) {
-  const map = { AVAILABLE:'av', BUSY:'busy', ENRT:'enrt', ARRVD:'arrvd', OFFDUTY:'od', UNAVAILABLE:'unavl' };
-  const labels = { AVAILABLE:'AVL', BUSY:'BUSY', ENRT:'ENRT', ARRVD:'ARRVD', OFFDUTY:'OFD', UNAVAILABLE:'UNAVL' };
-  return <span className={`cad-status ${map[status] || 'od'}`}>{labels[status] || status}</span>;
+  return <span style={cadStatus(status)}>{CAD_STATUS_LABEL[status] || status}</span>;
 }
 
 const ST_COLOR = {
@@ -86,7 +84,7 @@ export default function IncidentDetail() {
       <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#000', color:'#556677', gap:12 }}>
         <div style={{ fontSize:18, fontFamily:'var(--font-mono)', fontWeight:700 }}>CALL NOT FOUND</div>
         <div style={{ fontSize:12, color:'#334455' }}>Call {callId} does not exist or has been closed.</div>
-        <button className="n-btn n-btn-secondary" style={{ marginTop:8 }} onClick={() => navigate('/cad')}>← Back to CAD</button>
+        <button style={{ ...sm(S_BTN_SECONDARY), marginTop:8 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/cad')}>← Back to CAD</button>
       </div>
     );
   }
@@ -103,9 +101,9 @@ export default function IncidentDetail() {
         flexShrink:0, minHeight:52,
       }}>
         <button
-          className="n-btn n-btn-secondary"
+          style={{ ...sm(S_BTN_SECONDARY), flexShrink:0 }}
+          onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
           onClick={() => navigate('/cad')}
-          style={{ flexShrink:0 }}
         >
           ← CAD
         </button>
@@ -129,9 +127,9 @@ export default function IncidentDetail() {
 
         {isDispatch && (
           <button
-            className="n-btn n-btn-danger"
+            style={{ ...sm(S_BTN_DANGER), flexShrink:0 }}
+            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
             onClick={closeCall}
-            style={{ flexShrink:0 }}
           >
             CLOSE CALL
           </button>
@@ -324,9 +322,9 @@ export default function IncidentDetail() {
             </div>
             <div style={{ flex:1, overflowY:'auto' }}>
               {dispatchLog.slice(0, 100).map(e => (
-                <div key={e.id} className="detail-log-entry">
-                  <span className="detail-log-time">{e.time}</span>
-                  <span className={`detail-log-${e.kind}`} style={{ flex:1, whiteSpace:'normal', wordBreak:'break-word' }}>
+                <div key={e.id} style={S_TX_ENTRY}>
+                  <span style={S_TX_TIME}>{e.time}</span>
+                  <span style={{ color: TX_KIND_COLOR[e.kind] || 'var(--n-text-muted)', flex:1, whiteSpace:'normal', wordBreak:'break-word' }}>
                     {e.text}
                   </span>
                 </div>

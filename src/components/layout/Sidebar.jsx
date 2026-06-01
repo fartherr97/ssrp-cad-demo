@@ -159,7 +159,7 @@ export default function Sidebar() {
   const activeCalls = state.calls.filter(c => c.status !== 'CLOSED').length;
 
   return (
-    <nav className="n-sidebar" role="navigation" aria-label="Main navigation">
+    <nav role="navigation" aria-label="Main navigation" style={{ width: 200, minWidth: 200, display: 'flex', flexDirection: 'column', background: 'var(--n-bg-panel)', borderRight: '1px solid var(--n-border)', height: '100%', overflow: 'hidden' }}>
       {/* Logo */}
       <div style={{
         display: 'flex',
@@ -190,26 +190,38 @@ export default function Sidebar() {
           if (section.adminOnly && !isAdmin) return null;
           return (
             <div key={section.section}>
-              <div className="nav-divider" />
-              <div className="nav-section-label">{section.section}</div>
-              {section.items.map((item) => (
+              <div style={{ height: 1, background: 'var(--n-border)', margin: '4px 0' }} />
+              <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.7px', textTransform: 'uppercase', color: 'var(--n-text-muted)', padding: '2px 10px', fontFamily: 'var(--font-mono)' }}>{section.section}</div>
+              {section.items.map((item) => {
+                const isActive = currentPage === item.page;
+                return (
                 <button
                   key={item.page}
-                  className={`nav-item${currentPage === item.page ? ' active' : ''}`}
                   onClick={() => go(item.page)}
                   title={item.label}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                    fontSize: 12, color: isActive ? '#a0c8e8' : 'var(--n-text-dim)',
+                    background: isActive ? '#07111e' : 'none', border: 'none',
+                    borderLeft: `3px solid ${isActive ? '#1060a8' : 'transparent'}`,
+                    cursor: 'pointer', fontFamily: 'var(--font-ui)', textAlign: 'left', width: '100%',
+                    paddingLeft: isActive ? 7 : 10, transition: 'background 0.1s, color 0.1s',
+                  }}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--n-bg-hover)'; e.currentTarget.style.color = 'var(--n-text)'; } }}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--n-text-dim)'; } }}
                 >
-                  <Icon name={item.icon} />
+                  <span style={{ width: 16, height: 16, flexShrink: 0 }}><Icon name={item.icon} /></span>
                   <span style={{ flex: 1 }}>{item.label}</span>
                   {item.page === 'dispatch' && activeCalls > 0 && (
-                    <span className="nav-badge">{activeCalls}</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--pr2-bg)', color: 'var(--pr2-text)', padding: '1px 5px', borderRadius: 9999, border: '1px solid var(--pr2-border)' }}>{activeCalls}</span>
                   )}
                 </button>
-              ))}
+                );
+              })}
             </div>
           );
         })}
-        <div className="nav-divider" style={{ marginTop: 8 }} />
+        <div style={{ height: 1, background: 'var(--n-border)', marginTop: 8 }} />
       </div>
 
       {/* User card */}
@@ -257,8 +269,7 @@ export default function Sidebar() {
         </div>
 
         <button
-          className="n-btn n-btn-ghost"
-          style={{ width: '100%', justifyContent: 'center', fontSize: 10, color: 'var(--n-text-muted)' }}
+          style={{ width: '100%', justifyContent: 'center', fontSize: 10, color: 'var(--n-text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', fontFamily: 'var(--font-ui)' }}
           onClick={() => dispatch({ type: 'LOGOUT' })}
         >
           Sign Out

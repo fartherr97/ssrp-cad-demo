@@ -252,10 +252,10 @@ export default function FireBoard() {
                     <StatusBadge status={call.status} />
                   </td>
                   <td style={{ padding: '6px 10px', color: '#f0883e' }}>{call.units.join(', ') || '—'}</td>
-                  <td className="tnum" style={{ padding: '6px 10px', fontSize: '12px', fontWeight: 700, color: elapsedTone(call.createdAt, now, call.units.length > 0), whiteSpace: 'nowrap' }}>
+                  <td style={{ padding: '6px 10px', fontSize: '12px', fontWeight: 700, color: elapsedTone(call.createdAt, now, call.units.length > 0), whiteSpace: 'nowrap' }}>
                     ⏱ {fmtElapsed(call.createdAt, now)}
                   </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: '#a07e7a', fontSize: '12px' }}>
+                  <td style={{ padding: '6px 10px', color: '#a07e7a', fontSize: '12px' }}>
                     {call.timestamp?.split(' ')[1]}
                   </td>
                   <td style={{ padding: '6px 10px' }}>
@@ -368,7 +368,7 @@ export default function FireBoard() {
                     {isMe ? '▶ ' : ''}
                     {o.name}
                   </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: '#f0883e', fontWeight: 700 }}>{o.unitId}</td>
+                  <td style={{ padding: '6px 10px', color: '#f0883e', fontWeight: 700 }}>{o.unitId}</td>
                   <td style={{ padding: '6px 10px' }}>
                     <span style={{ display: 'inline-block', background: `${app.color}1f`, color: app.color, border: `1px solid ${app.color}55`, borderRadius: '3px', padding: '0 6px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px' }}>
                       {app.label}
@@ -377,7 +377,7 @@ export default function FireBoard() {
                   <td style={{ padding: '6px 10px' }}>
                     <StatusBadge status={o.status} />
                   </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: o.callId ? '#f5b740' : '#33415a' }}>{o.callId || '—'}</td>
+                  <td style={{ padding: '6px 10px', color: o.callId ? '#f5b740' : '#33415a' }}>{o.callId || '—'}</td>
                   <td style={{ padding: '6px 10px', color: '#b9a6a4' }}>{o.subdivision}</td>
                   <td style={{ padding: '6px 10px', color: '#a07e7a' }}>{o.location}</td>
                 </tr>

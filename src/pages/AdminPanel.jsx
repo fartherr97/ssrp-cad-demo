@@ -39,7 +39,7 @@ export default function AdminPanel() {
         </div>
 
         {/* Tabs */}
-        <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px', overflowX: 'auto' }}>
           {TABS.map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? '#0f172a' : 'transparent', border: tab === t ? '1px solid #fbbf24' : '1px solid transparent', borderBottom: 'none', color: tab === t ? '#fbbf24' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>
               {t}

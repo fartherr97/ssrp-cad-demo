@@ -6,6 +6,7 @@ import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
 } from 'react-icons/md';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_SUCCESS, S_BTN_WARNING, xs, btnHoverOn, btnHoverOff, BADGE } from '../constants/styles';
 
 const TEMPLATE_ICONS = {
   'Traffic Stop':      MdDirectionsCar,
@@ -18,11 +19,11 @@ const TEMPLATE_ICONS = {
 
 const BUILTIN_NAMES = Object.keys(TEMPLATE_ICONS);
 
-const STATUS_CLS = {
-  'Submitted':      'badge-blue',
-  'Approved':       'badge-green',
-  'Pending Review': 'badge-orange',
-  'Denied':         'badge-red',
+const STATUS_BADGE = {
+  'Submitted':      BADGE.blue,
+  'Approved':       BADGE.green,
+  'Pending Review': BADGE.orange,
+  'Denied':         BADGE.red,
 };
 
 export default function ReportsCenter() {
@@ -220,7 +221,7 @@ export default function ReportsCenter() {
               </span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
                 {hasSig && !sigApplied && (
-                  <button className="n-btn n-btn-secondary n-btn-xs" onClick={applySignature} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button style={{ ...xs(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 4 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={applySignature}>
                     ✍ Apply Signature
                   </button>
                 )}
@@ -234,10 +235,10 @@ export default function ReportsCenter() {
                     Set up signature
                   </button>
                 )}
-                <button className="n-btn n-btn-ghost n-btn-xs" onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
+                <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
                   ✕ Discard
                 </button>
-                <button className="n-btn n-btn-primary n-btn-xs" onClick={submitReport}>
+                <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={submitReport}>
                   Submit Report
                 </button>
               </div>
@@ -270,23 +271,23 @@ export default function ReportsCenter() {
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
                 {selReport.caseNumber} · {selReport.date}
               </span>
-              <span className={`n-badge ${STATUS_CLS[selReport.status] || 'badge-gray'}`} style={{ fontSize: 9 }}>
+              <span style={{ ...(STATUS_BADGE[selReport.status] || BADGE.gray), fontSize: 9 }}>
                 {selReport.status}
               </span>
               {isAdmin && (
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                   {selReport.status !== 'Approved' && (
-                    <button className="n-btn n-btn-success n-btn-xs" onClick={() => reviewReport(selReport.id, 'Approved')}>
+                    <button style={xs(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Approved')}>
                       Approve
                     </button>
                   )}
                   {selReport.status === 'Submitted' && (
-                    <button className="n-btn n-btn-warning n-btn-xs" onClick={() => reviewReport(selReport.id, 'Pending Review')}>
+                    <button style={xs(S_BTN_WARNING)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Pending Review')}>
                       Flag for Review
                     </button>
                   )}
                   {selReport.status !== 'Submitted' && (
-                    <button className="n-btn n-btn-secondary n-btn-xs" onClick={() => reviewReport(selReport.id, 'Submitted')}>
+                    <button style={xs(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Submitted')}>
                       Reset
                     </button>
                   )}
@@ -410,7 +411,7 @@ export default function ReportsCenter() {
               onMouseLeave={e => { if (selectedReport !== r.id) e.currentTarget.style.background = 'transparent'; }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                <span className={`n-badge ${STATUS_CLS[r.status] || 'badge-gray'}`} style={{ fontSize: 8 }}>{r.status}</span>
+                <span style={{ ...(STATUS_BADGE[r.status] || BADGE.gray), fontSize: 8 }}>{r.status}</span>
                 <span style={{ fontSize: 8, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>{r.date}</span>
               </div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--n-text)', marginBottom: 2, lineHeight: 1.2 }}>{r.type}</div>
@@ -429,12 +430,12 @@ export default function ReportsCenter() {
               Review: {selReport.caseNumber}
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button className="n-btn n-btn-success n-btn-xs" style={{ flex: 1 }}
+              <button style={{ ...xs(S_BTN_SUCCESS), flex: 1 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
                 onClick={() => reviewReport(selReport.id, 'Approved')}>
                 Approve
               </button>
               {selReport.status === 'Submitted' && (
-                <button className="n-btn n-btn-warning n-btn-xs" style={{ flex: 1 }}
+                <button style={{ ...xs(S_BTN_WARNING), flex: 1 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
                   onClick={() => reviewReport(selReport.id, 'Pending Review')}>
                   Flag
                 </button>

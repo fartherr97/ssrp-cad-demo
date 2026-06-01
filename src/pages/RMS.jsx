@@ -62,7 +62,7 @@ export default function RMS() {
       </div>
 
       {/* Tabs */}
-      <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #141720', marginBottom: '14px' }}>
+      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #141720', marginBottom: '14px', overflowX: 'auto' }}>
         {TABS.map(t => (
           <button
             key={t}

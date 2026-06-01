@@ -59,7 +59,7 @@ export default function TopBar() {
   const pageLabel = PAGE_LABELS[currentPage] || 'SSRP NEXUS CAD';
 
   return (
-    <header className="n-topbar">
+    <header style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', height: 42, minHeight: 42, background: 'var(--n-bg-card)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
       {/* Page Title */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{

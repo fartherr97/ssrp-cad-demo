@@ -5,6 +5,7 @@ import {
   MdCheckCircle, MdBusiness, MdMenuBook,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
+import { S_BTN_PRIMARY, BADGE, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#44aacc';
 
@@ -44,7 +45,7 @@ export default function BusinessHome() {
             You don't have a registered business yet. Register one to manage your profile,
             employees, and track incidents filed by law enforcement.
           </div>
-          <button className="n-btn n-btn-primary" onClick={() => navigate('/portal/my-business')}>
+          <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/portal/my-business')}>
             Register your business
           </button>
         </PortalCard>
@@ -109,7 +110,7 @@ export default function BusinessHome() {
                   <div style={{ fontSize: 14, fontWeight: 600, color: '#e6eef6' }}>{inc.type}</div>
                   <div style={{ fontSize: 12, color: 'rgba(160,185,215,0.6)', marginTop: 2 }}>{inc.date}</div>
                 </div>
-                <span className={`n-badge ${inc.status === 'Open' ? 'badge-orange' : 'badge-gray'}`}>{inc.status}</span>
+                <span style={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
               </div>
             ))}
           </div>

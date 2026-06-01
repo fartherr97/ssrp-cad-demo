@@ -6,13 +6,14 @@ import {
   MdWarning, MdMenuBook, MdChevronRight,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
+import { BADGE } from '../../constants/styles';
 
 const ACCENT = '#9090cc';
 
 const DL_BADGE = {
-  ACTIVE:    'badge-green',
-  SUSPENDED: 'badge-red',
-  EXPIRED:   'badge-orange',
+  ACTIVE:    BADGE.green,
+  SUSPENDED: BADGE.red,
+  EXPIRED:   BADGE.orange,
 };
 
 export default function CivilianHome() {
@@ -121,7 +122,7 @@ export default function CivilianHome() {
                     <div style={{ fontSize: 11, color: 'rgba(160,185,215,0.55)' }}>DOB {c.dob}</div>
                   </div>
                 </div>
-                <span className={`n-badge ${DL_BADGE[c.dlStatus] || 'badge-gray'}`}>{c.dlStatus || 'N/A'}</span>
+                <span style={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>
               </div>
             </PortalCard>
           ))}

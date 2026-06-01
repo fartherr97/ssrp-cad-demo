@@ -1,9 +1,20 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import {
+  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_CARD,
+  S_LABEL,
+  S_BTN_FIRE, S_BTN_SECONDARY,
+  sm, btnHoverOn, btnHoverOff, btnActiveOn,
+  BADGE,
+  S_DATA,
+  S_UNIT_ROW, unitRowHoverOn, unitRowHoverOff,
+  S_CALL_CARD, callCardHoverOn, callCardHoverOff,
+} from '../constants/styles';
 
 function PriBadge({ p }) {
-  const cls = ['','badge-p1','badge-p2','badge-p3','badge-p4'][p]||'badge-gray';
-  return <span className={`n-badge ${cls}`}>P{p}</span>;
+  const badgeMap = { 1: BADGE.p1, 2: BADGE.p2, 3: BADGE.p3, 4: BADGE.p4 };
+  return <span style={badgeMap[p] || BADGE.gray}>P{p}</span>;
 }
 
 export default function FireOpsBoard() {
@@ -33,7 +44,7 @@ export default function FireOpsBoard() {
   ];
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
       {/* Header stats */}
       <div style={{
         display: 'flex', gap: 20, alignItems: 'center',
@@ -62,29 +73,31 @@ export default function FireOpsBoard() {
 
       <div className="split-3" style={{ padding: 8 }}>
         {/* Fire Incidents */}
-        <div className="n-panel">
-          <div className="n-panel-header">
-            <div className="n-panel-title" style={{ color: '#c03820' }}>Active Incidents</div>
+        <div style={S_PANEL}>
+          <div style={S_PANEL_HEADER}>
+            <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>Active Incidents</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{fireCalls.length}</span>
           </div>
-          <div className="n-panel-body scroll-y">
+          <div style={S_PANEL_BODY}>
             {fireCalls.length === 0 ? (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No active fire/EMS incidents</div>
             ) : fireCalls.sort((a,b) => a.priority - b.priority).map(c => (
               <div
                 key={c.id}
-                className={`call-card p${c.priority}${selectedCall === c.id ? ' selected' : ''}`}
+                style={S_CALL_CARD(c.priority, selectedCall === c.id)}
                 onClick={() => setSelectedCall(c.id)}
+                onMouseEnter={callCardHoverOn}
+                onMouseLeave={e => callCardHoverOff(selectedCall === c.id, e)}
               >
                 <div style={{ display: 'flex', gap: 5, marginBottom: 3, alignItems: 'center' }}>
                   <PriBadge p={c.priority} />
-                  <span className="n-data" style={{ fontSize: 10 }}>{c.id}</span>
-                  <span className={`n-badge badge-${c.status === 'PENDING' ? 'orange' : c.status === 'ACTIVE' ? 'fire' : c.status === 'ENRT' ? 'yellow' : 'gray'}`} style={{ marginLeft: 'auto', fontSize: 8 }}>
+                  <span style={{ ...S_DATA, fontSize: 10 }}>{c.id}</span>
+                  <span style={{ ...(c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.fire : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray), marginLeft: 'auto', fontSize: 8 }}>
                     {c.status}
                   </span>
                 </div>
-                <div className="call-nature">{c.nature}</div>
-                <div className="call-meta">{c.location}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--n-text)', marginBottom: 2 }}>{c.nature}</div>
+                <div style={{ fontSize: 11, color: 'var(--n-text-muted)' }}>{c.location}</div>
                 <div style={{ fontSize: 10, color: 'var(--n-text-muted)', marginTop: 3 }}>
                   {c.units.length > 0 ? c.units.join(', ') : 'No apparatus'}
                 </div>
@@ -94,7 +107,7 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Incident Detail */}
-        <div className="n-panel">
+        <div style={S_PANEL}>
           {!selCall ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'var(--n-text-muted)', padding: 24 }}>
               <span style={{ fontSize: 40, opacity: 0.3 }}>🔥</span>
@@ -105,29 +118,29 @@ export default function FireOpsBoard() {
             </div>
           ) : (
             <>
-              <div className="n-panel-header">
+              <div style={S_PANEL_HEADER}>
                 <div>
-                  <div className="n-panel-title" style={{ color: '#c03820' }}>
-                    <span className="n-data">{selCall.id}</span> · {selCall.nature}
+                  <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>
+                    <span style={S_DATA}>{selCall.id}</span> · {selCall.nature}
                   </div>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 1 }}>{selCall.timestamp}</div>
                 </div>
                 <PriBadge p={selCall.priority} />
               </div>
-              <div className="n-panel-body scroll-y" style={{ padding: 12 }}>
-                <div className="n-card" style={{ marginBottom: 10, borderLeft: '3px solid #c03820' }}>
-                  <div className="n-label" style={{ marginBottom: 3 }}>Incident Location</div>
+              <div style={{ ...S_PANEL_BODY, padding: 12 }}>
+                <div style={{ ...S_CARD, marginBottom: 10, borderLeft: '3px solid #c03820' }}>
+                  <div style={{ ...S_LABEL, marginBottom: 3 }}>Incident Location</div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{selCall.location}</div>
                   <div style={{ fontSize: 11, color: 'var(--n-text-dim)' }}>{selCall.city}, {selCall.county}</div>
                 </div>
 
-                <div className="n-card" style={{ marginBottom: 10 }}>
-                  <div className="n-label" style={{ marginBottom: 6 }}>Incident Description</div>
+                <div style={{ ...S_CARD, marginBottom: 10 }}>
+                  <div style={{ ...S_LABEL, marginBottom: 6 }}>Incident Description</div>
                   <div style={{ fontSize: 11.5, lineHeight: 1.6 }}>{selCall.description}</div>
                 </div>
 
-                <div className="n-card" style={{ marginBottom: 10 }}>
-                  <div className="n-label" style={{ marginBottom: 6 }}>Assigned Apparatus ({selCall.units.length})</div>
+                <div style={{ ...S_CARD, marginBottom: 10 }}>
+                  <div style={{ ...S_LABEL, marginBottom: 6 }}>Assigned Apparatus ({selCall.units.length})</div>
                   {selCall.units.length === 0 ? (
                     <div style={{ fontSize: 11, color: 'var(--n-text-muted)' }}>No apparatus on scene</div>
                   ) : (
@@ -150,13 +163,19 @@ export default function FireOpsBoard() {
                 </div>
 
                 {me?.deptShort === 'HCFR' && !selCall.units.includes(me.unitId) && (
-                  <button className="n-btn n-btn-fire" style={{ width: '100%', justifyContent: 'center' }} onClick={selfAssign}>
+                  <button
+                    style={{ ...S_BTN_FIRE, width: '100%', justifyContent: 'center' }}
+                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                    onClick={selfAssign}
+                  >
                     Assign Apparatus to Incident
                   </button>
                 )}
 
                 <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                  <button className="n-btn n-btn-secondary n-btn-sm"
+                  <button
+                    style={sm(S_BTN_SECONDARY)}
+                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
                     onClick={() => dispatch({ type: 'CLOSE_CALL', payload: selCall.id }) || setSelectedCall(null)}>
                     Clear Incident
                   </button>
@@ -167,31 +186,31 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Apparatus Roster */}
-        <div className="n-panel">
-          <div className="n-panel-header">
-            <div className="n-panel-title" style={{ color: '#c03820' }}>Apparatus Status</div>
+        <div style={S_PANEL}>
+          <div style={S_PANEL_HEADER}>
+            <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>Apparatus Status</div>
           </div>
-          <div className="n-panel-body scroll-y">
+          <div style={S_PANEL_BODY}>
             {APPARATUS_TYPES.map(ap => (
               ap.units.length > 0 && (
                 <div key={ap.label}>
-                  <div className="n-section-title" style={{ color: '#8a3010' }}>
+                  <div style={{ padding: '3px 8px', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#8a3010', borderBottom: '1px solid var(--n-border-faint)' }}>
                     {ap.icon} {ap.label} ({ap.units.length})
                   </div>
                   {ap.units.map(o => (
-                    <div key={o.id} className="unit-row">
+                    <div key={o.id} style={S_UNIT_ROW} onMouseEnter={unitRowHoverOn} onMouseLeave={unitRowHoverOff}>
                       <div style={{
                         width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
                         background: o.status === 'AVAILABLE' ? 'var(--st-av-text)' :
                           o.status === 'ENRT' ? 'var(--st-enrt-text)' :
                           o.status === 'ARRVD' ? 'var(--st-arv-text)' : 'var(--st-busy-text)',
                       }} />
-                      <span className="n-data" style={{ minWidth: 40, fontSize: 10, color: '#d04020' }}>{o.unitId}</span>
+                      <span style={{ ...S_DATA, minWidth: 40, fontSize: 10, color: '#d04020' }}>{o.unitId}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</div>
                         <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{o.rank}</div>
                       </div>
-                      <span className={`n-badge badge-${o.status === 'AVAILABLE' ? 'available' : o.status === 'ENRT' ? 'enrt' : o.status === 'ARRVD' ? 'arrvd' : 'busy'}`} style={{ fontSize: 8 }}>
+                      <span style={{ ...(o.status === 'AVAILABLE' ? BADGE.available : o.status === 'ENRT' ? BADGE.enrt : o.status === 'ARRVD' ? BADGE.arrvd : BADGE.busy), fontSize: 8 }}>
                         {o.status}
                       </span>
                     </div>

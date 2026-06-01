@@ -1,4 +1,5 @@
 import { useCAD } from '../../store/cadStore';
+import { S_STATUSBAR, S_STATUSBAR_SEP, S_STATUSBAR_HI, S_STATUSBAR_AV, S_STATUSBAR_P1 } from '../../constants/styles';
 
 export default function BottomBar() {
   const { state } = useCAD();
@@ -12,39 +13,39 @@ export default function BottomBar() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
 
   return (
-    <footer className="cad-statusbar">
+    <footer style={S_STATUSBAR}>
       <span>CH: HILLSBOROUGH MAIN</span>
-      <span className="cad-statusbar-sep" />
+      <span style={S_STATUSBAR_SEP} />
 
-      <span>UNIT: <span className="hi">{me?.unitId || '—'}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>UNIT: <span style={S_STATUSBAR_HI}>{me?.unitId || '—'}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
       <span>CALL: <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: myCall ? 600 : 400 }}>
         {myCall ? myCall.id : 'UNASSIGNED'}
       </span></span>
-      <span className="cad-statusbar-sep" />
+      <span style={S_STATUSBAR_SEP} />
 
-      <span>ACTIVE: <span className="hi">{activeCalls}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>ACTIVE: <span style={S_STATUSBAR_HI}>{activeCalls}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
-      <span>PENDING: <span className="hi">{calls.filter(c => c.status === 'PENDING').length}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>PENDING: <span style={S_STATUSBAR_HI}>{calls.filter(c => c.status === 'PENDING').length}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
       {p1Count > 0 && (
         <>
-          <span className="p1">▲ P1 CRITICAL: {p1Count}</span>
-          <span className="cad-statusbar-sep" />
+          <span style={S_STATUSBAR_P1}>▲ P1 CRITICAL: {p1Count}</span>
+          <span style={S_STATUSBAR_SEP} />
         </>
       )}
 
-      <span>ON DUTY: <span className="av">{onDuty}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>ON DUTY: <span style={S_STATUSBAR_AV}>{onDuty}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
-      <span>AVAILABLE: <span className="av">{available}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>AVAILABLE: <span style={S_STATUSBAR_AV}>{available}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
-      <span>DEPT: <span className="hi">{me?.deptShort || '—'}</span></span>
-      <span className="cad-statusbar-sep" />
+      <span>DEPT: <span style={S_STATUSBAR_HI}>{me?.deptShort || '—'}</span></span>
+      <span style={S_STATUSBAR_SEP} />
 
       <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>
 

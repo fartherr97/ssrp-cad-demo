@@ -111,8 +111,9 @@ export default function AdminShell() {
         </button>
 
         {/* Section tabs (scrollable) */}
-        <div ref={scrollRef} className="admin-tabbar" onWheel={onWheel} style={{
+        <div ref={scrollRef} onWheel={onWheel} style={{
           display: 'flex', alignItems: 'stretch', overflowX: 'auto', flex: 1, minWidth: 0,
+          scrollbarWidth: 'none', msOverflowStyle: 'none',
         }}>
           {GROUPS.map((group, gi) => (
             <div key={gi} style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>

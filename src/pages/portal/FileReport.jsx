@@ -5,6 +5,7 @@ import {
   MdPlace, MdDescription, MdCategory,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { S_BTN_PRIMARY, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#9090cc';
 
@@ -115,7 +116,7 @@ export default function FileReport() {
             <Field label="Location" value={submitted.location} />
           </div>
           <div>
-            <button className="n-btn n-btn-primary" onClick={fileAnother}>File Another Report</button>
+            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={fileAnother}>File Another Report</button>
           </div>
         </PortalCard>
       ) : myChars.length === 0 ? (
@@ -164,7 +165,7 @@ export default function FileReport() {
               </div>
             </div>
             <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="submit" className="n-btn n-btn-primary" disabled={!canSubmit}>
+              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!canSubmit}>
                 Submit Report
               </button>
             </div>

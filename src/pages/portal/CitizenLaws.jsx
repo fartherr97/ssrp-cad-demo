@@ -55,7 +55,6 @@ export default function CitizenLaws() {
           {['ALL', 'Felony', 'Misdemeanor', 'Infraction'].map(t => (
             <button key={t}
               onClick={() => setTypeFilter(t)}
-              className="n-btn"
               style={{
                 background: typeFilter === t ? (TYPE_COLOR[t] || accent) : 'rgba(255,255,255,0.05)',
                 color: typeFilter === t ? '#fff' : 'rgba(200,220,240,0.7)',

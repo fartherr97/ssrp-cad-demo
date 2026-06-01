@@ -1,19 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
+import {
+  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_STAT, S_STAT_LABEL, S_STAT_VALUE, S_STAT_SUB,
+  S_BTN_PRIMARY, S_BTN_DANGER, S_BTN_GHOST,
+  sm, xs, btnHoverOn, btnHoverOff, btnActiveOn,
+  S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
+  BADGE,
+  S_DATA,
+  S_UNIT_ROW, unitRowHoverOn, unitRowHoverOff,
+  S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR,
+} from '../constants/styles';
 
 function StatCard({ label, value, sub, color, accent }) {
   return (
-    <div className="n-stat" style={{ borderTop: `2px solid ${color || 'var(--n-border)'}` }}>
-      <div className="n-stat-label">{label}</div>
-      <div className="n-stat-value" style={{ color: accent || 'var(--n-text)' }}>{value}</div>
-      {sub && <div className="n-stat-sub">{sub}</div>}
+    <div style={{ ...S_STAT, borderTop: `2px solid ${color || 'var(--n-border)'}` }}>
+      <div style={S_STAT_LABEL}>{label}</div>
+      <div style={{ ...S_STAT_VALUE, color: accent || 'var(--n-text)' }}>{value}</div>
+      {sub && <div style={S_STAT_SUB}>{sub}</div>}
     </div>
   );
 }
 
 function PriBadge({ p }) {
-  const cls = ['', 'badge-p1', 'badge-p2', 'badge-p3', 'badge-p4'][p] || 'badge-gray';
-  return <span className={`n-badge ${cls}`}>P{p}</span>;
+  const badgeMap = { 1: BADGE.p1, 2: BADGE.p2, 3: BADGE.p3, 4: BADGE.p4 };
+  return <span style={badgeMap[p] || BADGE.gray}>P{p}</span>;
 }
 
 function StatusDot({ status }) {
@@ -106,7 +117,7 @@ export default function CommandDashboard() {
   ];
 
   return (
-    <div className="n-page" style={{ gap: 10 }}>
+    <div style={{ ...S_PAGE, gap: 10 }}>
       {/* P1 Alert Banner */}
       {p1.length > 0 && (
         <div style={{
@@ -120,7 +131,11 @@ export default function CommandDashboard() {
           <span style={{ color: 'var(--pr1-text)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>
             {p1.map(c => `${c.id} — ${c.nature} @ ${c.location}`).join(' · ')}
           </span>
-          <button className="n-btn n-btn-danger n-btn-sm" style={{ marginLeft: 'auto' }} onClick={() => go('dispatch')}>
+          <button
+            style={{ ...sm(S_BTN_DANGER), marginLeft: 'auto' }}
+            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+            onClick={() => go('dispatch')}
+          >
             Go to Dispatch
           </button>
         </div>
@@ -139,9 +154,9 @@ export default function CommandDashboard() {
         {/* Left: modules + active calls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
           {/* Module grid */}
-          <div className="n-panel" style={{ flexShrink: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Operational Workspaces</div>
+          <div style={{ ...S_PANEL, flexShrink: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Operational Workspaces</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
                 {modules.length} MODULES
               </span>
@@ -160,49 +175,55 @@ export default function CommandDashboard() {
           </div>
 
           {/* Active calls */}
-          <div className="n-panel" style={{ flex: 1, minHeight: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Active Incidents</div>
+          <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Active Incidents</div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
                   {pending.length} PENDING · {active.filter(c => c.status === 'ACTIVE').length} ACTIVE
                 </span>
-                <button className="n-btn n-btn-primary n-btn-xs" onClick={() => go('dispatch')}>
+                <button
+                  style={xs(S_BTN_PRIMARY)}
+                  onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                  onClick={() => go('dispatch')}
+                >
                   Open Console
                 </button>
               </div>
             </div>
-            <div className="n-panel-body">
+            <div style={S_PANEL_BODY}>
               {active.length === 0 ? (
                 <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>
                   No active incidents
                 </div>
               ) : (
-                <table className="n-table">
+                <table style={S_TABLE}>
                   <thead>
                     <tr>
-                      <th>Call #</th>
-                      <th>Pri</th>
-                      <th>Nature</th>
-                      <th>Location</th>
-                      <th>Status</th>
-                      <th>Units</th>
+                      <th style={S_TABLE_TH}>Call #</th>
+                      <th style={S_TABLE_TH}>Pri</th>
+                      <th style={S_TABLE_TH}>Nature</th>
+                      <th style={S_TABLE_TH}>Location</th>
+                      <th style={S_TABLE_TH}>Status</th>
+                      <th style={S_TABLE_TH}>Units</th>
                     </tr>
                   </thead>
                   <tbody>
                     {active.map(c => (
-                      <tr key={c.id} className={c.priority === 1 ? 'row-p1' : c.priority === 2 ? 'row-p2' : ''}
-                        onClick={() => go('dispatch')} style={{ cursor: 'pointer' }}>
-                        <td><span className="n-data">{c.id}</span></td>
-                        <td><PriBadge p={c.priority} /></td>
-                        <td style={{ fontWeight: 500 }}>{c.nature}</td>
-                        <td style={{ color: 'var(--n-text-dim)', fontSize: 11 }}>{c.location}</td>
-                        <td>
-                          <span className={`n-badge badge-${c.status === 'PENDING' ? 'orange' : c.status === 'ACTIVE' ? 'blue' : c.status === 'ENRT' ? 'yellow' : 'gray'}`}>
+                      <tr key={c.id}
+                        style={{ cursor: 'pointer', transition: 'background 0.14s, transform 0.14s' }}
+                        onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
+                        onClick={() => go('dispatch')}>
+                        <td style={S_TABLE_TD}><span style={S_DATA}>{c.id}</span></td>
+                        <td style={S_TABLE_TD}><PriBadge p={c.priority} /></td>
+                        <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{c.nature}</td>
+                        <td style={{ ...S_TABLE_TD, color: 'var(--n-text-dim)', fontSize: 11 }}>{c.location}</td>
+                        <td style={S_TABLE_TD}>
+                          <span style={c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.blue : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray}>
                             {c.status}
                           </span>
                         </td>
-                        <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-dim)' }}>
+                        <td style={{ ...S_TABLE_TD, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-dim)' }}>
                           {c.units.length > 0 ? c.units.join(', ') : '—'}
                         </td>
                       </tr>
@@ -217,16 +238,16 @@ export default function CommandDashboard() {
         {/* Right: TX log + unit summary */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
           {/* TX feed */}
-          <div className="n-panel" style={{ flex: 1, minHeight: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Dispatch Feed</div>
+          <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Dispatch Feed</div>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)' }} />
             </div>
-            <div className="n-panel-body scroll-y">
+            <div style={S_PANEL_BODY}>
               {dispatchLog.slice(0, 40).map(e => (
-                <div key={e.id} className="tx-entry">
-                  <span className="tx-time">{e.time}</span>
-                  <span className={`tx-kind-${e.kind}`}>{e.text}</span>
+                <div key={e.id} style={S_TX_ENTRY}>
+                  <span style={S_TX_TIME}>{e.time}</span>
+                  <span style={{ color: TX_KIND_COLOR[e.kind] }}>{e.text}</span>
                 </div>
               ))}
               {dispatchLog.length === 0 && (
@@ -238,14 +259,20 @@ export default function CommandDashboard() {
           </div>
 
           {/* Unit quick view */}
-          <div className="n-panel" style={{ maxHeight: 200, flexShrink: 0 }}>
-            <div className="n-panel-header">
-              <div className="n-panel-title">Unit Summary</div>
-              <button className="n-btn n-btn-ghost n-btn-xs" onClick={() => go('units')}>View All</button>
+          <div style={{ ...S_PANEL, maxHeight: 200, flexShrink: 0 }}>
+            <div style={S_PANEL_HEADER}>
+              <div style={S_PANEL_TITLE}>Unit Summary</div>
+              <button
+                style={xs(S_BTN_GHOST)}
+                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                onClick={() => go('units')}
+              >
+                View All
+              </button>
             </div>
-            <div className="n-panel-body scroll-y">
+            <div style={S_PANEL_BODY}>
               {onDuty.slice(0, 8).map(o => (
-                <div key={o.id} className="unit-row">
+                <div key={o.id} style={S_UNIT_ROW} onMouseEnter={unitRowHoverOn} onMouseLeave={unitRowHoverOff}>
                   <StatusDot status={o.status} />
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-data)', minWidth: 52 }}>
                     {o.unitId}

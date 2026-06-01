@@ -1,9 +1,20 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import {
+  S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_CARD, cardHoverOn, cardHoverOff,
+  S_SELECT, S_LABEL,
+  S_BTN_PRIMARY, S_BTN_SECONDARY,
+  xs, btnHoverOn, btnHoverOff, btnActiveOn,
+  S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
+  BADGE,
+  S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
+  S_DATA,
+} from '../constants/styles';
 
 function StatusBadge({ status }) {
-  const map = { AVAILABLE:'badge-available',BUSY:'badge-busy',ENRT:'badge-enrt',ARRVD:'badge-arrvd',OFFDUTY:'badge-offduty',UNAVAILABLE:'badge-unavailable' };
-  return <span className={`n-badge ${map[status]||'badge-gray'}`}>{status}</span>;
+  const key = { AVAILABLE:'available', BUSY:'busy', ENRT:'enrt', ARRVD:'arrvd', OFFDUTY:'offduty', UNAVAILABLE:'unavailable' }[status] || 'gray';
+  return <span style={BADGE[key] || BADGE.gray}>{status}</span>;
 }
 
 export default function UnitManagement() {
@@ -31,7 +42,7 @@ export default function UnitManagement() {
   const DEPTS = ['ALL', ...departments.map(d => d.abbreviation)];
 
   return (
-    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div style={{ flex: 1, overflow: 'hidden', padding: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 20, padding: '6px 10px',
@@ -49,10 +60,10 @@ export default function UnitManagement() {
           </div>
         ))}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-          <select className="n-select" style={{ width: 110, fontSize: 10 }} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
+          <select style={{ ...S_SELECT, width: 110, fontSize: 10 }} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
             {DEPTS.map(d => <option key={d}>{d}</option>)}
           </select>
-          <select className="n-select" style={{ width: 110, fontSize: 10 }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <select style={{ ...S_SELECT, width: 110, fontSize: 10 }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             {STATUSES.map(s => <option key={s}>{s}</option>)}
           </select>
         </div>
@@ -60,50 +71,52 @@ export default function UnitManagement() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 0, flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Roster table */}
-        <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-          <div className="n-panel-header">
-            <div className="n-panel-title">Unit Roster</div>
+        <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
+          <div style={S_PANEL_HEADER}>
+            <div style={S_PANEL_TITLE}>Unit Roster</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
               {filtered.length} RECORDS
             </span>
           </div>
-          <div className="n-panel-body scroll-y">
-            <table className="n-table">
+          <div style={S_PANEL_BODY}>
+            <table style={S_TABLE}>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Unit ID</th>
-                  <th>Name</th>
-                  <th>Badge</th>
-                  <th>Department</th>
-                  <th>Division</th>
-                  <th>Rank</th>
-                  <th>Assigned Call</th>
-                  {isAdmin && <th>Actions</th>}
+                  <th style={S_TABLE_TH}>Status</th>
+                  <th style={S_TABLE_TH}>Unit ID</th>
+                  <th style={S_TABLE_TH}>Name</th>
+                  <th style={S_TABLE_TH}>Badge</th>
+                  <th style={S_TABLE_TH}>Department</th>
+                  <th style={S_TABLE_TH}>Division</th>
+                  <th style={S_TABLE_TH}>Rank</th>
+                  <th style={S_TABLE_TH}>Assigned Call</th>
+                  {isAdmin && <th style={S_TABLE_TH}>Actions</th>}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(o => (
-                  <tr key={o.id} className={selected === o.id ? 'selected' : ''}
+                  <tr key={o.id}
+                    style={{ background: selected === o.id ? 'var(--n-bg-selected)' : undefined, cursor: 'pointer' }}
+                    onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                     onClick={() => setSelected(o.id)}>
-                    <td><StatusBadge status={o.status} /></td>
-                    <td><span className="n-data">{o.unitId}</span></td>
-                    <td style={{ fontWeight: 500 }}>{o.name}</td>
-                    <td><span className="n-data" style={{ fontSize: 10 }}>{o.badge}</span></td>
-                    <td>
-                      <span className="n-badge badge-blue" style={{ fontSize: 9 }}>{o.deptShort}</span>
+                    <td style={S_TABLE_TD}><StatusBadge status={o.status} /></td>
+                    <td style={S_TABLE_TD}><span style={S_DATA}>{o.unitId}</span></td>
+                    <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{o.name}</td>
+                    <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{o.badge}</span></td>
+                    <td style={S_TABLE_TD}>
+                      <span style={{ ...BADGE.blue, fontSize: 9 }}>{o.deptShort}</span>
                     </td>
-                    <td style={{ fontSize: 11, color: 'var(--n-text-dim)' }}>{o.subdivision}</td>
-                    <td style={{ fontSize: 11, color: 'var(--n-text-dim)' }}>{o.rank}</td>
-                    <td>
+                    <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{o.subdivision}</td>
+                    <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{o.rank}</td>
+                    <td style={S_TABLE_TD}>
                       {o.callId
-                        ? <span className="n-data" style={{ fontSize: 10 }}>{o.callId}</span>
+                        ? <span style={{ ...S_DATA, fontSize: 10 }}>{o.callId}</span>
                         : <span style={{ color: 'var(--n-text-muted)', fontSize: 10 }}>—</span>
                       }
                     </td>
                     {isAdmin && (
-                      <td onClick={e => e.stopPropagation()}>
-                        <select className="n-select" style={{ width: 80, fontSize: 9, padding: '1px 4px' }}
+                      <td style={S_TABLE_TD} onClick={e => e.stopPropagation()}>
+                        <select style={{ ...S_SELECT, width: 80, fontSize: 9, padding: '1px 4px' }}
                           value={o.status}
                           onChange={e => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: o.unitId, status: e.target.value } })}>
                           <option>AVAILABLE</option>
@@ -123,7 +136,7 @@ export default function UnitManagement() {
         </div>
 
         {/* Detail panel */}
-        <div className="n-panel" style={{ borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
+        <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderRight: 'none', borderBottom: 'none' }}>
           {!selOfficer ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--n-text-muted)', padding: 20 }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.25">
@@ -133,11 +146,11 @@ export default function UnitManagement() {
             </div>
           ) : (
             <>
-              <div className="n-panel-header">
-                <div className="n-panel-title">Unit Profile</div>
+              <div style={S_PANEL_HEADER}>
+                <div style={S_PANEL_TITLE}>Unit Profile</div>
                 <StatusBadge status={selOfficer.status} />
               </div>
-              <div className="n-panel-body scroll-y" style={{ padding: 12 }}>
+              <div style={{ ...S_PANEL_BODY, padding: 12 }}>
                 {/* Avatar / Name */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                   <div style={{
@@ -150,48 +163,52 @@ export default function UnitManagement() {
                   </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{selOfficer.name}</div>
-                    <div className="n-data" style={{ fontSize: 10 }}>{selOfficer.badge}</div>
+                    <div style={{ ...S_DATA, fontSize: 10 }}>{selOfficer.badge}</div>
                   </div>
                 </div>
 
-                <div className="n-card" style={{ marginBottom: 8 }}>
+                <div style={{ ...S_CARD, marginBottom: 8 }}
+                  onMouseEnter={cardHoverOn} onMouseLeave={cardHoverOff}>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Assignment</div>
-                  <div className="detail-row"><span className="detail-label">Unit ID</span><span className="detail-value-mono">{selOfficer.unitId}</span></div>
-                  <div className="detail-row"><span className="detail-label">Department</span><span className="detail-value">{selOfficer.deptShort}</span></div>
-                  <div className="detail-row"><span className="detail-label">Division</span><span className="detail-value">{selOfficer.subdivision}</span></div>
-                  <div className="detail-row"><span className="detail-label">Rank</span><span className="detail-value">{selOfficer.rank}</span></div>
-                  <div className="detail-row"><span className="detail-label">Role</span><span className="detail-value">{selOfficer.role}</span></div>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Unit ID</span><span style={S_DETAIL_VALUE_MONO}>{selOfficer.unitId}</span></div>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Department</span><span style={S_DETAIL_VALUE}>{selOfficer.deptShort}</span></div>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Division</span><span style={S_DETAIL_VALUE}>{selOfficer.subdivision}</span></div>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Rank</span><span style={S_DETAIL_VALUE}>{selOfficer.rank}</span></div>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Role</span><span style={S_DETAIL_VALUE}>{selOfficer.role}</span></div>
                 </div>
 
-                <div className="n-card" style={{ marginBottom: 8 }}>
+                <div style={{ ...S_CARD, marginBottom: 8 }}
+                  onMouseEnter={cardHoverOn} onMouseLeave={cardHoverOff}>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Current Status</div>
-                  <div className="detail-row"><span className="detail-label">Status</span><StatusBadge status={selOfficer.status} /></div>
-                  <div className="detail-row">
-                    <span className="detail-label">Assigned Call</span>
-                    <span className="detail-value-mono">{selOfficer.callId || '—'}</span>
+                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
+                  <div style={S_DETAIL_ROW}>
+                    <span style={S_DETAIL_LABEL}>Assigned Call</span>
+                    <span style={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Location</span>
-                    <span className="detail-value">{selOfficer.location || '—'}</span>
+                  <div style={S_DETAIL_ROW}>
+                    <span style={S_DETAIL_LABEL}>Location</span>
+                    <span style={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
                   </div>
                 </div>
 
                 {selCall && (
-                  <div className="n-card" style={{ border: '1px solid var(--n-border-accent)' }}>
+                  <div style={{ ...S_CARD, border: '1px solid var(--n-border-accent)' }}
+                    onMouseEnter={cardHoverOn} onMouseLeave={cardHoverOff}>
                     <div style={{ fontSize: 9, color: 'var(--n-gold)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 6 }}>Active Call</div>
                     <div style={{ fontWeight: 600, marginBottom: 3 }}>{selCall.nature}</div>
                     <div style={{ fontSize: 11, color: 'var(--n-text-dim)' }}>{selCall.location}, {selCall.city}</div>
-                    <div className="n-data" style={{ fontSize: 10, marginTop: 4 }}>{selCall.id}</div>
+                    <div style={{ ...S_DATA, fontSize: 10, marginTop: 4 }}>{selCall.id}</div>
                   </div>
                 )}
 
                 {isAdmin && (
                   <div style={{ marginTop: 10 }}>
-                    <div className="n-label" style={{ marginBottom: 6 }}>Set Status</div>
+                    <div style={{ ...S_LABEL, marginBottom: 6 }}>Set Status</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                       {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (
                         <button key={s}
-                          className={`n-btn n-btn-xs ${selOfficer.status === s ? 'n-btn-primary' : 'n-btn-secondary'}`}
+                          style={selOfficer.status === s ? xs(S_BTN_PRIMARY) : xs(S_BTN_SECONDARY)}
+                          onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
                           onClick={() => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: selOfficer.unitId, status: s } })}>
                           {s}
                         </button>

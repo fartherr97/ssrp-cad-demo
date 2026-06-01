@@ -150,7 +150,7 @@ export default function DispatchConsole() {
                     }}>P{call.priority}</span>
                     <span style={{ color: '#4ade80', fontWeight: 700, fontSize: '12px' }}>{call.id}</span>
                     <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '12px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{call.nature}</span>
-                    <span className="tnum" style={{ color: elapsedColor(call.createdAt, now, call.units.length > 0), fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
+                    <span style={{ color: elapsedColor(call.createdAt, now, call.units.length > 0), fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
                       {fmtElapsed(call.createdAt, now)}
                     </span>
                     <StatusBadge status={call.status} />
@@ -172,7 +172,7 @@ export default function DispatchConsole() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700 }}>
                   CALL {selectedCall.id}
-                  <span className="tnum" style={{ color: elapsedColor(selectedCall.createdAt, now, selectedCall.units.length > 0), marginLeft: '6px' }}>
+                  <span style={{ color: elapsedColor(selectedCall.createdAt, now, selectedCall.units.length > 0), marginLeft: '6px' }}>
                     {fmtElapsed(selectedCall.createdAt, now)}
                   </span>
                 </span>
@@ -212,7 +212,7 @@ export default function DispatchConsole() {
             {officers.map(o => (
               <div key={o.id} style={{ padding: '7px 10px', borderBottom: '1px solid #141720', borderLeft: `3px solid ${uc(o.status)}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="tnum" style={{ color: '#93c5fd', fontWeight: 700, fontSize: '12px' }}>{o.unitId}</span>
+                  <span style={{ color: '#93c5fd', fontWeight: 700, fontSize: '12px' }}>{o.unitId}</span>
                   <span style={{ color: uc(o.status), fontWeight: 600, fontSize: '12px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
                   <span style={{ color: '#374151', fontSize: '10px', flexShrink: 0 }}>{o.deptShort}</span>
                   <StatusBadge status={o.status} />
@@ -250,7 +250,7 @@ export default function DispatchConsole() {
         {/* ===== TX LOG ===== */}
         <div style={{ display: !isMobile || mobileTab === 'log' ? 'flex' : 'none', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
           <ColHead title="TX LOG" count={dispatchLog.length} />
-          <div className="terminal" style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', background: '#06070c' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', background: '#06070c' }}>
             {dispatchLog.length === 0 && <Empty>No radio traffic.</Empty>}
             {dispatchLog.map(e => (
               <div key={e.id} style={{ display: 'flex', gap: '6px', padding: '2px 0', fontSize: '11px', lineHeight: 1.5 }}>

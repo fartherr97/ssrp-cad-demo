@@ -524,7 +524,7 @@ function ReviewQueue({ reports, dispatch }) {
 function TabBar({ tabs, active, setActive }) {
   const labels = { submitted: 'Submitted Reports', create: 'Create Report', builder: 'Form Builder', review: 'Review Queue' };
   return (
-    <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937' }}>
+    <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', overflowX: 'auto' }}>
       {tabs.map(t => (
         <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0f172a' : 'transparent', border: active === t ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: active === t ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' }}>
           {labels[t] || t}

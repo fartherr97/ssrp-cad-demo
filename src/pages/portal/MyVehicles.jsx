@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { MdDirectionsCar, MdAdd, MdClose, MdPerson } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm, btnHoverOn, btnHoverOff } from '../../constants/styles';
 
 const ACCENT = '#9090cc';
 
@@ -48,7 +49,7 @@ export default function MyVehicles() {
         accent={ACCENT}
         action={
           !showForm && myChars.length > 0 && (
-            <button className="n-btn n-btn-primary" onClick={openNew}>
+            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Vehicle
             </button>
           )
@@ -59,7 +60,7 @@ export default function MyVehicles() {
         <PortalCard accent={ACCENT} style={{ marginBottom: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#e6eef6' }}>Register New Vehicle</div>
-            <button className="n-btn n-btn-secondary" onClick={closeForm}>
+            <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={closeForm}>
               <MdClose size={16} style={{ marginRight: 4 }} /> Cancel
             </button>
           </div>
@@ -99,7 +100,7 @@ export default function MyVehicles() {
               </div>
             </div>
             <div style={{ marginTop: 18 }}>
-              <button type="submit" className="n-btn n-btn-primary">Register Vehicle</button>
+              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}>Register Vehicle</button>
             </div>
           </form>
         </PortalCard>
@@ -115,7 +116,7 @@ export default function MyVehicles() {
               : 'Register your first vehicle to get started.'}
           </div>
           {myChars.length > 0 && (
-            <button className="n-btn n-btn-primary" style={{ marginTop: 18 }} onClick={openNew}>
+            <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Vehicle
             </button>
           )}
@@ -133,7 +134,7 @@ export default function MyVehicles() {
                     {v.year} {v.make} {v.model}
                   </div>
                 </div>
-                <span className={`n-badge ${v.regStatus === 'VALID' ? 'badge-green' : 'badge-red'}`}>
+                <span style={v.regStatus === 'VALID' ? BADGE.green : BADGE.red}>
                   {v.regStatus}
                 </span>
               </div>

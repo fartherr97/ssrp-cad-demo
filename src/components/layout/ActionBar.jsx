@@ -38,14 +38,27 @@ function Clock() {
 function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, style = {} }) {
   return (
     <button
-      className={`cad-tool-btn${active ? ' active' : ''}`}
       onClick={onClick}
       disabled={disabled}
       title={title || label}
-      style={style}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: 3, padding: '4px 10px',
+        minWidth: 54, height: '100%',
+        background: active ? 'rgba(47,127,232,0.15)' : 'transparent',
+        border: 'none',
+        borderBottom: `2px solid ${active ? 'var(--acc-blue-hi)' : 'transparent'}`,
+        color: active ? '#a0c8f0' : '#4a6080',
+        cursor: disabled ? 'not-allowed' : 'pointer', flexShrink: 0,
+        transition: 'background 0.1s, color 0.1s', fontFamily: 'var(--font-ui)',
+        opacity: disabled ? 0.4 : 1,
+        ...style,
+      }}
+      onMouseEnter={e => { if (!active && !disabled) { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#7090b0'; } }}
+      onMouseLeave={e => { if (!active && !disabled) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#4a6080'; } }}
     >
-      <span className="cad-tool-icon"><IconComp size={20} /></span>
-      <span className="cad-tool-label">{label}</span>
+      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconComp size={20} /></span>
+      <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', lineHeight: 1 }}>{label}</span>
     </button>
   );
 }
@@ -155,7 +168,7 @@ export default function ActionBar({ onCreateCall }) {
       {/* ── Admin extras ── */}
       {portal.adminNav && (
         <>
-          <div className="cad-tool-sep" />
+          <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />
           {portal.adminNav.map(item => (
             <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
               onClick={() => go(item.route)} active={isActive(item.route)} />
@@ -164,7 +177,7 @@ export default function ActionBar({ onCreateCall }) {
       )}
 
       {/* ── Call actions (dispatch / field roles) ── */}
-      {(portal.showNewCall || portal.showCalls) && <div className="cad-tool-sep" />}
+      {(portal.showNewCall || portal.showCalls) && <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />}
       {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
       {portal.showCalls && (
         <>
@@ -179,7 +192,7 @@ export default function ActionBar({ onCreateCall }) {
       {/* ── Field-status buttons ── */}
       {portal.showStatus && (
         <>
-          <div className="cad-tool-sep" />
+          <div style={{ width: 1, background: '#1a3050', alignSelf: 'stretch', flexShrink: 0 }} />
           {STATUS_BTNS.map(s => (
             <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
               status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
