@@ -9,7 +9,9 @@ const initialState = {
   currentUser: null,
   currentPage: 'login',
   officers: OFFICERS,
-  calls: CALLS,
+  // Stamp each seed call with a staggered creation time (most recent first) so
+  // the live elapsed-time clocks in the console read realistically.
+  calls: CALLS.map((c, i) => ({ ...c, createdAt: Date.now() - (i * 6 + 3) * 60000 })),
   civilians: CIVILIANS,
   vehicles: VEHICLES,
   warrants: WARRANTS,
@@ -27,7 +29,31 @@ const initialState = {
   activeSessions: ACTIVE_SESSIONS,
   myCallId: null,
   nextId: 1000,
+  // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
+  // the running total of dispatcher radio broadcasts; `radioSeen` is how many
+  // the current viewer has acknowledged (by opening the MDT Radio feed).
+  radioCount: 0,
+  radioSeen: 0,
+  lastRadio: null,
+  dispatchLog: [
+    { id: 'seed-3', time: '14:22:04', kind: 'call', text: 'Call 23-1042 created — Traffic Stop (Elm St / Route 9)' },
+    { id: 'seed-2', time: '14:22:31', kind: 'unit', text: 'Unit 831-12 attached to 23-1042' },
+    { id: 'seed-1', time: '14:35:10', kind: 'alert', text: 'BOLO issued — Black Dodge Charger, plate SUS-1109' },
+  ],
 };
+
+const nowTime = () => {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+};
+
+// Append a line to the live dispatch (TX) log. `kind` drives the color of the
+// entry in the console feed: call | unit | status | alert | info.
+function addDispatchLog(state, text, kind = 'info') {
+  const entry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, time: nowTime(), text, kind };
+  return { dispatchLog: [entry, ...state.dispatchLog].slice(0, 250) };
+}
 
 function addAuditEntry(state, action, module) {
   const user = state.currentUser;
@@ -44,33 +70,43 @@ function addAuditEntry(state, action, module) {
 function reducer(state, action) {
   switch (action.type) {
     case 'LOGIN':
-      return { ...state, currentUser: action.payload, currentPage: 'dispatch' };
+      // After sign-in, drop into the selection hub where the user picks a module.
+      return { ...state, currentUser: action.payload, currentPage: 'hub' };
     case 'LOGOUT':
       return { ...state, currentUser: null, currentPage: 'login', myCallId: null };
     case 'SET_PAGE':
       return { ...state, currentPage: action.payload };
 
     case 'SET_STATUS': {
+      const me = state.officers.find(o => o.id === state.currentUser?.id);
       const officers = state.officers.map(o =>
         o.id === state.currentUser?.id ? { ...o, status: action.payload } : o
       );
       const audit = addAuditEntry(state, `Status changed to ${action.payload}`, 'CAD');
-      return { ...state, officers, ...audit };
+      const log = me ? addDispatchLog(state, `Unit ${me.unitId} (${me.name}) → ${action.payload}`, 'status') : {};
+      return { ...state, officers, ...audit, ...log };
     }
 
     case 'CREATE_CALL': {
-      const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), units: [] };
+      const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), createdAt: Date.now(), units: [] };
       const audit = addAuditEntry(state, `Created call ${newCall.id} (${newCall.nature})`, 'Dispatch');
-      return { ...state, calls: [newCall, ...state.calls], ...audit };
+      const log = addDispatchLog(state, `Call ${newCall.id} created — ${newCall.nature} (${newCall.location})`, 'call');
+      return { ...state, calls: [newCall, ...state.calls], ...audit, ...log };
     }
     case 'UPDATE_CALL': {
       const calls = state.calls.map(c => c.id === action.payload.id ? { ...c, ...action.payload } : c);
-      return { ...state, calls };
+      const log = addDispatchLog(state, `Call ${action.payload.id} updated`, 'call');
+      return { ...state, calls, ...log };
     }
     case 'CLOSE_CALL': {
+      // Clear the closed call from any units attached to it.
+      const officers = state.officers.map(o =>
+        o.callId === action.payload ? { ...o, callId: null, status: o.status === 'OFFDUTY' ? o.status : 'AVAILABLE' } : o
+      );
       const calls = state.calls.map(c => c.id === action.payload ? { ...c, status: 'CLOSED' } : c);
       const audit = addAuditEntry(state, `Closed call ${action.payload}`, 'Dispatch');
-      return { ...state, calls, ...audit };
+      const log = addDispatchLog(state, `Call ${action.payload} closed — units cleared`, 'call');
+      return { ...state, calls, officers, ...audit, ...log };
     }
     case 'ASSIGN_UNIT': {
       const { callId, unitId } = action.payload;
@@ -81,8 +117,40 @@ function reducer(state, action) {
         return c;
       });
       const officers = state.officers.map(o => o.unitId === unitId ? { ...o, callId, status: 'ENRT' } : o);
-      return { ...state, calls, officers };
+      const log = addDispatchLog(state, `Unit ${unitId} dispatched to ${callId}`, 'unit');
+      return { ...state, calls, officers, ...log };
     }
+    case 'DETACH_UNIT': {
+      const { callId, unitId } = action.payload;
+      const calls = state.calls.map(c =>
+        c.id === callId ? { ...c, units: c.units.filter(u => u !== unitId) } : c
+      );
+      const officers = state.officers.map(o =>
+        o.unitId === unitId ? { ...o, callId: null, status: o.status === 'OFFDUTY' ? o.status : 'AVAILABLE' } : o
+      );
+      const log = addDispatchLog(state, `Unit ${unitId} cleared from ${callId}`, 'unit');
+      return { ...state, calls, officers, ...log };
+    }
+    // Dispatcher control over ANY unit's status (not just the current user).
+    case 'SET_UNIT_STATUS': {
+      const { unitId, status } = action.payload;
+      const target = state.officers.find(o => o.unitId === unitId);
+      const officers = state.officers.map(o => o.unitId === unitId ? { ...o, status } : o);
+      const audit = addAuditEntry(state, `Set unit ${unitId} status to ${status}`, 'Dispatch');
+      const log = addDispatchLog(state, `Unit ${unitId}${target ? ` (${target.name})` : ''} → ${status}`, 'status');
+      return { ...state, officers, ...audit, ...log };
+    }
+    case 'DISPATCH_RADIO': {
+      const log = addDispatchLog(state, `[RADIO] ${action.payload}`, 'alert');
+      return {
+        ...state,
+        ...log,
+        radioCount: state.radioCount + 1,
+        lastRadio: { text: action.payload, time: nowTime(), id: `${Date.now()}` },
+      };
+    }
+    case 'MARK_RADIO_SEEN':
+      return { ...state, radioSeen: state.radioCount };
     case 'SET_MY_CALL':
       return { ...state, myCallId: action.payload };
 

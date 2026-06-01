@@ -1,226 +1,340 @@
+import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
-import StatusBadge from './StatusBadge';
-import {
-  FaBullhorn, FaMagnifyingGlass, FaFileLines, FaDesktop,
-  FaFolder, FaDatabase, FaMap, FaPhoneFlip, FaIdBadge,
-  FaBuilding, FaGavel, FaLayerGroup, FaGear, FaBan,
-  FaArrowLeft, FaArrowRight, FaStar, FaPhone, FaShieldHalved,
-} from 'react-icons/fa6';
+import { useResponsive } from '../hooks/useResponsive';
+import { FaBars, FaXmark, FaShieldHalved } from 'react-icons/fa6';
 
-const STATUSES = ['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
-
-const STATUS_COLORS = {
-  AVAILABLE: '#22c55e',
-  BUSY:      '#f59e0b',
-  UNAVAILABLE: '#ef4444',
-  OFFDUTY:   '#6b7280',
-  ENRT:      '#22c55e',
+const STATUS_ORDER = ['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
+const STATUS_CONFIG = {
+  AVAILABLE:   { bg: '#052e16', text: '#4ade80', border: '#166534', label: 'ON DUTY' },
+  BUSY:        { bg: '#431407', text: '#fb923c', border: '#9a3412', label: 'BUSY' },
+  UNAVAILABLE: { bg: '#450a0a', text: '#f87171', border: '#991b1b', label: 'UNAVAIL' },
+  OFFDUTY:     { bg: '#111827', text: '#6b7280', border: '#374151', label: 'OFF DUTY' },
 };
 
 const NAV = [
-  { page: 'dispatch',   label: 'CAD',        Icon: FaBullhorn },
-  { page: 'search',     label: 'Search',      Icon: FaMagnifyingGlass },
-  { page: 'returns',    label: 'Returns',     Icon: FaFileLines },
-  { page: 'mdt',        label: 'MDT',         Icon: FaDesktop,    badge: true },
-  { page: 'forms',      label: 'Forms',       Icon: FaFolder },
-  { page: 'rms',        label: 'RMS',         Icon: FaDatabase },
-  { page: 'livemap',    label: 'Live Map',    Icon: FaMap },
-  { page: 'createcall', label: 'New Call',    Icon: FaPhoneFlip },
-  { page: 'profile',    label: 'My Profile',  Icon: FaIdBadge },
+  { label: 'DISPATCH',  page: 'dispatch' },
+  { label: 'MAP',       page: 'livemap' },
+  { label: 'RECORDS',   page: 'search' },
+  { label: 'VEHICLES',  page: 'returns' },
+  { label: 'WARRANTS',  page: 'rms' },
+  { label: 'MESSAGES',  page: 'mdt', badge: true },
+  { label: 'REPORTS',   page: 'forms' },
+  { label: 'NEW CALL',  page: 'createcall' },
+  { label: 'PROFILE',   page: 'profile' },
+];
+const CONSOLE_ITEM = { label: 'CONSOLE', page: 'console' };
+const ADMIN_NAV = [
+  { label: 'DEPARTMENTS', page: 'departments' },
+  { label: 'PENAL CODE',  page: 'penalcode' },
+  { label: 'TEMPLATES',   page: 'recordtemplates' },
+  { label: 'ADMIN',       page: 'admin' },
+  { label: 'BANS',        page: 'bans' },
 ];
 
-const ADMIN_NAV = [
-  { page: 'departments',     label: 'Depts',       Icon: FaBuilding },
-  { page: 'penalcode',       label: 'Penal Code',  Icon: FaGavel },
-  { page: 'recordtemplates', label: 'Templates',   Icon: FaLayerGroup },
-  { page: 'admin',           label: 'Admin',       Icon: FaGear },
-  { page: 'bans',            label: 'Bans',        Icon: FaBan },
-];
+function useClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const p = n => String(n).padStart(2, '0');
+  return `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
 
 export default function NavBar() {
   const { state, dispatch } = useCAD();
-  const { currentUser, currentPage, officers } = state;
+  const { currentUser, currentPage, officers, messages } = state;
+  const { isMobile } = useResponsive();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const clock = useClock();
+
   const myOfficer   = officers.find(o => o.id === currentUser?.id);
   const myStatus    = myOfficer?.status || 'OFFDUTY';
-  const unread      = state.messages.filter(m => !m.read).length;
-  const go          = (page) => dispatch({ type: 'SET_PAGE', payload: page });
-  const statusColor = STATUS_COLORS[myStatus] || '#6b7280';
+  const statusCfg   = STATUS_CONFIG[myStatus] || STATUS_CONFIG.OFFDUTY;
+  const unread      = messages.filter(m => !m.read).length;
+  const go          = page => { dispatch({ type: 'SET_PAGE', payload: page }); setDrawerOpen(false); };
+  const canDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
+  const navItems    = canDispatch ? [CONSOLE_ITEM, ...NAV] : NAV;
+
+  const cycleStatus = () => {
+    const idx = STATUS_ORDER.indexOf(myStatus);
+    dispatch({ type: 'SET_STATUS', payload: STATUS_ORDER[(idx + 1) % STATUS_ORDER.length] });
+  };
+
+  // Derive short last name for the display (mirrors the reference: "Sgt. J. Davis")
+  const nameShort = currentUser
+    ? `${currentUser.rank || ''} ${currentUser.name.split(' ').pop()}`
+    : '';
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
-
-      {/* ── Branding bar ── */}
+      {/* ── Single CAD navigation bar ── */}
       <div style={{
-        background: '#07111f',
-        borderBottom: '1px solid #162540',
-        padding: '0 20px',
-        height: '50px',
+        background: '#08090e',
+        borderBottom: '1px solid #1a1e2c',
+        height: '42px',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        alignItems: 'stretch',
+        paddingLeft: '0',
+        paddingRight: '8px',
+        gap: 0,
       }}>
-        <div onClick={() => go('dispatch')} style={{ display:'flex', alignItems:'center', gap:'10px', cursor:'pointer' }}>
-          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height:'32px', width:'auto' }} />
-          <div style={{ lineHeight: 1.25 }}>
-            <div style={{ color:'#ffffff', fontWeight:700, fontSize:'14px', letterSpacing:'0.2px' }}>
-              Sunshine State <span style={{ color:'#f97316' }}>RP</span>
-            </div>
-            <div style={{ color:'#3a5a8a', fontSize:'9px', letterSpacing:'2px', textTransform:'uppercase' }}>
-              Computer Aided Dispatch
-            </div>
-          </div>
-        </div>
 
-        <div style={{ color:'#4a7aaa', fontSize:'13px', fontWeight:500 }}>
-          {PAGE_TITLES[currentPage] || 'CAD System'}
-        </div>
-
-        {currentUser && (
-          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-              <div style={{
-                width:'32px', height:'32px',
-                background:'linear-gradient(135deg,#1e4080,#2d5fa0)',
-                border:`2px solid ${statusColor}`,
-                borderRadius:'50%',
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:'13px',
-              }}>👮</div>
-              <div style={{ lineHeight:1.3 }}>
-                <div style={{ color:'#d1dff0', fontSize:'12px', fontWeight:600 }}>
-                  {currentUser.badge} | {currentUser.rank} | {currentUser.name}
-                </div>
-                <div style={{ color:'#f97316', fontSize:'10px' }}>
-                  {currentUser.deptShort}{myOfficer?.subdivision ? ` · ${myOfficer.subdivision}` : ''}
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => dispatch({ type:'LOGOUT' })}
-              style={{ background:'transparent', color:'#4a6a8a', border:'1px solid #1e3050', borderRadius:'4px', padding:'4px 10px', fontSize:'11px', cursor:'pointer' }}
-            >
-              Sign Out
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ── Toolbar ── */}
-      <div style={{
-        background: 'linear-gradient(180deg, #1a3a6b 0%, #152f58 100%)',
-        borderBottom: '2px solid #0d1e3a',
-        padding: '5px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        boxShadow: '0 3px 10px rgba(0,0,0,0.6)',
-      }}>
-        {/* Status */}
-        <div
-          onClick={() => {
-            const idx = STATUSES.indexOf(myStatus);
-            dispatch({ type:'SET_STATUS', payload: STATUSES[(idx+1) % STATUSES.length] });
+        {/* Logo / branding */}
+        <button
+          onClick={() => go('hub')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            borderRight: '1px solid #1a1e2c',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '0 14px 0 12px',
+            flexShrink: 0,
           }}
-          style={{ marginRight:'8px', cursor:'pointer', flexShrink:0 }}
         >
-          <StatusBadge status={myStatus} />
-        </div>
+          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: '22px', width: 'auto' }} />
+          <span style={{ color: '#cbd5e1', fontWeight: 700, fontSize: '13px', letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
+            SSRP <span style={{ color: '#f97316' }}>CAD</span>
+          </span>
+        </button>
 
-        <Sep />
-
-        {/* Main nav */}
-        {NAV.map(item => (
-          <ToolBtn
-            key={item.page}
-            label={item.label}
-            Icon={item.Icon}
-            active={currentPage === item.page}
-            badge={item.badge ? unread : 0}
-            onClick={() => go(item.page)}
-          />
-        ))}
-
-        {/* Admin section */}
-        {currentUser?.role === 'admin' && (
-          <>
-            <Sep />
-            {ADMIN_NAV.map(item => (
-              <ToolBtn
+        {/* Desktop nav items */}
+        {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'stretch', overflowX: 'auto', scrollbarWidth: 'none', flex: 1 }}>
+            {navItems.map(item => (
+              <NavBtn
                 key={item.page}
                 label={item.label}
-                Icon={item.Icon}
                 active={currentPage === item.page}
+                badge={item.badge ? unread : 0}
                 onClick={() => go(item.page)}
-                admin
               />
             ))}
-          </>
+            {currentUser?.role === 'admin' && (
+              <>
+                <div style={{ width: '1px', background: '#1a1e2c', margin: '8px 2px', flexShrink: 0 }} />
+                {ADMIN_NAV.map(item => (
+                  <NavBtn
+                    key={item.page}
+                    label={item.label}
+                    active={currentPage === item.page}
+                    onClick={() => go(item.page)}
+                    admin
+                  />
+                ))}
+              </>
+            )}
+          </div>
         )}
+
+        {/* Right side: status + user */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', paddingLeft: '8px', flexShrink: 0 }}>
+          {!isMobile && (
+            <>
+              {/* Status badge */}
+              <button
+                onClick={cycleStatus}
+                title="Click to cycle status"
+                style={{
+                  background: statusCfg.bg,
+                  color: statusCfg.text,
+                  border: `1px solid ${statusCfg.border}`,
+                  borderRadius: '3px',
+                  padding: '3px 10px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.5px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: statusCfg.text, flexShrink: 0 }} />
+                STATUS: {statusCfg.label}
+              </button>
+
+              {currentUser && (
+                <>
+                  <div style={{ width: '1px', height: '22px', background: '#1a1e2c' }} />
+                  <div style={{ lineHeight: 1.25, textAlign: 'right' }}>
+                    <div style={{ color: '#d1d5db', fontSize: '12px', fontWeight: 600 }}>
+                      {nameShort}
+                    </div>
+                    <div style={{ color: '#4b5563', fontSize: '10px' }}>
+                      Badge: {currentUser.badge}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div style={{ width: '1px', height: '22px', background: '#1a1e2c' }} />
+              <button
+                onClick={() => dispatch({ type: 'LOGOUT' })}
+                style={{ background: 'transparent', border: '1px solid #1a1e2c', borderRadius: '3px', color: '#4b5563', padding: '3px 8px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                Sign Out
+              </button>
+            </>
+          )}
+
+          {/* Mobile hamburger */}
+          {isMobile && (
+            <button
+              onClick={() => setDrawerOpen(d => !d)}
+              style={{ background: drawerOpen ? '#1e293b' : 'transparent', border: '1px solid #1a1e2c', borderRadius: '4px', color: '#9ca3af', padding: '5px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            >
+              {drawerOpen ? <FaXmark size={15} /> : <FaBars size={15} />}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* ── Mobile drawer ── */}
+      {isMobile && drawerOpen && (
+        <div style={{
+          background: '#08090e',
+          borderBottom: '2px solid #1a1e2c',
+          padding: '12px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.85)',
+          maxHeight: 'calc(100vh - 42px)',
+          overflowY: 'auto',
+        }}>
+          {currentUser && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #1a1e2c' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {currentUser.rank} {currentUser.name}
+                </div>
+                <div style={{ color: '#4b5563', fontSize: '11px' }}>
+                  Badge: {currentUser.badge} · {currentUser.deptShort}
+                </div>
+              </div>
+              <button
+                onClick={cycleStatus}
+                style={{ background: statusCfg.bg, color: statusCfg.text, border: `1px solid ${statusCfg.border}`, borderRadius: '3px', padding: '3px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
+              >
+                {statusCfg.label}
+              </button>
+              <button onClick={() => dispatch({ type: 'LOGOUT' })} style={{ background: 'transparent', border: '1px solid #1a1e2c', borderRadius: '3px', color: '#4b5563', padding: '3px 8px', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>
+                Out
+              </button>
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px', marginBottom: '8px' }}>
+            {navItems.map(item => (
+              <button
+                key={item.page}
+                onClick={() => go(item.page)}
+                style={{
+                  background: currentPage === item.page ? '#1e3a5f' : '#0d1117',
+                  border: `1px solid ${currentPage === item.page ? '#1d4ed8' : '#1a1e2c'}`,
+                  borderRadius: '3px',
+                  color: currentPage === item.page ? '#93c5fd' : '#6b7280',
+                  padding: '8px 4px',
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  letterSpacing: '0.3px',
+                  position: 'relative',
+                }}
+              >
+                {item.label}
+                {item.badge && unread > 0 && (
+                  <span style={{ position: 'absolute', top: '3px', right: '3px', background: '#dc2626', color: '#fff', borderRadius: '8px', fontSize: '9px', padding: '0 3px', lineHeight: '15px' }}>
+                    {unread}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {currentUser?.role === 'admin' && (
+            <>
+              <div style={{ color: '#f97316', fontSize: '10px', letterSpacing: '1.5px', textTransform: 'uppercase', margin: '10px 0 6px', paddingTop: '10px', borderTop: '1px solid #1a1e2c' }}>
+                Admin Tools
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px' }}>
+                {ADMIN_NAV.map(item => (
+                  <button
+                    key={item.page}
+                    onClick={() => go(item.page)}
+                    style={{
+                      background: currentPage === item.page ? '#431407' : '#0d1117',
+                      border: `1px solid ${currentPage === item.page ? '#c2410c' : '#1a1e2c'}`,
+                      borderRadius: '3px',
+                      color: currentPage === item.page ? '#fb923c' : '#78350f',
+                      padding: '8px 4px',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #1a1e2c', fontFamily: "'Ubuntu', sans-serif" }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+            <span style={{ color: '#1d4ed8', fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>{clock}</span>
+            <span style={{ color: '#374151', fontSize: '11px', marginLeft: 'auto' }}>Dispatch Net Online</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function Sep() {
-  return <div style={{ width:'1px', height:'34px', background:'rgba(255,255,255,0.12)', margin:'0 4px', flexShrink:0 }} />;
-}
+function NavBtn({ label, active, onClick, admin, badge }) {
+  const [hovered, setHovered] = useState(false);
+  const activeColor  = admin ? '#fb923c' : '#93c5fd';
+  const hoverColor   = admin ? '#d97706' : '#9ca3af';
+  const defaultColor = admin ? '#78350f' : '#4b5563';
 
-function ToolBtn({ label, Icon, active, onClick, admin, badge }) {
-  const accent = admin ? '#f97316' : '#60a5fa';
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: active ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.05)',
-        border: active ? `1px solid ${accent}60` : '1px solid rgba(255,255,255,0.09)',
-        borderRadius: '6px',
-        color: active ? '#fff' : (admin ? '#fbb87a' : '#a8c4e0'),
-        padding: '4px 9px 5px',
-        minWidth: '54px',
-        height: '46px',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: active ? `2px solid ${admin ? '#f97316' : '#1d4ed8'}` : '2px solid transparent',
+        color: active ? activeColor : hovered ? hoverColor : defaultColor,
+        padding: '0 10px',
+        height: '42px',
+        fontSize: '11px',
+        fontWeight: active ? 700 : 500,
+        letterSpacing: '0.5px',
         cursor: 'pointer',
+        whiteSpace: 'nowrap',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
         position: 'relative',
-        transition: 'background 0.12s, color 0.12s',
-        boxShadow: active ? `inset 0 -2px 0 ${accent}` : 'none',
+        transition: 'color 0.1s',
         flexShrink: 0,
       }}
-      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.11)'; e.currentTarget.style.color = '#fff'; }}}
-      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = admin ? '#fbb87a' : '#a8c4e0'; }}}
     >
-      <Icon size={16} />
-      <span style={{ fontSize:'9px', fontWeight: active ? 600 : 400, letterSpacing:'0.2px', whiteSpace:'nowrap', lineHeight:1 }}>
-        {label}
-      </span>
+      {label}
       {badge > 0 && (
         <span style={{
-          background:'#ef4444', color:'#fff', borderRadius:'8px',
-          fontSize:'8px', padding:'1px 4px', lineHeight:1.4,
-          position:'absolute', top:'3px', right:'3px',
-        }}>{badge}</span>
+          position: 'absolute', top: '6px', right: '3px',
+          background: '#dc2626', color: '#fff', borderRadius: '8px',
+          fontSize: '9px', padding: '0 3px', lineHeight: '15px', fontWeight: 700,
+        }}>
+          {badge}
+        </span>
       )}
     </button>
   );
 }
-
-const PAGE_TITLES = {
-  dispatch:        'Dispatch Board',
-  mdt:             'Mobile Data Terminal',
-  search:          'Records Search',
-  returns:         'NCIC / DMV Returns',
-  forms:           'Report Center',
-  rms:             'Records Management',
-  livemap:         'Live Map',
-  createcall:      'Create Call',
-  profile:         'Officer Profile',
-  civilian:        'Civilian Portal',
-  departments:     'Department Management',
-  penalcode:       'Penal Code Editor',
-  recordtemplates: 'Record Templates',
-  admin:           'Admin Panel',
-  bans:            'Ban Management',
-};

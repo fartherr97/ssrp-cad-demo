@@ -1,186 +1,201 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import StatusBadge from '../components/StatusBadge';
 
-const PRIORITY_COLORS = { 1: '#ef4444', 2: '#f59e0b', 3: '#22c55e' };
+function PriBadge({ p }) {
+  const cls = ['', 'badge-p1', 'badge-p2', 'badge-p3', 'badge-p4'][p] || 'badge-gray';
+  return <span className={`n-badge ${cls}`}>P{p}</span>;
+}
+
+function StatusBadge({ status }) {
+  const map = {
+    AVAILABLE: 'badge-available', BUSY: 'badge-busy',
+    ENRT: 'badge-enrt', ARRVD: 'badge-arrvd',
+    OFFDUTY: 'badge-offduty', UNAVAILABLE: 'badge-unavailable',
+  };
+  return <span className={`n-badge ${map[status] || 'badge-gray'}`}>{status}</span>;
+}
 
 export default function DispatchBoard() {
   const { state, dispatch } = useCAD();
-  const { calls, officers, currentUser, myCallId } = state;
+  const { calls, officers, currentUser } = state;
+  const [filter, setFilter] = useState('ALL');
   const [selectedCall, setSelectedCall] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('ALL');
+
+  const me = officers.find(o => o.id === currentUser?.id);
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
-  const filteredCalls = statusFilter === 'ALL' ? activeCalls : activeCalls.filter(c => c.status === statusFilter);
-  const myOfficer = officers.find(o => o.id === currentUser?.id);
+  const filtered = filter === 'ALL' ? activeCalls : activeCalls.filter(c => c.status === filter);
+  const selCall = selectedCall ? calls.find(c => c.id === selectedCall) : null;
 
-  const handleAssignSelf = (callId) => {
-    if (!currentUser) return;
-    const unitId = myOfficer?.unitId;
-    dispatch({ type: 'ASSIGN_UNIT', payload: { callId, unitId } });
-    dispatch({ type: 'SET_MY_CALL', payload: callId });
-    dispatch({ type: 'SET_STATUS', payload: 'ENRT' });
+  const onDuty = officers.filter(o => o.status !== 'OFFDUTY');
+
+  const myCall = me?.callId ? calls.find(c => c.id === me.callId) : null;
+  const myStatus = me?.status || 'OFFDUTY';
+
+  const selfAssign = () => {
+    if (!selectedCall || !me) return;
+    dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall, unitId: me.unitId } });
+    dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
   };
 
-  const handleClose = (callId) => {
-    dispatch({ type: 'CLOSE_CALL', payload: callId });
-    if (myCallId === callId) {
-      dispatch({ type: 'SET_MY_CALL', payload: null });
-      dispatch({ type: 'SET_STATUS', payload: 'AVAILABLE' });
-    }
-  };
+  const setMyStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
+
+  const TABS = ['ALL', 'PENDING', 'ACTIVE', 'ENRT'];
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
-      {/* Status bar */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ color: '#94a3b8', fontSize: '16px', marginRight: '4px' }}>MY STATUS:</span>
-        {['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'].map(s => (
-          <button
-            key={s}
-            onClick={() => dispatch({ type: 'SET_STATUS', payload: s })}
-            style={{
-              background: myOfficer?.status === s ? '#1e4080' : '#0d1f3c',
-              border: `1px solid ${myOfficer?.status === s ? '#4a9eff' : '#1e3060'}`,
-              borderRadius: '4px', color: myOfficer?.status === s ? '#4a9eff' : '#94a3b8',
-              padding: '4px 12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600,
-            }}
-          >
-            {s}
-          </button>
-        ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-          {['ALL', 'ACTIVE', 'PENDING', 'ENRT'].map(f => (
-            <button key={f} onClick={() => setStatusFilter(f)}
-              style={{ background: statusFilter === f ? '#1e4080' : '#0d1f3c', border: `1px solid ${statusFilter === f ? '#4a9eff' : '#1e3060'}`, borderRadius: '4px', color: statusFilter === f ? '#4a9eff' : '#64748b', padding: '4px 10px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
-              {f}
-            </button>
-          ))}
-        </div>
+    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+      {/* My status bar */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px',
+        background: 'var(--n-bg-panel)', borderBottom: '1px solid var(--n-border)', flexShrink: 0,
+      }}>
+        <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+          MY STATUS:
+        </span>
+        {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => {
+          const map = { AVAILABLE:'badge-available',BUSY:'badge-busy',ENRT:'badge-enrt',ARRVD:'badge-arrvd',UNAVAILABLE:'badge-unavailable',OFFDUTY:'badge-offduty' };
+          return (
+            <button
+              key={s}
+              className={`n-btn n-btn-xs ${myStatus === s ? 'n-btn-primary' : 'n-btn-ghost'}`}
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.3px' }}
+              onClick={() => setMyStatus(s)}
+            >{s}</button>
+          );
+        })}
+        <div style={{ width: 1, height: 18, background: 'var(--n-border)', margin: '0 4px' }} />
+        <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+          UNIT: <span style={{ color: 'var(--n-text-data)' }}>{me?.unitId || '—'}</span>
+          {myCall && <> · CALL: <span style={{ color: 'var(--pr3-text)' }}>{myCall.id} — {myCall.nature}</span></>}
+        </span>
       </div>
 
-      {/* Calls Table */}
-      <SectionHeader title="ACTIVE CALLS" count={filteredCalls.length} />
-      <div style={{ overflowX: 'auto', marginBottom: '24px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
-          <thead>
-            <tr style={{ background: '#0a1a35' }}>
-              {['Call #', 'Nature', 'Location', 'City', 'Priority', 'Status', 'Units', 'Time', 'Actions'].map(h => (
-                <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '14px', letterSpacing: '1px', fontWeight: 700, borderBottom: '1px solid #1e4080', whiteSpace: 'nowrap' }}>{h}</th>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 8, flex: 1, minHeight: 0, padding: 8, overflow: 'hidden' }}>
+        {/* Call table */}
+        <div className="n-panel">
+          <div className="n-panel-header">
+            <div className="n-panel-title">Active Calls</div>
+            <div style={{ display: 'flex', gap: 1 }}>
+              {TABS.map(t => (
+                <button key={t} className={`n-tab${filter === t ? ' active' : ''}`}
+                  style={{ padding: '3px 10px', fontSize: 9 }}
+                  onClick={() => setFilter(t)}>
+                  {t} {t === 'ALL' ? `(${activeCalls.length})` : `(${activeCalls.filter(c => c.status === t).length})`}
+                </button>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCalls.map((call, idx) => (
-              <tr
-                key={call.id}
-                onClick={() => setSelectedCall(selectedCall?.id === call.id ? null : call)}
-                style={{
-                  background: selectedCall?.id === call.id ? '#0d2545' : idx % 2 === 0 ? '#080f1e' : '#0a1525',
-                  cursor: 'pointer',
-                  borderLeft: `3px solid ${PRIORITY_COLORS[call.priority] || '#334155'}`,
-                }}
-              >
-                <td style={{ padding: '7px 10px', color: '#60a5fa', fontWeight: 700 }}>{call.id}</td>
-                <td style={{ padding: '7px 10px', color: '#e2e8f0' }}>{call.nature}</td>
-                <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{call.location}</td>
-                <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{call.city}</td>
-                <td style={{ padding: '7px 10px' }}>
-                  <span style={{ background: PRIORITY_COLORS[call.priority], color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '14px', fontWeight: 700 }}>P{call.priority}</span>
-                </td>
-                <td style={{ padding: '7px 10px' }}><StatusBadge status={call.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{call.units.join(', ') || '—'}</td>
-                <td style={{ padding: '7px 10px', color: '#475569', fontSize: '14px' }}>{call.timestamp?.split(' ')[1]}</td>
-                <td style={{ padding: '7px 10px' }}>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <ActionBtn label="Assign" color="#1e4080" onClick={(e) => { e.stopPropagation(); handleAssignSelf(call.id); }} />
-                    <ActionBtn label="Close" color="#7f1d1d" onClick={(e) => { e.stopPropagation(); handleClose(call.id); }} />
+            </div>
+          </div>
+          <div className="n-panel-body scroll-y">
+            {filtered.length === 0 ? (
+              <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No calls matching filter</div>
+            ) : (
+              <table className="n-table">
+                <thead>
+                  <tr>
+                    <th>Call #</th>
+                    <th>Pri</th>
+                    <th>Nature</th>
+                    <th>Location</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>Units</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.sort((a,b) => a.priority - b.priority).map(c => (
+                    <tr key={c.id}
+                      className={`${selectedCall === c.id ? 'selected' : ''} ${c.priority === 1 ? 'row-p1' : ''}`}
+                      onClick={() => setSelectedCall(c.id)}>
+                      <td><span className="n-data">{c.id}</span></td>
+                      <td><PriBadge p={c.priority} /></td>
+                      <td style={{ fontWeight: 500 }}>{c.nature}</td>
+                      <td style={{ color: 'var(--n-text-dim)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.location}</td>
+                      <td style={{ color: 'var(--n-text-dim)', fontSize: 11 }}>{c.city}</td>
+                      <td>
+                        <span className={`n-badge badge-${c.status === 'PENDING' ? 'orange' : c.status === 'ACTIVE' ? 'blue' : c.status === 'ENRT' ? 'yellow' : 'gray'}`}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: c.units.length > 0 ? 'var(--n-text)' : 'var(--pr2-text)' }}>
+                        {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--n-text-dim)' }}>
+                        {c.timestamp?.split(' ')[1] || '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Call detail strip */}
+          {selCall && (
+            <div style={{
+              borderTop: '1px solid var(--n-border)', padding: '8px 12px',
+              background: 'var(--n-bg-card)', flexShrink: 0,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 2 }}>
+                    {selCall.nature} — <span style={{ color: 'var(--n-text-dim)', fontWeight: 400 }}>{selCall.location}, {selCall.city}</span>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Call Detail Panel */}
-      {selectedCall && (
-        <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '16px' }}>CALL DETAIL — {selectedCall.id}</span>
-            <button onClick={() => setSelectedCall(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '16px' }}>✕</button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', fontSize: '16px' }}>
-            {[
-              ['Nature', selectedCall.nature],
-              ['Location', selectedCall.location],
-              ['City', selectedCall.city],
-              ['County', selectedCall.county],
-              ['Priority', `P${selectedCall.priority}`],
-              ['Status', selectedCall.status],
-              ['Reporting Party', selectedCall.reportingParty],
-              ['Timestamp', selectedCall.timestamp],
-              ['Units Assigned', selectedCall.units.join(', ') || 'None'],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <span style={{ color: '#4a9eff', fontSize: '14px', letterSpacing: '1px' }}>{k}: </span>
-                <span style={{ color: '#e2e8f0' }}>{v}</span>
+                  <div style={{ fontSize: 11, color: 'var(--n-text-dim)', lineHeight: 1.5 }}>{selCall.description}</div>
+                  <div style={{ fontSize: 10, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 3 }}>
+                    Reporting Party: {selCall.reportingParty || '—'} · {selCall.timestamp}
+                  </div>
+                </div>
+                {me && !selCall.units.includes(me.unitId) && (
+                  <button className="n-btn n-btn-success n-btn-sm" onClick={selfAssign}>
+                    Self-Assign
+                  </button>
+                )}
               </div>
-            ))}
+            </div>
+          )}
+        </div>
+
+        {/* Unit Roster */}
+        <div className="n-panel">
+          <div className="n-panel-header">
+            <div className="n-panel-title">Unit Roster</div>
+            <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length} ON</span>
           </div>
-          <div style={{ marginTop: '12px' }}>
-            <span style={{ color: '#4a9eff', fontSize: '14px', letterSpacing: '1px' }}>DESCRIPTION: </span>
-            <span style={{ color: '#94a3b8', fontSize: '16px' }}>{selectedCall.description}</span>
+          <div className="n-panel-body scroll-y">
+            {onDuty.map(o => {
+              const assignedCall = o.callId ? calls.find(c => c.id === o.callId) : null;
+              return (
+                <div key={o.id} className="unit-row">
+                  <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+                    background: o.status === 'AVAILABLE' ? 'var(--st-av-text)' :
+                      o.status === 'BUSY' ? 'var(--st-busy-text)' :
+                      o.status === 'ENRT' ? 'var(--st-enrt-text)' :
+                      o.status === 'ARRVD' ? 'var(--st-arv-text)' : 'var(--st-od-text)',
+                  }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                      <span className="n-data" style={{ fontSize: 10 }}>{o.unitId}</span>
+                      <StatusBadge status={o.status} />
+                    </div>
+                    <div style={{ fontSize: 10.5, color: 'var(--n-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {o.name}
+                    </div>
+                    <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      {o.deptShort} · {o.badge}
+                    </div>
+                    {assignedCall && (
+                      <div style={{ fontSize: 9, color: 'var(--pr3-text)', fontFamily: 'var(--font-mono)' }}>
+                        {assignedCall.id} — {assignedCall.nature}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
-
-      {/* Units Roster */}
-      <SectionHeader title="UNITS ROSTER" count={officers.filter(o => o.status !== 'OFFDUTY').length} />
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
-          <thead>
-            <tr style={{ background: '#0a1a35' }}>
-              {['Officer', 'Unit #', 'Status', 'Call #', 'Agency', 'Subdivision', 'Location'].map(h => (
-                <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4a9eff', fontSize: '14px', letterSpacing: '1px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {officers.map((o, idx) => (
-              <tr key={o.id} style={{ background: idx % 2 === 0 ? '#080f1e' : '#0a1525' }}>
-                <td style={{ padding: '7px 10px', color: '#e2e8f0', fontWeight: o.id === currentUser?.id ? 700 : 400 }}>
-                  {o.id === currentUser?.id ? '▶ ' : ''}{o.name}
-                </td>
-                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{o.unitId}</td>
-                <td style={{ padding: '7px 10px' }}><StatusBadge status={o.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#f59e0b' }}>{o.callId || '—'}</td>
-                <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{o.deptShort}</td>
-                <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{o.subdivision}</td>
-                <td style={{ padding: '7px 10px', color: '#475569' }}>{o.location}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
-  );
-}
-
-function SectionHeader({ title, count }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-      <span style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px' }}>{title}</span>
-      <span style={{ background: '#1e4080', color: '#4a9eff', borderRadius: '4px', padding: '1px 7px', fontSize: '14px', fontWeight: 700 }}>{count}</span>
-      <div style={{ flex: 1, height: '1px', background: '#1e3060' }} />
-    </div>
-  );
-}
-
-function ActionBtn({ label, color, onClick }) {
-  return (
-    <button onClick={onClick} style={{ background: color, border: 'none', borderRadius: '3px', color: '#fff', padding: '3px 8px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
-      {label}
-    </button>
   );
 }

@@ -1,113 +1,143 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import StatusBadge from '../components/StatusBadge';
 
 export default function BanManagement() {
   const { state, dispatch } = useCAD();
-  const { bannedUsers } = state;
+  const { bannedUsers, currentUser } = state;
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', discordId: '', reason: '', duration: 'Permanent' });
+  const [filter, setFilter] = useState('ALL');
+  const [form, setForm] = useState({ name:'', discordId:'', reason:'', duration:'Permanent' });
 
-  const handleBan = (e) => {
-    e.preventDefault();
-    dispatch({ type: 'BAN_USER', payload: form });
+  const filtered = filter === 'ALL' ? bannedUsers : bannedUsers.filter(b => b.status === filter);
+  const active = bannedUsers.filter(b => b.status === 'Active').length;
+  const perma = bannedUsers.filter(b => b.duration === 'Permanent' && b.status === 'Active').length;
+
+  const issueBan = () => {
+    if (!form.name || !form.discordId || !form.reason) return;
+    dispatch({ type: 'BAN_USER', payload: { ...form } });
+    setForm({ name:'',discordId:'',reason:'',duration:'Permanent' });
     setShowForm(false);
-    setForm({ name: '', discordId: '', reason: '', duration: 'Permanent' });
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box' };
+  const unban = (id) => dispatch({ type: 'UNBAN_USER', payload: id });
+
+  const statusColor = { Active:'badge-red', Expired:'badge-gray', Lifted:'badge-green' };
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-        <span style={{ color: '#ef4444', fontSize: '16px', fontWeight: 700, letterSpacing: '2px' }}>🔨 BAN MANAGEMENT</span>
-        <button onClick={() => setShowForm(true)} style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 }}>
-          + Issue Ban
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+    <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex', gap: 20, alignItems: 'center', padding: '5px 10px',
+        background: 'var(--n-bg-panel)', borderBottom: '1px solid var(--n-border)', flexShrink: 0,
+      }}>
         {[
-          { label: 'Total Bans', val: bannedUsers.length, color: '#ef4444' },
-          { label: 'Active', val: bannedUsers.filter(b => b.status === 'Active').length, color: '#f59e0b' },
-          { label: 'Permanent', val: bannedUsers.filter(b => b.duration === 'Permanent' && b.status === 'Active').length, color: '#ef4444' },
-          { label: 'Expired/Lifted', val: bannedUsers.filter(b => b.status !== 'Active').length, color: '#475569' },
+          { label: 'TOTAL BANS', value: bannedUsers.length, color: 'var(--n-text)' },
+          { label: 'ACTIVE', value: active, color: 'var(--pr1-text)' },
+          { label: 'PERMANENT', value: perma, color: 'var(--pr1-text)' },
+          { label: 'EXPIRED/LIFTED', value: bannedUsers.length - active, color: 'var(--n-text-dim)' },
         ].map(s => (
-          <div key={s.label} style={{ background: '#0d1f3c', border: `1px solid ${s.color}30`, borderRadius: '4px', padding: '10px 14px' }}>
-            <div style={{ color: s.color, fontSize: '20px', fontWeight: 700 }}>{s.val}</div>
-            <div style={{ color: '#64748b', fontSize: '12px' }}>{s.label}</div>
+          <div key={s.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: s.color }}>{s.value}</span>
+            <span style={{ fontSize: 8, color: 'var(--n-text-muted)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>{s.label}</span>
           </div>
         ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
+          {['ALL','Active','Expired','Lifted'].map(f => (
+            <button key={f} className={`n-btn n-btn-xs ${filter === f ? 'n-btn-primary' : 'n-btn-secondary'}`}
+              onClick={() => setFilter(f)}>{f}</button>
+          ))}
+          <button className="n-btn n-btn-danger n-btn-sm" onClick={() => setShowForm(true)}>
+            Issue Ban
+          </button>
+        </div>
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-        <thead>
-          <tr style={{ background: '#0a1a35' }}>
-            {['User','Discord ID','Reason','Issued By','Date','Duration','Status','Actions'].map(h => (
-              <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#ef4444', fontSize: '12px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {bannedUsers.map((ban, i) => (
-            <tr key={ban.id} style={{ background: i % 2 === 0 ? '#080f1e' : '#0a1525', opacity: ban.status !== 'Active' ? 0.5 : 1 }}>
-              <td style={{ padding: '7px 10px', color: '#e2e8f0', fontWeight: 600 }}>{ban.name}</td>
-              <td style={{ padding: '7px 10px', color: '#60a5fa', fontSize: '12px' }}>{ban.discordId}</td>
-              <td style={{ padding: '7px 10px', color: '#fca5a5', maxWidth: '250px' }}>{ban.reason}</td>
-              <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{ban.issuedBy}</td>
-              <td style={{ padding: '7px 10px', color: '#475569' }}>{ban.date}</td>
-              <td style={{ padding: '7px 10px' }}>
-                <span style={{ color: ban.duration === 'Permanent' ? '#ef4444' : '#f59e0b', fontWeight: ban.duration === 'Permanent' ? 700 : 400 }}>{ban.duration}</span>
-              </td>
-              <td style={{ padding: '7px 10px' }}><StatusBadge status={ban.status} /></td>
-              <td style={{ padding: '7px 10px' }}>
-                {ban.status === 'Active' && (
-                  <button onClick={() => dispatch({ type: 'UNBAN_USER', payload: ban.id })} style={{ background: '#14532d', border: '1px solid #22c55e', borderRadius: '3px', color: '#22c55e', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 }}>
-                    Unban
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {bannedUsers.length === 0 && (
-        <div style={{ color: '#334155', textAlign: 'center', padding: '40px', fontSize: '15px' }}>No bans on record.</div>
-      )}
-
-      {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <form onSubmit={handleBan} style={{ background: '#0d1f3c', border: '1px solid #ef4444', borderRadius: '8px', padding: '24px', maxWidth: '480px', width: '90%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '16px', fontFamily: 'Ubuntu Mono, monospace' }}>🔨 ISSUE BAN</span>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>✕</button>
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 10, gap: 8 }}>
+        {/* Issue form (inline) */}
+        {showForm && (
+          <div className="n-card" style={{ flexShrink: 0 }}>
+            <div style={{ fontSize: 9, color: 'var(--n-gold)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 10 }}>
+              Issue New Ban
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[['USERNAME *','name','text'],['DISCORD ID *','discordId','text']].map(([l,k,t]) => (
-                <div key={k}>
-                  <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>{l}</label>
-                  <input value={form[k]} onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))} type={t} required={l.includes('*')} style={base} />
-                </div>
-              ))}
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>REASON *</label>
-                <textarea value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} required rows={3} style={{ ...base, resize: 'vertical' }} />
-              </div>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '12px', display: 'block', marginBottom: '4px' }}>DURATION</label>
-                <select value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} style={base}>
-                  {['1 Day','3 Days','7 Days','14 Days','30 Days','90 Days','Permanent'].map(d => <option key={d}>{d}</option>)}
+            <div className="n-grid-2" style={{ gap: 8, marginBottom: 8 }}>
+              <div className="n-field"><label className="n-label">Username *</label><input className="n-input" placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
+              <div className="n-field"><label className="n-label">Discord ID *</label><input className="n-input" placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
+              <div className="n-field"><label className="n-label">Duration</label>
+                <select className="n-select" value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
+                  <option>Permanent</option>
+                  <option>30 Days</option>
+                  <option>14 Days</option>
+                  <option>7 Days</option>
+                  <option>3 Days</option>
+                  <option>24 Hours</option>
                 </select>
               </div>
-              <button type="submit" style={{ background: '#7f1d1d', border: '1px solid #ef4444', borderRadius: '4px', color: '#ef4444', padding: '10px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
-                CONFIRM BAN
+            </div>
+            <div className="n-field" style={{ marginBottom: 8 }}>
+              <label className="n-label">Ban Reason *</label>
+              <textarea className="n-textarea" rows={2} placeholder="Provide a clear, specific reason for this ban..." value={form.reason} onChange={e => setForm(p=>({...p,reason:e.target.value}))} />
+            </div>
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+              <button className="n-btn n-btn-ghost n-btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="n-btn n-btn-danger n-btn-sm" onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
+                Confirm Ban
               </button>
             </div>
-          </form>
+          </div>
+        )}
+
+        {/* Ban list table */}
+        <div className="n-panel" style={{ flex: 1 }}>
+          <div className="n-panel-header">
+            <div className="n-panel-title">Ban Registry</div>
+            <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              {filtered.length} RECORDS
+            </span>
+          </div>
+          <div className="n-panel-body scroll-y">
+            {filtered.length === 0 ? (
+              <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No bans matching filter</div>
+            ) : (
+              <table className="n-table">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Username</th>
+                    <th>Discord ID</th>
+                    <th>Duration</th>
+                    <th>Issued By</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(b => (
+                    <tr key={b.id}>
+                      <td><span className={`n-badge ${statusColor[b.status] || 'badge-gray'}`}>{b.status}</span></td>
+                      <td style={{ fontWeight: 500 }}>{b.name}</td>
+                      <td><span className="n-data" style={{ fontSize: 10 }}>{b.discordId}</span></td>
+                      <td>
+                        <span className={`n-badge ${b.duration === 'Permanent' ? 'badge-red' : 'badge-orange'}`} style={{ fontSize: 9 }}>
+                          {b.duration}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: 11, color: 'var(--n-text-dim)' }}>{b.issuedBy}</td>
+                      <td><span className="n-data" style={{ fontSize: 10 }}>{b.date}</span></td>
+                      <td style={{ fontSize: 11, color: 'var(--n-text-dim)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.reason}</td>
+                      <td>
+                        {b.status === 'Active' && (
+                          <button className="n-btn n-btn-warning n-btn-xs" onClick={() => unban(b.id)}>Lift Ban</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
