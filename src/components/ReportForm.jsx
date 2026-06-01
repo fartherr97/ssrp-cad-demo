@@ -1,7 +1,12 @@
 /* Dark, app-themed renderer for report/record templates.
    Renders a template's sections + fields as native form controls that match
-   the rest of the CAD UI (replaces the white "paper" document look). */
+   the rest of the CAD UI. Lookup fields (civilian / vehicle / officer) search
+   live data and auto-fill the rest of their section, Sonoran-style. */
 
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield } from 'react-icons/md';
+import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 
 // Static span classes so Tailwind JIT picks them up.
@@ -16,15 +21,168 @@ const FULL = 'sm:col-span-2 lg:col-span-4';
 const inputType = (t) =>
   t === 'datetime' ? 'datetime-local' : t === 'date' ? 'date' : t === 'number' ? 'number' : 'text';
 
-function Field({ f, value, onChange, readOnly }) {
+const LOOKUP_KIND = {
+  civilian_lookup: 'civilian',
+  vehicle_lookup: 'vehicle',
+  badge_lookup: 'officer',
+};
+
+/* ── Search a dataset for the lookup dropdown ── */
+function searchData(kind, q, state) {
+  const s = (q || '').trim().toLowerCase();
+  if (!s) return [];
+  if (kind === 'civilian') {
+    return (state.civilians || []).filter(c =>
+      `${c.firstName} ${c.lastName}`.toLowerCase().includes(s) ||
+      c.ssn?.includes(s) || c.dlNumber?.toLowerCase().includes(s) || c.phone?.includes(s)
+    ).slice(0, 8);
+  }
+  if (kind === 'vehicle') {
+    return (state.vehicles || []).filter(v =>
+      v.plate?.toLowerCase().includes(s) ||
+      `${v.year} ${v.make} ${v.model}`.toLowerCase().includes(s)
+    ).slice(0, 8);
+  }
+  // officer
+  return (state.officers || []).filter(o =>
+    o.name?.toLowerCase().includes(s) || String(o.badge || '').includes(s) ||
+    o.unitId?.toLowerCase().includes(s)
+  ).slice(0, 8);
+}
+
+/* ── Map a picked record onto the section's fields by label ── */
+function buildAutofill(kind, rec, fields, civilians) {
+  const out = {};
+  const has = (L, ...keys) => keys.some(k => L.includes(k));
+  for (const f of fields) {
+    const L = (f.label || '').toLowerCase();
+    if (kind === 'civilian') {
+      if (has(L, 'business')) continue;
+      if (has(L, 'name', 'holder', 'subject', 'driver', 'arrestee', 'party', 'person')) out[f.id] = `${rec.firstName} ${rec.lastName}`;
+      else if (has(L, 'dob', 'birth')) out[f.id] = rec.dob;
+      else if (has(L, 'residence', 'address')) out[f.id] = rec.address;
+      else if (has(L, 'license number', 'dl number', 'dl #', 'driver license', 'license #')) out[f.id] = rec.dlNumber;
+      else if (has(L, 'dl class', 'license class')) out[f.id] = rec.dlClass;
+      else if (has(L, 'ssn')) out[f.id] = rec.ssn;
+      else if (has(L, 'phone')) out[f.id] = rec.phone;
+      else if (has(L, 'gender', 'sex')) out[f.id] = rec.gender;
+      else if (has(L, 'race', 'ethnic')) out[f.id] = rec.ethnicity;
+      else if (has(L, 'height')) out[f.id] = rec.height;
+      else if (has(L, 'weight')) out[f.id] = rec.weight;
+      else if (has(L, 'hair')) out[f.id] = rec.hair;
+      else if (has(L, 'eye')) out[f.id] = rec.eyes;
+    } else if (kind === 'vehicle') {
+      if (has(L, 'plate', 'tag')) out[f.id] = rec.plate;
+      else if (has(L, 'make')) out[f.id] = rec.make;
+      else if (has(L, 'model')) out[f.id] = rec.model;
+      else if (has(L, 'year')) out[f.id] = String(rec.year || '');
+      else if (has(L, 'color', 'colour')) out[f.id] = rec.color;
+      else if (has(L, 'vin')) out[f.id] = rec.vin || '';
+      else if (has(L, 'registration', 'reg ')) out[f.id] = rec.regStatus;
+      else if (has(L, 'owner')) {
+        const o = (civilians || []).find(c => c.id === rec.ownerId);
+        if (o) out[f.id] = `${o.firstName} ${o.lastName}`;
+      }
+    } else if (kind === 'officer') {
+      if (has(L, 'badge')) out[f.id] = String(rec.badge || '');
+      else if (has(L, 'rank')) out[f.id] = rec.rank;
+      else if (has(L, 'unit')) out[f.id] = rec.unitId;
+      else if (has(L, 'officer', 'author', 'reporting', 'name', 'supervisor', 'deputy', 'trooper')) out[f.id] = rec.name;
+      else if (has(L, 'department', 'agency')) out[f.id] = rec.deptShort;
+    }
+  }
+  return out;
+}
+
+function LookupField({ f, kind, value, sectionFields, onChange, onBulk }) {
+  const { state } = useCAD();
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
+  const ref = useRef(null);
+  const boxRef = useRef(null);
+
+  const results = open ? searchData(kind, value, state) : [];
+
+  const place = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 4, width: r.width });
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => { if (!ref.current?.contains(e.target) && !boxRef.current?.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  const pick = (rec) => {
+    const updates = buildAutofill(kind, rec, sectionFields, state.civilians);
+    // Guarantee the triggering field gets the primary identifier.
+    if (kind === 'civilian') updates[f.id] = `${rec.firstName} ${rec.lastName}`;
+    if (kind === 'vehicle')  updates[f.id] = rec.plate;
+    if (kind === 'officer')  updates[f.id] = String(rec.badge || rec.name);
+    onBulk ? onBulk(updates) : Object.entries(updates).forEach(([k, v]) => onChange(k, v));
+    setOpen(false);
+  };
+
+  const KindIcon = kind === 'civilian' ? MdPerson : kind === 'vehicle' ? MdDirectionsCar : MdShield;
+  const placeholder = kind === 'civilian' ? 'Search person…' : kind === 'vehicle' ? 'Search plate / vehicle…' : 'Search officer / badge…';
+
+  return (
+    <>
+      <div ref={ref} className="relative">
+        <MdSearch size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
+        <input
+          className={`${S_INPUT} pl-9 pr-3`}
+          placeholder={placeholder}
+          value={value || ''}
+          onChange={e => { onChange(f.id, e.target.value); place(); setOpen(true); }}
+          onFocus={() => { place(); setOpen(true); }}
+        />
+      </div>
+      {open && results.length > 0 && coords && createPortal(
+        <div ref={boxRef}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[280px] overflow-auto"
+          style={{ left: coords.left, top: coords.top, width: Math.max(coords.width, 240), animation: 'dropdownFadeIn 0.12s ease-out' }}>
+          {results.map(rec => (
+            <button key={rec.id} type="button" onMouseDown={(e) => { e.preventDefault(); pick(rec); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left cursor-pointer transition-colors hover:bg-white/[0.07]">
+              <KindIcon size={16} className="text-slate-500 shrink-0" />
+              <div className="min-w-0">
+                {kind === 'civilian' && (<>
+                  <div className="text-[12.5px] font-semibold text-white truncate">{rec.firstName} {rec.lastName}</div>
+                  <div className="text-[10.5px] text-slate-500 font-mono">DOB {rec.dob} · DL {rec.dlNumber}</div>
+                </>)}
+                {kind === 'vehicle' && (<>
+                  <div className="text-[12.5px] font-semibold text-white truncate font-mono">{rec.plate}</div>
+                  <div className="text-[10.5px] text-slate-500">{rec.year} {rec.make} {rec.model} · {rec.color}</div>
+                </>)}
+                {kind === 'officer' && (<>
+                  <div className="text-[12.5px] font-semibold text-white truncate">{rec.name}</div>
+                  <div className="text-[10.5px] text-slate-500 font-mono">#{rec.badge} · {rec.deptShort}{rec.unitId ? ` · ${rec.unitId}` : ''}</div>
+                </>)}
+              </div>
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
+function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const span = Math.min(f.span || 1, 4);
+  const lookupKind = LOOKUP_KIND[f.type];
 
   // Checkbox — compact toggle row
   if (f.type === 'checkbox') {
     return (
       <label className={`${SPAN[span]} flex items-center gap-2.5 self-end px-3 py-2.5 rounded-lg bg-app-input border border-border-base text-[12.5px] text-slate-200 ${readOnly ? '' : 'cursor-pointer hover:border-border-strong'} transition-colors`}>
         <input type="checkbox" checked={!!value} disabled={readOnly}
-          onChange={e => onChange && onChange(e.target.checked)}
+          onChange={e => onChange(f.id, e.target.checked)}
           className="w-4 h-4 accent-brand cursor-pointer disabled:cursor-default" />
         {f.label}
       </label>
@@ -36,33 +194,42 @@ function Field({ f, value, onChange, readOnly }) {
 
   return (
     <div className={`flex flex-col ${cls}`}>
-      <label className="text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
         {f.label}{f.required && <span className="text-red-400"> *</span>}
+        {lookupKind && !readOnly && (
+          <span className="px-1.5 py-0.5 rounded bg-brand/15 text-brand-bright text-[8px] font-bold tracking-[0.4px] normal-case">LOOKUP</span>
+        )}
       </label>
 
       {readOnly ? (
         <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg bg-app-input border border-border-base text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}`}>
           {value || <span className="text-slate-600">—</span>}
         </div>
+      ) : lookupKind ? (
+        <LookupField f={f} kind={lookupKind} value={value} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
       ) : isNarr ? (
         <textarea className={S_TEXTAREA} rows={f.minRows || 4}
-          value={value || ''} onChange={e => onChange && onChange(e.target.value)} />
+          value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
-        <select className={S_SELECT} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
+        <select className={S_SELECT} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
           <option value="">—</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (
         <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''}`}
-          value={value || ''} onChange={e => onChange && onChange(e.target.value)} />
+          value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       )}
     </div>
   );
 }
 
-export default function ReportForm({ template, data = {}, onChange, readOnly = false }) {
+export default function ReportForm({ template, data = {}, onChange, onBulkChange, readOnly = false }) {
   const sections = template?.sections || [];
-  const set = (k) => (v) => onChange && onChange(k, v);
+  // Per-key change; fall back to bulk if a single onChange isn't supplied.
+  const change = (k, v) => {
+    if (onChange) onChange(k, v);
+    else if (onBulkChange) onBulkChange({ [k]: v });
+  };
 
   if (sections.length === 0) {
     return (
@@ -77,14 +244,15 @@ export default function ReportForm({ template, data = {}, onChange, readOnly = f
       <div data-doc-top />
       {sections.map(sec => (
         <section key={sec.id} data-section={sec.title}
-          className="bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm scroll-mt-4">
+          className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm scroll-mt-4">
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-faint text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">
             <span className="w-1.5 h-1.5 rounded-full bg-brand" />
             {sec.title}
           </div>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5">
             {sec.fields.map(f => (
-              <Field key={f.id} f={f} value={data[f.id]} onChange={set(f.id)} readOnly={readOnly} />
+              <Field key={f.id} f={f} value={data[f.id]} data={data}
+                onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly} />
             ))}
           </div>
         </section>

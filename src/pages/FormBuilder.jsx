@@ -15,8 +15,9 @@ const FIELD_TYPES = [
   { value: 'dropdown',        label: 'Dropdown' },
   { value: 'textarea',        label: 'Narrative / Textarea' },
   { value: 'checkbox',        label: 'Checkbox' },
-  { value: 'badge_lookup',    label: 'Badge Lookup' },
+  { value: 'badge_lookup',    label: 'Officer Lookup' },
   { value: 'civilian_lookup', label: 'Civilian Lookup' },
+  { value: 'vehicle_lookup',  label: 'Vehicle Lookup' },
 ];
 
 const SECTION_STYLES = [

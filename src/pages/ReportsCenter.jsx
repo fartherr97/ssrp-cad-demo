@@ -220,7 +220,8 @@ export default function ReportsCenter() {
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
             <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
-              <ReportForm template={tpl} data={formValues} onChange={handleFormChange} />
+              <ReportForm template={tpl} data={formValues} onChange={handleFormChange}
+                onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} />
             </div>
           </main>
 

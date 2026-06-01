@@ -122,8 +122,8 @@ export const REPORT_TEMPLATES = [
       {
         id: "s2", title: "Subject / Vehicle Information", style: "gray",
         fields: [
-          { id: "f5", label: "Driver Name",                type: "text",     span: 3, required: true },
-          { id: "f4", label: "Vehicle Plate",              type: "text",     span: 2, required: true, mono: true },
+          { id: "f5", label: "Driver Name",                type: "civilian_lookup", span: 3, required: true },
+          { id: "f4", label: "Vehicle Plate",              type: "vehicle_lookup",  span: 2, required: true, mono: true },
           { id: "f9", label: "Outcome",                    type: "dropdown", span: 1, required: true, options: ["Warning","Citation","Arrest","No Action"] },
           { id: "f6", label: "Reason for Stop",            type: "dropdown", span: 4, required: true, options: ["Speeding","Red Light Violation","Equipment Violation","Expired Registration","Erratic Driving","Other"] },
           { id: "f7", label: "DL Checked",                 type: "checkbox", span: 2 },
