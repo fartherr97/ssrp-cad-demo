@@ -46,8 +46,8 @@ export const CALLS = [
 ];
 
 export const CIVILIANS = [
-  { id: 1, firstName: "Michael", lastName: "Torres", dob: "1988-03-14", gender: "Male", ethnicity: "Hispanic", height: "5'11\"", weight: "185 lbs", hair: "Black", eyes: "Brown", ssn: "412-88-3301", phone: "555-0192", address: "1204 Riverside Dr, Tampa", dlNumber: "T8821044", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2026-03-14", vehicles: [1,2], flags: [] },
-  { id: 2, firstName: "Amanda", lastName: "Chen", dob: "1995-07-22", gender: "Female", ethnicity: "Asian", height: "5'4\"", weight: "125 lbs", hair: "Black", eyes: "Brown", ssn: "509-44-2210", phone: "555-0334", address: "88 Orchid Lane, Tampa", dlNumber: "C5543219", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2025-07-22", vehicles: [3], flags: ["CAUTION"] },
+  { id: 1, firstName: "Michael", lastName: "Torres", dob: "1988-03-14", gender: "Male", ethnicity: "Hispanic", height: "5'11\"", weight: "185 lbs", hair: "Black", eyes: "Brown", ssn: "412-88-3301", phone: "555-0192", address: "1204 Riverside Dr, Tampa", dlNumber: "T8821044", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2026-03-14", vehicles: [1,2], flags: [], ownedByPlayer: true, weaponPermit: "ACTIVE", weaponPermitExpiry: "2026-08-01" },
+  { id: 2, firstName: "Amanda", lastName: "Chen", dob: "1995-07-22", gender: "Female", ethnicity: "Asian", height: "5'4\"", weight: "125 lbs", hair: "Black", eyes: "Brown", ssn: "509-44-2210", phone: "555-0334", address: "88 Orchid Lane, Tampa", dlNumber: "C5543219", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2025-07-22", vehicles: [3], flags: ["CAUTION"], ownedByPlayer: true, weaponPermit: "NONE", weaponPermitExpiry: "" },
   { id: 3, firstName: "Darnell", lastName: "Washington", dob: "1979-11-05", gender: "Male", ethnicity: "Black", height: "6'1\"", weight: "210 lbs", hair: "Black", eyes: "Dark Brown", ssn: "618-77-9901", phone: "555-0441", address: "330 Magnolia Blvd, Tampa", dlNumber: "W1109872", dlClass: "Class C", dlStatus: "SUSPENDED", dlExpiry: "2024-11-05", vehicles: [4], flags: ["WARRANT","CAUTION"] },
   { id: 4, firstName: "Jessica", lastName: "Huang", dob: "2001-04-18", gender: "Female", ethnicity: "Asian", height: "5'2\"", weight: "115 lbs", hair: "Brown", eyes: "Brown", ssn: "723-11-4456", phone: "555-0557", address: "21 College Ave Apt 4B, Tampa", dlNumber: "H4456012", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2027-04-18", vehicles: [], flags: [] },
   { id: 5, firstName: "Robert", lastName: "Marino", dob: "1965-09-30", gender: "Male", ethnicity: "White", height: "5'9\"", weight: "195 lbs", hair: "Gray", eyes: "Blue", ssn: "301-55-8812", phone: "555-0678", address: "5 Harbor View Ct, Tampa", dlNumber: "M8812345", dlClass: "Class A", dlStatus: "ACTIVE", dlExpiry: "2025-09-30", vehicles: [5,6], flags: ["VIOLENT"] },
@@ -387,3 +387,23 @@ export const WHITELIST_APPS = [
   { id: 2, discordId: "887766554433", name: "RPFan2023",         appliedDate: "2026-05-29", status: "Pending",  notes: "Referred by Sgt. Reeves"     },
   { id: 3, discordId: "776655443322", name: "OfficerHopeful",    appliedDate: "2026-05-28", status: "Approved", notes: ""                             },
 ];
+
+/* ─── Businesses (citizen Business portal) ─── */
+export const BUSINESSES = [
+  {
+    id: 1, name: "Bayshore Auto & Towing", type: "Automotive / Towing",
+    owner: "Jordan Maxwell", ein: "FL-88-2210445", phone: "555-0710",
+    address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
+    license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
+    employees: [
+      { id: 1, name: "Michael Torres", role: "Manager",   phone: "555-0192", since: "2024-02-01" },
+      { id: 2, name: "Amanda Chen",    role: "Dispatcher", phone: "555-0334", since: "2025-01-15" },
+      { id: 3, name: "Luis Romero",    role: "Driver",     phone: "555-0911", since: "2025-06-20" },
+    ],
+    incidents: [
+      { id: 1, date: "2026-05-22", type: "Theft Report",    summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
+      { id: 2, date: "2026-04-10", type: "Alarm Activation", summary: "Silent alarm tripped 03:14, units responded, false alarm.", status: "Closed" },
+    ],
+  },
+];
+

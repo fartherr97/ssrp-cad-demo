@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { STATUS_COLORS } from '../../constants/statusColors';
+import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
-  MdDashboard, MdSearch, MdRefresh, MdDescription, MdMap, MdGridView,
-  MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid,
-  MdAdminPanelSettings, MdMenuBook, MdBlock, MdBuild,
   MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew,
@@ -106,40 +104,17 @@ const STATUS_BTNS = [
   { status: 'OFFDUTY',     label: 'OFD',   Icon: MdPowerSettingsNew },
 ];
 
-const PRIMARY_NAV = [
-  { Icon: MdDashboard,   label: 'CAD',     route: '/cad'     },
-  { Icon: MdSearch,      label: 'Search',  route: '/search'  },
-  { Icon: MdRefresh,     label: 'Returns', route: '/returns' },
-  { Icon: MdDescription, label: 'Forms',   route: '/forms'   },
-  { Icon: MdMap,         label: 'Map',     route: '/map'     },
-  { Icon: MdGridView,    label: 'Board',   route: '/board'   },
-];
-
-const SECONDARY_NAV = [
-  { Icon: MdGroups,       label: 'Units',     route: '/units'     },
-  { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
-  { Icon: MdPeopleAlt,    label: 'Civilians', route: '/civilians' },
-  { Icon: MdPhoneAndroid, label: 'MDT',       route: '/mdt'       },
-];
-
-const ADMIN_NAV = [
-  { Icon: MdAdminPanelSettings, label: 'Admin',   route: '/admin'   },
-  { Icon: MdMenuBook,           label: 'Penal',   route: '/penal'   },
-  { Icon: MdBlock,              label: 'Bans',    route: '/bans'    },
-  { Icon: MdBuild,              label: 'Builder', route: '/builder' },
-];
-
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
   const { currentUser, officers, calls, myCallId } = state;
   const navigate = useNavigate();
   const location = useLocation();
 
+  const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
+
   const me      = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
   const myCall  = myCallId ? calls.find(c => c.id === myCallId) : null;
-  const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
-  const isAdmin    = currentUser?.role === 'admin';
 
   const go      = (route) => navigate(route);
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
@@ -148,56 +123,65 @@ export default function ActionBar({ onCreateCall }) {
   return (
     <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'stretch', gap: 0, overflowX: 'auto' }}>
 
-      {/* ── Brand ── */}
+      {/* ── Brand + active portal ── */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
+        display: 'flex', alignItems: 'center', gap: 10,
         padding: '0 14px', height: '100%',
         borderRight: '1px solid #253a5e', background: '#0e2040', flexShrink: 0,
       }}>
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           style={{ width: 28, height: 28, flexShrink: 0, objectFit: 'contain' }} />
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
-          Sunshine State RP
+        <div style={{ lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010' }}>Sunshine State RP</div>
+          <div style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase',
+            color: portal.color,
+          }}>
+            {portal.label}
+          </div>
         </div>
       </div>
 
-      {/* ── Primary nav ── */}
-      {PRIMARY_NAV.map(item => (
+      {/* ── Portal nav ── */}
+      {portal.nav.map(item => (
         <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
           onClick={() => go(item.route)} active={isActive(item.route)} />
       ))}
 
-      <div className="cad-tool-sep" />
+      {/* ── Admin extras ── */}
+      {portal.adminNav && (
+        <>
+          <div className="cad-tool-sep" />
+          {portal.adminNav.map(item => (
+            <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+              onClick={() => go(item.route)} active={isActive(item.route)} />
+          ))}
+        </>
+      )}
 
-      {/* ── Secondary nav ── */}
-      {SECONDARY_NAV.map(item => (
-        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
-          onClick={() => go(item.route)} active={isActive(item.route)} />
-      ))}
+      {/* ── Call actions (dispatch / field roles) ── */}
+      {(portal.showNewCall || portal.showCalls) && <div className="cad-tool-sep" />}
+      {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
+      {portal.showCalls && (
+        <>
+          <ToolBtn Icon={MdPhone} label="My Call"
+            onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
+          <ToolBtn Icon={MdPersonAdd} label="Assign" onClick={() => {
+            if (me && myCall) dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
+          }} disabled={!myCall || !me} />
+        </>
+      )}
 
-      {/* ── Admin nav ── */}
-      {isAdmin && ADMIN_NAV.map(item => (
-        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
-          onClick={() => go(item.route)} active={isActive(item.route)} />
-      ))}
-
-      <div className="cad-tool-sep" />
-
-      {/* ── Call actions ── */}
-      {isDispatch && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
-      <ToolBtn Icon={MdPhone} label="My Call"
-        onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
-      <ToolBtn Icon={MdPersonAdd} label="Assign" onClick={() => {
-        if (me && myCall) dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
-      }} disabled={!myCall || !me} />
-
-      <div className="cad-tool-sep" />
-
-      {/* ── Status buttons — same square style, colored when active ── */}
-      {STATUS_BTNS.map(s => (
-        <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
-          status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
-      ))}
+      {/* ── Field-status buttons ── */}
+      {portal.showStatus && (
+        <>
+          <div className="cad-tool-sep" />
+          {STATUS_BTNS.map(s => (
+            <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
+              status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
+          ))}
+        </>
+      )}
 
       {/* ── Far right: clock + profile + sign out ── */}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>

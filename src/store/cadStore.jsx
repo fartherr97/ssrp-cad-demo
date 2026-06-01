@@ -2,7 +2,8 @@ import { createContext, useContext, useReducer } from 'react';
 import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
-  MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS
+  MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
+  BUSINESSES
 } from '../data/mockData';
 
 const initialState = {
@@ -27,6 +28,7 @@ const initialState = {
   departments: DEPARTMENTS,
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
+  businesses: BUSINESSES,
   myCallId: null,
   nextId: 1000,
   // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
@@ -207,6 +209,31 @@ function reducer(state, action) {
       const newReport = { ...action.payload, id: state.nextId, status: 'Submitted', date: new Date().toLocaleDateString() };
       const audit = addAuditEntry(state, `Submitted ${newReport.type} report`, 'Reports');
       return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, ...audit };
+    }
+
+    /* ─── Business portal ─── */
+    case 'ADD_BUSINESS': {
+      const b = { ...action.payload, id: state.nextId, employees: [], incidents: [], ownedByPlayer: true, status: 'ACTIVE' };
+      const audit = addAuditEntry(state, `Registered business: ${b.name}`, 'Business');
+      return { ...state, businesses: [...state.businesses, b], nextId: state.nextId + 1, ...audit };
+    }
+    case 'UPDATE_BUSINESS': {
+      const businesses = state.businesses.map(b => b.id === action.payload.id ? { ...b, ...action.payload } : b);
+      return { ...state, businesses };
+    }
+    case 'ADD_EMPLOYEE': {
+      const { businessId, employee } = action.payload;
+      const businesses = state.businesses.map(b =>
+        b.id === businessId ? { ...b, employees: [...b.employees, { ...employee, id: state.nextId }] } : b
+      );
+      return { ...state, businesses, nextId: state.nextId + 1 };
+    }
+    case 'REMOVE_EMPLOYEE': {
+      const { businessId, employeeId } = action.payload;
+      const businesses = state.businesses.map(b =>
+        b.id === businessId ? { ...b, employees: b.employees.filter(e => e.id !== employeeId) } : b
+      );
+      return { ...state, businesses };
     }
     case 'UPDATE_REPORT_STATUS': {
       const reports = state.reports.map(r => r.id === action.payload.id ? { ...r, status: action.payload.status } : r);

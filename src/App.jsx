@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { CADProvider, useCAD } from './store/cadStore';
+import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/LoginPage';
 import DispatchCenter from './pages/DispatchCenter';
@@ -18,6 +19,21 @@ import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
 import FormBuilder from './pages/FormBuilder';
 import OfficerProfile from './pages/OfficerProfile';
+// Citizen portals
+import CivilianHome from './pages/portal/CivilianHome';
+import MyCharacters from './pages/portal/MyCharacters';
+import MyVehicles from './pages/portal/MyVehicles';
+import MyLicenses from './pages/portal/MyLicenses';
+import FileReport from './pages/portal/FileReport';
+import CitizenLaws from './pages/portal/CitizenLaws';
+import BusinessHome from './pages/portal/BusinessHome';
+import MyBusiness from './pages/portal/MyBusiness';
+import Employees from './pages/portal/Employees';
+import BusinessIncidents from './pages/portal/BusinessIncidents';
+
+function landingFor(user) {
+  return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
+}
 
 function AuthShell() {
   const { state } = useCAD();
@@ -31,8 +47,14 @@ function AuthShell() {
 
 function LoginRoute() {
   const { state } = useCAD();
-  if (state.currentUser) return <Navigate to="/cad" replace />;
+  if (state.currentUser) return <Navigate to={landingFor(state.currentUser)} replace />;
   return <LoginPage />;
+}
+
+/* Catch-all: send users to their own portal's landing page. */
+function PortalFallback() {
+  const { state } = useCAD();
+  return <Navigate to={landingFor(state.currentUser)} replace />;
 }
 
 function CADApp() {
@@ -57,7 +79,22 @@ function CADApp() {
         <Route path="/bans"          element={<BanManagement />} />
         <Route path="/builder"       element={<FormBuilder />} />
         <Route path="/profile"       element={<OfficerProfile />} />
-        <Route path="*"              element={<Navigate to="/cad" replace />} />
+
+        {/* ── Civilian portal ── */}
+        <Route path="/portal/civilian"    element={<CivilianHome />} />
+        <Route path="/portal/characters"  element={<MyCharacters />} />
+        <Route path="/portal/vehicles"    element={<MyVehicles />} />
+        <Route path="/portal/licenses"    element={<MyLicenses />} />
+        <Route path="/portal/file-report" element={<FileReport />} />
+        <Route path="/portal/laws"        element={<CitizenLaws />} />
+
+        {/* ── Business portal ── */}
+        <Route path="/portal/business"    element={<BusinessHome />} />
+        <Route path="/portal/my-business" element={<MyBusiness />} />
+        <Route path="/portal/employees"   element={<Employees />} />
+        <Route path="/portal/incidents"   element={<BusinessIncidents />} />
+
+        <Route path="*" element={<PortalFallback />} />
       </Route>
     </Routes>
   );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
+import { PORTALS } from '../constants/portals';
 import { MdAdminPanelSettings, MdLocalPolice, MdPeopleAlt, MdStorefront, MdLocalFireDepartment, MdHeadsetMic } from 'react-icons/md';
 
 const ROLE_ICONS = {
@@ -70,11 +71,26 @@ export default function LoginPage() {
   const handleRoleSelect = (role) => {
     setLoading(role.id);
     setTimeout(() => {
-      const officer = OFFICERS.find(o =>
-        role.deptShorts.length === 0 ? true : role.deptShorts.includes(o.deptShort)
-      ) || OFFICERS[0];
-      dispatch({ type: 'LOGIN', payload: officer });
-      navigate(role.route, { replace: true });
+      const portal = PORTALS[role.id];
+      let user;
+      if (role.id === 'civilian' || role.id === 'business') {
+        // Citizen-facing portals — not tied to an officer record.
+        user = {
+          id: role.id === 'civilian' ? 'self-civ' : 'self-biz',
+          name: 'Jordan Maxwell',
+          role: role.id,
+          badge: role.id === 'civilian' ? 'CIV' : 'BIZ',
+          deptShort: role.id === 'civilian' ? 'CIV' : 'BIZ',
+        };
+      } else {
+        // Emergency-service portals log in as a representative officer.
+        const officer = OFFICERS.find(o =>
+          role.deptShorts.length === 0 ? true : role.deptShorts.includes(o.deptShort)
+        ) || OFFICERS[0];
+        user = { ...officer };
+      }
+      dispatch({ type: 'LOGIN', payload: { ...user, portal: role.id } });
+      navigate(portal?.landing || role.route, { replace: true });
     }, 350);
   };
 
