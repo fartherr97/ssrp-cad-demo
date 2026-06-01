@@ -16,6 +16,7 @@ const initialState = {
   currentUser: null,
   currentPage: 'login',
   discordConnected: false,
+  discordAccount: null,
   selfDispatch: false,
   officers: OFFICERS,
   // Stamp each seed call with a staggered creation time (most recent first) so
@@ -104,7 +105,7 @@ function addAuditEntry(state, action, module) {
 function reducer(state, action) {
   switch (action.type) {
     case 'CONNECT_DISCORD':
-      return { ...state, discordConnected: true };
+      return { ...state, discordConnected: true, discordAccount: action.payload || state.discordAccount };
     case 'TOGGLE_SELF_DISPATCH':
       return { ...state, selfDispatch: !state.selfDispatch };
     case 'LOGIN':

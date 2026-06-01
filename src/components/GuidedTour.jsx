@@ -4,7 +4,9 @@ import { useCAD } from '../store/cadStore';
 /* First-run guided tour * a spotlight walkthrough that teaches the CAD layout.
    Shows once per user (tracked in localStorage); fully skippable. */
 
-const TOUR_KEY = 'ssrp_tour_done_v1';
+// Tour-seen flag is keyed per Discord account so it shows once per account
+// (not just once per browser). Falls back to a generic key if not connected.
+const tourKey = (account) => `ssrp_tour_done_v1::${account?.id || 'anon'}`;
 
 const STEPS = [
   {
@@ -23,6 +25,12 @@ const STEPS = [
     title: 'Active calls',
     body: 'Service calls appear here, sorted by priority. Click any call to open it, see details, and attach yourself to it.',
     placement: 'right',
+  },
+  {
+    selector: '[data-tour="reports"]',
+    title: 'Reports & Records',
+    body: 'Need to file paperwork? Hover Reports to pick a report type (arrest, use of force, traffic stop…), or Records for licenses, citations, and warrants. Forms fill the whole screen and auto-save as you type.',
+    placement: 'bottom',
   },
   {
     selector: '[data-tour="panic"]',
@@ -51,20 +59,22 @@ export default function GuidedTour() {
   const [step, setStep] = useState(0);
   const [rect, setRect] = useState(null);
 
-  // Start the tour once, shortly after a user logs in.
+  const account = state.discordAccount;
+
+  // Start the tour once per Discord account, shortly after a user logs in.
   useEffect(() => {
     if (!state.currentUser) return;
     let done = false;
-    try { done = localStorage.getItem(TOUR_KEY) === '1'; } catch { /* ignore */ }
+    try { done = localStorage.getItem(tourKey(account)) === '1'; } catch { /* ignore */ }
     if (done) return;
     const t = setTimeout(() => { setStep(0); setActive(true); }, 700);
     return () => clearTimeout(t);
-  }, [state.currentUser]);
+  }, [state.currentUser, account]);
 
   const finish = useCallback(() => {
     setActive(false);
-    try { localStorage.setItem(TOUR_KEY, '1'); } catch { /* ignore */ }
-  }, []);
+    try { localStorage.setItem(tourKey(account), '1'); } catch { /* ignore */ }
+  }, [account]);
 
   const measure = useCallback(() => {
     const cur = STEPS[step];

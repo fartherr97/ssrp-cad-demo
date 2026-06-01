@@ -50,7 +50,7 @@ function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, extr
 }
 
 /* Dropdown nav button — click to open a template picker */
-function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }) {
+function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose, dataTour }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
@@ -82,6 +82,7 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
   return (
     <div
       className="h-full shrink-0"
+      data-tour={dataTour}
       onMouseEnter={openMenu}
       onMouseLeave={scheduleClose}
     >
@@ -235,6 +236,7 @@ export default function ActionBar({ onCreateCall }) {
             items={dropdownItems(item.dropdown)}
             active={isActive(item.route)}
             navigate={go}
+            dataTour={item.dropdown === 'reports' ? 'reports' : undefined}
           />
         ) : (
           <ToolBtn key={item.route} Icon={item.Icon} label={item.label}

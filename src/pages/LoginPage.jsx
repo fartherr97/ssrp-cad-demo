@@ -61,11 +61,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
 
+  // Resolve a stable Discord account identity for this browser. In a real
+  // deployment this comes from the Discord OAuth callback; here we persist a
+  // mock account so per-account flags (like the guided tour) survive refreshes.
+  const getDiscordAccount = () => {
+    const KEY = 'ssrp_discord_account';
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved) return JSON.parse(saved);
+    } catch { /* ignore */ }
+    const id = (crypto?.randomUUID?.() || `disc-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const account = { id, username: 'SSRP Member' };
+    try { localStorage.setItem(KEY, JSON.stringify(account)); } catch { /* ignore */ }
+    return account;
+  };
+
   const handleConnect = () => {
     setConnectLoading(true);
     setTimeout(() => {
       setConnectLoading(false);
-      dispatch({ type: 'CONNECT_DISCORD' });
+      dispatch({ type: 'CONNECT_DISCORD', payload: getDiscordAccount() });
     }, 600);
   };
 

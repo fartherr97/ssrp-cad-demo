@@ -68,10 +68,14 @@ export default function DispatchCenter() {
   const showCreateForm = searchParams.get('new') === '1';
   const closeCreate = () => setSearchParams({});
 
-  const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
-  // Field officers don't need the full unit roster by default * it only appears
-  // for dispatchers/admin, or once a field unit turns on self-dispatch.
-  const showUnits = isDispatch || selfDispatch;
+  // Use the active PORTAL (not the seed officer's role) to decide dispatcher
+  // privileges * the LEO portal logs in as a representative officer who may
+  // carry an "admin" role on their record.
+  const isDispatcher = currentUser?.portal === 'dispatch' || currentUser?.portal === 'admin';
+  // Field officers don't need the full unit roster / new-call button by default;
+  // they appear for dispatchers/admin, or once a field unit turns on self-dispatch.
+  const canDispatch = isDispatcher || selfDispatch;
+  const showUnits = canDispatch;
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
   const filteredCalls = callFilter === 'ALL'
@@ -138,7 +142,7 @@ export default function DispatchCenter() {
               );
             })}
           </div>
-          {isDispatch && (
+          {canDispatch && (
             <button
               onClick={() => setSearchParams({ new:'1' })}
               className="px-[10px] py-[2px] text-[9px] font-mono font-bold tracking-[0.5px] cursor-pointer bg-sky-950 text-sky-300 border border-sky-700 ml-1"
