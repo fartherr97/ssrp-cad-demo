@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 
@@ -22,6 +23,7 @@ const STAR_STYLE = {
 
 export default function LoginPage() {
   const { dispatch } = useCAD();
+  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(OFFICERS[0].id);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +31,10 @@ export default function LoginPage() {
     setLoading(true);
     setTimeout(() => {
       const officer = OFFICERS.find(o => o.id === Number(selectedUser));
-      if (officer) dispatch({ type: 'LOGIN', payload: officer });
+      if (officer) {
+        dispatch({ type: 'LOGIN', payload: officer });
+        navigate('/cad', { replace: true });
+      }
       setLoading(false);
     }, 400);
   };

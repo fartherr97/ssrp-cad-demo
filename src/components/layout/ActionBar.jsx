@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 
 /* ─── SVG icon helpers ─── */
@@ -41,14 +42,17 @@ function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} 
 
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
-  const { currentPage, currentUser, officers, calls, myCallId } = state;
+  const { currentUser, officers, calls, myCallId } = state;
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const me = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
   const myCall = myCallId ? calls.find(c => c.id === myCallId) : null;
   const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
 
-  const go = (page) => dispatch({ type: 'SET_PAGE', payload: page });
+  const go = (route) => navigate(route);
+  const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
 
   const assignSelf = () => {
@@ -88,12 +92,12 @@ export default function ActionBar({ onCreateCall }) {
       </div>
 
       {/* ── Nav group ── */}
-      <ToolBtn iconKey="cad"     label="CAD"     onClick={() => go('dispatch')} active={currentPage === 'dispatch'} />
-      <ToolBtn iconKey="search"  label="Search"  onClick={() => go('records')}  active={currentPage === 'records'}  />
-      <ToolBtn iconKey="returns" label="Returns" onClick={() => go('returns')}  active={currentPage === 'returns'}  />
-      <ToolBtn iconKey="forms"   label="Forms"   onClick={() => go('reports')}  active={currentPage === 'reports'}  />
-      <ToolBtn iconKey="map"     label="Map"     onClick={() => go('map')}      active={currentPage === 'map'}      />
-      <ToolBtn iconKey="board"   label="Board"   onClick={() => go('board')}    active={currentPage === 'board'}    />
+      <ToolBtn iconKey="cad"     label="CAD"     onClick={() => go('/cad')}      active={isActive('/cad')}     />
+      <ToolBtn iconKey="search"  label="Search"  onClick={() => go('/search')}   active={isActive('/search')}  />
+      <ToolBtn iconKey="returns" label="Returns" onClick={() => go('/returns')}  active={isActive('/returns')} />
+      <ToolBtn iconKey="forms"   label="Forms"   onClick={() => go('/forms')}    active={isActive('/forms')}   />
+      <ToolBtn iconKey="map"     label="Map"     onClick={() => go('/map')}      active={isActive('/map')}     />
+      <ToolBtn iconKey="board"   label="Board"   onClick={() => go('/board')}    active={isActive('/board')}   />
 
       <div className="cad-tool-sep" />
 
@@ -101,7 +105,7 @@ export default function ActionBar({ onCreateCall }) {
       {isDispatch && (
         <ToolBtn iconKey="newcall" label="New Call" onClick={onCreateCall} />
       )}
-      <ToolBtn iconKey="mycall"  label="My Call"    onClick={() => myCall && go('dispatch')} disabled={!myCall} />
+      <ToolBtn iconKey="mycall"  label="My Call"    onClick={() => myCall && go('/cad/' + myCall.id)} disabled={!myCall} />
       <ToolBtn iconKey="assign"  label="Assign Self" onClick={assignSelf} disabled={!myCall || !me} />
       <ToolBtn iconKey="assist"  label="Assist"      onClick={() => {}} />
       <ToolBtn iconKey="primary" label="Primary"     onClick={() => {}} />
