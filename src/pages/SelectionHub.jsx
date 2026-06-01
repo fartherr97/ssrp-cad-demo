@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import SiteFooter from '../components/SiteFooter';
 import {
   FaUser, FaIdCard, FaGavel, FaShieldHalved, FaFireFlameCurved,
   FaKitMedical, FaTowerBroadcast, FaUsersGear, FaRightFromBracket,
@@ -144,21 +145,7 @@ export default function SelectionHub() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div style={{
-        background: '#06070c',
-        borderTop: '1px solid #141720',
-        padding: '0 24px',
-        height: '28px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        <span style={{ color: '#1f2937', fontSize: '10px', fontFamily: "'Ubuntu', sans-serif" }}>
-          Sunshine State Roleplay • Computer Aided Dispatch
-        </span>
-      </div>
+      <SiteFooter />
     </div>
   );
 }

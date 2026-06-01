@@ -4,6 +4,7 @@ import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 import { PORTALS } from '../constants/portals';
 import { MdAdminPanelSettings, MdLocalPolice, MdPeopleAlt, MdStorefront, MdLocalFireDepartment, MdHeadsetMic } from 'react-icons/md';
+import SiteFooter from '../components/SiteFooter';
 
 const ROLE_ICONS = {
   admin:    MdAdminPanelSettings,
@@ -117,63 +118,52 @@ export default function LoginPage() {
       }} />
 
       {/* ── HEADER ── */}
-      <header style={{
-        position: 'relative', zIndex: 10,
-        width: '100%', height: 60,
-        background: 'rgba(4,10,24,0.92)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(8px)',
-        display: 'flex', alignItems: 'center',
-        padding: '0 32px', gap: 16, flexShrink: 0,
-      }}>
+      <header className="relative z-10 w-full shrink-0 bg-[rgba(4,10,24,0.92)] border-b border-white/[0.08] backdrop-blur-[8px] flex items-center px-4 sm:px-8 h-[52px] sm:h-[60px] gap-4">
         {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ width: 36, height: 36 }} />
+        <div className="flex items-center gap-3">
+          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-8 h-8 sm:w-9 sm:h-9" />
           <div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#ffffff', lineHeight: 1.1, letterSpacing: '-0.2px' }}>
-              Sunshine State <span style={{ color: '#ff8822' }}>RP</span>
+            <div className="text-[13px] sm:text-[15px] font-extrabold text-white leading-tight tracking-[-0.2px]">
+              Sunshine State <span className="text-[#ff8822]">RP</span>
             </div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(120,160,220,0.6)', letterSpacing: '1.2px', textTransform: 'uppercase' }}>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-[rgba(120,160,220,0.6)] tracking-[1.2px] uppercase">
               Computer Aided Dispatch
             </div>
           </div>
         </div>
 
-        {/* Right — status dots */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 20 }}>
-          {[
-            { label: 'CAD', color: '#22ff66' },
-            { label: 'MDT', color: '#22ff66' },
-            { label: 'RADIO', color: '#22ff66' },
-          ].map(s => (
-            <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: s.color, boxShadow: `0 0 6px ${s.color}` }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(180,210,240,0.5)', letterSpacing: '0.5px' }}>{s.label}</span>
-            </div>
-          ))}
+        {/* Right — status dots + connect */}
+        <div className="ml-auto flex items-center gap-3 sm:gap-5">
+          {/* Status dots — hidden on small screens */}
+          <div className="hidden sm:flex items-center gap-5">
+            {[
+              { label: 'CAD', color: '#22ff66' },
+              { label: 'MDT', color: '#22ff66' },
+              { label: 'RADIO', color: '#22ff66' },
+            ].map(s => (
+              <div key={s.label} className="flex items-center gap-1.5">
+                <div className="w-[7px] h-[7px] rounded-full" style={{ background: s.color, boxShadow: `0 0 6px ${s.color}` }} />
+                <span className="text-[11px] font-semibold text-[rgba(180,210,240,0.5)] tracking-[0.5px]">{s.label}</span>
+              </div>
+            ))}
+          </div>
 
-          {/* Connect Discord button in header */}
           {!connected && (
             <button
               onClick={handleConnect}
               disabled={connectLoading}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '8px 18px', fontSize: 13, fontWeight: 700,
-                background: '#5865F2', color: '#ffffff',
-                border: 'none', borderRadius: 6, cursor: 'pointer',
-                opacity: connectLoading ? 0.7 : 1,
-                transition: 'opacity 0.15s',
-              }}
+              className="flex items-center gap-2 px-3 sm:px-[18px] py-2 text-[12px] sm:text-[13px] font-bold bg-[#5865F2] text-white border-none rounded-md cursor-pointer transition-opacity disabled:opacity-70"
             >
               <DiscordSVG />
-              {connectLoading ? 'Connecting...' : 'Connect'}
+              <span className="hidden sm:inline">{connectLoading ? 'Connecting...' : 'Connect'}</span>
             </button>
           )}
           {connected && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22ff66', boxShadow: '0 0 6px #22ff66' }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#22ff66' }}>Discord Connected</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full" style={{ background: '#22ff66', boxShadow: '0 0 6px #22ff66' }} />
+              <span className="text-[11px] sm:text-[12px] font-semibold text-[#22ff66]">
+                <span className="hidden sm:inline">Discord </span>Connected
+              </span>
             </div>
           )}
         </div>
@@ -321,47 +311,7 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* ── FOOTER ── */}
-      <footer style={{
-        position: 'relative', zIndex: 10,
-        width: '100%',
-        background: 'rgba(4,10,24,0.9)',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(8px)',
-        padding: '14px 32px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexShrink: 0,
-      }}>
-        {/* Left */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ width: 22, height: 22, opacity: 0.5 }} />
-          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.45)' }}>
-            © 2025 Sunshine State Roleplay · All rights reserved
-          </span>
-        </div>
-
-        {/* Center — agency tags */}
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {[
-            { abbr: 'TPD', color: '#3a78cc' },
-            { abbr: 'HCSO', color: '#3aaa44' },
-            { abbr: 'FHP', color: '#c8a050' },
-            { abbr: 'HCFR', color: '#cc3333' },
-            { abbr: 'FDOT', color: '#dd7820' },
-          ].map(ag => (
-            <span key={ag.abbr} style={{
-              fontSize: 10, fontWeight: 700, color: ag.color,
-              letterSpacing: '0.5px', opacity: 0.6,
-            }}>{ag.abbr}</span>
-          ))}
-        </div>
-
-        {/* Right */}
-        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>Status: <span style={{ color: '#22ff66' }}>Online</span></span>
-          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>Status: <span style={{ color: '#22ff66' }}>Online</span></span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
