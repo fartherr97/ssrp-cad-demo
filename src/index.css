@@ -1512,3 +1512,418 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   .n-grid-2 { grid-template-columns: 1fr; }
   .cad-nav-item { padding: 0 8px; font-size: 10px; }
 }
+
+
+/* ════════════════════════════════════════
+   FORM DOCUMENTS — PDF / Paper aesthetic
+   White paper, black ink, grid fields
+   ════════════════════════════════════════ */
+
+.form-doc-wrap {
+  background: #3a3a3a;
+  overflow: auto;
+  padding: 20px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-doc {
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-size: 11px;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #888;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.7);
+  flex-shrink: 0;
+}
+
+/* ─── Document header ─── */
+.form-doc-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 14px 8px;
+  border-bottom: 2px solid #000;
+}
+
+.form-doc-header-text {
+  flex: 1;
+}
+
+.form-doc-agency {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.form-doc-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+  margin-top: 3px;
+  letter-spacing: 0.2px;
+}
+
+.form-doc-subtitle {
+  font-size: 9px;
+  color: #444;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+/* ─── ID / case number row ─── */
+.form-doc-idrow {
+  display: flex;
+  border-bottom: 1px solid #000;
+}
+
+.form-doc-complaint {
+  flex: 1;
+  padding: 4px 8px 6px;
+  border-right: 1px solid #000;
+}
+
+.form-doc-caseno {
+  flex: 1;
+  padding: 4px 8px 6px;
+  background: #fffde7;
+}
+
+.form-doc-idlabel {
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #333;
+  text-transform: uppercase;
+  line-height: 1.4;
+  display: block;
+}
+
+.form-doc-idvalue {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+/* ─── Rows and cells ─── */
+.form-row {
+  display: flex;
+  border-bottom: 1px solid #000;
+  min-height: 36px;
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-cell {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #000;
+  padding: 2px 5px 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.form-cell.grow { flex: 1; min-width: 0; }
+.form-cell.no-br { border-right: none; }
+
+.form-cell-label {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #000;
+  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
+  margin-bottom: 1px;
+}
+
+.form-cell-value {
+  font-size: 11px;
+  color: #000;
+  font-family: 'Courier New', monospace;
+  line-height: 1.4;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-cell-value input,
+.form-cell-value select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #000;
+  padding: 0;
+  line-height: 1.4;
+  cursor: text;
+}
+
+.form-cell-value input:focus,
+.form-cell-value select:focus {
+  background: #fffde7;
+}
+
+.form-cell-value select { cursor: pointer; }
+
+/* ─── Speed / highlighted cells ─── */
+.form-cell.highlight {
+  background: #222;
+  color: #fff;
+}
+.form-cell.highlight .form-cell-label { color: #fff; }
+.form-cell.highlight .form-cell-value { color: #fff; font-weight: 700; }
+
+/* ─── Section divider ─── */
+.form-section {
+  padding: 3px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #000;
+  color: #000;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-section.dark {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.form-section.blue {
+  background: #003366;
+  color: #fff;
+}
+
+/* ─── Narrative / large text ─── */
+.form-narrative {
+  padding: 5px 8px;
+  border-bottom: 1px solid #000;
+  min-height: 72px;
+}
+
+.form-narrative textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  color: #000;
+  resize: none;
+  min-height: 60px;
+  line-height: 1.7;
+  padding: 0;
+}
+
+.form-narrative-text {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #000;
+  min-height: 60px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Checkbox row ─── */
+.form-checkbox-row {
+  display: flex;
+  gap: 18px;
+  padding: 5px 8px;
+  border-bottom: 1px solid #000;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.form-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #000;
+  cursor: pointer;
+}
+
+.form-checkbox-item input[type="checkbox"] {
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #000;
+}
+
+/* ─── Charges / penal code list ─── */
+.form-charges {
+  padding: 4px 8px;
+  border-bottom: 1px solid #000;
+  min-height: 30px;
+}
+
+.form-charge-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 1px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 10px;
+}
+
+.form-charge-code {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 70px;
+  color: #000;
+}
+
+/* ─── Signature / certification ─── */
+.form-sig-row {
+  display: flex;
+  border-bottom: 1px solid #000;
+  min-height: 48px;
+}
+
+.form-sig-cell {
+  flex: 1;
+  padding: 4px 8px;
+  border-right: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.form-sig-cell:last-child { border-right: none; }
+
+.form-sig-line {
+  border-bottom: 1px solid #000;
+  margin-bottom: 2px;
+  min-height: 22px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #000;
+}
+
+.form-sig-label {
+  font-size: 7px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #444;
+}
+
+/* ─── Document footer ─── */
+.form-doc-footer {
+  padding: 4px 10px;
+  font-size: 7.5px;
+  color: #666;
+  text-align: center;
+  background: #f4f4f4;
+  border-top: 1px solid #ccc;
+  letter-spacing: 0.2px;
+}
+
+/* ─── Warning/flag bar ─── */
+.form-doc-alert {
+  padding: 5px 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #000;
+  display: flex;
+  gap: 12px;
+}
+
+.form-doc-alert.red { background: #cc0000; color: #fff; }
+.form-doc-alert.orange { background: #cc5500; color: #fff; }
+.form-doc-alert.yellow { background: #ccaa00; color: #000; }
+
+/* ─── Record return (NCIC-style) ─── */
+.record-return {
+  background: #ffffff;
+  color: #000;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  max-width: 760px;
+  width: 100%;
+  border: 1px solid #888;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.7);
+  flex-shrink: 0;
+}
+
+.record-return-header {
+  background: #000;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 5px 10px;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.record-return-body {
+  padding: 8px 10px;
+  line-height: 1.8;
+  color: #000;
+}
+
+.record-return-section {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid #000;
+  font-size: 10px;
+  padding-bottom: 1px;
+}
+
+.record-return-line {
+  display: flex;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.record-return-key {
+  font-weight: 700;
+  min-width: 140px;
+  flex-shrink: 0;
+  color: #000;
+}
+
+.record-return-val {
+  color: #000;
+}
+
+.record-return-flag {
+  background: #cc0000;
+  color: #fff;
+  font-weight: 700;
+  padding: 1px 6px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+
+.record-return-flag.warn { background: #cc5500; }
