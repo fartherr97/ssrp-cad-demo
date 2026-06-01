@@ -6,7 +6,10 @@ import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
 } from 'react-icons/md';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_SUCCESS, S_BTN_WARNING, xs, btnHoverOn, btnHoverOff, BADGE } from '../constants/styles';
+import {
+  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST,
+  S_BTN_SUCCESS, S_BTN_WARNING, xs,
+} from '../constants/styles';
 
 const TEMPLATE_ICONS = {
   'Traffic Stop':      MdDirectionsCar,
@@ -99,22 +102,19 @@ export default function ReportsCenter() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden', fontFamily: 'var(--font-ui)' }}>
+    <div className="flex h-full overflow-hidden font-ui">
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div style={{
-        width: 230, flexShrink: 0, display: 'flex', flexDirection: 'column',
-        borderRight: '1px solid var(--n-border)', background: 'var(--n-bg-toolbar)', overflow: 'hidden',
-      }}>
+      <div className="w-[230px] shrink-0 flex flex-col border-r border-border-base bg-app-toolbar overflow-hidden">
         {/* Header */}
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text)' }}>File New Report</div>
-          <div style={{ fontSize: 10, color: 'var(--n-text-muted)', marginTop: 2 }}>Select a report type to begin</div>
+        <div className="px-3 py-2 border-b border-border-base shrink-0">
+          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">File New Report</div>
+          <div className="text-[10px] text-cad-muted mt-0.5">Select a report type to begin</div>
         </div>
 
         {/* Template list */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 6px' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', padding: '4px 6px 8px' }}>Standard Reports</div>
+        <div className="flex-1 overflow-y-auto py-2 px-1.5">
+          <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted px-1.5 pb-2 pt-1">Standard Reports</div>
 
           {(builtinTpls.length > 0 ? builtinTpls : BUILTIN_NAMES.map((n, i) => ({ id: `builtin-${i}`, name: n, fields: [] }))).map(t => {
             const IconComp = TEMPLATE_ICONS[t.name] || MdDescription;
@@ -130,22 +130,16 @@ export default function ReportsCenter() {
                   setFormValues({});
                   setSelectedReport(null);
                 }}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '9px 8px', marginBottom: 2, textAlign: 'left', cursor: 'pointer',
-                  background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
-                  border: 'none',
-                  borderLeft: `3px solid ${isSelected ? '#3b82f6' : 'transparent'}`,
-                  color: isSelected ? '#60a5fa' : 'var(--n-text)',
-                  transition: 'background 0.1s',
-                }}
-                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
-                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
+                  isSelected
+                    ? 'bg-sky-500/10 border-l-sky-500 text-sky-400'
+                    : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.04]'
+                }`}
               >
-                <IconComp size={17} style={{ flexShrink: 0, opacity: 0.75 }} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, lineHeight: 1.3, color: isSelected ? '#60a5fa' : 'var(--n-text)' }}>{t.name}</div>
-                  {fieldCount > 0 && <div style={{ fontSize: 9, color: 'var(--n-text-muted)', marginTop: 1 }}>{fieldCount} fields</div>}
+                <IconComp size={17} className="shrink-0 opacity-75" />
+                <div className="min-w-0">
+                  <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-sky-400' : 'font-medium text-cad-text'}`}>{t.name}</div>
+                  {fieldCount > 0 && <div className="text-[9px] text-cad-muted mt-px">{fieldCount} fields</div>}
                 </div>
               </button>
             );
@@ -153,25 +147,20 @@ export default function ReportsCenter() {
 
           {customTpls.length > 0 && (
             <>
-              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', padding: '12px 6px 8px' }}>Custom Forms</div>
+              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted px-1.5 pb-2 pt-3">Custom Forms</div>
               {customTpls.map(t => {
                 const isSelected = selectedTemplate?.id === t.id;
                 return (
                   <button key={t.id}
                     onClick={() => { setSelectedTemplate(t); setFormValues({}); setSelectedReport(null); }}
-                    style={{
-                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '9px 8px', marginBottom: 2, textAlign: 'left', cursor: 'pointer',
-                      background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
-                      border: 'none',
-                      borderLeft: `3px solid ${isSelected ? '#3b82f6' : 'transparent'}`,
-                      transition: 'background 0.1s',
-                    }}
-                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                    className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
+                      isSelected
+                        ? 'bg-sky-500/10 border-l-sky-500'
+                        : 'bg-transparent border-l-transparent hover:bg-white/[0.04]'
+                    }`}
                   >
-                    <MdAssignment size={17} style={{ flexShrink: 0, opacity: 0.75, color: isSelected ? '#60a5fa' : 'var(--n-text-muted)' }} />
-                    <div style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, color: isSelected ? '#60a5fa' : 'var(--n-text)' }}>{t.name}</div>
+                    <MdAssignment size={17} className={`shrink-0 opacity-75 ${isSelected ? 'text-sky-400' : 'text-cad-muted'}`} />
+                    <div className={`text-[12px] ${isSelected ? 'font-bold text-sky-400' : 'font-medium text-cad-text'}`}>{t.name}</div>
                   </button>
                 );
               })}
@@ -180,22 +169,22 @@ export default function ReportsCenter() {
         </div>
 
         {/* Signature status */}
-        <div style={{ padding: '10px 12px', borderTop: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text-muted)', marginBottom: 6 }}>My Signature</div>
+        <div className="px-3 py-2.5 border-t border-border-base shrink-0 bg-app-card">
+          <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted mb-1.5">My Signature</div>
           {hasSig ? (
             <>
-              <div style={{ background: '#fff', padding: '4px 8px', border: '1px solid #374151', marginBottom: 4 }}>
-                <img src={currentUser.signature} alt="signature" style={{ height: 28, objectFit: 'contain', display: 'block' }} />
+              <div className="bg-white px-2 py-1 border border-slate-700 mb-1">
+                <img src={currentUser.signature} alt="signature" className="h-7 object-contain block" />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 9, color: '#22c55e' }}>✓ Signature on file</span>
-                <button onClick={() => navigate('/profile?tab=signature')} style={{ fontSize: 9, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Edit</button>
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] text-green-500">✓ Signature on file</span>
+                <button onClick={() => navigate('/profile?tab=signature')} className="text-[9px] text-sky-500 bg-transparent border-none cursor-pointer p-0">Edit</button>
               </div>
             </>
           ) : (
             <div>
-              <div style={{ fontSize: 10, color: 'var(--n-text-muted)', marginBottom: 4 }}>No signature on file</div>
-              <button onClick={() => navigate('/profile')} style={{ fontSize: 10, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <div className="text-[10px] text-cad-muted mb-1">No signature on file</div>
+              <button onClick={() => navigate('/profile')} className="text-[10px] text-sky-500 bg-transparent border-none cursor-pointer p-0">
                 Set up in Profile →
               </button>
             </div>
@@ -204,34 +193,31 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#2e2e32' }}>
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#2e2e32]">
 
         {/* ── Creating a new report ── */}
         {showForm && (
           <>
-            <div style={{
-              padding: '6px 12px', background: 'var(--n-bg-toolbar)',
-              borderBottom: '1px solid var(--n-border)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
+              <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selectedTemplate.name}
               </span>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              <span className="text-[9px] text-cad-muted font-mono">
                 {me?.badge || '—'} · {me?.name || currentUser?.name}
               </span>
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="ml-auto flex gap-2 items-center">
                 {hasSig && !sigApplied && (
-                  <button style={{ ...xs(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 4 }} onClick={applySignature}>
+                  <button className={`${xs(S_BTN_SECONDARY)} flex items-center gap-1`} onClick={applySignature}>
                     ✍ Apply Signature
                   </button>
                 )}
                 {sigApplied && (
-                  <span style={{ fontSize: 10, color: '#22c55e', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="text-[10px] text-green-400 flex items-center gap-1">
                     ✓ Signed
                   </span>
                 )}
                 {!hasSig && (
-                  <button onClick={() => navigate('/profile')} style={{ fontSize: 10, color: '#6b7280', background: 'none', border: '1px solid #374151', cursor: 'pointer', padding: '3px 8px' }}>
+                  <button onClick={() => navigate('/profile')} className="text-[10px] text-slate-500 bg-transparent border border-slate-700 cursor-pointer px-2 py-0.5">
                     Set up signature
                   </button>
                 )}
@@ -243,7 +229,7 @@ export default function ReportsCenter() {
                 </button>
               </div>
             </div>
-            <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+            <div className="flex-1 overflow-auto p-4 px-5">
               <FormDocWrap meta={draftMeta}>
                 <ReportDocument
                   type={selectedTemplate.name}
@@ -261,21 +247,18 @@ export default function ReportsCenter() {
         {/* ── Viewing a submitted report ── */}
         {showReport && (
           <>
-            <div style={{
-              padding: '6px 12px', background: 'var(--n-bg-toolbar)',
-              borderBottom: '1px solid var(--n-border)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--n-text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
+              <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selReport.type}
               </span>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              <span className="text-[9px] text-cad-muted font-mono">
                 {selReport.caseNumber} · {selReport.date}
               </span>
-              <span style={{ ...(STATUS_BADGE[selReport.status] || BADGE.gray), fontSize: 9 }}>
+              <span className={`${STATUS_BADGE[selReport.status] || BADGE.gray} text-[9px]`}>
                 {selReport.status}
               </span>
               {isAdmin && (
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                <div className="ml-auto flex gap-1.5">
                   {selReport.status !== 'Approved' && (
                     <button className={xs(S_BTN_SUCCESS)} onClick={() => reviewReport(selReport.id, 'Approved')}>
                       Approve
@@ -294,7 +277,7 @@ export default function ReportsCenter() {
                 </div>
               )}
             </div>
-            <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+            <div className="flex-1 overflow-auto p-4 px-5">
               <FormDocWrap meta={{
                 caseNumber: selReport.caseNumber,
                 status: selReport.status,
@@ -315,7 +298,7 @@ export default function ReportsCenter() {
 
         {/* ── Empty state ── */}
         {!showForm && !showReport && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#666', padding: 40 }}>
+          <div className="flex-1 flex flex-col items-center justify-center gap-3.5 text-slate-600 p-10">
             <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.3">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
@@ -323,17 +306,17 @@ export default function ReportsCenter() {
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10 9 9 9 8 9"/>
             </svg>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#888', marginBottom: 6 }}>No report open</div>
-              <div style={{ fontSize: 11, color: '#555', maxWidth: 260, lineHeight: 1.5 }}>
+            <div className="text-center">
+              <div className="text-[13px] font-semibold text-slate-500 mb-1.5">No report open</div>
+              <div className="text-[11px] text-slate-600 max-w-[260px] leading-relaxed">
                 Select a report type from the left panel to start filing, or choose an existing report from the list on the right.
               </div>
             </div>
             {!hasSig && (
-              <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 4, padding: '10px 16px', fontSize: 11, color: '#60a5fa', textAlign: 'center', maxWidth: 280 }}>
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>✍ Set up your signature</div>
-                <div style={{ color: '#4b7aaa', marginBottom: 8 }}>Apply your saved signature to reports with one click — like DocuSign.</div>
-                <button onClick={() => navigate('/profile')} style={{ fontSize: 11, color: '#3b82f6', background: 'none', border: '1px solid #3b82f6', cursor: 'pointer', padding: '4px 12px' }}>
+              <div className="bg-sky-500/[0.08] border border-sky-500/20 rounded p-2.5 px-4 text-[11px] text-sky-400 text-center max-w-[280px]">
+                <div className="font-semibold mb-1">✍ Set up your signature</div>
+                <div className="text-sky-700 mb-2">Apply your saved signature to reports with one click — like DocuSign.</div>
+                <button onClick={() => navigate('/profile')} className="text-[11px] text-sky-500 bg-transparent border border-sky-500 cursor-pointer px-3 py-1">
                   Go to Profile →
                 </button>
               </div>
@@ -343,32 +326,29 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ RIGHT: Report queue ═══════════════════════════════════ */}
-      <div style={{
-        width: 270, flexShrink: 0, display: 'flex', flexDirection: 'column',
-        borderLeft: '1px solid var(--n-border)', background: 'var(--n-bg-toolbar)', overflow: 'hidden',
-      }}>
+      <div className="w-[270px] shrink-0 flex flex-col border-l border-border-base bg-app-toolbar overflow-hidden">
         {/* Header + stats */}
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--n-text)' }}>Reports</span>
-            <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)' }}>{reports.length} total</span>
+        <div className="px-3 py-2 border-b border-border-base shrink-0">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">Reports</span>
+            <span className="text-[9px] font-mono text-cad-muted">{reports.length} total</span>
           </div>
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div className="flex gap-1">
             {[
-              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: '#3b82f6' },
-              { label: 'Pending',   count: pendingReports.length,                                  color: '#f59e0b' },
-              { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: '#22c55e' },
+              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: 'text-sky-500', border: 'border-sky-500/10' },
+              { label: 'Pending',   count: pendingReports.length,                                  color: 'text-amber-500', border: 'border-amber-500/10' },
+              { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: 'text-green-500', border: 'border-green-500/10' },
             ].map(s => (
-              <div key={s.label} style={{ flex: 1, background: 'var(--n-bg-card)', border: `1px solid ${s.color}22`, padding: '4px 6px', textAlign: 'center' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: s.color }}>{s.count}</div>
-                <div style={{ fontSize: 8, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{s.label}</div>
+              <div key={s.label} className={`flex-1 bg-app-card border ${s.border} px-1.5 py-1 text-center`}>
+                <div className={`text-[14px] font-bold ${s.color}`}>{s.count}</div>
+                <div className="text-[8px] text-cad-muted uppercase tracking-[0.3px]">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
+        <div className="flex border-b border-border-base shrink-0 bg-app-card">
           {[
             { id: 'MINE', label: 'My Reports', count: myReports.length },
             { id: 'PENDING', label: 'Pending', count: pendingReports.length },
@@ -376,17 +356,14 @@ export default function ReportsCenter() {
           ].map(t => (
             <button key={t.id}
               onClick={() => setReportTab(t.id)}
-              style={{
-                flex: 1, padding: '5px 4px', border: 'none', cursor: 'pointer',
-                fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px',
-                background: reportTab === t.id ? 'var(--n-bg-selected)' : 'transparent',
-                color: reportTab === t.id ? 'var(--n-text)' : 'var(--n-text-muted)',
-                borderBottom: reportTab === t.id ? '2px solid var(--n-blue)' : '2px solid transparent',
-                fontFamily: 'var(--font-ui)',
-              }}>
+              className={`flex-1 py-1.5 px-1 border-none cursor-pointer text-[9px] font-bold uppercase tracking-[0.4px] font-ui transition-colors border-b-2 ${
+                reportTab === t.id
+                  ? 'bg-app-selected text-cad-text border-b-sky-500'
+                  : 'bg-transparent text-cad-muted border-b-transparent hover:text-cad-text'
+              }`}>
               {t.label}
               {t.count > 0 && reportTab !== t.id && (
-                <span style={{ marginLeft: 3, fontSize: 8, background: 'var(--n-bg-elevated)', color: 'var(--n-text-muted)', padding: '0 3px' }}>
+                <span className="ml-0.5 text-[8px] bg-app-elevated text-cad-muted px-0.5">
                   {t.count}
                 </span>
               )}
@@ -395,29 +372,26 @@ export default function ReportsCenter() {
         </div>
 
         {/* Report list */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto">
           {displayedReports.length === 0 ? (
-            <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No reports</div>
+            <div className="p-5 text-center text-cad-muted text-[11px]">No reports</div>
           ) : displayedReports.map(r => (
             <div key={r.id}
               onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); }}
-              style={{
-                padding: '8px 10px', cursor: 'pointer',
-                borderBottom: '1px solid var(--n-border-subtle)',
-                borderLeft: selectedReport === r.id ? '3px solid var(--n-blue)' : '3px solid transparent',
-                background: selectedReport === r.id ? 'var(--n-bg-selected)' : 'transparent',
-              }}
-              onMouseEnter={e => { if (selectedReport !== r.id) e.currentTarget.style.background = 'var(--n-bg-hover)'; }}
-              onMouseLeave={e => { if (selectedReport !== r.id) e.currentTarget.style.background = 'transparent'; }}
+              className={`px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
+                selectedReport === r.id
+                  ? 'border-l-sky-500 bg-app-selected'
+                  : 'border-l-transparent bg-transparent hover:bg-app-hover'
+              }`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                <span style={{ ...(STATUS_BADGE[r.status] || BADGE.gray), fontSize: 8 }}>{r.status}</span>
-                <span style={{ fontSize: 8, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginLeft: 'auto' }}>{r.date}</span>
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className={`${STATUS_BADGE[r.status] || BADGE.gray} !text-[8px]`}>{r.status}</span>
+                <span className="text-[8px] text-cad-muted font-mono ml-auto">{r.date}</span>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--n-text)', marginBottom: 2, lineHeight: 1.2 }}>{r.type}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{r.caseNumber}</span>
-                {r.formData?._officerSig && <span style={{ fontSize: 9, color: '#22c55e' }}>✍</span>}
+              <div className="text-[12px] font-semibold text-cad-text mb-0.5 leading-[1.2]">{r.type}</div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] text-cad-muted font-mono">{r.caseNumber}</span>
+                {r.formData?._officerSig && <span className="text-[9px] text-green-400">✍</span>}
               </div>
             </div>
           ))}
@@ -425,17 +399,17 @@ export default function ReportsCenter() {
 
         {/* Admin action bar for selected report */}
         {isAdmin && selReport && selReport.status !== 'Approved' && (
-          <div style={{ padding: '8px 10px', borderTop: '1px solid var(--n-border)', flexShrink: 0, background: 'var(--n-bg-card)' }}>
-            <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+          <div className="px-2.5 py-2 border-t border-border-base shrink-0 bg-app-card">
+            <div className="text-[9px] text-cad-muted uppercase tracking-[0.5px] mb-1.5">
               Review: {selReport.caseNumber}
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button style={{ ...xs(S_BTN_SUCCESS), flex: 1 }}
+            <div className="flex gap-1.5">
+              <button className={`${xs(S_BTN_SUCCESS)} flex-1`}
                 onClick={() => reviewReport(selReport.id, 'Approved')}>
                 Approve
               </button>
               {selReport.status === 'Submitted' && (
-                <button style={{ ...xs(S_BTN_WARNING), flex: 1 }}
+                <button className={`${xs(S_BTN_WARNING)} flex-1`}
                   onClick={() => reviewReport(selReport.id, 'Pending Review')}>
                   Flag
                 </button>

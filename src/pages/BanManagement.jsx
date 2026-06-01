@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import {
-  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
-  S_CARD, S_INPUT, S_SELECT, S_TEXTAREA, S_LABEL, S_FIELD,
-  S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, S_BTN_WARNING,
-  sm, xs, btnHoverOn, btnHoverOff, btnActiveOn,
-  S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
-  BADGE, S_DATA,
+  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
+  S_BTN_DANGER, S_BTN_WARNING, S_BTN_GHOST, S_INPUT, S_SELECT, S_LABEL,
+  S_FIELD, S_DATA, trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
+
+const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y min-h-[60px]';
 
 export default function BanManagement() {
   const { state, dispatch } = useCAD();
-  const { bannedUsers } = state;
+  const { bannedUsers, currentUser } = state;
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('ALL');
   const [form, setForm] = useState({ name:'', discordId:'', reason:'', duration:'Permanent' });
@@ -32,49 +32,42 @@ export default function BanManagement() {
   const statusBadge = { Active: BADGE.red, Expired: BADGE.gray, Lifted: BADGE.green };
 
   return (
-    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Header */}
-      <div style={{
-        display: 'flex', gap: 20, alignItems: 'center', padding: '5px 10px',
-        background: 'var(--n-bg-panel)', borderBottom: '1px solid var(--n-border)', flexShrink: 0,
-      }}>
+      <div className="flex gap-5 items-center px-2.5 py-1.5 bg-app-panel border-b border-border-base shrink-0">
         {[
-          { label: 'TOTAL BANS', value: bannedUsers.length, color: 'var(--n-text)' },
-          { label: 'ACTIVE', value: active, color: 'var(--pr1-text)' },
-          { label: 'PERMANENT', value: perma, color: 'var(--pr1-text)' },
-          { label: 'EXPIRED/LIFTED', value: bannedUsers.length - active, color: 'var(--n-text-dim)' },
+          { label: 'TOTAL BANS', value: bannedUsers.length, cls: 'text-cad-text' },
+          { label: 'ACTIVE', value: active, cls: 'text-red-400' },
+          { label: 'PERMANENT', value: perma, cls: 'text-red-400' },
+          { label: 'EXPIRED/LIFTED', value: bannedUsers.length - active, cls: 'text-slate-500' },
         ].map(s => (
-          <div key={s.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: s.color }}>{s.value}</span>
-            <span style={{ fontSize: 8, color: 'var(--n-text-muted)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>{s.label}</span>
+          <div key={s.label} className="flex flex-col items-center">
+            <span className={`font-mono text-[15px] font-bold ${s.cls}`}>{s.value}</span>
+            <span className="text-[8px] text-cad-muted tracking-[0.6px] uppercase">{s.label}</span>
           </div>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
+        <div className="ml-auto flex gap-1.5 items-center">
           {['ALL','Active','Expired','Lifted'].map(f => (
-            <button key={f}
-              style={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-             
+            <button key={f} className={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
-          <button className={sm(S_BTN_DANGER)}
-            onMouseDown={btnActiveOn}
-            onClick={() => setShowForm(true)}>
+          <button className={sm(S_BTN_DANGER)} onClick={() => setShowForm(true)}>
             Issue Ban
           </button>
         </div>
       </div>
 
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 10, gap: 8 }}>
+      <div className="flex-1 overflow-hidden flex flex-col p-2.5 gap-2">
         {/* Issue form (inline) */}
         {showForm && (
-          <div style={{ ...S_CARD, flexShrink: 0 }}>
-            <div style={{ fontSize: 9, color: 'var(--n-gold)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 10 }}>
+          <div className={`${S_CARD} shrink-0`}>
+            <div className="text-[9px] text-yellow-600 uppercase tracking-[0.7px] mb-2.5">
               Issue New Ban
             </div>
-            <div className="n-grid-2" style={{ gap: 8, marginBottom: 8 }}>
-              <div style={S_FIELD}><label className={S_LABEL}>Username *</label><input className={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
-              <div style={S_FIELD}><label className={S_LABEL}>Discord ID *</label><input className={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
-              <div style={S_FIELD}><label className={S_LABEL}>Duration</label>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className={S_FIELD}><label className={S_LABEL}>Username *</label><input className={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
+              <div className={S_FIELD}><label className={S_LABEL}>Discord ID *</label><input className={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
+              <div className={S_FIELD}><label className={S_LABEL}>Duration</label>
                 <select className={S_SELECT} value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
                   <option>Permanent</option>
                   <option>30 Days</option>
@@ -85,14 +78,13 @@ export default function BanManagement() {
                 </select>
               </div>
             </div>
-            <div style={{ ...S_FIELD, marginBottom: 8 }}>
+            <div className={`${S_FIELD} mb-2`}>
               <label className={S_LABEL}>Ban Reason *</label>
               <textarea className={S_TEXTAREA} rows={2} placeholder="Provide a clear, specific reason for this ban..." value={form.reason} onChange={e => setForm(p=>({...p,reason:e.target.value}))} />
             </div>
-            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+            <div className="flex gap-1.5 justify-end">
               <button className={sm(S_BTN_GHOST)} onClick={() => setShowForm(false)}>Cancel</button>
-              <button className={sm(S_BTN_DANGER)} onMouseDown={btnActiveOn}
-                onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
+              <button className={sm(S_BTN_DANGER)} onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
                 Confirm Ban
               </button>
             </div>
@@ -100,16 +92,14 @@ export default function BanManagement() {
         )}
 
         {/* Ban list table */}
-        <div style={{ ...S_PANEL, flex: 1 }}>
+        <div className={`${S_PANEL} flex-1`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Ban Registry</div>
-            <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
-              {filtered.length} RECORDS
-            </span>
+            <span className="text-[9px] text-cad-muted font-mono">{filtered.length} RECORDS</span>
           </div>
-          <div className={S_PANEL_BODY}>
+          <div className={`${S_PANEL_BODY} overflow-y-auto`}>
             {filtered.length === 0 ? (
-              <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No bans matching filter</div>
+              <div className="p-6 text-center text-cad-muted text-[11px]">No bans matching filter</div>
             ) : (
               <table className={S_TABLE}>
                 <thead>
@@ -121,19 +111,18 @@ export default function BanManagement() {
                 </thead>
                 <tbody>
                   {filtered.map(b => (
-                    <tr key={b.id} style={{ cursor: 'pointer', transition: 'background 0.14s, transform 0.14s' }}
-                      onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td className={S_TABLE_TD}><span style={statusBadge[b.status] || BADGE.gray}>{b.status}</span></td>
-                      <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{b.name}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.discordId}</span></td>
+                    <tr key={b.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
+                      <td className={S_TABLE_TD}><span className={statusBadge[b.status] || BADGE.gray}>{b.status}</span></td>
+                      <td className={`${S_TABLE_TD} font-medium`}>{b.name}</td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{b.discordId}</span></td>
                       <td className={S_TABLE_TD}>
-                        <span style={{ ...(b.duration === 'Permanent' ? BADGE.red : BADGE.orange), fontSize: 9 }}>
+                        <span className={`${b.duration === 'Permanent' ? BADGE.red : BADGE.orange} text-[9px]`}>
                           {b.duration}
                         </span>
                       </td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{b.issuedBy}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.date}</span></td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.reason}</td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{b.issuedBy}</td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{b.date}</span></td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500 max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap`}>{b.reason}</td>
                       <td className={S_TABLE_TD}>
                         {b.status === 'Active' && (
                           <button className={xs(S_BTN_WARNING)} onClick={() => unban(b.id)}>Lift Ban</button>

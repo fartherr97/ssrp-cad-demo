@@ -2,13 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import {
-  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
-  S_CARD, S_INPUT, S_SELECT, S_LABEL, S_FIELD,
-  S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_SUCCESS,
-  sm, xs, btnHoverOn, btnHoverOff, btnActiveOn,
-  S_TABS, tabStyle,
-  S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
-  BADGE, S_DATA, S_DETAIL_ROW, S_DETAIL_LABEL,
+  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
+  S_BTN_DANGER, S_BTN_SUCCESS, S_INPUT, S_SELECT, S_LABEL, S_FIELD,
+  S_DATA, S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE_MONO,
+  trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
 
 export default function AdminCenter() {
@@ -31,14 +29,20 @@ export default function AdminCenter() {
   };
 
   return (
-    <div style={{ ...S_PAGE, padding: 0, overflow: 'hidden', gap: 0 }}>
+    <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Tabs */}
-      <div style={S_TABS}>
+      <div className="flex shrink-0 border-b border-border-base bg-app-card">
         {TABS.map(t => (
-          <button key={t} style={{ ...tabStyle(tab === t), fontSize: 10 }} onClick={() => setTab(t)}>
+          <button key={t}
+            onClick={() => setTab(t)}
+            className={`px-3 py-2 text-[10px] font-bold uppercase tracking-[0.5px] border-none cursor-pointer transition-colors border-b-2 font-ui ${
+              tab === t
+                ? 'bg-app-selected text-cad-text border-b-sky-500'
+                : 'bg-transparent text-cad-muted border-b-transparent hover:text-cad-text'
+            }`}>
             {t}
             {t === 'WHITELIST' && pendingApps.length > 0 && (
-              <span style={{ marginLeft: 4, fontSize: 9, background: 'var(--pr2-bg)', color: 'var(--pr2-text)', borderRadius: 2, padding: '0 3px', fontFamily: 'var(--font-mono)' }}>
+              <span className="ml-1 text-[9px] bg-amber-900/60 text-amber-400 rounded px-0.5 font-mono">
                 {pendingApps.length}
               </span>
             )}
@@ -46,51 +50,46 @@ export default function AdminCenter() {
         ))}
       </div>
 
-      <div style={{ ...S_PANEL_BODY, padding: 12, flex: 1 }}>
+      <div className="flex-1 overflow-y-auto p-3">
 
         {/* USERS */}
         {tab === 'USERS' && (
           <div className={S_PANEL}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Personnel Registry</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{officers.length} MEMBERS</span>
+              <span className="text-[9px] text-cad-muted font-mono">{officers.length} MEMBERS</span>
             </div>
             <div className={S_PANEL_BODY}>
               <table className={S_TABLE}>
                 <thead>
                   <tr>
-                    <th className={S_TABLE_TH}>Name</th>
-                    <th className={S_TABLE_TH}>Badge</th>
-                    <th className={S_TABLE_TH}>Department</th>
-                    <th className={S_TABLE_TH}>Rank</th>
-                    <th className={S_TABLE_TH}>Role</th>
-                    <th className={S_TABLE_TH}>Status</th>
-                    <th className={S_TABLE_TH}>Discord</th>
-                    <th className={S_TABLE_TH}>Actions</th>
+                    {['Name','Badge','Department','Rank','Role','Status','Discord','Actions'].map(h => (
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {officers.map(o => (
                     <tr key={o.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{o.name}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{o.badge}</span></td>
-                      <td className={S_TABLE_TD}><span style={{ ...BADGE.blue, fontSize: 9 }}>{o.deptShort}</span></td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{o.rank}</td>
+                      <td className={`${S_TABLE_TD} font-medium`}>{o.name}</td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{o.badge}</span></td>
+                      <td className={S_TABLE_TD}><span className={`${BADGE.blue} text-[9px]`}>{o.deptShort}</span></td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{o.rank}</td>
                       <td className={S_TABLE_TD}>
-                        <span style={{ ...( o.role === 'admin' ? BADGE.gold : o.role === 'dispatch' ? BADGE.cyan : BADGE.gray ), fontSize: 9 }}>
+                        <span className={`${o.role === 'admin' ? BADGE.gold : o.role === 'dispatch' ? BADGE.cyan : BADGE.gray} text-[9px]`}>
                           {o.role}
                         </span>
                       </td>
                       <td className={S_TABLE_TD}>
-                        <span style={{ ...( o.status === 'OFFDUTY' ? BADGE.offduty : BADGE.available ), fontSize: 9 }}>
+                        <span className={`${o.status === 'OFFDUTY' ? BADGE.offduty : BADGE.available} text-[9px]`}>
                           {o.status === 'OFFDUTY' ? 'OFF DUTY' : 'ON DUTY'}
                         </span>
                       </td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 9 }}>{o.discordId}</span></td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[9px]`}>{o.discordId}</span></td>
                       <td className={S_TABLE_TD}>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button className={xs(S_BTN_SECONDARY)} onMouseDown={btnActiveOn}>Edit</button>
-                          <button className={xs(S_BTN_DANGER)} onMouseDown={btnActiveOn} onClick={() => navigate('/bans')}>Ban</button>
+                        <div className="flex gap-1">
+                          <button className={xs(S_BTN_SECONDARY)}>Edit</button>
+                          <button className={xs(S_BTN_DANGER)} onClick={() => navigate('/bans')}>Ban</button>
                         </div>
                       </td>
                     </tr>
@@ -106,27 +105,27 @@ export default function AdminCenter() {
           <div className={S_PANEL}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Active Sessions</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{activeSessions.length} ONLINE</span>
+              <span className="text-[9px] text-cad-muted font-mono">{activeSessions.length} ONLINE</span>
             </div>
             <div className={S_PANEL_BODY}>
               <table className={S_TABLE}>
                 <thead>
                   <tr>
-                    <th className={S_TABLE_TH}>Name</th>
-                    <th className={S_TABLE_TH}>Role</th>
-                    <th className={S_TABLE_TH}>Login Time</th>
-                    <th className={S_TABLE_TH}>Last Active</th>
-                    <th className={S_TABLE_TH}>IP Address</th>
+                    {['Name','Role','Login Time','Last Active','IP Address'].map(h => (
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {activeSessions.map(s => (
                     <tr key={s.userId} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{s.name}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...( s.role === 'Admin' ? BADGE.gold : BADGE.gray ), fontSize: 9 }}>{s.role}</span></td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{s.loginTime}</span></td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{s.lastActive}</span></td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{s.ip}</span></td>
+                      <td className={`${S_TABLE_TD} font-medium`}>{s.name}</td>
+                      <td className={S_TABLE_TD}>
+                        <span className={`${s.role === 'Admin' ? BADGE.gold : BADGE.gray} text-[9px]`}>{s.role}</span>
+                      </td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{s.loginTime}</span></td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{s.lastActive}</span></td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{s.ip}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -140,25 +139,24 @@ export default function AdminCenter() {
           <div className={S_PANEL}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>System Audit Log</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{auditLog.length} ENTRIES</span>
+              <span className="text-[9px] text-cad-muted font-mono">{auditLog.length} ENTRIES</span>
             </div>
             <div className={S_PANEL_BODY}>
               <table className={S_TABLE}>
                 <thead>
                   <tr>
-                    <th className={S_TABLE_TH}>Timestamp</th>
-                    <th className={S_TABLE_TH}>User</th>
-                    <th className={S_TABLE_TH}>Module</th>
-                    <th className={S_TABLE_TH}>Action</th>
+                    {['Timestamp','User','Module','Action'].map(h => (
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {auditLog.map(e => (
                     <tr key={e.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{e.timestamp}</span></td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11 }}>{e.user}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...BADGE.gray, fontSize: 9 }}>{e.module}</span></td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{e.action}</td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{e.timestamp}</span></td>
+                      <td className={`${S_TABLE_TD} text-[11px]`}>{e.user}</td>
+                      <td className={S_TABLE_TD}><span className={`${BADGE.gray} text-[9px]`}>{e.module}</span></td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{e.action}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -169,27 +167,37 @@ export default function AdminCenter() {
 
         {/* DEPARTMENTS */}
         {tab === 'DEPARTMENTS' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button className={sm(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={() => setShowDeptForm(!showDeptForm)}>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex justify-end">
+              <button className={sm(S_BTN_PRIMARY)} onClick={() => setShowDeptForm(!showDeptForm)}>
                 {showDeptForm ? '✕ Cancel' : '+ Add Department'}
               </button>
             </div>
 
             {showDeptForm && (
               <div className={S_CARD}>
-                <div style={{ fontSize: 9, color: 'var(--n-gold)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 10 }}>New Department</div>
-                <div className="n-grid-2" style={{ gap: 8, marginBottom: 8 }}>
-                  <div style={S_FIELD}><label className={S_LABEL}>Full Name</label><input className={S_INPUT} value={deptForm.name} onChange={e => setDeptForm(p=>({...p,name:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Short Name</label><input className={S_INPUT} value={deptForm.short} onChange={e => setDeptForm(p=>({...p,short:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Abbreviation</label><input className={S_INPUT} value={deptForm.abbreviation} onChange={e => setDeptForm(p=>({...p,abbreviation:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Type</label><select className={S_SELECT} value={deptForm.type} onChange={e => setDeptForm(p=>({...p,type:e.target.value}))}><option value="LEO">LEO</option><option value="Fire">Fire</option><option value="EMS">EMS</option><option value="Dispatch">Dispatch</option></select></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Badge Prefix</label><input className={S_INPUT} value={deptForm.badgePrefix} onChange={e => setDeptForm(p=>({...p,badgePrefix:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Radio Channel</label><input className={S_INPUT} value={deptForm.radioChannel} onChange={e => setDeptForm(p=>({...p,radioChannel:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label className={S_LABEL}>Color</label><input type="color" value={deptForm.color} onChange={e => setDeptForm(p=>({...p,color:e.target.value}))} style={{ width: '100%', height: 32, borderRadius: 3, border: '1px solid var(--n-border)', background: 'none', cursor: 'pointer' }} /></div>
+                <div className="text-[9px] text-yellow-600 uppercase tracking-[0.7px] mb-2.5">New Department</div>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className={S_FIELD}><label className={S_LABEL}>Full Name</label><input className={S_INPUT} value={deptForm.name} onChange={e => setDeptForm(p=>({...p,name:e.target.value}))} /></div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Short Name</label><input className={S_INPUT} value={deptForm.short} onChange={e => setDeptForm(p=>({...p,short:e.target.value}))} /></div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Abbreviation</label><input className={S_INPUT} value={deptForm.abbreviation} onChange={e => setDeptForm(p=>({...p,abbreviation:e.target.value}))} /></div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Type</label>
+                    <select className={S_SELECT} value={deptForm.type} onChange={e => setDeptForm(p=>({...p,type:e.target.value}))}>
+                      <option value="LEO">LEO</option>
+                      <option value="Fire">Fire</option>
+                      <option value="EMS">EMS</option>
+                      <option value="Dispatch">Dispatch</option>
+                    </select>
+                  </div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Badge Prefix</label><input className={S_INPUT} value={deptForm.badgePrefix} onChange={e => setDeptForm(p=>({...p,badgePrefix:e.target.value}))} /></div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Radio Channel</label><input className={S_INPUT} value={deptForm.radioChannel} onChange={e => setDeptForm(p=>({...p,radioChannel:e.target.value}))} /></div>
+                  <div className={S_FIELD}><label className={S_LABEL}>Color</label>
+                    <input type="color" value={deptForm.color} onChange={e => setDeptForm(p=>({...p,color:e.target.value}))}
+                      className="w-full h-8 rounded border border-border-base bg-transparent cursor-pointer" />
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-                  <button className={sm(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={addDept}>Create Department</button>
+                <div className="flex justify-end gap-1.5">
+                  <button className={sm(S_BTN_PRIMARY)} onClick={addDept}>Create Department</button>
                 </div>
               </div>
             )}
@@ -197,27 +205,33 @@ export default function AdminCenter() {
             <div className={S_PANEL}>
               <div className={S_PANEL_HEADER}>
                 <div className={S_PANEL_TITLE}>Departments</div>
-                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{departments.length}</span>
+                <span className="text-[9px] text-cad-muted font-mono">{departments.length}</span>
               </div>
               <div className={S_PANEL_BODY}>
                 <table className={S_TABLE}>
                   <thead>
-                    <tr><th className={S_TABLE_TH}>Name</th><th className={S_TABLE_TH}>Abbrev</th><th className={S_TABLE_TH}>Type</th><th className={S_TABLE_TH}>Badge Prefix</th><th className={S_TABLE_TH}>Radio</th><th className={S_TABLE_TH}>Subdivisions</th></tr>
+                    <tr>
+                      {['Name','Abbrev','Type','Badge Prefix','Radio','Subdivisions'].map(h => (
+                        <th key={h} className={S_TABLE_TH}>{h}</th>
+                      ))}
+                    </tr>
                   </thead>
                   <tbody>
                     {departments.map(d => (
                       <tr key={d.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                        <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                            <span style={{ width: 10, height: 10, borderRadius: 2, background: d.color, flexShrink: 0 }} />
+                        <td className={`${S_TABLE_TD} font-medium`}>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ background: d.color }} />
                             {d.name}
                           </div>
                         </td>
                         <td className={S_TABLE_TD}><span className={S_DATA}>{d.abbreviation}</span></td>
-                        <td className={S_TABLE_TD}><span style={{ ...( d.type === 'LEO' ? BADGE.blue : d.type === 'Fire' ? BADGE.fire : BADGE.green ), fontSize: 9 }}>{d.type}</span></td>
-                        <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{d.badgePrefix}</span></td>
-                        <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{d.radioChannel}</span></td>
-                        <td style={{ ...S_TABLE_TD, fontSize: 10, color: 'var(--n-text-dim)' }}>{d.subdivisions?.join(', ') || '—'}</td>
+                        <td className={S_TABLE_TD}>
+                          <span className={`${d.type === 'LEO' ? BADGE.blue : d.type === 'Fire' ? BADGE.fire : BADGE.green} text-[9px]`}>{d.type}</span>
+                        </td>
+                        <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{d.badgePrefix}</span></td>
+                        <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{d.radioChannel}</span></td>
+                        <td className={`${S_TABLE_TD} text-[10px] text-slate-500`}>{d.subdivisions?.join(', ') || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -232,32 +246,34 @@ export default function AdminCenter() {
           <div className={S_PANEL}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Whitelist Applications</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                {pendingApps.length} PENDING
-              </span>
+              <span className="text-[9px] text-cad-muted font-mono">{pendingApps.length} PENDING</span>
             </div>
             <div className={S_PANEL_BODY}>
               <table className={S_TABLE}>
                 <thead>
-                  <tr><th className={S_TABLE_TH}>Name</th><th className={S_TABLE_TH}>Discord ID</th><th className={S_TABLE_TH}>Applied</th><th className={S_TABLE_TH}>Status</th><th className={S_TABLE_TH}>Notes</th><th className={S_TABLE_TH}>Actions</th></tr>
+                  <tr>
+                    {['Name','Discord ID','Applied','Status','Notes','Actions'].map(h => (
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
+                    ))}
+                  </tr>
                 </thead>
                 <tbody>
                   {whitelistApps.map(w => (
                     <tr key={w.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{w.name}</td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{w.discordId}</span></td>
-                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{w.appliedDate}</span></td>
+                      <td className={`${S_TABLE_TD} font-medium`}>{w.name}</td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{w.discordId}</span></td>
+                      <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{w.appliedDate}</span></td>
                       <td className={S_TABLE_TD}>
-                        <span style={w.status === 'Approved' ? BADGE.green : w.status === 'Pending' ? BADGE.orange : BADGE.red}>
+                        <span className={w.status === 'Approved' ? BADGE.green : w.status === 'Pending' ? BADGE.orange : BADGE.red}>
                           {w.status}
                         </span>
                       </td>
-                      <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{w.notes || '—'}</td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{w.notes || '—'}</td>
                       <td className={S_TABLE_TD}>
                         {w.status === 'Pending' && (
-                          <div style={{ display: 'flex', gap: 4 }}>
-                            <button className={xs(S_BTN_SUCCESS)} onMouseDown={btnActiveOn} onClick={() => dispatch({ type: 'APPROVE_WHITELIST', payload: w.id })}>Approve</button>
-                            <button className={xs(S_BTN_DANGER)} onMouseDown={btnActiveOn} onClick={() => dispatch({ type: 'DENY_WHITELIST', payload: w.id })}>Deny</button>
+                          <div className="flex gap-1">
+                            <button className={xs(S_BTN_SUCCESS)} onClick={() => dispatch({ type: 'APPROVE_WHITELIST', payload: w.id })}>Approve</button>
+                            <button className={xs(S_BTN_DANGER)} onClick={() => dispatch({ type: 'DENY_WHITELIST', payload: w.id })}>Deny</button>
                           </div>
                         )}
                       </td>
@@ -271,16 +287,16 @@ export default function AdminCenter() {
 
         {/* SETTINGS */}
         {tab === 'SETTINGS' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="grid grid-cols-2 gap-3">
             <div className={S_CARD}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10, color: 'var(--n-gold)' }}>Community Configuration</div>
-              <div style={{ ...S_FIELD, marginBottom: 8 }}><label className={S_LABEL}>Community Name</label><input className={S_INPUT} defaultValue="Sunshine State RP" /></div>
-              <div style={{ ...S_FIELD, marginBottom: 8 }}><label className={S_LABEL}>Dispatch Channel</label><input className={S_INPUT} defaultValue="Hillsborough Main" /></div>
-              <div style={{ ...S_FIELD, marginBottom: 8 }}><label className={S_LABEL}>CAD System Name</label><input className={S_INPUT} defaultValue="SSRP NEXUS CAD v2.0" /></div>
-              <button className={sm(S_BTN_PRIMARY)} onMouseDown={btnActiveOn}>Save Configuration</button>
+              <div className="text-[11px] font-semibold mb-2.5 text-yellow-600">Community Configuration</div>
+              <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>Community Name</label><input className={S_INPUT} defaultValue="Sunshine State RP" /></div>
+              <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>Dispatch Channel</label><input className={S_INPUT} defaultValue="Hillsborough Main" /></div>
+              <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>CAD System Name</label><input className={S_INPUT} defaultValue="SSRP NEXUS CAD v2.0" /></div>
+              <button className={sm(S_BTN_PRIMARY)}>Save Configuration</button>
             </div>
             <div className={S_CARD}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10, color: 'var(--n-gold)' }}>System Statistics</div>
+              <div className="text-[11px] font-semibold mb-2.5 text-yellow-600">System Statistics</div>
               {[
                 { label: 'Total Members', value: officers.length },
                 { label: 'Total Departments', value: departments.length },
@@ -290,7 +306,7 @@ export default function AdminCenter() {
               ].map(s => (
                 <div key={s.label} className={S_DETAIL_ROW}>
                   <span className={S_DETAIL_LABEL}>{s.label}</span>
-                  <span style={{ ...S_DATA, fontSize: 12 }}>{s.value}</span>
+                  <span className={`${S_DETAIL_VALUE_MONO} text-[12px]`}>{s.value}</span>
                 </div>
               ))}
             </div>

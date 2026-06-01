@@ -1,44 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import {
-  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
-  S_STAT, S_STAT_LABEL, S_STAT_VALUE, S_STAT_SUB,
-  S_BTN_PRIMARY, S_BTN_DANGER, S_BTN_GHOST,
-  sm, xs, btnHoverOn, btnHoverOff, btnActiveOn,
-  S_TABLE, S_TABLE_TH, S_TABLE_TD, trHoverOn, trHoverOff,
-  BADGE,
-  S_DATA,
-  S_UNIT_ROW, unitRowHoverOn, unitRowHoverOff,
-  S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR,
+  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  S_BTN_PRIMARY, S_BTN_DANGER, S_BTN_GHOST, S_TABLE, S_TABLE_TH, S_TABLE_TD,
+  S_STAT, S_STAT_LABEL, S_STAT_VALUE, S_STAT_SUB, S_DATA,
+  S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR, S_UNIT_ROW, cadStatus,
+  trHoverOn, trHoverOff, xs,
 } from '../constants/styles';
 
-function StatCard({ label, value, sub, color, accent }) {
+function StatCard({ label, value, sub, borderColor, valueColor }) {
   return (
-    <div style={{ ...S_STAT, borderTop: `2px solid ${color || 'var(--n-border)'}` }}>
+    <div className={`${S_STAT} border-t-2`} style={{ borderTopColor: borderColor || 'var(--color-border-base)' }}>
       <div className={S_STAT_LABEL}>{label}</div>
-      <div style={{ ...S_STAT_VALUE, color: accent || 'var(--n-text)' }}>{value}</div>
+      <div className={S_STAT_VALUE} style={valueColor ? { color: valueColor } : {}}>{value}</div>
       {sub && <div className={S_STAT_SUB}>{sub}</div>}
     </div>
   );
 }
 
 function PriBadge({ p }) {
-  const badgeMap = { 1: BADGE.p1, 2: BADGE.p2, 3: BADGE.p3, 4: BADGE.p4 };
-  return <span style={badgeMap[p] || BADGE.gray}>P{p}</span>;
+  const cls = [BADGE.gray, BADGE.p1, BADGE.p2, BADGE.p3, BADGE.p4][p] || BADGE.gray;
+  return <span className={cls}>P{p}</span>;
 }
 
 function StatusDot({ status }) {
   const colors = {
-    AVAILABLE: 'var(--st-av-text)', BUSY: 'var(--st-busy-text)',
-    ENRT: 'var(--st-enrt-text)', ARRVD: 'var(--st-arv-text)',
-    UNAVAILABLE: 'var(--st-unav-text)', OFFDUTY: 'var(--st-od-text)',
+    AVAILABLE: '#22c55e', BUSY: '#ef4444',
+    ENRT: '#eab308', ARRVD: '#06b6d4',
+    UNAVAILABLE: '#8b5cf6', OFFDUTY: '#6b7280',
   };
   return (
-    <span style={{
-      display: 'inline-block', width: 7, height: 7, borderRadius: '50%',
-      background: colors[status] || 'var(--n-text-muted)',
-      flexShrink: 0,
-    }} />
+    <span
+      className="inline-block w-[7px] h-[7px] rounded-full shrink-0"
+      style={{ background: colors[status] || '#6b7280' }}
+    />
   );
 }
 
@@ -46,27 +41,12 @@ function ModuleCard({ label, desc, page, color, icon, go }) {
   return (
     <button
       onClick={() => go(page)}
-      style={{
-        background: 'var(--n-bg-card)',
-        border: `1px solid var(--n-border)`,
-        borderLeft: `3px solid ${color}`,
-        borderRadius: 'var(--n-radius)',
-        padding: '10px 12px',
-        textAlign: 'left',
-        cursor: 'pointer',
-        transition: 'all 0.1s',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 3,
-        width: '100%',
-        fontFamily: 'var(--font-ui)',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = 'var(--n-bg-elevated)'; e.currentTarget.style.borderColor = `${color}88`; }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'var(--n-bg-card)'; e.currentTarget.style.borderColor = 'var(--n-border)'; e.currentTarget.style.borderLeftColor = color; }}
+      className="bg-app-card border border-border-base rounded text-left cursor-pointer transition-all flex flex-col gap-0.5 w-full p-2.5 font-ui hover:bg-app-elevated"
+      style={{ borderLeft: `3px solid ${color}` }}
     >
-      <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
-      <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--n-text)' }}>{label}</div>
-      <div style={{ fontSize: 10, color: 'var(--n-text-dim)', lineHeight: 1.4 }}>{desc}</div>
+      <div className="text-[18px] mb-0.5">{icon}</div>
+      <div className="text-[11.5px] font-semibold text-cad-text">{label}</div>
+      <div className="text-[10px] text-slate-500 leading-[1.4]">{desc}</div>
     </button>
   );
 }
@@ -117,56 +97,42 @@ export default function CommandDashboard() {
   ];
 
   return (
-    <div style={{ ...S_PAGE, gap: 10 }}>
+    <div className={`${S_PAGE} gap-2.5`}>
       {/* P1 Alert Banner */}
       {p1.length > 0 && (
-        <div style={{
-          background: 'var(--pr1-bg)', border: '1px solid var(--pr1-border)',
-          borderRadius: 'var(--n-radius)', padding: '8px 14px',
-          display: 'flex', alignItems: 'center', gap: 10,
-        }}>
-          <span style={{ color: 'var(--pr1-text)', fontWeight: 700, fontSize: 12, animation: 'pulseRed 1s ease-in-out infinite' }}>
+        <div className="bg-red-950/30 border border-red-900/50 rounded px-3.5 py-2 flex items-center gap-2.5">
+          <span className="text-red-400 font-bold text-[12px] animate-pulse">
             ▲ PRIORITY 1 ACTIVE
           </span>
-          <span style={{ color: 'var(--pr1-text)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+          <span className="text-red-400 text-[11px] font-mono">
             {p1.map(c => `${c.id} — ${c.nature} @ ${c.location}`).join(' · ')}
           </span>
-          <button
-            style={{ ...sm(S_BTN_DANGER), marginLeft: 'auto' }}
-            onMouseDown={btnActiveOn}
-            onClick={() => go('dispatch')}
-          >
+          <button className={`${xs(S_BTN_DANGER)} ml-auto`} onClick={() => go('dispatch')}>
             Go to Dispatch
           </button>
         </div>
       )}
 
       {/* Stats row */}
-      <div className="n-grid-4">
-        <StatCard label="Active Calls" value={active.length} sub={`${p1.length} priority 1`} color="var(--pr2-text)" accent={active.length > 0 ? 'var(--pr2-text)' : undefined} />
-        <StatCard label="Units On Duty" value={onDuty.length} sub={`${available.length} available`} color="var(--n-blue)" accent="var(--n-text-data)" />
-        <StatCard label="Pending Reports" value={pendingReports.length} sub="awaiting review" color="var(--pr3-text)" accent={pendingReports.length > 0 ? 'var(--pr3-text)' : undefined} />
-        <StatCard label="Active Warrants" value={activeWarrants.length} sub="outstanding" color="var(--pr1-text)" accent={activeWarrants.length > 0 ? 'var(--pr1-text)' : undefined} />
+      <div className="grid grid-cols-4 gap-2.5">
+        <StatCard label="Active Calls" value={active.length} sub={`${p1.length} priority 1`} borderColor="#f59e0b" valueColor={active.length > 0 ? '#f59e0b' : undefined} />
+        <StatCard label="Units On Duty" value={onDuty.length} sub={`${available.length} available`} borderColor="#0ea5e9" valueColor="#cdd4e0" />
+        <StatCard label="Pending Reports" value={pendingReports.length} sub="awaiting review" borderColor="#eab308" valueColor={pendingReports.length > 0 ? '#eab308' : undefined} />
+        <StatCard label="Active Warrants" value={activeWarrants.length} sub="outstanding" borderColor="#ef4444" valueColor={activeWarrants.length > 0 ? '#ef4444' : undefined} />
       </div>
 
       {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 10, flex: 1, minHeight: 0 }}>
+      <div className="grid flex-1 min-h-0 gap-2.5" style={{ gridTemplateColumns: '1fr 280px' }}>
         {/* Left: modules + active calls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
+        <div className="flex flex-col gap-2 min-h-0">
           {/* Module grid */}
-          <div style={{ ...S_PANEL, flexShrink: 0 }}>
+          <div className={`${S_PANEL} shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Operational Workspaces</div>
-              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                {modules.length} MODULES
-              </span>
+              <span className="text-[9px] text-cad-muted font-mono">{modules.length} MODULES</span>
             </div>
-            <div style={{ padding: 10 }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-                gap: 8,
-              }}>
+            <div className="p-2.5">
+              <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
                 {modules.map(m => (
                   <ModuleCard key={m.page} {...m} go={go} />
                 ))}
@@ -175,55 +141,48 @@ export default function CommandDashboard() {
           </div>
 
           {/* Active calls */}
-          <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
+          <div className={`${S_PANEL} flex-1 min-h-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Active Incidents</div>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              <div className="flex gap-1.5 items-center">
+                <span className="text-[9px] text-cad-muted font-mono">
                   {pending.length} PENDING · {active.filter(c => c.status === 'ACTIVE').length} ACTIVE
                 </span>
-                <button
-                  className={xs(S_BTN_PRIMARY)}
-                  onMouseDown={btnActiveOn}
-                  onClick={() => go('dispatch')}
-                >
+                <button className={xs(S_BTN_PRIMARY)} onClick={() => go('dispatch')}>
                   Open Console
                 </button>
               </div>
             </div>
             <div className={S_PANEL_BODY}>
               {active.length === 0 ? (
-                <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>
+                <div className="p-5 text-center text-cad-muted text-[11px]">
                   No active incidents
                 </div>
               ) : (
                 <table className={S_TABLE}>
                   <thead>
                     <tr>
-                      <th className={S_TABLE_TH}>Call #</th>
-                      <th className={S_TABLE_TH}>Pri</th>
-                      <th className={S_TABLE_TH}>Nature</th>
-                      <th className={S_TABLE_TH}>Location</th>
-                      <th className={S_TABLE_TH}>Status</th>
-                      <th className={S_TABLE_TH}>Units</th>
+                      {['Call #','Pri','Nature','Location','Status','Units'].map(h => (
+                        <th key={h} className={S_TABLE_TH}>{h}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {active.map(c => (
                       <tr key={c.id}
-                        style={{ cursor: 'pointer', transition: 'background 0.14s, transform 0.14s' }}
-                        onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
-                        onClick={() => go('dispatch')}>
+                        className={`cursor-pointer ${c.priority === 1 ? 'bg-red-950/10' : c.priority === 2 ? 'bg-orange-950/10' : ''}`}
+                        onClick={() => go('dispatch')}
+                        onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
                         <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
                         <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
-                        <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{c.nature}</td>
-                        <td style={{ ...S_TABLE_TD, color: 'var(--n-text-dim)', fontSize: 11 }}>{c.location}</td>
+                        <td className={`${S_TABLE_TD} font-medium`}>{c.nature}</td>
+                        <td className={`${S_TABLE_TD} text-slate-500 text-[11px]`}>{c.location}</td>
                         <td className={S_TABLE_TD}>
-                          <span style={c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.blue : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray}>
+                          <span className={c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.blue : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray}>
                             {c.status}
                           </span>
                         </td>
-                        <td style={{ ...S_TABLE_TD, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-dim)' }}>
+                        <td className={`${S_TABLE_TD} font-mono text-[11px] text-slate-500`}>
                           {c.units.length > 0 ? c.units.join(', ') : '—'}
                         </td>
                       </tr>
@@ -236,22 +195,22 @@ export default function CommandDashboard() {
         </div>
 
         {/* Right: TX log + unit summary */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
+        <div className="flex flex-col gap-2 min-h-0">
           {/* TX feed */}
-          <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
+          <div className={`${S_PANEL} flex-1 min-h-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Dispatch Feed</div>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)' }} />
+              <span className="w-[7px] h-[7px] rounded-full bg-green-500 shadow-[0_0_5px_#22c55e]" />
             </div>
-            <div className={S_PANEL_BODY}>
+            <div className={`${S_PANEL_BODY} overflow-y-auto`}>
               {dispatchLog.slice(0, 40).map(e => (
                 <div key={e.id} className={S_TX_ENTRY}>
                   <span className={S_TX_TIME}>{e.time}</span>
-                  <span style={{ color: TX_KIND_COLOR[e.kind] }}>{e.text}</span>
+                  <span className={TX_KIND_COLOR[e.kind] || 'text-slate-400'}>{e.text}</span>
                 </div>
               ))}
               {dispatchLog.length === 0 && (
-                <div style={{ padding: 16, color: 'var(--n-text-muted)', fontSize: 11, textAlign: 'center' }}>
+                <div className="p-4 text-cad-muted text-[11px] text-center">
                   No activity
                 </div>
               )}
@@ -259,25 +218,19 @@ export default function CommandDashboard() {
           </div>
 
           {/* Unit quick view */}
-          <div style={{ ...S_PANEL, maxHeight: 200, flexShrink: 0 }}>
+          <div className={`${S_PANEL} max-h-[200px] shrink-0`}>
             <div className={S_PANEL_HEADER}>
               <div className={S_PANEL_TITLE}>Unit Summary</div>
-              <button
-                className={xs(S_BTN_GHOST)}
-                onMouseDown={btnActiveOn}
-                onClick={() => go('units')}
-              >
-                View All
-              </button>
+              <button className={xs(S_BTN_GHOST)} onClick={() => go('units')}>View All</button>
             </div>
-            <div className={S_PANEL_BODY}>
+            <div className={`${S_PANEL_BODY} overflow-y-auto`}>
               {onDuty.slice(0, 8).map(o => (
                 <div key={o.id} className={S_UNIT_ROW}>
                   <StatusDot status={o.status} />
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-data)', minWidth: 52 }}>
+                  <span className="font-mono text-[11px] text-cad-data min-w-[52px]">
                     {o.unitId}
                   </span>
-                  <span style={{ fontSize: 11, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span className="text-[11px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-cad-text">
                     {o.name}
                   </span>
                 </div>

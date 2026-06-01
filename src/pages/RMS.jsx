@@ -1,20 +1,16 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import {
+  S_INPUT, S_SELECT,
+  S_BTN_PRIMARY, S_BTN_DANGER, S_BTN_SUCCESS,
+  S_TABLE_TH,
+  S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
+  S_BTN_SECONDARY, S_LABEL,
+  xs,
+} from '../constants/styles';
 
-const MONO = "'Ubuntu', sans-serif";
 const TABS = ['Criminal History', 'Warrants', 'Tow/Impound', 'Field Contacts', 'Custom Records'];
-
-const inp = {
-  background: '#06070c',
-  border: '1px solid #1a1e2c',
-  borderRadius: '2px',
-  color: '#d1d5db',
-  padding: '6px 8px',
-  fontSize: '12px',
-  fontFamily: MONO,
-  width: '100%',
-};
 
 export default function RMS() {
   const { state, dispatch } = useCAD();
@@ -53,35 +49,21 @@ export default function RMS() {
   };
 
   return (
-    <div style={{ padding: '12px 14px', fontFamily: MONO, background: '#080b12', minHeight: 'calc(100vh - 70px)' }}>
+    <div className="flex flex-col flex-1 overflow-auto p-3.5 gap-3.5 bg-neutral-950 font-sans">
 
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-        <span style={{ color: '#e2e8f0', fontSize: '14px', fontWeight: 700, letterSpacing: '1px' }}>RECORDS MANAGEMENT SYSTEM</span>
-        <span style={{ color: '#374151', fontSize: '11px' }}>— Hillsborough County, FL</span>
+      <div className="flex items-center gap-2.5">
+        <span className="text-slate-200 text-sm font-bold tracking-[1px]">RECORDS MANAGEMENT SYSTEM</span>
+        <span className="text-slate-600 text-[11px]">— Hillsborough County, FL</span>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #141720', marginBottom: '14px', overflowX: 'auto' }}>
+      <div className="flex gap-0.5 border-b border-slate-800 overflow-x-auto">
         {TABS.map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            style={{
-              background: tab === t ? '#0f172a' : 'transparent',
-              border: `1px solid ${tab === t ? '#1d4ed8' : 'transparent'}`,
-              borderBottom: 'none',
-              borderRadius: '2px 2px 0 0',
-              color: tab === t ? '#93c5fd' : '#374151',
-              padding: '6px 12px',
-              fontSize: '11px',
-              fontWeight: tab === t ? 700 : 400,
-              cursor: 'pointer',
-              letterSpacing: '0.3px',
-              fontFamily: MONO,
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
+            className={`px-3 py-1.5 text-[11px] font-mono shrink-0 whitespace-nowrap cursor-pointer transition-colors rounded-t border ${tab === t ? 'bg-slate-900 border-sky-700 border-b-transparent text-sky-300 font-bold' : 'bg-transparent border-transparent text-slate-600 font-normal hover:text-slate-400'}`}
           >
             {t}
           </button>
@@ -91,22 +73,22 @@ export default function RMS() {
       {/* Criminal History */}
       {tab === 'Criminal History' && (
         <div>
-          <TabBar count={`${criminalHistory.length} records`} onAdd={() => setShowArrest(true)} addLabel="+ Add Arrest Record" addColor="#0f2451" />
+          <TabBar count={`${criminalHistory.length} records`} onAdd={() => setShowArrest(true)} addLabel="+ Add Arrest Record" variant="primary" />
           <div className="table-scroll">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <table className="w-full border-collapse text-[12px]">
               <THead cols={['DATE', 'CASE #', 'SUBJECT', 'CHARGES', 'OFFICER', 'AGENCY', 'DISPOSITION', 'SENTENCE']} />
               <tbody>
                 {criminalHistory.map((h, i) => {
                   const civ = civilians.find(c => c.id === h.civilianId);
                   return (
-                    <tr key={h.id} style={{ background: i % 2 === 0 ? '#090b10' : '#0b0d14' }}>
+                    <tr key={h.id} className={i % 2 === 0 ? 'bg-slate-950' : 'bg-[#0b0d14]'}>
                       <TD dimmed>{h.date}</TD>
-                      <td style={{ padding: '5px 10px', color: '#93c5fd', fontWeight: 700 }}>{h.caseNumber}</td>
-                      <td style={{ padding: '5px 10px', color: '#e2e8f0' }}>{civ ? `${civ.firstName} ${civ.lastName}` : 'Unknown'}</td>
-                      <td style={{ padding: '5px 10px', color: '#9ca3af', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}</td>
+                      <td className="px-2.5 py-1.5 text-sky-300 font-bold">{h.caseNumber}</td>
+                      <td className="px-2.5 py-1.5 text-slate-200">{civ ? `${civ.firstName} ${civ.lastName}` : 'Unknown'}</td>
+                      <td className="px-2.5 py-1.5 text-slate-400 max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">{Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}</td>
                       <TD dimmed>{h.officerBadge}</TD>
                       <TD dimmed>{h.agency}</TD>
-                      <td style={{ padding: '5px 10px' }}><StatusBadge status={h.disposition} /></td>
+                      <td className="px-2.5 py-1.5"><StatusBadge status={h.disposition} /></td>
                       <TD dimmed>{h.sentence}</TD>
                     </tr>
                   );
@@ -120,24 +102,24 @@ export default function RMS() {
       {/* Warrants */}
       {tab === 'Warrants' && (
         <div>
-          <TabBar count={`${warrants.filter(w => w.status === 'ACTIVE').length} active warrants`} onAdd={() => setShowWarrant(true)} addLabel="+ Issue Warrant" addColor="#450a0a" addBorderColor="#991b1b" addTextColor="#f87171" />
+          <TabBar count={`${warrants.filter(w => w.status === 'ACTIVE').length} active warrants`} onAdd={() => setShowWarrant(true)} addLabel="+ Issue Warrant" variant="danger" />
           <div className="table-scroll">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <table className="w-full border-collapse text-[12px]">
               <THead cols={['SUBJECT', 'TYPE', 'CHARGE', 'ISSUED BY', 'DATE', 'STATUS', 'ACTIONS']} />
               <tbody>
                 {warrants.map((w, i) => (
-                  <tr key={w.id} style={{ background: i % 2 === 0 ? '#090b10' : '#0b0d14' }}>
-                    <td style={{ padding: '5px 10px', color: '#e2e8f0', fontWeight: 700 }}>{w.civilianName}</td>
+                  <tr key={w.id} className={i % 2 === 0 ? 'bg-slate-950' : 'bg-[#0b0d14]'}>
+                    <td className="px-2.5 py-1.5 text-slate-200 font-bold">{w.civilianName}</td>
                     <TD dimmed>{w.type}</TD>
-                    <td style={{ padding: '5px 10px', color: '#fca5a5' }}>{w.charge}</td>
+                    <td className="px-2.5 py-1.5 text-red-300">{w.charge}</td>
                     <TD dimmed>{w.issuedBy}</TD>
                     <TD dimmed>{w.issuedDate}</TD>
-                    <td style={{ padding: '5px 10px' }}><StatusBadge status={w.status} /></td>
-                    <td style={{ padding: '5px 8px' }}>
+                    <td className="px-2.5 py-1.5"><StatusBadge status={w.status} /></td>
+                    <td className="px-2 py-1.5">
                       {w.status === 'ACTIVE' && (
                         <button
                           onClick={() => dispatch({ type: 'SERVE_WARRANT', payload: w.id })}
-                          style={{ background: '#052e16', border: '1px solid #166534', borderRadius: '2px', color: '#4ade80', padding: '2px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: MONO }}
+                          className={xs(S_BTN_SUCCESS)}
                         >
                           Mark Served
                         </button>
@@ -154,20 +136,20 @@ export default function RMS() {
       {/* Tow/Impound */}
       {tab === 'Tow/Impound' && (
         <div>
-          <TabBar count={`${towLogs.length} records`} onAdd={() => setShowTow(true)} addLabel="+ Log Tow" addColor="#0f2451" />
+          <TabBar count={`${towLogs.length} records`} onAdd={() => setShowTow(true)} addLabel="+ Log Tow" variant="primary" />
           <div className="table-scroll">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <table className="w-full border-collapse text-[12px]">
               <THead cols={['PLATE', 'VEHICLE', 'TOWED BY', 'REASON', 'LOCATION', 'DATE', 'STATUS']} />
               <tbody>
                 {towLogs.map((t, i) => (
-                  <tr key={t.id} style={{ background: i % 2 === 0 ? '#090b10' : '#0b0d14' }}>
-                    <td style={{ padding: '5px 10px', color: '#93c5fd', fontWeight: 700 }}>{t.plate}</td>
+                  <tr key={t.id} className={i % 2 === 0 ? 'bg-slate-950' : 'bg-[#0b0d14]'}>
+                    <td className="px-2.5 py-1.5 text-sky-300 font-bold">{t.plate}</td>
                     <TD>{t.make} {t.model}</TD>
                     <TD dimmed>{t.towedBy}</TD>
-                    <td style={{ padding: '5px 10px', color: '#9ca3af', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.reason}</td>
+                    <td className="px-2.5 py-1.5 text-slate-400 max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">{t.reason}</td>
                     <TD dimmed>{t.location}</TD>
                     <TD dimmed>{t.date}</TD>
-                    <td style={{ padding: '5px 10px' }}><StatusBadge status={t.releaseStatus} /></td>
+                    <td className="px-2.5 py-1.5"><StatusBadge status={t.releaseStatus} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -178,11 +160,11 @@ export default function RMS() {
 
       {tab === 'Field Contacts' && (
         <div>
-          <div style={{ color: '#374151', fontSize: '12px', marginBottom: '10px' }}>Field interview / FI card records</div>
-          <div style={{ background: '#0d1117', border: '1px solid #1a1e2c', borderRadius: '2px', padding: '12px', fontSize: '12px' }}>
-            <div style={{ marginBottom: '4px', fontWeight: 700, color: '#e2e8f0' }}>FIC-2023-0044</div>
-            <div style={{ color: '#9ca3af' }}>Subject: Amanda Chen | Location: Park Ave near Oak St | Date: 2023-10-05</div>
-            <div style={{ color: '#374151', marginTop: '4px', fontSize: '11px' }}>Subject was approached near parked vehicles at 02:15. Stated she was looking for her cat. No criminal activity observed. No further action.</div>
+          <div className="text-slate-600 text-[12px] mb-2.5">Field interview / FI card records</div>
+          <div className="bg-app-card border border-border-base rounded p-3 text-[12px]">
+            <div className="mb-1 font-bold text-slate-200">FIC-2023-0044</div>
+            <div className="text-slate-400">Subject: Amanda Chen | Location: Park Ave near Oak St | Date: 2023-10-05</div>
+            <div className="text-slate-600 mt-1 text-[11px]">Subject was approached near parked vehicles at 02:15. Stated she was looking for her cat. No criminal activity observed. No further action.</div>
           </div>
         </div>
       )}
@@ -190,9 +172,9 @@ export default function RMS() {
       {tab === 'Custom Records' && (
         <div>
           {customRecordTypes.map(type => (
-            <div key={type.id} style={{ background: '#0d1117', border: '1px solid #1a1e2c', borderLeft: '3px solid #1d4ed8', borderRadius: '2px', padding: '12px', marginBottom: '8px' }}>
-              <div style={{ color: '#93c5fd', fontWeight: 700, marginBottom: '4px', fontSize: '13px' }}>{type.name}</div>
-              <div style={{ color: '#374151', fontSize: '11px' }}>{type.fields.length} fields: {type.fields.map(f => f.label).join(' | ')}</div>
+            <div key={type.id} className="bg-app-card border border-border-base border-l-[3px] border-l-sky-700 rounded p-3 mb-2">
+              <div className="text-sky-300 font-bold mb-1 text-[13px]">{type.name}</div>
+              <div className="text-slate-600 text-[11px]">{type.fields.length} fields: {type.fields.map(f => f.label).join(' | ')}</div>
             </div>
           ))}
         </div>
@@ -200,88 +182,112 @@ export default function RMS() {
 
       {/* ── Modals ── */}
       {showAddArrest && (
-        <Modal title="ADD ARREST RECORD" onClose={() => setShowArrest(false)}>
-          <form onSubmit={submitArrest} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <FormField label="SUBJECT">
-              <select value={arrestForm.civilianId} onChange={e => setA('civilianId', e.target.value)} required style={inp}>
-                <option value="">— Select Civilian —</option>
-                {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
-              </select>
-            </FormField>
-            <FormField label="CHARGES">
-              <div style={{ maxHeight: '140px', overflowY: 'auto', background: '#06070c', border: '1px solid #1a1e2c', borderRadius: '2px', padding: '5px' }}>
-                {penalCode.map(p => (
-                  <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '2px 4px', cursor: 'pointer', color: arrestForm.charges.includes(p.name) ? '#93c5fd' : '#374151', fontSize: '11px' }}>
-                    <input type="checkbox" checked={arrestForm.charges.includes(p.name)} onChange={e => setA('charges', e.target.checked ? [...arrestForm.charges, p.name] : arrestForm.charges.filter(c => c !== p.name))} style={{ accentColor: '#1d4ed8' }} />
-                    {p.code} — {p.name}
-                  </label>
-                ))}
-              </div>
-            </FormField>
-            <FormField label="OFFICER BADGE">
-              <input value={arrestForm.officerBadge} onChange={e => setA('officerBadge', e.target.value)} placeholder={currentUser?.badge} style={inp} />
-            </FormField>
-            <FormField label="DISPOSITION">
-              <select value={arrestForm.disposition} onChange={e => setA('disposition', e.target.value)} style={inp}>
-                {['Arrested','Cited','Released','No Action'].map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </FormField>
-            <FormField label="SENTENCE">
-              <input value={arrestForm.sentence} onChange={e => setA('sentence', e.target.value)} placeholder="e.g. 6 months, $1,500 fine..." style={inp} />
-            </FormField>
-            <FormField label="NOTES">
-              <textarea value={arrestForm.notes} onChange={e => setA('notes', e.target.value)} rows={3} style={{ ...inp, resize: 'vertical' }} />
-            </FormField>
-            <button type="submit" style={{ background: '#0f2451', border: '1px solid #1d4ed8', borderRadius: '2px', color: '#93c5fd', padding: '9px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: MONO }}>
-              SUBMIT ARREST RECORD
-            </button>
-          </form>
-        </Modal>
+        <div className={S_OVERLAY}>
+          <div className={S_MODAL}>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>ADD ARREST RECORD</div>
+              <button className="text-slate-500 hover:text-slate-200 text-lg cursor-pointer bg-none border-none" onClick={() => setShowArrest(false)}>×</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <form onSubmit={submitArrest} className="flex flex-col gap-2.5">
+                <FormField label="SUBJECT">
+                  <select value={arrestForm.civilianId} onChange={e => setA('civilianId', e.target.value)} required className={S_SELECT}>
+                    <option value="">— Select Civilian —</option>
+                    {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
+                  </select>
+                </FormField>
+                <FormField label="CHARGES">
+                  <div className="max-h-[140px] overflow-y-auto bg-app-input border border-border-base rounded p-1">
+                    {penalCode.map(p => (
+                      <label key={p.id} className={`flex items-center gap-1.5 px-1 py-0.5 cursor-pointer text-[11px] ${arrestForm.charges.includes(p.name) ? 'text-sky-300' : 'text-slate-600'}`}>
+                        <input type="checkbox" checked={arrestForm.charges.includes(p.name)} onChange={e => setA('charges', e.target.checked ? [...arrestForm.charges, p.name] : arrestForm.charges.filter(c => c !== p.name))} className="accent-sky-700" />
+                        {p.code} — {p.name}
+                      </label>
+                    ))}
+                  </div>
+                </FormField>
+                <FormField label="OFFICER BADGE">
+                  <input value={arrestForm.officerBadge} onChange={e => setA('officerBadge', e.target.value)} placeholder={currentUser?.badge} className={S_INPUT} />
+                </FormField>
+                <FormField label="DISPOSITION">
+                  <select value={arrestForm.disposition} onChange={e => setA('disposition', e.target.value)} className={S_SELECT}>
+                    {['Arrested','Cited','Released','No Action'].map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </FormField>
+                <FormField label="SENTENCE">
+                  <input value={arrestForm.sentence} onChange={e => setA('sentence', e.target.value)} placeholder="e.g. 6 months, $1,500 fine..." className={S_INPUT} />
+                </FormField>
+                <FormField label="NOTES">
+                  <textarea value={arrestForm.notes} onChange={e => setA('notes', e.target.value)} rows={3} className="w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y" />
+                </FormField>
+                <div className={S_MODAL_FOOTER}>
+                  <button type="submit" className={S_BTN_PRIMARY}>SUBMIT ARREST RECORD</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
 
       {showAddWarrant && (
-        <Modal title="ISSUE WARRANT" onClose={() => setShowWarrant(false)}>
-          <form onSubmit={submitWarrant} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <FormField label="SUBJECT">
-              <select value={warrantForm.civilianId} onChange={e => setW('civilianId', e.target.value)} required style={inp}>
-                <option value="">— Select Civilian —</option>
-                {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
-              </select>
-            </FormField>
-            <FormField label="WARRANT TYPE">
-              <select value={warrantForm.type} onChange={e => setW('type', e.target.value)} style={inp}>
-                {['Arrest Warrant','Bench Warrant','Search Warrant'].map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </FormField>
-            <FormField label="CHARGE">
-              <select value={warrantForm.charge} onChange={e => setW('charge', e.target.value)} required style={inp}>
-                <option value="">— Select Charge —</option>
-                {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} — {p.name}</option>)}
-              </select>
-            </FormField>
-            <FormField label="NOTES">
-              <textarea value={warrantForm.notes} onChange={e => setW('notes', e.target.value)} rows={3} style={{ ...inp, resize: 'vertical' }} />
-            </FormField>
-            <button type="submit" style={{ background: '#450a0a', border: '1px solid #991b1b', borderRadius: '2px', color: '#f87171', padding: '9px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: MONO }}>
-              ISSUE WARRANT
-            </button>
-          </form>
-        </Modal>
+        <div className={S_OVERLAY}>
+          <div className={S_MODAL}>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>ISSUE WARRANT</div>
+              <button className="text-slate-500 hover:text-slate-200 text-lg cursor-pointer bg-none border-none" onClick={() => setShowWarrant(false)}>×</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <form onSubmit={submitWarrant} className="flex flex-col gap-2.5">
+                <FormField label="SUBJECT">
+                  <select value={warrantForm.civilianId} onChange={e => setW('civilianId', e.target.value)} required className={S_SELECT}>
+                    <option value="">— Select Civilian —</option>
+                    {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
+                  </select>
+                </FormField>
+                <FormField label="WARRANT TYPE">
+                  <select value={warrantForm.type} onChange={e => setW('type', e.target.value)} className={S_SELECT}>
+                    {['Arrest Warrant','Bench Warrant','Search Warrant'].map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </FormField>
+                <FormField label="CHARGE">
+                  <select value={warrantForm.charge} onChange={e => setW('charge', e.target.value)} required className={S_SELECT}>
+                    <option value="">— Select Charge —</option>
+                    {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} — {p.name}</option>)}
+                  </select>
+                </FormField>
+                <FormField label="NOTES">
+                  <textarea value={warrantForm.notes} onChange={e => setW('notes', e.target.value)} rows={3} className="w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y" />
+                </FormField>
+                <div className={S_MODAL_FOOTER}>
+                  <button type="submit" className={S_BTN_DANGER}>ISSUE WARRANT</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
 
       {showAddTow && (
-        <Modal title="LOG TOW / IMPOUND" onClose={() => setShowTow(false)}>
-          <form onSubmit={submitTow} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {[['PLATE *','plate'],['MAKE','make'],['MODEL','model'],['REASON *','reason'],['IMPOUND LOCATION','location']].map(([l, k]) => (
-              <FormField key={k} label={l}>
-                <input value={towForm[k]} onChange={e => setT(k, e.target.value)} required={l.includes('*')} style={inp} />
-              </FormField>
-            ))}
-            <button type="submit" style={{ background: '#0f2451', border: '1px solid #1d4ed8', borderRadius: '2px', color: '#93c5fd', padding: '9px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: MONO }}>
-              LOG TOW
-            </button>
-          </form>
-        </Modal>
+        <div className={S_OVERLAY}>
+          <div className={S_MODAL}>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>LOG TOW / IMPOUND</div>
+              <button className="text-slate-500 hover:text-slate-200 text-lg cursor-pointer bg-none border-none" onClick={() => setShowTow(false)}>×</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <form onSubmit={submitTow} className="flex flex-col gap-2.5">
+                {[['PLATE *','plate'],['MAKE','make'],['MODEL','model'],['REASON *','reason'],['IMPOUND LOCATION','location']].map(([l, k]) => (
+                  <FormField key={k} label={l}>
+                    <input value={towForm[k]} onChange={e => setT(k, e.target.value)} required={l.includes('*')} className={S_INPUT} />
+                  </FormField>
+                ))}
+                <div className={S_MODAL_FOOTER}>
+                  <button type="submit" className={S_BTN_PRIMARY}>LOG TOW</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -292,9 +298,9 @@ export default function RMS() {
 function THead({ cols }) {
   return (
     <thead>
-      <tr style={{ background: '#0d1117' }}>
+      <tr className="bg-app-bg">
         {cols.map(h => (
-          <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#374151', fontSize: '10px', letterSpacing: '0.8px', fontWeight: 700, borderBottom: '1px solid #141720', whiteSpace: 'nowrap' }}>{h}</th>
+          <th key={h} className={S_TABLE_TH}>{h}</th>
         ))}
       </tr>
     </thead>
@@ -302,15 +308,15 @@ function THead({ cols }) {
 }
 
 function TD({ children, dimmed }) {
-  return <td style={{ padding: '5px 10px', color: dimmed ? '#6b7280' : '#9ca3af' }}>{children}</td>;
+  return <td className={`px-2.5 py-1.5 ${dimmed ? 'text-slate-500' : 'text-slate-400'}`}>{children}</td>;
 }
 
-function TabBar({ count, onAdd, addLabel, addColor, addBorderColor, addTextColor }) {
+function TabBar({ count, onAdd, addLabel, variant = 'primary' }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-      <span style={{ color: '#374151', fontSize: '12px' }}>{count}</span>
+    <div className="flex justify-between items-center mb-2.5">
+      <span className="text-slate-600 text-[12px]">{count}</span>
       {onAdd && (
-        <button onClick={onAdd} style={{ background: addColor || '#0f2451', border: `1px solid ${addBorderColor || '#1d4ed8'}`, borderRadius: '2px', color: addTextColor || '#93c5fd', padding: '4px 12px', fontSize: '11px', cursor: 'pointer', fontFamily: MONO, fontWeight: 700 }}>
+        <button onClick={onAdd} className={variant === 'danger' ? xs(S_BTN_DANGER) : xs(S_BTN_PRIMARY)}>
           {addLabel}
         </button>
       )}
@@ -321,22 +327,8 @@ function TabBar({ count, onAdd, addLabel, addColor, addBorderColor, addTextColor
 function FormField({ label, children }) {
   return (
     <div>
-      <label style={{ color: '#374151', fontSize: '10px', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>{label}</label>
+      <label className={S_LABEL}>{label}</label>
       {children}
-    </div>
-  );
-}
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#0d1117', border: '1px solid #1a1e2c', borderTop: '2px solid #1d4ed8', borderRadius: '3px', padding: '20px', maxWidth: '480px', width: '90%', maxHeight: '80vh', overflowY: 'auto', fontFamily: MONO }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ color: '#93c5fd', fontWeight: 700, fontSize: '13px', letterSpacing: '1px' }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#374151', cursor: 'pointer', fontSize: '16px', lineHeight: 1 }}>×</button>
-        </div>
-        {children}
-      </div>
     </div>
   );
 }
