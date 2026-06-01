@@ -19,7 +19,7 @@ export default function FormsCenter() {
       type: 'ADD_REPORT',
       payload: {
         type: selectedTemplate.name,
-        caseNumber: `SSRP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        caseNumber: `HCSO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
         officerBadge: currentUser?.badge || 'UNKN',
         summary: formValues['Narrative'] || formValues['Full Narrative'] || formValues['Supplement Narrative'] || 'Submitted via CAD',
         callId: null, civilianId: null,
@@ -31,120 +31,125 @@ export default function FormsCenter() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ color: '#f1f5f9', fontSize: '18px', fontWeight: 700, letterSpacing: '1px', marginBottom: '18px' }}>REPORT CENTER</div>
-      <TabBar tabs={tabs} active={activeTab} setActive={(t) => { setActiveTab(t); setSelectedTemplate(null); }} />
+    <div style={{ padding: '14px', fontFamily: 'Ubuntu Mono, monospace' }}>
+      {/* Header */}
+      <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px' }}>
+        <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>REPORT CENTER</span>
+      </div>
+      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px' }}>
+        <TabBar tabs={tabs} active={activeTab} setActive={(t) => { setActiveTab(t); setSelectedTemplate(null); }} />
 
-      {/* ── Submitted Reports ── */}
-      {activeTab === 'submitted' && (
-        <div style={{ marginTop: '18px' }}>
-          <div style={{ marginBottom: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <StatusSummary label="Total" count={reports.length} color="#4a9eff" />
-            <StatusSummary label="Pending" count={reports.filter(r => r.status === 'Submitted').length} color="#f59e0b" />
-            <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length} color="#22c55e" />
-            <StatusSummary label="Review" count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
-          </div>
-          <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px' }}>
-            <thead>
-              <tr style={{ background: '#0a1a35' }}>
-                {['Case #','Type','Officer','Date','Status','Call','Actions'].map(h => (
-                  <th key={h} style={{ padding: '10px 12px', textAlign: 'left', color: '#7a9ab8', fontSize: '14px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {reports.map((r, i) => (
-                <tr key={r.id} style={{ background: i % 2 === 0 ? '#080f1e' : '#0a1525' }}>
-                  <td style={{ padding: '9px 12px', color: '#60a5fa', fontWeight: 700 }}>{r.caseNumber}</td>
-                  <td style={{ padding: '9px 12px', color: '#e2e8f0' }}>{r.type}</td>
-                  <td style={{ padding: '9px 12px', color: '#94a3b8' }}>{r.officerBadge}</td>
-                  <td style={{ padding: '9px 12px', color: '#64748b' }}>{r.date}</td>
-                  <td style={{ padding: '9px 12px' }}><StatusBadge status={r.status} /></td>
-                  <td style={{ padding: '9px 12px', color: '#60a5fa' }}>{r.callId || '•'}</td>
-                  <td style={{ padding: '9px 12px' }}>
-                    <button onClick={() => setReviewReport(r)} style={smallBtn('#1e4080','#4a9eff')}>View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table></div>
-        </div>
-      )}
-
-      {/* ── Create Report ── */}
-      {activeTab === 'create' && (
-        <div style={{ marginTop: '18px' }}>
-          {!selectedTemplate ? (
-            <>
-              <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '14px' }}>Select a report template to begin:</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px' }}>
-                {reportTemplates.map(t => (
-                  <div key={t.id} onClick={() => { setSelectedTemplate(t); setFormValues({}); }}
-                    style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '18px', cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = '#4a9eff'}
-                    onMouseLeave={e => e.currentTarget.style.borderColor = '#1e4080'}
-                  >
-                    <div style={{ color: '#4a9eff', fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>📋 {t.name}</div>
-                    <div style={{ color: '#64748b', fontSize: '14px' }}>{t.fields.length} fields</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <DocumentForm
-              template={selectedTemplate}
-              formValues={formValues}
-              setFormValues={setFormValues}
-              onBack={() => { setSelectedTemplate(null); setFormValues({}); }}
-              onSubmit={handleSubmitReport}
-              currentUser={currentUser}
-              civilians={civilians}
-              officers={officers}
-            />
-          )}
-        </div>
-      )}
-
-      {/* ── Form Builder ── */}
-      {activeTab === 'builder' && isAdmin && (
-        <TemplateBuilder reportTemplates={reportTemplates} dispatch={dispatch} />
-      )}
-
-      {/* ── Review Queue ── */}
-      {activeTab === 'review' && isAdmin && (
-        <ReviewQueue reports={reports} dispatch={dispatch} />
-      )}
-
-      {/* Report detail modal */}
-      {reviewReport && (
-        <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} • ${reviewReport.caseNumber}`}>
-          <div style={{ fontSize: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <FieldRow label="Officer" value={reviewReport.officerBadge} />
-            <FieldRow label="Date" value={reviewReport.date} />
-            <FieldRow label="Status" value={<StatusBadge status={reviewReport.status} />} />
-            <FieldRow label="Call" value={reviewReport.callId || '•'} />
-            <div style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', color: '#94a3b8', lineHeight: '1.7', fontSize: '16px' }}>
-              {reviewReport.summary}
+        {/* Submitted Reports */}
+        {activeTab === 'submitted' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <StatusSummary label="Total" count={reports.length} color="#3b82f6" />
+              <StatusSummary label="Pending" count={reports.filter(r => r.status === 'Submitted').length} color="#fbbf24" />
+              <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length} color="#22c55e" />
+              <StatusSummary label="Review" count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
             </div>
-            {isAdmin && reviewReport.status === 'Submitted' && (
-              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Approved' } }); setReviewReport(null); }} style={{ ...smallBtn('#14532d','#22c55e'), padding: '9px 18px', flex: 1, fontSize: '15px' }}>✓ Approve</button>
-                <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Denied' } }); setReviewReport(null); }} style={{ ...smallBtn('#7f1d1d','#ef4444'), padding: '9px 18px', flex: 1, fontSize: '15px' }}>✗ Deny</button>
-              </div>
+            <div className="table-scroll">
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <thead>
+                  <tr style={{ background: '#0b0d14' }}>
+                    {['Case #','Type','Officer','Date','Status','Call','Actions'].map(h => (
+                      <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {reports.map((r, i) => (
+                    <tr key={r.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
+                      <td style={{ padding: '7px 10px', color: '#60a5fa', fontWeight: 700 }}>{r.caseNumber}</td>
+                      <td style={{ padding: '7px 10px', color: '#d1d5db' }}>{r.type}</td>
+                      <td style={{ padding: '7px 10px', color: '#9ca3af' }}>{r.officerBadge}</td>
+                      <td style={{ padding: '7px 10px', color: '#4b5563' }}>{r.date}</td>
+                      <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
+                      <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{r.callId || '—'}</td>
+                      <td style={{ padding: '7px 10px' }}>
+                        <button onClick={() => setReviewReport(r)} style={aBtn('#0c1a2e','#3b82f6')}>View</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Create Report */}
+        {activeTab === 'create' && (
+          <div style={{ marginTop: '14px' }}>
+            {!selectedTemplate ? (
+              <>
+                <div style={{ color: '#9ca3af', fontSize: '13px', marginBottom: '12px' }}>Select a report template to begin:</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+                  {reportTemplates.map(t => (
+                    <div key={t.id} onClick={() => { setSelectedTemplate(t); setFormValues({}); }}
+                      style={{ background: '#090b10', border: '1px solid #1e2533', padding: '16px', cursor: 'pointer', borderLeft: '3px solid #3b82f6' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = '#3b82f6'}
+                      onMouseLeave={e => e.currentTarget.style.borderLeftColor = '#3b82f6'}
+                    >
+                      <div style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>{t.name}</div>
+                      <div style={{ color: '#4b5563', fontSize: '11px' }}>{t.fields.length} fields</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <DocumentForm
+                template={selectedTemplate}
+                formValues={formValues}
+                setFormValues={setFormValues}
+                onBack={() => { setSelectedTemplate(null); setFormValues({}); }}
+                onSubmit={handleSubmitReport}
+                currentUser={currentUser}
+                civilians={civilians}
+                officers={officers}
+              />
             )}
           </div>
-        </Modal>
-      )}
+        )}
+
+        {/* Form Builder */}
+        {activeTab === 'builder' && isAdmin && (
+          <TemplateBuilder reportTemplates={reportTemplates} dispatch={dispatch} />
+        )}
+
+        {/* Review Queue */}
+        {activeTab === 'review' && isAdmin && (
+          <ReviewQueue reports={reports} dispatch={dispatch} />
+        )}
+
+        {/* Report detail modal */}
+        {reviewReport && (
+          <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} — ${reviewReport.caseNumber}`}>
+            <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <FieldRow label="Officer" value={reviewReport.officerBadge} />
+              <FieldRow label="Date" value={reviewReport.date} />
+              <FieldRow label="Status" value={<StatusBadge status={reviewReport.status} />} />
+              <FieldRow label="Call" value={reviewReport.callId || '—'} />
+              <div style={{ background: '#090b10', border: '1px solid #1f2937', padding: '12px', color: '#9ca3af', lineHeight: '1.6', fontSize: '13px' }}>
+                {reviewReport.summary}
+              </div>
+              {isAdmin && reviewReport.status === 'Submitted' && (
+                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                  <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Approved' } }); setReviewReport(null); }} style={{ ...aBtn('#052e16','#22c55e'), padding: '7px 16px', flex: 1, fontSize: '13px' }}>Approve</button>
+                  <button onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Denied' } }); setReviewReport(null); }} style={{ ...aBtn('#450a0a','#ef4444'), padding: '7px 16px', flex: 1, fontSize: '13px' }}>Deny</button>
+                </div>
+              )}
+            </div>
+          </Modal>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ════════════════════════════════════════════════════
-   DOCUMENT FORM — government citation / official report style
-════════════════════════════════════════════════════ */
+/* ════════════ DOCUMENT FORM — government citation / official report style ════════════ */
 function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, currentUser, civilians, officers }) {
   const { isMobile } = useResponsive();
-  const [formNumber] = useState(`SSRP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`);
+  const [formNumber] = useState(`HCSO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`);
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   const DOC_FONT = "'Arial Narrow', Arial, sans-serif";
@@ -164,15 +169,15 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
 
   return (
     <div>
-      {/* CAD-UI toolbar — sits outside document */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
-        <button onClick={onBack} style={{ ...cadBtn('#1e4080','#94a3b8'), padding: '6px 12px' }}>← Back</button>
-        <span style={{ color: '#e2a84b', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
+      {/* CAD-UI toolbar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <button onClick={onBack} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#9ca3af', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Back</button>
+        <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '12px', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '1px' }}>{template.name.toUpperCase()}</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
           {!isMobile && (
-            <button onClick={() => window.print()} style={{ ...cadBtn('#1e3a50','#60a5fa'), padding: '6px 12px' }}>🖨 Print</button>
+            <button onClick={() => window.print()} style={{ background: '#090b10', border: '1px solid #1e2533', color: '#60a5fa', padding: '5px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Print</button>
           )}
-          <button form="docform" type="submit" style={{ background: '#0f2548', border: '2px solid #1a1a2e', borderRadius: '0', color: '#ffffff', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: DOC_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+          <button form="docform" type="submit" style={{ background: '#0f2548', border: '2px solid #1a1a2e', color: '#ffffff', padding: '5px 18px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: DOC_FONT, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
             SUBMIT REPORT
           </button>
         </div>
@@ -189,18 +194,14 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
           fontFamily: DOC_FONT,
           overflow: 'hidden',
         }}>
-
-          {/* ── HEADER ── */}
+          {/* HEADER */}
           <div style={{ background: '#0f2548', display: 'flex', alignItems: 'stretch', borderBottom: '3px solid #1a1a2e' }}>
-            <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid rgba(255,255,255,0.15)', minWidth: isMobile ? '52px' : '80px' }}>
-              <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" style={{ height: isMobile ? '40px' : '58px', width: 'auto' }} />
-            </div>
             <div style={{ flex: 1, padding: '10px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
               <div style={{ color: '#b0c4d8', fontSize: isMobile ? '9px' : '11px', letterSpacing: '2px', fontWeight: 400, marginBottom: '1px', fontFamily: DOC_FONT }}>
-                SUNSHINE STATE ROLEPLAY
+                HILLSBOROUGH COUNTY, FLORIDA
               </div>
               <div style={{ color: '#7aa0bc', fontSize: isMobile ? '8px' : '10px', letterSpacing: '1.5px', marginBottom: '5px', fontFamily: DOC_FONT }}>
-                SUNSHINE STATE POLICE DEPARTMENT
+                {currentUser?.deptShort || 'LAW ENFORCEMENT'} — COMPUTER AIDED DISPATCH
               </div>
               <div style={{ color: '#ffffff', fontWeight: 700, fontSize: isMobile ? '14px' : '18px', letterSpacing: '1px', textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.25)', paddingTop: '5px', width: '100%', fontFamily: DOC_FONT }}>
                 {template.name}
@@ -214,7 +215,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
             </div>
           </div>
 
-          {/* ── OFFICER INFO ROW ── */}
+          {/* OFFICER INFO ROW */}
           <table style={{ width: '100%', borderCollapse: 'collapse', borderBottom: '2px solid #1a1a2e' }}>
             <tbody>
               <tr>
@@ -235,7 +236,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
             </tbody>
           </table>
 
-          {/* ── FORM FIELDS ── */}
+          {/* FORM FIELDS */}
           <DocFieldGrid
             fields={template.fields}
             formValues={formValues}
@@ -249,14 +250,14 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
             DATA_FONT={DATA_FONT}
           />
 
-          {/* ── CERTIFICATION BANNER ── */}
+          {/* CERTIFICATION BANNER */}
           <div style={{ background: LABEL_BG, borderTop: '2px solid #1a1a2e', borderBottom: BORDER, padding: '3px 10px' }}>
             <span style={{ fontSize: '9px', fontWeight: 700, color: '#1a1a2e', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>
               THE UNDERSIGNED CERTIFIES THAT THE FOREGOING INFORMATION IS TRUE AND CORRECT TO THE BEST OF THEIR KNOWLEDGE
             </span>
           </div>
 
-          {/* ── SIGNATURE ROW ── */}
+          {/* SIGNATURE ROW */}
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <tbody>
               <tr>
@@ -284,9 +285,9 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
             </tbody>
           </table>
 
-          {/* ── FOOTER ── */}
+          {/* FOOTER */}
           <div style={{ background: '#0f2548', borderTop: '2px solid #1a1a2e', padding: '4px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>SUNSHINE STATE ROLEPLAY • COMPUTER AIDED DISPATCH</span>
+            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>HILLSBOROUGH COUNTY, FL — COMPUTER AIDED DISPATCH</span>
             <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', fontFamily: DOC_FONT }}>CONFIDENTIAL LAW ENFORCEMENT DOCUMENT</span>
           </div>
         </div>
@@ -357,17 +358,7 @@ function DocFieldGrid({ fields, formValues, setFormValues, civilians, officers, 
 }
 
 function DocInput({ field, value, onChange, civilians, officers, DATA_FONT }) {
-  const base = {
-    width: '100%',
-    background: 'transparent',
-    border: 'none',
-    outline: 'none',
-    color: '#0a0a1a',
-    fontSize: '13px',
-    fontFamily: DATA_FONT,
-    padding: 0,
-    boxSizing: 'border-box',
-  };
+  const base = { width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#0a0a1a', fontSize: '13px', fontFamily: DATA_FONT, padding: 0, boxSizing: 'border-box' };
 
   if (field.type === 'textarea')
     return <textarea value={value} onChange={e => onChange(e.target.value)} required={field.required} rows={5} style={{ ...base, resize: 'vertical', lineHeight: '1.8', minHeight: '76px', width: '100%' }} />;
@@ -408,9 +399,7 @@ function DocInput({ field, value, onChange, civilians, officers, DATA_FONT }) {
   return <input value={value} onChange={e => onChange(e.target.value)} style={base} />;
 }
 
-/* ════════════════════════════════════════════════════
-   TEMPLATE BUILDER
-════════════════════════════════════════════════════ */
+/* ════════════ TEMPLATE BUILDER ════════════ */
 function TemplateBuilder({ reportTemplates, dispatch }) {
   const { isMobile } = useResponsive();
   const [tpl, setTpl] = useState({ name: '', fields: [] });
@@ -441,63 +430,61 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
     setTpl({ name: '', fields: [] });
   };
 
-  const base = { background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '8px 10px', fontSize: '15px', width: '100%', boxSizing: 'border-box' };
-
   return (
-    <div style={{ marginTop: '18px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '18px' }}>
+    <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
       <div>
-        <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>EXISTING TEMPLATES</div>
+        <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>EXISTING TEMPLATES</div>
         {reportTemplates.map(t => (
-          <div key={t.id} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '10px 14px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '16px' }}>
+          <div key={t.id} style={{ background: '#090b10', border: '1px solid #1e2533', padding: '9px 12px', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
             <div>
-              <span style={{ color: '#e2e8f0' }}>{t.name}</span>
-              <span style={{ color: '#475569', marginLeft: '10px', fontSize: '14px' }}>{t.fields.length} fields</span>
+              <span style={{ color: '#d1d5db' }}>{t.name}</span>
+              <span style={{ color: '#374151', marginLeft: '10px', fontSize: '11px' }}>{t.fields.length} fields</span>
             </div>
-            <button onClick={() => setTpl({ ...t })} style={smallBtn('#1e4080','#4a9eff')}>Edit</button>
+            <button onClick={() => setTpl({ ...t })} style={aBtn('#0c1a2e','#3b82f6')}>Edit</button>
           </div>
         ))}
       </div>
       <div>
-        <div style={{ color: '#e2a84b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
-        <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>{tpl.id ? 'EDIT TEMPLATE' : 'NEW TEMPLATE'}</div>
+        <div style={{ background: '#090b10', border: '1px solid #1e2533', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
-            <label style={{ color: '#7a9ab8', fontSize: '14px', display: 'block', marginBottom: '5px' }}>TEMPLATE NAME</label>
-            <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} style={base} />
+            <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>TEMPLATE NAME</label>
+            <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} style={inputBase} />
           </div>
           <div>
-            <div style={{ color: '#7a9ab8', fontSize: '14px', marginBottom: '8px' }}>FIELDS ({tpl.fields.length})</div>
+            <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', marginBottom: '6px' }}>FIELDS ({tpl.fields.length})</div>
             {tpl.fields.map((f, idx) => (
-              <div key={f.id} style={{ background: '#060d1a', border: '1px solid #1e3060', borderRadius: '4px', padding: '8px 10px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px' }}>
-                <span style={{ color: '#64748b' }}>{idx + 1}.</span>
-                <span style={{ color: '#e2e8f0', flex: 1 }}>{f.label}</span>
-                <span style={{ color: '#4a9eff', fontSize: '12px' }}>[{f.type}]</span>
-                {f.required && <span style={{ color: '#ef4444', fontSize: '12px' }}>*</span>}
-                <button onClick={() => moveField(idx, -1)} style={sBtn()}>↑</button>
-                <button onClick={() => moveField(idx, 1)} style={sBtn()}>↓</button>
-                <button onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} style={{ ...sBtn(), background: '#7f1d1d', color: '#ef4444', border: '1px solid #ef4444' }}>✕</button>
+              <div key={f.id} style={{ background: '#0d1117', border: '1px solid #1f2937', padding: '7px 10px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+                <span style={{ color: '#374151' }}>{idx + 1}.</span>
+                <span style={{ color: '#d1d5db', flex: 1 }}>{f.label}</span>
+                <span style={{ color: '#3b82f6', fontSize: '10px' }}>[{f.type}]</span>
+                {f.required && <span style={{ color: '#ef4444', fontSize: '10px' }}>*</span>}
+                <button onClick={() => moveField(idx, -1)} style={sBtn}>^</button>
+                <button onClick={() => moveField(idx, 1)} style={sBtn}>v</button>
+                <button onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} style={{ ...sBtn, background: '#450a0a', color: '#ef4444', border: '1px solid #991b1b' }}>X</button>
               </div>
             ))}
           </div>
-          <div style={{ background: '#060d1a', border: '1px dashed #1e4080', borderRadius: '4px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div style={{ color: '#7a9ab8', fontSize: '14px' }}>ADD FIELD</div>
+          <div style={{ background: '#0d1117', border: '1px dashed #1e2533', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px' }}>ADD FIELD</div>
             <div style={{ display: 'flex', gap: '6px' }}>
-              <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label" style={{ ...base, flex: 2 }} />
-              <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))} style={{ ...base, flex: 1 }}>
+              <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label" style={{ ...inputBase, flex: 2 }} />
+              <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))} style={{ ...inputBase, flex: 1 }}>
                 {['text','textarea','dropdown','checkbox','date','datetime','badge_lookup','civilian_lookup'].map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             {newField.type === 'dropdown' && (
-              <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)" style={base} />
+              <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)" style={inputBase} />
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '15px', cursor: 'pointer' }}>
-                <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} style={{ accentColor: '#4a9eff' }} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '13px', cursor: 'pointer' }}>
+                <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} style={{ accentColor: '#3b82f6' }} />
                 Required
               </label>
-              <button onClick={addField} style={{ ...smallBtn('#1e4080','#4a9eff'), padding: '6px 14px', marginLeft: 'auto' }}>+ Add Field</button>
+              <button onClick={addField} style={{ ...blueBtn, marginLeft: 'auto', fontSize: '11px', padding: '4px 10px' }}>+ Add Field</button>
             </div>
           </div>
-          <button onClick={handleSave} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '10px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={handleSave} style={{ ...blueBtn, padding: '9px', fontSize: '13px', letterSpacing: '1px', width: '100%', textAlign: 'center' }}>
             SAVE TEMPLATE
           </button>
         </div>
@@ -509,23 +496,23 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
 function ReviewQueue({ reports, dispatch }) {
   const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
   return (
-    <div style={{ marginTop: '18px' }}>
-      <div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700, letterSpacing: '1px', marginBottom: '14px' }}>SUPERVISOR REVIEW QUEUE • {pending.length} pending</div>
-      {pending.length === 0 && <div style={{ color: '#334155', fontSize: '16px' }}>No reports pending review.</div>}
+    <div style={{ marginTop: '14px' }}>
+      <div style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px' }}>SUPERVISOR REVIEW QUEUE — {pending.length} pending</div>
+      {pending.length === 0 && <div style={{ color: '#374151', fontSize: '14px' }}>No reports pending review.</div>}
       {pending.map(r => (
-        <div key={r.id} style={{ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '4px', padding: '14px', marginBottom: '10px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div key={r.id} style={{ background: '#090b10', border: '1px solid #1e2533', padding: '12px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <div>
-              <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '16px' }}>{r.caseNumber}</span>
-              <span style={{ color: '#94a3b8', marginLeft: '12px', fontSize: '15px' }}>{r.type}</span>
-              <span style={{ color: '#64748b', marginLeft: '12px', fontSize: '14px' }}>Officer: {r.officerBadge}</span>
+              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px' }}>{r.caseNumber}</span>
+              <span style={{ color: '#9ca3af', marginLeft: '12px', fontSize: '12px' }}>{r.type}</span>
+              <span style={{ color: '#4b5563', marginLeft: '12px', fontSize: '11px' }}>Officer: {r.officerBadge}</span>
             </div>
             <StatusBadge status={r.status} />
           </div>
-          <div style={{ color: '#64748b', fontSize: '15px', marginBottom: '10px' }}>{r.summary}</div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Approved' } })} style={{ ...smallBtn('#14532d','#22c55e'), padding: '7px 16px' }}>✓ Approve</button>
-            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Denied' } })} style={{ ...smallBtn('#7f1d1d','#ef4444'), padding: '7px 16px' }}>✗ Deny</button>
+          <div style={{ color: '#4b5563', fontSize: '12px', marginBottom: '8px' }}>{r.summary}</div>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Approved' } })} style={{ ...aBtn('#052e16','#22c55e'), padding: '5px 14px' }}>Approve</button>
+            <button onClick={() => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: 'Denied' } })} style={{ ...aBtn('#450a0a','#ef4444'), padding: '5px 14px' }}>Deny</button>
           </div>
         </div>
       ))}
@@ -533,13 +520,13 @@ function ReviewQueue({ reports, dispatch }) {
   );
 }
 
-/* ── Shared UI helpers ── */
+/* Shared UI helpers */
 function TabBar({ tabs, active, setActive }) {
   const labels = { submitted: 'Submitted Reports', create: 'Create Report', builder: 'Form Builder', review: 'Review Queue' };
   return (
-    <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060' }}>
+    <div className="tab-scroll" style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937' }}>
       {tabs.map(t => (
-        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0d2545' : 'transparent', border: active === t ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: active === t ? '#4a9eff' : '#64748b', padding: '8px 16px', fontSize: '15px', cursor: 'pointer' }}>
+        <button key={t} onClick={() => setActive(t)} style={{ background: active === t ? '#0f172a' : 'transparent', border: active === t ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: active === t ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
           {labels[t] || t}
         </button>
       ))}
@@ -549,9 +536,9 @@ function TabBar({ tabs, active, setActive }) {
 
 function StatusSummary({ label, count, color }) {
   return (
-    <div style={{ background: '#0d1f3c', border: `1px solid ${color}30`, borderRadius: '5px', padding: '8px 16px', textAlign: 'center', minWidth: '80px' }}>
-      <div style={{ color, fontSize: '22px', fontWeight: 700 }}>{count}</div>
-      <div style={{ color: '#64748b', fontSize: '12px' }}>{label}</div>
+    <div style={{ background: '#090b10', border: `1px solid ${color}25`, padding: '7px 14px', textAlign: 'center', minWidth: '70px' }}>
+      <div style={{ color, fontSize: '20px', fontWeight: 700 }}>{count}</div>
+      <div style={{ color: '#4b5563', fontSize: '11px' }}>{label}</div>
     </div>
   );
 }
@@ -559,19 +546,19 @@ function StatusSummary({ label, count, color }) {
 function FieldRow({ label, value }) {
   return (
     <div style={{ display: 'flex', gap: '10px' }}>
-      <span style={{ color: '#4a9eff', fontSize: '14px', minWidth: '80px' }}>{label}:</span>
-      <span style={{ color: '#94a3b8', fontSize: '15px' }}>{value}</span>
+      <span style={{ color: '#3b82f6', fontSize: '12px', minWidth: '70px' }}>{label}:</span>
+      <span style={{ color: '#9ca3af', fontSize: '13px' }}>{value}</span>
     </div>
   );
 }
 
 function Modal({ title, onClose, children }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '8px', padding: '26px', maxWidth: '560px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-          <span style={{ color: '#4a9eff', fontWeight: 700, fontSize: '15px' }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '20px' }}>✕</button>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '540px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace' }}>{title}</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '18px' }}>X</button>
         </div>
         {children}
       </div>
@@ -579,6 +566,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-const smallBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '4px', color, padding: '5px 12px', fontSize: '14px', cursor: 'pointer', fontWeight: 600 });
-const cadBtn = (bg, color) => ({ background: bg, border: `1px solid ${color}`, borderRadius: '3px', color, padding: '5px 12px', fontSize: '13px', cursor: 'pointer', fontWeight: 600, fontFamily: 'Ubuntu Mono, monospace' });
-const sBtn = () => ({ background: '#0a1525', border: '1px solid #1e3060', borderRadius: '3px', color: '#64748b', padding: '2px 7px', fontSize: '12px', cursor: 'pointer' });
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 700 };
+const aBtn = (bg, c) => ({ background: bg, border: `1px solid ${c}`, color: c, padding: '4px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 });
+const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };

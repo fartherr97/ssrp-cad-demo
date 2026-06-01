@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
@@ -16,88 +16,93 @@ export default function OfficerProfile() {
   const { isMobile } = useResponsive();
 
   if (!myOfficer) return (
-    <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', color: '#334155', textAlign: 'center' }}>
+    <div style={{ padding: '32px', fontFamily: 'Ubuntu Mono, monospace', color: '#4b5563', textAlign: 'center' }}>
       No officer profile found for current session.
     </div>
   );
 
   const commendations = [
     { id: 1, type: 'Commendation', date: '2023-09-15', from: 'Lt. Commander', note: 'Outstanding work on the Washington arrest. Demonstrated excellent tactical judgment.' },
-    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award • monthly food drive coordination.' },
+    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award — monthly food drive coordination.' },
   ];
   const complaints = [];
+
+  const initials = myOfficer.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  const accentColor = myDept?.color || '#3b82f6';
 
   return (
     <div style={{ padding: '16px', fontFamily: 'Ubuntu Mono, monospace', maxWidth: '900px' }}>
       {/* Profile header */}
-      <div style={{ background: `linear-gradient(135deg, #0d1f3c, ${myDept?.color || '#1e4080'}20)`, border: `1px solid ${myDept?.color || '#1e4080'}`, borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '64px', height: '64px', background: '#0a1a35', border: `2px solid ${myDept?.color || '#4a9eff'}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
-            👮
+      <div style={{ background: '#0d1117', border: `1px solid ${accentColor}40`, borderLeft: `3px solid ${accentColor}`, padding: '16px 20px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '56px', height: '56px', background: '#090b10', border: `2px solid ${accentColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: accentColor, flexShrink: 0, letterSpacing: '1px' }}>
+            {initials}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700 }}>{myOfficer.name}</div>
-            <div style={{ color: '#94a3b8', fontSize: '15px', marginTop: '4px' }}>
-              {myOfficer.rank} • {myDept?.name || 'Unknown Department'}
+            <div style={{ color: '#f9fafb', fontSize: '18px', fontWeight: 700, letterSpacing: '0.5px' }}>{myOfficer.name}</div>
+            <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '3px' }}>
+              {myOfficer.rank} &bull; {myDept?.name || 'Unknown Department'}
             </div>
-            <div style={{ color: '#64748b', fontSize: '14px', marginTop: '2px' }}>
-              Badge: <span style={{ color: '#60a5fa' }}>{myOfficer.badge}</span> • Unit: <span style={{ color: '#60a5fa' }}>{myOfficer.unitId}</span> • {myOfficer.subdivision}
+            <div style={{ color: '#4b5563', fontSize: '12px', marginTop: '2px' }}>
+              Badge: <span style={{ color: '#60a5fa' }}>{myOfficer.badge}</span>
+              &nbsp;&bull;&nbsp;Unit: <span style={{ color: '#60a5fa' }}>{myOfficer.unitId}</span>
+              &nbsp;&bull;&nbsp;{myOfficer.subdivision}
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <StatusBadge status={myOfficer.status} style={{ fontSize: '15px', padding: '4px 12px' }} />
-            {myOfficer.callId && <div style={{ color: '#f59e0b', fontSize: '14px', marginTop: '6px' }}>On Call: {myOfficer.callId}</div>}
+            <StatusBadge status={myOfficer.status} style={{ fontSize: '13px', padding: '4px 10px' }} />
+            {myOfficer.callId && <div style={{ color: '#fbbf24', fontSize: '12px', marginTop: '6px' }}>On Call: {myOfficer.callId}</div>}
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '10px', marginTop: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px', marginTop: '14px' }}>
           {[
             { label: 'Reports Filed', val: myReports.length },
             { label: 'Calls Attended', val: myCallHistory.length },
             { label: 'Commendations', val: commendations.length },
             { label: 'Complaints', val: complaints.length },
           ].map(s => (
-            <div key={s.label} style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '4px', padding: '8px 12px' }}>
-              <div style={{ color: '#f1f5f9', fontSize: '18px', fontWeight: 700 }}>{s.val}</div>
-              <div style={{ color: '#64748b', fontSize: '11px' }}>{s.label}</div>
+            <div key={s.label} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '8px 12px' }}>
+              <div style={{ color: '#f9fafb', fontSize: '18px', fontWeight: 700 }}>{s.val}</div>
+              <div style={{ color: '#4b5563', fontSize: '11px', marginTop: '1px' }}>{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1e3060', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px' }}>
         {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0d2545' : 'transparent', border: tab === k ? '1px solid #4a9eff' : '1px solid transparent', borderBottom: 'none', borderRadius: '4px 4px 0 0', color: tab === k ? '#4a9eff' : '#64748b', padding: '7px 14px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
+          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0f172a' : 'transparent', border: tab === k ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: tab === k ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', letterSpacing: '0.5px' }}>
             {l}
           </button>
         ))}
       </div>
 
       {tab === 'info' && (
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
-          <InfoCard title="ASSIGNMENT">
-            {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '•']].map(([k,v]) => (
-              <InfoRow key={k} label={k} value={v || '•'} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+          <InfoCard title="ASSIGNMENT" accentColor={accentColor}>
+            {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '—']].map(([k,v]) => (
+              <InfoRow key={k} label={k} value={v || '—'} />
             ))}
           </InfoCard>
-          <InfoCard title="TRANSFER REQUEST">
+          <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
             {!requestingTransfer ? (
               <div>
-                <div style={{ color: '#64748b', fontSize: '14px', marginBottom: '12px' }}>Current subdivision: <span style={{ color: '#94a3b8' }}>{myOfficer.subdivision}</span></div>
-                <button onClick={() => setRequestingTransfer(true)} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '8px 14px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>
+                <div style={{ color: '#4b5563', fontSize: '13px', marginBottom: '12px' }}>Current subdivision: <span style={{ color: '#9ca3af' }}>{myOfficer.subdivision}</span></div>
+                <button onClick={() => setRequestingTransfer(true)} style={blueBtn}>
                   Request Transfer
                 </button>
               </div>
             ) : (
               <div>
-                <div style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '8px' }}>REQUESTED SUBDIVISION</div>
-                <select style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box', marginBottom: '8px' }}>
+                <div style={{ color: '#9ca3af', fontSize: '11px', letterSpacing: '1px', marginBottom: '6px' }}>REQUESTED SUBDIVISION</div>
+                <select style={{ ...inputBase, marginBottom: '8px' }}>
                   {(myDept?.subdivisions || []).map(s => <option key={s}>{s}</option>)}
                 </select>
-                <textarea value={transferNote} onChange={e => setTransferNote(e.target.value)} placeholder="Reason for transfer request..." rows={3} style={{ background: '#060d1a', border: '1px solid #1e4080', borderRadius: '4px', color: '#e2e8f0', padding: '7px 10px', fontSize: '14px', fontFamily: 'Ubuntu Mono, monospace', width: '100%', boxSizing: 'border-box', resize: 'vertical', marginBottom: '8px' }} />
+                <textarea value={transferNote} onChange={e => setTransferNote(e.target.value)} placeholder="Reason for transfer request..." rows={3} style={{ ...inputBase, resize: 'vertical', marginBottom: '8px' }} />
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => { alert('Transfer request submitted!'); setRequestingTransfer(false); }} style={{ background: '#1e4080', border: '1px solid #4a9eff', borderRadius: '4px', color: '#4a9eff', padding: '7px 12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Submit</button>
-                  <button onClick={() => setRequestingTransfer(false)} style={{ background: 'transparent', border: '1px solid #1e3060', borderRadius: '4px', color: '#64748b', padding: '7px 12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' }}>Cancel</button>
+                  <button onClick={() => { alert('Transfer request submitted!'); setRequestingTransfer(false); }} style={blueBtn}>Submit</button>
+                  <button onClick={() => setRequestingTransfer(false)} style={ghostBtn}>Cancel</button>
                 </div>
               </div>
             )}
@@ -106,68 +111,62 @@ export default function OfficerProfile() {
       )}
 
       {tab === 'reports' && (
-        <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ background: '#0a1a35' }}>
-              {['Case #','Type','Date','Status','Call'].map(h => (
-                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '12px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+        <div className="table-scroll">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <THead cols={['Case #','Type','Date','Status','Call']} />
+            <tbody>
+              {myReports.map((r, i) => (
+                <tr key={r.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
+                  <TD blue>{r.caseNumber}</TD>
+                  <TD>{r.type}</TD>
+                  <TD muted>{r.date}</TD>
+                  <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
+                  <TD blue>{r.callId || '—'}</TD>
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {myReports.map((r, i) => (
-              <tr key={r.id} style={{ background: i % 2 === 0 ? '#080f1e' : '#0a1525' }}>
-                <td style={{ padding: '7px 10px', color: '#60a5fa', fontWeight: 700 }}>{r.caseNumber}</td>
-                <td style={{ padding: '7px 10px', color: '#e2e8f0' }}>{r.type}</td>
-                <td style={{ padding: '7px 10px', color: '#475569' }}>{r.date}</td>
-                <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#60a5fa' }}>{r.callId || '•'}</td>
-              </tr>
-            ))}
-            {myReports.length === 0 && <tr><td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#334155' }}>No reports filed.</td></tr>}
-          </tbody>
-        </table></div>
+              {myReports.length === 0 && <tr><td colSpan={5} style={{ padding: '18px', textAlign: 'center', color: '#374151' }}>No reports filed.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {tab === 'calls' && (
-        <div className="table-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ background: '#0a1a35' }}>
-              {['Call #','Nature','Location','Priority','Status','Time'].map(h => (
-                <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#7a9ab8', fontSize: '12px', fontWeight: 700, borderBottom: '1px solid #1e4080' }}>{h}</th>
+        <div className="table-scroll">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <THead cols={['Call #','Nature','Location','Priority','Status','Time']} />
+            <tbody>
+              {myCallHistory.map((c, i) => (
+                <tr key={c.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
+                  <TD blue>{c.id}</TD>
+                  <TD>{c.nature}</TD>
+                  <TD muted>{c.location}</TD>
+                  <td style={{ padding: '7px 10px' }}>
+                    <span style={{ color: ['#dc2626','#ea580c','#ca8a04'][c.priority - 1] || '#d1d5db', fontWeight: 700, fontSize: '12px' }}>P{c.priority}</span>
+                  </td>
+                  <td style={{ padding: '7px 10px' }}><StatusBadge status={c.status} /></td>
+                  <TD muted small>{c.timestamp}</TD>
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {myCallHistory.map((c, i) => (
-              <tr key={c.id} style={{ background: i % 2 === 0 ? '#080f1e' : '#0a1525' }}>
-                <td style={{ padding: '7px 10px', color: '#60a5fa', fontWeight: 700 }}>{c.id}</td>
-                <td style={{ padding: '7px 10px', color: '#e2e8f0' }}>{c.nature}</td>
-                <td style={{ padding: '7px 10px', color: '#94a3b8' }}>{c.location}</td>
-                <td style={{ padding: '7px 10px' }}><span style={{ color: ['#ef4444','#f59e0b','#22c55e'][c.priority - 1] || '#fff', fontWeight: 700 }}>P{c.priority}</span></td>
-                <td style={{ padding: '7px 10px' }}><StatusBadge status={c.status} /></td>
-                <td style={{ padding: '7px 10px', color: '#475569', fontSize: '12px' }}>{c.timestamp}</td>
-              </tr>
-            ))}
-            {myCallHistory.length === 0 && <tr><td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#334155' }}>No call history.</td></tr>}
-          </tbody>
-        </table></div>
+              {myCallHistory.length === 0 && <tr><td colSpan={6} style={{ padding: '18px', textAlign: 'center', color: '#374151' }}>No call history.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {tab === 'commendations' && (
         <div>
           {commendations.map(c => (
-            <div key={c.id} style={{ background: '#051a05', border: '1px solid #22c55e', borderRadius: '4px', padding: '14px', marginBottom: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '14px' }}>★ {c.type}</span>
-                <span style={{ color: '#475569', fontSize: '12px' }}>{c.date}</span>
+            <div key={c.id} style={{ background: '#051a05', border: '1px solid #166534', borderLeft: '3px solid #22c55e', padding: '14px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '13px' }}>{c.type.toUpperCase()}</span>
+                <span style={{ color: '#4b5563', fontSize: '11px' }}>{c.date}</span>
               </div>
-              <div style={{ color: '#64748b', fontSize: '12px', marginBottom: '4px' }}>From: {c.from}</div>
-              <div style={{ color: '#94a3b8', fontSize: '14px' }}>{c.note}</div>
+              <div style={{ color: '#4b5563', fontSize: '11px', letterSpacing: '0.5px', marginBottom: '4px' }}>FROM: {c.from.toUpperCase()}</div>
+              <div style={{ color: '#9ca3af', fontSize: '13px', lineHeight: 1.5 }}>{c.note}</div>
             </div>
           ))}
           {complaints.length === 0 && commendations.length > 0 && (
-            <div style={{ color: '#22c55e', fontSize: '14px', marginTop: '12px' }}>✓ No complaints on record.</div>
+            <div style={{ color: '#166534', fontSize: '13px', marginTop: '10px', background: '#051a05', border: '1px solid #166534', padding: '8px 12px' }}>NO COMPLAINTS ON RECORD</div>
           )}
         </div>
       )}
@@ -175,10 +174,10 @@ export default function OfficerProfile() {
   );
 }
 
-function InfoCard({ title, children }) {
+function InfoCard({ title, accentColor, children }) {
   return (
-    <div style={{ background: '#0d1f3c', border: '1px solid #1e4080', borderRadius: '6px', padding: '16px' }}>
-      <div style={{ color: '#4a9eff', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px', borderBottom: '1px solid #1e3060', paddingBottom: '6px' }}>{title}</div>
+    <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px 16px' }}>
+      <div style={{ color: accentColor || '#3b82f6', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', borderBottom: '1px solid #1f2937', paddingBottom: '6px' }}>{title}</div>
       {children}
     </div>
   );
@@ -186,9 +185,33 @@ function InfoCard({ title, children }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
-      <span style={{ color: '#64748b' }}>{label}</span>
-      <span style={{ color: '#e2e8f0' }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px', fontSize: '13px' }}>
+      <span style={{ color: '#4b5563' }}>{label}</span>
+      <span style={{ color: '#d1d5db' }}>{value}</span>
     </div>
   );
 }
+
+function THead({ cols }) {
+  return (
+    <thead>
+      <tr style={{ background: '#0b0d14' }}>
+        {cols.map(h => (
+          <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533', whiteSpace: 'nowrap' }}>{h}</th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+function TD({ children, blue, muted, small }) {
+  return (
+    <td style={{ padding: '7px 10px', color: blue ? '#60a5fa' : muted ? '#6b7280' : '#d1d5db', fontWeight: blue ? 700 : 400, fontSize: small ? '11px' : '13px' }}>
+      {children}
+    </td>
+  );
+}
+
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu Mono, monospace', boxSizing: 'border-box' };
+const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace', fontWeight: 600 };
+const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu Mono, monospace' };

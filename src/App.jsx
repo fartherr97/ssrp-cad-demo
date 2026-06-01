@@ -57,7 +57,7 @@ function CADApp() {
     <div style={{ minHeight: '100vh', color: '#dce6f5', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
       <RadioToast />
-      <div style={{ paddingTop: isMobile ? '50px' : '102px', flex: 1 }}>
+      <div style={{ paddingTop: '42px', paddingBottom: '28px', flex: 1 }}>
         {pages[currentPage] || <DispatchBoard />}
       </div>
       <Footer />

@@ -2,166 +2,144 @@ import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
-const MONO = 'Ubuntu Mono, monospace';
+const MONO = "'Ubuntu Mono', monospace";
 
-const PRIORITY_COLORS = { 1: '#e5484d', 2: '#f0883e', 3: '#f5b740', 4: '#46c971' };
+const PR_COLOR = { 1: '#dc2626', 2: '#ea580c', 3: '#ca8a04', 4: '#16a34a' };
+const PR_BG    = { 1: '#450a0a', 2: '#431407', 3: '#422006', 4: '#052e16' };
 
-// Maps a unit status to a row "tone" used to color-code the roster the way a
-// real CAD does: available=green, en route=gold, on-scene=purple, busy=orange,
-// unavailable=red, off-duty=gray.
 const UNIT_TONE = {
-  AVAILABLE: { text: '#46c971', bar: '#46c971', tint: 'rgba(70, 201, 113, 0.06)' },
-  ENRT: { text: '#f5b740', bar: '#f5b740', tint: 'rgba(245, 183, 64, 0.07)' },
-  ARRVD: { text: '#c66cf0', bar: '#c66cf0', tint: 'rgba(198, 108, 240, 0.07)' },
-  ONSCENE: { text: '#c66cf0', bar: '#c66cf0', tint: 'rgba(198, 108, 240, 0.07)' },
-  BUSY: { text: '#f0883e', bar: '#f0883e', tint: 'rgba(240, 136, 62, 0.06)' },
-  UNAVAILABLE: { text: '#e5484d', bar: '#e5484d', tint: 'rgba(229, 72, 77, 0.06)' },
-  OFFDUTY: { text: '#6b7280', bar: '#33415a', tint: 'transparent' },
+  AVAILABLE:   { text: '#4ade80',  bar: '#16a34a',  bg: 'rgba(22,163,74,0.04)' },
+  ENRT:        { text: '#fbbf24',  bar: '#d97706',  bg: 'rgba(217,119,6,0.05)' },
+  ARRVD:       { text: '#c084fc',  bar: '#9333ea',  bg: 'rgba(147,51,234,0.05)' },
+  ONSCENE:     { text: '#c084fc',  bar: '#9333ea',  bg: 'rgba(147,51,234,0.05)' },
+  BUSY:        { text: '#fb923c',  bar: '#ea580c',  bg: 'rgba(234,88,12,0.05)' },
+  UNAVAILABLE: { text: '#f87171',  bar: '#dc2626',  bg: 'rgba(220,38,38,0.05)' },
+  OFFDUTY:     { text: '#374151',  bar: '#1f2937',  bg: 'transparent' },
 };
-const toneFor = (status) => UNIT_TONE[status] || UNIT_TONE.AVAILABLE;
+const tone = s => UNIT_TONE[s] || UNIT_TONE.AVAILABLE;
 
-function useClock() {
+function useTick() {
   const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   const d = new Date(now);
-  const p = (n) => String(n).padStart(2, '0');
-  return { clock: `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`, now };
+  const p = n => String(n).padStart(2, '0');
+  return { now, clock: `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}` };
 }
 
-// mm:ss for the first hour, then h:mm:ss, since the call was created.
-function fmtElapsed(fromMs, nowMs) {
+function elapsed(fromMs, nowMs) {
   if (!fromMs) return '--:--';
-  const total = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  const p = (n) => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+  const s = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sc = s % 60;
+  const p = n => String(n).padStart(2, '0');
+  return h > 0 ? `${h}:${p(m)}:${p(sc)}` : `${p(m)}:${p(sc)}`;
 }
 
-// Unassigned calls escalate amber (5m) then red (10m) so officers can triage.
-function elapsedTone(fromMs, nowMs, hasUnits) {
-  if (!fromMs) return '#5f779b';
-  const mins = (nowMs - fromMs) / 60000;
-  if (!hasUnits && mins >= 10) return '#e5484d';
-  if (!hasUnits && mins >= 5) return '#f0883e';
-  return '#7aa0cc';
+function elapsedColor(from, now, hasUnits) {
+  if (!from) return '#374151';
+  const mins = (now - from) / 60000;
+  if (!hasUnits && mins >= 10) return '#dc2626';
+  if (!hasUnits && mins >= 5)  return '#ea580c';
+  return '#374151';
 }
+
+const STATUSES = ['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'];
 
 export default function DispatchBoard() {
   const { state, dispatch } = useCAD();
   const { calls, officers, currentUser, myCallId } = state;
   const [selectedCall, setSelectedCall] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const { clock, now } = useClock();
+  const [filter, setFilter] = useState('ALL');
+  const { clock, now } = useTick();
 
-  // Fire/rescue incidents live on the HCFR board; the police board hides them.
-  const activeCalls = calls.filter((c) => c.status !== 'CLOSED' && c.category !== 'fire');
-  const filteredCalls =
-    statusFilter === 'ALL' ? activeCalls : activeCalls.filter((c) => c.status === statusFilter);
-  const myOfficer = officers.find((o) => o.id === currentUser?.id);
-  const onDuty = officers.filter((o) => o.status !== 'OFFDUTY');
-  const availableCount = officers.filter((o) => o.status === 'AVAILABLE').length;
+  const activeCalls = calls.filter(c => c.status !== 'CLOSED' && c.category !== 'fire');
+  const filtered    = filter === 'ALL' ? activeCalls : activeCalls.filter(c => c.status === filter);
+  const myOfficer   = officers.find(o => o.id === currentUser?.id);
+  const onDuty      = officers.filter(o => o.status !== 'OFFDUTY');
+  const available   = officers.filter(o => o.status === 'AVAILABLE');
+  const pending     = activeCalls.filter(c => c.units.length === 0).length;
 
-  const handleAssignSelf = (callId) => {
-    if (!currentUser) return;
-    const unitId = myOfficer?.unitId;
-    dispatch({ type: 'ASSIGN_UNIT', payload: { callId, unitId } });
-    dispatch({ type: 'SET_MY_CALL', payload: callId });
-    dispatch({ type: 'SET_STATUS', payload: 'ENRT' });
+  const assignSelf = callId => {
+    if (!myOfficer) return;
+    dispatch({ type: 'ASSIGN_UNIT',  payload: { callId, unitId: myOfficer.unitId } });
+    dispatch({ type: 'SET_MY_CALL',  payload: callId });
+    dispatch({ type: 'SET_STATUS',   payload: 'ENRT' });
   };
-
-  const handleClose = (callId) => {
+  const closeCall = callId => {
     dispatch({ type: 'CLOSE_CALL', payload: callId });
     if (myCallId === callId) {
       dispatch({ type: 'SET_MY_CALL', payload: null });
-      dispatch({ type: 'SET_STATUS', payload: 'AVAILABLE' });
+      dispatch({ type: 'SET_STATUS',  payload: 'AVAILABLE' });
     }
+    if (selectedCall?.id === callId) setSelectedCall(null);
   };
 
   return (
-    <div style={{ padding: '12px 14px 28px', fontFamily: MONO }}>
-      {/* ── Dispatch status bar (ImperialCAD-style) ── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '10px',
-          padding: '8px 14px',
-          marginBottom: '14px',
-          background: 'linear-gradient(180deg, #26282e, #15161a)',
-          border: '1px solid #2e3138',
-          borderRadius: '6px',
-          boxShadow: '0 6px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)',
-        }}
-      >
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px', color: '#46c971' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#46c971', boxShadow: '0 0 6px #46c971', animation: 'cadPulse 1.6s ease-in-out infinite' }} />
-          CONNECTED
-        </span>
-        <Divider />
-        <span style={{ color: '#93a6c4', fontSize: '12px' }}>
-          DISPATCH: <span style={{ color: '#dce6f5' }}>{currentUser?.name || '—'}</span>
-        </span>
-        <Divider />
-        <span style={{ color: '#93a6c4', fontSize: '12px' }}>
-          CALLS <span style={{ color: '#f5b740', fontWeight: 700 }}>{activeCalls.length}</span>
-        </span>
-        <span style={{ color: '#93a6c4', fontSize: '12px' }}>
-          ON-DUTY <span style={{ color: '#46c971', fontWeight: 700 }}>{onDuty.length}</span>
-        </span>
-        <span style={{ color: '#93a6c4', fontSize: '12px' }}>
-          AVAIL <span style={{ color: '#4aa3ff', fontWeight: 700 }}>{availableCount}</span>
-        </span>
-        <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#dce6f5', fontWeight: 700, fontSize: '14px', letterSpacing: '0.5px' }}>
-          <span style={{ color: '#5f779b', fontSize: '11px', fontWeight: 400 }}>AOP</span>
+    <div style={{ padding: '10px 12px 16px', fontFamily: MONO }}>
+
+      {/* ── Status bar ── */}
+      <div style={{
+        background: '#0d1117',
+        border: '1px solid #1a1e2c',
+        borderLeft: '3px solid #1d4ed8',
+        borderRadius: '3px',
+        padding: '6px 12px',
+        marginBottom: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        flexWrap: 'wrap',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
+          <span style={{ color: '#22c55e', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px' }}>CONNECTED</span>
+        </div>
+        <Pipe />
+        <StatItem label="OPERATOR"    value={currentUser?.name || '—'} color="#e2e8f0" />
+        <Pipe />
+        <StatItem label="CALLS"       value={activeCalls.length}        color="#fbbf24" />
+        <StatItem label="UNASSIGNED"  value={pending}                   color={pending > 0 ? '#f87171' : '#374151'} />
+        <StatItem label="ON-DUTY"     value={onDuty.length}             color="#4ade80" />
+        <StatItem label="AVAILABLE"   value={available.length}          color="#93c5fd" />
+        <div style={{ marginLeft: 'auto', color: '#1d4ed8', fontWeight: 700, fontSize: '14px', letterSpacing: '0.5px' }}>
           {clock}
-        </span>
+        </div>
       </div>
 
       {/* ── Controls row ── */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ color: '#93a6c4', fontSize: '13px', marginRight: '2px', letterSpacing: '0.5px' }}>MY STATUS:</span>
-        {['AVAILABLE', 'BUSY', 'UNAVAILABLE', 'OFFDUTY'].map((s) => {
-          const active = myOfficer?.status === s;
-          const tone = toneFor(s);
-          return (
-            <button
-              key={s}
-              onClick={() => dispatch({ type: 'SET_STATUS', payload: s })}
-              style={{
-                background: active ? 'rgba(47,129,247,0.16)' : '#15161a',
-                border: `1px solid ${active ? tone.bar : '#2e3138'}`,
-                borderRadius: '4px',
-                color: active ? tone.text : '#93a6c4',
-                padding: '5px 13px',
-                fontSize: '13px',
-                fontFamily: MONO,
-                fontWeight: 600,
-                letterSpacing: '0.4px',
-              }}
-            >
-              {s}
-            </button>
-          );
-        })}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-          {['ALL', 'ACTIVE', 'PENDING', 'ENRT'].map((f) => (
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <span style={{ color: '#374151', fontSize: '11px', letterSpacing: '0.5px', marginRight: '2px' }}>MY STATUS:</span>
+        {STATUSES.map(s => (
+          <button
+            key={s}
+            onClick={() => dispatch({ type: 'SET_STATUS', payload: s })}
+            style={{
+              background: myOfficer?.status === s ? tone(s).bg : 'transparent',
+              border: `1px solid ${myOfficer?.status === s ? tone(s).bar : '#1a1e2c'}`,
+              borderRadius: '3px',
+              color: myOfficer?.status === s ? tone(s).text : '#374151',
+              padding: '4px 10px',
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.4px',
+              cursor: 'pointer',
+            }}
+          >
+            {s}
+          </button>
+        ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+          {['ALL', 'ACTIVE', 'PENDING', 'ENRT'].map(f => (
             <button
               key={f}
-              onClick={() => setStatusFilter(f)}
+              onClick={() => setFilter(f)}
               style={{
-                background: statusFilter === f ? 'rgba(47,129,247,0.16)' : '#15161a',
-                border: `1px solid ${statusFilter === f ? '#2f81f7' : '#2e3138'}`,
-                borderRadius: '4px',
-                color: statusFilter === f ? '#4aa3ff' : '#5f779b',
-                padding: '5px 11px',
-                fontSize: '13px',
-                fontFamily: MONO,
+                background: filter === f ? '#0f172a' : 'transparent',
+                border: `1px solid ${filter === f ? '#1d4ed8' : '#1a1e2c'}`,
+                borderRadius: '3px',
+                color: filter === f ? '#93c5fd' : '#374151',
+                padding: '4px 10px',
+                fontSize: '11px',
+                cursor: 'pointer',
               }}
             >
               {f}
@@ -170,165 +148,137 @@ export default function DispatchBoard() {
         </div>
       </div>
 
-      {/* ── Active Calls ── */}
-      <SectionHeader title="ACTIVE CALLS" count={filteredCalls.length} />
-      <div className="table-scroll" style={{ marginBottom: '24px', border: '1px solid #2e3138', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+      {/* ── Active calls table ── */}
+      <SectionHead title="ACTIVE CALLS" count={filtered.length} />
+      <div className="table-scroll" style={{ border: '1px solid #1a1e2c', borderTop: 'none', borderRadius: '0 0 3px 3px', marginBottom: '16px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
           <thead>
-            <tr>
-              {['Call #', 'Nature', 'Location', 'City', 'County', 'Pr', 'Status', 'Units', 'Elapsed', 'Time', 'Actions'].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: '7px 10px',
-                    textAlign: h === 'Pr' ? 'center' : 'left',
-                    color: '#93a6c4',
-                    fontSize: '11px',
-                    letterSpacing: '0.6px',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                    background: 'linear-gradient(180deg, #26282e, #1c1e23)',
-                    borderBottom: '2px solid #0b0c0f',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+            <tr style={{ background: '#0d1117' }}>
+              {['CALL #', 'NATURE', 'LOCATION', 'CITY', 'PR', 'STATUS', 'UNITS', 'ELAPSED', 'TIME', 'ACTIONS'].map(h => (
+                <th key={h} style={{
+                  padding: '6px 10px',
+                  textAlign: h === 'PR' ? 'center' : 'left',
+                  color: '#374151',
+                  fontSize: '10px',
+                  letterSpacing: '0.8px',
+                  fontWeight: 700,
+                  borderBottom: '1px solid #141720',
+                  whiteSpace: 'nowrap',
+                }}>
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filteredCalls.map((call, idx) => {
+            {filtered.map((call, idx) => {
               const sel = selectedCall?.id === call.id;
+              const ec  = elapsedColor(call.createdAt, now, call.units.length > 0);
               return (
                 <tr
                   key={call.id}
                   onClick={() => setSelectedCall(sel ? null : call)}
                   style={{
-                    background: sel ? 'rgba(47,129,247,0.14)' : idx % 2 === 0 ? '#111216' : '#131418',
+                    background: sel ? '#0f172a' : idx % 2 === 0 ? '#090b10' : '#0b0d14',
                     cursor: 'pointer',
-                    borderLeft: `3px solid ${PRIORITY_COLORS[call.priority] || '#33415a'}`,
+                    borderLeft: `3px solid ${PR_COLOR[call.priority] || '#1a1e2c'}`,
                   }}
                 >
-                  <td style={{ padding: '6px 10px', color: '#46c971', fontWeight: 700 }}>{call.id}</td>
-                  <td style={{ padding: '6px 10px', color: '#dce6f5', fontWeight: 600 }}>{call.nature}</td>
-                  <td style={{ padding: '6px 10px', color: '#93a6c4' }}>{call.location}</td>
-                  <td style={{ padding: '6px 10px', color: '#93a6c4' }}>{call.city}</td>
-                  <td style={{ padding: '6px 10px', color: '#5f779b' }}>{call.county}</td>
-                  <td style={{ padding: '6px 10px', textAlign: 'center' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        minWidth: '22px',
-                        background: PRIORITY_COLORS[call.priority],
-                        color: call.priority >= 3 ? '#1a1205' : '#fff',
-                        borderRadius: '3px',
-                        padding: '1px 6px',
-                        fontSize: '12px',
-                        fontWeight: 800,
-                      }}
-                    >
+                  <td style={{ padding: '5px 10px', color: '#4ade80', fontWeight: 700 }}>{call.id}</td>
+                  <td style={{ padding: '5px 10px', color: '#e2e8f0', fontWeight: 600 }}>{call.nature}</td>
+                  <td style={{ padding: '5px 10px', color: '#9ca3af' }}>{call.location}</td>
+                  <td style={{ padding: '5px 10px', color: '#6b7280' }}>{call.city}</td>
+                  <td style={{ padding: '5px 10px', textAlign: 'center' }}>
+                    <span style={{
+                      display: 'inline-block', minWidth: '26px',
+                      background: PR_BG[call.priority], color: PR_COLOR[call.priority],
+                      border: `1px solid ${PR_COLOR[call.priority]}44`,
+                      borderRadius: '2px', padding: '1px 5px', fontSize: '11px', fontWeight: 700,
+                    }}>
                       P{call.priority}
                     </span>
                   </td>
-                  <td style={{ padding: '6px 10px' }}>
-                    <StatusBadge status={call.status} />
+                  <td style={{ padding: '5px 10px' }}><StatusBadge status={call.status} /></td>
+                  <td style={{ padding: '5px 10px', color: '#93c5fd' }}>{call.units.join(', ') || '—'}</td>
+                  <td className="tnum" style={{ padding: '5px 10px', color: ec, fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    {elapsed(call.createdAt, now)}
                   </td>
-                  <td style={{ padding: '6px 10px', color: '#4aa3ff' }}>{call.units.join(', ') || '—'}</td>
-                  <td className="tnum" style={{ padding: '6px 10px', fontSize: '12px', fontWeight: 700, color: elapsedTone(call.createdAt, now, call.units.length > 0), whiteSpace: 'nowrap' }}>
-                    ⏱ {fmtElapsed(call.createdAt, now)}
+                  <td className="tnum" style={{ padding: '5px 10px', color: '#374151', fontSize: '11px' }}>
+                    {call.timestamp?.split(' ')[1] || '—'}
                   </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: '#5f779b', fontSize: '12px' }}>
-                    {call.timestamp?.split(' ')[1]}
-                  </td>
-                  <td style={{ padding: '6px 10px' }}>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <ActionBtn label="Assign" color="#1e4080" onClick={(e) => { e.stopPropagation(); handleAssignSelf(call.id); }} />
-                      <ActionBtn label="Close" color="#7f1d1d" onClick={(e) => { e.stopPropagation(); handleClose(call.id); }} />
+                  <td style={{ padding: '5px 8px' }}>
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                      <Btn label="Assign"  bg="#0f2451" onClick={e => { e.stopPropagation(); assignSelf(call.id); }} />
+                      <Btn label="Close"   bg="#450a0a" onClick={e => { e.stopPropagation(); closeCall(call.id);  }} />
                     </div>
                   </td>
                 </tr>
               );
             })}
-            {filteredCalls.length === 0 && (
-              <tr>
-                <td colSpan={11} style={{ padding: '18px', textAlign: 'center', color: '#5f779b' }}>
-                  No calls match this filter.
-                </td>
-              </tr>
+            {filtered.length === 0 && (
+              <tr><td colSpan={10} style={{ padding: '16px', textAlign: 'center', color: '#374151' }}>No calls match this filter.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* ── Call Detail ── */}
+      {/* ── Call detail panel ── */}
       {selectedCall && (
-        <div
-          style={{
-            background: 'linear-gradient(180deg, #1c1e23, #15161a)',
-            border: '1px solid #2e3138',
-            borderLeft: `4px solid ${PRIORITY_COLORS[selectedCall.priority] || '#33415a'}`,
-            borderRadius: '6px',
-            padding: '16px',
-            marginBottom: '24px',
-            boxShadow: '0 6px 22px rgba(0,0,0,0.45)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ color: '#f5b740', fontWeight: 700, fontSize: '14px', letterSpacing: '0.5px' }}>
-              CALL DETAIL • {selectedCall.id}
+        <div style={{
+          background: '#0d1117',
+          border: '1px solid #1a1e2c',
+          borderLeft: `3px solid ${PR_COLOR[selectedCall.priority] || '#1a1e2c'}`,
+          borderRadius: '3px',
+          padding: '14px',
+          marginBottom: '16px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px' }}>
+              CALL DETAIL — {selectedCall.id}
             </span>
-            <button onClick={() => setSelectedCall(null)} style={{ background: 'none', border: 'none', color: '#5f779b', cursor: 'pointer', fontSize: '16px' }}>
-              ✕
+            <button onClick={() => setSelectedCall(null)} style={{ background: 'none', border: 'none', color: '#374151', cursor: 'pointer', fontSize: '15px', lineHeight: 1 }}>
+              ×
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px', fontSize: '13px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px', fontSize: '12px' }}>
             {[
-              ['Nature', selectedCall.nature],
-              ['Location', selectedCall.location],
-              ['City', selectedCall.city],
-              ['County', selectedCall.county],
-              ['Priority', `P${selectedCall.priority}`],
-              ['Status', selectedCall.status],
-              ['Reporting Party', selectedCall.reportingParty],
-              ['Timestamp', selectedCall.timestamp],
-              ['Units Assigned', selectedCall.units.join(', ') || 'None'],
+              ['NATURE',          selectedCall.nature],
+              ['LOCATION',        selectedCall.location],
+              ['CITY',            selectedCall.city],
+              ['COUNTY',          selectedCall.county],
+              ['PRIORITY',        `P${selectedCall.priority}`],
+              ['STATUS',          selectedCall.status],
+              ['REPORTING PARTY', selectedCall.reportingParty],
+              ['TIMESTAMP',       selectedCall.timestamp],
+              ['UNITS',           selectedCall.units.join(', ') || 'None'],
             ].map(([k, v]) => (
               <div key={k}>
-                <span style={{ color: '#5f779b', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>{k}: </span>
-                <span style={{ color: '#dce6f5' }}>{v}</span>
+                <span style={{ color: '#374151', fontSize: '10px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>{k}: </span>
+                <span style={{ color: '#d1d5db' }}>{v}</span>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #2e3138' }}>
-            <span style={{ color: '#5f779b', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Description: </span>
-            <span style={{ color: '#93a6c4', fontSize: '13px' }}>{selectedCall.description}</span>
-          </div>
+          {selectedCall.description && (
+            <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #141720' }}>
+              <span style={{ color: '#374151', fontSize: '10px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>DESCRIPTION: </span>
+              <span style={{ color: '#9ca3af', fontSize: '12px' }}>{selectedCall.description}</span>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── Units Roster ── */}
-      <SectionHeader title="UNITS ROSTER" count={onDuty.length} />
-      <div className="table-scroll" style={{ border: '1px solid #2e3138', borderRadius: '0 0 6px 6px', borderTop: 'none' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+      {/* ── Units roster ── */}
+      <SectionHead title="UNITS ROSTER" count={onDuty.length} />
+      <div className="table-scroll" style={{ border: '1px solid #1a1e2c', borderTop: 'none', borderRadius: '0 0 3px 3px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
           <thead>
-            <tr>
-              {['Officer', 'Unit #', 'Status', 'Call #', 'Agency', 'Subdivision', 'Location'].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: '7px 10px',
-                    textAlign: 'left',
-                    color: '#93a6c4',
-                    fontSize: '11px',
-                    letterSpacing: '0.6px',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                    background: 'linear-gradient(180deg, #26282e, #1c1e23)',
-                    borderBottom: '2px solid #0b0c0f',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+            <tr style={{ background: '#0d1117' }}>
+              {['OFFICER', 'UNIT #', 'STATUS', 'CALL #', 'AGENCY', 'SUBDIVISION', 'LOCATION'].map(h => (
+                <th key={h} style={{
+                  padding: '6px 10px', textAlign: 'left',
+                  color: '#374151', fontSize: '10px', letterSpacing: '0.8px', fontWeight: 700,
+                  borderBottom: '1px solid #141720', whiteSpace: 'nowrap',
+                }}>
                   {h}
                 </th>
               ))}
@@ -336,28 +286,25 @@ export default function DispatchBoard() {
           </thead>
           <tbody>
             {officers.map((o, idx) => {
-              const tone = toneFor(o.status);
+              const t   = tone(o.status);
               const isMe = o.id === currentUser?.id;
               return (
                 <tr
                   key={o.id}
                   style={{
-                    background: tone.tint !== 'transparent' ? tone.tint : idx % 2 === 0 ? '#111216' : '#131418',
-                    borderLeft: `3px solid ${tone.bar}`,
+                    background: t.bg !== 'transparent' ? t.bg : idx % 2 === 0 ? '#090b10' : '#0b0d14',
+                    borderLeft: `3px solid ${t.bar}`,
                   }}
                 >
-                  <td style={{ padding: '6px 10px', color: tone.text, fontWeight: isMe ? 800 : 600 }}>
-                    {isMe ? '▶ ' : ''}
-                    {o.name}
+                  <td style={{ padding: '5px 10px', color: isMe ? '#fbbf24' : t.text, fontWeight: isMe ? 800 : 600 }}>
+                    {isMe ? '» ' : ''}{o.name}
                   </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: '#4aa3ff' }}>{o.unitId}</td>
-                  <td style={{ padding: '6px 10px' }}>
-                    <StatusBadge status={o.status} />
-                  </td>
-                  <td className="tnum" style={{ padding: '6px 10px', color: o.callId ? '#f5b740' : '#33415a' }}>{o.callId || '—'}</td>
-                  <td style={{ padding: '6px 10px', color: '#93a6c4' }}>{o.deptShort}</td>
-                  <td style={{ padding: '6px 10px', color: '#93a6c4' }}>{o.subdivision}</td>
-                  <td style={{ padding: '6px 10px', color: '#5f779b' }}>{o.location}</td>
+                  <td className="tnum" style={{ padding: '5px 10px', color: '#93c5fd' }}>{o.unitId}</td>
+                  <td style={{ padding: '5px 10px' }}><StatusBadge status={o.status} /></td>
+                  <td className="tnum" style={{ padding: '5px 10px', color: o.callId ? '#fbbf24' : '#1f2937' }}>{o.callId || '—'}</td>
+                  <td style={{ padding: '5px 10px', color: '#6b7280' }}>{o.deptShort}</td>
+                  <td style={{ padding: '5px 10px', color: '#6b7280' }}>{o.subdivision}</td>
+                  <td style={{ padding: '5px 10px', color: '#374151' }}>{o.location}</td>
                 </tr>
               );
             })}
@@ -368,46 +315,44 @@ export default function DispatchBoard() {
   );
 }
 
-function Divider() {
-  return <span style={{ width: '1px', height: '14px', background: '#33363d' }} />;
-}
-
-function SectionHeader({ title, count }) {
+function SectionHead({ title, count }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '6px 12px',
-        background: 'linear-gradient(180deg, #26282e, #1c1e23)',
-        border: '1px solid #2e3138',
-        borderRadius: '6px 6px 0 0',
-      }}
-    >
-      <span style={{ color: '#f5b740', fontSize: '12px', fontWeight: 700, letterSpacing: '0.8px' }}>{title}</span>
-      <span style={{ background: 'rgba(0,0,0,0.35)', color: '#4aa3ff', border: '1px solid rgba(21,38,66,0.5)', borderRadius: '9px', padding: '1px 8px', fontSize: '11px', fontWeight: 700 }}>
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '5px 10px',
+      background: '#0d1117',
+      border: '1px solid #1a1e2c',
+      borderRadius: '3px 3px 0 0',
+    }}>
+      <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>{title}</span>
+      <span style={{ background: 'rgba(0,0,0,0.4)', color: '#93c5fd', border: '1px solid #1d4ed844', borderRadius: '10px', padding: '0 7px', fontSize: '10px', fontWeight: 700 }}>
         {count}
       </span>
-      <div style={{ flex: 1, height: '1px', background: 'rgba(29,55,95,0.6)' }} />
+      <div style={{ flex: 1, height: '1px', background: '#141720' }} />
     </div>
   );
 }
 
-function ActionBtn({ label, color, onClick }) {
+function StatItem({ label, value, color }) {
+  return (
+    <span style={{ fontSize: '11px', color: '#374151' }}>
+      {label} <span style={{ color, fontWeight: 700 }}>{value}</span>
+    </span>
+  );
+}
+
+function Pipe() {
+  return <span style={{ width: '1px', height: '12px', background: '#1a1e2c', flexShrink: 0 }} />;
+}
+
+function Btn({ label, bg, onClick }) {
   return (
     <button
       onClick={onClick}
       style={{
-        background: color,
-        border: 'none',
-        borderRadius: '3px',
-        color: '#fff',
-        padding: '3px 9px',
-        fontSize: '12px',
-        cursor: 'pointer',
-        fontFamily: MONO,
-        fontWeight: 600,
+        background: bg, border: 'none', borderRadius: '2px',
+        color: '#d1d5db', padding: '2px 8px', fontSize: '11px',
+        cursor: 'pointer', fontFamily: MONO, fontWeight: 600,
       }}
     >
       {label}

@@ -31,39 +31,30 @@ export default function RadioToast() {
       onClick={() => setDismissedId(toast.id)}
       style={{
         position: 'fixed',
-        top: '64px',
-        right: '16px',
+        top: '50px',
+        right: '14px',
         zIndex: 4000,
-        width: '320px',
-        maxWidth: 'calc(100vw - 32px)',
-        background: 'linear-gradient(180deg, #1c1405, #12203a)',
-        border: '1px solid #f5b740',
-        borderLeft: '4px solid #f5b740',
-        borderRadius: '6px',
-        boxShadow: '0 10px 34px rgba(0,0,0,0.6)',
-        padding: '10px 12px',
+        width: '300px',
+        maxWidth: 'calc(100vw - 28px)',
+        background: '#0d1117',
+        border: '1px solid #92400e',
+        borderLeft: '3px solid #f59e0b',
+        borderRadius: '2px',
+        boxShadow: '0 8px 28px rgba(0,0,0,0.7)',
+        padding: '8px 10px',
         cursor: 'pointer',
         fontFamily: "'Ubuntu Mono', monospace",
-        animation: 'radioToastIn 0.25s ease-out',
+        animation: 'radioToastIn 0.2s ease-out',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '4px' }}>
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#f5b740',
-            boxShadow: '0 0 6px #f5b740',
-            animation: 'cadPulse 1.2s ease-in-out infinite',
-          }}
-        />
-        <span style={{ color: '#f5b740', fontWeight: 800, fontSize: '11px', letterSpacing: '1px' }}>
-          📻 DISPATCH RADIO
+        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
+        <span style={{ color: '#f59e0b', fontWeight: 700, fontSize: '10px', letterSpacing: '1px' }}>
+          DISPATCH RADIO
         </span>
-        <span style={{ marginLeft: 'auto', color: '#5f779b', fontSize: '11px' }}>{toast.time}</span>
+        <span style={{ marginLeft: 'auto', color: '#374151', fontSize: '10px' }}>{toast.time}</span>
       </div>
-      <div style={{ color: '#fce8be', fontSize: '13px', lineHeight: 1.45 }}>{toast.text}</div>
+      <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: 1.5 }}>{toast.text}</div>
     </div>
   );
 }

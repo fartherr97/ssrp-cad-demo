@@ -117,7 +117,7 @@ export default function FireBoard() {
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '13px', letterSpacing: '0.6px', color: FIRE_RED }}>
-          🚒 HCFR — FIRE / RESCUE
+          HCFR — FIRE / RESCUE
         </span>
         <Divider />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontWeight: 700, fontSize: '12px', color: '#46c971' }}>

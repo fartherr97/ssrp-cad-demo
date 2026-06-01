@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================================
    Sunshine State RP CAD - base / theme tokens
    FONT: Ubuntu + Ubuntu Mono (loaded in index.html) - DO NOT CHANGE
