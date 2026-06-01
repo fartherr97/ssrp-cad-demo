@@ -62,10 +62,10 @@ export default function ReportsCenter() {
 
   return (
     <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className="mob-two-pane" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* ── LEFT: Report list ─────────────────────────────────────── */}
-        <div style={{
+        <div className={`mob-list-panel${(showCreate || selectedReport) ? ' mob-gone' : ''}`} style={{
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           borderRight: '2px solid var(--n-border)', background: 'var(--n-bg-base)',
         }}>
@@ -135,7 +135,11 @@ export default function ReportsCenter() {
         </div>
 
         {/* ── RIGHT: Form document view ─────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#3a3a3a' }}>
+        <div className={`mob-detail-panel${(!showCreate && !selectedReport) ? ' mob-gone' : ''}`} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#3a3a3a' }}>
+          {/* Mobile back button */}
+          <button className="mob-back-btn" onClick={() => { setShowCreate(false); setSelectedReport(null); setSelectedTemplate(null); }}>
+            ← Back to Reports
+          </button>
 
           {/* Template picker */}
           {showCreate && !selectedTemplate && (

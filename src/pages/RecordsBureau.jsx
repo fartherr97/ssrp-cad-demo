@@ -61,10 +61,10 @@ export default function RecordsBureau() {
 
   return (
     <div className="n-page" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className="mob-two-pane" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 0, flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* ── LEFT: Query panel ─────────────────────────────────────── */}
-        <div style={{
+        <div className={`mob-list-panel${selected ? ' mob-gone' : ''}`} style={{
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           borderRight: '2px solid var(--n-border)', background: 'var(--n-bg-base)',
         }}>
@@ -182,7 +182,11 @@ export default function RecordsBureau() {
         </div>
 
         {/* ── RIGHT: Record detail ──────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#1a1a1a' }}>
+        <div className={`mob-detail-panel${!selected ? ' mob-gone' : ''}`} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#1a1a1a' }}>
+          {/* Mobile back button */}
+          <button className="mob-back-btn" onClick={() => setSelected(null)}>
+            ← Back to Results
+          </button>
           {!selected ? (
             <div style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',

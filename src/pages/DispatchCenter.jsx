@@ -84,6 +84,7 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
     setInternalShow(v);
     if (!v && onCloseCreate) onCloseCreate();
   };
+  const [mobileTab, setMobileTab] = useState('calls');
   const [radioMsg, setRadioMsg] = useState('');
   const [newCall, setNewCall] = useState({
     nature: '', location: '', city: 'Tampa', county: 'Hillsborough',
@@ -155,12 +156,26 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
   const unassignedCount = activeCalls.filter(c => c.units.length === 0).length;
 
   return (
-    <div className="cad-dispatch">
+    <div className={`cad-dispatch${mobileTab === 'detail' ? ' detail-tab' : ''}`}>
       {/* ─── LEFT/CENTER: Two grids stacked ─── */}
       <div className="cad-dispatch-main">
 
+        {/* Mobile tab bar */}
+        <div className="mob-tab-bar">
+          <button className={`mob-tab${mobileTab === 'calls' ? ' active' : ''}`} onClick={() => setMobileTab('calls')}>
+            CALLS ({sortedCalls.length})
+            {p1Count > 0 && <span style={{ marginLeft: 4, color: 'var(--pr1-text)' }}>▲P1</span>}
+          </button>
+          <button className={`mob-tab${mobileTab === 'units' ? ' active' : ''}`} onClick={() => setMobileTab('units')}>
+            UNITS ({onDutyOfficers.length})
+          </button>
+          <button className={`mob-tab${mobileTab === 'detail' ? ' active' : ''}`} onClick={() => setMobileTab('detail')}>
+            DETAIL {selCall ? `· ${selCall.id}` : ''}
+          </button>
+        </div>
+
         {/* CALLS GRID */}
-        <div className="cad-grid-panel calls-panel">
+        <div className={`cad-grid-panel calls-panel${mobileTab === 'calls' ? ' mob-active' : ''}`}>
           <div className="cad-grid-titlebar">
             <span className="cad-grid-title">■ ACTIVE SERVICE CALLS</span>
             <span className="cad-grid-count">({sortedCalls.length})</span>
@@ -242,7 +257,7 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                   <tr
                     key={c.id}
                     className={`pri-${c.priority}${selectedCallId === c.id ? ' row-selected' : ''}`}
-                    onClick={() => { setSelectedCallId(c.id); setSelectedUnitId(null); }}
+                    onClick={() => { setSelectedCallId(c.id); setSelectedUnitId(null); setMobileTab('detail'); }}
                   >
                     <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--n-text-data)', fontWeight: 600 }}>{c.id}</td>
                     <td style={{ fontWeight: 500 }}>{c.nature}</td>
@@ -263,7 +278,7 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
         </div>
 
         {/* UNITS GRID */}
-        <div className="cad-grid-panel units-panel">
+        <div className={`cad-grid-panel units-panel${mobileTab === 'units' ? ' mob-active' : ''}`}>
           <div className="cad-grid-titlebar">
             <span className="cad-grid-title">■ FIELD UNITS</span>
             <span className="cad-grid-count">({onDutyOfficers.length} ON DUTY)</span>
@@ -325,6 +340,7 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                       setSelectedUnitId(o.unitId);
                       if (o.callId) setSelectedCallId(o.callId);
                       else setSelectedCallId(null);
+                      setMobileTab('detail');
                     }}
                   >
                     <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: 'var(--n-text-data)' }}>{o.unitId}</td>
@@ -347,7 +363,11 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
       </div>
 
       {/* ─── RIGHT: Detail Panel ─── */}
-      <div className="cad-dispatch-detail">
+      <div className={`cad-dispatch-detail${mobileTab === 'detail' ? ' mob-active' : ''}`}>
+        {/* Mobile back button */}
+        <button className="mob-back-btn" onClick={() => setMobileTab(selectedCallId ? 'calls' : 'units')}>
+          ← Back to {selectedCallId ? 'Calls' : 'Units'}
+        </button>
         {/* CALL DETAILS section */}
         <div className="detail-titlebar">
           <span className="detail-title">■ {selCall ? 'INCIDENT DETAIL' : 'NO CALL SELECTED'}</span>

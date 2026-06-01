@@ -22,10 +22,11 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      height: '100vh', overflow: 'auto',
+      minHeight: '100vh', overflow: 'auto',
       background: '#020810',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', gap: 0,
+      padding: '16px 12px',
     }}>
       {/* Top accent bar */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, background: '#0a3a6a' }} />
@@ -34,7 +35,8 @@ export default function LoginPage() {
       <div style={{
         background: '#040c1a',
         border: '1px solid #1a3050',
-        width: 420,
+        width: '100%',
+        maxWidth: 420,
         boxShadow: '0 20px 60px rgba(0,0,0,0.95)',
       }}>
         {/* Title bar */}
