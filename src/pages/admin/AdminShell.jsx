@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { ADMIN, AdminContent } from './AdminKit';
+import { AdminContent } from './AdminKit';
 import {
   MdPeople, MdFingerprint, MdVpnKey, MdBrush, MdInventory2, MdShield,
   MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
@@ -42,21 +42,14 @@ function AdminTab({ item, active, onClick }) {
     <button
       onClick={onClick}
       title={item.label}
-      className={`flex items-center gap-2 h-full px-[15px] whitespace-nowrap cursor-pointer border-none text-[13px] tracking-[0.2px] shrink-0 transition-all duration-[140ms]
+      className={`group relative flex items-center gap-2 my-2 px-3.5 rounded-lg whitespace-nowrap cursor-pointer border-none text-[13px] tracking-[0.2px] shrink-0 transition-all duration-[140ms] font-ui
         ${active
-          ? 'font-bold border-b-2'
-          : 'font-medium border-b-2 border-transparent hover:border-b-2'}`}
-      style={{
-        background: active ? ADMIN.panel2 : 'transparent',
-        borderBottomColor: active ? ADMIN.red : undefined,
-        color: active ? '#fff' : ADMIN.textDim,
-        fontFamily: 'var(--font-ui)',
-      }}
-      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; } }}
-      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; } }}
+          ? 'font-bold bg-brand/15 text-brand-bright'
+          : 'font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
     >
-      <Icon size={17} color={active ? ADMIN.redHi : ADMIN.red} style={{ flexShrink: 0 }} />
+      <Icon size={17} className={active ? 'text-brand-bright shrink-0' : 'text-slate-400 group-hover:text-slate-200 shrink-0'} />
       {item.label}
+      {active && <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[3px] w-7 rounded-full bg-brand" />}
     </button>
   );
 }
@@ -83,66 +76,58 @@ export default function AdminShell() {
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full h-full min-w-0" style={{ background: ADMIN.bg }}>
+    <div className="flex flex-col flex-1 w-full h-full min-w-0 bg-app-bg">
 
       {/* ── Top nav bar ── */}
-      <div className="flex items-stretch h-14 shrink-0" style={{ background: ADMIN.panel, borderBottom: `1px solid ${ADMIN.border}` }}>
+      <div className="flex items-stretch h-14 shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base gap-1 px-1">
 
         {/* Brand */}
-        <div className="flex items-center gap-[11px] px-[18px] shrink-0 bg-black" style={{ borderRight: `1px solid ${ADMIN.border}` }}>
+        <div className="flex items-center gap-2.5 pl-3 pr-4 mr-1 shrink-0 border-r border-border-base select-none">
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
-            className="w-[26px] h-[26px] object-contain" />
-          <div className="leading-[1.2] whitespace-nowrap">
-            <div className="text-[13px] font-extrabold text-white tracking-[-0.2px]">Admin Panel</div>
-            <div className="text-[10px] font-bold tracking-[0.5px] uppercase" style={{ color: ADMIN.red }}>{community}</div>
+            className="w-9 h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
+          <div className="leading-[1.15] whitespace-nowrap">
+            <div className="text-[15px] font-extrabold text-white tracking-[-0.3px]">Admin Panel</div>
+            <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">{community}</div>
           </div>
         </div>
 
         {/* Scroll-left affordance */}
         <button onClick={() => scrollBy(-260)} title="Scroll left"
-          className="shrink-0 w-[30px] bg-transparent border-none cursor-pointer"
-          style={{ borderRight: `1px solid ${ADMIN.border}`, color: ADMIN.textMute }}>
-          <MdChevronLeft size={20} />
+          className="shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
+          <MdChevronLeft size={20} className="mx-auto" />
         </button>
 
         {/* Section tabs (scrollable) */}
-        <div ref={scrollRef} className="admin-tabbar flex items-stretch overflow-x-auto flex-1 min-w-0" onWheel={onWheel}>
+        <nav ref={scrollRef} className="admin-tabbar flex items-stretch gap-0.5 overflow-x-auto flex-1 min-w-0" onWheel={onWheel}>
           {GROUPS.map((group, gi) => (
-            <div key={gi} className="flex items-stretch shrink-0">
-              {gi > 0 && <div className="w-px my-3 shrink-0" style={{ background: ADMIN.border }} />}
+            <div key={gi} className="flex items-stretch gap-0.5 shrink-0">
+              {gi > 0 && <div className="w-px my-3 mx-1 shrink-0 bg-border-base" />}
               {group.map(item => (
                 <AdminTab key={item.route} item={item} active={isActive(item)} onClick={() => navigate(item.route)} />
               ))}
             </div>
           ))}
-        </div>
+        </nav>
 
         {/* Scroll-right affordance */}
         <button onClick={() => scrollBy(260)} title="Scroll right"
-          className="shrink-0 w-[30px] bg-transparent border-none cursor-pointer"
-          style={{ borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textMute }}>
-          <MdChevronRight size={20} />
+          className="shrink-0 w-8 my-2 rounded-lg bg-transparent border-none cursor-pointer text-slate-500 hover:bg-white/[0.05] hover:text-slate-200 transition-all">
+          <MdChevronRight size={20} className="mx-auto" />
         </button>
 
         {/* Right actions */}
-        <div className="flex items-stretch shrink-0" style={{ borderLeft: `1px solid ${ADMIN.border}` }}>
+        <div className="flex items-stretch gap-0.5 shrink-0 pl-1 ml-1 border-l border-border-base">
           <button
             onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
             title="Exit to Home * choose another portal"
-            className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
-            style={{ color: ADMIN.textDim }}
-            onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}
+            className="flex items-center gap-2 my-2 px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 transition-all duration-[140ms]"
           >
             <MdHome size={17} /> Exit to Home
           </button>
           <button
             onClick={() => dispatch({ type: 'LOGOUT' })}
             title="Sign Out"
-            className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
-            style={{ borderLeft: `1px solid ${ADMIN.border}`, color: ADMIN.textDim }}
-            onMouseEnter={e => { e.currentTarget.style.background = `${ADMIN.red}22`; e.currentTarget.style.color = ADMIN.redHi; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}
+            className="flex items-center gap-2 my-2 px-3.5 rounded-lg cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-[140ms]"
           >
             <MdLogout size={17} /> Sign Out
           </button>

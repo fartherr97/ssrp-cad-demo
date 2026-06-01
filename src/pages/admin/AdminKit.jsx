@@ -1,59 +1,55 @@
-/* Sonoran-style Admin customization UI kit.
-   Dark panels, red accents, dense editors. Shared by every admin section. */
+/* SSRP Admin customization UI kit.
+   Deep navy panels, blue accent, translucent rounded cards. Shared by every admin section. */
 
 export const ADMIN = {
-  red:      '#e3342f',
-  redHi:    '#ff4b45',
-  redGlow:  'rgba(227,52,47,0.4)',
-  bg:       '#0e0e12',
-  panel:    '#16161c',
-  panel2:   '#1c1c24',
-  row:      '#1a1a20',
-  rowAlt:   '#15151b',
-  border:   '#26262e',
-  borderHi: '#33333d',
-  text:     '#e8e8ec',
-  textDim:  '#9a9aa6',
-  textMute: '#6a6a76',
+  red:      '#3d82f0',
+  redHi:    '#5a97f5',
+  redGlow:  'rgba(61,130,240,0.4)',
+  bg:       '#0b1424',
+  panel:    '#101d31',
+  panel2:   '#13233b',
+  row:      '#0f1c30',
+  rowAlt:   '#101f34',
+  border:   'rgba(255,255,255,0.10)',
+  borderHi: 'rgba(255,255,255,0.14)',
+  text:     '#dde6f1',
+  textDim:  '#93a4bd',
+  textMute: '#5d6f88',
   green:    '#22c55e',
   amber:    '#f59e0b',
-  blue:     '#3a88e8',
+  blue:     '#3d82f0',
 };
 
-/* Page wrapper * full-height scroll area with dark bg */
+/* Page wrapper * full-height scroll area with navy bg */
 export function AdminContent({ children }) {
   return (
-    <div
-      className="flex-1 min-w-0 min-h-0 w-full overflow-auto p-[22px] box-border font-ui"
-      style={{ background: ADMIN.bg }}
-    >
+    <div className="flex-1 min-w-0 min-h-0 w-full overflow-auto p-6 box-border font-ui bg-app-bg">
       {children}
     </div>
   );
 }
 
-/* A titled dark panel (the boxed sections in Sonoran) */
+/* A titled translucent panel (the boxed sections) */
 export function AdminPanel({ title, subtitle, right, children, center, style = {} }) {
   return (
     <div
-      className="rounded-lg mb-4 overflow-hidden"
-      style={{ background: ADMIN.panel, border: `1px solid ${ADMIN.border}`, ...style }}
+      className="rounded-xl mb-5 overflow-hidden bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20"
+      style={style}
     >
       {(title || right) && (
         <div
-          className={`flex items-center gap-3 px-[18px] py-[14px] flex-wrap relative ${center ? 'justify-center' : 'justify-between'}`}
-          style={{ borderBottom: `1px solid ${ADMIN.border}`, background: ADMIN.panel2 }}
+          className={`flex items-center gap-3 px-5 py-4 flex-wrap relative border-b border-border-faint ${center ? 'justify-center' : 'justify-between'}`}
         >
           <div style={{ textAlign: center ? 'center' : 'left' }}>
-            {title && <div className="text-[17px] font-bold tracking-[0.2px]" style={{ color: ADMIN.text }}>{title}</div>}
-            {subtitle && <div className="text-[12px] mt-0.5" style={{ color: ADMIN.textDim }}>{subtitle}</div>}
+            {title && <div className="text-[11px] font-bold uppercase tracking-[0.9px] text-slate-400">{title}</div>}
+            {subtitle && <div className="text-[12px] mt-1 text-slate-500 normal-case">{subtitle}</div>}
           </div>
           {right && (
-            <div className={`flex gap-2 items-center ${center ? 'absolute right-[18px]' : ''}`}>{right}</div>
+            <div className={`flex gap-2 items-center ${center ? 'absolute right-5' : ''}`}>{right}</div>
           )}
         </div>
       )}
-      <div className="p-[18px]">{children}</div>
+      <div className="p-5">{children}</div>
     </div>
   );
 }
@@ -61,11 +57,8 @@ export function AdminPanel({ title, subtitle, right, children, center, style = {
 /* Page-level header (e.g. "Community Customization") */
 export function AdminPageTitle({ children, right }) {
   return (
-    <div
-      className="flex items-center justify-between gap-3 rounded-lg px-5 py-[14px] mb-4"
-      style={{ background: ADMIN.panel, border: `1px solid ${ADMIN.border}` }}
-    >
-      <div className="text-[18px] font-semibold" style={{ color: ADMIN.text }}>{children}</div>
+    <div className="flex items-center justify-between gap-3 rounded-xl px-5 py-4 mb-5 bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20">
+      <div className="text-[18px] font-bold text-white tracking-[-0.2px]">{children}</div>
       {right && <div className="flex gap-2">{right}</div>}
     </div>
   );
@@ -76,18 +69,12 @@ export function SonCard({ icon: Icon, title, desc, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="son-card text-left rounded-lg p-[20px_22px] cursor-pointer flex flex-col gap-7 min-h-[120px] transition-all duration-150 hover:-translate-y-0.5"
-      style={{
-        background: ADMIN.panel,
-        border: `1px solid ${ADMIN.border}`,
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.panel2; e.currentTarget.style.borderColor = ADMIN.red; }}
-      onMouseLeave={e => { e.currentTarget.style.background = ADMIN.panel; e.currentTarget.style.borderColor = ADMIN.border; }}
+      className="son-card text-left rounded-xl p-5 cursor-pointer flex flex-col gap-7 min-h-[120px] bg-app-card/70 border border-border-base backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-brand/50 hover:bg-app-elevated/70"
     >
-      {Icon && <Icon size={26} color={ADMIN.red} />}
+      {Icon && <Icon size={26} className="text-brand-bright" />}
       <div>
-        <div className="text-[14px] font-bold" style={{ color: ADMIN.text }}>{title}</div>
-        {desc && <div className="text-[11px] mt-1 leading-[1.4]" style={{ color: ADMIN.textDim }}>{desc}</div>}
+        <div className="text-[14px] font-bold text-cad-text">{title}</div>
+        {desc && <div className="text-[11px] mt-1 leading-[1.4] text-slate-500">{desc}</div>}
       </div>
     </button>
   );
@@ -96,18 +83,19 @@ export function SonCard({ icon: Icon, title, desc, onClick }) {
 /* Buttons */
 export function SonButton({ children, onClick, variant = 'default', size, style = {}, type, disabled, title }) {
   const variants = {
-    default: { background: ADMIN.panel2, color: ADMIN.text, border: `1px solid ${ADMIN.border}` },
-    red:     { background: ADMIN.red, color: '#fff', border: '1px solid transparent', boxShadow: `0 2px 10px ${ADMIN.redGlow}` },
-    green:   { background: '#1c8a3f', color: '#fff', border: '1px solid transparent' },
-    ghost:   { background: 'transparent', color: ADMIN.textDim, border: `1px solid ${ADMIN.border}` },
+    default: 'bg-white/[0.05] text-slate-200 border border-white/10 hover:bg-white/[0.1]',
+    red:     'bg-blue-600 text-white border border-blue-400/30 shadow-sm shadow-blue-950/40 hover:bg-blue-500',
+    green:   'bg-emerald-600 text-white border border-emerald-400/30 shadow-sm shadow-emerald-950/40 hover:bg-emerald-500',
+    ghost:   'bg-transparent text-slate-400 border border-white/10 hover:bg-white/[0.06] hover:text-slate-200',
   };
   return (
     <button
       type={type} onClick={onClick} disabled={disabled} title={title}
-      className={`inline-flex items-center justify-center gap-1.5 font-semibold rounded-md cursor-pointer font-ui whitespace-nowrap transition-all duration-150
-        ${size === 'sm' ? 'px-[11px] py-[5px] text-[12px]' : 'px-4 py-2 text-[13px]'}
-        ${disabled ? 'opacity-50 cursor-default' : 'hover:brightness-[1.15] hover:-translate-y-px active:translate-y-0'}`}
-      style={{ ...variants[variant], ...style }}
+      className={`inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg cursor-pointer font-ui whitespace-nowrap transition-all duration-150 active:scale-[0.98]
+        ${size === 'sm' ? 'px-3 py-1.5 text-[12px]' : 'px-4 py-2 text-[13px]'}
+        ${disabled ? 'opacity-40 cursor-not-allowed active:scale-100' : ''}
+        ${variants[variant]}`}
+      style={style}
     >
       {children}
     </button>
@@ -115,14 +103,14 @@ export function SonButton({ children, onClick, variant = 'default', size, style 
 }
 
 export const SON_INPUT = {
-  width: '100%', background: ADMIN.bg, border: `1px solid ${ADMIN.border}`,
-  borderRadius: 6, color: ADMIN.text, padding: '9px 11px', fontSize: 13,
+  width: '100%', background: '#0d1a2c', border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: 8, color: '#dde6f1', padding: '10px 14px', fontSize: 13,
   fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
 };
 
 export const SON_LABEL = {
-  display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.5px',
-  textTransform: 'uppercase', color: ADMIN.textMute, marginBottom: 5,
+  display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.5px',
+  textTransform: 'uppercase', color: '#5d6f88', marginBottom: 6,
 };
 
 export function SonField({ label, children }) {
@@ -145,16 +133,13 @@ export function SonSearch({ value, onChange, placeholder = 'Search' }) {
 /* Table primitives */
 export function SonTable({ columns, children }) {
   return (
-    <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${ADMIN.border}` }}>
+    <div className="overflow-x-auto rounded-xl border border-border-base">
       <table className="w-full border-collapse text-[13px]">
         <thead>
-          <tr style={{ background: ADMIN.panel2 }}>
+          <tr className="bg-app-bg/60 backdrop-blur-sm">
             {columns.map((c, i) => (
-              <th key={i} className="text-[11px] font-bold tracking-[0.5px] uppercase py-[11px] px-[14px] whitespace-nowrap"
-                style={{
-                  textAlign: c.align || 'left', color: ADMIN.textDim,
-                  borderBottom: `1px solid ${ADMIN.border}`, width: c.width,
-                }}>{c.label}</th>
+              <th key={i} className="text-[10px] font-bold tracking-[0.7px] uppercase py-3 px-4 whitespace-nowrap text-slate-500 border-b border-border-base"
+                style={{ textAlign: c.align || 'left', width: c.width }}>{c.label}</th>
             ))}
           </tr>
         </thead>
@@ -167,9 +152,9 @@ export function SonTable({ columns, children }) {
 export function SonRow({ children, i = 0 }) {
   return (
     <tr
-      className="transition-all duration-[140ms] hover:translate-x-0.5"
+      className="transition-colors"
       style={{ background: i % 2 ? ADMIN.rowAlt : ADMIN.row }}
-      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.panel2; }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = i % 2 ? ADMIN.rowAlt : ADMIN.row; }}
     >
       {children}
@@ -179,10 +164,9 @@ export function SonRow({ children, i = 0 }) {
 
 export function SonCell({ children, align, mono, color, bold, width }) {
   return (
-    <td className="py-[10px] px-[14px] whitespace-nowrap"
+    <td className="py-2.5 px-4 whitespace-nowrap border-b border-border-faint"
       style={{
         textAlign: align || 'left', color: color || ADMIN.text,
-        borderBottom: `1px solid ${ADMIN.border}`,
         fontFamily: mono ? 'var(--font-mono)' : 'var(--font-ui)',
         fontWeight: bold ? 700 : 400, width,
       }}>{children}</td>
@@ -193,12 +177,11 @@ export function SonCell({ children, align, mono, color, bold, width }) {
 export function SonIconBtn({ icon: Icon, onClick, color = ADMIN.textDim, title, danger }) {
   return (
     <button onClick={onClick} title={title}
-      className="w-7 h-7 rounded-md inline-flex items-center justify-center cursor-pointer transition-[filter] duration-[120ms] hover:brightness-[1.3]"
-      style={{
-        background: danger ? 'rgba(227,52,47,0.12)' : ADMIN.panel2,
-        border: `1px solid ${danger ? 'rgba(227,52,47,0.4)' : ADMIN.border}`,
-        color: danger ? ADMIN.red : color,
-      }}>
+      className={`w-7 h-7 rounded-lg inline-flex items-center justify-center cursor-pointer transition-all duration-150 border
+        ${danger
+          ? 'bg-red-500/12 border-red-500/40 text-red-400 hover:bg-red-500/20'
+          : 'bg-white/[0.05] border-white/10 hover:bg-white/[0.1]'}`}
+      style={danger ? undefined : { color }}>
       <Icon size={15} />
     </button>
   );
@@ -206,7 +189,7 @@ export function SonIconBtn({ icon: Icon, onClick, color = ADMIN.textDim, title, 
 
 export function SonBadge({ children, color = ADMIN.blue }) {
   return (
-    <span className="inline-flex items-center px-[9px] py-[2px] text-[11px] font-bold rounded-full tracking-[0.3px] whitespace-nowrap"
+    <span className="inline-flex items-center px-2.5 py-0.5 text-[11px] font-bold rounded-full tracking-[0.3px] whitespace-nowrap"
       style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}
     >{children}</span>
   );
@@ -214,7 +197,7 @@ export function SonBadge({ children, color = ADMIN.blue }) {
 
 export function EmptyState({ children }) {
   return (
-    <div className="text-center py-[50px] text-[13px]" style={{ color: ADMIN.textMute }}>{children}</div>
+    <div className="text-center py-[50px] text-[13px] text-slate-500">{children}</div>
   );
 }
 
@@ -222,10 +205,10 @@ export function EmptyState({ children }) {
 export function ComingSoon({ icon: Icon, title, note }) {
   return (
     <AdminPanel center title={title}>
-      <div className="text-center py-[36px] px-5" style={{ color: ADMIN.textDim }}>
-        {Icon && <Icon size={44} color={ADMIN.textMute} style={{ marginBottom: 14 }} />}
-        <div className="text-[14px] mb-1.5" style={{ color: ADMIN.text }}>{title}</div>
-        <div className="text-[12px] max-w-[460px] mx-auto leading-[1.6]" style={{ color: ADMIN.textMute }}>
+      <div className="text-center py-9 px-5 text-slate-400">
+        {Icon && <Icon size={44} className="text-slate-600 mx-auto mb-3.5" />}
+        <div className="text-[14px] mb-1.5 text-cad-text">{title}</div>
+        <div className="text-[12px] max-w-[460px] mx-auto leading-[1.6] text-slate-500">
           {note || 'This integration panel is configured here. Live service connections are managed by your server administrator.'}
         </div>
       </div>
