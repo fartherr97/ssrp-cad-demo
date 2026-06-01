@@ -75,6 +75,14 @@ export default function AdminShell() {
 
   const scrollBy = (dx) => scrollRef.current?.scrollBy({ left: dx, behavior: 'smooth' });
 
+  // Let a vertical mouse wheel scroll the tab bar horizontally.
+  const onWheel = (e) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (delta) el.scrollLeft += delta;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', height: '100%', background: ADMIN.bg, minWidth: 0 }}>
 
@@ -103,7 +111,7 @@ export default function AdminShell() {
         </button>
 
         {/* Section tabs (scrollable) */}
-        <div ref={scrollRef} className="admin-tabbar" style={{
+        <div ref={scrollRef} className="admin-tabbar" onWheel={onWheel} style={{
           display: 'flex', alignItems: 'stretch', overflowX: 'auto', flex: 1, minWidth: 0,
         }}>
           {GROUPS.map((group, gi) => (

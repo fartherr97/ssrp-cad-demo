@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { RecordReturn } from '../components/FormDocument';
 
 export default function MDT() {
   const { state, dispatch } = useCAD();
@@ -25,28 +26,15 @@ export default function MDT() {
     if (queryType === 'PERSON') {
       setResults(civilians.filter(c =>
         `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) || c.ssn?.includes(q)
-      ).map(c => ({
-        type: 'PERSON',
-        title: `${c.firstName} ${c.lastName}`,
-        sub: `DOB: ${c.dob} · SSN: ${c.ssn}`,
-        flags: c.flags,
-        extra: `DL: ${c.dlStatus} · Address: ${c.address}`,
-      })));
+      ).map(c => ({ type: 'PERSON', data: c })));
     } else if (queryType === 'VEHICLE') {
       setResults(vehicles.filter(v =>
         v.plate?.toLowerCase().includes(q) || `${v.make} ${v.model}`.toLowerCase().includes(q)
-      ).map(v => {
-        const owner = civilians.find(c => c.id === v.ownerId);
-        const ownerWarrant = owner ? warrants.find(w => w.civilianId === owner.id && w.status === 'ACTIVE') : null;
-        return {
-          type: 'VEHICLE',
-          title: v.plate,
-          sub: `${v.year} ${v.make} ${v.model} · ${v.color}`,
-          flags: [...(v.flags || []), v.stolen ? 'STOLEN' : null].filter(Boolean),
-          extra: owner ? `Owner: ${owner.firstName} ${owner.lastName}${ownerWarrant ? ' ⚠ WARRANT' : ''}` : 'Owner: Unknown',
-          regStatus: v.regStatus,
-        };
-      }));
+      ).map(v => ({
+        type: 'VEHICLE',
+        data: v,
+        subject: civilians.find(c => c.id === v.ownerId) || null,
+      })));
     }
   };
 
@@ -197,27 +185,12 @@ export default function MDT() {
                   <div style={{ color: 'var(--n-border-strong)', marginTop: 12 }}>{'>'} READY_</div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--st-av-text)', marginBottom: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--st-av-text)', marginBottom: 4, alignSelf: 'flex-start' }}>
                     QUERY RETURNED {results.length} RECORD(S)
                   </div>
                   {results.map((r, i) => (
-                    <div key={i} style={{
-                      background: 'var(--n-bg-panel)', border: '1px solid var(--n-border)',
-                      borderRadius: 3, padding: 12, fontFamily: 'var(--font-mono)', fontSize: 11.5,
-                    }}>
-                      <div style={{ display: 'flex', gap: 8, marginBottom: 6, alignItems: 'center' }}>
-                        <span style={{ color: 'var(--n-text-data)', fontWeight: 600, fontSize: 13 }}>{r.title}</span>
-                        {r.flags?.map(f => (
-                          <span key={f} className={`n-badge ${f === 'STOLEN' || f === 'WARRANT' || f === 'VIOLENT' ? 'badge-red' : 'badge-orange'}`} style={{ fontSize: 9 }}>{f}</span>
-                        ))}
-                        {r.regStatus && r.regStatus !== 'VALID' && (
-                          <span className="n-badge badge-orange" style={{ fontSize: 9 }}>REG {r.regStatus}</span>
-                        )}
-                      </div>
-                      <div style={{ color: 'var(--n-text-dim)', marginBottom: 3 }}>{r.sub}</div>
-                      <div style={{ color: 'var(--n-text-muted)', fontSize: 10.5 }}>{r.extra}</div>
-                    </div>
+                    <RecordReturn key={i} type={r.type} data={r.data} subject={r.subject} />
                   ))}
                 </div>
               )}

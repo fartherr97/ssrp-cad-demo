@@ -260,7 +260,7 @@ export default function RecordsBureau() {
                       <div key={h.id} className="record-return" style={{ marginBottom: 12 }}>
                         <div className="record-return-header">
                           <span>CRIMINAL HISTORY ENTRY — {h.caseNumber}</span>
-                          <span>{h.date}</span>
+                          <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{h.date}</span>
                         </div>
                         <div className="record-return-body">
                           <div className="record-return-section">CASE INFORMATION</div>
@@ -280,7 +280,7 @@ export default function RecordsBureau() {
                           {h.notes && (
                             <>
                               <div className="record-return-section">NOTES</div>
-                              <div style={{ fontSize: 11, fontFamily: 'Courier New', lineHeight: 1.5, color: '#000' }}>{h.notes}</div>
+                              <div style={{ fontSize: 12, fontFamily: 'var(--font-mono), Courier New', lineHeight: 1.6, color: '#aeb9c8' }}>{h.notes}</div>
                             </>
                           )}
                         </div>
@@ -324,7 +324,7 @@ export default function RecordsBureau() {
                   <div className="record-return" style={{ width: '100%', maxWidth: 760 }}>
                     <div className="record-return-header">
                       <span>VEHICLE FLAGS — {selVeh.plate}</span>
-                      <span>{new Date().toLocaleString()}</span>
+                      <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{new Date().toLocaleString()}</span>
                     </div>
                     <div className="record-return-body">
                       {!selVeh.stolen && selVeh.flags?.length === 0 && !vehWarrants.some(w => w.status === 'ACTIVE') ? (
