@@ -50,17 +50,17 @@ export function PortalPage({ children }) {
 export function PortalHeader({ icon: Icon, title, subtitle, accent = 'brand', action }) {
   const hex = resolveHex(accent);
   return (
-    <div className="flex items-center gap-4 mb-6 pb-[18px] border-b border-border-base">
+    <div className="flex items-center flex-wrap gap-x-4 gap-y-3 mb-6 pb-[18px] border-b border-border-base">
       {Icon && (
         <div
-          className={`w-[52px] h-[52px] rounded-xl shrink-0 flex items-center justify-center backdrop-blur-sm ${ACCENT_BG[accent] || ''} ${ACCENT_BORDER[accent] ? `border ${ACCENT_BORDER[accent]}` : ''}`}
+          className={`w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-xl shrink-0 flex items-center justify-center backdrop-blur-sm ${ACCENT_BG[accent] || ''} ${ACCENT_BORDER[accent] ? `border ${ACCENT_BORDER[accent]}` : ''}`}
           style={!ACCENT_BG[accent] ? { background: `${hex}1f`, border: `1px solid ${hex}55` } : undefined}
         >
           <Icon size={28} color={hex} />
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <div className="text-[22px] font-extrabold text-white tracking-[-0.3px] leading-tight">{title}</div>
+        <div className="text-[19px] sm:text-[22px] font-extrabold text-white tracking-[-0.3px] leading-tight">{title}</div>
         {subtitle && <div className="text-[13px] text-cad-muted mt-0.5">{subtitle}</div>}
       </div>
       {action}
@@ -71,7 +71,7 @@ export function PortalHeader({ icon: Icon, title, subtitle, accent = 'brand', ac
 export function StatCard({ label, value, accent = 'brand', icon: Icon, hint }) {
   const hex = resolveHex(accent);
   return (
-    <div className="stat-card-enter animate-slide-up bg-app-card/70 border border-border-base rounded-xl px-5 py-[18px] flex-1 min-w-[150px] flex flex-col gap-1.5 relative overflow-hidden backdrop-blur-sm transition-[border-color,transform]">
+    <div className="stat-card-enter animate-slide-up bg-app-card/70 border border-border-base rounded-xl px-4 py-4 sm:px-5 sm:py-[18px] flex-1 min-w-[130px] flex flex-col gap-1.5 relative overflow-hidden backdrop-blur-sm transition-[border-color,transform]">
       <div className="absolute top-[-10px] right-[-10px] opacity-10">
         {Icon && <Icon size={68} color={hex} />}
       </div>
@@ -87,7 +87,7 @@ export function PortalCard({ children, accent, style = {}, onClick, hover, class
   return (
     <div
       onClick={onClick}
-      className={`bg-app-panel/80 border border-border-base rounded-xl p-5 backdrop-blur-sm ${hover ? 'portal-card-hover cursor-pointer' : ''} ${className}`}
+      className={`bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm ${hover ? 'portal-card-hover cursor-pointer' : ''} ${className}`}
       style={{
         ...(hex ? { borderColor: `${hex}44`, borderLeft: `3px solid ${hex}` } : {}),
         ...style,

@@ -29,7 +29,7 @@ export default function CustomizationHub() {
   return (
     <>
       <AdminPageTitle>Community Customization</AdminPageTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))', gap: 14 }}>
         {CARDS.map(c => (
           <SonCard key={c.route} icon={c.icon} title={c.title} desc={c.desc} onClick={() => navigate(c.route)} />
         ))}

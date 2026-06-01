@@ -56,7 +56,7 @@ export default function CitizenLaws() {
             onChange={e => setQuery(e.target.value)}
           />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 flex-wrap">
           {['ALL', 'Felony', 'Misdemeanor', 'Infraction'].map(t => (
             <button
               key={t}
@@ -89,7 +89,7 @@ export default function CitizenLaws() {
           >
             {category}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: 12 }}>
             {laws.map(law => (
               <div
                 key={law.id}

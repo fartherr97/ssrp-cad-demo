@@ -34,7 +34,7 @@ export default function BanManagement() {
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Header */}
-      <div className="flex gap-5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
+      <div className="flex flex-wrap gap-x-5 gap-y-2 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
         {[
           { label: 'TOTAL BANS', value: bannedUsers.length, cls: 'text-cad-text' },
           { label: 'ACTIVE', value: active, cls: 'text-red-400' },

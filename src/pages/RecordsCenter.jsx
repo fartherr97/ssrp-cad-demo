@@ -116,7 +116,7 @@ export default function RecordsCenter() {
   if (showForm) {
     return (
       <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
-        <div className="px-4 py-2 bg-app-toolbar border-b border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-3 md:px-4 py-2 bg-app-toolbar border-b border-border-base flex flex-wrap items-center gap-x-3 gap-y-1 shrink-0">
           <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
             {selectedTemplate.name}
           </span>
@@ -146,7 +146,7 @@ export default function RecordsCenter() {
           />
         </FormDocWrap>
 
-        <div className="px-4 py-2.5 bg-app-toolbar border-t border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-3 md:px-4 py-2.5 bg-app-toolbar border-t border-border-base flex flex-wrap items-center gap-x-3 gap-y-2 shrink-0">
           <span className="text-[10px] text-cad-muted">
             Changes are saved automatically as a draft until you issue the record.
           </span>
@@ -169,10 +169,10 @@ export default function RecordsCenter() {
   );
 
   return (
-    <div className="flex h-full overflow-hidden font-ui">
+    <div className="flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden font-ui">
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-[240px] shrink-0 flex flex-col border-r border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+      <div className="w-full lg:w-[240px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden max-h-[40vh] lg:max-h-none">
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issue New Record</div>
           <div className="text-[10px] text-slate-500 mt-0.5">Select a record type to begin</div>
@@ -220,11 +220,11 @@ export default function RecordsCenter() {
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#2e2e32]">
+      <div className="flex-1 min-h-[50vh] lg:min-h-0 flex flex-col overflow-hidden bg-[#2e2e32]">
 
         {showRecord && (
           <>
-            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex items-center gap-2.5 shrink-0">
+            <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex flex-wrap items-center gap-x-2.5 gap-y-1 shrink-0">
               <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selRecord.type}
               </span>
@@ -278,7 +278,7 @@ export default function RecordsCenter() {
       </div>
 
       {/* ══ RIGHT: Record history ═════════════════════════════════ */}
-      <div className="w-[280px] shrink-0 flex flex-col border-l border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+      <div className="w-full lg:w-[280px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden max-h-[40vh] lg:max-h-none">
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issued Records</span>

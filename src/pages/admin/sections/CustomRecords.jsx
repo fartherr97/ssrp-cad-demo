@@ -94,7 +94,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         {expanded ? <MdExpandMore size={16} color={ADMIN.textDim} /> : <MdChevronRight size={16} color={ADMIN.textDim} />}
       </div>
       {expanded && (
-        <div className="p-3 grid grid-cols-2 gap-3">
+        <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label style={SON_LABEL}>Field Label</label>
             <input style={SON_INPUT} value={field.label} onChange={e => onUpdate({ ...field, label: e.target.value })} placeholder="e.g. Subject Name" />
@@ -317,7 +317,7 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
       </div>
 
       {/* Meta fields */}
-      <div className="px-4 pt-4 pb-3 grid grid-cols-2 gap-3 shrink-0" style={{ borderBottom: `1px solid ${ADMIN.border}`, background: ADMIN.panel }}>
+      <div className="px-4 pt-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-3 shrink-0" style={{ borderBottom: `1px solid ${ADMIN.border}`, background: ADMIN.panel }}>
         <div>
           <label style={SON_LABEL}>Template Name *</label>
           <input style={SON_INPUT} value={draft.name} onChange={e => up({ name: e.target.value })} placeholder="e.g. Use of Force Report" />
@@ -449,7 +449,7 @@ export default function CustomRecords() {
   }
 
   return (
-    <div style={{ background: ADMIN.bg, minHeight: '100%', padding: 22 }}>
+    <div className="p-3 md:p-[22px]" style={{ background: ADMIN.bg, minHeight: '100%' }}>
       <AdminPageTitle
         right={
           <div className="flex gap-2">
@@ -466,7 +466,7 @@ export default function CustomRecords() {
       </AdminPageTitle>
 
       {/* Filters + search */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <SonSearch value={search} onChange={setSearch} placeholder="Search templates..." />
         <div className="flex gap-1">
           {[
@@ -490,7 +490,7 @@ export default function CustomRecords() {
       </div>
 
       {/* Template table */}
-      <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${ADMIN.border}` }}>
+      <div className="rounded-lg overflow-x-auto" style={{ border: `1px solid ${ADMIN.border}` }}>
         <table className="w-full border-collapse text-[13px]">
           <thead>
             <tr style={{ background: ADMIN.panel2 }}>

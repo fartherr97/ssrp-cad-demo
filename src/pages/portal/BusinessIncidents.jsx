@@ -91,7 +91,7 @@ export default function BusinessIncidents() {
           </div>
         </PortalCard>
       ) : (
-        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
+        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))' }}>
           {filtered.map(inc => (
             <PortalCard key={inc.id} accent={inc.status === 'Open' ? 'amber' : ACCENT}>
               <div className="flex justify-between items-start gap-2.5 mb-2">

@@ -56,7 +56,7 @@ export default function Departments() {
         right={<SonSearch value={query} onChange={setQuery} placeholder="Search agencies…" />}
       >
         {filtered.length === 0 ? <EmptyState>No agencies match.</EmptyState> : (
-          <div className="grid gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))' }}>
+          <div className="grid gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))' }}>
             {filtered.map(d => {
               const open = expanded === d.id;
               return (

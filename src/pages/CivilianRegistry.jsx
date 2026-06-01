@@ -8,6 +8,7 @@ import {
   S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
   trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
+import { MdArrowBack } from 'react-icons/md';
 
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
@@ -56,9 +57,9 @@ export default function CivilianRegistry() {
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
-      <div className="grid overflow-hidden flex-1 min-h-0 p-4 lg:p-5 gap-4 lg:gap-5" style={{ gridTemplateColumns: '280px 1fr' }}>
+      <div className="mob-two-pane grid overflow-hidden flex-1 min-h-0 p-3 md:p-5 gap-4 lg:gap-5" style={{ gridTemplateColumns: '280px 1fr' }}>
         {/* LEFT: Civilian List */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-list-panel${selected != null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Civilian Registry</div>
             <button className={`${xs(S_BTN_PRIMARY)} ml-auto`} onClick={() => setShowCreate(true)}>+ New</button>
@@ -99,7 +100,10 @@ export default function CivilianRegistry() {
         </div>
 
         {/* RIGHT: Detail */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-detail-panel${selected == null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
+          <button className="mob-back-btn !rounded-none" onClick={() => setSelected(null)}>
+            <MdArrowBack size={14} /> Back to registry
+          </button>
           {!selCiv ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-cad-muted p-6">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.2">
@@ -128,7 +132,7 @@ export default function CivilianRegistry() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap justify-end gap-1.5">
                     <button className={sm(S_BTN_SECONDARY)} onClick={() => setShowAddVeh(true)}>+ Vehicle</button>
                     <button className={sm(S_BTN_DANGER)} onClick={() => deleteCiv(selCiv.id)}>Delete</button>
                   </div>
@@ -157,7 +161,7 @@ export default function CivilianRegistry() {
 
               <div className="flex-1 overflow-y-auto p-4">
                 {tab === 'INFO' && (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className={S_CARD}>
                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">Personal</div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Height</span><span className={S_DETAIL_VALUE}>{selCiv.height}</span></div>
@@ -239,7 +243,7 @@ export default function CivilianRegistry() {
               <button className={sm(S_BTN_GHOST)} onClick={() => setShowCreate(false)}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>First Name *</label><input className={S_INPUT} value={form.firstName} onChange={e => setForm(p => ({...p, firstName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Last Name *</label><input className={S_INPUT} value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Date of Birth</label><input className={S_INPUT} type="date" value={form.dob} onChange={e => setForm(p => ({...p, dob: e.target.value}))} /></div>
@@ -252,7 +256,7 @@ export default function CivilianRegistry() {
                 <div className={S_FIELD}><label className={S_LABEL}>SSN</label><input className={S_INPUT} placeholder="XXX-XX-XXXX" value={form.ssn} onChange={e => setForm(p => ({...p, ssn: e.target.value}))} /></div>
               </div>
               <div className={S_FIELD}><label className={S_LABEL}>Home Address</label><input className={S_INPUT} value={form.address} onChange={e => setForm(p => ({...p, address: e.target.value}))} /></div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>DL Number</label><input className={S_INPUT} value={form.dlNumber} onChange={e => setForm(p => ({...p, dlNumber: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>DL Status</label><select className={S_SELECT} value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></select></div>
               </div>
@@ -274,7 +278,7 @@ export default function CivilianRegistry() {
               <button className={sm(S_BTN_GHOST)} onClick={() => setShowAddVeh(false)}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>License Plate *</label><input className={S_INPUT} placeholder="e.g. ABC-1234" value={vehForm.plate} onChange={e => setVehForm(p => ({...p, plate: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Year</label><input className={S_INPUT} placeholder="2023" value={vehForm.year} onChange={e => setVehForm(p => ({...p, year: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Make *</label><input className={S_INPUT} placeholder="Ford" value={vehForm.make} onChange={e => setVehForm(p => ({...p, make: e.target.value}))} /></div>

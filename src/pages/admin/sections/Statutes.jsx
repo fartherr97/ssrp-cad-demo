@@ -22,7 +22,7 @@ function TypeList({ title, listKey }) {
           onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
         <SonButton size="sm" variant="red" onClick={add}><MdAdd size={15} /></SonButton>
       </div>
-    } style={{ flex: 1, minWidth: 320 }}>
+    } style={{ flex: 1, minWidth: 280 }}>
       <SonTable columns={[{ label: 'Action', width: 110 }, { label: title.replace(' Types', '') }]}>
         {list.map((t, i) => (
           <SonRow key={t.id} i={i}>
@@ -73,7 +73,7 @@ export default function Statutes() {
         </>}
       >
         {form && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 16, padding: 14, background: ADMIN.bg, border: `1px solid ${ADMIN.border}`, borderRadius: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: 10, marginBottom: 16, padding: 14, background: ADMIN.bg, border: `1px solid ${ADMIN.border}`, borderRadius: 8 }}>
             <input style={SON_INPUT} placeholder="Code" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} />
             <input style={{ ...SON_INPUT, gridColumn: 'span 2' }} placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
             <select style={SON_INPUT} value={form.chargeType} onChange={e => setForm(f => ({ ...f, chargeType: e.target.value }))}>

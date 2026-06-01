@@ -168,7 +168,7 @@ export default function ReportsCenter() {
         </FormDocWrap>
 
         {/* Bottom submit bar */}
-        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base flex items-center flex-wrap gap-x-3 gap-y-1.5 shrink-0">
           <span className="text-[10px] text-cad-muted">
             Changes are saved automatically as a draft until you submit.
           </span>
@@ -182,10 +182,10 @@ export default function ReportsCenter() {
   }
 
   return (
-    <div className="flex h-full overflow-hidden font-ui">
+    <div className="flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden font-ui">
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-[230px] shrink-0 flex flex-col border-r border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden">
+      <div className="w-full md:w-[230px] shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden max-h-[40vh] md:max-h-none">
         {/* Header */}
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">File New Report</div>
@@ -246,12 +246,12 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#2e2e32]">
+      <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col overflow-hidden bg-[#2e2e32]">
 
         {/* ── Viewing a submitted report ── */}
         {showReport && (
           <>
-            <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-2.5 shrink-0">
+            <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center flex-wrap gap-2.5 shrink-0">
               <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selReport.type}
               </span>
@@ -319,7 +319,7 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ RIGHT: Report queue ═══════════════════════════════════ */}
-      <div className="w-[270px] shrink-0 flex flex-col border-l border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden">
+      <div className="w-full md:w-[270px] shrink-0 flex flex-col border-t md:border-t-0 md:border-l border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden max-h-[45vh] md:max-h-none">
         {/* Header + stats */}
         <div className="px-3 py-3 border-b border-border-faint shrink-0">
           <div className="flex items-center justify-between mb-2">

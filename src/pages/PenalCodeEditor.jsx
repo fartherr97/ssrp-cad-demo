@@ -60,8 +60,8 @@ export default function PenalCodeEditor() {
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
       {/* Header */}
-      <div className="flex gap-2.5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
-        <input className={`${S_INPUT} !w-[200px] text-[11px]`} placeholder="Search codes or names..." value={filter} onChange={e => setFilter(e.target.value)} />
+      <div className="flex flex-wrap gap-2.5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
+        <input className={`${S_INPUT} w-full sm:!w-[200px] text-[11px]`} placeholder="Search codes or names..." value={filter} onChange={e => setFilter(e.target.value)} />
         <select className={`${S_SELECT} !w-[130px] text-[10px]`} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="ALL">All Types</option>
           <option value="Felony">Felony</option>
@@ -81,15 +81,15 @@ export default function PenalCodeEditor() {
         )}
       </div>
 
-      <div className="grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '1fr 320px' }}>
+      <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '1fr 320px' }}>
         {/* Charges table */}
-        <div className="flex flex-col border-r border-border-base overflow-hidden">
+        <div className={`mob-list-panel${selCharge ? ' mob-gone' : ''} flex flex-col border-r border-border-base overflow-hidden`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Penal Code Reference</div>
             <span className="text-[9px] text-cad-muted font-mono">SSRP LEGAL CODE</span>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <table className={S_TABLE}>
+          <div className="flex-1 overflow-auto">
+            <table className={`${S_TABLE} min-w-[640px]`}>
               <thead>
                 <tr>
                   {['Code','Offense','Category','Type','Fine','Jail Time','Points'].map(h => (
@@ -128,7 +128,10 @@ export default function PenalCodeEditor() {
         </div>
 
         {/* Detail / Edit Panel */}
-        <div className="flex flex-col overflow-hidden">
+        <div className={`mob-detail-panel${!selCharge ? ' mob-gone' : ''} flex flex-col overflow-hidden`}>
+          <button className="mob-back-btn" onClick={() => { setSelected(null); setEditing(null); }}>
+            ← Back to charges
+          </button>
           {!selCharge ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25">

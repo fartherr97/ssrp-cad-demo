@@ -79,18 +79,18 @@ export default function WarrantControl() {
         </div>
       </div>
 
-      <div className="grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
+      <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
         {/* Warrant Table */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-list-panel${selected != null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Warrant Registry</div>
             <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{filtered.length}</span>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-auto">
             {filtered.length === 0 ? (
               <div className="p-6 text-center text-cad-muted text-[11px]">No warrants on file</div>
             ) : (
-              <table className={S_TABLE}>
+              <table className={`${S_TABLE} min-w-[560px]`}>
                 <thead>
                   <tr>
                     {['Status','Subject','Type','Charge','Issued By','Issue Date'].map(h => (
@@ -121,7 +121,10 @@ export default function WarrantControl() {
         </div>
 
         {/* Detail Panel */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-detail-panel${selected == null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
+          <button className="mob-back-btn !rounded-none" onClick={() => setSelected(null)}>
+            <MdArrowBack size={14} /> Back to registry
+          </button>
           {!selWarrant ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25">

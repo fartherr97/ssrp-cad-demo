@@ -98,7 +98,7 @@ export default function MyCharacters() {
             </button>
           </div>
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
               {FORM_FIELDS.map(f => (
                 <div key={f.key}>
                   <label className={PORTAL_LABEL}>{f.label}</label>
@@ -144,7 +144,7 @@ export default function MyCharacters() {
           </div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: 14 }}>
           {myChars.map(c => (
             <PortalCard key={c.id} accent="brand">
               <div className="flex justify-between items-start gap-2.5 mb-4">

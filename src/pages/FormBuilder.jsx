@@ -52,7 +52,7 @@ const BLANK_NEW_FIELD = { label: '', type: 'text', span: 1, required: false, mon
 function AddFieldForm({ value, onChange, onAdd, onCancel }) {
   return (
     <div className="mt-1.5 p-2 bg-app-card border border-brand/40 rounded-lg">
-      <div className="grid gap-1.5 mb-1.5" style={{ gridTemplateColumns: '1fr 140px 70px' }}>
+      <div className="grid gap-1.5 mb-1.5 grid-cols-1 sm:grid-cols-[1fr_140px_70px]">
         <div>
           <label className={LABEL_CLS}>Field Label *</label>
           <input
@@ -390,10 +390,10 @@ export default function FormBuilder() {
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
-      <div className="grid flex-1 min-h-0 overflow-hidden" style={{ gridTemplateColumns: '260px 1fr', gap: 0 }}>
+      <div className="flex flex-col md:grid md:grid-cols-[260px_1fr] flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
 
         {/* ── LEFT: Template list ───────────────────────────────── */}
-        <div className="flex flex-col overflow-hidden border-r border-border-base bg-app-toolbar/80 backdrop-blur-md">
+        <div className="flex flex-col overflow-hidden border-b md:border-b-0 md:border-r border-border-base bg-app-toolbar/80 backdrop-blur-md max-h-[35vh] md:max-h-none shrink-0">
           <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint flex items-center justify-between shrink-0">
             <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">
               Form Builder
@@ -432,7 +432,7 @@ export default function FormBuilder() {
         </div>
 
         {/* ── RIGHT: Editor / Preview ───────────────────────────── */}
-        <div className={`flex flex-col overflow-hidden ${editing && activeTab === 'preview' ? 'bg-[#3a3a3a]' : 'bg-app-bg'}`}>
+        <div className={`flex flex-col overflow-hidden min-h-[55vh] md:min-h-0 ${editing && activeTab === 'preview' ? 'bg-[#3a3a3a]' : 'bg-app-bg'}`}>
           {!editing ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-500 p-6">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.4">
@@ -452,7 +452,7 @@ export default function FormBuilder() {
           ) : (
             <>
               {/* Toolbar */}
-              <div className="px-3 py-2 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-2 shrink-0">
+              <div className="px-3 py-2 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center flex-wrap gap-2 shrink-0">
                 <div className="flex gap-1 p-0.5 bg-app-bg/60 rounded-lg border border-border-faint">
                   {['edit', 'preview'].map(tab => (
                     <button

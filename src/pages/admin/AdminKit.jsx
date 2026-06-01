@@ -57,9 +57,9 @@ export function AdminPanel({ title, subtitle, right, children, center, style = {
 /* Page-level header (e.g. "Community Customization") */
 export function AdminPageTitle({ children, right }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl px-5 py-4 mb-5 bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20">
+    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl px-5 py-4 mb-5 bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20">
       <div className="text-[18px] font-bold text-white tracking-[-0.2px]">{children}</div>
-      {right && <div className="flex gap-2">{right}</div>}
+      {right && <div className="flex gap-2 flex-wrap">{right}</div>}
     </div>
   );
 }

@@ -34,7 +34,7 @@ export default function MyBusiness() {
           accent="brand"
         />
         <PortalCard accent="brand">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 16 }}>
             <div>
               <label className={PORTAL_LABEL}>Business Name</label>
               <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="e.g. Bayshore Auto & Towing" />
@@ -97,7 +97,7 @@ export default function MyBusiness() {
       <PortalCard accent="brand">
         {editing ? (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 16 }}>
               <div>
                 <label className={PORTAL_LABEL}>Business Name</label>
                 <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} />
@@ -129,7 +129,7 @@ export default function MyBusiness() {
             </div>
           </>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 20 }}>
             <Field label="Business Name" value={myBiz.name} />
             <Field label="Type" value={myBiz.type} />
             <Field label="Owner" value={myBiz.owner} />

@@ -74,8 +74,8 @@ export default function MDT() {
       <div className="flex-1 overflow-hidden flex">
         {/* MESSAGES */}
         {tab === 'MESSAGES' && (
-          <div className="grid flex-1 overflow-hidden min-h-0" style={{ gridTemplateColumns: '260px 1fr' }}>
-            <div className={`${S_PANEL} rounded-none border-t-0 border-l-0 border-b-0 border-r-0`}>
+          <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 grid-cols-1 md:grid-cols-[260px_1fr]">
+            <div className={`mob-list-panel${selMsg ? ' mob-gone' : ''} ${S_PANEL} rounded-none border-t-0 border-l-0 border-b-0 border-r-0`}>
               <div className={S_PANEL_HEADER}>
                 <div className={S_PANEL_TITLE}>Inbox</div>
                 <span className="text-[9px] font-mono text-cad-muted">{messages.length} MESSAGES</span>
@@ -104,7 +104,10 @@ export default function MDT() {
                 ))}
               </div>
             </div>
-            <div className={`${S_PANEL} rounded-none border-t-0 border-r-0 border-b-0`}>
+            <div className={`mob-detail-panel${!selMsg ? ' mob-gone' : ''} ${S_PANEL} rounded-none border-t-0 border-r-0 border-b-0`}>
+              <button className="mob-back-btn" onClick={() => setSelectedMsg(null)}>
+                <MdArrowBack size={14} /> Back to inbox
+              </button>
               {!selMsg ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
                   <span className="text-[28px] opacity-20">📨</span>
@@ -161,15 +164,15 @@ export default function MDT() {
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.7px] mb-2">
                 STATE / NCIC QUERY TERMINAL
               </div>
-              <div className="flex gap-1.5 items-end">
-                <div className={`${S_FIELD} flex-[0_0_120px]`}>
+              <div className="flex flex-wrap gap-1.5 items-end">
+                <div className={`${S_FIELD} flex-[0_0_120px] min-w-[120px]`}>
                   <label className={S_LABEL}>Query Type</label>
                   <select className={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
                     <option value="PERSON">Person</option>
                     <option value="VEHICLE">Vehicle</option>
                   </select>
                 </div>
-                <div className={`${S_FIELD} flex-1`}>
+                <div className={`${S_FIELD} flex-1 min-w-[160px]`}>
                   <label className={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
                   <input className={S_INPUT} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
                     placeholder={queryType === 'PERSON' ? 'e.g. Washington or 618-77-9901' : 'e.g. SUS-1109 or Dodge Charger'} />

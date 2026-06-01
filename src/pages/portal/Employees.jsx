@@ -62,7 +62,7 @@ export default function Employees() {
 
       {adding && (
         <PortalCard accent={ACCENT} className="mb-5">
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))' }}>
             <div>
               <label className={PORTAL_LABEL}>Name</label>
               <input className={PORTAL_INPUT} value={form.name} onChange={set('name')} placeholder="Full name" />
@@ -98,7 +98,7 @@ export default function Employees() {
           <div className="text-sm text-slate-400">Use "Add Employee" to build your roster.</div>
         </PortalCard>
       ) : (
-        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
+        <div className="grid gap-3.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))' }}>
           {myBiz.employees.map(emp => (
             <PortalCard key={emp.id} accent={ACCENT}>
               <div className="flex justify-between items-start gap-2.5">
