@@ -1,7 +1,7 @@
 import { useCAD } from '../../store/cadStore';
 
 /* ─── SVG icon helpers ─── */
-const Icon = ({ d, size = 16 }) => (
+const Icon = ({ d, size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
   </svg>
@@ -32,7 +32,7 @@ function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} 
       style={style}
     >
       <span className="cad-tool-icon">
-        <Icon d={ICONS[iconKey]} size={15} />
+        <Icon d={ICONS[iconKey]} size={20} />
       </span>
       <span className="cad-tool-label">{label}</span>
     </button>
@@ -73,15 +73,15 @@ export default function ActionBar({ onCreateCall }) {
       {/* My call indicator */}
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-        justifyContent: 'center', padding: '0 10px', height: '100%',
-        borderRight: '1px solid #0d1e32', flexShrink: 0, minWidth: 100,
+        justifyContent: 'center', padding: '0 12px', height: '100%',
+        borderRight: '1px solid #2a4060', flexShrink: 0, minWidth: 110,
       }}>
-        <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.5px', textTransform: 'uppercase' }}>My Call</span>
-        <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, color: myCall ? '#66ddff' : '#334455', lineHeight: 1.2 }}>
+        <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: '#6090b8', letterSpacing: '0.5px', textTransform: 'uppercase' }}>My Call</span>
+        <span style={{ fontSize: 13, fontFamily: 'var(--font-mono)', fontWeight: 700, color: myCall ? '#66ddff' : '#334455', lineHeight: 1.2 }}>
           {myCall ? myCall.id : 'UNASSIGNED'}
         </span>
         {myCall && (
-          <span style={{ fontSize: 8, color: '#44779a', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 9, color: '#5090b0', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {myCall.nature}
           </span>
         )}
@@ -110,15 +110,15 @@ export default function ActionBar({ onCreateCall }) {
 
       {/* ── Status buttons ── */}
       <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1, padding: '0 4px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: 6, borderRight: '1px solid #0d1e32', marginRight: 4, height: 38 }}>
-          <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.4px', textTransform: 'uppercase' }}>Status</span>
-          <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700, color: activeStatusColor }}>{STATUS_BTNS.find(s => s.status === myStatus)?.label || '—'}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: 8, borderRight: '1px solid #2a4060', marginRight: 4, height: 42 }}>
+          <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: '#6090b8', letterSpacing: '0.4px', textTransform: 'uppercase' }}>Status</span>
+          <span style={{ fontSize: 13, fontFamily: 'var(--font-mono)', fontWeight: 700, color: activeStatusColor }}>{STATUS_BTNS.find(s => s.status === myStatus)?.label || '—'}</span>
         </div>
         {STATUS_BTNS.map(s => (
           <button
             key={s.status}
             className={`cad-status-btn ${myStatus === s.status ? s.cls : ''}`}
-            style={{ height: 28, padding: '0 7px', fontSize: 9 }}
+            style={{ height: 30, padding: '0 9px', fontSize: 10 }}
             onClick={() => setStatus(s.status)}
             title={`Set status: ${s.status}`}
           >

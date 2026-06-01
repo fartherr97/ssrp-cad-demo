@@ -58,6 +58,16 @@ function AgencyBadge({ agency }) {
   return <span className={`cad-agency ${cls}`}>{agency}</span>;
 }
 
+/* ─── Status → neon color ─── */
+const ST_COLOR = {
+  AVAILABLE:   '#22ff66',
+  ENRT:        '#ddff33',
+  BUSY:        '#ff8822',
+  ARRVD:       '#ffee22',
+  UNAVAILABLE: '#dd44aa',
+  OFFDUTY:     '#ff4444',
+};
+
 /* ─── Call nature display (for calls grid) ─── */
 const CALL_NATURES = [
   'Traffic Stop', 'Suspicious Person', 'Suspicious Vehicle', 'Domestic Disturbance',
@@ -180,17 +190,17 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
             <span className="cad-grid-title">■ ACTIVE SERVICE CALLS</span>
             <span className="cad-grid-count">({sortedCalls.length})</span>
             {p1Count > 0 && (
-              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--pr1-text)', fontWeight: 700, marginLeft: 4, animation: 'pulseRed 1.5s ease-in-out infinite' }}>
+              <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#ff3333', fontWeight: 700, marginLeft: 4, animation: 'pulseRed 1.5s ease-in-out infinite' }}>
                 ▲ P1:{p1Count}
               </span>
             )}
             {pendingCount > 0 && (
-              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--pr2-text)', marginLeft: 4 }}>
+              <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#ff8822', marginLeft: 4 }}>
                 PNDG:{pendingCount}
               </span>
             )}
             {unassignedCount > 0 && (
-              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--pr3-text)', marginLeft: 4 }}>
+              <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#ffee22', marginLeft: 4 }}>
                 UNASN:{unassignedCount}
               </span>
             )}
@@ -259,15 +269,15 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                     className={`pri-${c.priority}${selectedCallId === c.id ? ' row-selected' : ''}`}
                     onClick={() => { setSelectedCallId(c.id); setSelectedUnitId(null); setMobileTab('detail'); }}
                   >
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#22ff88', fontWeight: 700 }}>{c.id}</td>
-                    <td style={{ fontWeight: 500, color: '#e8e8e8' }}>{c.nature}</td>
-                    <td style={{ color: '#ddee44', fontSize: 10 }}>{c.location}</td>
-                    <td style={{ color: '#44bbdd', fontSize: 10 }}>{c.city}</td>
-                    <td style={{ color: '#336688', fontSize: 10 }}>{c.county}</td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#ffffff' }}>{c.id}</td>
+                    <td style={{ fontWeight: 600, color: '#00ee44' }}>{c.nature}</td>
+                    <td style={{ color: '#ffff00', fontWeight: 500 }}>{c.location}</td>
+                    <td style={{ color: '#00ccff' }}>{c.city}</td>
+                    <td style={{ color: '#aabb00' }}>{c.county}</td>
                     <td><PriBadge p={c.priority} /></td>
                     <td><CallStatus status={c.status} /></td>
                     <td>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span style={{ color: '#334455' }}>—</span>}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: c.units.length > 0 ? '#22ff88' : '#334455' }}>
+                    <td style={{ fontFamily: 'var(--font-mono)', color: c.units.length > 0 ? '#00ee66' : '#334455' }}>
                       {c.units.length > 0 ? c.units.join(', ') : '—'}
                     </td>
                   </tr>
@@ -282,13 +292,13 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
           <div className="cad-grid-titlebar">
             <span className="cad-grid-title">■ FIELD UNITS</span>
             <span className="cad-grid-count">({onDutyOfficers.length} ON DUTY)</span>
-            <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--st-av-text)', marginLeft: 6 }}>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#22ff66', marginLeft: 6 }}>
               AVL: {officers.filter(o => o.status === 'AVAILABLE').length}
             </span>
-            <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--st-busy-text)', marginLeft: 6 }}>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#ff8822', marginLeft: 6 }}>
               BUSY: {officers.filter(o => o.status === 'BUSY').length}
             </span>
-            <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--st-enrt-text)', marginLeft: 6 }}>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#ddff33', marginLeft: 6 }}>
               ENRT: {officers.filter(o => o.status === 'ENRT').length}
             </span>
 
@@ -343,16 +353,16 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                       setMobileTab('detail');
                     }}
                   >
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: '#66ddff' }}>{o.unitId}</td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: ST_COLOR[o.status] || '#aabbcc' }}>{o.unitId}</td>
                     <td><StatusBadge status={o.status} /></td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: o.callId ? '#ffcc44' : '#334455' }}>
+                    <td style={{ fontFamily: 'var(--font-mono)', color: o.callId ? '#ffee44' : '#334455' }}>
                       {o.callId || '—'}
                     </td>
-                    <td><AgencyBadge agency={o.deptShort} /></td>
-                    <td style={{ color: '#557799', fontSize: 10 }}>{o.location}</td>
-                    <td style={{ color: '#c8c8c8', fontSize: 10 }}>
+                    <td style={{ color: '#aaccee', fontWeight: 600 }}>{o.deptShort}</td>
+                    <td style={{ color: '#44bbff' }}>{o.location}</td>
+                    <td style={{ color: ST_COLOR[o.status] || '#c8c8c8', fontWeight: 500 }}>
                       {o.name}
-                      {o.rank && <span style={{ color: '#446688', marginLeft: 4 }}>· {o.rank}</span>}
+                      {o.rank && <span style={{ color: '#556677', marginLeft: 4 }}>· {o.rank}</span>}
                     </td>
                   </tr>
                 ))}
