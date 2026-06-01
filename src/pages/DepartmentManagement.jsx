@@ -6,6 +6,10 @@ import { useResponsive } from '../hooks/useResponsive';
 
 const DEPT_TYPES = ['LEO','Fire','EMS','Dispatch','Civilian'];
 
+const INPUT_CLS = 'w-full bg-app-input border border-border-base text-cad-text px-2.5 py-1.5 text-sm box-border';
+const BLUE_BTN  = 'bg-sky-950 border border-sky-700 text-sky-400 px-3.5 py-1.5 text-xs cursor-pointer font-bold';
+const GHOST_BTN = 'bg-transparent border border-border-base text-slate-600 px-2.5 py-1.5 text-xs cursor-pointer';
+
 export default function DepartmentManagement() {
   const { state, dispatch } = useCAD();
   const { departments, officers } = state;
@@ -36,18 +40,18 @@ export default function DepartmentManagement() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
+    <div className="p-3.5">
       {/* Mobile: dropdown selector */}
       {isMobile && (
-        <div style={{ marginBottom: '12px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>DEPARTMENTS</span>
-            <button onClick={() => setShowForm(true)} style={{ ...blueBtn, marginLeft: 'auto', fontSize: '11px', padding: '4px 10px' }}>+ New</button>
+        <div className="mb-3">
+          <div className="flex gap-2 items-center mb-2">
+            <span className="text-amber-400 text-xs font-bold tracking-[1.5px]">DEPARTMENTS</span>
+            <button onClick={() => setShowForm(true)} className={`${BLUE_BTN} ml-auto`}>+ New</button>
           </div>
           <select
             value={selectedDept?.id || ''}
             onChange={e => setSelectedDept(departments.find(d => d.id === Number(e.target.value)))}
-            style={inputBase}
+            className={INPUT_CLS}
           >
             {departments.map(dept => (
               <option key={dept.id} value={dept.id}>{dept.short} — {dept.name}</option>
@@ -56,33 +60,31 @@ export default function DepartmentManagement() {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '14px', minHeight: isMobile ? 'auto' : 'calc(100vh - 80px)' }}>
+      <div className="flex gap-3.5" style={{ minHeight: isMobile ? 'auto' : 'calc(100vh - 80px)' }}>
         {/* Desktop: sidebar list */}
         {!isMobile && (
-          <div style={{ width: '250px', flexShrink: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>DEPARTMENTS</span>
-              <button onClick={() => setShowForm(true)} style={{ ...blueBtn, fontSize: '11px', padding: '3px 10px' }}>+ New</button>
+          <div className="w-[250px] shrink-0">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-amber-400 text-xs font-bold tracking-[1.5px]">DEPARTMENTS</span>
+              <button onClick={() => setShowForm(true)} className={BLUE_BTN}>+ New</button>
             </div>
             {departments.map(dept => (
               <div
                 key={dept.id}
                 onClick={() => setSelectedDept(dept)}
+                className="px-3 py-2.5 cursor-pointer mb-1 transition-colors"
                 style={{
                   background: selectedDept?.id === dept.id ? '#0f172a' : '#090b10',
                   border: `1px solid ${selectedDept?.id === dept.id ? dept.color : '#1e2533'}`,
-                  padding: '9px 12px',
-                  cursor: 'pointer',
-                  marginBottom: '4px',
                   borderLeft: `3px solid ${dept.color}`,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: '#d1d5db', fontSize: '13px', fontWeight: 700 }}>{dept.short}</span>
-                  <span style={{ color: '#4b5563', fontSize: '10px' }}>[{dept.type}]</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-300 text-sm font-bold">{dept.short}</span>
+                  <span className="text-slate-600 text-[10px]">[{dept.type}]</span>
                 </div>
-                <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>{dept.name}</div>
-                <div style={{ color: '#374151', fontSize: '10px', marginTop: '1px' }}>
+                <div className="text-slate-400 text-[11px] mt-0.5">{dept.name}</div>
+                <div className="text-slate-700 text-[10px] mt-px">
                   {officers.filter(o => o.dept === dept.id).length} officers
                 </div>
               </div>
@@ -91,93 +93,104 @@ export default function DepartmentManagement() {
         )}
 
         {/* Department detail */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
           {selectedDept && (
             <>
               {/* Dept header */}
-              <div style={{ background: '#0d1117', border: `1px solid ${selectedDept.color}50`, borderLeft: `3px solid ${selectedDept.color}`, padding: '14px 16px', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ color: '#f9fafb', fontSize: '16px', fontWeight: 700 }}>{selectedDept.name}</span>
-                  <span style={{ background: selectedDept.color + '25', border: `1px solid ${selectedDept.color}60`, color: selectedDept.color, padding: '2px 8px', fontSize: '11px', fontWeight: 700 }}>{selectedDept.type}</span>
+              <div
+                className="bg-app-card p-3.5 mb-3"
+                style={{ border: `1px solid ${selectedDept.color}50`, borderLeft: `3px solid ${selectedDept.color}` }}
+              >
+                <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
+                  <span className="text-slate-50 text-base font-bold">{selectedDept.name}</span>
+                  <span
+                    className="px-2 py-0.5 text-[11px] font-bold"
+                    style={{ background: selectedDept.color + '25', border: `1px solid ${selectedDept.color}60`, color: selectedDept.color }}
+                  >
+                    {selectedDept.type}
+                  </span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px', fontSize: '13px' }}>
+                <div
+                  className="grid gap-2 text-sm"
+                  style={{ gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)' }}
+                >
                   {[['Abbreviation', selectedDept.abbreviation || selectedDept.short],['Badge Prefix', selectedDept.badgePrefix],['Radio Channel', selectedDept.radioChannel],['Active Officers', deptOfficers.filter(o => o.status !== 'OFFDUTY').length + ' / ' + deptOfficers.length]].map(([l,v]) => (
-                    <div key={l} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '8px 10px' }}>
-                      <div style={{ color: '#3b82f6', fontSize: '10px', letterSpacing: '1px', marginBottom: '3px' }}>{l.toUpperCase()}</div>
-                      <div style={{ color: '#d1d5db' }}>{v || '—'}</div>
+                    <div key={l} className="bg-app-input border border-border-base px-2.5 py-2">
+                      <div className="text-sky-400 text-[10px] tracking-widest mb-0.5">{l.toUpperCase()}</div>
+                      <div className="text-slate-300">{v || '—'}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Subdivisions */}
-              <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px' }}>SUBDIVISIONS</span>
-                  <button onClick={() => setShowSubForm(true)} style={{ ...blueBtn, fontSize: '11px', padding: '3px 10px' }}>+ Add</button>
+              <div className="bg-app-card border border-border-subtle p-3.5 mb-2.5">
+                <div className="flex justify-between items-center mb-2.5">
+                  <span className="text-amber-400 text-[11px] font-bold tracking-[1.5px]">SUBDIVISIONS</span>
+                  <button onClick={() => setShowSubForm(true)} className={BLUE_BTN}>+ Add</button>
                 </div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <div className="flex gap-1.5 flex-wrap">
                   {(selectedDept.subdivisions || []).map(sub => (
-                    <div key={sub} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '5px 12px', fontSize: '12px', color: '#9ca3af' }}>
+                    <div key={sub} className="bg-app-input border border-border-base px-3 py-1 text-xs text-slate-400">
                       {sub}
-                      <span style={{ color: '#374151', marginLeft: '8px', fontSize: '10px' }}>
+                      <span className="text-slate-700 ml-2 text-[10px]">
                         ({deptOfficers.filter(o => o.subdivision === sub).length})
                       </span>
                     </div>
                   ))}
                   {(!selectedDept.subdivisions || selectedDept.subdivisions.length === 0) && (
-                    <span style={{ color: '#374151', fontSize: '13px' }}>No subdivisions defined</span>
+                    <span className="text-slate-700 text-sm">No subdivisions defined</span>
                   )}
                 </div>
                 {showSubForm && (
-                  <form onSubmit={handleAddSub} style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-                    <input value={subName} onChange={e => setSubName(e.target.value)} placeholder="Subdivision name..." required style={{ ...inputBase, flex: 1, minWidth: '150px' }} />
-                    <button type="submit" style={blueBtn}>Add</button>
-                    <button type="button" onClick={() => setShowSubForm(false)} style={ghostBtn}>Cancel</button>
+                  <form onSubmit={handleAddSub} className="flex gap-2 mt-2.5 flex-wrap">
+                    <input value={subName} onChange={e => setSubName(e.target.value)} placeholder="Subdivision name..." required className={`${INPUT_CLS} flex-1 min-w-[150px]`} />
+                    <button type="submit" className={BLUE_BTN}>Add</button>
+                    <button type="button" onClick={() => setShowSubForm(false)} className={GHOST_BTN}>Cancel</button>
                   </form>
                 )}
               </div>
 
               {/* Rank structure */}
-              <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px', marginBottom: '10px' }}>
-                <div style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>RANK STRUCTURE</div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <div className="bg-app-card border border-border-subtle p-3.5 mb-2.5">
+                <div className="text-amber-400 text-[11px] font-bold tracking-[1.5px] mb-2.5">RANK STRUCTURE</div>
+                <div className="flex gap-1.5 flex-wrap">
                   {(RANKS[selectedDept.type] || RANKS.LEO).map((rank, i) => (
-                    <div key={rank} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '4px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span style={{ color: '#3b82f6', fontSize: '10px' }}>{i + 1}.</span>
-                      <span style={{ color: '#9ca3af' }}>{rank}</span>
-                      <span style={{ color: '#374151', fontSize: '10px' }}>({deptOfficers.filter(o => o.rank === rank).length})</span>
+                    <div key={rank} className="bg-app-input border border-border-base px-2.5 py-1 text-[11px] flex items-center gap-1">
+                      <span className="text-sky-400 text-[10px]">{i + 1}.</span>
+                      <span className="text-slate-400">{rank}</span>
+                      <span className="text-slate-700 text-[10px]">({deptOfficers.filter(o => o.rank === rank).length})</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Roster */}
-              <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px' }}>
-                <div style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>DEPARTMENT ROSTER ({deptOfficers.length})</div>
+              <div className="bg-app-card border border-border-subtle p-3.5">
+                <div className="text-amber-400 text-[11px] font-bold tracking-[1.5px] mb-2.5">DEPARTMENT ROSTER ({deptOfficers.length})</div>
                 <div className="table-scroll">
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <table className="w-full border-collapse text-sm">
                     <thead>
-                      <tr style={{ background: '#0b0d14' }}>
+                      <tr className="bg-app-input">
                         {['Name','Badge','Rank','Subdivision','Status'].map(h => (
-                          <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533', whiteSpace: 'nowrap' }}>{h}</th>
+                          <th key={h} className="px-2.5 py-1.5 text-left text-slate-500 text-[11px] font-bold tracking-wide border-b border-border-subtle whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {deptOfficers.map((o, i) => (
-                        <tr key={o.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
-                          <td style={{ padding: '6px 10px', color: '#d1d5db' }}>{o.name}</td>
-                          <td style={{ padding: '6px 10px', color: '#60a5fa', fontWeight: 700 }}>{o.badge}</td>
-                          <td style={{ padding: '6px 10px', color: '#9ca3af' }}>{o.rank}</td>
-                          <td style={{ padding: '6px 10px', color: '#9ca3af' }}>{o.subdivision}</td>
-                          <td style={{ padding: '6px 10px' }}><StatusBadge status={o.status} /></td>
+                        <tr key={o.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
+                          <td className="px-2.5 py-1.5 text-slate-300">{o.name}</td>
+                          <td className="px-2.5 py-1.5 text-sky-400 font-bold">{o.badge}</td>
+                          <td className="px-2.5 py-1.5 text-slate-400">{o.rank}</td>
+                          <td className="px-2.5 py-1.5 text-slate-400">{o.subdivision}</td>
+                          <td className="px-2.5 py-1.5"><StatusBadge status={o.status} /></td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                {deptOfficers.length === 0 && <div style={{ color: '#374151', fontSize: '13px', textAlign: 'center', padding: '18px' }}>No officers in this department.</div>}
+                {deptOfficers.length === 0 && <div className="text-slate-700 text-sm text-center py-4">No officers in this department.</div>}
               </div>
             </>
           )}
@@ -186,31 +199,34 @@ export default function DepartmentManagement() {
 
       {/* New Department Modal */}
       {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <form onSubmit={handleAddDept} style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '500px', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu, sans-serif' }}>CREATE DEPARTMENT</span>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '16px' }}>X</button>
+        <div className="fixed inset-0 bg-black/75 z-[2000] flex items-center justify-center p-4">
+          <form onSubmit={handleAddDept} className="bg-app-card border border-border-subtle p-5 max-w-[500px] w-full">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sky-400 font-bold text-sm tracking-[1.5px]">CREATE DEPARTMENT</span>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-transparent border-none text-slate-600 cursor-pointer text-base">X</button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+            <div
+              className="grid gap-2.5 mb-3.5"
+              style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
+            >
               {[['Full Name *','name'],['Short Name *','short'],['Abbreviation','abbreviation'],['Badge Prefix','badgePrefix'],['Radio Channel','radioChannel']].map(([l,k]) => (
                 <div key={k} style={k === 'name' ? { gridColumn: '1/-1' } : {}}>
-                  <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>{l}</label>
-                  <input value={deptForm[k]} onChange={e => setDeptForm(f => ({ ...f, [k]: e.target.value }))} required={l.includes('*')} style={inputBase} />
+                  <label className="text-slate-500 text-[11px] tracking-widest block mb-1">{l}</label>
+                  <input value={deptForm[k]} onChange={e => setDeptForm(f => ({ ...f, [k]: e.target.value }))} required={l.includes('*')} className={INPUT_CLS} />
                 </div>
               ))}
               <div>
-                <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>TYPE</label>
-                <select value={deptForm.type} onChange={e => setDeptForm(f => ({ ...f, type: e.target.value }))} style={inputBase}>
+                <label className="text-slate-500 text-[11px] tracking-widest block mb-1">TYPE</label>
+                <select value={deptForm.type} onChange={e => setDeptForm(f => ({ ...f, type: e.target.value }))} className={INPUT_CLS}>
                   {DEPT_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>COLOR</label>
-                <input type="color" value={deptForm.color} onChange={e => setDeptForm(f => ({ ...f, color: e.target.value }))} style={{ ...inputBase, height: '36px', padding: '4px' }} />
+                <label className="text-slate-500 text-[11px] tracking-widest block mb-1">COLOR</label>
+                <input type="color" value={deptForm.color} onChange={e => setDeptForm(f => ({ ...f, color: e.target.value }))} className={`${INPUT_CLS} h-9 py-1`} />
               </div>
             </div>
-            <button type="submit" style={{ width: '100%', ...blueBtn, padding: '9px', fontSize: '13px', letterSpacing: '1px' }}>
+            <button type="submit" className={`${BLUE_BTN} w-full py-2.5 text-sm tracking-widest`}>
               CREATE DEPARTMENT
             </button>
           </form>
@@ -219,7 +235,3 @@ export default function DepartmentManagement() {
     </div>
   );
 }
-
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
-const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '6px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

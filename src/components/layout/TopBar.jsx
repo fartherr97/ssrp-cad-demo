@@ -14,7 +14,7 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--n-text-data)', letterSpacing: '0.5px' }}>
+    <span className="font-mono text-[13px] text-cad-data tracking-wide">
       {time}
     </span>
   );
@@ -59,69 +59,55 @@ export default function TopBar() {
   const pageLabel = PAGE_LABELS[currentPage] || 'SSRP NEXUS CAD';
 
   return (
-    <header style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', height: 42, minHeight: 42, background: 'var(--n-bg-card)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
+    <header className="flex items-center gap-3 px-3.5 h-[42px] min-h-[42px] bg-app-card border-b border-border-base shrink-0">
       {/* Page Title */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color: 'var(--n-text)',
-          letterSpacing: '0.3px',
-          textTransform: 'uppercase',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}>
+      <div className="flex-1 min-w-0">
+        <div className="text-[11px] font-bold text-cad-text tracking-wide uppercase overflow-hidden text-ellipsis whitespace-nowrap">
           {pageLabel}
         </div>
-        <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.3px' }}>
+        <div className="text-[9px] text-cad-muted font-mono tracking-wide">
           HILLSBOROUGH CO. COMMUNICATIONS · EMERGENCY COMM. CENTER
         </div>
       </div>
 
       {/* Quick stats */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600, color: activeCalls > 0 ? 'var(--pr2-text)' : 'var(--n-text-dim)' }}>
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col items-end">
+          <span className={`font-mono text-xs font-semibold ${activeCalls > 0 ? 'text-[var(--pr2-text)]' : 'text-cad-dim'}`}>
             {activeCalls}
           </span>
-          <span style={{ fontSize: 8, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+          <span className="text-[8px] text-cad-muted uppercase tracking-[0.6px]">
             Active
           </span>
         </div>
-        <div style={{ width: 1, height: 24, background: 'var(--n-border)', flexShrink: 0 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600, color: 'var(--n-text-data)' }}>
+        <div className="w-px h-6 bg-border-base shrink-0" />
+        <div className="flex flex-col items-end">
+          <span className="font-mono text-xs font-semibold text-cad-data">
             {onDuty}
           </span>
-          <span style={{ fontSize: 8, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+          <span className="text-[8px] text-cad-muted uppercase tracking-[0.6px]">
             On Duty
           </span>
         </div>
-        <div style={{ width: 1, height: 24, background: 'var(--n-border)', flexShrink: 0 }} />
+        <div className="w-px h-6 bg-border-base shrink-0" />
       </div>
 
       {/* Clock */}
       <Clock />
 
-      <div style={{ width: 1, height: 24, background: 'var(--n-border)', flexShrink: 0 }} />
+      <div className="w-px h-6 bg-border-base shrink-0" />
 
       {/* User info */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {/* Status dot */}
-        <div style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          background: statusColor,
-          boxShadow: `0 0 6px ${statusColor}`,
-          flexShrink: 0,
-        }} />
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--n-text)', letterSpacing: '0.2px' }}>
+      <div className="flex items-center gap-2">
+        <div
+          className="w-2 h-2 rounded-full shrink-0"
+          style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
+        />
+        <div className="text-right">
+          <div className="text-[11px] font-semibold text-cad-text tracking-wide">
             {me?.rank ? `${me.rank.toUpperCase().slice(0, 3)}. ` : ''}{currentUser?.name}
           </div>
-          <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', letterSpacing: '0.3px' }}>
+          <div className="text-[9px] font-mono text-cad-muted tracking-wide">
             {me?.badge || '—'} · {me?.deptShort || '—'} · {myStatus}
           </div>
         </div>

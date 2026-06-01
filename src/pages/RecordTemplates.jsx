@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 
+const INPUT_CLS = 'w-full bg-app-input border border-border-base text-cad-text px-2.5 py-1.5 text-sm box-border';
+const BLUE_BTN  = 'bg-sky-950 border border-sky-700 text-sky-400 px-3.5 py-1.5 text-xs cursor-pointer font-bold';
+const GHOST_BTN = 'bg-transparent border border-border-base text-slate-600 px-2.5 py-1.5 text-xs cursor-pointer';
+const GREEN_BTN = 'bg-green-950 border border-green-900 text-green-400 px-3.5 py-1.5 text-xs cursor-pointer font-bold';
+const S_BTN     = 'bg-app-input border border-border-base text-slate-600 px-1.5 py-0.5 text-[11px] cursor-pointer';
+
 export default function RecordTemplates() {
   const { state, dispatch } = useCAD();
   const { customRecordTypes, civilians, vehicles, officers } = state;
@@ -47,19 +53,19 @@ export default function RecordTemplates() {
   };
 
   return (
-    <div style={{ padding: '14px', fontFamily: 'Ubuntu, sans-serif' }}>
+    <div className="p-3.5">
       {/* Mobile: dropdown selector */}
       {isMobile && (
-        <div style={{ marginBottom: '12px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ color: '#3b82f6', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>RECORD TYPES</span>
-            <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} style={{ ...blueBtn, marginLeft: 'auto', fontSize: '11px', padding: '3px 10px' }}>+ New</button>
+        <div className="mb-3">
+          <div className="flex gap-2 items-center mb-2">
+            <span className="text-sky-400 text-xs font-bold tracking-[1.5px]">RECORD TYPES</span>
+            <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} className={`${BLUE_BTN} ml-auto`}>+ New</button>
           </div>
           {customRecordTypes.length > 0 && (
             <select
               value={selected?.id || ''}
               onChange={e => { setSelected(customRecordTypes.find(t => t.id === Number(e.target.value))); setFillMode(null); }}
-              style={inputBase}
+              className={INPUT_CLS}
             >
               {customRecordTypes.map(type => (
                 <option key={type.id} value={type.id}>{type.name} ({type.fields.length} fields)</option>
@@ -69,53 +75,60 @@ export default function RecordTemplates() {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '14px', minHeight: isMobile ? 'auto' : 'calc(100vh - 80px)' }}>
+      <div className="flex gap-3.5" style={{ minHeight: isMobile ? 'auto' : 'calc(100vh - 80px)' }}>
         {/* Desktop sidebar */}
         {!isMobile && (
-          <div style={{ width: '210px', flexShrink: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ color: '#3b82f6', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>RECORD TYPES</span>
-              <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} style={{ ...blueBtn, fontSize: '11px', padding: '3px 10px' }}>+ New</button>
+          <div className="w-[210px] shrink-0">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sky-400 text-xs font-bold tracking-[1.5px]">RECORD TYPES</span>
+              <button onClick={() => { setShowForm(true); setTpl({ name: '', fields: [] }); }} className={BLUE_BTN}>+ New</button>
             </div>
             {customRecordTypes.map(type => (
-              <div key={type.id} onClick={() => { setSelected(type); setFillMode(null); }}
-                style={{ background: selected?.id === type.id ? '#0f172a' : '#090b10', border: `1px solid ${selected?.id === type.id ? '#3b82f6' : '#1e2533'}`, padding: '9px 12px', cursor: 'pointer', marginBottom: '4px' }}>
-                <div style={{ color: '#d1d5db', fontSize: '13px', fontWeight: 700 }}>{type.name}</div>
-                <div style={{ color: '#374151', fontSize: '11px', marginTop: '2px' }}>{type.fields.length} fields</div>
+              <div
+                key={type.id}
+                onClick={() => { setSelected(type); setFillMode(null); }}
+                className="px-3 py-2.5 cursor-pointer mb-1 transition-colors"
+                style={{
+                  background: selected?.id === type.id ? '#0f172a' : '#090b10',
+                  border: `1px solid ${selected?.id === type.id ? '#3b82f6' : '#1e2533'}`,
+                }}
+              >
+                <div className="text-slate-300 text-sm font-bold">{type.name}</div>
+                <div className="text-slate-700 text-[11px] mt-0.5">{type.fields.length} fields</div>
               </div>
             ))}
           </div>
         )}
 
         {/* Detail panel */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
           {selected && !showForm && (
             <div>
-              <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                <span style={{ color: '#f9fafb', fontSize: '13px', fontWeight: 700 }}>{selected.name}</span>
-                <button onClick={() => { setTpl({ ...selected, fields: [...selected.fields] }); setShowForm(true); }} style={{ ...ghostBtn, fontSize: '11px', padding: '3px 10px' }}>Edit Template</button>
-                <button onClick={() => setFillMode(selected)} style={{ ...greenBtn, fontSize: '11px', padding: '3px 10px' }}>+ New Record</button>
+              <div className="bg-app-input border border-border-subtle border-b-0 px-3.5 py-2 flex items-center gap-2.5 flex-wrap">
+                <span className="text-slate-50 text-sm font-bold">{selected.name}</span>
+                <button onClick={() => { setTpl({ ...selected, fields: [...selected.fields] }); setShowForm(true); }} className={GHOST_BTN}>Edit Template</button>
+                <button onClick={() => setFillMode(selected)} className={GREEN_BTN}>+ New Record</button>
               </div>
 
               {/* Field definitions */}
-              <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px', marginBottom: '10px' }}>
-                <div style={{ color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>FORM FIELDS</div>
+              <div className="bg-app-card border border-border-subtle p-3.5 mb-2.5">
+                <div className="text-slate-500 text-[11px] font-bold tracking-[1.5px] mb-2.5">FORM FIELDS</div>
                 <div className="table-scroll">
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <table className="w-full border-collapse text-sm">
                     <thead>
-                      <tr style={{ background: '#0b0d14' }}>
+                      <tr className="bg-app-input">
                         {['#','Label','Type','Required'].map(h => (
-                          <th key={h} style={{ padding: '6px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533' }}>{h}</th>
+                          <th key={h} className="px-2.5 py-1.5 text-left text-slate-500 text-[11px] font-bold tracking-wide border-b border-border-subtle">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {selected.fields.map((f, i) => (
-                        <tr key={f.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
-                          <td style={{ padding: '6px 10px', color: '#374151' }}>{i + 1}</td>
-                          <td style={{ padding: '6px 10px', color: '#d1d5db' }}>{f.label}</td>
-                          <td style={{ padding: '6px 10px', color: '#3b82f6' }}>{f.type}</td>
-                          <td style={{ padding: '6px 10px', color: f.required ? '#22c55e' : '#374151' }}>{f.required ? 'Yes' : 'No'}</td>
+                        <tr key={f.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
+                          <td className="px-2.5 py-1.5 text-slate-700">{i + 1}</td>
+                          <td className="px-2.5 py-1.5 text-slate-300">{f.label}</td>
+                          <td className="px-2.5 py-1.5 text-sky-400">{f.type}</td>
+                          <td className={`px-2.5 py-1.5 ${f.required ? 'text-green-400' : 'text-slate-700'}`}>{f.required ? 'Yes' : 'No'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -125,46 +138,49 @@ export default function RecordTemplates() {
 
               {/* Fill form */}
               {fillMode && (
-                <div style={{ background: '#0d1117', border: '1px solid #166534', borderLeft: '3px solid #22c55e', padding: '14px' }}>
-                  <div style={{ color: '#22c55e', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '14px' }}>CREATE NEW RECORD — {selected.name}</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
+                <div className="bg-app-card border border-green-900 border-l-[3px] border-l-green-500 p-3.5">
+                  <div className="text-green-400 text-xs font-bold tracking-[1.5px] mb-3.5">CREATE NEW RECORD — {selected.name}</div>
+                  <div
+                    className="grid gap-2.5"
+                    style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
+                  >
                     {selected.fields.map(field => {
                       const v = fillValues[field.label] || '';
                       return (
                         <div key={field.id} style={field.type === 'textarea' ? { gridColumn: '1/-1' } : {}}>
-                          <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>
-                            {field.label.toUpperCase()}{field.required && <span style={{ color: '#ef4444' }}> *</span>}
+                          <label className="text-slate-500 text-[11px] tracking-widest block mb-1">
+                            {field.label.toUpperCase()}{field.required && <span className="text-red-400"> *</span>}
                           </label>
-                          {field.type === 'text' && <input value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase} />}
-                          {field.type === 'textarea' && <textarea value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} rows={3} style={{ ...inputBase, resize: 'vertical' }} />}
-                          {field.type === 'date' && <input type="date" value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase} />}
-                          {field.type === 'number' && <input type="number" value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase} />}
+                          {field.type === 'text' && <input value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS} />}
+                          {field.type === 'textarea' && <textarea value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} rows={3} className={`${INPUT_CLS} resize-y`} />}
+                          {field.type === 'date' && <input type="date" value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS} />}
+                          {field.type === 'number' && <input type="number" value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS} />}
                           {field.type === 'checkbox' && (
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                              <input type="checkbox" checked={!!v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.checked }))} style={{ accentColor: '#3b82f6' }} />
-                              <span style={{ color: '#9ca3af', fontSize: '13px' }}>Yes</span>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input type="checkbox" checked={!!v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.checked }))} className="accent-sky-500" />
+                              <span className="text-slate-400 text-sm">Yes</span>
                             </label>
                           )}
                           {field.type === 'dropdown' && (
-                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase}>
+                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select --</option>
                               {field.options?.map(o => <option key={o}>{o}</option>)}
                             </select>
                           )}
                           {field.type === 'civilian_lookup' && (
-                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase}>
+                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select Civilian --</option>
                               {civilians.map(c => <option key={c.id}>{c.firstName} {c.lastName}</option>)}
                             </select>
                           )}
                           {field.type === 'vehicle_lookup' && (
-                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase}>
+                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select Vehicle --</option>
                               {vehicles.map(v => <option key={v.id}>{v.plate} — {v.make} {v.model}</option>)}
                             </select>
                           )}
                           {field.type === 'officer_lookup' && (
-                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} style={inputBase}>
+                            <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select Officer --</option>
                               {officers.map(o => <option key={o.id}>{o.badge} — {o.name}</option>)}
                             </select>
@@ -173,9 +189,9 @@ export default function RecordTemplates() {
                       );
                     })}
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
-                    <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} style={{ ...greenBtn, padding: '8px 20px', fontSize: '13px' }}>SAVE RECORD</button>
-                    <button onClick={() => setFillMode(null)} style={ghostBtn}>Cancel</button>
+                  <div className="flex gap-2 mt-3.5">
+                    <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} className={`${GREEN_BTN} px-5 py-2 text-sm`}>SAVE RECORD</button>
+                    <button onClick={() => setFillMode(null)} className={GHOST_BTN}>Cancel</button>
                   </div>
                 </div>
               )}
@@ -183,58 +199,58 @@ export default function RecordTemplates() {
           )}
 
           {(!selected && !showForm) && (
-            <div style={{ color: '#374151', textAlign: 'center', marginTop: '80px', fontSize: '14px' }}>Select a record type or create a new one.</div>
+            <div className="text-slate-700 text-center mt-20 text-sm">Select a record type or create a new one.</div>
           )}
         </div>
       </div>
 
       {/* Template builder modal */}
       {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <form onSubmit={handleSave} style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '22px', maxWidth: '540px', width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', fontFamily: 'Ubuntu, sans-serif' }}>{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontSize: '16px' }}>X</button>
+        <div className="fixed inset-0 bg-black/75 z-[2000] flex items-center justify-center p-4">
+          <form onSubmit={handleSave} className="bg-app-card border border-border-subtle p-5 max-w-[540px] w-full max-h-[85vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sky-400 font-bold text-sm tracking-[1.5px]">{tpl.id ? 'EDIT RECORD TYPE' : 'CREATE RECORD TYPE'}</span>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-transparent border-none text-slate-600 cursor-pointer text-base">X</button>
             </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', display: 'block', marginBottom: '4px' }}>RECORD TYPE NAME *</label>
-              <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} required style={inputBase} />
+            <div className="mb-3">
+              <label className="text-slate-500 text-[11px] tracking-widest block mb-1">RECORD TYPE NAME *</label>
+              <input value={tpl.name} onChange={e => setTpl(t => ({ ...t, name: e.target.value }))} required className={INPUT_CLS} />
             </div>
 
-            <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px', marginBottom: '6px' }}>FIELDS ({tpl.fields.length})</div>
+            <div className="text-slate-500 text-[11px] tracking-widest mb-1.5">FIELDS ({tpl.fields.length})</div>
             {tpl.fields.map((f, idx) => (
-              <div key={f.id} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '7px 10px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
-                <span style={{ color: '#374151' }}>{idx + 1}.</span>
-                <span style={{ color: '#d1d5db', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.label}</span>
-                <span style={{ color: '#3b82f6', fontSize: '10px', flexShrink: 0 }}>[{f.type}]</span>
-                {f.required && <span style={{ color: '#ef4444', fontSize: '10px' }}>*</span>}
-                <button type="button" onClick={() => moveField(idx, -1)} style={sBtn}>^</button>
-                <button type="button" onClick={() => moveField(idx, 1)} style={sBtn}>v</button>
-                <button type="button" onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} style={{ ...sBtn, background: '#450a0a', color: '#ef4444', border: '1px solid #991b1b' }}>X</button>
+              <div key={f.id} className="bg-app-input border border-border-base px-2.5 py-1.5 mb-1 flex items-center gap-1.5 text-sm">
+                <span className="text-slate-700">{idx + 1}.</span>
+                <span className="text-slate-300 flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{f.label}</span>
+                <span className="text-sky-400 text-[10px] shrink-0">[{f.type}]</span>
+                {f.required && <span className="text-red-400 text-[10px]">*</span>}
+                <button type="button" onClick={() => moveField(idx, -1)} className={S_BTN}>^</button>
+                <button type="button" onClick={() => moveField(idx, 1)} className={S_BTN}>v</button>
+                <button type="button" onClick={() => setTpl(t => ({ ...t, fields: t.fields.filter((_, i) => i !== idx) }))} className="bg-red-950 border border-red-900 text-red-400 px-1.5 py-0.5 text-[11px] cursor-pointer">X</button>
               </div>
             ))}
 
-            <div style={{ background: '#090b10', border: '1px dashed #1e2533', padding: '12px', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ color: '#6b7280', fontSize: '11px', letterSpacing: '1px' }}>ADD FIELD</div>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label" style={{ ...inputBase, flex: '2 1 120px' }} />
-                <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))} style={{ ...inputBase, flex: '1 1 100px' }}>
+            <div className="bg-app-input border border-dashed border-border-subtle p-3 mb-3 flex flex-col gap-2">
+              <div className="text-slate-500 text-[11px] tracking-widest">ADD FIELD</div>
+              <div className="flex gap-1.5 flex-wrap">
+                <input value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} placeholder="Field label" className={`${INPUT_CLS} flex-[2_1_120px]`} />
+                <select value={newField.type} onChange={e => setNewField(f => ({ ...f, type: e.target.value }))} className={`${INPUT_CLS} flex-[1_1_100px]`}>
                   {['text','number','textarea','dropdown','checkbox','date','civilian_lookup','vehicle_lookup','officer_lookup'].map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               {newField.type === 'dropdown' && (
-                <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)" style={inputBase} />
+                <input value={newField.options} onChange={e => setNewField(f => ({ ...f, options: e.target.value }))} placeholder="Options (comma-separated)" className={INPUT_CLS} />
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '13px', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} style={{ accentColor: '#3b82f6' }} />
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-1.5 text-slate-400 text-sm cursor-pointer">
+                  <input type="checkbox" checked={newField.required} onChange={e => setNewField(f => ({ ...f, required: e.target.checked }))} className="accent-sky-500" />
                   Required
                 </label>
-                <button type="button" onClick={addField} style={{ ...blueBtn, marginLeft: 'auto', fontSize: '11px', padding: '4px 12px' }}>+ Add</button>
+                <button type="button" onClick={addField} className={`${BLUE_BTN} ml-auto`}>+ Add</button>
               </div>
             </div>
 
-            <button type="submit" style={{ width: '100%', ...blueBtn, padding: '9px', fontSize: '13px', letterSpacing: '1px' }}>
+            <button type="submit" className={`${BLUE_BTN} w-full py-2.5 text-sm tracking-widest`}>
               SAVE RECORD TYPE
             </button>
           </form>
@@ -243,9 +259,3 @@ export default function RecordTemplates() {
     </div>
   );
 }
-
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
-const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '6px 10px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };
-const greenBtn = { background: '#052e16', border: '1px solid #166534', color: '#22c55e', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 700 };
-const sBtn = { background: '#0b0d14', border: '1px solid #1f2937', color: '#4b5563', padding: '2px 6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };

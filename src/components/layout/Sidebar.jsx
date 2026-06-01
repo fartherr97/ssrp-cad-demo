@@ -114,20 +114,11 @@ function StatusBtn({ status, label, color, active, onClick }) {
   return (
     <button
       onClick={onClick}
+      className="flex-1 py-1 text-[9px] font-bold uppercase tracking-wide font-mono rounded cursor-pointer transition-all"
       style={{
-        flex: 1,
-        padding: '4px 2px',
-        fontSize: '9px',
-        fontWeight: 700,
-        letterSpacing: '0.5px',
-        textTransform: 'uppercase',
-        fontFamily: 'var(--font-mono)',
         border: `1px solid ${active ? color : 'var(--n-border)'}`,
-        borderRadius: '3px',
         background: active ? `${color}22` : 'var(--n-bg-card)',
         color: active ? color : 'var(--n-text-muted)',
-        cursor: 'pointer',
-        transition: 'all 0.1s',
       }}
     >
       {label}
@@ -142,122 +133,98 @@ export default function Sidebar() {
   const me = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
   const isAdmin = currentUser?.role === 'admin';
-  const isDispatch = currentUser?.role === 'dispatch';
 
   const go = (page) => dispatch({ type: 'SET_PAGE', payload: page });
 
   const statusColors = {
-    AVAILABLE: 'var(--st-av-text)',
-    BUSY: 'var(--st-busy-text)',
-    ENRT: 'var(--st-enrt-text)',
+    AVAILABLE:   'var(--st-av-text)',
+    BUSY:        'var(--st-busy-text)',
+    ENRT:        'var(--st-enrt-text)',
     UNAVAILABLE: 'var(--st-unav-text)',
-    OFFDUTY: 'var(--st-od-text)',
+    OFFDUTY:     'var(--st-od-text)',
   };
 
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
 
   const activeCalls = state.calls.filter(c => c.status !== 'CLOSED').length;
+  const statusColor = statusColors[myStatus] || 'var(--n-text-muted)';
 
   return (
-    <nav role="navigation" aria-label="Main navigation" style={{ width: 200, minWidth: 200, display: 'flex', flexDirection: 'column', background: 'var(--n-bg-panel)', borderRight: '1px solid var(--n-border)', height: '100%', overflow: 'hidden' }}>
+    <nav
+      role="navigation"
+      aria-label="Main navigation"
+      className="w-[200px] min-w-[200px] flex flex-col bg-app-panel border-r border-border-base h-full overflow-hidden"
+    >
       {/* Logo */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '12px 10px 10px',
-        borderBottom: '1px solid var(--n-border)',
-        background: 'var(--n-bg-card)',
-        flexShrink: 0,
-      }}>
+      <div className="flex items-center gap-2.5 px-2.5 pt-3 pb-2.5 border-b border-border-base bg-app-card shrink-0">
         <SSRPShield />
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--n-gold-bright)', letterSpacing: '0.5px', lineHeight: 1.2 }}>
+          <div className="text-[11px] font-bold text-gold-bright leading-tight tracking-wide">
             SSRP NEXUS
           </div>
-          <div style={{ fontSize: 9, color: 'var(--n-text-muted)', letterSpacing: '0.3px', lineHeight: 1.4 }}>
+          <div className="text-[9px] text-cad-muted tracking-wide leading-snug">
             CAD v2.0
           </div>
-          <div style={{ fontSize: 8, color: 'var(--n-text-muted)', letterSpacing: '0.2px', marginTop: 1 }}>
+          <div className="text-[8px] text-cad-muted tracking-wide mt-px">
             HILLSBOROUGH CO.
           </div>
         </div>
       </div>
 
       {/* Nav items */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      <div className="flex-1 overflow-auto">
         {NAV.map((section) => {
           if (section.adminOnly && !isAdmin) return null;
           return (
             <div key={section.section}>
-              <div style={{ height: 1, background: 'var(--n-border)', margin: '4px 0' }} />
-              <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.7px', textTransform: 'uppercase', color: 'var(--n-text-muted)', padding: '2px 10px', fontFamily: 'var(--font-mono)' }}>{section.section}</div>
+              <div className="h-px bg-border-base my-1" />
+              <div className="text-[8px] font-bold tracking-[0.7px] uppercase text-cad-muted px-2.5 py-0.5 font-mono">{section.section}</div>
               {section.items.map((item) => {
                 const isActive = currentPage === item.page;
                 return (
-                <button
-                  key={item.page}
-                  onClick={() => go(item.page)}
-                  title={item.label}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
-                    fontSize: 12, color: isActive ? '#a0c8e8' : 'var(--n-text-dim)',
-                    background: isActive ? '#07111e' : 'none', border: 'none',
-                    borderLeft: `3px solid ${isActive ? '#1060a8' : 'transparent'}`,
-                    cursor: 'pointer', fontFamily: 'var(--font-ui)', textAlign: 'left', width: '100%',
-                    paddingLeft: isActive ? 7 : 10, transition: 'background 0.1s, color 0.1s',
-                  }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--n-bg-hover)'; e.currentTarget.style.color = 'var(--n-text)'; } }}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--n-text-dim)'; } }}
-                >
-                  <span style={{ width: 16, height: 16, flexShrink: 0 }}><Icon name={item.icon} /></span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                  {item.page === 'dispatch' && activeCalls > 0 && (
-                    <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--pr2-bg)', color: 'var(--pr2-text)', padding: '1px 5px', borderRadius: 9999, border: '1px solid var(--pr2-border)' }}>{activeCalls}</span>
-                  )}
-                </button>
+                  <button
+                    key={item.page}
+                    onClick={() => go(item.page)}
+                    title={item.label}
+                    className={`flex items-center gap-2 w-full text-left text-xs border-none cursor-pointer transition-colors ${
+                      isActive
+                        ? 'bg-app-elevated text-sky-300 border-l-[3px] border-l-sky-700 pl-[7px] pr-2.5 py-[7px]'
+                        : 'bg-transparent text-cad-dim hover:bg-app-hover hover:text-cad-text border-l-[3px] border-l-transparent px-2.5 py-[7px]'
+                    }`}
+                  >
+                    <span className="w-4 h-4 shrink-0"><Icon name={item.icon} /></span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.page === 'dispatch' && activeCalls > 0 && (
+                      <span className="text-[9px] font-bold bg-[var(--pr2-bg)] text-[var(--pr2-text)] border border-[var(--pr2-border)] px-1.5 py-px rounded-full">{activeCalls}</span>
+                    )}
+                  </button>
                 );
               })}
             </div>
           );
         })}
-        <div style={{ height: 1, background: 'var(--n-border)', marginTop: 8 }} />
+        <div className="h-px bg-border-base mt-2" />
       </div>
 
       {/* User card */}
-      <div style={{
-        padding: '8px 10px 10px',
-        borderTop: '1px solid var(--n-border)',
-        background: 'var(--n-bg-card)',
-        flexShrink: 0,
-      }}>
-        {/* Status indicator */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          marginBottom: 7,
-        }}>
-          <div style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: statusColors[myStatus] || 'var(--n-text-muted)',
-            flexShrink: 0,
-            boxShadow: `0 0 6px ${statusColors[myStatus] || 'transparent'}`,
-          }} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--n-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <div className="px-2.5 pt-2 pb-2.5 border-t border-border-base bg-app-card shrink-0">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <div
+            className="w-[7px] h-[7px] rounded-full shrink-0"
+            style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-semibold text-cad-text overflow-hidden text-ellipsis whitespace-nowrap">
               {currentUser?.name || 'Unknown'}
             </div>
-            <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            <div className="text-[9px] text-cad-muted font-mono">
               {me?.badge || '—'} · {me?.deptShort || '—'}
             </div>
           </div>
         </div>
 
         {/* Status buttons */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+        <div className="flex gap-1 mb-1.5">
           <StatusBtn status="AVAILABLE" label="AVL" color="var(--st-av-text)"
             active={myStatus === 'AVAILABLE'} onClick={() => setStatus('AVAILABLE')} />
           <StatusBtn status="BUSY" label="BUSY" color="var(--st-busy-text)"
@@ -269,7 +236,7 @@ export default function Sidebar() {
         </div>
 
         <button
-          style={{ width: '100%', justifyContent: 'center', fontSize: 10, color: 'var(--n-text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', fontFamily: 'var(--font-ui)' }}
+          className="w-full text-center text-[10px] text-cad-muted bg-transparent border-none cursor-pointer py-1.5 hover:text-cad-dim transition-colors"
           onClick={() => dispatch({ type: 'LOGOUT' })}
         >
           Sign Out

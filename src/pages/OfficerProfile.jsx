@@ -1,11 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import { useResponsive } from '../hooks/useResponsive';
 
+const INPUT_CLS = 'w-full bg-app-input border border-border-base text-cad-text px-2.5 py-2 text-sm box-border';
+const BLUE_BTN = 'bg-sky-950 border border-sky-700 text-sky-400 px-4 py-2 text-sm cursor-pointer font-semibold rounded';
+const GHOST_BTN = 'bg-white/5 border border-border-base text-cad-dim px-4 py-2 text-sm cursor-pointer rounded';
+
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, departments, reports, calls, criminalHistory } = state;
+  const { currentUser, officers, departments, reports, calls } = state;
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myDept = departments.find(d => d.id === myOfficer?.dept);
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
@@ -16,7 +20,7 @@ export default function OfficerProfile() {
   const { isMobile } = useResponsive();
 
   if (!myOfficer) return (
-    <div style={{ padding: '32px', fontFamily: 'Ubuntu, sans-serif', color: '#4b5563', textAlign: 'center' }}>
+    <div className="p-8 text-center text-slate-500">
       No officer profile found for current session.
     </div>
   );
@@ -31,56 +35,76 @@ export default function OfficerProfile() {
   const accentColor = myDept?.color || '#3b82f6';
 
   return (
-    <div style={{ padding: '16px', fontFamily: 'Ubuntu, sans-serif', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+    <div className="p-4 h-full overflow-auto box-border">
       {/* Profile header */}
-      <div style={{ background: '#0d1117', border: `1px solid ${accentColor}40`, borderLeft: `3px solid ${accentColor}`, padding: '16px 20px', marginBottom: '16px', maxWidth: 900 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '56px', height: '56px', background: '#090b10', border: `2px solid ${accentColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: accentColor, flexShrink: 0, letterSpacing: '1px' }}>
+      <div
+        className="bg-app-card p-4 mb-4 max-w-[900px]"
+        style={{ border: `1px solid ${accentColor}40`, borderLeft: `3px solid ${accentColor}` }}
+      >
+        <div className="flex items-center gap-4">
+          <div
+            className="w-14 h-14 bg-app-input flex items-center justify-center text-lg font-extrabold shrink-0 tracking-widest"
+            style={{ border: `2px solid ${accentColor}`, color: accentColor }}
+          >
             {initials}
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ color: '#f9fafb', fontSize: '18px', fontWeight: 700, letterSpacing: '0.5px' }}>{myOfficer.name}</div>
-            <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '3px' }}>
+          <div className="flex-1">
+            <div className="text-slate-50 text-lg font-bold tracking-wide">{myOfficer.name}</div>
+            <div className="text-slate-400 text-sm mt-0.5">
               {myOfficer.rank} &bull; {myDept?.name || 'Unknown Department'}
             </div>
-            <div style={{ color: '#4b5563', fontSize: '12px', marginTop: '2px' }}>
-              Badge: <span style={{ color: '#60a5fa' }}>{myOfficer.badge}</span>
-              &nbsp;&bull;&nbsp;Unit: <span style={{ color: '#60a5fa' }}>{myOfficer.unitId}</span>
+            <div className="text-slate-600 text-xs mt-0.5">
+              Badge: <span className="text-sky-400">{myOfficer.badge}</span>
+              &nbsp;&bull;&nbsp;Unit: <span className="text-sky-400">{myOfficer.unitId}</span>
               &nbsp;&bull;&nbsp;{myOfficer.subdivision}
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <StatusBadge status={myOfficer.status} style={{ fontSize: '13px', padding: '4px 10px' }} />
-            {myOfficer.callId && <div style={{ color: '#fbbf24', fontSize: '12px', marginTop: '6px' }}>On Call: {myOfficer.callId}</div>}
+          <div className="text-right">
+            <StatusBadge status={myOfficer.status} />
+            {myOfficer.callId && <div className="text-amber-400 text-xs mt-1.5">On Call: {myOfficer.callId}</div>}
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px', marginTop: '14px' }}>
+        <div
+          className="grid gap-2 mt-3.5"
+          style={{ gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)' }}
+        >
           {[
             { label: 'Reports Filed', val: myReports.length },
             { label: 'Calls Attended', val: myCallHistory.length },
             { label: 'Commendations', val: commendations.length },
             { label: 'Complaints', val: complaints.length },
           ].map(s => (
-            <div key={s.label} style={{ background: '#090b10', border: '1px solid #1f2937', padding: '8px 12px' }}>
-              <div style={{ color: '#f9fafb', fontSize: '18px', fontWeight: 700 }}>{s.val}</div>
-              <div style={{ color: '#4b5563', fontSize: '11px', marginTop: '1px' }}>{s.label}</div>
+            <div key={s.label} className="bg-app-input border border-border-subtle px-3 py-2">
+              <div className="text-slate-50 text-lg font-bold">{s.val}</div>
+              <div className="text-slate-600 text-[11px] mt-0.5">{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #1f2937', marginBottom: '14px', maxWidth: 900 }}>
+      <div className="flex gap-0.5 border-b border-border-base mb-3.5 max-w-[900px]">
         {[['info','My Info'],['signature','Signature'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ background: tab === k ? '#0f172a' : 'transparent', border: tab === k ? '1px solid #3b82f6' : '1px solid transparent', borderBottom: 'none', color: tab === k ? '#3b82f6' : '#4b5563', padding: '6px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', letterSpacing: '0.5px' }}>
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            className={`border border-b-0 px-3.5 py-1.5 text-xs cursor-pointer tracking-wide transition-colors ${
+              tab === k
+                ? 'bg-app-elevated border-sky-700 text-sky-500'
+                : 'bg-transparent border-transparent text-slate-600 hover:text-cad-dim'
+            }`}
+          >
             {l}
           </button>
         ))}
       </div>
 
-      <div style={{ maxWidth: 900 }}>
+      <div className="max-w-[900px]">
         {tab === 'info' && (
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+          <div
+            className="grid gap-3.5"
+            style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
+          >
             <InfoCard title="ASSIGNMENT" accentColor={accentColor}>
               {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '—']].map(([k,v]) => (
                 <InfoRow key={k} label={k} value={v || '—'} />
@@ -89,21 +113,27 @@ export default function OfficerProfile() {
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
               {!requestingTransfer ? (
                 <div>
-                  <div style={{ color: '#4b5563', fontSize: '13px', marginBottom: '12px' }}>Current subdivision: <span style={{ color: '#9ca3af' }}>{myOfficer.subdivision}</span></div>
-                  <button onClick={() => setRequestingTransfer(true)} style={blueBtn}>
+                  <div className="text-slate-600 text-sm mb-3">Current subdivision: <span className="text-slate-400">{myOfficer.subdivision}</span></div>
+                  <button onClick={() => setRequestingTransfer(true)} className={BLUE_BTN}>
                     Request Transfer
                   </button>
                 </div>
               ) : (
                 <div>
-                  <div style={{ color: '#9ca3af', fontSize: '11px', letterSpacing: '1px', marginBottom: '6px' }}>REQUESTED SUBDIVISION</div>
-                  <select style={{ ...inputBase, marginBottom: '8px' }}>
+                  <div className="text-slate-400 text-[11px] tracking-widest mb-1.5">REQUESTED SUBDIVISION</div>
+                  <select className={`${INPUT_CLS} mb-2`}>
                     {(myDept?.subdivisions || []).map(s => <option key={s}>{s}</option>)}
                   </select>
-                  <textarea value={transferNote} onChange={e => setTransferNote(e.target.value)} placeholder="Reason for transfer request..." rows={3} style={{ ...inputBase, resize: 'vertical', marginBottom: '8px' }} />
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => { setRequestingTransfer(false); }} style={blueBtn}>Submit</button>
-                    <button onClick={() => setRequestingTransfer(false)} style={ghostBtn}>Cancel</button>
+                  <textarea
+                    value={transferNote}
+                    onChange={e => setTransferNote(e.target.value)}
+                    placeholder="Reason for transfer request..."
+                    rows={3}
+                    className={`${INPUT_CLS} resize-y mb-2`}
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={() => setRequestingTransfer(false)} className={BLUE_BTN}>Submit</button>
+                    <button onClick={() => setRequestingTransfer(false)} className={GHOST_BTN}>Cancel</button>
                   </div>
                 </div>
               )}
@@ -117,19 +147,19 @@ export default function OfficerProfile() {
 
         {tab === 'reports' && (
           <div className="table-scroll">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <table className="w-full border-collapse text-sm">
               <THead cols={['Case #','Type','Date','Status','Call']} />
               <tbody>
                 {myReports.map((r, i) => (
-                  <tr key={r.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
+                  <tr key={r.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
                     <TD blue>{r.caseNumber}</TD>
                     <TD>{r.type}</TD>
                     <TD muted>{r.date}</TD>
-                    <td style={{ padding: '7px 10px' }}><StatusBadge status={r.status} /></td>
+                    <td className="px-2.5 py-1.5"><StatusBadge status={r.status} /></td>
                     <TD blue>{r.callId || '—'}</TD>
                   </tr>
                 ))}
-                {myReports.length === 0 && <tr><td colSpan={5} style={{ padding: '18px', textAlign: 'center', color: '#374151' }}>No reports filed.</td></tr>}
+                {myReports.length === 0 && <tr><td colSpan={5} className="px-2.5 py-4 text-center text-slate-700">No reports filed.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -137,22 +167,24 @@ export default function OfficerProfile() {
 
         {tab === 'calls' && (
           <div className="table-scroll">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <table className="w-full border-collapse text-sm">
               <THead cols={['Call #','Nature','Location','Priority','Status','Time']} />
               <tbody>
                 {myCallHistory.map((c, i) => (
-                  <tr key={c.id} style={{ background: i % 2 === 0 ? '#0d1117' : '#111218' }}>
+                  <tr key={c.id} className={i % 2 === 0 ? 'bg-app-card' : 'bg-[#111218]'}>
                     <TD blue>{c.id}</TD>
                     <TD>{c.nature}</TD>
                     <TD muted>{c.location}</TD>
-                    <td style={{ padding: '7px 10px' }}>
-                      <span style={{ color: ['#dc2626','#ea580c','#ca8a04'][c.priority - 1] || '#d1d5db', fontWeight: 700, fontSize: '12px' }}>P{c.priority}</span>
+                    <td className="px-2.5 py-1.5">
+                      <span className={`font-bold text-xs ${['text-red-500','text-orange-500','text-yellow-500'][c.priority-1] || 'text-slate-300'}`}>
+                        P{c.priority}
+                      </span>
                     </td>
-                    <td style={{ padding: '7px 10px' }}><StatusBadge status={c.status} /></td>
+                    <td className="px-2.5 py-1.5"><StatusBadge status={c.status} /></td>
                     <TD muted small>{c.timestamp}</TD>
                   </tr>
                 ))}
-                {myCallHistory.length === 0 && <tr><td colSpan={6} style={{ padding: '18px', textAlign: 'center', color: '#374151' }}>No call history.</td></tr>}
+                {myCallHistory.length === 0 && <tr><td colSpan={6} className="px-2.5 py-4 text-center text-slate-700">No call history.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -161,17 +193,17 @@ export default function OfficerProfile() {
         {tab === 'commendations' && (
           <div>
             {commendations.map(c => (
-              <div key={c.id} style={{ background: '#051a05', border: '1px solid #166534', borderLeft: '3px solid #22c55e', padding: '14px', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '13px' }}>{c.type.toUpperCase()}</span>
-                  <span style={{ color: '#4b5563', fontSize: '11px' }}>{c.date}</span>
+              <div key={c.id} className="bg-green-950 border border-green-900 border-l-[3px] border-l-green-500 px-3.5 py-3.5 mb-2">
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-green-400 font-bold text-sm">{c.type.toUpperCase()}</span>
+                  <span className="text-slate-600 text-[11px]">{c.date}</span>
                 </div>
-                <div style={{ color: '#4b5563', fontSize: '11px', letterSpacing: '0.5px', marginBottom: '4px' }}>FROM: {c.from.toUpperCase()}</div>
-                <div style={{ color: '#9ca3af', fontSize: '13px', lineHeight: 1.5 }}>{c.note}</div>
+                <div className="text-slate-600 text-[11px] tracking-wide mb-1">FROM: {c.from.toUpperCase()}</div>
+                <div className="text-slate-400 text-sm leading-relaxed">{c.note}</div>
               </div>
             ))}
             {complaints.length === 0 && commendations.length > 0 && (
-              <div style={{ color: '#166534', fontSize: '13px', marginTop: '10px', background: '#051a05', border: '1px solid #166534', padding: '8px 12px' }}>NO COMPLAINTS ON RECORD</div>
+              <div className="text-green-800 text-sm mt-2.5 bg-green-950 border border-green-900 px-3 py-2">NO COMPLAINTS ON RECORD</div>
             )}
           </div>
         )}
@@ -180,7 +212,6 @@ export default function OfficerProfile() {
   );
 }
 
-/* ─── Signature Tab ─────────────────────────────────────────────────── */
 function SignatureTab({ currentUser, dispatch }) {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
@@ -246,29 +277,21 @@ function SignatureTab({ currentUser, dispatch }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
-      {/* Draw pad */}
-      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '16px' }}>
-        <div style={{ color: '#3b82f6', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', borderBottom: '1px solid #1f2937', paddingBottom: '6px' }}>
+    <div className="grid grid-cols-2 gap-5 items-start">
+      <div className="bg-app-card border border-border-subtle p-4">
+        <div className="text-sky-500 text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5">
           SET UP YOUR SIGNATURE
         </div>
-        <div style={{ color: '#6b7280', fontSize: '12px', marginBottom: '10px' }}>
+        <div className="text-slate-500 text-xs mb-2.5">
           Draw your signature below using your mouse or touchscreen. This will be applied to official reports.
         </div>
-        <div style={{ position: 'relative', marginBottom: 10 }}>
+        <div className="relative mb-2.5">
           <canvas
             ref={canvasRef}
             width={480}
             height={140}
-            style={{
-              background: '#fff',
-              border: '1px solid #374151',
-              cursor: 'crosshair',
-              display: 'block',
-              width: '100%',
-              height: 140,
-              touchAction: 'none',
-            }}
+            className="border border-border-strong cursor-crosshair block w-full"
+            style={{ background: '#fff', height: 140, touchAction: 'none' }}
             onMouseDown={startDraw}
             onMouseMove={draw}
             onMouseUp={stopDraw}
@@ -278,59 +301,52 @@ function SignatureTab({ currentUser, dispatch }) {
             onTouchEnd={stopDraw}
           />
           {!hasMark && (
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              pointerEvents: 'none', color: '#aab', fontSize: 13, fontStyle: 'italic',
-            }}>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-sm italic">
               Sign here...
             </div>
           )}
-          <div style={{
-            position: 'absolute', bottom: 8, left: 12, right: 12,
-            borderBottom: '1px solid #ccc', pointerEvents: 'none',
-          }} />
+          <div className="absolute bottom-2 left-3 right-3 border-b border-gray-300 pointer-events-none" />
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={clear} style={ghostBtn}>Clear</button>
-          <button onClick={save} disabled={!hasMark} style={{ ...blueBtn, opacity: hasMark ? 1 : 0.5, cursor: hasMark ? 'pointer' : 'default' }}>
+        <div className="flex gap-2">
+          <button onClick={clear} className={GHOST_BTN}>Clear</button>
+          <button onClick={save} disabled={!hasMark} className={`${BLUE_BTN} disabled:opacity-50 disabled:cursor-default`}>
             Save Signature
           </button>
         </div>
-        {saved && <div style={{ color: '#22c55e', fontSize: '12px', marginTop: '8px' }}>✓ Signature saved successfully.</div>}
+        {saved && <div className="text-green-400 text-xs mt-2">✓ Signature saved successfully.</div>}
       </div>
 
-      {/* Current signature preview */}
-      <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '16px' }}>
-        <div style={{ color: '#3b82f6', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', borderBottom: '1px solid #1f2937', paddingBottom: '6px' }}>
+      <div className="bg-app-card border border-border-subtle p-4">
+        <div className="text-sky-500 text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5">
           SIGNATURE ON FILE
         </div>
         {currentUser?.signature ? (
           <>
-            <div style={{ color: '#6b7280', fontSize: '12px', marginBottom: '10px' }}>
-              Your saved signature will automatically appear in all official reports. You can apply it with one click when filing.
+            <div className="text-slate-500 text-xs mb-2.5">
+              Your saved signature will automatically appear in all official reports.
             </div>
-            <div style={{ background: '#fff', border: '1px solid #374151', padding: '12px 16px', marginBottom: '12px', display: 'inline-block', minWidth: '100%', boxSizing: 'border-box' }}>
-              <img src={currentUser.signature} alt="Saved signature" style={{ height: 80, objectFit: 'contain', display: 'block' }} />
+            <div className="bg-white border border-border-strong px-4 py-3 mb-3 block min-w-full box-border">
+              <img src={currentUser.signature} alt="Saved signature" className="h-20 object-contain block" />
             </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ color: '#22c55e', fontSize: '12px' }}>✓ Active</span>
-              <button onClick={remove} style={{ ...ghostBtn, marginLeft: 'auto', borderColor: '#991b1b', color: '#ef4444' }}>Remove</button>
+            <div className="flex gap-2 items-center">
+              <span className="text-green-400 text-xs">✓ Active</span>
+              <button onClick={remove} className="ml-auto bg-white/5 border border-red-900 text-red-400 px-4 py-2 text-sm cursor-pointer rounded">Remove</button>
             </div>
-            <div style={{ marginTop: 14, background: '#090b10', border: '1px solid #1e2533', padding: '12px', borderLeft: '3px solid #3b82f6' }}>
-              <div style={{ color: '#6b7280', fontSize: '10px', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 4 }}>Preview on form</div>
-              <div style={{ background: '#fff', border: '1px solid #ccc', padding: '8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <img src={currentUser.signature} alt="signature" style={{ height: 40, objectFit: 'contain', objectPosition: 'left' }} />
-                <div style={{ fontSize: 8, color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: 'Arial, sans-serif', borderTop: '1px solid #ccc', paddingTop: 3 }}>
+            <div className="mt-3.5 bg-app-input border border-border-subtle border-l-[3px] border-l-sky-700 p-3">
+              <div className="text-slate-600 text-[10px] tracking-widest uppercase mb-1">Preview on form</div>
+              <div className="bg-white border border-gray-300 p-2 flex flex-col gap-1">
+                <img src={currentUser.signature} alt="signature" className="h-10 object-contain object-left" />
+                <div className="text-[8px] text-gray-500 uppercase tracking-wide border-t border-gray-300 pt-0.5">
                   Officer Signature / Badge #
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <div style={{ color: '#4b5563', fontSize: '13px', padding: '20px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 8, opacity: 0.3 }}>✍</div>
+          <div className="text-slate-600 text-sm text-center py-5">
+            <div className="text-3xl mb-2 opacity-30">✍</div>
             No signature on file.<br />
-            <span style={{ fontSize: '12px' }}>Draw your signature on the left and click "Save Signature".</span>
+            <span className="text-xs">Draw your signature on the left and click "Save Signature".</span>
           </div>
         )}
       </div>
@@ -340,8 +356,13 @@ function SignatureTab({ currentUser, dispatch }) {
 
 function InfoCard({ title, accentColor, children }) {
   return (
-    <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '14px 16px' }}>
-      <div style={{ color: accentColor || '#3b82f6', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', borderBottom: '1px solid #1f2937', paddingBottom: '6px' }}>{title}</div>
+    <div className="bg-app-card border border-border-subtle px-4 py-3.5">
+      <div
+        className="text-[11px] font-bold tracking-[1.5px] mb-3 border-b border-border-base pb-1.5"
+        style={{ color: accentColor || '#3b82f6' }}
+      >
+        {title}
+      </div>
       {children}
     </div>
   );
@@ -349,9 +370,9 @@ function InfoCard({ title, accentColor, children }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px', fontSize: '13px' }}>
-      <span style={{ color: '#4b5563' }}>{label}</span>
-      <span style={{ color: '#d1d5db' }}>{value}</span>
+    <div className="flex justify-between mb-1.5 text-sm">
+      <span className="text-slate-600">{label}</span>
+      <span className="text-slate-300">{value}</span>
     </div>
   );
 }
@@ -359,9 +380,9 @@ function InfoRow({ label, value }) {
 function THead({ cols }) {
   return (
     <thead>
-      <tr style={{ background: '#0b0d14' }}>
+      <tr className="bg-app-input">
         {cols.map(h => (
-          <th key={h} style={{ padding: '7px 10px', textAlign: 'left', color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '0.6px', borderBottom: '1px solid #1e2533', whiteSpace: 'nowrap' }}>{h}</th>
+          <th key={h} className="px-2.5 py-1.5 text-left text-slate-500 text-[11px] font-bold tracking-wide border-b border-border-subtle whitespace-nowrap">{h}</th>
         ))}
       </tr>
     </thead>
@@ -370,12 +391,8 @@ function THead({ cols }) {
 
 function TD({ children, blue, muted, small }) {
   return (
-    <td style={{ padding: '7px 10px', color: blue ? '#60a5fa' : muted ? '#6b7280' : '#d1d5db', fontWeight: blue ? 700 : 400, fontSize: small ? '11px' : '13px' }}>
+    <td className={`px-2.5 py-1.5 ${blue ? 'text-sky-400 font-bold' : muted ? 'text-slate-500' : 'text-slate-300'} ${small ? 'text-[11px]' : 'text-sm'}`}>
       {children}
     </td>
   );
 }
-
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', borderRadius: 4, color: '#d1d5db', padding: '8px 11px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
-const blueBtn = { background: 'linear-gradient(180deg, #4d97ff, #2f7fe8)', border: 'none', borderRadius: 4, color: '#fff', padding: '9px 16px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600, boxShadow: '0 2px 10px rgba(47,127,232,0.45)' };
-const ghostBtn = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 4, color: '#9ca3af', padding: '9px 16px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 };
