@@ -68,22 +68,6 @@ export default function LoginPage() {
           }}
         />
 
-        {/* Badge pill */}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          border: '1px solid rgba(220,130,30,0.7)', borderRadius: 20,
-          padding: '5px 14px', marginBottom: 18,
-          background: 'rgba(220,110,20,0.08)',
-        }}>
-          <span style={{ fontSize: 11 }}>⚡</span>
-          <span style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: '#e89a40', fontFamily: "'Ubuntu', sans-serif",
-          }}>
-            Emergency Dispatch System
-          </span>
-        </div>
-
         {/* Title */}
         <div style={{
           fontSize: 28, fontWeight: 800, color: '#ffffff', textAlign: 'center',
