@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { DeptTag } from '../constants/deptLogos.jsx';
+import { MdArrowBack } from 'react-icons/md';
 import {
   S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD,
@@ -44,10 +45,10 @@ export default function UnitManagement() {
   const DEPTS = ['ALL', ...departments.map(d => d.abbreviation)];
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden p-4 lg:p-5 gap-4 lg:gap-5">
+    <div className="flex flex-col flex-1 overflow-hidden p-3 md:p-5 gap-4 lg:gap-5">
       {/* Header — stat widgets + filters */}
       <div className="flex flex-wrap items-center gap-3 shrink-0">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1 min-w-[280px]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1 min-w-0 sm:min-w-[280px]">
           {[
             { label: 'On Duty', value: onDuty, color: '#ffffff' },
             { label: 'Available', value: available, color: '#4ade80' },
@@ -60,7 +61,7 @@ export default function UnitManagement() {
             </div>
           ))}
         </div>
-        <div className="flex gap-2 ml-auto">
+        <div className="flex flex-wrap gap-2 ml-auto">
           <select className={`${S_SELECT} !w-[130px]`} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
             {DEPTS.map(d => <option key={d}>{d}</option>)}
           </select>
@@ -70,17 +71,17 @@ export default function UnitManagement() {
         </div>
       </div>
 
-      <div className="grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 300px' }}>
+      <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 300px' }}>
         {/* Roster table */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-list-panel${selected ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Unit Roster</div>
             <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">
               {filtered.length}
             </span>
           </div>
-          <div className={S_PANEL_BODY}>
-            <table className={S_TABLE}>
+          <div className={`${S_PANEL_BODY} overflow-x-auto`}>
+            <table className={`${S_TABLE} min-w-[640px]`}>
               <thead>
                 <tr>
                   <th className={S_TABLE_TH}>Status</th>
@@ -137,7 +138,10 @@ export default function UnitManagement() {
         </div>
 
         {/* Detail panel */}
-        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
+        <div className={`mob-detail-panel${!selected ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
+          <button className="mob-back-btn !rounded-none" onClick={() => setSelected(null)}>
+            <MdArrowBack size={14} /> Back to roster
+          </button>
           {!selOfficer ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.25">

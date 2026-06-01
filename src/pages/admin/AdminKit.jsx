@@ -23,7 +23,7 @@ export const ADMIN = {
 /* Page wrapper * full-height scroll area with navy bg */
 export function AdminContent({ children }) {
   return (
-    <div className="flex-1 min-w-0 min-h-0 w-full overflow-auto p-6 box-border font-ui bg-app-bg">
+    <div className="flex-1 min-w-0 min-h-0 w-full overflow-auto p-3 md:p-6 box-border font-ui bg-app-bg">
       {children}
     </div>
   );
@@ -40,12 +40,12 @@ export function AdminPanel({ title, subtitle, right, children, center, style = {
         <div
           className={`flex items-center gap-3 px-5 py-4 flex-wrap relative border-b border-border-faint ${center ? 'justify-center' : 'justify-between'}`}
         >
-          <div style={{ textAlign: center ? 'center' : 'left' }}>
+          <div className="min-w-0" style={{ textAlign: center ? 'center' : 'left' }}>
             {title && <div className="text-[11px] font-bold uppercase tracking-[0.9px] text-slate-400">{title}</div>}
             {subtitle && <div className="text-[12px] mt-1 text-slate-500 normal-case">{subtitle}</div>}
           </div>
           {right && (
-            <div className={`flex gap-2 items-center ${center ? 'absolute right-5' : ''}`}>{right}</div>
+            <div className={`flex gap-2 items-center flex-wrap ${center ? 'sm:absolute sm:right-5' : ''}`}>{right}</div>
           )}
         </div>
       )}

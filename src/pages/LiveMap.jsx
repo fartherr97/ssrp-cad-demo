@@ -78,9 +78,9 @@ export default function LiveMap() {
 
   return (
     <div className={`${S_PAGE} !p-4 lg:!p-5 !gap-4 lg:!gap-5 overflow-hidden`}>
-      <div className="flex gap-4 lg:gap-5 flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 flex-1 min-h-0 overflow-auto lg:overflow-hidden">
         {/* Map */}
-        <div className={`${S_PANEL} flex-1 relative overflow-hidden`}>
+        <div className={`${S_PANEL} flex-1 min-h-[320px] relative overflow-hidden`}>
           <div className={S_PANEL_HEADER}>
             <div className={`${S_PANEL_TITLE} flex items-center`}>
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] mr-1.5" />
@@ -216,7 +216,7 @@ export default function LiveMap() {
         </div>
 
         {/* Right: Legend + Unit list */}
-        <div className="w-[240px] flex flex-col gap-4 lg:gap-5">
+        <div className="w-full lg:w-[240px] shrink-0 flex flex-col gap-4 lg:gap-5">
           {/* Legend */}
           <div className={`${S_PANEL} shrink-0`}>
             <div className={S_PANEL_HEADER}>

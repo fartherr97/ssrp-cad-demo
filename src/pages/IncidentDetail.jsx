@@ -141,7 +141,7 @@ export default function IncidentDetail() {
       </div>
 
       {/* ── Body: 3-column layout ── */}
-      <div className="flex-1 grid overflow-hidden gap-4 lg:gap-5 min-h-0" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+      <div className="flex-1 grid overflow-auto lg:overflow-hidden gap-4 lg:gap-5 min-h-0 grid-cols-1 lg:grid-cols-3">
 
         {/* ── COL 1: Incident info + narrative ── */}
         <Panel>

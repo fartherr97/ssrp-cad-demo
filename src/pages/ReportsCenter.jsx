@@ -136,7 +136,7 @@ export default function ReportsCenter() {
     return (
       <div className="flex flex-col h-full overflow-hidden font-ui bg-[#2e2e32]">
         {/* Top bar */}
-        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center gap-3 shrink-0">
+        <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center flex-wrap gap-x-3 gap-y-1.5 shrink-0">
           <span className="text-[12px] font-bold text-cad-text uppercase tracking-[0.5px]">
             {selectedTemplate.name}
           </span>

@@ -87,7 +87,7 @@ export default function DispatchBoard() {
         </span>
       </div>
 
-      <div className="grid gap-4 lg:gap-5 flex-1 min-h-0 overflow-hidden" style={{ gridTemplateColumns: '1fr 300px' }}>
+      <div className="grid gap-4 lg:gap-5 flex-1 min-h-0 overflow-auto lg:overflow-hidden grid-cols-1 lg:grid-cols-[1fr_300px]">
         {/* Call table */}
         <div className={S_PANEL}>
           <div className={S_PANEL_HEADER}>
@@ -106,6 +106,7 @@ export default function DispatchBoard() {
             {filtered.length === 0 ? (
               <div className="p-8 text-center text-slate-600 text-[12px]">No calls matching filter</div>
             ) : (
+              <div className="overflow-x-auto">
               <table className={S_TABLE}>
                 <thead>
                   <tr>
@@ -142,6 +143,7 @@ export default function DispatchBoard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
 

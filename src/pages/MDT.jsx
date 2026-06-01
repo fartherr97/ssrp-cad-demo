@@ -7,6 +7,7 @@ import {
   S_BTN_PRIMARY,
   BADGE, S_TX_ENTRY, S_TX_TIME, TX_KIND_COLOR,
 } from '../constants/styles';
+import { MdArrowBack } from 'react-icons/md';
 
 export default function MDT() {
   const { state, dispatch } = useCAD();

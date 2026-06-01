@@ -39,7 +39,7 @@ function resolveHex(accent) {
 
 export function PortalPage({ children }) {
   return (
-    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-10 py-7 font-ui bg-app-bg"
+    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-4 py-5 sm:px-10 sm:py-7 font-ui bg-app-bg"
       style={{ background: 'radial-gradient(ellipse at 20% -10%, rgba(61,130,240,0.12) 0%, transparent 55%), var(--n-bg-app)' }}
     >
       {children}
