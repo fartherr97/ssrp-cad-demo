@@ -158,10 +158,10 @@ export default function DispatchCenter() {
                   onClick={() => navigate('/cad/' + c.id)}
                 >
                   <td style={{ fontFamily:'var(--font-mono)', fontWeight:700, color:'#ffffff' }}>{c.id}</td>
-                  <td style={{ fontWeight:600, color:'#00ee44' }}>{c.nature}</td>
-                  <td style={{ color:'#ffff00', fontWeight:500 }}>{c.location}</td>
-                  <td style={{ color:'#00ccff' }}>{c.city}</td>
-                  <td style={{ color:'#aabb00' }}>{c.county}</td>
+                  <td style={{ fontWeight:600, color:'#ffffff' }}>{c.nature}</td>
+                  <td style={{ color:'#ffffff', fontWeight:500 }}>{c.location}</td>
+                  <td style={{ color:'#ffffff' }}>{c.city}</td>
+                  <td style={{ color:'#cccccc' }}>{c.county}</td>
                   <td><PriBadge p={c.priority} /></td>
                   <td><CallStatus status={c.status} /></td>
                   <td>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span style={{ color:'#334455' }}>—</span>}</td>
@@ -219,14 +219,14 @@ export default function DispatchCenter() {
                   style={{ cursor: o.callId ? 'pointer' : 'default' }}
                   onClick={() => o.callId && navigate('/cad/' + o.callId)}
                 >
-                  <td style={{ fontFamily:'var(--font-mono)', fontWeight:700, color: ST_COLOR[o.status] || '#aabbcc' }}>{o.unitId}</td>
+                  <td style={{ fontFamily:'var(--font-mono)', fontWeight:700, color: ST_COLOR[o.status] || '#ffffff' }}>{o.unitId}</td>
                   <td><StatusBadge status={o.status} /></td>
-                  <td style={{ fontFamily:'var(--font-mono)', color: o.callId ? '#ffee44' : '#334455' }}>{o.callId || '—'}</td>
-                  <td style={{ color:'#aaccee', fontWeight:600 }}>{o.deptShort}</td>
-                  <td style={{ color:'#44bbff' }}>{o.location}</td>
-                  <td style={{ color: ST_COLOR[o.status] || '#c8c8c8', fontWeight:500 }}>
+                  <td style={{ fontFamily:'var(--font-mono)', fontWeight:600, color: o.callId ? '#ffee44' : '#555560' }}>{o.callId || '—'}</td>
+                  <td style={{ color:'#ffffff', fontWeight:600 }}>{o.deptShort}</td>
+                  <td style={{ color:'#cccccc' }}>{o.location}</td>
+                  <td style={{ color:'#ffffff', fontWeight:500 }}>
                     {o.name}
-                    {o.rank && <span style={{ color:'#556677', marginLeft:4 }}>· {o.rank}</span>}
+                    {o.rank && <span style={{ color:'#888898', marginLeft:4 }}>· {o.rank}</span>}
                   </td>
                 </tr>
               ))}

@@ -77,14 +77,14 @@
   --ag-civ:  #7878aa;
 
   /* ─── Layout dimensions ─── */
-  --menubar-h:   28px;
+  --menubar-h:   0px;
   --actionbar-h: 52px;
   --statusbar-h: 20px;
   --detail-w:    292px;
 
   /* Legacy compat */
   --sidebar-w:   0px;
-  --topbar-h:    var(--menubar-h);
+  --topbar-h:    var(--actionbar-h);
   --bottombar-h: var(--statusbar-h);
 
   /* ─── No rounded corners — Windows desktop app ─── */
@@ -590,8 +590,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   min-height: 26px;
   display: flex;
   align-items: center;
-  background: #0a1828;
-  border-bottom: 1px solid var(--n-border-strong);
+  background: #1a1a1e;
+  border-bottom: 1px solid #2a2a30;
   padding: 0 8px;
   gap: 8px;
   flex-shrink: 0;
@@ -628,14 +628,14 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   font-family: var(--font-mono);
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  color: #4a6a88;
-  background: #060f1e;
-  border: 1px solid #0d1e30;
+  color: #707070;
+  background: #242428;
+  border: 1px solid #303034;
   cursor: pointer;
   transition: none;
 }
-.cad-filter-btn:hover { color: #a0c0d8; border-color: #1a3050; }
-.cad-filter-btn.active { color: #ffffff; background: #163060; border-color: #2060a0; }
+.cad-filter-btn:hover { color: #d0d0d0; border-color: #505050; }
+.cad-filter-btn.active { color: #ffffff; background: #383840; border-color: #6060a0; }
 
 .cad-grid-actions {
   margin-left: auto;
@@ -674,10 +674,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: #7090a8;
-  background: #060f1e;
-  border-bottom: 2px solid #0d2035;
-  border-right: 1px solid #0a1828;
+  color: #909090;
+  background: #1c1c1e;
+  border-bottom: 2px solid #2a2a2e;
+  border-right: 1px solid #242428;
   white-space: nowrap;
   overflow: hidden;
   font-family: var(--font-ui);
@@ -687,10 +687,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
 .cad-table td {
   padding: 3px 8px;
-  border-bottom: 1px solid #060e18;
+  border-bottom: 1px solid #242428;
   border-right: none;
-  color: #c8d8e0;
-  background: #000000;
+  color: #e8e8e8;
+  background: #1e1e22;
   vertical-align: middle;
   white-space: nowrap;
   overflow: hidden;
@@ -702,8 +702,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-table td:last-child { border-right: none; }
 
 .cad-table tbody tr { cursor: pointer; }
-.cad-table tbody tr:hover td { background: #0a1e38 !important; }
-.cad-table tbody tr.row-selected td { background: #0e2848 !important; border-bottom-color: #1a4070; }
+.cad-table tbody tr:hover td { background: #2c2c32 !important; }
+.cad-table tbody tr.row-selected td { background: #303038 !important; border-bottom-color: #404050; }
 
 /* Priority left-border accent on calls rows */
 .cad-table tbody tr.pri-1 td:first-child { border-left: 3px solid var(--pr1-text); }
@@ -712,7 +712,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-table tbody tr.pri-4 td:first-child { border-left: 3px solid var(--pr4-text); }
 
 /* Alternating row shading — very subtle */
-.cad-table tbody tr:nth-child(even) td { background: #030810; }
+.cad-table tbody tr:nth-child(even) td { background: #222226; }
 
 /* Empty state row */
 .cad-table-empty {

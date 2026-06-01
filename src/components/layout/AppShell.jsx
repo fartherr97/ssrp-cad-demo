@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import MenuBar from './MenuBar';
 import ActionBar from './ActionBar';
 import BottomBar from './BottomBar';
 import RadioToast from '../RadioToast';
@@ -10,7 +9,6 @@ export default function AppShell({ children }) {
 
   return (
     <div className="cad-shell">
-      <MenuBar />
       <ActionBar onCreateCall={onCreateCall} />
       <div className="cad-workspace">
         {children}
