@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { STATUS_COLORS } from '../constants/statusColors';
+import { DeptTag } from '../constants/deptLogos';
 import {
   S_FIELD, S_LABEL, S_SELECT, S_INPUT, S_TEXTAREA,
   S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, xs,
@@ -321,7 +322,7 @@ export default function DispatchCenter() {
                           style={{ color: STATUS_COLORS[o.status] || '#fff' }}>{o.unitId}</td>
                         <td className="px-4 py-2.5"><StatusBadge status={o.status} /></td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>
-                        <td className="px-4 py-2.5 text-[12.5px] font-semibold text-slate-300 whitespace-nowrap">{o.deptShort}</td>
+                        <td className="px-4 py-2.5 text-[12.5px] whitespace-nowrap"><DeptTag code={o.deptShort} /></td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 max-w-[200px] truncate">{o.location}</td>
                         <td className="px-4 py-2.5 text-[12.5px] text-white whitespace-nowrap">
                           {o.name}{o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}

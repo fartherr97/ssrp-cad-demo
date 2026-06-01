@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { STATUS_COLORS } from '../../constants/statusColors';
 import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
-  MdLogout, MdAccountCircle, MdShield,
+  MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
 } from 'react-icons/md';
@@ -72,10 +73,12 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
     <div className="relative" data-tour={dataTour} onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <NavBtn Icon={IconComp} label={label} active={active || open} refCb={btnRef}
         onClick={() => (open ? setOpen(false) : openMenu())} />
-      {open && (
+      {open && createPortal(
         <div
           ref={menuRef}
-          className="fixed z-[200] bg-app-card border border-border-strong shadow-2xl shadow-black/50 rounded-xl min-w-[230px] p-1.5"
+          onMouseEnter={openMenu}
+          onMouseLeave={scheduleClose}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl min-w-[230px] p-1.5"
           style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
           {items.length === 0 && (
@@ -90,7 +93,8 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
               {item.name}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -108,11 +112,25 @@ const STATUS_BTNS = [
 /* ─── User chip with dropdown (status, panic, profile, portal, sign-out) ─── */
 function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isActive }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
+  const menuRef = useRef(null);
+
+  const MENU_W = 260;
+  const toggle = () => {
+    if (open) { setOpen(false); return; }
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: Math.max(8, r.right - MENU_W), top: r.bottom + 8 });
+    }
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!open) return;
-    const h = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const h = e => {
+      if (!ref.current?.contains(e.target) && !menuRef.current?.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, [open]);
@@ -135,7 +153,7 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
   return (
     <div className="relative" ref={ref} data-tour="account">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={toggle}
         className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-lg cursor-pointer transition-all hover:bg-white/[0.05] border border-transparent hover:border-border-base"
       >
         <span className="relative shrink-0">
@@ -152,10 +170,11 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
         <MdExpandMore size={16} className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
-          className="absolute right-0 top-[calc(100%+8px)] z-[200] bg-app-card border border-border-strong shadow-2xl shadow-black/50 rounded-xl w-[260px] p-1.5"
-          style={{ animation: 'dropdownFadeIn 0.13s ease-out' }}
+          ref={menuRef}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl w-[260px] p-1.5"
+          style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
           {/* header */}
           <div className="flex items-center gap-3 px-2.5 py-2.5 mb-1 border-b border-border-faint">
@@ -204,7 +223,8 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
             className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-red-400 hover:text-red-300 cursor-pointer transition-colors hover:bg-red-500/10">
             <MdLogout size={16} /> Sign Out
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -244,9 +264,8 @@ export default function ActionBar() {
 
       {/* ── Brand ── */}
       <div className="flex items-center gap-2.5 pr-4 mr-1 border-r border-border-base shrink-0 select-none">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand/15 border border-brand/30 shrink-0">
-          <MdShield size={20} className="text-brand-bright" />
-        </div>
+        <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
+          className="w-9 h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
         <div className="leading-[1.15] whitespace-nowrap">
           <div className="text-[15px] font-extrabold tracking-[-0.3px] text-white">SSRP CAD</div>
           <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Sunshine State RP</div>
