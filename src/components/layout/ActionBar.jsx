@@ -1,124 +1,135 @@
 import { useCAD } from '../../store/cadStore';
 
+/* ─── SVG icon helpers ─── */
+const Icon = ({ d, size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+  </svg>
+);
+
+const ICONS = {
+  cad:      ['M3 3h18v4H3z', 'M3 10h18v4H3z', 'M3 17h18v4H3z'],
+  search:   'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z',
+  returns:  ['M1 4v6h6', 'M23 20v-6h-6', 'M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15'],
+  forms:    ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
+  map:      ['M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z', 'M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z'],
+  board:    ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
+  mycall:   ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z'],
+  newcall:  ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 11.5 19.79 19.79 0 0 1 1 2.18 2 2 0 0 1 2.98 0h3.04a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 14.91v2.01z', 'M19 3v6', 'M22 6h-6'],
+  assign:   ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M19 8v6', 'M22 11h-6'],
+  assist:   ['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M23 21v-2a4 4 0 0 0-3-3.87', 'M16 3.13a4 4 0 0 1 0 7.75'],
+  primary:  ['M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'],
+  signout:  ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
+};
+
+function ToolBtn({ iconKey, label, onClick, active, disabled, title, style = {} }) {
+  return (
+    <button
+      className={`cad-tool-btn${active ? ' active' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+      title={title || label}
+      style={style}
+    >
+      <span className="cad-tool-icon">
+        <Icon d={ICONS[iconKey]} size={15} />
+      </span>
+      <span className="cad-tool-label">{label}</span>
+    </button>
+  );
+}
+
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, calls, myCallId } = state;
+  const { currentPage, currentUser, officers, calls, myCallId } = state;
 
   const me = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
   const myCall = myCallId ? calls.find(c => c.id === myCallId) : null;
   const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
 
+  const go = (page) => dispatch({ type: 'SET_PAGE', payload: page });
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
-
-  const statusMap = {
-    AVAILABLE:   { cls: 'st-available', label: 'AVL'   },
-    BUSY:        { cls: 'st-busy',      label: 'BUSY'  },
-    ENRT:        { cls: 'st-enrt',      label: 'ENRT'  },
-    ARRVD:       { cls: 'st-arrvd',     label: 'ARRVD' },
-    OFFDUTY:     { cls: 'st-offduty',   label: 'OFD'   },
-    UNAVAILABLE: { cls: 'st-unavl',     label: 'UNAVL' },
-  };
-
-  const myCallDisplay = myCall ? myCall.id : 'UNASSIGNED';
 
   const assignSelf = () => {
     if (!me || !myCall) return;
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId: myCall.id, unitId: me.unitId } });
   };
 
+  const STATUS_BTNS = [
+    { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available', color: '#22ff66' },
+    { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt',      color: '#aaff33' },
+    { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy',      color: '#ff8822' },
+    { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd',     color: '#ffee22' },
+    { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl',     color: '#dd44aa' },
+    { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty',   color: '#cc3333' },
+  ];
+
+  const activeStatusColor = STATUS_BTNS.find(s => s.status === myStatus)?.color || '#cc3333';
+
   return (
-    <div className="cad-actionbar">
-      {/* My Call indicator */}
+    <div className="cad-actionbar" style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+
+      {/* My call indicator */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px',
-        height: '100%', borderRight: '1px solid var(--n-border-faint)',
-        fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)',
-        flexShrink: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+        justifyContent: 'center', padding: '0 10px', height: '100%',
+        borderRight: '1px solid #0d1e32', flexShrink: 0, minWidth: 100,
       }}>
-        MY CALL:&nbsp;
-        <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: 600 }}>
-          {myCallDisplay}
+        <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.5px', textTransform: 'uppercase' }}>My Call</span>
+        <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, color: myCall ? '#66ddff' : '#334455', lineHeight: 1.2 }}>
+          {myCall ? myCall.id : 'UNASSIGNED'}
         </span>
         {myCall && (
-          <span style={{ color: 'var(--n-text-dim)', marginLeft: 3 }}>
-            · {myCall.nature}
+          <span style={{ fontSize: 8, color: '#44779a', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {myCall.nature}
           </span>
         )}
       </div>
 
+      {/* ── Nav group ── */}
+      <ToolBtn iconKey="cad"     label="CAD"     onClick={() => go('dispatch')} active={currentPage === 'dispatch'} />
+      <ToolBtn iconKey="search"  label="Search"  onClick={() => go('records')}  active={currentPage === 'records'}  />
+      <ToolBtn iconKey="returns" label="Returns" onClick={() => go('returns')}  active={currentPage === 'returns'}  />
+      <ToolBtn iconKey="forms"   label="Forms"   onClick={() => go('reports')}  active={currentPage === 'reports'}  />
+      <ToolBtn iconKey="map"     label="Map"     onClick={() => go('map')}      active={currentPage === 'map'}      />
+      <ToolBtn iconKey="board"   label="Board"   onClick={() => go('board')}    active={currentPage === 'board'}    />
+
+      <div className="cad-tool-sep" />
+
+      {/* ── Call actions ── */}
       {isDispatch && (
-        <>
-          <button className="cad-action-btn btn-create" style={{ marginLeft: 4 }} onClick={onCreateCall}>
-            + Create Call
-          </button>
-          <div className="cad-action-sep" />
-        </>
+        <ToolBtn iconKey="newcall" label="New Call" onClick={onCreateCall} />
       )}
+      <ToolBtn iconKey="mycall"  label="My Call"    onClick={() => myCall && go('dispatch')} disabled={!myCall} />
+      <ToolBtn iconKey="assign"  label="Assign Self" onClick={assignSelf} disabled={!myCall || !me} />
+      <ToolBtn iconKey="assist"  label="Assist"      onClick={() => {}} />
+      <ToolBtn iconKey="primary" label="Primary"     onClick={() => {}} />
 
-      <button className="cad-action-btn" onClick={assignSelf} disabled={!myCall || !me} style={{ marginLeft: isDispatch ? 0 : 4 }}>
-        Assign Self
-      </button>
-      <button className="cad-action-btn">
-        Assist Unit
-      </button>
-      <button className="cad-action-btn">
-        Primary Unit
-      </button>
+      <div className="cad-tool-sep" />
 
-      <div className="cad-action-sep" />
-
-      <button
-        className="cad-action-btn"
-        onClick={() => dispatch({ type: 'SET_PAGE', payload: 'dispatch' })}
-      >
-        CAD Board
-      </button>
-      <button
-        className="cad-action-btn"
-        onClick={() => dispatch({ type: 'SET_PAGE', payload: 'records' })}
-      >
-        Search
-      </button>
-      <button
-        className="cad-action-btn"
-        onClick={() => dispatch({ type: 'SET_PAGE', payload: 'map' })}
-      >
-        Live Map
-      </button>
-
-      {/* Status controls — right side */}
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: 2, paddingRight: 6 }}>
-        <span style={{ fontSize: 8, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)', alignSelf: 'center', marginRight: 4, letterSpacing: '0.5px' }}>
-          STATUS:
-        </span>
-        {[
-          { status: 'AVAILABLE',   label: 'AVL',   cls: 'st-available' },
-          { status: 'ENRT',        label: 'ENRT',  cls: 'st-enrt'      },
-          { status: 'BUSY',        label: 'BUSY',  cls: 'st-busy'      },
-          { status: 'ARRVD',       label: 'ARRVD', cls: 'st-arrvd'     },
-          { status: 'UNAVAILABLE', label: 'UNAVL', cls: 'st-unavl'     },
-          { status: 'OFFDUTY',     label: 'OFD',   cls: 'st-offduty'   },
-        ].map(s => (
+      {/* ── Status buttons ── */}
+      <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1, padding: '0 4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: 6, borderRight: '1px solid #0d1e32', marginRight: 4, height: 38 }}>
+          <span style={{ fontSize: 7, fontFamily: 'var(--font-mono)', color: '#3a5a80', letterSpacing: '0.4px', textTransform: 'uppercase' }}>Status</span>
+          <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700, color: activeStatusColor }}>{STATUS_BTNS.find(s => s.status === myStatus)?.label || '—'}</span>
+        </div>
+        {STATUS_BTNS.map(s => (
           <button
             key={s.status}
             className={`cad-status-btn ${myStatus === s.status ? s.cls : ''}`}
+            style={{ height: 28, padding: '0 7px', fontSize: 9 }}
             onClick={() => setStatus(s.status)}
             title={`Set status: ${s.status}`}
           >
             {s.label}
           </button>
         ))}
+      </div>
 
-        <div className="cad-action-sep" />
-
-        <button
-          className="cad-action-btn"
-          style={{ color: 'var(--n-text-muted)', fontSize: 9 }}
-          onClick={() => dispatch({ type: 'LOGOUT' })}
-        >
-          Sign Out
-        </button>
+      {/* ── Sign out ── far right */}
+      <div style={{ marginLeft: 'auto', borderLeft: '1px solid #0d1e32' }}>
+        <ToolBtn iconKey="signout" label="Sign Out" onClick={() => dispatch({ type: 'LOGOUT' })} />
       </div>
     </div>
   );

@@ -78,7 +78,7 @@
 
   /* ─── Layout dimensions ─── */
   --menubar-h:   28px;
-  --actionbar-h: 26px;
+  --actionbar-h: 52px;
   --statusbar-h: 20px;
   --detail-w:    292px;
 
@@ -287,10 +287,65 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   min-height: var(--actionbar-h);
   display: flex;
   align-items: center;
-  background: #060d1a;
-  border-bottom: 2px solid var(--n-border-strong);
+  background: #05101e;
+  border-bottom: 2px solid #1a2a40;
   padding: 0 4px;
   gap: 0;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+/* Icon-style toolbar buttons (ImperialCAD-style) */
+.cad-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 7px;
+  min-width: 50px;
+  height: 46px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #6a8db0;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  flex-shrink: 0;
+  transition: none;
+}
+.cad-tool-btn:hover:not(:disabled) {
+  background: #0d1e32;
+  border-color: #1a3050;
+  color: #c0d8f0;
+}
+.cad-tool-btn.active {
+  background: #061828;
+  border-color: #1060a0;
+  color: #80c8f0;
+}
+.cad-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.cad-tool-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.cad-tool-label {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  line-height: 1;
+}
+.cad-tool-sep {
+  width: 1px;
+  height: 34px;
+  background: #1a2840;
+  margin: 0 3px;
   flex-shrink: 0;
 }
 
@@ -632,9 +687,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
 .cad-table td {
   padding: 2px 6px;
-  border-bottom: 1px solid #06101a;
-  border-right: 1px solid var(--n-border-faint);
-  color: var(--n-text);
+  border-bottom: 1px solid #060e18;
+  border-right: 1px solid #0a1828;
+  color: #b8ccd8;
+  background: #000000;
   vertical-align: middle;
   white-space: nowrap;
   overflow: hidden;
@@ -646,7 +702,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-table td:last-child { border-right: none; }
 
 .cad-table tbody tr { cursor: pointer; }
-.cad-table tbody tr:hover td { background: #071426 !important; }
+.cad-table tbody tr:hover td { background: #081828 !important; }
 .cad-table tbody tr.row-selected td { background: var(--n-bg-selected) !important; }
 
 /* Priority left-border accent on calls rows */
@@ -656,7 +712,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-table tbody tr.pri-4 td:first-child { border-left: 3px solid var(--pr4-text); }
 
 /* Alternating row shading */
-.cad-table tbody tr:nth-child(even) td { background: #030c18; }
+.cad-table tbody tr:nth-child(even) td { background: #020508; }
 
 /* Empty state row */
 .cad-table-empty {
@@ -674,55 +730,46 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 
 .cad-status {
   display: inline-block;
-  padding: 0 5px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   font-family: var(--font-mono);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  line-height: 14px;
-  border: 1px solid transparent;
   white-space: nowrap;
 }
 
-.cad-status.av   { background: var(--st-av-bg);   color: var(--st-av-text);   border-color: var(--st-av-border);   }
-.cad-status.busy { background: var(--st-busy-bg);  color: var(--st-busy-text); border-color: var(--st-busy-border); }
-.cad-status.enrt { background: var(--st-enrt-bg);  color: var(--st-enrt-text); border-color: var(--st-enrt-border); }
-.cad-status.arrvd{ background: var(--st-arv-bg);   color: var(--st-arv-text);  border-color: var(--st-arv-border);  }
-.cad-status.od   { background: var(--st-od-bg);    color: var(--st-od-text);   border-color: var(--st-od-border);   }
-.cad-status.unavl{ background: var(--st-unav-bg);  color: var(--st-unav-text); border-color: var(--st-unav-border); }
+.cad-status.av    { color: #22ff66; }
+.cad-status.busy  { color: #ff8822; }
+.cad-status.enrt  { color: #aaff33; }
+.cad-status.arrvd { color: #ffee22; }
+.cad-status.od    { color: #cc3333; }
+.cad-status.unavl { color: #dd44aa; }
 
 .cad-pri {
   display: inline-block;
-  padding: 0 5px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   font-family: var(--font-mono);
-  letter-spacing: 0.3px;
-  line-height: 14px;
-  border: 1px solid transparent;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
-.cad-pri.p1 { background: var(--pr1-bg); color: var(--pr1-text); border-color: var(--pr1-border); }
-.cad-pri.p2 { background: var(--pr2-bg); color: var(--pr2-text); border-color: var(--pr2-border); }
-.cad-pri.p3 { background: var(--pr3-bg); color: var(--pr3-text); border-color: var(--pr3-border); }
-.cad-pri.p4 { background: var(--pr4-bg); color: var(--pr4-text); border-color: var(--pr4-border); }
+.cad-pri.p1 { color: #ff3333; }
+.cad-pri.p2 { color: #ff8822; }
+.cad-pri.p3 { color: #ffee22; }
+.cad-pri.p4 { color: #22ff66; }
 
 .cad-call-status {
   display: inline-block;
-  padding: 0 5px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   font-family: var(--font-mono);
-  letter-spacing: 0.3px;
-  line-height: 14px;
-  border: 1px solid transparent;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
-.cad-call-status.pending { background: #160800; color: var(--pr2-text); border-color: #3a1800; }
-.cad-call-status.active  { background: #040c22; color: #4888dd; border-color: #0c2248; }
-.cad-call-status.enrt    { background: var(--st-enrt-bg); color: var(--st-enrt-text); border-color: var(--st-enrt-border); }
-.cad-call-status.closed  { background: #0a0a0a; color: #344858; border-color: #141e28; }
+.cad-call-status.pending { color: #ff8822; }
+.cad-call-status.active  { color: #22ff66; }
+.cad-call-status.enrt    { color: #aaff33; }
+.cad-call-status.closed  { color: #334455; }
 
 /* Agency badge */
 .cad-agency {
