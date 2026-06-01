@@ -5,16 +5,16 @@
 
 // ─── Buttons ───────────────────────────────────────────────
 
-const _BTN_BASE = 'inline-flex items-center gap-1.5 select-none cursor-pointer font-semibold rounded border transition-all disabled:opacity-40 disabled:cursor-not-allowed';
+const _BTN_BASE = 'inline-flex items-center justify-center gap-2 select-none cursor-pointer font-semibold rounded-lg border transition-all duration-150 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100';
 
-export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-sky-700 hover:bg-sky-600 text-white border-sky-600/50`;
-export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/5 hover:bg-white/[0.08] text-slate-300 border-white/10`;
-export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-green-800 hover:bg-green-700 text-white border-green-700/40`;
-export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-900/60 hover:bg-red-800/70 text-red-300 border-red-700/30`;
-export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-900/60 hover:bg-amber-800/70 text-amber-300 border-amber-700/30`;
-export const S_BTN_GHOST     = `${_BTN_BASE} px-3 py-1.5 text-sm bg-transparent hover:bg-white/5 text-slate-400 hover:text-slate-200 border-transparent`;
-export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-yellow-900/40 hover:bg-yellow-800/50 text-yellow-600 border-yellow-700/30`;
-export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-900/60 hover:bg-orange-800/70 text-orange-300 border-orange-700/30`;
+export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-600 hover:bg-blue-500 text-white border-blue-400/30 shadow-sm shadow-blue-950/40`;
+export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border-white/10`;
+export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/30 shadow-sm shadow-emerald-950/40`;
+export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white border-red-400/30 shadow-sm shadow-red-950/40`;
+export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-600 hover:bg-amber-500 text-white border-amber-400/30 shadow-sm shadow-amber-950/40`;
+export const S_BTN_GHOST     = `${_BTN_BASE} px-3 py-1.5 text-sm bg-transparent hover:bg-white/[0.06] text-slate-400 hover:text-slate-200 border-transparent`;
+export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/30`;
+export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-600 hover:bg-orange-500 text-white border-orange-400/30 shadow-sm shadow-orange-950/40`;
 
 // sm / xs * append smaller padding/size to any button class string
 export const sm = (base) => base.replace('px-4 py-2 text-sm', 'px-3 py-1.5 text-xs');
@@ -28,7 +28,7 @@ export const btnActiveOn = undefined;
 
 // ─── Badges ────────────────────────────────────────────────
 
-const _BADGE = 'inline-flex items-center leading-none px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border';
+const _BADGE = 'inline-flex items-center leading-none px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.3px] rounded-full border';
 
 export const BADGE = {
   red:         `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
@@ -41,34 +41,34 @@ export const BADGE = {
   gold:        `${_BADGE} bg-yellow-900/40 text-yellow-600 border-yellow-700/30`,
   gray:        `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
   fire:        `${_BADGE} bg-orange-500/15 text-orange-400 border-orange-500/30`,
-  available:   `${_BADGE} bg-green-950 text-green-400 border-green-900`,
-  busy:        `${_BADGE} bg-red-950 text-red-400 border-red-900`,
-  enrt:        `${_BADGE} bg-yellow-950 text-yellow-400 border-yellow-900`,
-  arrvd:       `${_BADGE} bg-cyan-950 text-cyan-400 border-cyan-900`,
-  offduty:     `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`,
-  unavailable: `${_BADGE} bg-violet-950 text-violet-400 border-violet-900`,
-  p1:          `${_BADGE} bg-red-950 text-red-400 border-red-900`,
-  p2:          `${_BADGE} bg-orange-950 text-orange-400 border-orange-900`,
-  p3:          `${_BADGE} bg-yellow-950 text-yellow-400 border-yellow-900`,
-  p4:          `${_BADGE} bg-green-950 text-green-400 border-green-900`,
+  available:   `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  busy:        `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
+  enrt:        `${_BADGE} bg-violet-500/15 text-violet-400 border-violet-500/30`,
+  arrvd:       `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  offduty:     `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
+  unavailable: `${_BADGE} bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30`,
+  p1:          `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
+  p2:          `${_BADGE} bg-orange-500/15 text-orange-400 border-orange-500/30`,
+  p3:          `${_BADGE} bg-yellow-500/15 text-yellow-400 border-yellow-500/30`,
+  p4:          `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
 };
 
 
 // ─── Layout shells ─────────────────────────────────────────
 
-export const S_PAGE         = 'flex flex-col flex-1 overflow-auto p-4 gap-4 bg-app-bg';
-export const S_PANEL        = 'flex flex-col bg-app-panel border border-border-base rounded overflow-hidden';
-export const S_PANEL_HEADER = 'flex items-center gap-2 px-3 py-2 bg-app-card border-b border-border-base shrink-0';
-export const S_PANEL_TITLE  = 'font-mono text-[10px] font-bold uppercase tracking-[0.8px] text-sky-400';
+export const S_PAGE         = 'flex flex-col flex-1 overflow-auto p-5 gap-5';
+export const S_PANEL        = 'flex flex-col bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20';
+export const S_PANEL_HEADER = 'flex items-center gap-2 px-4 py-3 border-b border-border-faint shrink-0';
+export const S_PANEL_TITLE  = 'text-[11px] font-bold uppercase tracking-[0.9px] text-slate-400';
 export const S_PANEL_BODY   = 'flex flex-col flex-1 overflow-y-auto';
-export const S_CARD         = 'bg-app-card border border-border-base rounded p-4';
+export const S_CARD         = 'bg-app-card/70 border border-border-base rounded-xl p-4 backdrop-blur-sm';
 
 
 // ─── Form controls ─────────────────────────────────────────
 
-export const S_INPUT    = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none focus:border-sky-700 transition-colors';
-export const S_SELECT   = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none cursor-pointer';
-export const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded px-3 py-2 text-sm text-slate-200 outline-none resize-y min-h-[90px]';
+export const S_INPUT    = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
+export const S_SELECT   = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
+export const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[90px] focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
 export const S_LABEL    = 'block text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5';
 export const S_FIELD    = 'flex flex-col gap-0.5';
 
@@ -76,33 +76,33 @@ export const S_FIELD    = 'flex flex-col gap-0.5';
 // ─── Tables ────────────────────────────────────────────────
 
 export const S_TABLE    = 'w-full border-collapse table-fixed';
-export const S_TABLE_TH = 'px-2 py-1.5 text-left text-[9px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-bg border-b border-border-strong sticky top-0';
-export const S_TABLE_TD = 'px-2 py-[5px] text-[12px] text-slate-300 border-b border-border-faint';
+export const S_TABLE_TH = 'px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 bg-app-bg/60 backdrop-blur-sm border-b border-border-base sticky top-0';
+export const S_TABLE_TD = 'px-4 py-2.5 text-[12.5px] text-slate-300 border-b border-border-faint';
 
-export const trHoverOn  = (e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; };
+export const trHoverOn  = (e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; };
 export const trHoverOff = (e) => { e.currentTarget.style.background = ''; };
 
 
 // ─── Modals ────────────────────────────────────────────────
 
-export const S_OVERLAY      = 'fixed inset-0 z-[800] bg-black/80 flex items-center justify-center p-4';
-export const S_MODAL        = 'relative bg-app-card border border-border-strong rounded-xl shadow-2xl w-full max-w-[560px] max-h-[90vh] flex flex-col overflow-hidden animate-modal-pop';
-export const S_MODAL_HEADER = 'flex items-center gap-3 px-5 py-4 border-b border-border-strong bg-app-panel shrink-0';
+export const S_OVERLAY      = 'fixed inset-0 z-[800] bg-app-overlay backdrop-blur-sm flex items-center justify-center p-4';
+export const S_MODAL        = 'relative bg-app-card border border-border-strong rounded-2xl shadow-2xl shadow-black/60 w-full max-w-[560px] max-h-[90vh] flex flex-col overflow-hidden animate-modal-pop';
+export const S_MODAL_HEADER = 'flex items-center gap-3 px-5 py-4 border-b border-border-base shrink-0';
 export const S_MODAL_TITLE  = 'flex-1 text-[15px] font-bold text-white tracking-[-0.2px]';
 export const S_MODAL_BODY   = 'flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4';
-export const S_MODAL_FOOTER = 'flex justify-end gap-2 px-5 py-3 border-t border-border-strong bg-app-panel shrink-0';
+export const S_MODAL_FOOTER = 'flex justify-end gap-2 px-5 py-3 border-t border-border-base shrink-0';
 
 
 // ─── Status / Priority helpers ─────────────────────────────
 
 export const cadStatus = (s) => ({
-  AVAILABLE:   `${_BADGE} bg-green-950 text-green-400 border-green-900`,
-  BUSY:        `${_BADGE} bg-red-950 text-red-400 border-red-900`,
-  ENRT:        `${_BADGE} bg-yellow-950 text-yellow-400 border-yellow-900`,
-  ARRVD:       `${_BADGE} bg-cyan-950 text-cyan-400 border-cyan-900`,
-  OFFDUTY:     `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`,
-  UNAVAILABLE: `${_BADGE} bg-violet-950 text-violet-400 border-violet-900`,
-}[s] || `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`);
+  AVAILABLE:   `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  BUSY:        `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
+  ENRT:        `${_BADGE} bg-violet-500/15 text-violet-400 border-violet-500/30`,
+  ARRVD:       `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  OFFDUTY:     `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
+  UNAVAILABLE: `${_BADGE} bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30`,
+}[s] || `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`);
 
 export const CAD_STATUS_LABEL = {
   AVAILABLE: 'AVAILABLE', BUSY: 'BUSY', ENRT: 'EN ROUTE',
@@ -110,20 +110,21 @@ export const CAD_STATUS_LABEL = {
 };
 
 export const cadCallStatus = (s) => ({
-  PENDING:   `${_BADGE} bg-amber-950 text-amber-400 border-amber-900`,
-  ACTIVE:    `${_BADGE} bg-sky-950 text-sky-400 border-sky-900`,
-  ENRT:      `${_BADGE} bg-yellow-950 text-yellow-400 border-yellow-900`,
-  ONSCENE:   `${_BADGE} bg-cyan-950 text-cyan-400 border-cyan-900`,
-  CLOSED:    `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`,
-  CANCELLED: `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`,
-}[s] || `${_BADGE} bg-slate-900 text-slate-500 border-slate-800`);
+  PENDING:   `${_BADGE} bg-amber-500/15 text-amber-400 border-amber-500/30`,
+  ACTIVE:    `${_BADGE} bg-blue-500/15 text-blue-400 border-blue-500/30`,
+  ENRT:      `${_BADGE} bg-violet-500/15 text-violet-400 border-violet-500/30`,
+  ONSCENE:   `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  CLOSED:    `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
+  CANCELLED: `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
+}[s] || `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`);
 
+const _PRI = 'inline-flex items-center leading-none px-2 py-0.5 text-[10px] font-extrabold rounded-md border';
 export const cadPri = (p) => ({
-  1: 'inline-flex items-center leading-none px-1.5 py-0.5 text-[10px] font-bold rounded border bg-red-950 text-red-400 border-red-900',
-  2: 'inline-flex items-center leading-none px-1.5 py-0.5 text-[10px] font-bold rounded border bg-orange-950 text-orange-400 border-orange-900',
-  3: 'inline-flex items-center leading-none px-1.5 py-0.5 text-[10px] font-bold rounded border bg-yellow-950 text-yellow-400 border-yellow-900',
-  4: 'inline-flex items-center leading-none px-1.5 py-0.5 text-[10px] font-bold rounded border bg-green-950 text-green-400 border-green-900',
-}[p] || 'inline-flex items-center leading-none px-1.5 py-0.5 text-[10px] font-bold rounded border bg-slate-900 text-slate-500 border-slate-800');
+  1: `${_PRI} bg-red-500/15 text-red-400 border-red-500/30`,
+  2: `${_PRI} bg-orange-500/15 text-orange-400 border-orange-500/30`,
+  3: `${_PRI} bg-yellow-500/15 text-yellow-400 border-yellow-500/30`,
+  4: `${_PRI} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+}[p] || `${_PRI} bg-slate-500/15 text-slate-400 border-slate-500/30`);
 
 export const cadElapsed = (cls) => ({
   normal:   'text-[10px] font-mono text-slate-400',
@@ -175,9 +176,9 @@ export const TX_KIND_COLOR = {
 
 // ─── Stat widgets ──────────────────────────────────────────
 
-export const S_STAT       = 'flex flex-col gap-1 p-3 bg-app-card border border-border-base rounded';
-export const S_STAT_LABEL = 'text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500';
-export const S_STAT_VALUE = 'text-2xl font-extrabold font-mono text-white';
+export const S_STAT       = 'flex flex-col gap-1.5 p-4 bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm';
+export const S_STAT_LABEL = 'text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500';
+export const S_STAT_VALUE = 'text-[28px] leading-none font-extrabold text-white';
 export const S_STAT_SUB   = 'text-[10px] text-slate-500';
 
 

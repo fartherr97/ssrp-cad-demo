@@ -12,35 +12,38 @@
 
 :root {
   /* ─── Core workspace backgrounds ─── */
-  --n-bg-root:      #000000;
-  --n-bg-app:       #030810;
-  --n-bg-panel:     #040c1a;
-  --n-bg-card:      #050e1c;
-  --n-bg-elevated:  #07111e;
-  --n-bg-input:     #030810;
-  --n-bg-hover:     #071426;
-  --n-bg-selected:  #0c2848;
-  --n-bg-overlay:   rgba(0,0,0,0.82);
+  --n-bg-root:      #0b1424;
+  --n-bg-app:       #0b1424;
+  --n-bg-panel:     #101d31;
+  --n-bg-card:      #13233b;
+  --n-bg-elevated:  #192f4d;
+  --n-bg-input:     #0d1a2c;
+  --n-bg-hover:     rgba(255,255,255,0.04);
+  --n-bg-selected:  #1c3a5e;
+  --n-bg-overlay:   rgba(3,8,18,0.78);
+
+  /* App gradient backdrop */
+  --n-bg-gradient:  linear-gradient(155deg, #14233c 0%, #0c1828 45%, #0a1322 100%);
 
   /* ─── Toolbar & header backgrounds ─── */
-  --n-bg-toolbar:   #0a1c34;
-  --n-bg-titlebar:  #0c2040;
-  --n-bg-tblhdr:    #060f1e;
+  --n-bg-toolbar:   #0e1c30;
+  --n-bg-titlebar:  #0e1c30;
+  --n-bg-tblhdr:    #0e1c30;
 
   /* ─── Borders ─── */
-  --n-border-faint:  #0a1a2c;
-  --n-border-subtle: #0d2038;
-  --n-border:        #14304a;
-  --n-border-strong: #1a3c58;
-  --n-border-accent: #0d4a80;
+  --n-border-faint:  rgba(255,255,255,0.05);
+  --n-border-subtle: rgba(255,255,255,0.07);
+  --n-border:        rgba(255,255,255,0.10);
+  --n-border-strong: rgba(255,255,255,0.14);
+  --n-border-accent: rgba(61,130,240,0.55);
   --n-border-gold:   #5a3c04;
 
   /* ─── Text ─── */
-  --n-text:       #b8ccd8;
-  --n-text-dim:   #5878a0;
-  --n-text-muted: #2e4258;
-  --n-text-data:  #4890c0;
-  --n-text-link:  #2278b8;
+  --n-text:       #dde6f1;
+  --n-text-dim:   #93a4bd;
+  --n-text-muted: #5d6f88;
+  --n-text-data:  #5aa0e8;
+  --n-text-link:  #5a97f5;
 
   /* ─── Brand ─── */
   --n-gold:        #a07808;
@@ -52,26 +55,26 @@
   --n-blue-bg:     #040c1c;
 
   /* ─── Status colors ─── */
-  --st-av-bg:   #001a06; --st-av-border:   #004010; --st-av-text:   #22ff66;
-  --st-enrt-bg: #1a1400; --st-enrt-border: #3d3000; --st-enrt-text: #ffd700;
-  --st-busy-bg: #1a0000; --st-busy-border: #3d0000; --st-busy-text: #ff3333;
-  --st-arv-bg:  #001a1f; --st-arv-border:  #003d4d; --st-arv-text:  #22ccff;
-  --st-unav-bg: #180022; --st-unav-border: #3d0055; --st-unav-text: #cc44ff;
-  --st-od-bg:   #141414; --st-od-border:   #2e2e2e; --st-od-text:   #888888;
+  --st-av-bg:   rgba(34,197,94,0.14);  --st-av-border:   rgba(34,197,94,0.40);  --st-av-text:   #4ade80;
+  --st-enrt-bg: rgba(139,92,246,0.14); --st-enrt-border: rgba(139,92,246,0.40); --st-enrt-text: #a78bfa;
+  --st-busy-bg: rgba(239,68,68,0.14);  --st-busy-border: rgba(239,68,68,0.40);  --st-busy-text: #f87171;
+  --st-arv-bg:  rgba(34,197,94,0.14);  --st-arv-border:  rgba(34,197,94,0.40);  --st-arv-text:  #4ade80;
+  --st-unav-bg: rgba(217,70,239,0.14); --st-unav-border: rgba(217,70,239,0.40); --st-unav-text: #e879f9;
+  --st-od-bg:   rgba(148,163,184,0.12);--st-od-border:   rgba(148,163,184,0.30);--st-od-text:   #94a3b8;
 
   /* ─── Priority levels ─── */
-  --pr1-bg: #150000; --pr1-border: #3a0000; --pr1-text: #ff2222;
-  --pr2-bg: #150800; --pr2-border: #3a1800; --pr2-text: #ff8822;
-  --pr3-bg: #141200; --pr3-border: #383000; --pr3-text: #ddcc00;
-  --pr4-bg: #001a04; --pr4-border: #003808; --pr4-text: #22cc55;
+  --pr1-bg: rgba(239,68,68,0.14);  --pr1-border: rgba(239,68,68,0.40);  --pr1-text: #f87171;
+  --pr2-bg: rgba(249,115,22,0.14); --pr2-border: rgba(249,115,22,0.40); --pr2-text: #fb923c;
+  --pr3-bg: rgba(234,179,8,0.14);  --pr3-border: rgba(234,179,8,0.40);  --pr3-text: #facc15;
+  --pr4-bg: rgba(34,197,94,0.14);  --pr4-border: rgba(34,197,94,0.40);  --pr4-text: #4ade80;
 
   /* ─── Agency colors ─── */
   --ag-tpd:  #3a78cc; --ag-hcso: #3aaa44; --ag-fhp:  #c8a050;
   --ag-hcfr: #cc3333; --ag-fdot: #dd7820; --ag-civ:  #7878aa;
 
   /* ─── Layout dimensions ─── */
-  --actionbar-h: 64px;
-  --statusbar-h: 20px;
+  --actionbar-h: 72px;
+  --statusbar-h: 30px;
   --detail-w:    292px;
   --menubar-h:   0px;
   --sidebar-w:   0px;
@@ -79,9 +82,9 @@
   --bottombar-h: var(--statusbar-h);
 
   /* ─── Radii ─── */
-  --n-radius:    6px;
-  --n-radius-sm: 4px;
-  --n-radius-lg: 10px;
+  --n-radius:    8px;
+  --n-radius-sm: 6px;
+  --n-radius-lg: 14px;
 
   /* ─── Shadow ─── */
   --n-shadow:    0 12px 40px rgba(0,0,0,0.7);
@@ -120,11 +123,11 @@ body {
 }
 
 /* ─── Scrollbars ─── */
-* { scrollbar-width: thin; scrollbar-color: #1a3050 transparent; }
-*::-webkit-scrollbar { width: 4px; height: 4px; }
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.14) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: #1a3050; }
-*::-webkit-scrollbar-thumb:hover { background: #254870; }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); background-clip: padding-box; }
 
 /* ─── Typography ─── */
 h1,h2,h3,h4,h5,h6 { font-family: var(--font-ui); font-weight: 600; color: var(--n-text); line-height: 1.2; }
@@ -153,12 +156,12 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
    These are kept so mobile media queries can target them.
    ════════════════════════════════════════ */
 
-.cad-shell     { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--n-bg-root); }
+.cad-shell     { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--n-bg-gradient); background-attachment: fixed; }
 .cad-workspace { flex: 1; overflow: hidden; display: flex; min-height: 0; }
 .cad-workspace > * { animation: pageEnter var(--t-slow) var(--ease-out); }
 
 /* ActionBar * desktop styling inline; display:none handled by mobile media query */
-.cad-actionbar { height: var(--actionbar-h); min-height: var(--actionbar-h); display: flex; align-items: center; overflow-x: auto; flex-shrink: 0; }
+.cad-actionbar { height: var(--actionbar-h); min-height: var(--actionbar-h); display: flex; align-items: center; overflow: visible; flex-shrink: 0; }
 
 /* Dispatch layout */
 .cad-dispatch        { display: flex; flex: 1; overflow: hidden; min-height: 0; }

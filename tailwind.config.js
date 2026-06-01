@@ -8,33 +8,39 @@ export default {
         mono: ['"Courier New"', '"Lucida Console"', 'Consolas', 'monospace'],
       },
       colors: {
-        // App shell backgrounds — deep dark navy
+        // App shell backgrounds — refined navy / slate gradient theme
         app: {
-          bg:       '#030810',
-          panel:    '#040c1a',
-          card:     '#050e1c',
-          elevated: '#07111e',
-          input:    '#030810',
-          hover:    '#071426',
-          selected: '#0c2848',
-          toolbar:  '#0a1c34',
-          titlebar: '#0c2040',
-          overlay:  'rgba(0,0,0,0.82)',
+          bg:       '#0b1424',
+          panel:    '#101d31',
+          card:     '#13233b',
+          elevated: '#192f4d',
+          input:    '#0d1a2c',
+          hover:    'rgba(255,255,255,0.04)',
+          selected: '#1c3a5e',
+          toolbar:  '#0e1c30',
+          titlebar: '#0e1c30',
+          overlay:  'rgba(3,8,18,0.78)',
         },
         // CAD text tokens
         cad: {
-          text:  '#b8ccd8',
-          dim:   '#5878a0',
-          muted: '#2e4258',
-          data:  '#4890c0',
+          text:  '#dde6f1',
+          dim:   '#93a4bd',
+          muted: '#5d6f88',
+          data:  '#5aa0e8',
         },
-        // CAD borders
+        // CAD borders — soft translucent strokes
         border: {
-          faint:  '#0a1a2c',
-          subtle: '#0d2038',
-          base:   '#14304a',
-          strong: '#1a3c58',
-          accent: '#0d4a80',
+          faint:  'rgba(255,255,255,0.05)',
+          subtle: 'rgba(255,255,255,0.07)',
+          base:   'rgba(255,255,255,0.10)',
+          strong: 'rgba(255,255,255,0.14)',
+          accent: 'rgba(61,130,240,0.55)',
+        },
+        // Primary accent (brand blue)
+        brand: {
+          DEFAULT: '#3d82f0',
+          bright:  '#5a97f5',
+          dim:     '#1d3a66',
         },
         // Accents
         gold: {

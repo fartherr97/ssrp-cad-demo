@@ -1,12 +1,30 @@
+import { MdLock } from 'react-icons/md';
+
 export default function SiteFooter() {
   return (
-    <footer className="relative z-10 w-full shrink-0 bg-[rgba(4,10,24,0.9)] border-t border-white/[0.07] backdrop-blur-[8px]">
-      <div className="flex items-center px-4 sm:px-8 py-3">
-        {/* Logo + copyright */}
-        <div className="flex items-center gap-2">
-          <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-[20px] h-[20px] opacity-50" />
-          <span className="text-[11px] text-[rgba(120,160,200,0.45)]">© 2026 Sunshine State RP</span>
-        </div>
+    <footer className="relative z-10 w-full shrink-0 flex items-center gap-4 px-4 h-[30px] bg-app-toolbar/80 border-t border-border-base backdrop-blur-md text-[10.5px] font-medium overflow-hidden whitespace-nowrap">
+      {/* Connection */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(74,222,128,0.8)] animate-pulse" />
+        <span className="text-emerald-400 font-semibold tracking-[0.4px]">CONNECTED TO SSRP NETWORK</span>
+      </div>
+
+      <span className="text-slate-600 shrink-0">CAD v2.4.1</span>
+
+      <div className="hidden md:flex items-center gap-1.5 shrink-0">
+        <span className="text-slate-600">DISPATCH:</span>
+        <span className="text-slate-400">Hillsborough Communications</span>
+      </div>
+
+      <div className="ml-auto hidden lg:flex items-center gap-1.5 shrink-0">
+        <span className="text-slate-600">PRIMARY CHANNEL:</span>
+        <span className="text-brand-bright font-semibold">COUNTY OPS 1</span>
+      </div>
+
+      <div className="flex items-center gap-1.5 shrink-0">
+        <span className="text-slate-600">ENCRYPTION:</span>
+        <span className="text-emerald-400 font-semibold">ACTIVE</span>
+        <MdLock size={11} className="text-emerald-400" />
       </div>
     </footer>
   );

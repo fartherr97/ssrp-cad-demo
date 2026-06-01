@@ -1,10 +1,10 @@
 export const STATUS_COLORS = {
-  AVAILABLE:   '#22ff66',
-  ENRT:        '#ffd700',
-  BUSY:        '#ff3333',
-  ARRVD:       '#22ccff',
-  UNAVAILABLE: '#cc44ff',
-  OFFDUTY:     '#888888',
+  AVAILABLE:   '#4ade80',
+  ENRT:        '#a78bfa',
+  BUSY:        '#f87171',
+  ARRVD:       '#4ade80',
+  UNAVAILABLE: '#e879f9',
+  OFFDUTY:     '#94a3b8',
 };
 
 export const STATUS_LABELS = {
