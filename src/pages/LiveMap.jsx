@@ -1,253 +1,282 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import StatusBadge from '../components/StatusBadge';
-import { useResponsive } from '../hooks/useResponsive';
+
+const MAP_W = 800;
+const MAP_H = 560;
+
+const REGIONS = [
+  { id: 'downtown', label: 'DOWNTOWN', x: 380, y: 200, w: 160, h: 100 },
+  { id: 'port', label: 'PORT TAMPA', x: 200, y: 340, w: 120, h: 80 },
+  { id: 'brandon', label: 'BRANDON', x: 560, y: 280, w: 120, h: 80 },
+  { id: 'ybor', label: 'YBOR CITY', x: 460, y: 160, w: 100, h: 70 },
+  { id: 'riverview', label: 'RIVERVIEW', x: 580, y: 400, w: 120, h: 70 },
+  { id: 'plant-city', label: 'PLANT CITY', x: 660, y: 200, w: 110, h: 60 },
+];
+
+const ROADS = [
+  { id: 'i275', label: 'I-275', x1: 350, y1: 80, x2: 340, y2: 520, color: '#204060' },
+  { id: 'i4', label: 'I-4', x1: 100, y1: 200, x2: 750, y2: 200, color: '#204060' },
+  { id: 'i75', label: 'I-75', x1: 620, y1: 80, x2: 640, y2: 520, color: '#204060' },
+  { id: 'us41', label: 'US-41', x1: 260, y1: 80, x2: 280, y2: 520, color: '#1a3048' },
+  { id: 'sr60', label: 'SR-60', x1: 100, y1: 300, x2: 750, y2: 290, color: '#1a3048' },
+];
 
 const UNIT_POSITIONS = {
-  1: { x: 42, y: 35 },
-  2: { x: 58, y: 48 },
-  3: { x: 25, y: 62 },
-  4: { x: 72, y: 28 },
-  5: { x: 83, y: 55 },
-  6: { x: 50, y: 70 },
-  7: { x: 38, y: 20 },
-  8: { x: 65, y: 40 },
+  '831':    { x: 395, y: 210 },
+  '831-12': { x: 360, y: 235 },
+  '831-07': { x: 310, y: 195 },
+  'SO-22':  { x: 430, y: 295 },
+  'SHP-09': { x: 625, y: 200 },
+  'MED-3':  { x: 415, y: 320 },
+  'E-11':   { x: 400, y: 340 },
+  '831-19': { x: 380, y: 180 },
+  'DISP-1': { x: 355, y: 260 },
+  'L-7':    { x: 440, y: 340 },
+  'MED-7':  { x: 480, y: 380 },
+  'BC-1':   { x: 360, y: 380 },
+  'HZ-2':   { x: 420, y: 400 },
 };
 
 const CALL_POSITIONS = {
-  '23-1042': { x: 56, y: 47 },
-  '23-1043': { x: 44, y: 38 },
-  '23-1044': { x: 70, y: 65 },
-  '23-1045': { x: 48, y: 32 },
-  '23-1046': { x: 80, y: 52 },
-  '23-1047': { x: 36, y: 55 },
+  '23-1042': { x: 360, y: 235 },
+  '23-1043': { x: 400, y: 220 },
+  '23-1044': { x: 540, y: 285 },
+  '23-1045': { x: 370, y: 260 },
+  '23-1046': { x: 625, y: 200 },
+  '23-1047': { x: 680, y: 250 },
+  '23-1048': { x: 380, y: 300 },
+  '23-1049': { x: 600, y: 420 },
 };
 
-const PRIORITY_COLORS = { 1: '#dc2626', 2: '#ea580c', 3: '#16a34a' };
-const STATUS_COLORS = { AVAILABLE: '#22c55e', BUSY: '#f59e0b', ENRT: '#60a5fa', UNAVAILABLE: '#ef4444', OFFDUTY: '#374151' };
+function statusColor(status) {
+  return status === 'AVAILABLE' ? '#1ab858' :
+    status === 'ENRT' || status === 'BUSY' ? '#bcA018' :
+    status === 'ARRVD' ? '#4880c8' : '#384858';
+}
+
+function priBorderColor(p) {
+  return p === 1 ? '#d83838' : p === 2 ? '#c06828' : p === 3 ? '#b09818' : '#249848';
+}
 
 export default function LiveMap() {
   const { state } = useCAD();
   const { officers, calls } = state;
-  const [hoveredUnit, setHoveredUnit] = useState(null);
-  const [hoveredCall, setHoveredCall] = useState(null);
+
   const [showUnits, setShowUnits] = useState(true);
   const [showCalls, setShowCalls] = useState(true);
-  const [showLegend, setShowLegend] = useState(false);
-  const { isMobile } = useResponsive();
+  const [hover, setHover] = useState(null);
+
+  const onDuty = officers.filter(o => o.status !== 'OFFDUTY');
   const activeCalls = calls.filter(c => c.status !== 'CLOSED');
 
   return (
-    <div style={{ padding: '12px', fontFamily: 'Ubuntu, sans-serif', height: isMobile ? 'calc(100vh - 50px)' : 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column' }}>
-      {/* Header bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', background: '#0b0d14', border: '1px solid #1e2533', padding: '7px 12px' }}>
-        <div style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>LIVE MAP &bull; HILLSBOROUGH COUNTY DISPATCH</div>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          <LayerToggle active={showUnits} onClick={() => setShowUnits(v => !v)} label="Units" color="#22c55e" />
-          <LayerToggle active={showCalls} onClick={() => setShowCalls(v => !v)} label="Calls" color="#ef4444" />
-          {isMobile && (
-            <LayerToggle active={showLegend} onClick={() => setShowLegend(v => !v)} label="Legend" color="#3b82f6" />
-          )}
-        </div>
-      </div>
-
-      <div style={{ flex: 1, display: 'flex', gap: '10px', minHeight: 0 }}>
-        {/* Map area */}
-        <div style={{ flex: 1, position: 'relative', background: '#060c14', border: '1px solid #1e2533', overflow: 'hidden' }}>
-          {/* Grid lines */}
-          {[...Array(10)].map((_, i) => (
-            <div key={`v${i}`} style={{ position: 'absolute', left: `${(i+1)*10}%`, top: 0, bottom: 0, borderLeft: '1px solid rgba(30,37,51,0.6)' }} />
-          ))}
-          {[...Array(8)].map((_, i) => (
-            <div key={`h${i}`} style={{ position: 'absolute', top: `${(i+1)*12.5}%`, left: 0, right: 0, borderTop: '1px solid rgba(30,37,51,0.6)' }} />
-          ))}
-
-          {/* Road overlay */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 100 100" preserveAspectRatio="none">
-            <line x1="0" y1="50" x2="100" y2="50" stroke="#1e2533" strokeWidth="0.7" strokeDasharray="3,3" />
-            <line x1="50" y1="0" x2="50" y2="100" stroke="#1e2533" strokeWidth="0.7" strokeDasharray="3,3" />
-            <line x1="0" y1="30" x2="100" y2="70" stroke="#1e2533" strokeWidth="0.4" strokeDasharray="2,4" />
-            <line x1="20" y1="0" x2="80" y2="100" stroke="#1e2533" strokeWidth="0.4" strokeDasharray="2,4" />
-            {/* I-275 label */}
-            <text x="5" y="52" fill="#2d3d55" fontSize="3.5" fontFamily="Courier New" fontWeight="700">I-275</text>
-            <text x="10" y="10" fill="#1e2d40" fontSize="3" fontFamily="Courier New">TAMPA NORTH</text>
-            <text x="60" y="10" fill="#1e2d40" fontSize="3" fontFamily="Courier New">BRANDON</text>
-            <text x="5" y="95" fill="#1e2d40" fontSize="3" fontFamily="Courier New">RIVERVIEW</text>
-            <text x="62" y="95" fill="#1e2d40" fontSize="3" fontFamily="Courier New">PLANT CITY</text>
-            <text x="30" y="52" fill="#2d3d55" fontSize="3" fontFamily="Courier New">DOWNTOWN TAMPA</text>
-          </svg>
-
-          {/* Call markers */}
-          {showCalls && activeCalls.map(call => {
-            const pos = CALL_POSITIONS[call.id];
-            if (!pos) return null;
-            return (
-              <div
-                key={call.id}
-                onMouseEnter={() => setHoveredCall(call)}
-                onMouseLeave={() => setHoveredCall(null)}
-                style={{
-                  position: 'absolute',
-                  left: `${pos.x}%`,
-                  top: `${pos.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: '20px',
-                  height: '20px',
-                  background: PRIORITY_COLORS[call.priority],
-                  border: '2px solid rgba(255,255,255,0.6)',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  color: '#fff',
-                  boxShadow: `0 0 8px ${PRIORITY_COLORS[call.priority]}80`,
-                  zIndex: 10,
-                  animation: call.priority === 1 ? 'mapPulse 1.5s infinite' : 'none',
-                }}
-              >
-                P{call.priority}
-              </div>
-            );
-          })}
-
-          {/* Unit markers */}
-          {showUnits && officers.filter(o => o.status !== 'OFFDUTY').map(officer => {
-            const pos = UNIT_POSITIONS[officer.id];
-            if (!pos) return null;
-            const color = STATUS_COLORS[officer.status] || '#374151';
-            return (
-              <div
-                key={officer.id}
-                onMouseEnter={() => setHoveredUnit(officer)}
-                onMouseLeave={() => setHoveredUnit(null)}
-                style={{
-                  position: 'absolute',
-                  left: `${pos.x}%`,
-                  top: `${pos.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: '26px',
-                  height: '26px',
-                  background: '#0d1117',
-                  border: `2px solid ${color}`,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '9px',
-                  fontWeight: 800,
-                  color,
-                  boxShadow: `0 0 6px ${color}40`,
-                  zIndex: 20,
-                }}
-              >
-                {officer.unitId.split('-').pop()?.slice(-3) || officer.unitId.slice(-3)}
-              </div>
-            );
-          })}
-
-          {/* Unit tooltip */}
-          {hoveredUnit && (
-            <div style={{
-              position: 'absolute',
-              left: `${UNIT_POSITIONS[hoveredUnit.id]?.x}%`,
-              top: `${(UNIT_POSITIONS[hoveredUnit.id]?.y || 0) - 14}%`,
-              transform: 'translateX(-50%)',
-              background: '#0d1117',
-              border: '1px solid #3b82f6',
-              padding: '8px 12px',
-              fontSize: '11px',
-              zIndex: 100,
-              whiteSpace: 'nowrap',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.7)',
-            }}>
-              <div style={{ color: '#3b82f6', fontWeight: 700 }}>{hoveredUnit.unitId} &bull; {hoveredUnit.name}</div>
-              <div style={{ color: '#9ca3af' }}>{hoveredUnit.deptShort} / {hoveredUnit.subdivision}</div>
-              <div style={{ color: STATUS_COLORS[hoveredUnit.status], fontWeight: 600 }}>{hoveredUnit.status}</div>
-              <div style={{ color: '#4b5563' }}>{hoveredUnit.location}</div>
-              {hoveredUnit.callId && <div style={{ color: '#fbbf24' }}>Call: {hoveredUnit.callId}</div>}
+    <div className="n-page" style={{ padding: 8, gap: 8, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', gap: 8, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {/* Map */}
+        <div className="n-panel" style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+          <div className="n-panel-header">
+            <div className="n-panel-title">
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block' }} />
+              Live Situational Map
             </div>
-          )}
-
-          {/* Call tooltip */}
-          {hoveredCall && (
-            <div style={{
-              position: 'absolute',
-              left: `${CALL_POSITIONS[hoveredCall.id]?.x}%`,
-              top: `${(CALL_POSITIONS[hoveredCall.id]?.y || 0) - 12}%`,
-              transform: 'translateX(-50%)',
-              background: '#0d1117',
-              border: `1px solid ${PRIORITY_COLORS[hoveredCall.priority]}`,
-              padding: '8px 12px',
-              fontSize: '11px',
-              zIndex: 100,
-              whiteSpace: 'nowrap',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.7)',
-            }}>
-              <div style={{ color: PRIORITY_COLORS[hoveredCall.priority], fontWeight: 700 }}>{hoveredCall.id} &bull; P{hoveredCall.priority}</div>
-              <div style={{ color: '#d1d5db' }}>{hoveredCall.nature}</div>
-              <div style={{ color: '#9ca3af' }}>{hoveredCall.location}</div>
-              <div style={{ color: '#4b5563' }}>{hoveredCall.units.length} unit(s) assigned</div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {[
+                { label: 'Units', active: showUnits, toggle: () => setShowUnits(v => !v) },
+                { label: 'Calls', active: showCalls, toggle: () => setShowCalls(v => !v) },
+              ].map(l => (
+                <button key={l.label}
+                  className={`n-btn n-btn-xs ${l.active ? 'n-btn-primary' : 'n-btn-secondary'}`}
+                  onClick={l.toggle}>
+                  {l.label}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* Compass */}
-          <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: '#090b10', border: '1px solid #1e2533', padding: '4px 8px', fontSize: '10px', color: '#374151' }}>
-            N
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#050e1c' }}>
+            <svg width="100%" height="100%" viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ display: 'block' }}>
+              {/* Background */}
+              <rect width={MAP_W} height={MAP_H} fill="#050e1c"/>
+
+              {/* Grid lines */}
+              {Array.from({ length: 20 }, (_, i) => (
+                <line key={`v${i}`} x1={i * 40} y1={0} x2={i * 40} y2={MAP_H} stroke="#091828" strokeWidth="0.5"/>
+              ))}
+              {Array.from({ length: 14 }, (_, i) => (
+                <line key={`h${i}`} x1={0} y1={i * 40} x2={MAP_W} y2={i * 40} stroke="#091828" strokeWidth="0.5"/>
+              ))}
+
+              {/* Water body */}
+              <ellipse cx={200} cy={420} rx={140} ry={100} fill="#061422" stroke="#0c2840" strokeWidth="1"/>
+              <text x={200} y={425} textAnchor="middle" fill="#0c3050" fontSize="11" fontFamily="var(--font-ui)" fontWeight="600">TAMPA BAY</text>
+
+              {/* Roads */}
+              {ROADS.map(r => (
+                <g key={r.id}>
+                  <line x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke={r.color} strokeWidth="4"/>
+                  <line x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke="#081c34" strokeWidth="1.5" strokeDasharray="8 6"/>
+                </g>
+              ))}
+
+              {/* Road labels */}
+              {ROADS.map(r => (
+                <text key={`${r.id}-lbl`}
+                  x={(r.x1 + r.x2) / 2 + 6}
+                  y={(r.y1 + r.y2) / 2 - 6}
+                  fill="#1a4068"
+                  fontSize="9"
+                  fontFamily="var(--font-mono)"
+                  fontWeight="700">
+                  {r.label}
+                </text>
+              ))}
+
+              {/* Region overlays */}
+              {REGIONS.map(reg => (
+                <g key={reg.id}>
+                  <rect x={reg.x} y={reg.y} width={reg.w} height={reg.h}
+                    fill="rgba(13,84,146,0.06)" stroke="#0d3858" strokeWidth="0.8" rx="3"/>
+                  <text x={reg.x + reg.w / 2} y={reg.y + 14} textAnchor="middle"
+                    fill="#0c3060" fontSize="8.5" fontFamily="var(--font-mono)" fontWeight="700" letterSpacing="1">
+                    {reg.label}
+                  </text>
+                </g>
+              ))}
+
+              {/* Call markers */}
+              {showCalls && activeCalls.map(call => {
+                const pos = CALL_POSITIONS[call.id] || { x: 400 + Math.random() * 100 - 50, y: 250 + Math.random() * 100 - 50 };
+                const bc = priBorderColor(call.priority);
+                const isHovered = hover === `call-${call.id}`;
+                return (
+                  <g key={call.id}
+                    onMouseEnter={() => setHover(`call-${call.id}`)}
+                    onMouseLeave={() => setHover(null)}
+                    style={{ cursor: 'pointer' }}>
+                    <circle cx={pos.x} cy={pos.y} r={isHovered ? 10 : 7}
+                      fill={`${bc}22`} stroke={bc} strokeWidth="1.5"/>
+                    <text x={pos.x} y={pos.y + 4} textAnchor="middle" fill={bc} fontSize="8" fontFamily="var(--font-mono)" fontWeight="700">
+                      P{call.priority}
+                    </text>
+                    {isHovered && (
+                      <g>
+                        <rect x={pos.x + 12} y={pos.y - 22} width={140} height={38} fill="#0c1828" stroke={bc} strokeWidth="1" rx="3"/>
+                        <text x={pos.x + 82} y={pos.y - 9} textAnchor="middle" fill={bc} fontSize="9" fontFamily="var(--font-mono)" fontWeight="700">{call.id}</text>
+                        <text x={pos.x + 82} y={pos.y + 4} textAnchor="middle" fill="#8ab0c8" fontSize="8.5" fontFamily="var(--font-ui)">{call.nature}</text>
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+
+              {/* Unit markers */}
+              {showUnits && onDuty.map(o => {
+                const pos = UNIT_POSITIONS[o.unitId] || { x: 350 + (o.id * 23 % 80), y: 230 + (o.id * 17 % 60) };
+                const sc = statusColor(o.status);
+                const isHovered = hover === `unit-${o.id}`;
+                return (
+                  <g key={o.id}
+                    onMouseEnter={() => setHover(`unit-${o.id}`)}
+                    onMouseLeave={() => setHover(null)}
+                    style={{ cursor: 'pointer' }}>
+                    <rect x={pos.x - 14} y={pos.y - 8} width={28} height={16}
+                      fill="#0a1622" stroke={sc} strokeWidth="1.2" rx="2"/>
+                    <text x={pos.x} y={pos.y + 4} textAnchor="middle" fill={sc} fontSize="7.5" fontFamily="var(--font-mono)" fontWeight="700">
+                      {o.unitId.length > 6 ? o.unitId.slice(0,6) : o.unitId}
+                    </text>
+                    {isHovered && (
+                      <g>
+                        <rect x={pos.x + 16} y={pos.y - 24} width={130} height={46} fill="#0c1828" stroke={sc} strokeWidth="1" rx="3"/>
+                        <text x={pos.x + 81} y={pos.y - 11} textAnchor="middle" fill={sc} fontSize="9" fontFamily="var(--font-mono)" fontWeight="700">{o.unitId}</text>
+                        <text x={pos.x + 81} y={pos.y + 1} textAnchor="middle" fill="#8ab0c8" fontSize="8.5" fontFamily="var(--font-ui)">{o.name}</text>
+                        <text x={pos.x + 81} y={pos.y + 12} textAnchor="middle" fill={sc} fontSize="8" fontFamily="var(--font-mono)">{o.status}</text>
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+
+              {/* Compass */}
+              <g transform={`translate(${MAP_W - 40}, 40)`}>
+                <circle cx={0} cy={0} r={16} fill="none" stroke="#0d2840" strokeWidth="1"/>
+                <text x={0} y={-20} textAnchor="middle" fill="#1a3858" fontSize="8" fontFamily="var(--font-ui)" fontWeight="700">N</text>
+                <line x1={0} y1={-12} x2={0} y2={12} stroke="#0d2840" strokeWidth="0.8"/>
+                <line x1={-12} y1={0} x2={12} y2={0} stroke="#0d2840" strokeWidth="0.8"/>
+              </g>
+            </svg>
           </div>
         </div>
 
-        {/* Side panel */}
-        {(!isMobile || showLegend) && (
-          <div style={{ width: isMobile ? '100%' : '190px', display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '10px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
-            <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '10px' }}>
-              <div style={{ color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>LEGEND</div>
-              {Object.entries(STATUS_COLORS).map(([s, c]) => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-                  <div style={{ width: '12px', height: '12px', background: '#0d1117', border: `2px solid ${c}` }} />
-                  <span style={{ color: '#9ca3af', fontSize: '11px' }}>{s}</span>
+        {/* Right: Legend + Unit list */}
+        <div style={{ width: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* Legend */}
+          <div className="n-panel" style={{ flexShrink: 0 }}>
+            <div className="n-panel-header">
+              <div className="n-panel-title">Legend</div>
+            </div>
+            <div style={{ padding: '8px 10px' }}>
+              <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 6 }}>Unit Status</div>
+              {[
+                { label: 'Available', color: '#1ab858' },
+                { label: 'Responding', color: '#bca018' },
+                { label: 'On Scene', color: '#4880c8' },
+                { label: 'Off Duty', color: '#384858' },
+              ].map(l => (
+                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
+                  <span style={{ fontSize: 10, color: 'var(--n-text-dim)' }}>{l.label}</span>
                 </div>
               ))}
-              <div style={{ borderTop: '1px solid #1f2937', marginTop: '8px', paddingTop: '8px' }}>
-                {[1,2,3].map(p => (
-                  <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-                    <div style={{ width: '12px', height: '12px', background: PRIORITY_COLORS[p], borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)' }} />
-                    <span style={{ color: '#9ca3af', fontSize: '11px' }}>Priority {p}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ background: '#0d1117', border: '1px solid #1e2533', padding: '10px', flex: 1, overflowY: 'auto' }}>
-              <div style={{ color: '#6b7280', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '10px' }}>
-                ACTIVE UNITS ({officers.filter(o => o.status !== 'OFFDUTY').length})
-              </div>
-              {officers.filter(o => o.status !== 'OFFDUTY').map(o => (
-                <div key={o.id} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #1f2937' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#60a5fa', fontSize: '11px', fontWeight: 700 }}>{o.unitId}</span>
-                    <StatusBadge status={o.status} style={{ fontSize: '9px', padding: '1px 4px' }} />
-                  </div>
-                  <div style={{ color: '#4b5563', fontSize: '10px', marginTop: '1px' }}>{o.name}</div>
+              <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '8px 0 6px' }}>Incident Priority</div>
+              {[
+                { label: 'P1 — Critical', color: '#d83838' },
+                { label: 'P2 — High', color: '#c06828' },
+                { label: 'P3 — Medium', color: '#b09818' },
+                { label: 'P4 — Low', color: '#249848' },
+              ].map(l => (
+                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />
+                  <span style={{ fontSize: 10, color: 'var(--n-text-dim)' }}>{l.label}</span>
                 </div>
               ))}
             </div>
           </div>
-        )}
-      </div>
 
-      <style>{`@keyframes mapPulse { 0%,100% { box-shadow: 0 0 8px #dc262680; } 50% { box-shadow: 0 0 18px #dc2626; } }`}</style>
+          {/* Unit list */}
+          <div className="n-panel" style={{ flex: 1 }}>
+            <div className="n-panel-header">
+              <div className="n-panel-title">On-Duty Units</div>
+              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length}</span>
+            </div>
+            <div className="n-panel-body scroll-y">
+              {onDuty.map(o => (
+                <div key={o.id} className="unit-row">
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor(o.status), flexShrink: 0 }} />
+                  <span className="n-data" style={{ minWidth: 42, fontSize: 10, color: '#6ab4d8' }}>{o.unitId}</span>
+                  <span style={{ flex: 1, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Active calls list */}
+          <div className="n-panel" style={{ maxHeight: 160, flexShrink: 0 }}>
+            <div className="n-panel-header">
+              <div className="n-panel-title">Active Calls</div>
+              <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{activeCalls.length}</span>
+            </div>
+            <div className="n-panel-body scroll-y">
+              {activeCalls.map(c => (
+                <div key={c.id} style={{ padding: '4px 8px', borderBottom: '1px solid var(--n-border-faint)', display: 'flex', gap: 5, alignItems: 'center' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: priBorderColor(c.priority) }} />
+                  <span className="n-data" style={{ fontSize: 9, minWidth: 52 }}>{c.id}</span>
+                  <span style={{ fontSize: 10, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--n-text-dim)' }}>{c.nature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
-}
-
-function LayerToggle({ active, onClick, label, color }) {
-  return (
-    <button onClick={onClick} style={{ background: active ? '#090b10' : 'transparent', border: `1px solid ${active ? color : '#1e2533'}`, color: active ? color : '#374151', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', display: 'flex', alignItems: 'center', gap: '5px' }}>
-      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: active ? color : '#374151' }} />
-      {label}
-    </button>
   );
 }

@@ -1,67 +1,48 @@
 import { CADProvider, useCAD } from './store/cadStore';
-import NavBar from './components/NavBar';
-import { useResponsive } from './hooks/useResponsive';
-import Footer from './components/Footer';
+import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/LoginPage';
-import SelectionHub from './pages/SelectionHub';
+import CommandDashboard from './pages/CommandDashboard';
+import DispatchCenter from './pages/DispatchCenter';
 import DispatchBoard from './pages/DispatchBoard';
-import DispatchConsole from './pages/DispatchConsole';
-import FireBoard from './pages/FireBoard';
-import MDT from './pages/MDT';
-import SearchPage from './pages/SearchPage';
-import CreateCall from './pages/CreateCall';
-import FormsCenter from './pages/FormsCenter';
-import RMS from './pages/RMS';
-import Returns from './pages/Returns';
-import LiveMap from './pages/LiveMap';
-import CivilianPortal from './pages/CivilianPortal';
-import DepartmentManagement from './pages/DepartmentManagement';
-import AdminPanel from './pages/AdminPanel';
+import FireOpsBoard from './pages/FireOpsBoard';
+import RecordsBureau from './pages/RecordsBureau';
+import ReportsCenter from './pages/ReportsCenter';
+import UnitManagement from './pages/UnitManagement';
+import WarrantControl from './pages/WarrantControl';
+import CivilianRegistry from './pages/CivilianRegistry';
+import PenalCodeEditor from './pages/PenalCodeEditor';
+import AdminCenter from './pages/AdminCenter';
 import BanManagement from './pages/BanManagement';
-import PenalCode from './pages/PenalCode';
-import RecordTemplates from './pages/RecordTemplates';
-import OfficerProfile from './pages/OfficerProfile';
-import RadioToast from './components/RadioToast';
+import LiveMap from './pages/LiveMap';
+import MDT from './pages/MDT';
 
 function CADApp() {
   const { state } = useCAD();
   const { currentUser, currentPage } = state;
-  const { isMobile } = useResponsive();
 
   if (!currentUser) return <LoginPage />;
 
-  // The selection hub renders full-screen without the app chrome.
-  if (currentPage === 'hub') return <SelectionHub />;
-
   const pages = {
-    console: <DispatchConsole />,
-    dispatch: <DispatchBoard />,
-    fire: <FireBoard />,
-    mdt: <MDT />,
-    search: <SearchPage />,
-    createcall: <CreateCall />,
-    forms: <FormsCenter />,
-    rms: <RMS />,
-    returns: <Returns />,
-    livemap: <LiveMap />,
-    civilian: <CivilianPortal />,
-    departments: <DepartmentManagement />,
-    admin: <AdminPanel />,
-    bans: <BanManagement />,
-    penalcode: <PenalCode />,
-    recordtemplates: <RecordTemplates />,
-    profile: <OfficerProfile />,
+    dashboard: <CommandDashboard />,
+    dispatch:  <DispatchCenter />,
+    board:     <DispatchBoard />,
+    fire:      <FireOpsBoard />,
+    records:   <RecordsBureau />,
+    reports:   <ReportsCenter />,
+    units:     <UnitManagement />,
+    warrants:  <WarrantControl />,
+    civilian:  <CivilianRegistry />,
+    penal:     <PenalCodeEditor />,
+    admin:     <AdminCenter />,
+    bans:      <BanManagement />,
+    map:       <LiveMap />,
+    mdt:       <MDT />,
   };
 
   return (
-    <div style={{ minHeight: '100vh', color: '#dce6f5', display: 'flex', flexDirection: 'column' }}>
-      <NavBar />
-      <RadioToast />
-      <div style={{ paddingTop: '42px', paddingBottom: isMobile ? '0' : '28px', flex: 1 }}>
-        {pages[currentPage] || <DispatchBoard />}
-      </div>
-      <Footer />
-    </div>
+    <AppShell>
+      {pages[currentPage] || <CommandDashboard />}
+    </AppShell>
   );
 }
 
