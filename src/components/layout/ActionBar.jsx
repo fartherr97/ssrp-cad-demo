@@ -6,7 +6,7 @@ import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
   MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
-  MdDoNotDisturb, MdPowerSettingsNew,
+  MdDoNotDisturb, MdPowerSettingsNew, MdHome,
 } from 'react-icons/md';
 
 /* ─── Clock ─── */
@@ -161,12 +161,16 @@ export default function ActionBar({ onCreateCall }) {
         </>
       )}
 
-      {/* ── Far right: clock + profile + sign out ── */}
+      {/* ── Far right: clock + profile + home + sign out ── */}
       <div className="ml-auto flex items-stretch shrink-0">
         <Clock />
         <ToolBtn Icon={MdAccountCircle} label="Profile"
           onClick={() => go('/profile')} active={isActive('/profile')}
           title="My Profile & Signature"
+          extraClass="border-l border-[#1a3050]" />
+        <ToolBtn Icon={MdHome} label="Home"
+          onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
+          title="Exit to Home — choose another portal"
           extraClass="border-l border-[#1a3050]" />
         <ToolBtn Icon={MdLogout} label="Sign Out"
           onClick={() => dispatch({ type: 'LOGOUT' })}

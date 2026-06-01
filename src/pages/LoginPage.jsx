@@ -55,9 +55,9 @@ const DiscordSVG = () => (
 );
 
 export default function LoginPage() {
-  const { dispatch } = useCAD();
+  const { state, dispatch } = useCAD();
   const navigate = useNavigate();
-  const [connected, setConnected] = useState(false);
+  const connected = state.discordConnected;
   const [loading, setLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
     setConnectLoading(true);
     setTimeout(() => {
       setConnectLoading(false);
-      setConnected(true);
+      dispatch({ type: 'CONNECT_DISCORD' });
     }, 600);
   };
 

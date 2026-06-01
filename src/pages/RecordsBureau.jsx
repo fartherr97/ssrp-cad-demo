@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
-import { BADGE, xs, S_BTN_PRIMARY, S_BTN_SECONDARY } from '../constants/styles';
+import { BADGE, xs, S_PAGE, S_BTN_PRIMARY, S_BTN_SECONDARY } from '../constants/styles';
 
 function FlagBadge({ flag }) {
   const map = { WARRANT: BADGE.red, CAUTION: BADGE.orange, VIOLENT: BADGE.fire };

@@ -5,7 +5,7 @@ import {
   MdPeople, MdFingerprint, MdVpnKey, MdBrush, MdInventory2, MdShield,
   MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
   MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
-  MdArrowBack, MdLogout, MdChevronLeft, MdChevronRight,
+  MdHome, MdLogout, MdChevronLeft, MdChevronRight,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -127,14 +127,14 @@ export default function AdminShell() {
         {/* Right actions */}
         <div className="flex items-stretch shrink-0" style={{ borderLeft: `1px solid ${ADMIN.border}` }}>
           <button
-            onClick={() => navigate('/cad')}
-            title="Back to CAD"
+            onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
+            title="Exit to Home — choose another portal"
             className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
             style={{ color: ADMIN.textDim }}
             onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ADMIN.textDim; }}
           >
-            <MdArrowBack size={17} /> Exit to CAD
+            <MdHome size={17} /> Exit to Home
           </button>
           <button
             onClick={() => dispatch({ type: 'LOGOUT' })}
