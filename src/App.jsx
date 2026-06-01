@@ -9,6 +9,7 @@ import DispatchBoard from './pages/DispatchBoard';
 import FireOpsBoard from './pages/FireOpsBoard';
 import RecordsBureau from './pages/RecordsBureau';
 import ReportsCenter from './pages/ReportsCenter';
+import RecordsCenter from './pages/RecordsCenter';
 import UnitManagement from './pages/UnitManagement';
 import WarrantControl from './pages/WarrantControl';
 import CivilianRegistry from './pages/CivilianRegistry';
@@ -99,6 +100,7 @@ function CADApp() {
         <Route path="/search"        element={<RecordsBureau />} />
         <Route path="/returns"       element={<RecordsBureau />} />
         <Route path="/forms"         element={<ReportsCenter />} />
+        <Route path="/records"       element={<RecordsCenter />} />
         <Route path="/board"         element={<DispatchBoard />} />
         <Route path="/fire"          element={<FireOpsBoard />} />
         <Route path="/map"           element={<LiveMap />} />

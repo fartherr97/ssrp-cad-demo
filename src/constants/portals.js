@@ -2,33 +2,24 @@ import {
   MdDashboard, MdSearch, MdDescription, MdMap, MdGridView,
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
-  MdHome, MdPerson, MdStore, MdGroup, MdAssignment,
+  MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
 } from 'react-icons/md';
 
-/*
- * Portal definitions * each login role gets its own top-nav + landing page.
- *   nav:         primary square nav items
- *   adminNav:    extra items rendered after a separator (admin only)
- *   showStatus:  show the AVL/ENRT/... field-status squares
- *   showCalls:   show My Call / Assign actions
- *   showNewCall: show the New Call action (dispatchers/command)
- *   landing:     route to navigate to right after login
- */
 export const PORTALS = {
-  leo:      { id: 'leo',      label: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
+  leo: { id: 'leo', label: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
-      { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
-      { Icon: MdSearch,       label: 'Search',    route: '/search'    },
-      { Icon: MdDescription,  label: 'Forms',     route: '/forms'     },
-      { Icon: MdPhoneAndroid, label: 'MDT',       route: '/mdt'       },
-      { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
-      { Icon: MdMap,          label: 'Map',       route: '/map'       },
+      { Icon: MdDashboard,    label: 'CAD',      route: '/cad'      },
+      { Icon: MdSearch,       label: 'Search',   route: '/search'   },
+      { Icon: MdDescription,  label: 'Reports',  route: '/forms',   dropdown: 'reports' },
+      { Icon: MdFolder,       label: 'Records',  route: '/records', dropdown: 'records' },
+      { Icon: MdPhoneAndroid, label: 'MDT',      route: '/mdt'      },
+      { Icon: MdGavel,        label: 'Warrants', route: '/warrants' },
+      { Icon: MdMap,          label: 'Map',      route: '/map'      },
     ],
   },
 
-  dispatch: {
-    id: 'dispatch', label: 'Dispatch', color: '#3aaa44', landing: '/cad',
+  dispatch: { id: 'dispatch', label: 'Dispatch', color: '#3aaa44', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard, label: 'CAD',    route: '/cad'    },
@@ -39,25 +30,25 @@ export const PORTALS = {
     ],
   },
 
-  fire: {
-    id: 'fire', label: 'Fire & EMS', color: '#e04020', landing: '/fire',
+  fire: { id: 'fire', label: 'Fire & EMS', color: '#e04020', landing: '/fire',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
-      { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'   },
-      { Icon: MdDashboard,           label: 'CAD',        route: '/cad'    },
-      { Icon: MdGroups,              label: 'Units',      route: '/units'  },
-      { Icon: MdMap,                 label: 'Map',        route: '/map'    },
-      { Icon: MdDescription,         label: 'Forms',      route: '/forms'  },
+      { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'     },
+      { Icon: MdDashboard,           label: 'CAD',        route: '/cad'      },
+      { Icon: MdGroups,              label: 'Units',      route: '/units'    },
+      { Icon: MdMap,                 label: 'Map',        route: '/map'      },
+      { Icon: MdDescription,         label: 'Reports',   route: '/forms',   dropdown: 'reports' },
+      { Icon: MdFolder,              label: 'Records',   route: '/records', dropdown: 'records' },
     ],
   },
 
-  admin: {
-    id: 'admin', label: 'Administration', color: '#c09010', landing: '/admin',
+  admin: { id: 'admin', label: 'Administration', color: '#c09010', landing: '/admin',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
       { Icon: MdSearch,       label: 'Search',    route: '/search'    },
-      { Icon: MdDescription,  label: 'Forms',     route: '/forms'     },
+      { Icon: MdDescription,  label: 'Reports',   route: '/forms',    dropdown: 'reports' },
+      { Icon: MdFolder,       label: 'Records',   route: '/records',  dropdown: 'records' },
       { Icon: MdMap,          label: 'Map',       route: '/map'       },
       { Icon: MdGridView,     label: 'Board',     route: '/board'     },
       { Icon: MdGroups,       label: 'Units',     route: '/units'     },
@@ -67,8 +58,7 @@ export const PORTALS = {
     ],
   },
 
-  civilian: {
-    id: 'civilian', label: 'Civilian Services', color: '#9090cc', landing: '/portal/civilian',
+  civilian: { id: 'civilian', label: 'Civilian Services', color: '#9090cc', landing: '/portal/civilian',
     showStatus: false, showCalls: false, showNewCall: false,
     nav: [
       { Icon: MdHome,          label: 'Home',        route: '/portal/civilian'    },
@@ -80,8 +70,7 @@ export const PORTALS = {
     ],
   },
 
-  business: {
-    id: 'business', label: 'Business Services', color: '#44aacc', landing: '/portal/business',
+  business: { id: 'business', label: 'Business Services', color: '#44aacc', landing: '/portal/business',
     showStatus: false, showCalls: false, showNewCall: false,
     nav: [
       { Icon: MdHome,       label: 'Home',        route: '/portal/business'    },

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { FormDocWrap, ReportDocument } from '../components/FormDocument';
 import {
@@ -31,10 +32,18 @@ const STATUS_BADGE = {
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
   const { reports, reportTemplates, currentUser, officers } = state;
+  const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
   const [selectedReport, setSelectedReport]     = useState(null);
   const [reportTab, setReportTab]               = useState('MINE');
+
+  useEffect(() => {
+    const openName = searchParams.get('open');
+    if (!openName || !reportTemplates?.length) return;
+    const tpl = reportTemplates.find(t => t.name === decodeURIComponent(openName));
+    if (tpl) { setSelectedTemplate(tpl); setFormValues({}); setSelectedReport(null); }
+  }, [searchParams, reportTemplates]);
 
   const isAdmin   = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const me        = officers.find(o => o.id === currentUser?.id);

@@ -217,6 +217,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 @keyframes slideInLeft  { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0);  opacity: 1; } }
 @keyframes slideUp      { from { transform: translateY(6px);   opacity: 0; } to { transform: translateY(0);  opacity: 1; } }
 @keyframes fadeIn       { from { opacity: 0; }                               to { opacity: 1; } }
+@keyframes dropdownFadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes modalPop     { from { transform: translateY(12px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes pageEnter    { from { transform: translateY(8px);   opacity: 0; } to { transform: translateY(0);  opacity: 1; } }
 @keyframes expandDown   { from { opacity: 0; transform: translateY(-6px); }  to { opacity: 1; transform: translateY(0); } }

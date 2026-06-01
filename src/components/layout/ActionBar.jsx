@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { STATUS_COLORS } from '../../constants/statusColors';
@@ -6,7 +6,7 @@ import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
   MdAddCall, MdPhone, MdPersonAdd, MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
-  MdDoNotDisturb, MdPowerSettingsNew, MdHome,
+  MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdChevronRight,
 } from 'react-icons/md';
 
 /* ─── Clock ─── */
@@ -49,6 +49,84 @@ function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, extr
   );
 }
 
+/* Dropdown nav button — click to open a template picker */
+const CATEGORY_ORDER = { 'Incident': 0, 'License': 1, 'Legal': 2, 'Citation': 3, 'Notice': 4, 'Registration': 5 };
+
+function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Group items by category
+  const groups = {};
+  items.forEach(item => {
+    const cat = item.category || 'General';
+    (groups[cat] ||= []).push(item);
+  });
+  const sortedCats = Object.keys(groups).sort((a, b) =>
+    (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99)
+  );
+
+  return (
+    <div ref={ref} className="relative h-full shrink-0">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex flex-col items-center justify-center gap-[3px] px-2.5 py-1 min-w-[58px] h-full border-none cursor-pointer transition-all font-ui
+          ${active || open
+            ? 'bg-sky-500/15 border-b-2 border-sky-400 text-sky-200'
+            : 'bg-transparent border-b-2 border-transparent text-slate-500 hover:bg-white/[0.06] hover:text-slate-400'}`}
+      >
+        <span className="flex items-center justify-center"><IconComp size={20} /></span>
+        <span className="text-[9px] font-bold uppercase tracking-[0.5px] whitespace-nowrap leading-none flex items-center gap-[2px]">
+          {label}
+          <MdChevronRight size={10} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
+        </span>
+      </button>
+
+      {open && (
+        <div
+          className="absolute top-full left-0 z-[200] mt-0.5 bg-[#0d1929] border border-[#1f3456] shadow-2xl rounded min-w-[210px] overflow-hidden"
+          style={{ animation: 'dropdownFadeIn 0.13s ease-out' }}
+        >
+          {sortedCats.map((cat, ci) => (
+            <div key={cat}>
+              {ci > 0 && <div className="h-px bg-white/[0.06] mx-2" />}
+              <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold uppercase tracking-[0.7px] text-slate-500">
+                {cat}
+              </div>
+              {groups[cat].map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    navigate(item.route);
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] text-slate-300 hover:bg-white/[0.07] hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500/60 shrink-0" />
+                  <span className="font-medium">{item.name}</span>
+                  {item.formCode && (
+                    <span className="ml-auto text-[9px] font-mono text-slate-600 shrink-0">{item.formCode}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ))}
+          {items.length === 0 && (
+            <div className="px-4 py-3 text-[11px] text-slate-600 italic">No templates yet</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* Status square button * uses the status color when active */
 function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
   const isActive = myStatus === status;
@@ -73,7 +151,6 @@ function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
   );
 }
 
-
 const STATUS_BTNS = [
   { status: 'AVAILABLE',   label: 'AVL',   Icon: MdCheckCircle      },
   { status: 'ENRT',        label: 'ENRT',  Icon: MdDirectionsCar    },
@@ -85,19 +162,36 @@ const STATUS_BTNS = [
 
 export default function ActionBar({ onCreateCall }) {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, calls, myCallId } = state;
+  const { currentUser, officers, calls, myCallId, reportTemplates, recordTemplates } = state;
   const navigate = useNavigate();
   const location = useLocation();
 
   const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
 
-  const me      = officers.find(o => o.id === currentUser?.id);
+  const me       = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
-  const myCall  = myCallId ? calls.find(c => c.id === myCallId) : null;
+  const myCall   = myCallId ? calls.find(c => c.id === myCallId) : null;
 
-  const go      = (route) => navigate(route);
+  const go       = (route) => navigate(route);
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
   const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
+
+  const dropdownItems = (kind) => {
+    if (kind === 'reports') {
+      return (reportTemplates || []).map(t => ({
+        ...t,
+        category: t.category || 'Incident',
+        route: `/forms?open=${encodeURIComponent(t.name)}`,
+      }));
+    }
+    if (kind === 'records') {
+      return (recordTemplates || []).map(t => ({
+        ...t,
+        route: `/records?open=${encodeURIComponent(t.name)}`,
+      }));
+    }
+    return [];
+  };
 
   return (
     <div className="cad-actionbar flex items-stretch gap-0 overflow-x-auto">
@@ -111,20 +205,28 @@ export default function ActionBar({ onCreateCall }) {
             <span className="text-white">Sunshine State </span>
             <span className="text-[#f2800d]">RP</span>
           </div>
-          <div
-            className="text-[9px] font-bold tracking-[0.8px] uppercase mt-px transition-colors"
-            style={{ color: portal.color }}
-          >
+          <div className="text-[9px] font-bold tracking-[0.8px] uppercase mt-px transition-colors" style={{ color: portal.color }}>
             {portal.label}
           </div>
         </div>
       </div>
 
       {/* ── Portal nav ── */}
-      {portal.nav.map(item => (
-        <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
-          onClick={() => go(item.route)} active={isActive(item.route)} />
-      ))}
+      {portal.nav.map(item =>
+        item.dropdown ? (
+          <DropdownBtn
+            key={item.route}
+            Icon={item.Icon}
+            label={item.label}
+            items={dropdownItems(item.dropdown)}
+            active={isActive(item.route)}
+            navigate={go}
+          />
+        ) : (
+          <ToolBtn key={item.route} Icon={item.Icon} label={item.label}
+            onClick={() => go(item.route)} active={isActive(item.route)} />
+        )
+      )}
 
       {/* ── Admin extras ── */}
       {portal.adminNav && (
@@ -137,7 +239,7 @@ export default function ActionBar({ onCreateCall }) {
         </>
       )}
 
-      {/* ── Call actions (dispatch / field roles) ── */}
+      {/* ── Call actions ── */}
       {(portal.showNewCall || portal.showCalls) && <div className="w-px bg-[#1a3050] self-stretch shrink-0" />}
       {portal.showNewCall && <ToolBtn Icon={MdAddCall} label="New Call" onClick={onCreateCall} />}
       {portal.showCalls && (
@@ -161,12 +263,12 @@ export default function ActionBar({ onCreateCall }) {
         </>
       )}
 
-      {/* ── Far right: clock + profile + home + sign out ── */}
+      {/* ── Far right ── */}
       <div className="ml-auto flex items-stretch shrink-0">
         <Clock />
         <ToolBtn Icon={MdAccountCircle} label="Profile"
           onClick={() => go('/profile')} active={isActive('/profile')}
-          title="My Profile & Signature"
+          title="My Profile"
           extraClass="border-l border-[#1a3050]" />
         <ToolBtn Icon={MdHome} label="Home"
           onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}

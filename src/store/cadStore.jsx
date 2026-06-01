@@ -26,6 +26,7 @@ const initialState = {
   criminalHistory: CRIMINAL_HISTORY,
   penalCode: PENAL_CODE,
   reports: REPORTS,
+  records: [],
   reportTemplates: REPORT_TEMPLATES,
   recordTemplates: RECORD_TEMPLATES,
   bannedUsers: BANNED_USERS,
@@ -319,6 +320,13 @@ function reducer(state, action) {
       const reportTemplates = state.reportTemplates.filter(t => t.id !== action.payload);
       return { ...state, reportTemplates };
     }
+
+    case 'ADD_RECORD': {
+      const newRecord = { ...action.payload, id: state.nextId, date: new Date().toLocaleDateString() };
+      return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
+    }
+    case 'UPDATE_RECORD_STATUS':
+      return { ...state, records: state.records.map(r => r.id === action.payload.id ? { ...r, status: action.payload.status } : r) };
 
     case 'ADD_RECORD_TEMPLATE':
       return { ...state, recordTemplates: [...state.recordTemplates, { ...action.payload, id: `r${Date.now()}` }] };
