@@ -55,6 +55,7 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
   const btnRef = useRef(null);
+  const closeTimer = useRef(null);
 
   useEffect(() => {
     if (!open) return;
@@ -65,16 +66,25 @@ function DropdownBtn({ Icon: IconComp, label, items, active, navigate, onClose }
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const toggle = () => {
-    if (!open && btnRef.current) {
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  const place = () => {
+    if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
-      setCoords({ left: r.left, top: r.bottom + 2 });
+      setCoords({ left: r.left, top: r.bottom });
     }
-    setOpen(o => !o);
   };
 
+  const openMenu = () => { clearTimeout(closeTimer.current); place(); setOpen(true); };
+  const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(false), 120); };
+  const toggle = () => { if (open) setOpen(false); else openMenu(); };
+
   return (
-    <div className="h-full shrink-0">
+    <div
+      className="h-full shrink-0"
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
+    >
       <button
         ref={btnRef}
         onClick={toggle}
