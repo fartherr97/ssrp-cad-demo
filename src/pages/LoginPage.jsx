@@ -388,8 +388,7 @@ export default function LoginPage() {
 
         {/* Right */}
         <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>NEXUS CAD v2.0</span>
-          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>Hillsborough County ECC</span>
+          <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>Status: <span style={{ color: '#22ff66' }}>Online</span></span>
           <span style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)' }}>Status: <span style={{ color: '#22ff66' }}>Online</span></span>
         </div>
       </footer>

@@ -157,13 +157,8 @@ export default function ActionBar({ onCreateCall }) {
       }}>
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           style={{ width: 24, height: 24, flexShrink: 0, objectFit: 'contain' }} />
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
-            Sunshine State RP
-          </div>
-          <div style={{ fontSize: 9, color: '#2e4258', fontFamily: 'var(--font-mono)', letterSpacing: '0.5px' }}>
-            CAD · ECC
-          </div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#c09010', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
+          Sunshine State RP
         </div>
       </div>
 
