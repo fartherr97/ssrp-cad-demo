@@ -8,7 +8,7 @@ import {
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { BADGE } from '../../constants/styles';
 
-const ACCENT = 'violet';
+const ACCENT = 'brand';
 
 const DL_BADGE = {
   ACTIVE:    BADGE.green,
@@ -81,8 +81,8 @@ export default function CivilianHome() {
         {QUICK.map(q => (
           <PortalCard key={q.route} accent={ACCENT} hover onClick={() => navigate(q.route)}>
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-400/10 border border-violet-400/30">
-                <q.icon size={24} className="text-violet-400" />
+              <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
+                <q.icon size={24} className="text-brand-bright" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[15px] font-bold text-slate-100">{q.title}</div>
@@ -99,7 +99,7 @@ export default function CivilianHome() {
         <PortalCard accent={ACCENT}>
           <div className="text-sm text-slate-400">
             You haven't registered any characters yet. Head to{' '}
-            <span className="text-violet-400 font-semibold">My Characters</span> to get started.
+            <span className="text-brand-bright font-semibold">My Characters</span> to get started.
           </div>
         </PortalCard>
       ) : (
@@ -108,7 +108,7 @@ export default function CivilianHome() {
             <PortalCard key={c.id} accent={ACCENT} hover onClick={() => navigate('/portal/characters')}>
               <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-3 min-w-0">
-                  <MdPerson size={22} className="text-violet-400 shrink-0" />
+                  <MdPerson size={22} className="text-brand-bright shrink-0" />
                   <div className="min-w-0">
                     <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
                     <div className="text-[11px] text-slate-500">DOB {c.dob}</div>

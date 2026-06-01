@@ -5,7 +5,7 @@ import { MdGroup, MdAdd, MdDelete, MdBusiness } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
 
-const ACCENT = 'cyan';
+const ACCENT = 'brand';
 const ROLES = ['Manager', 'Employee', 'Driver', 'Security', 'Dispatcher'];
 const BLANK = { name: '', role: 'Employee', phone: '', since: '' };
 
@@ -91,8 +91,8 @@ export default function Employees() {
 
       {myBiz.employees.length === 0 ? (
         <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
-          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
-            <MdGroup size={30} className="text-cyan-400" />
+          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-brand/15 border border-brand/30">
+            <MdGroup size={30} className="text-brand-bright" />
           </div>
           <div className="text-[15px] font-bold text-slate-100 mb-1.5">No employees yet</div>
           <div className="text-sm text-slate-400">Use "Add Employee" to build your roster.</div>
@@ -104,7 +104,7 @@ export default function Employees() {
               <div className="flex justify-between items-start gap-2.5">
                 <div className="min-w-0">
                   <div className="text-[15px] font-bold text-slate-100">{emp.name}</div>
-                  <span className="inline-block mt-1.5 text-[11px] font-bold px-[9px] py-0.5 rounded-full bg-cyan-400/[0.13] text-cyan-400 border border-cyan-400/30">
+                  <span className="inline-block mt-1.5 text-[11px] font-bold px-[9px] py-0.5 rounded-full bg-brand/15 text-brand-bright border border-brand/30">
                     {emp.role}
                   </span>
                 </div>

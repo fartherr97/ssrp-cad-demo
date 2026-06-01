@@ -44,7 +44,7 @@ export default function MyVehicles() {
         icon={MdDirectionsCar}
         title="My Vehicles"
         subtitle="Register vehicles to your characters and view their registration status."
-        accent="#9090cc"
+        accent="brand"
         action={
           !showForm && myChars.length > 0 && (
             <button className={S_BTN_PRIMARY} onClick={openNew}>
@@ -55,7 +55,7 @@ export default function MyVehicles() {
       />
 
       {showForm && (
-        <PortalCard accent="#9090cc" style={{ marginBottom: 22 }}>
+        <PortalCard accent="brand" style={{ marginBottom: 22 }}>
           <div className="flex justify-between items-center mb-[18px]">
             <div className="text-[15px] font-extrabold text-slate-100">Register New Vehicle</div>
             <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
@@ -105,9 +105,9 @@ export default function MyVehicles() {
       )}
 
       {myVehicles.length === 0 && !showForm ? (
-        <PortalCard accent="#9090cc">
+        <PortalCard accent="brand">
           <div className="text-center p-12">
-            <MdDirectionsCar size={48} color="rgba(144,144,204,0.4)" />
+            <MdDirectionsCar size={48} color="rgba(61,130,240,0.4)" />
             <div className="text-[15px] font-bold text-slate-100 mt-3">No vehicles registered</div>
             <div className="text-sm text-slate-400 mt-1.5">
               {myChars.length === 0
@@ -124,7 +124,7 @@ export default function MyVehicles() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
           {myVehicles.map(v => (
-            <PortalCard key={v.id} accent="#9090cc">
+            <PortalCard key={v.id} accent="brand">
               <div className="flex justify-between items-start gap-2.5 mb-3.5">
                 <div>
                   <div className="text-[22px] font-extrabold text-slate-100 font-mono tracking-[1px]">
@@ -143,7 +143,7 @@ export default function MyVehicles() {
                 <Field label="Reg. Expiry" value={v.regExpiry} />
               </div>
               <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
-                <MdPerson size={15} color="#9090cc" />
+                <MdPerson size={15} color="#3d82f0" />
                 <span>Registered to <span className="text-slate-200 font-semibold">{ownerName(v.ownerId)}</span></span>
               </div>
             </PortalCard>

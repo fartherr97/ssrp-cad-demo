@@ -11,9 +11,9 @@ const TYPE_COLOR = {
 
 export default function CitizenLaws() {
   const { state } = useCAD();
-  const { penalCode, currentUser } = state;
-  const accent = currentUser?.portal === 'business' ? 'cyan' : 'violet';
-  const accentHex = currentUser?.portal === 'business' ? '#44aacc' : '#9090cc';
+  const { penalCode } = state;
+  const accent = 'brand';
+  const accentHex = '#3d82f0';
 
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
@@ -61,12 +61,12 @@ export default function CitizenLaws() {
             <button
               key={t}
               onClick={() => setTypeFilter(t)}
-              className="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded border cursor-pointer transition-all select-none"
-              style={{
-                background: typeFilter === t ? (TYPE_COLOR[t] || accentHex) : 'rgba(255,255,255,0.05)',
-                color: typeFilter === t ? '#fff' : 'rgba(200,220,240,0.7)',
-                borderColor: typeFilter === t ? 'transparent' : 'rgba(255,255,255,0.12)',
-              }}
+              className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg border cursor-pointer transition-all select-none ${typeFilter === t ? '' : 'bg-app-input text-cad-dim border-border-base hover:text-cad-text'}`}
+              style={typeFilter === t ? {
+                background: TYPE_COLOR[t] || accentHex,
+                color: '#fff',
+                borderColor: 'transparent',
+              } : undefined}
             >
               {t}
             </button>
@@ -85,8 +85,7 @@ export default function CitizenLaws() {
       {Object.entries(categories).map(([category, laws]) => (
         <div key={category} className="mb-[26px]">
           <div
-            className="text-sm font-bold tracking-[0.6px] uppercase mb-3 pb-1.5 border-b border-white/[0.08]"
-            style={{ color: accentHex }}
+            className="text-[12px] font-bold tracking-[0.7px] uppercase mb-3 pb-1.5 border-b border-border-base text-cad-muted"
           >
             {category}
           </div>
@@ -94,7 +93,7 @@ export default function CitizenLaws() {
             {laws.map(law => (
               <div
                 key={law.id}
-                className="bg-white/[0.035] border border-white/[0.08] rounded-[10px] px-4 py-3.5"
+                className="bg-app-card/70 border border-border-base rounded-xl px-4 py-3.5 backdrop-blur-sm"
                 style={{ borderLeft: `3px solid ${TYPE_COLOR[law.type] || accentHex}` }}
               >
                 <div className="flex justify-between items-start gap-2.5 mb-2">

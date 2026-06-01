@@ -77,7 +77,7 @@ export default function MyCharacters() {
         icon={MdPerson}
         title="My Characters"
         subtitle="Register and manage the identities tied to your account."
-        accent="#9090cc"
+        accent="brand"
         action={
           !showForm && (
             <button className={S_BTN_PRIMARY} onClick={openNew}>
@@ -88,7 +88,7 @@ export default function MyCharacters() {
       />
 
       {showForm && (
-        <PortalCard accent="#9090cc" style={{ marginBottom: 22 }}>
+        <PortalCard accent="brand" style={{ marginBottom: 22 }}>
           <div className="flex justify-between items-center mb-[18px]">
             <div className="text-[15px] font-extrabold text-slate-100">
               {editingId != null ? 'Edit Character' : 'Register New Character'}
@@ -131,9 +131,9 @@ export default function MyCharacters() {
       )}
 
       {myChars.length === 0 && !showForm ? (
-        <PortalCard accent="#9090cc">
+        <PortalCard accent="brand">
           <div className="text-center p-12">
-            <MdPerson size={48} color="rgba(144,144,204,0.4)" />
+            <MdPerson size={48} color="rgba(61,130,240,0.4)" />
             <div className="text-[15px] font-bold text-slate-100 mt-3">No characters yet</div>
             <div className="text-sm text-slate-400 mt-1.5">
               Register your first character to get started.
@@ -146,11 +146,11 @@ export default function MyCharacters() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: 14 }}>
           {myChars.map(c => (
-            <PortalCard key={c.id} accent="#9090cc">
+            <PortalCard key={c.id} accent="brand">
               <div className="flex justify-between items-start gap-2.5 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-400/10 border border-violet-400/30">
-                    <MdPerson size={22} color="#9090cc" />
+                  <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
+                    <MdPerson size={22} color="#3d82f0" />
                   </div>
                   <div>
                     <div className="text-base font-extrabold text-slate-100">{c.firstName} {c.lastName}</div>

@@ -5,7 +5,7 @@ import { useCAD } from '../../store/cadStore';
 import { PortalPage, PortalHeader, StatCard, PortalCard } from './PortalKit';
 import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
 
-const ACCENT = 'cyan';
+const ACCENT = 'brand';
 
 export default function BusinessIncidents() {
   const { state } = useCAD();
@@ -61,10 +61,10 @@ export default function BusinessIncidents() {
           <button
             key={t}
             onClick={() => setFilter(t)}
-            className={`inline-flex items-center justify-center px-3.5 py-1.5 text-sm font-semibold rounded cursor-pointer border transition-all ${
+            className={`inline-flex items-center justify-center px-3.5 py-1.5 text-sm font-semibold rounded-lg cursor-pointer border transition-all ${
               filter === t
-                ? 'bg-cyan-400 text-white border-transparent'
-                : 'bg-white/5 text-slate-300 border-white/[0.12]'
+                ? 'bg-blue-600 text-white border-transparent'
+                : 'bg-white/[0.05] text-slate-300 border-border-base'
             }`}
           >
             {t} ({COUNTS[t]})
@@ -80,8 +80,8 @@ export default function BusinessIncidents() {
 
       {filtered.length === 0 ? (
         <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
-          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
-            <MdAssignment size={30} className="text-cyan-400" />
+          <div className="w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center bg-brand/15 border border-brand/30">
+            <MdAssignment size={30} className="text-brand-bright" />
           </div>
           <div className="text-[15px] font-bold text-slate-100 mb-1.5">
             {filter === 'ALL' ? 'No incidents on record' : `No ${filter.toLowerCase()} incidents`}

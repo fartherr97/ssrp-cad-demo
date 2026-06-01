@@ -31,9 +31,9 @@ export default function MyBusiness() {
           icon={MdBusiness}
           title="Register Business"
           subtitle="Register your business with the city to access the self-service portal."
-          accent="#44aacc"
+          accent="brand"
         />
-        <PortalCard accent="#44aacc">
+        <PortalCard accent="brand">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             <div>
               <label className={PORTAL_LABEL}>Business Name</label>
@@ -86,7 +86,7 @@ export default function MyBusiness() {
         icon={MdBusiness}
         title="My Business"
         subtitle="Your registered business profile."
-        accent="#44aacc"
+        accent="brand"
         action={!editing && (
           <button className={`${sm(S_BTN_SECONDARY)} flex items-center gap-1.5`} onClick={startEdit}>
             <MdEdit size={16} /> Edit
@@ -94,7 +94,7 @@ export default function MyBusiness() {
         )}
       />
 
-      <PortalCard accent="#44aacc">
+      <PortalCard accent="brand">
         {editing ? (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>

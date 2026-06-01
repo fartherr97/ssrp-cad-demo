@@ -172,18 +172,18 @@ export default function RecordsCenter() {
     <div className="flex h-full overflow-hidden font-ui">
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-[230px] shrink-0 flex flex-col border-r border-border-base bg-app-toolbar overflow-hidden">
-        <div className="px-3 py-2 border-b border-border-base shrink-0">
-          <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">Issue New Record</div>
-          <div className="text-[10px] text-cad-muted mt-0.5">Select a record type to begin</div>
+      <div className="w-[240px] shrink-0 flex flex-col border-r border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-border-faint shrink-0">
+          <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issue New Record</div>
+          <div className="text-[10px] text-slate-500 mt-0.5">Select a record type to begin</div>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-2 px-1.5">
+        <div className="flex-1 overflow-y-auto py-2 px-2">
           {sortedCats.map(cat => {
             const IconComp = CATEGORY_ICONS[cat] || MdDescription;
             return (
               <div key={cat}>
-                <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-cad-muted px-1.5 pb-2 pt-3 first:pt-1">
+                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-600 px-1.5 pb-2 pt-3 first:pt-1">
                   {cat}
                 </div>
                 {groupedTemplates[cat].map(t => {
@@ -191,15 +191,15 @@ export default function RecordsCenter() {
                   return (
                     <button key={t.id}
                       onClick={() => openTemplate(t)}
-                      className={`w-full flex items-center gap-2.5 px-2 py-2.5 mb-0.5 text-left cursor-pointer border-l-[3px] transition-colors ${
+                      className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 mb-0.5 rounded-lg text-left cursor-pointer border-l-[3px] transition-all ${
                         isSelected
-                          ? 'bg-sky-500/10 border-l-sky-500 text-sky-400'
-                          : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.04]'
+                          ? 'bg-brand/15 border-l-brand text-brand-bright'
+                          : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.05]'
                       }`}
                     >
                       <IconComp size={17} className="shrink-0 opacity-75" />
                       <div className="min-w-0">
-                        <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-sky-400' : 'font-medium text-cad-text'}`}>
+                        <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-brand-bright' : 'font-medium text-cad-text'}`}>
                           {t.name}
                         </div>
                         {t.formCode && (
@@ -278,21 +278,21 @@ export default function RecordsCenter() {
       </div>
 
       {/* ══ RIGHT: Record history ═════════════════════════════════ */}
-      <div className="w-[270px] shrink-0 flex flex-col border-l border-border-base bg-app-toolbar overflow-hidden">
-        <div className="px-3 py-2 border-b border-border-base shrink-0">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-cad-text">Issued Records</span>
-            <span className="text-[9px] font-mono text-cad-muted">{records.length} total</span>
+      <div className="w-[280px] shrink-0 flex flex-col border-l border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-border-faint shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issued Records</span>
+            <span className="text-[9px] font-mono text-slate-500">{records.length} total</span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {[
-              { label: 'Active',  count: records.filter(r => r.status === 'Active').length,  color: 'text-green-500',  border: 'border-green-500/10' },
-              { label: 'Expired', count: records.filter(r => r.status === 'Expired').length, color: 'text-slate-500',  border: 'border-slate-500/10' },
-              { label: 'Revoked', count: records.filter(r => r.status === 'Revoked').length, color: 'text-red-500',    border: 'border-red-500/10' },
+              { label: 'Active',  count: records.filter(r => r.status === 'Active').length,  color: 'text-green-400',  border: 'border-green-500/20' },
+              { label: 'Expired', count: records.filter(r => r.status === 'Expired').length, color: 'text-slate-400',  border: 'border-slate-500/20' },
+              { label: 'Revoked', count: records.filter(r => r.status === 'Revoked').length, color: 'text-red-400',    border: 'border-red-500/20' },
             ].map(s => (
-              <div key={s.label} className={`flex-1 bg-app-card border ${s.border} px-1.5 py-1 text-center`}>
-                <div className={`text-[14px] font-bold ${s.color}`}>{s.count}</div>
-                <div className="text-[8px] text-cad-muted uppercase tracking-[0.3px]">{s.label}</div>
+              <div key={s.label} className={`flex-1 bg-app-card/70 border ${s.border} rounded-lg px-1.5 py-1.5 text-center`}>
+                <div className={`text-[15px] font-extrabold ${s.color}`}>{s.count}</div>
+                <div className="text-[8px] text-slate-500 uppercase tracking-[0.3px] font-bold">{s.label}</div>
               </div>
             ))}
           </div>
@@ -304,18 +304,18 @@ export default function RecordsCenter() {
           ) : records.map(r => (
             <div key={r.id}
               onClick={() => { setSelectedRecord(r.id); setSelectedTemplate(null); setFormValues({}); }}
-              className={`px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
+              className={`px-3 py-2.5 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedRecord === r.id
-                  ? 'border-l-sky-500 bg-app-selected'
-                  : 'border-l-transparent bg-transparent hover:bg-app-hover'
+                  ? 'border-l-brand bg-brand/15'
+                  : 'border-l-transparent bg-transparent hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-1.5 mb-0.5">
+              <div className="flex items-center gap-1.5 mb-1">
                 <span className={`${STATUS_BADGE[r.status] || BADGE.gray} !text-[8px]`}>{r.status}</span>
-                <span className="text-[8px] text-cad-muted font-mono ml-auto">{r.date}</span>
+                <span className="text-[8px] text-slate-500 font-mono ml-auto">{r.date}</span>
               </div>
-              <div className="text-[12px] font-semibold text-cad-text mb-0.5 leading-[1.2]">{r.type}</div>
-              <div className="text-[10px] text-cad-muted font-mono">{r.recordNumber}</div>
+              <div className="text-[12.5px] font-semibold text-white mb-0.5 leading-[1.2]">{r.type}</div>
+              <div className="text-[10px] text-slate-500 font-mono">{r.recordNumber}</div>
             </div>
           ))}
         </div>

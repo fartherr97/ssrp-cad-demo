@@ -7,7 +7,7 @@ import {
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
 
-const ACCENT = 'cyan';
+const ACCENT = 'brand';
 
 const QUICK_ACTIONS = [
   { to: '/portal/my-business', icon: MdBusiness,    title: 'My Business',  desc: 'View & edit your business profile' },
@@ -31,8 +31,8 @@ export default function BusinessHome() {
           accent={ACCENT}
         />
         <PortalCard accent={ACCENT} className="text-center p-12">
-          <div className="w-16 h-16 rounded-[16px] mx-auto mb-[18px] flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
-            <MdStore size={34} className="text-cyan-400" />
+          <div className="w-16 h-16 rounded-[16px] mx-auto mb-[18px] flex items-center justify-center bg-brand/15 border border-brand/30">
+            <MdStore size={34} className="text-brand-bright" />
           </div>
           <div className="text-lg font-extrabold text-white mb-2">
             Welcome * let's get you set up
@@ -74,8 +74,8 @@ export default function BusinessHome() {
       <div className="grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
         {QUICK_ACTIONS.map(a => (
           <PortalCard key={a.to} accent={ACCENT} hover onClick={() => navigate(a.to)} className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
-              <a.icon size={24} className="text-cyan-400" />
+            <div className="w-11 h-11 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
+              <a.icon size={24} className="text-brand-bright" />
             </div>
             <div className="min-w-0">
               <div className="text-[15px] font-bold text-slate-100">{a.title}</div>
@@ -94,7 +94,7 @@ export default function BusinessHome() {
         ) : (
           <div className="flex flex-col">
             {recentIncidents.map((inc, idx) => (
-              <div key={inc.id} className={`flex items-center gap-3 py-3 ${idx !== 0 ? 'border-t border-white/[0.06]' : ''}`}>
+              <div key={inc.id} className={`flex items-center gap-3 py-3 ${idx !== 0 ? 'border-t border-border-faint' : ''}`}>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-slate-100">{inc.type}</div>
                   <div className="text-xs text-slate-400 mt-0.5">{inc.date}</div>

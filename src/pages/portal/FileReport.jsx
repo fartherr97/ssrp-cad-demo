@@ -7,7 +7,7 @@ import {
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY } from '../../constants/styles';
 
-const ACCENT = 'violet';
+const ACCENT = 'brand';
 
 const REPORT_TYPES = [
   'Theft',
@@ -93,7 +93,7 @@ export default function FileReport() {
             Your report has been received and forwarded to law enforcement for review.
             Keep your case number for reference.
           </div>
-          <div className="inline-block bg-black/25 border border-white/[0.12] rounded-[10px] px-[26px] py-3.5 mb-6">
+          <div className="inline-block bg-app-input border border-border-base rounded-xl px-[26px] py-3.5 mb-6">
             <div className="text-[10px] font-bold tracking-[0.8px] uppercase text-slate-400">
               Case Number
             </div>
@@ -113,7 +113,7 @@ export default function FileReport() {
         </PortalCard>
       ) : myChars.length === 0 ? (
         <PortalCard accent={ACCENT} className="text-center p-12">
-          <MdReportProblem size={48} className="text-violet-400/40 mx-auto" />
+          <MdReportProblem size={48} className="text-brand/40 mx-auto" />
           <div className="text-[15px] font-bold text-slate-100 mt-3">No characters yet</div>
           <div className="text-sm text-slate-400 mt-1.5">
             Register a character before filing a report.

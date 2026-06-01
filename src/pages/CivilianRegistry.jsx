@@ -56,38 +56,38 @@ export default function CivilianRegistry() {
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
-      <div className="grid overflow-hidden flex-1 min-h-0" style={{ gridTemplateColumns: '260px 1fr' }}>
+      <div className="grid overflow-hidden flex-1 min-h-0 p-4 lg:p-5 gap-4 lg:gap-5" style={{ gridTemplateColumns: '280px 1fr' }}>
         {/* LEFT: Civilian List */}
-        <div className="flex flex-col border-r border-border-base overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Civilian Registry</div>
-            <button className={xs(S_BTN_PRIMARY)} onClick={() => setShowCreate(true)}>+ New</button>
+            <button className={`${xs(S_BTN_PRIMARY)} ml-auto`} onClick={() => setShowCreate(true)}>+ New</button>
           </div>
-          <div className="px-2 py-1.5 border-b border-border-base shrink-0">
+          <div className="px-3 py-2.5 border-b border-border-faint shrink-0">
             <input className={S_INPUT} placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <div className="text-[9px] text-cad-muted px-2.5 pt-1.5 pb-0.5 tracking-[0.5px]">
-              {filtered.length} RECORDS
+          <div className="flex-1 overflow-y-auto p-2">
+            <div className="text-[10px] font-bold uppercase text-slate-600 px-1.5 pt-1 pb-1.5 tracking-[0.6px]">
+              {filtered.length} Records
             </div>
             {filtered.map(c => {
               const hasWarrant = warrants.some(w => w.civilianId === c.id && w.status === 'ACTIVE');
               return (
                 <div
                   key={c.id}
-                  className={`mx-2 my-0.5 px-2.5 py-1.5 rounded cursor-pointer border transition-colors ${
+                  className={`my-1 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
                     selected === c.id
-                      ? 'border-sky-700/60 bg-app-selected'
-                      : 'border-border-faint bg-app-card hover:bg-app-hover'
+                      ? 'border-brand/40 bg-brand/15'
+                      : 'border-border-faint bg-white/[0.02] hover:bg-white/[0.05] hover:border-border-base'
                   }`}
                   onClick={() => { setSelected(c.id); setTab('INFO'); }}
                 >
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <div className="font-semibold text-[12px] flex-1">{c.firstName} {c.lastName}</div>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div className="font-semibold text-[12.5px] text-white flex-1">{c.firstName} {c.lastName}</div>
                     {hasWarrant && <span className={`${BADGE.red} text-[8px]`}>WARRANT</span>}
                   </div>
-                  <div className={`${S_DATA} text-[9px]`}>DOB: {c.dob} · {c.gender}</div>
-                  <div className="flex gap-0.5 mt-0.5 flex-wrap">
+                  <div className={`${S_DATA} text-[10px]`}>DOB: {c.dob} · {c.gender}</div>
+                  <div className="flex gap-1 mt-1 flex-wrap">
                     {c.flags?.filter(f => f !== 'WARRANT').map(f => (
                       <span key={f} className={`${f === 'VIOLENT' ? BADGE.fire : BADGE.orange} text-[8px]`}>{f}</span>
                     ))}
@@ -99,7 +99,7 @@ export default function CivilianRegistry() {
         </div>
 
         {/* RIGHT: Detail */}
-        <div className="flex flex-col overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20">
           {!selCiv ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-cad-muted p-6">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.2">
@@ -113,11 +113,11 @@ export default function CivilianRegistry() {
             </div>
           ) : (
             <>
-              <div className="px-3.5 py-2.5 bg-app-card border-b border-border-base shrink-0">
-                <div className="flex justify-between items-start">
+              <div className="px-5 py-4 border-b border-border-faint shrink-0">
+                <div className="flex justify-between items-start gap-3">
                   <div>
-                    <div className="text-[16px] font-bold">{selCiv.firstName} {selCiv.lastName}</div>
-                    <div className="text-[10px] font-mono text-slate-500 mt-0.5">
+                    <div className="text-[18px] font-extrabold text-white tracking-[-0.2px]">{selCiv.firstName} {selCiv.lastName}</div>
+                    <div className="text-[11px] font-mono text-slate-500 mt-0.5">
                       DOB: {selCiv.dob} · {selCiv.gender} · {selCiv.ethnicity}
                     </div>
                     <div className="flex gap-1 mt-1.5">
@@ -136,41 +136,43 @@ export default function CivilianRegistry() {
               </div>
 
               {/* Tabs */}
-              <div className="flex border-b border-border-base shrink-0 bg-app-card">
-                {['INFO','VEHICLES','FLAGS'].map(t => (
-                  <button key={t}
-                    onClick={() => setTab(t)}
-                    className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.5px] border-none cursor-pointer transition-colors border-b-2 font-ui ${
-                      tab === t
-                        ? 'bg-app-selected text-cad-text border-b-sky-500'
-                        : 'bg-transparent text-cad-muted border-b-transparent hover:text-cad-text'
-                    }`}>
-                    {t}
-                    {t === 'VEHICLES' && civVehicles.length > 0 && (
-                      <span className="ml-1 text-[9px] font-mono text-slate-500">({civVehicles.length})</span>
-                    )}
-                  </button>
-                ))}
+              <div className="flex gap-0.5 px-3 pt-2 border-b border-border-faint shrink-0">
+                {['INFO','VEHICLES','FLAGS'].map(t => {
+                  const on = tab === t;
+                  return (
+                    <button key={t}
+                      onClick={() => setTab(t)}
+                      className={`relative px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.4px] whitespace-nowrap cursor-pointer transition-colors ${
+                        on ? 'text-brand-bright' : 'text-slate-500 hover:text-slate-300'
+                      }`}>
+                      {t}
+                      {t === 'VEHICLES' && civVehicles.length > 0 && (
+                        <span className="ml-1 text-[9px] font-mono text-slate-500">({civVehicles.length})</span>
+                      )}
+                      {on && <span className="absolute -bottom-[2px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="flex-1 overflow-y-auto p-3.5">
+              <div className="flex-1 overflow-y-auto p-4">
                 {tab === 'INFO' && (
                   <div className="grid grid-cols-2 gap-3">
                     <div className={S_CARD}>
-                      <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">Personal</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">Personal</div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Height</span><span className={S_DETAIL_VALUE}>{selCiv.height}</span></div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Weight</span><span className={S_DETAIL_VALUE}>{selCiv.weight}</span></div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Hair</span><span className={S_DETAIL_VALUE}>{selCiv.hair}</span></div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Eyes</span><span className={S_DETAIL_VALUE}>{selCiv.eyes}</span></div>
                     </div>
                     <div className={S_CARD}>
-                      <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">Identification</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">Identification</div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>SSN</span><span className={S_DETAIL_VALUE_MONO}>{selCiv.ssn}</span></div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Phone</span><span className={S_DETAIL_VALUE_MONO}>{selCiv.phone}</span></div>
                       <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Address</span><span className={S_DETAIL_VALUE}>{selCiv.address}</span></div>
                     </div>
                     <div className={`${S_CARD} col-span-2`}>
-                      <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">Driver License</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">Driver License</div>
                       <div className="grid grid-cols-2 gap-2">
                         <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>DL Number</span><span className={S_DETAIL_VALUE_MONO}>{selCiv.dlNumber}</span></div>
                         <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Class</span><span className={S_DETAIL_VALUE}>{selCiv.dlClass}</span></div>
@@ -209,7 +211,7 @@ export default function CivilianRegistry() {
 
                 {tab === 'FLAGS' && (
                   <div className={S_CARD}>
-                    <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-2">System Flags</div>
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">System Flags</div>
                     {selCiv.flags?.length === 0 && civWarrants.length === 0 ? (
                       <div className="text-[11px] text-cad-muted">No flags on record</div>
                     ) : (
