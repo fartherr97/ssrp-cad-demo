@@ -49,7 +49,7 @@ export default function MyVehicles() {
         accent={ACCENT}
         action={
           !showForm && myChars.length > 0 && (
-            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
+            <button className={S_BTN_PRIMARY} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Vehicle
             </button>
           )
@@ -60,7 +60,7 @@ export default function MyVehicles() {
         <PortalCard accent={ACCENT} style={{ marginBottom: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#e6eef6' }}>Register New Vehicle</div>
-            <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={closeForm}>
+            <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
               <MdClose size={16} style={{ marginRight: 4 }} /> Cancel
             </button>
           </div>
@@ -100,7 +100,7 @@ export default function MyVehicles() {
               </div>
             </div>
             <div style={{ marginTop: 18 }}>
-              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}>Register Vehicle</button>
+              <button type="submit" className={S_BTN_PRIMARY}>Register Vehicle</button>
             </div>
           </form>
         </PortalCard>
@@ -116,7 +116,7 @@ export default function MyVehicles() {
               : 'Register your first vehicle to get started.'}
           </div>
           {myChars.length > 0 && (
-            <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
+            <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Vehicle
             </button>
           )}

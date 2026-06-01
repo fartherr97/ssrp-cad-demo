@@ -63,7 +63,7 @@ export default function MyBusiness() {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!canSubmit} onClick={register}>
+            <button className={S_BTN_PRIMARY} disabled={!canSubmit} onClick={register}>
               Register Business
             </button>
           </div>
@@ -90,7 +90,7 @@ export default function MyBusiness() {
         subtitle="Your registered business profile."
         accent={ACCENT}
         action={!editing && (
-          <button style={{ ...sm(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={startEdit}>
+          <button style={{ ...sm(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 6 }} onClick={startEdit}>
             <MdEdit size={16} /> Edit
           </button>
         )}
@@ -126,8 +126,8 @@ export default function MyBusiness() {
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
-              <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setEditing(false)}>Cancel</button>
-              <button style={sm(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
+              <button className={sm(S_BTN_SECONDARY)} onClick={() => setEditing(false)}>Cancel</button>
+              <button className={sm(S_BTN_SUCCESS)} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
             </div>
           </>
         ) : (

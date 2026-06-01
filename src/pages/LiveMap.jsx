@@ -75,8 +75,8 @@ export default function LiveMap() {
       <div style={{ display: 'flex', gap: 8, flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {/* Map */}
         <div style={{ ...S_PANEL, flex: 1, position: 'relative', overflow: 'hidden' }}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block' }} />
               Live Situational Map
             </div>
@@ -87,7 +87,7 @@ export default function LiveMap() {
               ].map(l => (
                 <button key={l.label}
                   style={xs(l.active ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-                  onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+                 
                   onClick={l.toggle}>
                   {l.label}
                 </button>
@@ -213,8 +213,8 @@ export default function LiveMap() {
         <div style={{ width: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* Legend */}
           <div style={{ ...S_PANEL, flexShrink: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Legend</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Legend</div>
             </div>
             <div style={{ padding: '8px 10px' }}>
               <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 6 }}>Unit Status</div>
@@ -246,13 +246,13 @@ export default function LiveMap() {
 
           {/* Unit list */}
           <div style={{ ...S_PANEL, flex: 1 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>On-Duty Units</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>On-Duty Units</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length}</span>
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {onDuty.map(o => (
-                <div key={o.id} style={S_UNIT_ROW}>
+                <div key={o.id} className={S_UNIT_ROW}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor(o.status), flexShrink: 0 }} />
                   <span style={{ ...S_DATA, minWidth: 42, fontSize: 10, color: '#6ab4d8' }}>{o.unitId}</span>
                   <span style={{ flex: 1, fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
@@ -263,11 +263,11 @@ export default function LiveMap() {
 
           {/* Active calls list */}
           <div style={{ ...S_PANEL, maxHeight: 160, flexShrink: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Active Calls</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Active Calls</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{activeCalls.length}</span>
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {activeCalls.map(c => (
                 <div key={c.id} style={{ padding: '4px 8px', borderBottom: '1px solid var(--n-border-faint)', display: 'flex', gap: 5, alignItems: 'center' }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: priBorderColor(c.priority) }} />

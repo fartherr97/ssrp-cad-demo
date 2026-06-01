@@ -45,7 +45,7 @@ export default function BusinessHome() {
             You don't have a registered business yet. Register one to manage your profile,
             employees, and track incidents filed by law enforcement.
           </div>
-          <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/portal/my-business')}>
+          <button className={S_BTN_PRIMARY} onClick={() => navigate('/portal/my-business')}>
             Register your business
           </button>
         </PortalCard>

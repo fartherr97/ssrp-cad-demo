@@ -89,7 +89,7 @@ export default function RecordsBureau() {
             {SEARCH_TYPES.map(t => (
               <button key={t}
                 style={{ ...xs(searchType === t ? S_BTN_PRIMARY : S_BTN_SECONDARY), flex: 1 }}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                onMouseDown={btnActiveOn}
                 onClick={() => { setSearchType(t); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}>
                 {t}
               </button>
@@ -115,7 +115,7 @@ export default function RecordsBureau() {
               />
               <button
                 style={{ ...xs(S_BTN_PRIMARY), flexShrink: 0, padding: '0 8px' }}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                onMouseDown={btnActiveOn}
                 onClick={doSearch}>
                 RUN
               </button>
@@ -162,7 +162,7 @@ export default function RecordsBureau() {
                     </div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap' }}>
                       {r.flags?.map(f => <FlagBadge key={f} flag={f} />)}
-                      {r.dlStatus === 'SUSPENDED' && <span style={BADGE.orange}>DL SUSP</span>}
+                      {r.dlStatus === 'SUSPENDED' && <span className={BADGE.orange}>DL SUSP</span>}
                     </div>
                   </div>
                 );
@@ -172,8 +172,8 @@ export default function RecordsBureau() {
                     <div style={{ fontWeight: 700, fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--n-text-data)' }}>{r.plate}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text)', marginTop: 1 }}>{r.year} {r.make} {r.model} · {r.color}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
-                      {r.stolen && <span style={BADGE.red}>STOLEN</span>}
-                      {r.regStatus !== 'VALID' && <span style={BADGE.orange}>REG {r.regStatus}</span>}
+                      {r.stolen && <span className={BADGE.red}>STOLEN</span>}
+                      {r.regStatus !== 'VALID' && <span className={BADGE.orange}>REG {r.regStatus}</span>}
                     </div>
                   </div>
                 );
@@ -184,7 +184,7 @@ export default function RecordsBureau() {
                     <div style={{ fontSize: 10, color: 'var(--n-text-dim)', marginTop: 1 }}>{r.charge}</div>
                     <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
                       <span style={r.status === 'ACTIVE' ? BADGE.red : BADGE.green}>{r.status}</span>
-                      <span style={BADGE.gray}>{r.type}</span>
+                      <span className={BADGE.gray}>{r.type}</span>
                     </div>
                   </div>
                 );
@@ -270,7 +270,7 @@ export default function RecordsBureau() {
                       </div>
                     ) : civHistory.map(h => (
                       <div key={h.id} style={{ ...S_RECORD_RETURN, marginBottom: 12 }}>
-                        <div style={S_RECORD_RETURN_HEADER}>
+                        <div className={S_RECORD_RETURN_HEADER}>
                           <span>CRIMINAL HISTORY ENTRY — {h.caseNumber}</span>
                           <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{h.date}</span>
                         </div>
@@ -340,7 +340,7 @@ export default function RecordsBureau() {
                 {/* Vehicle FLAGS tab */}
                 {tab === 'FLAGS' && selVeh && (
                   <div style={{ ...S_RECORD_RETURN, width: '100%', maxWidth: 760 }}>
-                    <div style={S_RECORD_RETURN_HEADER}>
+                    <div className={S_RECORD_RETURN_HEADER}>
                       <span>VEHICLE FLAGS — {selVeh.plate}</span>
                       <span style={{ marginLeft: 'auto', fontWeight: 400, fontSize: 12, opacity: 0.85 }}>{new Date().toLocaleString()}</span>
                     </div>

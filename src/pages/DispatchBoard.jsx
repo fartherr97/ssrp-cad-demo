@@ -59,7 +59,7 @@ export default function DispatchBoard() {
         {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (
           <button key={s}
             style={{ ...xs(myStatus === s ? S_BTN_PRIMARY : S_BTN_GHOST), fontFamily: 'var(--font-mono)', letterSpacing: '0.3px' }}
-            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+           
             onClick={() => setMyStatus(s)}>{s}</button>
         ))}
         <div style={{ width: 1, height: 18, background: 'var(--n-border)', margin: '0 4px' }} />
@@ -71,29 +71,29 @@ export default function DispatchBoard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 8, flex: 1, minHeight: 0, padding: 8, overflow: 'hidden' }}>
         {/* Call table */}
-        <div style={S_PANEL}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Active Calls</div>
+        <div className={S_PANEL}>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Active Calls</div>
             <div style={{ display: 'flex', gap: 1 }}>
               {TABS.map(t => (
                 <button key={t}
                   style={{ ...tabStyle(filter === t), padding: '3px 10px', fontSize: 9 }}
-                  onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+                 
                   onClick={() => setFilter(t)}>
                   {t} {t === 'ALL' ? `(${activeCalls.length})` : `(${activeCalls.filter(c => c.status === t).length})`}
                 </button>
               ))}
             </div>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {filtered.length === 0 ? (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No calls matching filter</div>
             ) : (
-              <table style={S_TABLE}>
+              <table className={S_TABLE}>
                 <thead>
                   <tr>
                     {['Call #','Pri','Nature','Location','City','Status','Units','Time'].map(h => (
-                      <th key={h} style={S_TABLE_TH}>{h}</th>
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -109,12 +109,12 @@ export default function DispatchBoard() {
                       }}
                       onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                       onClick={() => setSelectedCall(c.id)}>
-                      <td style={S_TABLE_TD}><span style={S_DATA}>{c.id}</span></td>
-                      <td style={S_TABLE_TD}><PriBadge p={c.priority} /></td>
+                      <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
+                      <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
                       <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{c.nature}</td>
                       <td style={{ ...S_TABLE_TD, color: 'var(--n-text-dim)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.location}</td>
                       <td style={{ ...S_TABLE_TD, color: 'var(--n-text-dim)', fontSize: 11 }}>{c.city}</td>
-                      <td style={S_TABLE_TD}><span style={callStatusBadge(c.status)}>{c.status}</span></td>
+                      <td className={S_TABLE_TD}><span style={callStatusBadge(c.status)}>{c.status}</span></td>
                       <td style={{ ...S_TABLE_TD, fontFamily: 'var(--font-mono)', fontSize: 10, color: c.units.length > 0 ? 'var(--n-text)' : 'var(--pr2-text)' }}>
                         {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
                       </td>
@@ -142,7 +142,7 @@ export default function DispatchBoard() {
                   </div>
                 </div>
                 {me && !selCall.units.includes(me.unitId) && (
-                  <button style={sm(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={selfAssign}>
+                  <button className={sm(S_BTN_SUCCESS)} onClick={selfAssign}>
                     Self-Assign
                   </button>
                 )}
@@ -152,16 +152,16 @@ export default function DispatchBoard() {
         </div>
 
         {/* Unit Roster */}
-        <div style={S_PANEL}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Unit Roster</div>
+        <div className={S_PANEL}>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Unit Roster</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{onDuty.length} ON</span>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {onDuty.map(o => {
               const assignedCall = o.callId ? calls.find(c => c.id === o.callId) : null;
               return (
-                <div key={o.id} style={S_UNIT_ROW} onMouseEnter={unitRowHoverOn} onMouseLeave={unitRowHoverOff}>
+                <div key={o.id} className={S_UNIT_ROW}>
                   <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
                     background: o.status === 'AVAILABLE' ? 'var(--st-av-text)' :
                       o.status === 'BUSY' ? 'var(--st-busy-text)' :

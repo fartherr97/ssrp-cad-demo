@@ -82,7 +82,7 @@ export default function MyCharacters() {
         accent={ACCENT}
         action={
           !showForm && (
-            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
+            <button className={S_BTN_PRIMARY} onClick={openNew}>
               <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
             </button>
           )
@@ -95,7 +95,7 @@ export default function MyCharacters() {
             <div style={{ fontSize: 15, fontWeight: 800, color: '#e6eef6' }}>
               {editingId != null ? 'Edit Character' : 'Register New Character'}
             </div>
-            <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={closeForm}>
+            <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
               <MdClose size={16} style={{ marginRight: 4 }} /> Cancel
             </button>
           </div>
@@ -124,7 +124,7 @@ export default function MyCharacters() {
               </div>
             </div>
             <div style={{ marginTop: 18, display: 'flex', gap: 10 }}>
-              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}>
+              <button type="submit" className={S_BTN_PRIMARY}>
                 {editingId != null ? 'Save Changes' : 'Register Character'}
               </button>
             </div>
@@ -139,7 +139,7 @@ export default function MyCharacters() {
           <div style={{ fontSize: 13, color: 'rgba(160,185,215,0.6)', marginTop: 6 }}>
             Register your first character to get started.
           </div>
-          <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={openNew}>
+          <button style={{ ...S_BTN_PRIMARY, marginTop: 18 }} onClick={openNew}>
             <MdAdd size={18} style={{ marginRight: 6 }} /> Register Character
           </button>
         </PortalCard>
@@ -163,7 +163,7 @@ export default function MyCharacters() {
                     </span>
                   </div>
                 </div>
-                <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => openEdit(c)}>
+                <button className={sm(S_BTN_SECONDARY)} onClick={() => openEdit(c)}>
                   <MdEdit size={15} style={{ marginRight: 4 }} /> Edit
                 </button>
               </div>
@@ -181,7 +181,7 @@ export default function MyCharacters() {
                 <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <MdWarning size={16} color="#f5a93b" />
                   {c.flags.map(fl => (
-                    <span key={fl} style={BADGE.orange}>{fl}</span>
+                    <span key={fl} className={BADGE.orange}>{fl}</span>
                   ))}
                 </div>
               )}

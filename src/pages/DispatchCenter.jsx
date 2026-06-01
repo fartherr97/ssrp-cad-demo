@@ -26,19 +26,19 @@ function Elapsed({ createdAt }) {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [createdAt]);
-  return <span style={cadElapsed(cls)}>{elapsed}</span>;
+  return <span className={cadElapsed(cls)}>{elapsed}</span>;
 }
 
 function StatusBadge({ status }) {
-  return <span style={cadStatus(status)}>{CAD_STATUS_LABEL[status] || status}</span>;
+  return <span className={cadStatus(status)}>{CAD_STATUS_LABEL[status] || status}</span>;
 }
 
 function CallStatus({ status }) {
-  return <span style={cadCallStatus(status)}>{status}</span>;
+  return <span className={cadCallStatus(status)}>{status}</span>;
 }
 
 function PriBadge({ p }) {
-  return <span style={cadPri(p)}>P{p}</span>;
+  return <span className={cadPri(p)}>P{p}</span>;
 }
 
 
@@ -254,28 +254,28 @@ export default function DispatchCenter() {
 
       {/* Create Call Modal */}
       {showCreateForm && (
-        <div style={S_OVERLAY} onClick={e => e.target === e.currentTarget && closeCreate()}>
+        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && closeCreate()}>
           <div style={{ ...S_MODAL, maxWidth: 640 }}>
-            <div style={S_MODAL_HEADER}>
-              <div style={S_MODAL_TITLE}>■ CREATE NEW INCIDENT</div>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>■ CREATE NEW INCIDENT</div>
               <button
-                style={xs(S_BTN_GHOST)}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                className={xs(S_BTN_GHOST)}
+                onMouseDown={btnActiveOn}
                 onClick={closeCreate}
               >✕</button>
             </div>
-            <div style={S_MODAL_BODY}>
+            <div className={S_MODAL_BODY}>
               <div className="n-grid-2">
                 <div style={S_FIELD}>
-                  <label style={S_LABEL}>Nature of Call *</label>
-                  <select style={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
+                  <label className={S_LABEL}>Nature of Call *</label>
+                  <select className={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
                     <option value="">Select nature...</option>
                     {CALL_NATURES.map(n => <option key={n}>{n}</option>)}
                   </select>
                 </div>
                 <div style={S_FIELD}>
-                  <label style={S_LABEL}>Priority</label>
-                  <select style={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
+                  <label className={S_LABEL}>Priority</label>
+                  <select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
                     <option value={1}>P1 — Critical / Life Safety</option>
                     <option value={2}>P2 — High</option>
                     <option value={3}>P3 — Medium</option>
@@ -285,8 +285,8 @@ export default function DispatchCenter() {
               </div>
               <div className="n-grid-2">
                 <div style={S_FIELD}>
-                  <label style={S_LABEL}>Category</label>
-                  <select style={S_SELECT} value={newCall.category} onChange={e => setNewCall(p => ({ ...p, category:e.target.value }))}>
+                  <label className={S_LABEL}>Category</label>
+                  <select className={S_SELECT} value={newCall.category} onChange={e => setNewCall(p => ({ ...p, category:e.target.value }))}>
                     <option value="police">Law Enforcement</option>
                     <option value="fire">Fire / EMS</option>
                     <option value="traffic">Traffic / FDOT</option>
@@ -294,34 +294,34 @@ export default function DispatchCenter() {
                   </select>
                 </div>
                 <div style={S_FIELD}>
-                  <label style={S_LABEL}>City</label>
-                  <select style={S_SELECT} value={newCall.city} onChange={e => setNewCall(p => ({ ...p, city:e.target.value }))}>
+                  <label className={S_LABEL}>City</label>
+                  <select className={S_SELECT} value={newCall.city} onChange={e => setNewCall(p => ({ ...p, city:e.target.value }))}>
                     {['Tampa','Brandon','Plant City','Riverview','Ruskin','Gibsonton','Temple Terrace','Unincorporated'].map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Location / Address *</label>
-                <input style={S_INPUT} placeholder="e.g. 412 Oakwood Ave / I-275 MM 42 SB" value={newCall.location} onChange={e => setNewCall(p => ({ ...p, location:e.target.value }))} />
+                <label className={S_LABEL}>Location / Address *</label>
+                <input className={S_INPUT} placeholder="e.g. 412 Oakwood Ave / I-275 MM 42 SB" value={newCall.location} onChange={e => setNewCall(p => ({ ...p, location:e.target.value }))} />
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Reporting Party</label>
-                <input style={S_INPUT} placeholder="911 Caller / Officer / FDOT / Dispatch..." value={newCall.reportingParty} onChange={e => setNewCall(p => ({ ...p, reportingParty:e.target.value }))} />
+                <label className={S_LABEL}>Reporting Party</label>
+                <input className={S_INPUT} placeholder="911 Caller / Officer / FDOT / Dispatch..." value={newCall.reportingParty} onChange={e => setNewCall(p => ({ ...p, reportingParty:e.target.value }))} />
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Incident Narrative</label>
-                <textarea style={S_TEXTAREA} rows={3} placeholder="Describe the incident..." value={newCall.description} onChange={e => setNewCall(p => ({ ...p, description:e.target.value }))} />
+                <label className={S_LABEL}>Incident Narrative</label>
+                <textarea className={S_TEXTAREA} rows={3} placeholder="Describe the incident..." value={newCall.description} onChange={e => setNewCall(p => ({ ...p, description:e.target.value }))} />
               </div>
             </div>
-            <div style={S_MODAL_FOOTER}>
+            <div className={S_MODAL_FOOTER}>
               <button
-                style={S_BTN_SECONDARY}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                className={S_BTN_SECONDARY}
+                onMouseDown={btnActiveOn}
                 onClick={closeCreate}
               >Cancel</button>
               <button
-                style={S_BTN_PRIMARY}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                className={S_BTN_PRIMARY}
+                onMouseDown={btnActiveOn}
                 onClick={createCall}
                 disabled={!newCall.nature || !newCall.location}
               >

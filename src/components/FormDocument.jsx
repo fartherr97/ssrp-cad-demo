@@ -19,7 +19,7 @@ export const FormMetaContext = React.createContext({});
 export function FormDocWrap({ children, meta = {} }) {
   return (
     <FormMetaContext.Provider value={meta}>
-      <div style={S_FORM_DOC_WRAP}><div style={S_FORM_DOC}>{children}</div></div>
+      <div className={S_FORM_DOC_WRAP}><div style={S_FORM_DOC}>{children}</div></div>
     </FormMetaContext.Provider>
   );
 }
@@ -708,7 +708,7 @@ const RETURN_ICON = { PERSON: MdPerson, VEHICLE: MdDirectionsCar, WARRANT: MdGav
 function ReturnHeader({ type, title }) {
   const Icon = RETURN_ICON[type] || MdPerson;
   return (
-    <div style={S_RECORD_RETURN_HEADER}>
+    <div className={S_RECORD_RETURN_HEADER}>
       <Icon size={18} />
       <span>{title}</span>
     </div>
@@ -738,7 +738,7 @@ export function RecordReturn({ type, subject, data }) {
     const hasWarrant = flags.includes('WARRANT');
     const dlSusp = data.dlStatus === 'SUSPENDED';
     return (
-      <div style={S_RECORD_RETURN}>
+      <div className={S_RECORD_RETURN}>
         <ReturnHeader type="PERSON" title={`DR — Name: ${data.firstName} ${data.lastName}`} />
         {hasWarrant && (
           <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***</div>
@@ -801,7 +801,7 @@ export function RecordReturn({ type, subject, data }) {
 
   if (type === 'VEHICLE' && data) {
     return (
-      <div style={S_RECORD_RETURN}>
+      <div className={S_RECORD_RETURN}>
         <ReturnHeader type="VEHICLE" title={`VR — Plate: ${data.plate}`} />
         {data.stolen && (
           <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***</div>
@@ -865,7 +865,7 @@ export function RecordReturn({ type, subject, data }) {
 
   if (type === 'WARRANT' && data) {
     return (
-      <div style={S_RECORD_RETURN}>
+      <div className={S_RECORD_RETURN}>
         <ReturnHeader type="WARRANT" title={`WR — Subject: ${data.civilianName}`} />
         {data.status === 'ACTIVE' && (
           <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***</div>

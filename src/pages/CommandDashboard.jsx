@@ -15,9 +15,9 @@ import {
 function StatCard({ label, value, sub, color, accent }) {
   return (
     <div style={{ ...S_STAT, borderTop: `2px solid ${color || 'var(--n-border)'}` }}>
-      <div style={S_STAT_LABEL}>{label}</div>
+      <div className={S_STAT_LABEL}>{label}</div>
       <div style={{ ...S_STAT_VALUE, color: accent || 'var(--n-text)' }}>{value}</div>
-      {sub && <div style={S_STAT_SUB}>{sub}</div>}
+      {sub && <div className={S_STAT_SUB}>{sub}</div>}
     </div>
   );
 }
@@ -133,7 +133,7 @@ export default function CommandDashboard() {
           </span>
           <button
             style={{ ...sm(S_BTN_DANGER), marginLeft: 'auto' }}
-            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+            onMouseDown={btnActiveOn}
             onClick={() => go('dispatch')}
           >
             Go to Dispatch
@@ -155,8 +155,8 @@ export default function CommandDashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
           {/* Module grid */}
           <div style={{ ...S_PANEL, flexShrink: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Operational Workspaces</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Operational Workspaces</div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
                 {modules.length} MODULES
               </span>
@@ -176,36 +176,36 @@ export default function CommandDashboard() {
 
           {/* Active calls */}
           <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Active Incidents</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Active Incidents</div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
                   {pending.length} PENDING · {active.filter(c => c.status === 'ACTIVE').length} ACTIVE
                 </span>
                 <button
-                  style={xs(S_BTN_PRIMARY)}
-                  onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                  className={xs(S_BTN_PRIMARY)}
+                  onMouseDown={btnActiveOn}
                   onClick={() => go('dispatch')}
                 >
                   Open Console
                 </button>
               </div>
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {active.length === 0 ? (
                 <div style={{ padding: 20, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>
                   No active incidents
                 </div>
               ) : (
-                <table style={S_TABLE}>
+                <table className={S_TABLE}>
                   <thead>
                     <tr>
-                      <th style={S_TABLE_TH}>Call #</th>
-                      <th style={S_TABLE_TH}>Pri</th>
-                      <th style={S_TABLE_TH}>Nature</th>
-                      <th style={S_TABLE_TH}>Location</th>
-                      <th style={S_TABLE_TH}>Status</th>
-                      <th style={S_TABLE_TH}>Units</th>
+                      <th className={S_TABLE_TH}>Call #</th>
+                      <th className={S_TABLE_TH}>Pri</th>
+                      <th className={S_TABLE_TH}>Nature</th>
+                      <th className={S_TABLE_TH}>Location</th>
+                      <th className={S_TABLE_TH}>Status</th>
+                      <th className={S_TABLE_TH}>Units</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -214,11 +214,11 @@ export default function CommandDashboard() {
                         style={{ cursor: 'pointer', transition: 'background 0.14s, transform 0.14s' }}
                         onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                         onClick={() => go('dispatch')}>
-                        <td style={S_TABLE_TD}><span style={S_DATA}>{c.id}</span></td>
-                        <td style={S_TABLE_TD}><PriBadge p={c.priority} /></td>
+                        <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
+                        <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
                         <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{c.nature}</td>
                         <td style={{ ...S_TABLE_TD, color: 'var(--n-text-dim)', fontSize: 11 }}>{c.location}</td>
-                        <td style={S_TABLE_TD}>
+                        <td className={S_TABLE_TD}>
                           <span style={c.status === 'PENDING' ? BADGE.orange : c.status === 'ACTIVE' ? BADGE.blue : c.status === 'ENRT' ? BADGE.yellow : BADGE.gray}>
                             {c.status}
                           </span>
@@ -239,14 +239,14 @@ export default function CommandDashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
           {/* TX feed */}
           <div style={{ ...S_PANEL, flex: 1, minHeight: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Dispatch Feed</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Dispatch Feed</div>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)' }} />
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {dispatchLog.slice(0, 40).map(e => (
-                <div key={e.id} style={S_TX_ENTRY}>
-                  <span style={S_TX_TIME}>{e.time}</span>
+                <div key={e.id} className={S_TX_ENTRY}>
+                  <span className={S_TX_TIME}>{e.time}</span>
                   <span style={{ color: TX_KIND_COLOR[e.kind] }}>{e.text}</span>
                 </div>
               ))}
@@ -260,19 +260,19 @@ export default function CommandDashboard() {
 
           {/* Unit quick view */}
           <div style={{ ...S_PANEL, maxHeight: 200, flexShrink: 0 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>Unit Summary</div>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>Unit Summary</div>
               <button
-                style={xs(S_BTN_GHOST)}
-                onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                className={xs(S_BTN_GHOST)}
+                onMouseDown={btnActiveOn}
                 onClick={() => go('units')}
               >
                 View All
               </button>
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {onDuty.slice(0, 8).map(o => (
-                <div key={o.id} style={S_UNIT_ROW} onMouseEnter={unitRowHoverOn} onMouseLeave={unitRowHoverOff}>
+                <div key={o.id} className={S_UNIT_ROW}>
                   <StatusDot status={o.status} />
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--n-text-data)', minWidth: 52 }}>
                     {o.unitId}

@@ -103,8 +103,8 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
           Required
         </label>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onCancel}>Cancel</button>
-          <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onAdd} disabled={!value.label.trim()}>Add Field</button>
+          <button className={xs(S_BTN_GHOST)} onMouseDown={btnActiveOn} onClick={onCancel}>Cancel</button>
+          <button className={xs(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={onAdd} disabled={!value.label.trim()}>Add Field</button>
         </div>
       </div>
     </div>
@@ -205,9 +205,9 @@ function SectionEditor({
         >
           {SECTION_STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onMoveUp}  disabled={sIdx === 0}>↑</button>
-        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onMoveDown} disabled={sIdx === totalSections - 1}>↓</button>
-        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onDelete}>✕</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseDown={btnActiveOn} onClick={onMoveUp}  disabled={sIdx === 0}>↑</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9 }} onMouseDown={btnActiveOn} onClick={onMoveDown} disabled={sIdx === totalSections - 1}>↓</button>
+        <button style={{ ...xs(S_BTN_GHOST), padding: '1px 4px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseDown={btnActiveOn} onClick={onDelete}>✕</button>
       </div>
 
       {/* Fields */}
@@ -243,9 +243,9 @@ function SectionEditor({
                   <span style={{ fontSize: 8, color: 'var(--n-text-dim)', fontFamily: 'var(--font-mono)', width: 16, flexShrink: 0 }}>×{field.span || 1}</span>
                 )}
                 <div style={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldUp(section.id, fIdx); }} disabled={fIdx === 0}>↑</button>
-                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldDown(section.id, fIdx); }} disabled={fIdx === section.fields.length - 1}>↓</button>
-                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onDeleteField(section.id, field.id); }}>✕</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldUp(section.id, fIdx); }} disabled={fIdx === 0}>↑</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9 }} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onMoveFieldDown(section.id, fIdx); }} disabled={fIdx === section.fields.length - 1}>↓</button>
+                  <button style={{ ...xs(S_BTN_GHOST), padding: '1px 3px', fontSize: 9, color: 'var(--pr1-text)' }} onMouseDown={btnActiveOn} onClick={e => { e.stopPropagation(); onDeleteField(section.id, field.id); }}>✕</button>
                 </div>
               </div>
               {isExpanded && (
@@ -266,7 +266,7 @@ function SectionEditor({
             onCancel={onCancelAdd}
           />
         ) : (
-          <button style={{ ...xs(S_BTN_GHOST), marginTop: 4, fontSize: 9 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={onStartAdd}>
+          <button style={{ ...xs(S_BTN_GHOST), marginTop: 4, fontSize: 9 }} onMouseDown={btnActiveOn} onClick={onStartAdd}>
             + Add Field
           </button>
         )}
@@ -425,7 +425,7 @@ export default function FormBuilder() {
               Form Builder
             </span>
             {isAdmin && (
-              <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={startNew}>+ New</button>
+              <button className={xs(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={startNew}>+ New</button>
             )}
           </div>
 
@@ -453,7 +453,7 @@ export default function FormBuilder() {
                 {isAdmin && t.id >= 7 && (
                   <button
                     style={{ ...xs(S_BTN_GHOST), fontSize: 8, color: 'var(--pr1-text)', padding: '1px 5px', flexShrink: 0 }}
-                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                    onMouseDown={btnActiveOn}
                     onClick={e => deleteTemplate(t.id, e)}
                   >
                     ✕
@@ -485,7 +485,7 @@ export default function FormBuilder() {
                 </div>
               </div>
               {isAdmin && (
-                <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={startNew}>Create New Template</button>
+                <button className={xs(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={startNew}>Create New Template</button>
               )}
             </div>
           ) : (
@@ -518,9 +518,9 @@ export default function FormBuilder() {
                   {editing.name || 'Untitled'}{!editing.id ? ' — unsaved' : ''}
                 </span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>Cancel</button>
+                  <button className={xs(S_BTN_GHOST)} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>Cancel</button>
                   {isAdmin && (
-                    <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={saveTemplate}>
+                    <button className={xs(S_BTN_PRIMARY)} onMouseDown={btnActiveOn} onClick={saveTemplate}>
                       {editing.id ? 'Save Changes' : 'Create Template'}
                     </button>
                   )}
@@ -588,7 +588,7 @@ export default function FormBuilder() {
 
                   <button
                     style={{ ...sm(S_BTN_SECONDARY), width: '100%', marginTop: 4, boxSizing: 'border-box' }}
-                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                    onMouseDown={btnActiveOn}
                     onClick={addSection}
                   >
                     + Add Section

@@ -18,19 +18,19 @@ function Elapsed({ createdAt }) {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [createdAt]);
-  return <span style={cadElapsed(cls)}>{elapsed}</span>;
+  return <span className={cadElapsed(cls)}>{elapsed}</span>;
 }
 
 function PriBadge({ p }) {
-  return <span style={cadPri(p)}>P{p}</span>;
+  return <span className={cadPri(p)}>P{p}</span>;
 }
 
 function CallStatusBadge({ status }) {
-  return <span style={cadCallStatus(status)}>{status}</span>;
+  return <span className={cadCallStatus(status)}>{status}</span>;
 }
 
 function StatusBadge({ status }) {
-  return <span style={cadStatus(status)}>{CAD_STATUS_LABEL[status] || status}</span>;
+  return <span className={cadStatus(status)}>{CAD_STATUS_LABEL[status] || status}</span>;
 }
 
 const ST_COLOR = {
@@ -84,7 +84,7 @@ export default function IncidentDetail() {
       <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#000', color:'#556677', gap:12 }}>
         <div style={{ fontSize:18, fontFamily:'var(--font-mono)', fontWeight:700 }}>CALL NOT FOUND</div>
         <div style={{ fontSize:12, color:'#334455' }}>Call {callId} does not exist or has been closed.</div>
-        <button style={{ ...sm(S_BTN_SECONDARY), marginTop:8 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/cad')}>← Back to CAD</button>
+        <button style={{ ...sm(S_BTN_SECONDARY), marginTop:8 }} onClick={() => navigate('/cad')}>← Back to CAD</button>
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function IncidentDetail() {
       }}>
         <button
           style={{ ...sm(S_BTN_SECONDARY), flexShrink:0 }}
-          onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+         
           onClick={() => navigate('/cad')}
         >
           ← CAD
@@ -128,7 +128,7 @@ export default function IncidentDetail() {
         {isDispatch && (
           <button
             style={{ ...sm(S_BTN_DANGER), flexShrink:0 }}
-            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+           
             onClick={closeCall}
           >
             CLOSE CALL
@@ -322,8 +322,8 @@ export default function IncidentDetail() {
             </div>
             <div style={{ flex:1, overflowY:'auto' }}>
               {dispatchLog.slice(0, 100).map(e => (
-                <div key={e.id} style={S_TX_ENTRY}>
-                  <span style={S_TX_TIME}>{e.time}</span>
+                <div key={e.id} className={S_TX_ENTRY}>
+                  <span className={S_TX_TIME}>{e.time}</span>
                   <span style={{ color: TX_KIND_COLOR[e.kind] || 'var(--n-text-muted)', flex:1, whiteSpace:'normal', wordBreak:'break-word' }}>
                     {e.text}
                   </span>

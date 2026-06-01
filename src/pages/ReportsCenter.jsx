@@ -221,7 +221,7 @@ export default function ReportsCenter() {
               </span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
                 {hasSig && !sigApplied && (
-                  <button style={{ ...xs(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 4 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={applySignature}>
+                  <button style={{ ...xs(S_BTN_SECONDARY), display: 'flex', alignItems: 'center', gap: 4 }} onClick={applySignature}>
                     ✍ Apply Signature
                   </button>
                 )}
@@ -235,10 +235,10 @@ export default function ReportsCenter() {
                     Set up signature
                   </button>
                 )}
-                <button style={xs(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
+                <button className={xs(S_BTN_GHOST)} onClick={() => { setSelectedTemplate(null); setFormValues({}); }}>
                   ✕ Discard
                 </button>
-                <button style={xs(S_BTN_PRIMARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={submitReport}>
+                <button className={xs(S_BTN_PRIMARY)} onClick={submitReport}>
                   Submit Report
                 </button>
               </div>
@@ -277,17 +277,17 @@ export default function ReportsCenter() {
               {isAdmin && (
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                   {selReport.status !== 'Approved' && (
-                    <button style={xs(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Approved')}>
+                    <button className={xs(S_BTN_SUCCESS)} onClick={() => reviewReport(selReport.id, 'Approved')}>
                       Approve
                     </button>
                   )}
                   {selReport.status === 'Submitted' && (
-                    <button style={xs(S_BTN_WARNING)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Pending Review')}>
+                    <button className={xs(S_BTN_WARNING)} onClick={() => reviewReport(selReport.id, 'Pending Review')}>
                       Flag for Review
                     </button>
                   )}
                   {selReport.status !== 'Submitted' && (
-                    <button style={xs(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => reviewReport(selReport.id, 'Submitted')}>
+                    <button className={xs(S_BTN_SECONDARY)} onClick={() => reviewReport(selReport.id, 'Submitted')}>
                       Reset
                     </button>
                   )}
@@ -430,12 +430,12 @@ export default function ReportsCenter() {
               Review: {selReport.caseNumber}
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button style={{ ...xs(S_BTN_SUCCESS), flex: 1 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+              <button style={{ ...xs(S_BTN_SUCCESS), flex: 1 }}
                 onClick={() => reviewReport(selReport.id, 'Approved')}>
                 Approve
               </button>
               {selReport.status === 'Submitted' && (
-                <button style={{ ...xs(S_BTN_WARNING), flex: 1 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+                <button style={{ ...xs(S_BTN_WARNING), flex: 1 }}
                   onClick={() => reviewReport(selReport.id, 'Pending Review')}>
                   Flag
                 </button>

@@ -53,11 +53,11 @@ export default function BanManagement() {
           {['ALL','Active','Expired','Lifted'].map(f => (
             <button key={f}
               style={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-              onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff}
+             
               onClick={() => setFilter(f)}>{f}</button>
           ))}
-          <button style={sm(S_BTN_DANGER)}
-            onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+          <button className={sm(S_BTN_DANGER)}
+            onMouseDown={btnActiveOn}
             onClick={() => setShowForm(true)}>
             Issue Ban
           </button>
@@ -72,10 +72,10 @@ export default function BanManagement() {
               Issue New Ban
             </div>
             <div className="n-grid-2" style={{ gap: 8, marginBottom: 8 }}>
-              <div style={S_FIELD}><label style={S_LABEL}>Username *</label><input style={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
-              <div style={S_FIELD}><label style={S_LABEL}>Discord ID *</label><input style={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
-              <div style={S_FIELD}><label style={S_LABEL}>Duration</label>
-                <select style={S_SELECT} value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
+              <div style={S_FIELD}><label className={S_LABEL}>Username *</label><input className={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
+              <div style={S_FIELD}><label className={S_LABEL}>Discord ID *</label><input className={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
+              <div style={S_FIELD}><label className={S_LABEL}>Duration</label>
+                <select className={S_SELECT} value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
                   <option>Permanent</option>
                   <option>30 Days</option>
                   <option>14 Days</option>
@@ -86,12 +86,12 @@ export default function BanManagement() {
               </div>
             </div>
             <div style={{ ...S_FIELD, marginBottom: 8 }}>
-              <label style={S_LABEL}>Ban Reason *</label>
-              <textarea style={S_TEXTAREA} rows={2} placeholder="Provide a clear, specific reason for this ban..." value={form.reason} onChange={e => setForm(p=>({...p,reason:e.target.value}))} />
+              <label className={S_LABEL}>Ban Reason *</label>
+              <textarea className={S_TEXTAREA} rows={2} placeholder="Provide a clear, specific reason for this ban..." value={form.reason} onChange={e => setForm(p=>({...p,reason:e.target.value}))} />
             </div>
             <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-              <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setShowForm(false)}>Cancel</button>
-              <button style={sm(S_BTN_DANGER)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+              <button className={sm(S_BTN_GHOST)} onClick={() => setShowForm(false)}>Cancel</button>
+              <button className={sm(S_BTN_DANGER)} onMouseDown={btnActiveOn}
                 onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
                 Confirm Ban
               </button>
@@ -101,21 +101,21 @@ export default function BanManagement() {
 
         {/* Ban list table */}
         <div style={{ ...S_PANEL, flex: 1 }}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Ban Registry</div>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Ban Registry</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
               {filtered.length} RECORDS
             </span>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {filtered.length === 0 ? (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No bans matching filter</div>
             ) : (
-              <table style={S_TABLE}>
+              <table className={S_TABLE}>
                 <thead>
                   <tr>
                     {['Status','Username','Discord ID','Duration','Issued By','Date','Reason','Actions'].map(h => (
-                      <th key={h} style={S_TABLE_TH}>{h}</th>
+                      <th key={h} className={S_TABLE_TH}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -123,20 +123,20 @@ export default function BanManagement() {
                   {filtered.map(b => (
                     <tr key={b.id} style={{ cursor: 'pointer', transition: 'background 0.14s, transform 0.14s' }}
                       onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}>
-                      <td style={S_TABLE_TD}><span style={statusBadge[b.status] || BADGE.gray}>{b.status}</span></td>
+                      <td className={S_TABLE_TD}><span style={statusBadge[b.status] || BADGE.gray}>{b.status}</span></td>
                       <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{b.name}</td>
-                      <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.discordId}</span></td>
-                      <td style={S_TABLE_TD}>
+                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.discordId}</span></td>
+                      <td className={S_TABLE_TD}>
                         <span style={{ ...(b.duration === 'Permanent' ? BADGE.red : BADGE.orange), fontSize: 9 }}>
                           {b.duration}
                         </span>
                       </td>
                       <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{b.issuedBy}</td>
-                      <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.date}</span></td>
+                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{b.date}</span></td>
                       <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.reason}</td>
-                      <td style={S_TABLE_TD}>
+                      <td className={S_TABLE_TD}>
                         {b.status === 'Active' && (
-                          <button style={xs(S_BTN_WARNING)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => unban(b.id)}>Lift Ban</button>
+                          <button className={xs(S_BTN_WARNING)} onClick={() => unban(b.id)}>Lift Ban</button>
                         )}
                       </td>
                     </tr>

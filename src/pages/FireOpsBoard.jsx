@@ -73,12 +73,12 @@ export default function FireOpsBoard() {
 
       <div className="split-3" style={{ padding: 8 }}>
         {/* Fire Incidents */}
-        <div style={S_PANEL}>
-          <div style={S_PANEL_HEADER}>
+        <div className={S_PANEL}>
+          <div className={S_PANEL_HEADER}>
             <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>Active Incidents</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{fireCalls.length}</span>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {fireCalls.length === 0 ? (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No active fire/EMS incidents</div>
             ) : fireCalls.sort((a,b) => a.priority - b.priority).map(c => (
@@ -86,7 +86,7 @@ export default function FireOpsBoard() {
                 key={c.id}
                 style={S_CALL_CARD(c.priority, selectedCall === c.id)}
                 onClick={() => setSelectedCall(c.id)}
-                onMouseEnter={callCardHoverOn}
+               
                 onMouseLeave={e => callCardHoverOff(selectedCall === c.id, e)}
               >
                 <div style={{ display: 'flex', gap: 5, marginBottom: 3, alignItems: 'center' }}>
@@ -107,7 +107,7 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Incident Detail */}
-        <div style={S_PANEL}>
+        <div className={S_PANEL}>
           {!selCall ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'var(--n-text-muted)', padding: 24 }}>
               <span style={{ fontSize: 40, opacity: 0.3 }}>🔥</span>
@@ -118,10 +118,10 @@ export default function FireOpsBoard() {
             </div>
           ) : (
             <>
-              <div style={S_PANEL_HEADER}>
+              <div className={S_PANEL_HEADER}>
                 <div>
                   <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>
-                    <span style={S_DATA}>{selCall.id}</span> · {selCall.nature}
+                    <span className={S_DATA}>{selCall.id}</span> · {selCall.nature}
                   </div>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 1 }}>{selCall.timestamp}</div>
                 </div>
@@ -165,7 +165,7 @@ export default function FireOpsBoard() {
                 {me?.deptShort === 'HCFR' && !selCall.units.includes(me.unitId) && (
                   <button
                     style={{ ...S_BTN_FIRE, width: '100%', justifyContent: 'center' }}
-                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                    onMouseDown={btnActiveOn}
                     onClick={selfAssign}
                   >
                     Assign Apparatus to Incident
@@ -174,8 +174,8 @@ export default function FireOpsBoard() {
 
                 <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
                   <button
-                    style={sm(S_BTN_SECONDARY)}
-                    onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                    className={sm(S_BTN_SECONDARY)}
+                    onMouseDown={btnActiveOn}
                     onClick={() => dispatch({ type: 'CLOSE_CALL', payload: selCall.id }) || setSelectedCall(null)}>
                     Clear Incident
                   </button>
@@ -186,11 +186,11 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Apparatus Roster */}
-        <div style={S_PANEL}>
-          <div style={S_PANEL_HEADER}>
+        <div className={S_PANEL}>
+          <div className={S_PANEL_HEADER}>
             <div style={{ ...S_PANEL_TITLE, color: '#c03820' }}>Apparatus Status</div>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {APPARATUS_TYPES.map(ap => (
               ap.units.length > 0 && (
                 <div key={ap.label}>
@@ -198,7 +198,7 @@ export default function FireOpsBoard() {
                     {ap.icon} {ap.label} ({ap.units.length})
                   </div>
                   {ap.units.map(o => (
-                    <div key={o.id} style={S_UNIT_ROW} onMouseEnter={unitRowHoverOn} onMouseLeave={unitRowHoverOff}>
+                    <div key={o.id} className={S_UNIT_ROW}>
                       <div style={{
                         width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
                         background: o.status === 'AVAILABLE' ? 'var(--st-av-text)' :

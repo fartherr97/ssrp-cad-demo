@@ -13,39 +13,39 @@ export default function BottomBar() {
   const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
 
   return (
-    <footer style={S_STATUSBAR}>
+    <footer className={S_STATUSBAR}>
       <span>CH: HILLSBOROUGH MAIN</span>
-      <span style={S_STATUSBAR_SEP} />
+      <span className={S_STATUSBAR_SEP} />
 
-      <span>UNIT: <span style={S_STATUSBAR_HI}>{me?.unitId || '—'}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>UNIT: <span className={S_STATUSBAR_HI}>{me?.unitId || '—'}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
       <span>CALL: <span style={{ color: myCall ? 'var(--pr3-text)' : 'var(--n-text-muted)', fontWeight: myCall ? 600 : 400 }}>
         {myCall ? myCall.id : 'UNASSIGNED'}
       </span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span className={S_STATUSBAR_SEP} />
 
-      <span>ACTIVE: <span style={S_STATUSBAR_HI}>{activeCalls}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>ACTIVE: <span className={S_STATUSBAR_HI}>{activeCalls}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
-      <span>PENDING: <span style={S_STATUSBAR_HI}>{calls.filter(c => c.status === 'PENDING').length}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>PENDING: <span className={S_STATUSBAR_HI}>{calls.filter(c => c.status === 'PENDING').length}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
       {p1Count > 0 && (
         <>
-          <span style={S_STATUSBAR_P1}>▲ P1 CRITICAL: {p1Count}</span>
-          <span style={S_STATUSBAR_SEP} />
+          <span className={S_STATUSBAR_P1}>▲ P1 CRITICAL: {p1Count}</span>
+          <span className={S_STATUSBAR_SEP} />
         </>
       )}
 
-      <span>ON DUTY: <span style={S_STATUSBAR_AV}>{onDuty}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>ON DUTY: <span className={S_STATUSBAR_AV}>{onDuty}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
-      <span>AVAILABLE: <span style={S_STATUSBAR_AV}>{available}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>AVAILABLE: <span className={S_STATUSBAR_AV}>{available}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
-      <span>DEPT: <span style={S_STATUSBAR_HI}>{me?.deptShort || '—'}</span></span>
-      <span style={S_STATUSBAR_SEP} />
+      <span>DEPT: <span className={S_STATUSBAR_HI}>{me?.deptShort || '—'}</span></span>
+      <span className={S_STATUSBAR_SEP} />
 
       <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>
 

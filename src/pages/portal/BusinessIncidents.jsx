@@ -22,7 +22,7 @@ export default function BusinessIncidents() {
           <div style={{ fontSize: 14, color: 'rgba(180,200,230,0.6)', marginBottom: 18 }}>
             You need to register a business before you can view incidents.
           </div>
-          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/portal/my-business')}>
+          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/portal/my-business')}>
             <MdBusiness size={16} /> Register your business
           </button>
         </PortalCard>

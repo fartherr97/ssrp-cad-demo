@@ -26,7 +26,7 @@ export default function Employees() {
           <div style={{ fontSize: 14, color: 'rgba(180,200,230,0.6)', marginBottom: 18 }}>
             You need to register a business before you can manage employees.
           </div>
-          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => navigate('/portal/my-business')}>
+          <button style={{ ...S_BTN_PRIMARY, display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/portal/my-business')}>
             <MdBusiness size={16} /> Register your business
           </button>
         </PortalCard>
@@ -50,7 +50,7 @@ export default function Employees() {
         subtitle={`Staff roster for ${myBiz.name}`}
         accent={ACCENT}
         action={(
-          <button style={{ ...S_BTN_PRIMARY, display: 'flex', alignItems: 'center', gap: 6 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setAdding(v => !v)}>
+          <button style={{ ...S_BTN_PRIMARY, display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => setAdding(v => !v)}>
             <MdAdd size={18} /> Add Employee
           </button>
         )}
@@ -83,8 +83,8 @@ export default function Employees() {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
-            <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => { setForm(BLANK); setAdding(false); }}>Cancel</button>
-            <button style={sm(S_BTN_SUCCESS)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!canSubmit} onClick={addEmployee}>Add Employee</button>
+            <button className={sm(S_BTN_SECONDARY)} onClick={() => { setForm(BLANK); setAdding(false); }}>Cancel</button>
+            <button className={sm(S_BTN_SUCCESS)} disabled={!canSubmit} onClick={addEmployee}>Add Employee</button>
           </div>
         </PortalCard>
       )}
@@ -113,7 +113,7 @@ export default function Employees() {
                     background: `${ACCENT}22`, color: ACCENT, border: `1px solid ${ACCENT}55`,
                   }}>{emp.role}</span>
                 </div>
-                <button style={{ ...sm(S_BTN_DANGER), display: 'flex', alignItems: 'center', gap: 5 }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } })}>
+                <button style={{ ...sm(S_BTN_DANGER), display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } })}>
                   <MdDelete size={16} /> Remove
                 </button>
               </div>

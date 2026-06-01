@@ -27,7 +27,7 @@ function LicenseBlock({ icon: Icon, title, status, rows }) {
           <Icon size={20} color={ACCENT} />
           <span style={{ fontSize: 13, fontWeight: 700, color: '#e6eef6' }}>{title}</span>
         </div>
-        <span style={statusBadge(status)}>{status || 'NONE'}</span>
+        <span className={statusBadge(status)}>{status || 'NONE'}</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {rows.map(r => <Field key={r.label} label={r.label} value={r.value} mono={r.mono} />)}

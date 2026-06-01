@@ -69,11 +69,11 @@ export default function MDT() {
         {tab === 'MESSAGES' && (
           <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', flex: 1, overflow: 'hidden', minHeight: 0 }}>
             <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-              <div style={S_PANEL_HEADER}>
-                <div style={S_PANEL_TITLE}>Inbox</div>
+              <div className={S_PANEL_HEADER}>
+                <div className={S_PANEL_TITLE}>Inbox</div>
                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--n-text-muted)' }}>{messages.length} MESSAGES</span>
               </div>
-              <div style={S_PANEL_BODY}>
+              <div className={S_PANEL_BODY}>
                 {messages.map(m => (
                   <div key={m.id}
                     style={{
@@ -107,7 +107,7 @@ export default function MDT() {
                 <>
                   <div style={{ padding: '10px 14px', background: 'var(--n-bg-card)', borderBottom: '1px solid var(--n-border)', flexShrink: 0 }}>
                     <div style={{ display: 'flex', gap: 8, marginBottom: 4, alignItems: 'center' }}>
-                      {selMsg.priority === 'HIGH' && <span style={BADGE.red}>HIGH PRIORITY</span>}
+                      {selMsg.priority === 'HIGH' && <span className={BADGE.red}>HIGH PRIORITY</span>}
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{selMsg.subject}</div>
                     <div style={{ fontSize: 10, color: 'var(--n-text-dim)', fontFamily: 'var(--font-mono)' }}>
@@ -126,17 +126,17 @@ export default function MDT() {
         {/* RADIO LOG */}
         {tab === 'RADIO' && (
           <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', flex: 1 }}>
-            <div style={S_PANEL_HEADER}>
-              <div style={S_PANEL_TITLE}>
+            <div className={S_PANEL_HEADER}>
+              <div className={S_PANEL_TITLE}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--st-av-text)', boxShadow: '0 0 5px var(--st-av-text)', display: 'inline-block', marginRight: 5 }} />
                 Dispatch Radio Log
               </div>
               <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>CH: HILLSBOROUGH MAIN</span>
             </div>
-            <div style={S_PANEL_BODY}>
+            <div className={S_PANEL_BODY}>
               {dispatchLog.map(e => (
-                <div key={e.id} style={S_TX_ENTRY}>
-                  <span style={S_TX_TIME}>{e.time}</span>
+                <div key={e.id} className={S_TX_ENTRY}>
+                  <span className={S_TX_TIME}>{e.time}</span>
                   <span style={{ color: TX_KIND_COLOR[e.kind] || 'var(--n-text-muted)' }}>{e.text}</span>
                 </div>
               ))}
@@ -156,18 +156,18 @@ export default function MDT() {
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
                 <div style={{ ...S_FIELD, flex: '0 0 120px' }}>
-                  <label style={S_LABEL}>Query Type</label>
-                  <select style={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
+                  <label className={S_LABEL}>Query Type</label>
+                  <select className={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
                     <option value="PERSON">Person</option>
                     <option value="VEHICLE">Vehicle</option>
                   </select>
                 </div>
                 <div style={{ ...S_FIELD, flex: 1 }}>
-                  <label style={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
-                  <input style={S_INPUT} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
+                  <label className={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>
+                  <input className={S_INPUT} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && runQuery()}
                     placeholder={queryType === 'PERSON' ? 'e.g. Washington or 618-77-9901' : 'e.g. SUS-1109 or Dodge Charger'} />
                 </div>
-                <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={runQuery}>Query</button>
+                <button className={S_BTN_PRIMARY} onMouseDown={btnActiveOn} onClick={runQuery}>Query</button>
               </div>
             </div>
 

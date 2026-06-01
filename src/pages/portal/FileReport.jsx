@@ -116,7 +116,7 @@ export default function FileReport() {
             <Field label="Location" value={submitted.location} />
           </div>
           <div>
-            <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={fileAnother}>File Another Report</button>
+            <button className={S_BTN_PRIMARY} onClick={fileAnother}>File Another Report</button>
           </div>
         </PortalCard>
       ) : myChars.length === 0 ? (
@@ -165,7 +165,7 @@ export default function FileReport() {
               </div>
             </div>
             <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="submit" style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} disabled={!canSubmit}>
+              <button type="submit" className={S_BTN_PRIMARY} disabled={!canSubmit}>
                 Submit Report
               </button>
             </div>

@@ -74,10 +74,10 @@ export default function WarrantControl() {
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
           {['ALL','ACTIVE','SERVED'].map(f => (
             <button key={f} style={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-              onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+              onMouseDown={btnActiveOn}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
-          <button style={sm(S_BTN_DANGER)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowIssue(true)}>
+          <button className={sm(S_BTN_DANGER)} onMouseDown={btnActiveOn} onClick={() => setShowIssue(true)}>
             Issue Warrant
           </button>
         </div>
@@ -86,36 +86,36 @@ export default function WarrantControl() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 0, flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Warrant Table */}
         <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Warrant Registry</div>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Warrant Registry</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>{filtered.length} WARRANTS</span>
           </div>
-          <div style={S_PANEL_BODY}>
+          <div className={S_PANEL_BODY}>
             {filtered.length === 0 ? (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--n-text-muted)', fontSize: 11 }}>No warrants on file</div>
             ) : (
-              <table style={S_TABLE}>
+              <table className={S_TABLE}>
                 <thead>
                   <tr>
-                    <th style={S_TABLE_TH}>Status</th>
-                    <th style={S_TABLE_TH}>Subject</th>
-                    <th style={S_TABLE_TH}>Type</th>
-                    <th style={S_TABLE_TH}>Charge</th>
-                    <th style={S_TABLE_TH}>Issued By</th>
-                    <th style={S_TABLE_TH}>Issue Date</th>
+                    <th className={S_TABLE_TH}>Status</th>
+                    <th className={S_TABLE_TH}>Subject</th>
+                    <th className={S_TABLE_TH}>Type</th>
+                    <th className={S_TABLE_TH}>Charge</th>
+                    <th className={S_TABLE_TH}>Issued By</th>
+                    <th className={S_TABLE_TH}>Issue Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map(w => (
                     <tr key={w.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff} style={{ transition: 'background 0.14s, transform 0.14s', cursor: 'pointer', background: selected === w.id ? 'var(--n-bg-selected)' : '' }} onClick={() => setSelected(w.id)}>
-                      <td style={S_TABLE_TD}>
+                      <td className={S_TABLE_TD}>
                         <span style={w.status === 'ACTIVE' ? BADGE.red : BADGE.green}>{w.status}</span>
                       </td>
                       <td style={{ ...S_TABLE_TD, fontWeight: 600 }}>{w.civilianName}</td>
-                      <td style={S_TABLE_TD}><span style={BADGE.gray}>{w.type}</span></td>
+                      <td className={S_TABLE_TD}><span className={BADGE.gray}>{w.type}</span></td>
                       <td style={{ ...S_TABLE_TD, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11 }}>{w.charge}</td>
                       <td style={{ ...S_TABLE_TD, fontSize: 10, color: 'var(--n-text-dim)' }}>{w.issuedBy}</td>
-                      <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{w.issuedDate}</span></td>
+                      <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{w.issuedDate}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -135,8 +135,8 @@ export default function WarrantControl() {
             </div>
           ) : (
             <>
-              <div style={S_PANEL_HEADER}>
-                <div style={S_PANEL_TITLE}>Warrant Detail</div>
+              <div className={S_PANEL_HEADER}>
+                <div className={S_PANEL_TITLE}>Warrant Detail</div>
                 <span style={selWarrant.status === 'ACTIVE' ? BADGE.red : BADGE.green}>
                   {selWarrant.status}
                 </span>
@@ -144,28 +144,28 @@ export default function WarrantControl() {
               <div style={{ ...S_PANEL_BODY, padding: 12 }}>
                 <div style={{ ...S_CARD, marginBottom: 8, borderLeft: selWarrant.status === 'ACTIVE' ? '3px solid var(--pr1-text)' : '3px solid var(--st-av-text)' }}>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 3 }}>{selWarrant.civilianName}</div>
-                  <span style={BADGE.gray}>{selWarrant.type}</span>
+                  <span className={BADGE.gray}>{selWarrant.type}</span>
                 </div>
 
                 <div style={{ ...S_CARD, marginBottom: 8 }}>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Charge</span><span style={{ ...S_DETAIL_VALUE, fontWeight: 500 }}>{selWarrant.charge}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Issued By</span><span style={S_DETAIL_VALUE}>{selWarrant.issuedBy}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Issue Date</span><span style={S_DETAIL_VALUE_MONO}>{selWarrant.issuedDate}</span></div>
-                  {selWarrant.notes && <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Notes</span><span style={{ ...S_DETAIL_VALUE, fontStyle: 'italic', color: 'var(--n-text-dim)' }}>{selWarrant.notes}</span></div>}
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Charge</span><span style={{ ...S_DETAIL_VALUE, fontWeight: 500 }}>{selWarrant.charge}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Issued By</span><span className={S_DETAIL_VALUE}>{selWarrant.issuedBy}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Issue Date</span><span className={S_DETAIL_VALUE_MONO}>{selWarrant.issuedDate}</span></div>
+                  {selWarrant.notes && <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Notes</span><span style={{ ...S_DETAIL_VALUE, fontStyle: 'italic', color: 'var(--n-text-dim)' }}>{selWarrant.notes}</span></div>}
                 </div>
 
                 {selCiv && (
                   <div style={{ ...S_CARD, marginBottom: 8 }}>
                     <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Subject Information</div>
-                    <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>DOB</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.dob}</span></div>
-                    <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>SSN</span><span style={S_DETAIL_VALUE_MONO}>{selCiv.ssn}</span></div>
-                    <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Address</span><span style={S_DETAIL_VALUE}>{selCiv.address}</span></div>
-                    <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>DL Status</span><span style={S_DETAIL_VALUE}>{selCiv.dlStatus}</span></div>
+                    <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>DOB</span><span className={S_DETAIL_VALUE_MONO}>{selCiv.dob}</span></div>
+                    <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>SSN</span><span className={S_DETAIL_VALUE_MONO}>{selCiv.ssn}</span></div>
+                    <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Address</span><span className={S_DETAIL_VALUE}>{selCiv.address}</span></div>
+                    <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>DL Status</span><span className={S_DETAIL_VALUE}>{selCiv.dlStatus}</span></div>
                   </div>
                 )}
 
                 {selWarrant.status === 'ACTIVE' && (
-                  <button style={{ ...S_BTN_SUCCESS, width: '100%', justifyContent: 'center' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => serveWarrant(selWarrant.id)}>
+                  <button style={{ ...S_BTN_SUCCESS, width: '100%', justifyContent: 'center' }} onMouseDown={btnActiveOn} onClick={() => serveWarrant(selWarrant.id)}>
                     Mark as Served
                   </button>
                 )}
@@ -177,16 +177,16 @@ export default function WarrantControl() {
 
       {/* Issue Warrant Modal */}
       {showIssue && (
-        <div style={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowIssue(false)}>
-          <div style={S_MODAL}>
-            <div style={S_MODAL_HEADER}>
-              <div style={S_MODAL_TITLE}>Issue New Warrant</div>
-              <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onClick={() => setShowIssue(false)}>✕</button>
+        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowIssue(false)}>
+          <div className={S_MODAL}>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>Issue New Warrant</div>
+              <button className={sm(S_BTN_GHOST)} onClick={() => setShowIssue(false)}>✕</button>
             </div>
-            <div style={S_MODAL_BODY}>
+            <div className={S_MODAL_BODY}>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Subject *</label>
-                <select style={S_SELECT} value={form.civilianId} onChange={e => setForm(p => ({ ...p, civilianId: e.target.value }))}>
+                <label className={S_LABEL}>Subject *</label>
+                <select className={S_SELECT} value={form.civilianId} onChange={e => setForm(p => ({ ...p, civilianId: e.target.value }))}>
                   <option value="">Select civilian...</option>
                   {civilians.map(c => (
                     <option key={c.id} value={c.id}>{c.firstName} {c.lastName} — {c.dob}</option>
@@ -194,25 +194,25 @@ export default function WarrantControl() {
                 </select>
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Warrant Type</label>
-                <select style={S_SELECT} value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
+                <label className={S_LABEL}>Warrant Type</label>
+                <select className={S_SELECT} value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
                   <option>Arrest Warrant</option>
                   <option>Bench Warrant</option>
                   <option>Search Warrant</option>
                 </select>
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Charge / Basis *</label>
-                <input style={S_INPUT} placeholder="e.g. Possession of Controlled Substance" value={form.charge} onChange={e => setForm(p => ({ ...p, charge: e.target.value }))} />
+                <label className={S_LABEL}>Charge / Basis *</label>
+                <input className={S_INPUT} placeholder="e.g. Possession of Controlled Substance" value={form.charge} onChange={e => setForm(p => ({ ...p, charge: e.target.value }))} />
               </div>
               <div style={S_FIELD}>
-                <label style={S_LABEL}>Notes</label>
-                <textarea style={S_TEXTAREA} rows={2} placeholder="Subject description, last known location, etc." value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+                <label className={S_LABEL}>Notes</label>
+                <textarea className={S_TEXTAREA} rows={2} placeholder="Subject description, last known location, etc." value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
               </div>
             </div>
-            <div style={S_MODAL_FOOTER}>
-              <button style={S_BTN_SECONDARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowIssue(false)}>Cancel</button>
-              <button style={S_BTN_DANGER} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={issueWarrant} disabled={!form.civilianId || !form.charge}>
+            <div className={S_MODAL_FOOTER}>
+              <button className={S_BTN_SECONDARY} onMouseDown={btnActiveOn} onClick={() => setShowIssue(false)}>Cancel</button>
+              <button className={S_BTN_DANGER} onMouseDown={btnActiveOn} onClick={issueWarrant} disabled={!form.civilianId || !form.charge}>
                 Issue Warrant
               </button>
             </div>

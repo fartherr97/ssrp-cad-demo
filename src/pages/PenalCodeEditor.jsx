@@ -79,7 +79,7 @@ export default function PenalCodeEditor() {
           {filtered.length} charges
         </span>
         {isAdmin && (
-          <button style={{ ...sm(S_BTN_PRIMARY), marginLeft: 'auto' }} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAdd(true)}>
+          <button style={{ ...sm(S_BTN_PRIMARY), marginLeft: 'auto' }} onMouseDown={btnActiveOn} onClick={() => setShowAdd(true)}>
             + Add Charge
           </button>
         )}
@@ -88,37 +88,37 @@ export default function PenalCodeEditor() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 0, flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Charges table */}
         <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Penal Code Reference</div>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Penal Code Reference</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>SSRP LEGAL CODE</span>
           </div>
-          <div style={S_PANEL_BODY}>
-            <table style={S_TABLE}>
+          <div className={S_PANEL_BODY}>
+            <table className={S_TABLE}>
               <thead>
                 <tr>
-                  <th style={S_TABLE_TH}>Code</th>
-                  <th style={S_TABLE_TH}>Offense</th>
-                  <th style={S_TABLE_TH}>Category</th>
-                  <th style={S_TABLE_TH}>Type</th>
-                  <th style={S_TABLE_TH}>Fine</th>
-                  <th style={S_TABLE_TH}>Jail Time</th>
-                  <th style={S_TABLE_TH}>Points</th>
+                  <th className={S_TABLE_TH}>Code</th>
+                  <th className={S_TABLE_TH}>Offense</th>
+                  <th className={S_TABLE_TH}>Category</th>
+                  <th className={S_TABLE_TH}>Type</th>
+                  <th className={S_TABLE_TH}>Fine</th>
+                  <th className={S_TABLE_TH}>Jail Time</th>
+                  <th className={S_TABLE_TH}>Points</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(p => (
                   <tr key={p.id} onMouseEnter={trHoverOn} onMouseLeave={trHoverOff} onClick={() => setSelected(p.id)} style={{ cursor: 'pointer' }}>
-                    <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 11 }}>{p.code}</span></td>
+                    <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 11 }}>{p.code}</span></td>
                     <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{p.name}</td>
                     <td style={{ ...S_TABLE_TD, fontSize: 10, color: 'var(--n-text-dim)' }}>{p.category}</td>
-                    <td style={S_TABLE_TD}><span style={typeColors[p.type] || BADGE.gray}>{p.type}</span></td>
+                    <td className={S_TABLE_TD}><span style={typeColors[p.type] || BADGE.gray}>{p.type}</span></td>
                     <td style={{ ...S_TABLE_TD, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
                       {p.fine > 0 ? `$${p.fine.toLocaleString()}` : '—'}
                     </td>
                     <td style={{ ...S_TABLE_TD, fontSize: 11, color: p.jailTime === 'None' ? 'var(--n-text-muted)' : 'var(--n-text)' }}>
                       {p.jailTime}
                     </td>
-                    <td style={S_TABLE_TD}>
+                    <td className={S_TABLE_TD}>
                       {p.points > 0 ? (
                         <span style={p.points >= 7 ? BADGE.red : p.points >= 4 ? BADGE.orange : BADGE.yellow}>
                           {p.points}
@@ -143,41 +143,41 @@ export default function PenalCodeEditor() {
             </div>
           ) : editing === selCharge.id ? (
             <>
-              <div style={S_PANEL_HEADER}>
-                <div style={S_PANEL_TITLE}>Edit Charge</div>
-                <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>✕</button>
+              <div className={S_PANEL_HEADER}>
+                <div className={S_PANEL_TITLE}>Edit Charge</div>
+                <button className={sm(S_BTN_GHOST)} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>✕</button>
               </div>
               <div style={{ ...S_PANEL_BODY, padding: 12 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={S_FIELD}><label style={S_LABEL}>Code</label><input style={S_INPUT} value={form.code} onChange={e => setForm(p=>({...p,code:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Offense Name</label><input style={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Category</label><input style={S_INPUT} value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Type</label>
-                    <select style={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}>
+                  <div style={S_FIELD}><label className={S_LABEL}>Code</label><input className={S_INPUT} value={form.code} onChange={e => setForm(p=>({...p,code:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Offense Name</label><input className={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Category</label><input className={S_INPUT} value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Type</label>
+                    <select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}>
                       <option>Felony</option><option>Misdemeanor</option><option>Infraction</option>
                     </select>
                   </div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Fine ($)</label><input style={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Jail Time</label><input style={S_INPUT} placeholder="e.g. 5 Years or None" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
-                  <div style={S_FIELD}><label style={S_LABEL}>Points</label><input style={S_INPUT} type="number" min="0" max="10" value={form.points} onChange={e => setForm(p=>({...p,points:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Fine ($)</label><input className={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Jail Time</label><input className={S_INPUT} placeholder="e.g. 5 Years or None" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
+                  <div style={S_FIELD}><label className={S_LABEL}>Points</label><input className={S_INPUT} type="number" min="0" max="10" value={form.points} onChange={e => setForm(p=>({...p,points:e.target.value}))} /></div>
                 </div>
               </div>
               <div style={{ padding: '8px 12px', borderTop: '1px solid var(--n-border)', display: 'flex', gap: 6, justifyContent: 'flex-end', background: 'var(--n-bg-card)', flexShrink: 0 }}>
-                <button style={S_BTN_SECONDARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>Cancel</button>
-                <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={saveEdit}>Save Changes</button>
+                <button className={S_BTN_SECONDARY} onMouseDown={btnActiveOn} onClick={() => setEditing(null)}>Cancel</button>
+                <button className={S_BTN_PRIMARY} onMouseDown={btnActiveOn} onClick={saveEdit}>Save Changes</button>
               </div>
             </>
           ) : (
             <>
-              <div style={S_PANEL_HEADER}>
+              <div className={S_PANEL_HEADER}>
                 <div>
-                  <div style={S_PANEL_TITLE}><span style={S_DATA}>{selCharge.code}</span></div>
+                  <div className={S_PANEL_TITLE}><span className={S_DATA}>{selCharge.code}</span></div>
                   <div style={{ fontSize: 10, color: 'var(--n-text-dim)', marginTop: 1 }}>{selCharge.category}</div>
                 </div>
                 {isAdmin && (
                   <div style={{ display: 'flex', gap: 4 }}>
-                    <button style={sm(S_BTN_SECONDARY)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => startEdit(selCharge)}>Edit</button>
-                    <button style={sm(S_BTN_DANGER)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => { dispatch({type:'DELETE_CHARGE',payload:selCharge.id}); setSelected(null); }}>Delete</button>
+                    <button className={sm(S_BTN_SECONDARY)} onMouseDown={btnActiveOn} onClick={() => startEdit(selCharge)}>Edit</button>
+                    <button className={sm(S_BTN_DANGER)} onMouseDown={btnActiveOn} onClick={() => { dispatch({type:'DELETE_CHARGE',payload:selCharge.id}); setSelected(null); }}>Delete</button>
                   </div>
                 )}
               </div>
@@ -186,21 +186,21 @@ export default function PenalCodeEditor() {
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{selCharge.name}</div>
                   <span style={typeColors[selCharge.type] || BADGE.gray}>{selCharge.type}</span>
                 </div>
-                <div style={S_CARD}>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Penal Code</span><span style={S_DETAIL_VALUE_MONO}>{selCharge.code}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Category</span><span style={S_DETAIL_VALUE}>{selCharge.category}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Classification</span><span style={S_DETAIL_VALUE}>{selCharge.type}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Fine</span>
+                <div className={S_CARD}>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Penal Code</span><span className={S_DETAIL_VALUE_MONO}>{selCharge.code}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Category</span><span className={S_DETAIL_VALUE}>{selCharge.category}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Classification</span><span className={S_DETAIL_VALUE}>{selCharge.type}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Fine</span>
                     <span style={{ ...S_DETAIL_VALUE, fontFamily: 'var(--font-mono)', color: selCharge.fine > 0 ? 'var(--pr2-text)' : 'var(--n-text-muted)' }}>
                       {selCharge.fine > 0 ? `$${selCharge.fine.toLocaleString()}` : 'No fine'}
                     </span>
                   </div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Imprisonment</span>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Imprisonment</span>
                     <span style={{ ...S_DETAIL_VALUE, color: selCharge.jailTime !== 'None' ? 'var(--pr1-text)' : 'var(--n-text-muted)' }}>
                       {selCharge.jailTime}
                     </span>
                   </div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Points</span>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Points</span>
                     <span style={selCharge.points >= 7 ? BADGE.red : selCharge.points >= 4 ? BADGE.orange : selCharge.points > 0 ? BADGE.yellow : BADGE.gray}>
                       {selCharge.points}
                     </span>
@@ -214,28 +214,28 @@ export default function PenalCodeEditor() {
 
       {/* Add Charge Modal */}
       {showAdd && (
-        <div style={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowAdd(false)}>
-          <div style={S_MODAL}>
-            <div style={S_MODAL_HEADER}>
-              <div style={S_MODAL_TITLE}>Add Penal Code Entry</div>
-              <button style={sm(S_BTN_GHOST)} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAdd(false)}>✕</button>
+        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowAdd(false)}>
+          <div className={S_MODAL}>
+            <div className={S_MODAL_HEADER}>
+              <div className={S_MODAL_TITLE}>Add Penal Code Entry</div>
+              <button className={sm(S_BTN_GHOST)} onMouseDown={btnActiveOn} onClick={() => setShowAdd(false)}>✕</button>
             </div>
-            <div style={S_MODAL_BODY}>
+            <div className={S_MODAL_BODY}>
               <div className="n-grid-2">
-                <div style={S_FIELD}><label style={S_LABEL}>Code *</label><input style={S_INPUT} placeholder="e.g. 459 PC" value={form.code} onChange={e => setForm(p=>({...p,code:e.target.value}))} /></div>
-                <div style={S_FIELD}><label style={S_LABEL}>Type</label><select style={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}><option>Felony</option><option>Misdemeanor</option><option>Infraction</option></select></div>
+                <div style={S_FIELD}><label className={S_LABEL}>Code *</label><input className={S_INPUT} placeholder="e.g. 459 PC" value={form.code} onChange={e => setForm(p=>({...p,code:e.target.value}))} /></div>
+                <div style={S_FIELD}><label className={S_LABEL}>Type</label><select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}><option>Felony</option><option>Misdemeanor</option><option>Infraction</option></select></div>
               </div>
-              <div style={S_FIELD}><label style={S_LABEL}>Offense Name *</label><input style={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
-              <div style={S_FIELD}><label style={S_LABEL}>Category</label><input style={S_INPUT} placeholder="e.g. Crimes Against Property" value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
+              <div style={S_FIELD}><label className={S_LABEL}>Offense Name *</label><input className={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
+              <div style={S_FIELD}><label className={S_LABEL}>Category</label><input className={S_INPUT} placeholder="e.g. Crimes Against Property" value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
               <div className="n-grid-2">
-                <div style={S_FIELD}><label style={S_LABEL}>Fine ($)</label><input style={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
-                <div style={S_FIELD}><label style={S_LABEL}>Jail Time</label><input style={S_INPUT} placeholder="e.g. 5 Years" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
-                <div style={S_FIELD}><label style={S_LABEL}>Points</label><input style={S_INPUT} type="number" min="0" max="10" value={form.points} onChange={e => setForm(p=>({...p,points:e.target.value}))} /></div>
+                <div style={S_FIELD}><label className={S_LABEL}>Fine ($)</label><input className={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
+                <div style={S_FIELD}><label className={S_LABEL}>Jail Time</label><input className={S_INPUT} placeholder="e.g. 5 Years" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
+                <div style={S_FIELD}><label className={S_LABEL}>Points</label><input className={S_INPUT} type="number" min="0" max="10" value={form.points} onChange={e => setForm(p=>({...p,points:e.target.value}))} /></div>
               </div>
             </div>
-            <div style={S_MODAL_FOOTER}>
-              <button style={S_BTN_SECONDARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={() => setShowAdd(false)}>Cancel</button>
-              <button style={S_BTN_PRIMARY} onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn} onClick={addCharge} disabled={!form.code || !form.name}>Add to Code</button>
+            <div className={S_MODAL_FOOTER}>
+              <button className={S_BTN_SECONDARY} onMouseDown={btnActiveOn} onClick={() => setShowAdd(false)}>Cancel</button>
+              <button className={S_BTN_PRIMARY} onMouseDown={btnActiveOn} onClick={addCharge} disabled={!form.code || !form.name}>Add to Code</button>
             </div>
           </div>
         </div>

@@ -72,25 +72,25 @@ export default function UnitManagement() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 0, flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Roster table */}
         <div style={{ ...S_PANEL, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderBottom: 'none', borderRight: 'none' }}>
-          <div style={S_PANEL_HEADER}>
-            <div style={S_PANEL_TITLE}>Unit Roster</div>
+          <div className={S_PANEL_HEADER}>
+            <div className={S_PANEL_TITLE}>Unit Roster</div>
             <span style={{ fontSize: 9, color: 'var(--n-text-muted)', fontFamily: 'var(--font-mono)' }}>
               {filtered.length} RECORDS
             </span>
           </div>
-          <div style={S_PANEL_BODY}>
-            <table style={S_TABLE}>
+          <div className={S_PANEL_BODY}>
+            <table className={S_TABLE}>
               <thead>
                 <tr>
-                  <th style={S_TABLE_TH}>Status</th>
-                  <th style={S_TABLE_TH}>Unit ID</th>
-                  <th style={S_TABLE_TH}>Name</th>
-                  <th style={S_TABLE_TH}>Badge</th>
-                  <th style={S_TABLE_TH}>Department</th>
-                  <th style={S_TABLE_TH}>Division</th>
-                  <th style={S_TABLE_TH}>Rank</th>
-                  <th style={S_TABLE_TH}>Assigned Call</th>
-                  {isAdmin && <th style={S_TABLE_TH}>Actions</th>}
+                  <th className={S_TABLE_TH}>Status</th>
+                  <th className={S_TABLE_TH}>Unit ID</th>
+                  <th className={S_TABLE_TH}>Name</th>
+                  <th className={S_TABLE_TH}>Badge</th>
+                  <th className={S_TABLE_TH}>Department</th>
+                  <th className={S_TABLE_TH}>Division</th>
+                  <th className={S_TABLE_TH}>Rank</th>
+                  <th className={S_TABLE_TH}>Assigned Call</th>
+                  {isAdmin && <th className={S_TABLE_TH}>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -99,23 +99,23 @@ export default function UnitManagement() {
                     style={{ background: selected === o.id ? 'var(--n-bg-selected)' : undefined, cursor: 'pointer' }}
                     onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                     onClick={() => setSelected(o.id)}>
-                    <td style={S_TABLE_TD}><StatusBadge status={o.status} /></td>
-                    <td style={S_TABLE_TD}><span style={S_DATA}>{o.unitId}</span></td>
+                    <td className={S_TABLE_TD}><StatusBadge status={o.status} /></td>
+                    <td className={S_TABLE_TD}><span className={S_DATA}>{o.unitId}</span></td>
                     <td style={{ ...S_TABLE_TD, fontWeight: 500 }}>{o.name}</td>
-                    <td style={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{o.badge}</span></td>
-                    <td style={S_TABLE_TD}>
+                    <td className={S_TABLE_TD}><span style={{ ...S_DATA, fontSize: 10 }}>{o.badge}</span></td>
+                    <td className={S_TABLE_TD}>
                       <span style={{ ...BADGE.blue, fontSize: 9 }}>{o.deptShort}</span>
                     </td>
                     <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{o.subdivision}</td>
                     <td style={{ ...S_TABLE_TD, fontSize: 11, color: 'var(--n-text-dim)' }}>{o.rank}</td>
-                    <td style={S_TABLE_TD}>
+                    <td className={S_TABLE_TD}>
                       {o.callId
                         ? <span style={{ ...S_DATA, fontSize: 10 }}>{o.callId}</span>
                         : <span style={{ color: 'var(--n-text-muted)', fontSize: 10 }}>—</span>
                       }
                     </td>
                     {isAdmin && (
-                      <td style={S_TABLE_TD} onClick={e => e.stopPropagation()}>
+                      <td className={S_TABLE_TD} onClick={e => e.stopPropagation()}>
                         <select style={{ ...S_SELECT, width: 80, fontSize: 9, padding: '1px 4px' }}
                           value={o.status}
                           onChange={e => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: o.unitId, status: e.target.value } })}>
@@ -146,8 +146,8 @@ export default function UnitManagement() {
             </div>
           ) : (
             <>
-              <div style={S_PANEL_HEADER}>
-                <div style={S_PANEL_TITLE}>Unit Profile</div>
+              <div className={S_PANEL_HEADER}>
+                <div className={S_PANEL_TITLE}>Unit Profile</div>
                 <StatusBadge status={selOfficer.status} />
               </div>
               <div style={{ ...S_PANEL_BODY, padding: 12 }}>
@@ -170,24 +170,24 @@ export default function UnitManagement() {
                 <div style={{ ...S_CARD, marginBottom: 8 }}
                   onMouseEnter={cardHoverOn} onMouseLeave={cardHoverOff}>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Assignment</div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Unit ID</span><span style={S_DETAIL_VALUE_MONO}>{selOfficer.unitId}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Department</span><span style={S_DETAIL_VALUE}>{selOfficer.deptShort}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Division</span><span style={S_DETAIL_VALUE}>{selOfficer.subdivision}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Rank</span><span style={S_DETAIL_VALUE}>{selOfficer.rank}</span></div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Role</span><span style={S_DETAIL_VALUE}>{selOfficer.role}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Unit ID</span><span className={S_DETAIL_VALUE_MONO}>{selOfficer.unitId}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Department</span><span className={S_DETAIL_VALUE}>{selOfficer.deptShort}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Division</span><span className={S_DETAIL_VALUE}>{selOfficer.subdivision}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Rank</span><span className={S_DETAIL_VALUE}>{selOfficer.rank}</span></div>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Role</span><span className={S_DETAIL_VALUE}>{selOfficer.role}</span></div>
                 </div>
 
                 <div style={{ ...S_CARD, marginBottom: 8 }}
                   onMouseEnter={cardHoverOn} onMouseLeave={cardHoverOff}>
                   <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>Current Status</div>
-                  <div style={S_DETAIL_ROW}><span style={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
-                  <div style={S_DETAIL_ROW}>
-                    <span style={S_DETAIL_LABEL}>Assigned Call</span>
-                    <span style={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
+                  <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
+                  <div className={S_DETAIL_ROW}>
+                    <span className={S_DETAIL_LABEL}>Assigned Call</span>
+                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
                   </div>
-                  <div style={S_DETAIL_ROW}>
-                    <span style={S_DETAIL_LABEL}>Location</span>
-                    <span style={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
+                  <div className={S_DETAIL_ROW}>
+                    <span className={S_DETAIL_LABEL}>Location</span>
+                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
                   </div>
                 </div>
 
@@ -208,7 +208,7 @@ export default function UnitManagement() {
                       {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (
                         <button key={s}
                           style={selOfficer.status === s ? xs(S_BTN_PRIMARY) : xs(S_BTN_SECONDARY)}
-                          onMouseEnter={btnHoverOn} onMouseLeave={btnHoverOff} onMouseDown={btnActiveOn}
+                          onMouseDown={btnActiveOn}
                           onClick={() => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: selOfficer.unitId, status: s } })}>
                           {s}
                         </button>
