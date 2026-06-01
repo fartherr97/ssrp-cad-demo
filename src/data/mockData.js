@@ -107,85 +107,218 @@ export const REPORTS = [
 export const REPORT_TEMPLATES = [
   {
     id: 1, name: "Traffic Stop",
-    fields: [
-      { id: "f1", label: "Date/Time",               type: "datetime",        required: true  },
-      { id: "f2", label: "Officer Badge",            type: "badge_lookup",    required: true  },
-      { id: "f3", label: "Location",                 type: "text",            required: true  },
-      { id: "f4", label: "Vehicle Plate",            type: "text",            required: true  },
-      { id: "f5", label: "Driver Name",              type: "civilian_lookup", required: true  },
-      { id: "f6", label: "Reason for Stop",          type: "dropdown",        required: true, options: ["Speeding","Red Light Violation","Equipment Violation","Expired Registration","Erratic Driving","Other"] },
-      { id: "f7", label: "DL Checked",               type: "checkbox",        required: false },
-      { id: "f8", label: "Sobriety Test Administered",type: "checkbox",       required: false },
-      { id: "f9", label: "Outcome",                  type: "dropdown",        required: true, options: ["Warning","Citation","Arrest","No Action"] },
-      { id: "f10",label: "Narrative",                type: "textarea",        required: true  },
-    ]
+    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    formCode: "TPD-TS-001",
+    signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature", "Date"],
+    sections: [
+      {
+        id: "s1", title: "Incident Information", style: "blue",
+        fields: [
+          { id: "f1", label: "Date / Time",      type: "datetime",     span: 2, required: true },
+          { id: "f3", label: "Location of Stop", type: "text",         span: 3, required: true },
+          { id: "f2", label: "Officer Badge #",   type: "badge_lookup", span: 1, required: true, mono: true },
+        ],
+      },
+      {
+        id: "s2", title: "Subject / Vehicle Information", style: "gray",
+        fields: [
+          { id: "f5", label: "Driver Name",                type: "text",     span: 3, required: true },
+          { id: "f4", label: "Vehicle Plate",              type: "text",     span: 2, required: true, mono: true },
+          { id: "f9", label: "Outcome",                    type: "dropdown", span: 1, required: true, options: ["Warning","Citation","Arrest","No Action"] },
+          { id: "f6", label: "Reason for Stop",            type: "dropdown", span: 4, required: true, options: ["Speeding","Red Light Violation","Equipment Violation","Expired Registration","Erratic Driving","Other"] },
+          { id: "f7", label: "DL Checked",                 type: "checkbox", span: 2 },
+          { id: "f8", label: "Sobriety Test Administered", type: "checkbox", span: 2 },
+        ],
+      },
+      {
+        id: "s3", title: "Narrative", style: "gray",
+        fields: [
+          { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+    ],
   },
   {
     id: 2, name: "Use of Force",
-    fields: [
-      { id: "f1", label: "Date/Time",        type: "datetime",        required: true  },
-      { id: "f2", label: "Officer Badge",    type: "badge_lookup",    required: true  },
-      { id: "f3", label: "Subject Name",     type: "civilian_lookup", required: true  },
-      { id: "f4", label: "Location",         type: "text",            required: true  },
-      { id: "f5", label: "Force Type Used",  type: "dropdown",        required: true, options: ["Verbal Commands","Soft Empty Hand","Hard Empty Hand","OC Spray","Taser","Impact Weapon","K9","Firearm"] },
-      { id: "f6", label: "Reason for Force", type: "textarea",        required: true  },
-      { id: "f7", label: "Subject Injured",  type: "checkbox",        required: false },
-      { id: "f8", label: "Officer Injured",  type: "checkbox",        required: false },
-      { id: "f9", label: "EMS Called",       type: "checkbox",        required: false },
-      { id: "f10",label: "Full Narrative",   type: "textarea",        required: true  },
-    ]
+    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    formCode: "TPD-UOF-001",
+    signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature / Badge #", "Review Date"],
+    sections: [
+      {
+        id: "s1", title: "Incident Information", style: "blue",
+        fields: [
+          { id: "f1", label: "Date / Time",   type: "datetime",     span: 2, required: true },
+          { id: "f4", label: "Location",      type: "text",         span: 3, required: true },
+          { id: "f2", label: "Officer Badge #", type: "badge_lookup", span: 1, required: true, mono: true },
+          { id: "f3", label: "Subject Name",  type: "text",         span: 4, required: true },
+        ],
+      },
+      {
+        id: "s2", title: "Force Used", style: "gray",
+        fields: [
+          { id: "f5", label: "Type of Force",  type: "dropdown", span: 4, required: true, options: ["Verbal Commands","Soft Empty Hand","Hard Empty Hand","OC Spray","Taser","Impact Weapon","K9","Firearm"] },
+          { id: "f7", label: "Subject Injured", type: "checkbox", span: 1 },
+          { id: "f8", label: "Officer Injured", type: "checkbox", span: 1 },
+          { id: "f9", label: "EMS Called",      type: "checkbox", span: 1 },
+        ],
+      },
+      {
+        id: "s3", title: "Reason for Use of Force", style: "gray",
+        fields: [
+          { id: "f6", label: "Reason for Use of Force", type: "textarea", span: 4, required: true, minRows: 3 },
+        ],
+      },
+      {
+        id: "s4", title: "Full Narrative", style: "gray",
+        fields: [
+          { id: "f10", label: "Full Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+    ],
   },
   {
     id: 3, name: "Arrest Report",
-    fields: [
-      { id: "f1", label: "Date/Time of Arrest",     type: "datetime",        required: true  },
-      { id: "f2", label: "Arresting Officer Badge",  type: "badge_lookup",    required: true  },
-      { id: "f3", label: "Arrestee Name",            type: "civilian_lookup", required: true  },
-      { id: "f4", label: "Location of Arrest",       type: "text",            required: true  },
-      { id: "f5", label: "Charges",                  type: "textarea",        required: true  },
-      { id: "f6", label: "Bail Set ($)",             type: "text",            required: false },
-      { id: "f7", label: "Weapons Seized",           type: "checkbox",        required: false },
-      { id: "f8", label: "Drugs Seized",             type: "checkbox",        required: false },
-      { id: "f9", label: "Evidence Collected",       type: "textarea",        required: false },
-      { id: "f10",label: "Narrative",                type: "textarea",        required: true  },
-    ]
+    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    formCode: "TPD-AR-001",
+    signatureSlots: ["Arresting Officer / Badge #", "Supervisor / Badge #", "Booking Officer / Date"],
+    sections: [
+      {
+        id: "s1", title: "Arrest Information", style: "blue",
+        fields: [
+          { id: "f1", label: "Date / Time of Arrest",    type: "datetime",     span: 2, required: true },
+          { id: "f4", label: "Location of Arrest",       type: "text",         span: 3, required: true },
+          { id: "f2", label: "Arresting Officer Badge",  type: "badge_lookup", span: 1, required: true, mono: true },
+        ],
+      },
+      {
+        id: "s2", title: "Arrestee Information", style: "gray",
+        fields: [
+          { id: "f3", label: "Arrestee Name",  type: "text", span: 3, required: true },
+          { id: "f6", label: "Bail Set ($)",   type: "text", span: 2, mono: true },
+        ],
+      },
+      {
+        id: "s3", title: "Charges", style: "gray",
+        fields: [
+          { id: "f5", label: "Charges / Statutes", type: "textarea", span: 4, required: true, minRows: 3 },
+        ],
+      },
+      {
+        id: "s4", title: "Evidence / Seizures", style: "gray",
+        fields: [
+          { id: "f7", label: "Weapons Seized", type: "checkbox", span: 2 },
+          { id: "f8", label: "Drugs Seized",   type: "checkbox", span: 2 },
+          { id: "f9", label: "Evidence Collected", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "s5", title: "Arrest Narrative", style: "gray",
+        fields: [
+          { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+    ],
   },
   {
     id: 4, name: "Incident Report",
-    fields: [
-      { id: "f1", label: "Date/Time",        type: "datetime", required: true  },
-      { id: "f2", label: "Reporting Officer Badge", type: "badge_lookup", required: true },
-      { id: "f3", label: "Incident Type",    type: "dropdown", required: true, options: ["MVA","Property Damage","Theft","Vandalism","Disturbance","Other"] },
-      { id: "f4", label: "Location",         type: "text",     required: true  },
-      { id: "f5", label: "Parties Involved", type: "textarea", required: false },
-      { id: "f6", label: "Injuries Reported",type: "checkbox", required: false },
-      { id: "f7", label: "Property Damage",  type: "checkbox", required: false },
-      { id: "f8", label: "Narrative",        type: "textarea", required: true  },
-    ]
+    agency: "HILLSBOROUGH COUNTY SHERIFF'S OFFICE / LAW ENFORCEMENT",
+    formCode: "HCSO-IR-001",
+    signatureSlots: ["Reporting Officer / Badge #", "Supervisor Signature", "Date"],
+    sections: [
+      {
+        id: "s1", title: "Incident Information", style: "blue",
+        fields: [
+          { id: "f1", label: "Date / Time",              type: "datetime",     span: 2, required: true },
+          { id: "f4", label: "Location",                 type: "text",         span: 3, required: true },
+          { id: "f2", label: "Reporting Officer Badge",  type: "badge_lookup", span: 1, required: true, mono: true },
+          { id: "f3", label: "Incident Type",            type: "dropdown",     span: 4, required: true, options: ["MVA","Property Damage","Theft","Vandalism","Disturbance","Other"] },
+        ],
+      },
+      {
+        id: "s2", title: "Conditions", style: "gray",
+        fields: [
+          { id: "f6", label: "Injuries Reported", type: "checkbox", span: 2 },
+          { id: "f7", label: "Property Damage",   type: "checkbox", span: 2 },
+        ],
+      },
+      {
+        id: "s3", title: "Parties Involved", style: "gray",
+        fields: [
+          { id: "f5", label: "Parties Involved", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "s4", title: "Narrative", style: "gray",
+        fields: [
+          { id: "f8", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+    ],
   },
   {
     id: 5, name: "Field Interview",
-    fields: [
-      { id: "f1", label: "Date/Time",          type: "datetime",        required: true  },
-      { id: "f2", label: "Officer Badge",      type: "badge_lookup",    required: true  },
-      { id: "f3", label: "Subject Name",       type: "civilian_lookup", required: true  },
-      { id: "f4", label: "Location",           type: "text",            required: true  },
-      { id: "f5", label: "Reason for Contact", type: "textarea",        required: true  },
-      { id: "f6", label: "Subject Description",type: "textarea",        required: false },
-      { id: "f7", label: "Associates Present", type: "text",            required: false },
-      { id: "f8", label: "Outcome",            type: "dropdown",        required: true, options: ["No Action","Warned","Cited","Arrested","Referred"] },
-      { id: "f9", label: "Notes",              type: "textarea",        required: false },
-    ]
+    agency: "HILLSBOROUGH COUNTY LAW ENFORCEMENT",
+    formCode: "HCSO-FI-001",
+    signatureSlots: ["Officer Signature / Badge #", "Date"],
+    sections: [
+      {
+        id: "s1", title: "Contact Information", style: "blue",
+        fields: [
+          { id: "f1", label: "Date / Time",       type: "datetime",     span: 2, required: true },
+          { id: "f4", label: "Location",          type: "text",         span: 3, required: true },
+          { id: "f2", label: "Officer Badge #",    type: "badge_lookup", span: 1, required: true, mono: true },
+          { id: "f3", label: "Subject Name",      type: "text",         span: 3, required: true },
+          { id: "f7", label: "Associates Present",type: "text",         span: 1 },
+        ],
+      },
+      {
+        id: "s2", title: "Contact Details", style: "gray",
+        fields: [
+          { id: "f5", label: "Reason for Contact",  type: "textarea", span: 4, required: true, minRows: 2 },
+          { id: "f6", label: "Subject Description", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "s3", title: "Outcome", style: "gray",
+        fields: [
+          { id: "f8", label: "Outcome", type: "dropdown", span: 4, required: true, options: ["No Action","Warned","Cited","Arrested","Referred"] },
+        ],
+      },
+      {
+        id: "s4", title: "Notes", style: "gray",
+        fields: [
+          { id: "f9", label: "Additional Notes", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+    ],
   },
   {
     id: 6, name: "Supplement Report",
-    fields: [
-      { id: "f1", label: "Original Case Number",      type: "text",         required: true  },
-      { id: "f2", label: "Date/Time",                 type: "datetime",     required: true  },
-      { id: "f3", label: "Supplement Author Badge",   type: "badge_lookup", required: true  },
-      { id: "f4", label: "Supplement Narrative",      type: "textarea",     required: true  },
-      { id: "f5", label: "New Evidence",              type: "textarea",     required: false },
-    ]
+    agency: "HILLSBOROUGH COUNTY LAW ENFORCEMENT",
+    formCode: "HCSO-SUPP-001",
+    signatureSlots: ["Supplement Author / Badge #", "Supervisor Approval", "Date"],
+    sections: [
+      {
+        id: "s1", title: "Supplement Reference", style: "blue",
+        fields: [
+          { id: "f1", label: "Original Case Number",  type: "text",         span: 3, required: true, mono: true },
+          { id: "f2", label: "Date / Time",           type: "datetime",     span: 2 },
+          { id: "f3", label: "Author Badge #",        type: "badge_lookup", span: 1, mono: true },
+        ],
+      },
+      {
+        id: "s2", title: "Supplement Narrative", style: "gray",
+        fields: [
+          { id: "f4", label: "Supplement Narrative", type: "textarea", span: 4, required: true, minRows: 6 },
+        ],
+      },
+      {
+        id: "s3", title: "New Evidence / Information", style: "gray",
+        fields: [
+          { id: "f5", label: "New Evidence", type: "textarea", span: 4, minRows: 3 },
+        ],
+      },
+    ],
   },
 ];
 

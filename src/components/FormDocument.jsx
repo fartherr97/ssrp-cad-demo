@@ -1,6 +1,6 @@
 /* PDF-style government form document components */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 /* ── Primitives ──────────────────────────────────────────────────── */
 
@@ -546,9 +546,105 @@ export function GenericFormDoc({ template, data = {}, editable, onChange, meta =
   );
 }
 
+/* ── Dynamic form renderer — renders any sections-based template ─ */
+
+function packRows(fields, cols = 4) {
+  const rows = [];
+  let row = [];
+  let rowSpan = 0;
+  for (const f of fields) {
+    const span = Math.min(f.span || 1, cols);
+    if (rowSpan + span > cols && row.length > 0) {
+      rows.push(row);
+      row = [f];
+      rowSpan = span;
+    } else {
+      row.push(f);
+      rowSpan += span;
+    }
+  }
+  if (row.length) rows.push(row);
+  return rows;
+}
+
+export function DynamicFormDoc({ template, data = {}, editable, onChange, meta = {} }) {
+  const fv = (k) => (data[k] !== undefined ? data[k] : '');
+  const set = (k) => (v) => onChange && onChange(k, v);
+  const sections = template?.sections || [];
+
+  return (
+    <>
+      <FormDocHeader
+        agency={template?.agency || 'HILLSBOROUGH COUNTY LAW ENFORCEMENT'}
+        title={template?.name || 'Report'}
+        subtitle={template?.formCode ? `Form ${template.formCode} · For Official Use Only` : 'For Official Use Only'}
+        caseNo={meta.caseNumber}
+        status={meta.status}
+      />
+      {sections.map(section => {
+        const inlineFields  = section.fields.filter(f => f.type !== 'checkbox' && f.type !== 'textarea');
+        const checkboxFields = section.fields.filter(f => f.type === 'checkbox');
+        const narrativeFields = section.fields.filter(f => f.type === 'textarea');
+        const rows = packRows(inlineFields);
+        return (
+          <React.Fragment key={section.id}>
+            <FormSection
+              title={section.title}
+              blue={section.style === 'blue'}
+              dark={section.style === 'dark'}
+            />
+            {rows.map((row, ri) => (
+              <FormRow key={ri}>
+                {row.map(field => (
+                  <FormCell
+                    key={field.id}
+                    label={field.label}
+                    value={fv(field.id)}
+                    onChange={set(field.id)}
+                    type={field.type}
+                    options={field.options || []}
+                    mono={field.mono}
+                    colSpan={field.span || 1}
+                    required={field.required}
+                    editable={editable}
+                  />
+                ))}
+              </FormRow>
+            ))}
+            {checkboxFields.length > 0 && (
+              <FormCheckboxes
+                items={checkboxFields.map(f => ({ id: f.id, label: f.label }))}
+                values={data}
+                onChange={(k, v) => onChange && onChange(k, v)}
+                editable={editable}
+              />
+            )}
+            {narrativeFields.map(field => (
+              <FormNarrative
+                key={field.id}
+                label={field.label.toUpperCase()}
+                value={fv(field.id)}
+                onChange={set(field.id)}
+                editable={editable}
+                minRows={field.minRows || 4}
+              />
+            ))}
+          </React.Fragment>
+        );
+      })}
+      <FormSignatureRow slots={template?.signatureSlots || ['Officer Signature / Badge #', 'Supervisor Signature', 'Date']} />
+      <FormDocFooter
+        left={template?.formCode ? `${template.formCode} Rev. 2026-01` : 'FORM Rev. 2026-01'}
+        right="Page 1 of 1"
+      />
+    </>
+  );
+}
+
 /* ── Route to the right form by type name ────────────────────── */
 export function ReportDocument({ type, template, data, editable, onChange, meta }) {
   const props = { data, editable, onChange, meta };
+  if (template?.sections) return <DynamicFormDoc template={template} {...props} />;
   switch (type) {
     case 'Traffic Stop':     return <TrafficStopDoc {...props} />;
     case 'Use of Force':     return <UseOfForceDoc {...props} />;

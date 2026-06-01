@@ -15,6 +15,7 @@ import AdminCenter from './pages/AdminCenter';
 import BanManagement from './pages/BanManagement';
 import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
+import FormBuilder from './pages/FormBuilder';
 
 function CADApp() {
   const { state, dispatch: cadDispatch } = useCAD();
@@ -38,7 +39,8 @@ function CADApp() {
     admin:     <AdminCenter />,
     bans:      <BanManagement />,
     map:       <LiveMap />,
-    mdt:       <MDT />,
+    mdt:          <MDT />,
+    formbuilder:  <FormBuilder />,
   };
 
   return (

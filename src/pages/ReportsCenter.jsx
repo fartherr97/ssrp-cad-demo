@@ -167,7 +167,9 @@ export default function ReportsCenter() {
                     onMouseLeave={e => { e.currentTarget.style.background = 'var(--n-bg-card)'; }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--n-text)', marginBottom: 4 }}>{t.name}</div>
                     <div style={{ fontSize: 9, color: 'var(--n-text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                      {t.fields.length} fields
+                      {t.sections
+                        ? `${t.sections.reduce((a, s) => a + s.fields.length, 0)} fields · ${t.sections.length} sections`
+                        : `${t.fields?.length || 0} fields`}
                     </div>
                   </button>
                 ))}

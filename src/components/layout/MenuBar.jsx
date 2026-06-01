@@ -30,9 +30,10 @@ const NAV_ITEMS = [
 ];
 
 const ADMIN_ITEMS = [
-  { page: 'admin', label: 'Admin' },
-  { page: 'penal', label: 'Penal' },
-  { page: 'bans',  label: 'Bans'  },
+  { page: 'admin',       label: 'Admin'   },
+  { page: 'penal',       label: 'Penal'   },
+  { page: 'bans',        label: 'Bans'    },
+  { page: 'formbuilder', label: 'Builder' },
 ];
 
 const STATUS_COLORS = {
@@ -202,7 +203,7 @@ export default function MenuBar() {
             <button
               className="cad-mobile-nav-item"
               style={{ color: '#80c8f0', borderBottom: '1px solid var(--n-border)', fontWeight: 600 }}
-              onClick={() => { go('dispatch'); /* trigger create */ setMobileOpen(false); }}
+              onClick={() => { go('dispatch'); setMobileOpen(false); }}
             >
               + Create Call
             </button>

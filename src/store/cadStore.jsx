@@ -219,6 +219,10 @@ function reducer(state, action) {
       const reportTemplates = state.reportTemplates.map(t => t.id === action.payload.id ? action.payload : t);
       return { ...state, reportTemplates };
     }
+    case 'DELETE_REPORT_TEMPLATE': {
+      const reportTemplates = state.reportTemplates.filter(t => t.id !== action.payload);
+      return { ...state, reportTemplates };
+    }
 
     case 'ADD_CHARGE': {
       const newCharge = { ...action.payload, id: state.nextId };

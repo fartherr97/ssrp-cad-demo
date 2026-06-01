@@ -259,15 +259,15 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                     className={`pri-${c.priority}${selectedCallId === c.id ? ' row-selected' : ''}`}
                     onClick={() => { setSelectedCallId(c.id); setSelectedUnitId(null); setMobileTab('detail'); }}
                   >
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--n-text-data)', fontWeight: 600 }}>{c.id}</td>
-                    <td style={{ fontWeight: 500 }}>{c.nature}</td>
-                    <td style={{ color: 'var(--n-text-dim)' }}>{c.location}</td>
-                    <td style={{ color: 'var(--n-text-dim)' }}>{c.city}</td>
-                    <td style={{ color: 'var(--n-text-muted)', fontSize: 10 }}>{c.county}</td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#22ff88', fontWeight: 700 }}>{c.id}</td>
+                    <td style={{ fontWeight: 500, color: '#e8e8e8' }}>{c.nature}</td>
+                    <td style={{ color: '#ddee44', fontSize: 10 }}>{c.location}</td>
+                    <td style={{ color: '#44bbdd', fontSize: 10 }}>{c.city}</td>
+                    <td style={{ color: '#336688', fontSize: 10 }}>{c.county}</td>
                     <td><PriBadge p={c.priority} /></td>
                     <td><CallStatus status={c.status} /></td>
-                    <td>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span style={{ color: 'var(--n-text-muted)' }}>—</span>}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: c.units.length > 0 ? 'var(--st-enrt-text)' : 'var(--n-text-muted)' }}>
+                    <td>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span style={{ color: '#334455' }}>—</span>}</td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: c.units.length > 0 ? '#22ff88' : '#334455' }}>
                       {c.units.length > 0 ? c.units.join(', ') : '—'}
                     </td>
                   </tr>
@@ -343,16 +343,16 @@ export default function DispatchCenter({ showCreateForm: externalShow, onCloseCr
                       setMobileTab('detail');
                     }}
                   >
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: 'var(--n-text-data)' }}>{o.unitId}</td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: '#66ddff' }}>{o.unitId}</td>
                     <td><StatusBadge status={o.status} /></td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: o.callId ? 'var(--pr3-text)' : 'var(--n-text-muted)' }}>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: o.callId ? '#ffcc44' : '#334455' }}>
                       {o.callId || '—'}
                     </td>
                     <td><AgencyBadge agency={o.deptShort} /></td>
-                    <td style={{ color: 'var(--n-text-dim)', fontSize: 10 }}>{o.location}</td>
-                    <td style={{ color: 'var(--n-text-dim)', fontSize: 10 }}>
+                    <td style={{ color: '#557799', fontSize: 10 }}>{o.location}</td>
+                    <td style={{ color: '#c8c8c8', fontSize: 10 }}>
                       {o.name}
-                      {o.rank && <span style={{ color: 'var(--n-text-muted)', marginLeft: 4 }}>· {o.rank}</span>}
+                      {o.rank && <span style={{ color: '#446688', marginLeft: 4 }}>· {o.rank}</span>}
                     </td>
                   </tr>
                 ))}
