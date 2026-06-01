@@ -20,7 +20,7 @@ export const TEN_CODES = [
   { id: 17, code: '10-20',  label: 'Location' },
   { id: 18, code: '10-22',  label: 'Disregard' },
   { id: 19, code: '10-23',  label: 'Standby' },
-  { id: 20, code: '10-24',  label: 'TROUBLE — Send Help' },
+  { id: 20, code: '10-24',  label: 'TROUBLE * Send Help' },
   { id: 21, code: '10-76',  label: 'En Route' },
   { id: 22, code: '10-97',  label: 'Arrived on Scene' },
 ];
@@ -106,9 +106,9 @@ export const NOTIFICATION_TONES = [
 ];
 
 export const ADMIN_SERVERS = [
-  { id: 1, name: 'SSRP — Primary',  ip: 'play.ssrp.us:30120',  status: 'ONLINE',  players: '112 / 128', map: 'Sonoran County' },
-  { id: 2, name: 'SSRP — Overflow', ip: 'play2.ssrp.us:30120', status: 'ONLINE',  players: '38 / 64',   map: 'Sonoran County' },
-  { id: 3, name: 'SSRP — Staff',    ip: 'staff.ssrp.us:30120', status: 'OFFLINE', players: '0 / 32',    map: 'Sonoran County' },
+  { id: 1, name: 'SSRP * Primary',  ip: 'play.ssrp.us:30120',  status: 'ONLINE',  players: '112 / 128', map: 'Sonoran County' },
+  { id: 2, name: 'SSRP * Overflow', ip: 'play2.ssrp.us:30120', status: 'ONLINE',  players: '38 / 64',   map: 'Sonoran County' },
+  { id: 3, name: 'SSRP * Staff',    ip: 'staff.ssrp.us:30120', status: 'OFFLINE', players: '0 / 32',    map: 'Sonoran County' },
 ];
 
 export const LOOKUP_TYPES = [
@@ -133,7 +133,7 @@ export const COMMUNITY_CONFIG = {
   timezone: 'America/New_York (EST)',
   defaultLanguage: 'English (US)',
   maxCharacters: 5,
-  description: 'Florida-based serious roleplay community — emergency services, civilian operations, and command.',
+  description: 'Florida-based serious roleplay community * emergency services, civilian operations, and command.',
 };
 
 export const GEO_SETTINGS = {
@@ -145,7 +145,7 @@ export const GEO_SETTINGS = {
 export const LOGIN_PAGE_CONFIG = {
   title: 'Sunshine State Roleplay',
   subtitle: 'Computer Aided Dispatch',
-  description: 'Unified platform for Emergency Services, Civilian Operations, and Command — TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.',
+  description: 'Unified platform for Emergency Services, Civilian Operations, and Command * TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.',
   logoUrl: 'https://cdn.ssrp.us/images/ssrp.png',
   primaryColor: '#3a88e8',
   backgroundStyle: 'Gradient (Deep Blue)',
@@ -163,7 +163,7 @@ export const ACCOUNT_RESTRICTIONS = {
 
 export const DISCORD_PRESENCE = {
   enabled: true,
-  details: 'On Duty — {department}',
+  details: 'On Duty * {department}',
   state: 'Unit {callsign}',
   largeImage: 'ssrp_logo',
   showElapsed: true,

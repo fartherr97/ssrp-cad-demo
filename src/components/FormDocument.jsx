@@ -118,7 +118,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         ) : type === 'dropdown' ? (
           <select style={{ ...inputStyle, cursor: 'pointer' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
-            <option value="">—</option>
+            <option value="">*</option>
             {options.map(o => <option key={o}>{o}</option>)}
           </select>
         ) : (
@@ -130,7 +130,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         )
       ) : (
-        <span style={valueStyle}>{value || <span style={{ color: '#aaa' }}>—</span>}</span>
+        <span style={valueStyle}>{value || <span style={{ color: '#aaa' }}>*</span>}</span>
       )}
     </div>
   );
@@ -257,7 +257,7 @@ export function FormDocFooter({ left, right }) {
   return (
     <div style={{ ...S_FORM_DOC_FOOTER_S, display: 'flex', justifyContent: 'space-between' }}>
       <span>{left}</span>
-      <span>SSRP CAD SYSTEM — HILLSBOROUGH COUNTY</span>
+      <span>SSRP CAD SYSTEM * HILLSBOROUGH COUNTY</span>
       <span>{right}</span>
     </div>
   );
@@ -334,7 +334,7 @@ export function UseOfForceDoc({ data = {}, editable, onChange, meta = {} }) {
         caseNo={meta.caseNumber}
         status={meta.status}
       />
-      {meta.status === 'Pending Review' && <FormAlert text="PENDING SUPERVISOR REVIEW — DO NOT DISTRIBUTE" level="orange" />}
+      {meta.status === 'Pending Review' && <FormAlert text="PENDING SUPERVISOR REVIEW * DO NOT DISTRIBUTE" level="orange" />}
       <FormSection title="Incident Information" blue />
       <FormRow>
         <FormCell label="Date / Time" value={fv('f1')} onChange={set('f1')} type="datetime" editable={editable} colSpan={2} />
@@ -592,7 +592,7 @@ export function GenericFormDoc({ template, data = {}, editable, onChange, meta =
   );
 }
 
-/* ── Dynamic form renderer — renders any sections-based template ─ */
+/* ── Dynamic form renderer * renders any sections-based template ─ */
 
 function packRows(fields, cols = 4) {
   const rows = [];
@@ -718,7 +718,7 @@ function ReturnHeader({ type, title }) {
 function ReturnFooter() {
   return (
     <div style={S_RECORD_RETURN_FOOTER}>
-      END OF RETURN — HCSO RMS — {new Date().toLocaleString().toUpperCase()}
+      END OF RETURN * RMS * {new Date().toLocaleString().toUpperCase()}
     </div>
   );
 }
@@ -739,12 +739,12 @@ export function RecordReturn({ type, subject, data }) {
     const dlSusp = data.dlStatus === 'SUSPENDED';
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="PERSON" title={`DR — Name: ${data.firstName} ${data.lastName}`} />
+        <ReturnHeader type="PERSON" title={`DR * Name: ${data.firstName} ${data.lastName}`} />
         {hasWarrant && (
-          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE — DO NOT APPROACH WITHOUT BACKUP ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE * DO NOT APPROACH WITHOUT BACKUP ***</div>
         )}
         {dlSusp && (
-          <div style={S_RECORD_RETURN_ALERT_WARN}>*** DRIVER LICENSE SUSPENDED — NO VALID DL ***</div>
+          <div style={S_RECORD_RETURN_ALERT_WARN}>*** DRIVER LICENSE SUSPENDED * NO VALID DL ***</div>
         )}
         <div style={S_RECORD_RETURN_BODY}>
           <div style={S_RECORD_RETURN_SECTION}>
@@ -802,9 +802,9 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'VEHICLE' && data) {
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="VEHICLE" title={`VR — Plate: ${data.plate}`} />
+        <ReturnHeader type="VEHICLE" title={`VR * Plate: ${data.plate}`} />
         {data.stolen && (
-          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE — CAUTION ADVISED — CONTACT LOCAL LE IMMEDIATELY ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE * CAUTION ADVISED * CONTACT LOCAL LE IMMEDIATELY ***</div>
         )}
         {subject && subject.flags?.includes('WARRANT') && (
           <div style={S_RECORD_RETURN_ALERT_WARN}>*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>
@@ -828,7 +828,7 @@ export function RecordReturn({ type, subject, data }) {
           {line('Color', data.color)}
           {line('Registration', data.regStatus)}
           {line('Reg Expiry', data.regExpiry)}
-          {line('Stolen', data.stolen ? 'YES — REPORTED STOLEN' : 'No')}
+          {line('Stolen', data.stolen ? 'YES * REPORTED STOLEN' : 'No')}
 
           {subject && (
             <>
@@ -866,9 +866,9 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'WARRANT' && data) {
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="WARRANT" title={`WR — Subject: ${data.civilianName}`} />
+        <ReturnHeader type="WARRANT" title={`WR * Subject: ${data.civilianName}`} />
         {data.status === 'ACTIVE' && (
-          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT — SUBJECT MAY BE APPREHENDED ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT * SUBJECT MAY BE APPREHENDED ***</div>
         )}
         <div style={S_RECORD_RETURN_BODY}>
           <div style={S_RECORD_RETURN_SECTION}>

@@ -37,7 +37,7 @@ export default function CitizenLaws() {
       <PortalHeader
         icon={MdMenuBook}
         title="State Laws & Statutes"
-        subtitle="Public reference for the Florida penal code — fines, jail time, and classifications."
+        subtitle="Public reference for the Florida penal code * fines, jail time, and classifications."
         accent={accent}
       />
 
@@ -118,7 +118,7 @@ export default function CitizenLaws() {
                   </div>
                   <div>
                     <span className="text-slate-500">Jail: </span>
-                    <span className="text-amber-400 font-semibold">{law.jailTime || '—'}</span>
+                    <span className="text-amber-400 font-semibold">{law.jailTime || '*'}</span>
                   </div>
                   {law.points != null && (
                     <div>

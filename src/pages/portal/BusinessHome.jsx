@@ -35,7 +35,7 @@ export default function BusinessHome() {
             <MdStore size={34} className="text-cyan-400" />
           </div>
           <div className="text-lg font-extrabold text-white mb-2">
-            Welcome — let's get you set up
+            Welcome * let's get you set up
           </div>
           <div className="text-sm text-slate-400 max-w-[440px] mx-auto mb-[22px] leading-relaxed">
             You don't have a registered business yet. Register one to manage your profile,

@@ -50,7 +50,7 @@ export default function FileReport() {
     dispatch({
       type: 'ADD_REPORT',
       payload: {
-        type: `Citizen — ${form.reportType}`,
+        type: `Citizen * ${form.reportType}`,
         caseNumber,
         officerBadge: 'CITIZEN',
         summary: form.description,

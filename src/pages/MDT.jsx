@@ -189,7 +189,7 @@ export default function MDT() {
                 </div>
               ) : results.length === 0 ? (
                 <div className="bg-app-panel border border-border-base rounded-[3px] p-4 font-mono text-[11.5px] text-cad-dim">
-                  <div className="text-amber-400 mb-1.5">QUERY COMPLETE — NO RECORDS FOUND</div>
+                  <div className="text-amber-400 mb-1.5">QUERY COMPLETE * NO RECORDS FOUND</div>
                   <div>Search terms: "{query}"</div>
                   <div className="text-border-strong mt-3">{'>'} READY_</div>
                 </div>

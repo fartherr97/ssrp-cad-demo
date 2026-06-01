@@ -70,7 +70,7 @@ export default function ReportsCenter() {
       payload: {
         type: selectedTemplate.name,
         caseNumber: caseNum,
-        officerBadge: me?.badge || currentUser?.badge || '—',
+        officerBadge: me?.badge || currentUser?.badge || '*',
         callId: formValues.callId || null,
         civilianId: null,
         summary: formValues.narrative || formValues.f10 || formValues.f4 || formValues.f8 ||
@@ -203,7 +203,7 @@ export default function ReportsCenter() {
                 {selectedTemplate.name}
               </span>
               <span className="text-[9px] text-cad-muted font-mono">
-                {me?.badge || '—'} · {me?.name || currentUser?.name}
+                {me?.badge || '*'} · {me?.name || currentUser?.name}
               </span>
               <div className="ml-auto flex gap-2 items-center">
                 {hasSig && !sigApplied && (
@@ -315,7 +315,7 @@ export default function ReportsCenter() {
             {!hasSig && (
               <div className="bg-sky-500/[0.08] border border-sky-500/20 rounded p-2.5 px-4 text-[11px] text-sky-400 text-center max-w-[280px]">
                 <div className="font-semibold mb-1">✍ Set up your signature</div>
-                <div className="text-sky-700 mb-2">Apply your saved signature to reports with one click — like DocuSign.</div>
+                <div className="text-sky-700 mb-2">Apply your saved signature to reports with one click * like DocuSign.</div>
                 <button onClick={() => navigate('/profile')} className="text-[11px] text-sky-500 bg-transparent border border-sky-500 cursor-pointer px-3 py-1">
                   Go to Profile →
                 </button>

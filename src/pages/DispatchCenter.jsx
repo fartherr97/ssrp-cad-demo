@@ -177,9 +177,9 @@ export default function DispatchCenter() {
                   <td className={`${S_TABLE_TD} text-slate-300`}>{c.county}</td>
                   <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
                   <td className={S_TABLE_TD}><CallStatus status={c.status} /></td>
-                  <td className={S_TABLE_TD}>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">—</span>}</td>
+                  <td className={S_TABLE_TD}>{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">*</span>}</td>
                   <td className={`${S_TABLE_TD} font-mono ${c.units.length > 0 ? 'text-green-400' : 'text-slate-600'}`}>
-                    {c.units.length > 0 ? c.units.join(', ') : '—'}
+                    {c.units.length > 0 ? c.units.join(', ') : '*'}
                   </td>
                 </tr>
               );
@@ -243,7 +243,7 @@ export default function DispatchCenter() {
                 >
                   <td className={`${S_TABLE_TD} font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
                   <td className={S_TABLE_TD}><StatusBadge status={o.status} /></td>
-                  <td className={`${S_TABLE_TD} font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '—'}</td>
+                  <td className={`${S_TABLE_TD} font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '*'}</td>
                   <td className={`${S_TABLE_TD} text-white font-semibold`}>{o.deptShort}</td>
                   <td className={`${S_TABLE_TD} text-slate-300`}>{o.location}</td>
                   <td className={`${S_TABLE_TD} text-white font-medium`}>
@@ -281,10 +281,10 @@ export default function DispatchCenter() {
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Priority</label>
                   <select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
-                    <option value={1}>P1 — Critical / Life Safety</option>
-                    <option value={2}>P2 — High</option>
-                    <option value={3}>P3 — Medium</option>
-                    <option value={4}>P4 — Low / Routine</option>
+                    <option value={1}>P1 * Critical / Life Safety</option>
+                    <option value={2}>P2 * High</option>
+                    <option value={3}>P3 * Medium</option>
+                    <option value={4}>P4 * Low / Routine</option>
                   </select>
                 </div>
               </div>

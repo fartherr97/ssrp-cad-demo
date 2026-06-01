@@ -222,7 +222,7 @@ export default function SearchPage() {
                 </div>
                 {activeWarrants.length > 0 && (
                   <span className="ml-auto bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm px-2 py-0.5 text-[11px] font-bold">
-                    WANTED — {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
+                    WANTED * {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
                   </span>
                 )}
               </div>
@@ -436,10 +436,10 @@ function SummaryTab({ civ, civVehicles, activeWarrants }) {
             ) : (
               civVehicles.slice(0, 5).map((v, i) => (
                 <tr key={v.id} className={i % 2 === 0 ? 'bg-[#0b0d14]' : ''}>
-                  <td className="px-2 py-1 text-[#374151]">—</td>
+                  <td className="px-2 py-1 text-[#374151]">*</td>
                   <td className="px-2 py-1 text-sky-300">{v.plate}</td>
                   <td className="px-2 py-1 text-[#9ca3af]">Vehicle on file</td>
-                  <td className="px-2 py-1 text-[#6b7280]">—</td>
+                  <td className="px-2 py-1 text-[#6b7280]">*</td>
                   <td className="px-2 py-1"><StatusBadge status={v.regStatus} /></td>
                 </tr>
               ))
@@ -455,7 +455,7 @@ function HistoryTab({ civHistory }) {
   if (civHistory.length === 0) {
     return (
       <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
-        *** SUBJECT RETURNS CLEAR — NO CRIMINAL HISTORY ON FILE ***
+        *** SUBJECT RETURNS CLEAR * NO CRIMINAL HISTORY ON FILE ***
       </div>
     );
   }
@@ -491,7 +491,7 @@ function WarrantsTab({ civWarrants }) {
   if (civWarrants.length === 0) {
     return (
       <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
-        *** SUBJECT RETURNS CLEAR — NO ACTIVE WARRANTS ***
+        *** SUBJECT RETURNS CLEAR * NO ACTIVE WARRANTS ***
       </div>
     );
   }
@@ -542,7 +542,7 @@ function VehiclesTab({ civVehicles }) {
               <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.color}</td>
               <td className="px-2.5 py-[5px]"><StatusBadge status={v.regStatus} /></td>
               <td className="px-2.5 py-[5px]"><StatusBadge status={v.stolen ? 'ACTIVE' : 'VALID'} /></td>
-              <td className="px-2.5 py-[5px] text-[#374151]">{v.flags?.join(', ') || '—'}</td>
+              <td className="px-2.5 py-[5px] text-[#374151]">{v.flags?.join(', ') || '*'}</td>
             </tr>
           ))}
         </tbody>

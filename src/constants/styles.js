@@ -16,11 +16,11 @@ export const S_BTN_GHOST     = `${_BTN_BASE} px-3 py-1.5 text-sm bg-transparent 
 export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-yellow-900/40 hover:bg-yellow-800/50 text-yellow-600 border-yellow-700/30`;
 export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-900/60 hover:bg-orange-800/70 text-orange-300 border-orange-700/30`;
 
-// sm / xs — append smaller padding/size to any button class string
+// sm / xs * append smaller padding/size to any button class string
 export const sm = (base) => base.replace('px-4 py-2 text-sm', 'px-3 py-1.5 text-xs');
 export const xs = (base) => base.replace('px-4 py-2 text-sm', 'px-2 py-0.5 text-[11px]');
 
-// No-ops — hover is now built into class strings via hover: prefix
+// No-ops * hover is now built into class strings via hover: prefix
 export const btnHoverOn  = undefined;
 export const btnHoverOff = undefined;
 export const btnActiveOn = undefined;
@@ -188,7 +188,7 @@ export const S_RECORD_RETURN_HEADER = 'flex items-center gap-1.5 text-[10px] fon
 export const S_RECORD_RETURN_MAIN   = 'text-[13px] font-semibold text-slate-200';
 export const S_RECORD_RETURN_SUB    = 'text-[11px] text-slate-500';
 
-// NCIC terminal teletype aesthetics — must remain as style objects
+// NCIC terminal teletype aesthetics * must remain as style objects
 const FONT_MONO = '"Courier New"';
 export const S_RECORD_RETURN_ALERT      = { padding: '6px 14px', background: '#c41818', color: '#fff', fontFamily: `${FONT_MONO}, monospace`, fontSize: 11, fontWeight: 700, letterSpacing: '0.4px' };
 export const S_RECORD_RETURN_ALERT_WARN = { ...S_RECORD_RETURN_ALERT, background: '#c4621a' };
@@ -210,7 +210,7 @@ export const S_DETAIL_VALUE_MONO = 'text-[13px] text-slate-200 flex-1 font-mono'
 // ─── Form document ─────────────────────────────────────────
 
 export const S_FORM_DOC_WRAP    = 'flex flex-col flex-1 overflow-hidden bg-app-bg';
-// Paper document (white background, print-fidelity) — must remain style objects
+// Paper document (white background, print-fidelity) * must remain style objects
 export const S_FORM_DOC         = { background: '#ffffff', color: '#000000', fontFamily: "'Arial', 'Helvetica', sans-serif", fontSize: 11, width: '100%', maxWidth: 800, border: '1px solid #888', boxShadow: '0 6px 28px rgba(0,0,0,0.7)', flexShrink: 0 };
 const _S_FORM_DOC_ALERT         = { padding: '5px 10px', fontSize: 9, fontWeight: 700, letterSpacing: '0.4px', textTransform: 'uppercase', borderBottom: '1px solid #000', display: 'flex', gap: 12 };
 export const S_FORM_DOC_FOOTER_S   = { padding: '4px 10px', fontSize: 7.5, color: '#666', textAlign: 'center', background: '#f4f4f4', borderTop: '1px solid #ccc', letterSpacing: '0.2px' };

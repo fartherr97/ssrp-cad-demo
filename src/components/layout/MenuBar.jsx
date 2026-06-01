@@ -139,10 +139,10 @@ export default function MenuBar() {
           </div>
           <div className="flex items-center gap-[5px] px-2.5 text-[9px] font-mono text-cad-muted border-l border-border-base shrink-0">
             <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT_COLOR[myStatus] || 'bg-[#2e4258]'}`} />
-            <span className="text-cad-dim">{me?.badge || '—'} · {me?.deptShort || '—'}</span>
+            <span className="text-cad-dim">{me?.badge || '*'} · {me?.deptShort || '*'}</span>
           </div>
           <Clock />
-          {/* Hamburger — lives here so it's always on the far right */}
+          {/* Hamburger * lives here so it's always on the far right */}
           <button
             className="cad-mobile-toggle border-l border-border-strong ml-0"
             onClick={() => setMobileOpen(o => !o)}

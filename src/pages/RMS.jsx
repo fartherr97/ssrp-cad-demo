@@ -54,7 +54,7 @@ export default function RMS() {
       {/* Page header */}
       <div className="flex items-center gap-2.5">
         <span className="text-slate-200 text-sm font-bold tracking-[1px]">RECORDS MANAGEMENT SYSTEM</span>
-        <span className="text-slate-600 text-[11px]">— Hillsborough County, FL</span>
+        <span className="text-slate-600 text-[11px]">* Hillsborough County, FL</span>
       </div>
 
       {/* Tabs */}
@@ -192,7 +192,7 @@ export default function RMS() {
               <form onSubmit={submitArrest} className="flex flex-col gap-2.5">
                 <FormField label="SUBJECT">
                   <select value={arrestForm.civilianId} onChange={e => setA('civilianId', e.target.value)} required className={S_SELECT}>
-                    <option value="">— Select Civilian —</option>
+                    <option value="">* Select Civilian *</option>
                     {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
                   </select>
                 </FormField>
@@ -201,7 +201,7 @@ export default function RMS() {
                     {penalCode.map(p => (
                       <label key={p.id} className={`flex items-center gap-1.5 px-1 py-0.5 cursor-pointer text-[11px] ${arrestForm.charges.includes(p.name) ? 'text-sky-300' : 'text-slate-600'}`}>
                         <input type="checkbox" checked={arrestForm.charges.includes(p.name)} onChange={e => setA('charges', e.target.checked ? [...arrestForm.charges, p.name] : arrestForm.charges.filter(c => c !== p.name))} className="accent-sky-700" />
-                        {p.code} — {p.name}
+                        {p.code} * {p.name}
                       </label>
                     ))}
                   </div>
@@ -240,7 +240,7 @@ export default function RMS() {
               <form onSubmit={submitWarrant} className="flex flex-col gap-2.5">
                 <FormField label="SUBJECT">
                   <select value={warrantForm.civilianId} onChange={e => setW('civilianId', e.target.value)} required className={S_SELECT}>
-                    <option value="">— Select Civilian —</option>
+                    <option value="">* Select Civilian *</option>
                     {civilians.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
                   </select>
                 </FormField>
@@ -251,8 +251,8 @@ export default function RMS() {
                 </FormField>
                 <FormField label="CHARGE">
                   <select value={warrantForm.charge} onChange={e => setW('charge', e.target.value)} required className={S_SELECT}>
-                    <option value="">— Select Charge —</option>
-                    {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} — {p.name}</option>)}
+                    <option value="">* Select Charge *</option>
+                    {penalCode.map(p => <option key={p.id} value={p.name}>{p.code} * {p.name}</option>)}
                   </select>
                 </FormField>
                 <FormField label="NOTES">

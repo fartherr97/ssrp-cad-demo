@@ -108,7 +108,7 @@ export default function TopBar() {
             {me?.rank ? `${me.rank.toUpperCase().slice(0, 3)}. ` : ''}{currentUser?.name}
           </div>
           <div className="text-[9px] font-mono text-cad-muted tracking-wide">
-            {me?.badge || '—'} · {me?.deptShort || '—'} · {myStatus}
+            {me?.badge || '*'} · {me?.deptShort || '*'} · {myStatus}
           </div>
         </div>
       </div>

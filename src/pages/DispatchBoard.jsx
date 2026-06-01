@@ -56,7 +56,7 @@ export default function DispatchBoard() {
 
   const TABS = ['ALL', 'PENDING', 'ACTIVE', 'ENRT'];
 
-  // Unit status dot color (runtime dynamic — kept in style)
+  // Unit status dot color (runtime dynamic * kept in style)
   const dotColor = (status) => ({
     AVAILABLE: '#22dd66',
     BUSY:      '#ff4444',
@@ -78,8 +78,8 @@ export default function DispatchBoard() {
         ))}
         <div className="w-px h-[18px] bg-border-base mx-1" />
         <span className="text-[9px] text-cad-muted font-mono">
-          UNIT: <span className="text-cad-data">{me?.unitId || '—'}</span>
-          {myCall && <> · CALL: <span className="text-yellow-300">{myCall.id} — {myCall.nature}</span></>}
+          UNIT: <span className="text-cad-data">{me?.unitId || '*'}</span>
+          {myCall && <> · CALL: <span className="text-yellow-300">{myCall.id} * {myCall.nature}</span></>}
         </span>
       </div>
 
@@ -131,7 +131,7 @@ export default function DispatchBoard() {
                         {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
                       </td>
                       <td className={`${S_TABLE_TD} font-mono text-[10px] text-cad-dim`}>
-                        {c.timestamp?.split(' ')[1] || '—'}
+                        {c.timestamp?.split(' ')[1] || '*'}
                       </td>
                     </tr>
                   ))}
@@ -146,11 +146,11 @@ export default function DispatchBoard() {
               <div className="flex items-start gap-3">
                 <div className="flex-1">
                   <div className="text-xs font-semibold mb-0.5">
-                    {selCall.nature} — <span className="text-cad-dim font-normal">{selCall.location}, {selCall.city}</span>
+                    {selCall.nature} * <span className="text-cad-dim font-normal">{selCall.location}, {selCall.city}</span>
                   </div>
                   <div className="text-[11px] text-cad-dim leading-[1.5]">{selCall.description}</div>
                   <div className="text-[10px] text-cad-muted font-mono mt-[3px]">
-                    Reporting Party: {selCall.reportingParty || '—'} · {selCall.timestamp}
+                    Reporting Party: {selCall.reportingParty || '*'} · {selCall.timestamp}
                   </div>
                 </div>
                 {me && !selCall.units.includes(me.unitId) && (
@@ -188,7 +188,7 @@ export default function DispatchBoard() {
                     </div>
                     {assignedCall && (
                       <div className="text-[9px] text-yellow-300 font-mono">
-                        {assignedCall.id} — {assignedCall.nature}
+                        {assignedCall.id} * {assignedCall.nature}
                       </div>
                     )}
                   </div>

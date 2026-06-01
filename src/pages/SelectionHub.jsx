@@ -16,7 +16,7 @@ const MODULES = [
   },
   {
     key: 'console', label: 'CONSOLE',
-    desc: 'Dispatcher console — radio, units, call control',
+    desc: 'Dispatcher console * radio, units, call control',
     Icon: FaTowerBroadcast, page: 'console', color: '#7c3aed',
     dept: 'Dispatch',
   },
@@ -28,7 +28,7 @@ const MODULES = [
   },
   {
     key: 'police', label: 'MDT',
-    desc: 'Mobile data terminal — messages, returns, alerts',
+    desc: 'Mobile data terminal * messages, returns, alerts',
     Icon: FaShieldHalved, page: 'mdt', color: '#1d4ed8',
     dept: 'TPD / HCSO / FHP',
   },
@@ -119,7 +119,7 @@ export default function SelectionHub() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 20px' }}>
         <div style={{ marginBottom: '28px', textAlign: 'center' }}>
           <div style={{ color: '#374151', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', fontFamily: "'Ubuntu', sans-serif" }}>
-            Hillsborough County, FL — Integrated CAD/RMS
+            Hillsborough County, FL * Integrated CAD/RMS
           </div>
           <div style={{ color: '#e2e8f0', fontSize: '22px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
             Select a Module

@@ -20,7 +20,7 @@ export const ADMIN = {
   blue:     '#3a88e8',
 };
 
-/* Page wrapper — full-height scroll area with dark bg */
+/* Page wrapper * full-height scroll area with dark bg */
 export function AdminContent({ children }) {
   return (
     <div

@@ -135,7 +135,7 @@ export default function AdminPanel() {
                       <td className="px-[10px] py-[7px] text-[#d1d5db]">{app.name}</td>
                       <td className="px-[10px] py-[7px] text-[#374151]">{app.appliedDate}</td>
                       <td className="px-[10px] py-[7px]"><StatusBadge status={app.status} /></td>
-                      <td className="px-[10px] py-[7px] text-[#4b5563] text-[11px]">{app.notes || '—'}</td>
+                      <td className="px-[10px] py-[7px] text-[#4b5563] text-[11px]">{app.notes || '*'}</td>
                       <td className="px-[10px] py-[7px]">
                         {app.status === 'Pending' && (
                           <div className="flex gap-1">

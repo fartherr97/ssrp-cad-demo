@@ -118,7 +118,7 @@ export default function PenalCode() {
                           {p.type}
                         </span>
                       </td>
-                      <td className={`px-2.5 py-1.5 ${p.fine > 0 ? 'text-amber-400' : 'text-slate-700'}`}>{p.fine > 0 ? `$${p.fine.toLocaleString()}` : '—'}</td>
+                      <td className={`px-2.5 py-1.5 ${p.fine > 0 ? 'text-amber-400' : 'text-slate-700'}`}>{p.fine > 0 ? `$${p.fine.toLocaleString()}` : '*'}</td>
                       <td className={`px-2.5 py-1.5 ${p.jailTime !== 'None' ? 'text-red-400' : 'text-slate-700'}`}>{p.jailTime}</td>
                       <td className={`px-2.5 py-1.5 ${p.points > 0 ? 'text-amber-400' : 'text-slate-700'}`}>{p.points}</td>
                       <td className="px-2.5 py-1.5">

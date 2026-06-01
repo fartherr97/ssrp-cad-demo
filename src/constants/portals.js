@@ -6,7 +6,7 @@ import {
 } from 'react-icons/md';
 
 /*
- * Portal definitions — each login role gets its own top-nav + landing page.
+ * Portal definitions * each login role gets its own top-nav + landing page.
  *   nav:         primary square nav items
  *   adminNav:    extra items rendered after a separator (admin only)
  *   showStatus:  show the AVL/ENRT/... field-status squares

@@ -237,10 +237,10 @@ export default function LiveMap() {
               ))}
               <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mt-2 mb-1.5">Incident Priority</div>
               {[
-                { label: 'P1 — Critical', color: '#d83838' },
-                { label: 'P2 — High', color: '#c06828' },
-                { label: 'P3 — Medium', color: '#b09818' },
-                { label: 'P4 — Low', color: '#249848' },
+                { label: 'P1 * Critical', color: '#d83838' },
+                { label: 'P2 * High', color: '#c06828' },
+                { label: 'P3 * Medium', color: '#b09818' },
+                { label: 'P4 * Low', color: '#249848' },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5 mb-1">
                   <div style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${l.color}`, flexShrink: 0, background: `${l.color}22` }} />

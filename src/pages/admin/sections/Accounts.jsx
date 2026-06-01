@@ -53,7 +53,7 @@ export default function Accounts() {
                   </span>
                 </SonCell>
                 <SonCell color={ADMIN.textDim}>
-                  {a.permissions.length ? a.permissions.join(', ') : <span style={{ color: ADMIN.textMute }}>—</span>}
+                  {a.permissions.length ? a.permissions.join(', ') : <span style={{ color: ADMIN.textMute }}>*</span>}
                 </SonCell>
                 <SonCell color={ADMIN.textDim} mono>{a.lastLogin}</SonCell>
                 <SonCell color={ADMIN.textDim} mono>{a.joined}</SonCell>

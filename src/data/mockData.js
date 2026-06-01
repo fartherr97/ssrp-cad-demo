@@ -33,7 +33,7 @@ export const OFFICERS = [
 ];
 
 export const CALLS = [
-  { id: "26-1042", nature: "Traffic Stop",          category: "police", location: "Elm St / Route 9",          city: "Tampa",           county: "Hillsborough", priority: 3, status: "ACTIVE",  units: ["TPD-819"],                   description: "Speeding vehicle — driver appears impaired. Field sobriety in progress.", timestamp: "2026-06-01 14:22", reportingParty: "Officer Santos" },
+  { id: "26-1042", nature: "Traffic Stop",          category: "police", location: "Elm St / Route 9",          city: "Tampa",           county: "Hillsborough", priority: 3, status: "ACTIVE",  units: ["TPD-819"],                   description: "Speeding vehicle * driver appears impaired. Field sobriety in progress.", timestamp: "2026-06-01 14:22", reportingParty: "Officer Santos" },
   { id: "26-1043", nature: "Domestic Disturbance",  category: "police", location: "412 Oakwood Ave",           city: "Tampa",           county: "Hillsborough", priority: 1, status: "PENDING", units: [],                            description: "Caller reports loud arguing and breaking objects. Child in residence. Neighbor called 911.", timestamp: "2026-06-01 14:30", reportingParty: "911 Caller" },
   { id: "26-1044", nature: "Structure Fire",         category: "fire",   location: "88 Commerce Blvd",          city: "Brandon",         county: "Hillsborough", priority: 1, status: "ACTIVE",  units: ["HCFR-E11","HCFR-L7","HCFR-M3"], description: "2-story commercial building. Smoke visible 3rd floor. Occupants evacuating. Confirmed working fire.", timestamp: "2026-06-01 14:35", reportingParty: "911 Caller" },
   { id: "26-1045", nature: "Suspicious Person",      category: "police", location: "Curtis Hixon Waterfront Park",city: "Tampa",          county: "Hillsborough", priority: 2, status: "PENDING", units: [],                            description: "Male in black hoodie, early 20s, staring at parked vehicles. Possibly casing. No weapons seen.", timestamp: "2026-06-01 14:40", reportingParty: "Civilian Report" },
@@ -70,7 +70,7 @@ export const WARRANTS = [
 export const CRIMINAL_HISTORY = [
   { id: 1, civilianId: 3, date: "2026-04-01", charges: ["Possession of Controlled Substance", "Resisting Arrest"], officerBadge: "TPD-831", agency: "TPD", caseNumber: "TPD-2026-0401", disposition: "Arrested", sentence: "Pending Trial",           callId: "26-0401", notes: "Subject fled on foot, caught after 2-block pursuit" },
   { id: 2, civilianId: 2, date: "2026-02-10", charges: ["Speeding (25+ Over)", "Reckless Driving"],                  officerBadge: "TPD-807", agency: "TPD", caseNumber: "TPD-2026-0210", disposition: "Cited",    sentence: "$850 fine",               callId: "26-0210", notes: "Vehicle traveling 72 in 45 zone on Dale Mabry" },
-  { id: 3, civilianId: 5, date: "2025-11-20", charges: ["Assault with Deadly Weapon"],                               officerBadge: "TPD-831", agency: "TPD", caseNumber: "TPD-2025-1120", disposition: "Arrested", sentence: "18 months probation",     callId: "25-1120", notes: "Bar altercation — victim required hospitalization" },
+  { id: 3, civilianId: 5, date: "2025-11-20", charges: ["Assault with Deadly Weapon"],                               officerBadge: "TPD-831", agency: "TPD", caseNumber: "TPD-2025-1120", disposition: "Arrested", sentence: "18 months probation",     callId: "25-1120", notes: "Bar altercation * victim required hospitalization" },
   { id: 4, civilianId: 1, date: "2025-05-03", charges: ["DUI"],                                                       officerBadge: "TPD-807", agency: "TPD", caseNumber: "TPD-2025-0503", disposition: "Arrested", sentence: "License susp. 1 yr $1500",callId: "25-0503", notes: "BAC 0.14 on Kennedy Blvd" },
 ];
 
@@ -323,7 +323,7 @@ export const REPORT_TEMPLATES = [
 ];
 
 export const BANNED_USERS = [
-  { id: 1, name: "xX_GunRunner_Xx",  discordId: "111222333444", reason: "Mass RDM — killed 14 civilians in spawn area",                    issuedBy: "Admin Reeves", date: "2026-04-30", duration: "Permanent", status: "Active"  },
+  { id: 1, name: "xX_GunRunner_Xx",  discordId: "111222333444", reason: "Mass RDM * killed 14 civilians in spawn area",                    issuedBy: "Admin Reeves", date: "2026-04-30", duration: "Permanent", status: "Active"  },
   { id: 2, name: "SpeedHack420",      discordId: "222333444555", reason: "Modding/hacking vehicle speed, evading RP consequences",          issuedBy: "Admin Santos", date: "2026-05-01", duration: "30 Days",  status: "Active"  },
   { id: 3, name: "ToxicPlayer99",     discordId: "333444555666", reason: "Verbal harassment of staff and community members",               issuedBy: "Admin Reeves", date: "2026-04-15", duration: "7 Days",   status: "Expired" },
 ];
@@ -339,7 +339,7 @@ export const AUDIT_LOG = [
 ];
 
 export const MESSAGES = [
-  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "BOLO — Black Dodge Charger",    body: "BOLO for black Dodge Charger plate SUS-1109. Owner has active warrant. Do not approach without backup. Last seen northbound US-41.",           timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
+  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "BOLO * Black Dodge Charger",    body: "BOLO for black Dodge Charger plate SUS-1109. Owner has active warrant. Do not approach without backup. Last seen northbound US-41.",           timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
   { id: 2, from: "Sgt. Reeves (TPD-831)", to: "All TPD Units", subject: "Briefing Update",           body: "All patrol units: increased gang activity in Riverside district. Exercise caution. Extra patrol ordered for evening shift.",                   timestamp: "2026-06-01 13:00", read: true,  priority: "NORMAL" },
   { id: 3, from: "Lt. Commander",     to: "Supervisors",    subject: "Use of Force Policy Update",   body: "New UOF reporting requirements effective Monday. All use of force incidents require supervisor review within 24 hours. See department portal.", timestamp: "2026-05-31 09:15", read: true,  priority: "NORMAL" },
 ];
@@ -371,8 +371,8 @@ export const CUSTOM_RECORD_TYPES = [
 ];
 
 export const TOW_LOGS = [
-  { id: 1, plate: "SUS-1109", make: "Dodge", model: "Charger",   towedBy: "Ofc. Santos (TPD-819)", reason: "Evidence Hold — Active Warrant",            location: "TPD Impound Lot A",  date: "2026-05-10", releaseStatus: "Hold"     },
-  { id: 2, plate: "GRN-5543", make: "Honda", model: "Civic",     towedBy: "Cpl. Walsh (TPD-807)",  reason: "Expired Registration — Roadway Obstruction", location: "City Impound Lot",   date: "2026-04-22", releaseStatus: "Released" },
+  { id: 1, plate: "SUS-1109", make: "Dodge", model: "Charger",   towedBy: "Ofc. Santos (TPD-819)", reason: "Evidence Hold * Active Warrant",            location: "TPD Impound Lot A",  date: "2026-05-10", releaseStatus: "Hold"     },
+  { id: 2, plate: "GRN-5543", make: "Honda", model: "Civic",     towedBy: "Cpl. Walsh (TPD-807)",  reason: "Expired Registration * Roadway Obstruction", location: "City Impound Lot",   date: "2026-04-22", releaseStatus: "Released" },
 ];
 
 export const ACTIVE_SESSIONS = [

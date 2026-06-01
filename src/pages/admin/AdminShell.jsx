@@ -9,7 +9,7 @@ import {
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
-/* Section nav — grouped, rendered horizontally as the admin top bar.
+/* Section nav * grouped, rendered horizontally as the admin top bar.
    Each group is separated by a thin divider in the bar. */
 const GROUPS = [
   [
@@ -128,7 +128,7 @@ export default function AdminShell() {
         <div className="flex items-stretch shrink-0" style={{ borderLeft: `1px solid ${ADMIN.border}` }}>
           <button
             onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
-            title="Exit to Home — choose another portal"
+            title="Exit to Home * choose another portal"
             className="flex items-center gap-2 px-4 cursor-pointer bg-transparent border-none text-[13px] font-semibold font-ui whitespace-nowrap transition-all duration-[140ms]"
             style={{ color: ADMIN.textDim }}
             onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; }}

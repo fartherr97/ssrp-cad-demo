@@ -146,9 +146,9 @@ export default function IncidentDetail() {
           <Section title="INCIDENT INFORMATION">
             <DetailRow label="CALL #"    value={call.id} mono />
             <DetailRow label="CATEGORY"  value={call.category?.toUpperCase()} />
-            <DetailRow label="RPT PARTY" value={call.reportingParty || '—'} />
+            <DetailRow label="RPT PARTY" value={call.reportingParty || '*'} />
             <DetailRow label="TIMESTAMP" value={call.timestamp} mono small />
-            <DetailRow label="PRIORITY"  value={`P${call.priority} — ${['Critical','High','Medium','Low'][call.priority-1] || ''}`} color={priColor} mono />
+            <DetailRow label="PRIORITY"  value={`P${call.priority} * ${['Critical','High','Medium','Low'][call.priority-1] || ''}`} color={priColor} mono />
           </Section>
 
           <Section title="NARRATIVE" flex>
@@ -170,7 +170,7 @@ export default function IncidentDetail() {
               return (
                 <div key={uid} className="flex items-center gap-2.5 px-2 py-1.5 border-b border-[#060e18] bg-[#030810]">
                   <span className="font-mono font-bold text-[13px] min-w-[60px]" style={{ color: sc }}>{uid}</span>
-                  <span className="text-xs flex-1" style={{ color: sc }}>{off?.name || '—'}</span>
+                  <span className="text-xs flex-1" style={{ color: sc }}>{off?.name || '*'}</span>
                   {off && <StatusBadge status={off.status} />}
                   {isDispatch && (
                     <button
@@ -231,7 +231,7 @@ export default function IncidentDetail() {
             </Section>
           )}
 
-          {/* All field units at this call — let dispatch change their status */}
+          {/* All field units at this call * let dispatch change their status */}
           {isDispatch && call.units.length > 0 && (
             <Section title="UNIT STATUS CONTROL">
               {call.units.map(uid => {

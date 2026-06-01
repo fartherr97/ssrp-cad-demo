@@ -200,7 +200,7 @@ function SectionEditor({
       <div className="px-2 py-1.5">
         {section.fields.length === 0 && !isAddingField && (
           <div className="text-[9px] text-cad-muted text-center py-2 uppercase tracking-[0.4px]">
-            No fields — click Add Field
+            No fields * click Add Field
           </div>
         )}
 
@@ -465,7 +465,7 @@ export default function FormBuilder() {
                   ))}
                 </div>
                 <span className="text-[9px] text-cad-muted tracking-[0.3px]">
-                  {editing.name || 'Untitled'}{!editing.id ? ' — unsaved' : ''}
+                  {editing.name || 'Untitled'}{!editing.id ? ' * unsaved' : ''}
                 </span>
                 <div className="ml-auto flex gap-1.5 items-center">
                   <button className={xs(S_BTN_GHOST)} onClick={() => setEditing(null)}>Cancel</button>

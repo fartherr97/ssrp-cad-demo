@@ -108,7 +108,7 @@ export default function PenalCodeEditor() {
                     <td className={`${S_TABLE_TD} text-[10px] text-slate-500`}>{p.category}</td>
                     <td className={S_TABLE_TD}><span className={typeBadge[p.type] || BADGE.gray}>{p.type}</span></td>
                     <td className={`${S_TABLE_TD} font-mono text-[11px]`}>
-                      {p.fine > 0 ? `$${p.fine.toLocaleString()}` : '—'}
+                      {p.fine > 0 ? `$${p.fine.toLocaleString()}` : '*'}
                     </td>
                     <td className={`${S_TABLE_TD} text-[11px] ${p.jailTime === 'None' ? 'text-slate-500' : 'text-cad-text'}`}>
                       {p.jailTime}

@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* ================================================================
-   SSRP CAD — design tokens (CSS custom properties)
+   SSRP CAD * design tokens (CSS custom properties)
    These are referenced by inline styles via var(--name).
    All component styling lives in components / src/constants/styles.js
    ================================================================ */
@@ -157,7 +157,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-workspace { flex: 1; overflow: hidden; display: flex; min-height: 0; }
 .cad-workspace > * { animation: pageEnter var(--t-slow) var(--ease-out); }
 
-/* ActionBar — desktop styling inline; display:none handled by mobile media query */
+/* ActionBar * desktop styling inline; display:none handled by mobile media query */
 .cad-actionbar { height: var(--actionbar-h); min-height: var(--actionbar-h); display: flex; align-items: center; overflow-x: auto; flex-shrink: 0; }
 
 /* Dispatch layout */
@@ -168,7 +168,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .cad-grid-panel.calls-panel { flex: 55; border-bottom: 2px solid var(--n-border-strong); }
 .cad-grid-panel.units-panel { flex: 45; }
 
-/* Grid helpers — desktop layout + responsive overrides */
+/* Grid helpers * desktop layout + responsive overrides */
 .n-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .n-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
 .n-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -178,7 +178,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .split-2       { display: grid; grid-template-columns: 280px 1fr; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
 .split-2-right { display: grid; grid-template-columns: 1fr 280px; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
 
-/* Mobile nav elements — hidden on desktop, shown on mobile */
+/* Mobile nav elements * hidden on desktop, shown on mobile */
 .cad-mobile-toggle { display: none; align-items: center; justify-content: center; width: 40px; height: 100%; border: none; background: none; cursor: pointer; color: var(--n-text-dim); border-left: 1px solid var(--n-border); flex-shrink: 0; padding: 0; }
 .cad-mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 900; flex-direction: column; background: rgba(0,0,0,0.7); }
 .cad-mobile-nav.open { display: flex; }
@@ -208,7 +208,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .table-scroll { overflow: auto; flex: 1; }
 
 /* ════════════════════════════════════════
-   ANIMATIONS — keyframe definitions
+   ANIMATIONS * keyframe definitions
    Referenced by inline style={{ animation: '...' }}
    ════════════════════════════════════════ */
 
@@ -231,7 +231,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .blink         { animation: blink 1s step-end infinite; }
 
 /* ════════════════════════════════════════
-   RESPONSIVE — mobile overrides
+   RESPONSIVE * mobile overrides
    These reference structural class names that components keep.
    ════════════════════════════════════════ */
 

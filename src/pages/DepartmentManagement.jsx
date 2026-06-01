@@ -54,7 +54,7 @@ export default function DepartmentManagement() {
             className={INPUT_CLS}
           >
             {departments.map(dept => (
-              <option key={dept.id} value={dept.id}>{dept.short} — {dept.name}</option>
+              <option key={dept.id} value={dept.id}>{dept.short} * {dept.name}</option>
             ))}
           </select>
         </div>
@@ -117,7 +117,7 @@ export default function DepartmentManagement() {
                   {[['Abbreviation', selectedDept.abbreviation || selectedDept.short],['Badge Prefix', selectedDept.badgePrefix],['Radio Channel', selectedDept.radioChannel],['Active Officers', deptOfficers.filter(o => o.status !== 'OFFDUTY').length + ' / ' + deptOfficers.length]].map(([l,v]) => (
                     <div key={l} className="bg-app-input border border-border-base px-2.5 py-2">
                       <div className="text-sky-400 text-[10px] tracking-widest mb-0.5">{l.toUpperCase()}</div>
-                      <div className="text-slate-300">{v || '—'}</div>
+                      <div className="text-slate-300">{v || '*'}</div>
                     </div>
                   ))}
                 </div>

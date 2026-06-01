@@ -223,7 +223,7 @@ export default function RecordsBureau() {
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-5 flex flex-col items-start">
 
-                {/* RETURN tab — NCIC-style record return */}
+                {/* RETURN tab * NCIC-style record return */}
                 {tab === 'RETURN' && selCiv && (
                   <RecordReturn type="PERSON" data={selCiv} />
                 )}
@@ -244,7 +244,7 @@ export default function RecordsBureau() {
                     ) : civHistory.map(h => (
                       <div key={h.id} className="mb-3 border border-border-base bg-app-card rounded overflow-hidden">
                         <div className="flex items-center gap-1.5 px-3 py-2 bg-app-bg border-b border-border-base text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500">
-                          <span>CRIMINAL HISTORY ENTRY — {h.caseNumber}</span>
+                          <span>CRIMINAL HISTORY ENTRY * {h.caseNumber}</span>
                           <span className="ml-auto font-normal text-[12px] opacity-85">{h.date}</span>
                         </div>
                         <div className="p-3 font-mono text-[12px] text-slate-300 flex flex-col gap-1">
@@ -308,7 +308,7 @@ export default function RecordsBureau() {
                 {tab === 'FLAGS' && selVeh && (
                   <div className="w-full max-w-[760px] border border-border-base bg-app-card rounded overflow-hidden">
                     <div className="flex items-center gap-1.5 px-3 py-2 bg-app-bg border-b border-border-base text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500">
-                      <span>VEHICLE FLAGS — {selVeh.plate}</span>
+                      <span>VEHICLE FLAGS * {selVeh.plate}</span>
                       <span className="ml-auto font-normal text-[12px] opacity-85">{new Date().toLocaleString()}</span>
                     </div>
                     <div className="p-3 font-mono text-[12px] text-slate-300 flex flex-col gap-1.5">

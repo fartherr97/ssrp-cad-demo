@@ -268,7 +268,7 @@ export default function CivilianRegistry() {
         <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowAddVeh(false)}>
           <div className={S_MODAL}>
             <div className={S_MODAL_HEADER}>
-              <div className={S_MODAL_TITLE}>Register Vehicle — {selCiv.firstName} {selCiv.lastName}</div>
+              <div className={S_MODAL_TITLE}>Register Vehicle * {selCiv.firstName} {selCiv.lastName}</div>
               <button className={sm(S_BTN_GHOST)} onClick={() => setShowAddVeh(false)}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>

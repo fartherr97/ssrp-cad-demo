@@ -105,7 +105,7 @@ export default function CommandDashboard() {
             ▲ PRIORITY 1 ACTIVE
           </span>
           <span className="text-red-400 text-[11px] font-mono">
-            {p1.map(c => `${c.id} — ${c.nature} @ ${c.location}`).join(' · ')}
+            {p1.map(c => `${c.id} * ${c.nature} @ ${c.location}`).join(' · ')}
           </span>
           <button className={`${xs(S_BTN_DANGER)} ml-auto`} onClick={() => go('dispatch')}>
             Go to Dispatch
@@ -183,7 +183,7 @@ export default function CommandDashboard() {
                           </span>
                         </td>
                         <td className={`${S_TABLE_TD} font-mono text-[11px] text-slate-500`}>
-                          {c.units.length > 0 ? c.units.join(', ') : '—'}
+                          {c.units.length > 0 ? c.units.join(', ') : '*'}
                         </td>
                       </tr>
                     ))}

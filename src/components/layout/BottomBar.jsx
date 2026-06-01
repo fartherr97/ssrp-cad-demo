@@ -17,7 +17,7 @@ export default function BottomBar() {
       <span>CH: HILLSBOROUGH MAIN</span>
       <span className={S_STATUSBAR_SEP} />
 
-      <span>UNIT: <span className={S_STATUSBAR_HI}>{me?.unitId || '—'}</span></span>
+      <span>UNIT: <span className={S_STATUSBAR_HI}>{me?.unitId || '*'}</span></span>
       <span className={S_STATUSBAR_SEP} />
 
       <span>CALL: <span className={myCall ? 'text-amber-400 font-semibold' : 'text-cad-muted'}>
@@ -44,7 +44,7 @@ export default function BottomBar() {
       <span>AVAILABLE: <span className={S_STATUSBAR_AV}>{available}</span></span>
       <span className={S_STATUSBAR_SEP} />
 
-      <span>DEPT: <span className={S_STATUSBAR_HI}>{me?.deptShort || '—'}</span></span>
+      <span>DEPT: <span className={S_STATUSBAR_HI}>{me?.deptShort || '*'}</span></span>
       <span className={S_STATUSBAR_SEP} />
 
       <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>

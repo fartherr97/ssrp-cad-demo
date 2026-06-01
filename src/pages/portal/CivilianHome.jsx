@@ -43,7 +43,7 @@ export default function CivilianHome() {
       <PortalHeader
         icon={MdHome}
         title="Civilian Services"
-        subtitle={`Welcome back, ${currentUser?.name || 'Citizen'} — manage your records and services here.`}
+        subtitle={`Welcome back, ${currentUser?.name || 'Citizen'} * manage your records and services here.`}
         accent={ACCENT}
       />
 
@@ -57,7 +57,7 @@ export default function CivilianHome() {
               {myWarrants.length} active warrant{myWarrants.length !== 1 ? 's' : ''} on your record{myWarrants.length !== 1 ? 's' : ''}
             </div>
             <div className="text-xs text-red-300/75 mt-[3px]">
-              {myWarrants.map(w => `${w.civilianName} — ${w.charge}`).join('  •  ')}
+              {myWarrants.map(w => `${w.civilianName} * ${w.charge}`).join('  •  ')}
             </div>
           </div>
         </PortalCard>

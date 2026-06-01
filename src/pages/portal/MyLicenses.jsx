@@ -78,7 +78,7 @@ export default function MyLicenses() {
                   status={c.weaponPermit}
                   rows={[
                     { label: 'Status', value: c.weaponPermit },
-                    { label: 'Expires', value: c.weaponPermitExpiry || (c.weaponPermit === 'NONE' ? '—' : '') },
+                    { label: 'Expires', value: c.weaponPermitExpiry || (c.weaponPermit === 'NONE' ? '*' : '') },
                   ]}
                 />
               </div>

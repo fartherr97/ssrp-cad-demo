@@ -108,7 +108,7 @@ export default function UnitManagement() {
                     <td className={S_TABLE_TD}>
                       {o.callId
                         ? <span className={`${S_DATA} text-[10px]`}>{o.callId}</span>
-                        : <span className="text-cad-muted text-[10px]">—</span>
+                        : <span className="text-cad-muted text-[10px]">*</span>
                       }
                     </td>
                     {isAdmin && (
@@ -173,11 +173,11 @@ export default function UnitManagement() {
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Assigned Call</span>
-                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
+                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '*'}</span>
                   </div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Location</span>
-                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
+                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '*'}</span>
                   </div>
                 </div>
 

@@ -49,7 +49,7 @@ function ToolBtn({ Icon: IconComp, label, onClick, active, disabled, title, extr
   );
 }
 
-/* Status square button — uses the status color when active */
+/* Status square button * uses the status color when active */
 function StatusBtn({ Icon: IconComp, label, status, myStatus, onClick }) {
   const isActive = myStatus === status;
   const color = STATUS_COLORS[status];
@@ -170,7 +170,7 @@ export default function ActionBar({ onCreateCall }) {
           extraClass="border-l border-[#1a3050]" />
         <ToolBtn Icon={MdHome} label="Home"
           onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
-          title="Exit to Home — choose another portal"
+          title="Exit to Home * choose another portal"
           extraClass="border-l border-[#1a3050]" />
         <ToolBtn Icon={MdLogout} label="Sign Out"
           onClick={() => dispatch({ type: 'LOGOUT' })}

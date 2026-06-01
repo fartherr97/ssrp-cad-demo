@@ -75,7 +75,7 @@ export default function LoginPage() {
       const portal = PORTALS[role.id];
       let user;
       if (role.id === 'civilian' || role.id === 'business') {
-        // Citizen-facing portals — not tied to an officer record.
+        // Citizen-facing portals * not tied to an officer record.
         user = {
           id: role.id === 'civilian' ? 'self-civ' : 'self-biz',
           name: 'Jordan Maxwell',
@@ -132,7 +132,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right — connect */}
+        {/* Right * connect */}
         <div className="ml-auto flex items-center gap-3 sm:gap-5">
           {!connected && (
             <button
@@ -192,7 +192,7 @@ export default function LoginPage() {
             lineHeight: 1.6, marginBottom: 32, maxWidth: 360,
           }}>
             Unified platform for Emergency Services, Civilian Operations,
-            and Command — TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.
+            and Command * TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.
           </div>
 
           {/* ── BEFORE CONNECT: show big Discord button ── */}
@@ -221,7 +221,7 @@ export default function LoginPage() {
           {/* Demo note */}
           {!connected && (
             <div style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)', textAlign: 'center' }}>
-              Demo environment — select your role after connecting
+              Demo environment * select your role after connecting
             </div>
           )}
 

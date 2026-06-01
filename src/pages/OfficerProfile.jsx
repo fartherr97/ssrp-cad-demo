@@ -27,7 +27,7 @@ export default function OfficerProfile() {
 
   const commendations = [
     { id: 1, type: 'Commendation', date: '2023-09-15', from: 'Lt. Commander', note: 'Outstanding work on the Washington arrest. Demonstrated excellent tactical judgment.' },
-    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award — monthly food drive coordination.' },
+    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award * monthly food drive coordination.' },
   ];
   const complaints = [];
 
@@ -106,8 +106,8 @@ export default function OfficerProfile() {
             style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
           >
             <InfoCard title="ASSIGNMENT" accentColor={accentColor}>
-              {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '—']].map(([k,v]) => (
-                <InfoRow key={k} label={k} value={v || '—'} />
+              {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '*']].map(([k,v]) => (
+                <InfoRow key={k} label={k} value={v || '*'} />
               ))}
             </InfoCard>
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
@@ -156,7 +156,7 @@ export default function OfficerProfile() {
                     <TD>{r.type}</TD>
                     <TD muted>{r.date}</TD>
                     <td className="px-2.5 py-1.5"><StatusBadge status={r.status} /></td>
-                    <TD blue>{r.callId || '—'}</TD>
+                    <TD blue>{r.callId || '*'}</TD>
                   </tr>
                 ))}
                 {myReports.length === 0 && <tr><td colSpan={5} className="px-2.5 py-4 text-center text-slate-700">No reports filed.</td></tr>}

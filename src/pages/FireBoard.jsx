@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 
-// HCFR livery — fire-rescue red.
+// HCFR livery * fire-rescue red.
 const FIRE_RED = '#e5484d';
 const FIRE_RED_DEEP = '#7f1d1d';
 
@@ -105,7 +105,7 @@ export default function FireBoard() {
         }}
       >
         <span className="inline-flex items-center gap-2 font-extrabold text-[13px] tracking-[0.6px]" style={{ color: FIRE_RED }}>
-          HCFR — FIRE / RESCUE
+          HCFR * FIRE / RESCUE
         </span>
         <Divider />
         <span className="inline-flex items-center gap-[7px] font-bold text-[12px] text-green-400">
@@ -219,7 +219,7 @@ export default function FireBoard() {
                   <td className="px-2.5 py-1.5">
                     <StatusBadge status={call.status} />
                   </td>
-                  <td className="px-2.5 py-1.5 text-[#f0883e]">{call.units.join(', ') || '—'}</td>
+                  <td className="px-2.5 py-1.5 text-[#f0883e]">{call.units.join(', ') || '*'}</td>
                   <td className="px-2.5 py-1.5 text-[12px] font-bold whitespace-nowrap" style={{ color: elapsedTone(call.createdAt, now, call.units.length > 0) }}>
                     ⏱ {fmtElapsed(call.createdAt, now)}
                   </td>
@@ -334,7 +334,7 @@ export default function FireBoard() {
                   <td className="px-2.5 py-1.5">
                     <StatusBadge status={o.status} />
                   </td>
-                  <td className="px-2.5 py-1.5" style={{ color: o.callId ? '#f5b740' : '#33415a' }}>{o.callId || '—'}</td>
+                  <td className="px-2.5 py-1.5" style={{ color: o.callId ? '#f5b740' : '#33415a' }}>{o.callId || '*'}</td>
                   <td className="px-2.5 py-1.5 text-[#b9a6a4]">{o.subdivision}</td>
                   <td className="px-2.5 py-1.5 text-[#a07e7a]">{o.location}</td>
                 </tr>

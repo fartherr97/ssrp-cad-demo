@@ -139,7 +139,7 @@ export default function RecordTemplates() {
               {/* Fill form */}
               {fillMode && (
                 <div className="bg-app-card border border-green-900 border-l-[3px] border-l-green-500 p-3.5">
-                  <div className="text-green-400 text-xs font-bold tracking-[1.5px] mb-3.5">CREATE NEW RECORD — {selected.name}</div>
+                  <div className="text-green-400 text-xs font-bold tracking-[1.5px] mb-3.5">CREATE NEW RECORD * {selected.name}</div>
                   <div
                     className="grid gap-2.5"
                     style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
@@ -176,13 +176,13 @@ export default function RecordTemplates() {
                           {field.type === 'vehicle_lookup' && (
                             <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select Vehicle --</option>
-                              {vehicles.map(v => <option key={v.id}>{v.plate} — {v.make} {v.model}</option>)}
+                              {vehicles.map(v => <option key={v.id}>{v.plate} * {v.make} {v.model}</option>)}
                             </select>
                           )}
                           {field.type === 'officer_lookup' && (
                             <select value={v} onChange={e => setFillValues(fv => ({ ...fv, [field.label]: e.target.value }))} className={INPUT_CLS}>
                               <option value="">-- Select Officer --</option>
-                              {officers.map(o => <option key={o.id}>{o.badge} — {o.name}</option>)}
+                              {officers.map(o => <option key={o.id}>{o.badge} * {o.name}</option>)}
                             </select>
                           )}
                         </div>
@@ -190,7 +190,7 @@ export default function RecordTemplates() {
                     })}
                   </div>
                   <div className="flex gap-2 mt-3.5">
-                    <button onClick={() => { alert('Record saved! (Demo mode — records stored in state)'); setFillMode(null); setFillValues({}); }} className={`${GREEN_BTN} px-5 py-2 text-sm`}>SAVE RECORD</button>
+                    <button onClick={() => { alert('Record saved! (Demo mode * records stored in state)'); setFillMode(null); setFillValues({}); }} className={`${GREEN_BTN} px-5 py-2 text-sm`}>SAVE RECORD</button>
                     <button onClick={() => setFillMode(null)} className={GHOST_BTN}>Cancel</button>
                   </div>
                 </div>

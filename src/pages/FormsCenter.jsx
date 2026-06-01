@@ -65,7 +65,7 @@ export default function FormsCenter() {
                       <td className="px-2.5 py-[7px] text-[#9ca3af]">{r.officerBadge}</td>
                       <td className="px-2.5 py-[7px] text-[#4b5563]">{r.date}</td>
                       <td className="px-2.5 py-[7px]"><StatusBadge status={r.status} /></td>
-                      <td className="px-2.5 py-[7px] text-blue-400">{r.callId || '—'}</td>
+                      <td className="px-2.5 py-[7px] text-blue-400">{r.callId || '*'}</td>
                       <td className="px-2.5 py-[7px]">
                         <button onClick={() => setReviewReport(r)} className="bg-[#0c1a2e] border border-blue-500 text-blue-500 px-2.5 py-1 text-[12px] cursor-pointer font-semibold font-ui">View</button>
                       </td>
@@ -122,12 +122,12 @@ export default function FormsCenter() {
 
         {/* Report detail modal */}
         {reviewReport && (
-          <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} — ${reviewReport.caseNumber}`}>
+          <Modal onClose={() => setReviewReport(null)} title={`${reviewReport.type} * ${reviewReport.caseNumber}`}>
             <div className="text-[13px] flex flex-col gap-2">
               <FieldRow label="Officer" value={reviewReport.officerBadge} />
               <FieldRow label="Date"    value={reviewReport.date} />
               <FieldRow label="Status"  value={<StatusBadge status={reviewReport.status} />} />
-              <FieldRow label="Call"    value={reviewReport.callId || '—'} />
+              <FieldRow label="Call"    value={reviewReport.callId || '*'} />
               <div className="bg-[#090b10] border border-[#1f2937] p-3 text-[#9ca3af] leading-[1.6] text-[13px]">
                 {reviewReport.summary}
               </div>
@@ -151,7 +151,7 @@ export default function FormsCenter() {
   );
 }
 
-/* ════════════ DOCUMENT FORM — government citation / official report style ════════════ */
+/* ════════════ DOCUMENT FORM * government citation / official report style ════════════ */
 function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, currentUser, civilians, officers }) {
   const { isMobile } = useResponsive();
   const [formNumber] = useState(`HCSO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`);
@@ -201,7 +201,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
                 HILLSBOROUGH COUNTY, FLORIDA
               </div>
               <div style={{ color: '#7aa0bc', fontSize: isMobile ? '8px' : '10px', letterSpacing: '1.5px', marginBottom: '5px', fontFamily: DOC_FONT }}>
-                {currentUser?.deptShort || 'LAW ENFORCEMENT'} — COMPUTER AIDED DISPATCH
+                {currentUser?.deptShort || 'LAW ENFORCEMENT'} * COMPUTER AIDED DISPATCH
               </div>
               <div style={{ color: '#ffffff', fontWeight: 700, fontSize: isMobile ? '14px' : '18px', letterSpacing: '1px', textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.25)', paddingTop: '5px', width: '100%', fontFamily: DOC_FONT }}>
                 {template.name}
@@ -287,7 +287,7 @@ function DocumentForm({ template, formValues, setFormValues, onBack, onSubmit, c
 
           {/* FOOTER */}
           <div style={{ background: '#0f2548', borderTop: '2px solid #1a1a2e', padding: '4px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>HILLSBOROUGH COUNTY, FL — COMPUTER AIDED DISPATCH</span>
+            <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: DOC_FONT }}>HILLSBOROUGH COUNTY, FL * COMPUTER AIDED DISPATCH</span>
             <span style={{ fontSize: '8px', color: '#4a6a8a', letterSpacing: '1px', fontFamily: DOC_FONT }}>CONFIDENTIAL LAW ENFORCEMENT DOCUMENT</span>
           </div>
         </div>
@@ -500,7 +500,7 @@ function ReviewQueue({ reports, dispatch }) {
   const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
   return (
     <div className="mt-3.5">
-      <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-3">SUPERVISOR REVIEW QUEUE — {pending.length} pending</div>
+      <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-3">SUPERVISOR REVIEW QUEUE * {pending.length} pending</div>
       {pending.length === 0 && <div className="text-[#374151] text-[14px]">No reports pending review.</div>}
       {pending.map(r => (
         <div key={r.id} className="bg-[#090b10] border border-[#1e2533] p-3 mb-2">

@@ -231,7 +231,7 @@ export default function AdminCenter() {
                         </td>
                         <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{d.badgePrefix}</span></td>
                         <td className={S_TABLE_TD}><span className={`${S_DATA} text-[10px]`}>{d.radioChannel}</span></td>
-                        <td className={`${S_TABLE_TD} text-[10px] text-slate-500`}>{d.subdivisions?.join(', ') || '—'}</td>
+                        <td className={`${S_TABLE_TD} text-[10px] text-slate-500`}>{d.subdivisions?.join(', ') || '*'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -268,7 +268,7 @@ export default function AdminCenter() {
                           {w.status}
                         </span>
                       </td>
-                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{w.notes || '—'}</td>
+                      <td className={`${S_TABLE_TD} text-[11px] text-slate-500`}>{w.notes || '*'}</td>
                       <td className={S_TABLE_TD}>
                         {w.status === 'Pending' && (
                           <div className="flex gap-1">

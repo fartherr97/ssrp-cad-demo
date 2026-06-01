@@ -34,7 +34,7 @@ export default function WarrantControl() {
       type: 'ADD_WARRANT',
       payload: {
         civilianId: Number(form.civilianId),
-        civilianName: civ ? `${civ.firstName} ${civ.lastName}` : '—',
+        civilianName: civ ? `${civ.firstName} ${civ.lastName}` : '*',
         type: form.type,
         charge: form.charge,
         issuedBy: `${me?.rank || ''} ${me?.name || currentUser?.name} (${me?.badge})`,
@@ -183,7 +183,7 @@ export default function WarrantControl() {
                 <select className={S_SELECT} value={form.civilianId} onChange={e => setForm(p => ({ ...p, civilianId: e.target.value }))}>
                   <option value="">Select civilian...</option>
                   {civilians.map(c => (
-                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName} — {c.dob}</option>
+                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName} * {c.dob}</option>
                   ))}
                 </select>
               </div>

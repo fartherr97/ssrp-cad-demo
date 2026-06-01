@@ -218,7 +218,7 @@ export default function Sidebar() {
               {currentUser?.name || 'Unknown'}
             </div>
             <div className="text-[9px] text-cad-muted font-mono">
-              {me?.badge || '—'} · {me?.deptShort || '—'}
+              {me?.badge || '*'} · {me?.deptShort || '*'}
             </div>
           </div>
         </div>

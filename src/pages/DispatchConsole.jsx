@@ -80,7 +80,7 @@ export default function DispatchConsole() {
           <span className="text-amber-400 font-bold text-[11px] tracking-[1px]">DISPATCH CONSOLE</span>
         </div>
         <Pipe />
-        <span className="text-[#374151] text-[11px]">OPER: <span className="text-[#9ca3af]">{currentUser?.name || '—'}</span></span>
+        <span className="text-[#374151] text-[11px]">OPER: <span className="text-[#9ca3af]">{currentUser?.name || '*'}</span></span>
         <Pipe />
         <StatChip label="CALLS"       value={activeCalls.length} color="#fbbf24" />
         <StatChip label="UNASSIGNED"  value={pending}            color={pending > 0 ? '#f87171' : '#374151'} />
@@ -178,7 +178,7 @@ export default function DispatchConsole() {
               <div className="text-[#4b5563] text-[11px] mb-[5px]">{selectedCall.description}</div>
               <div className="text-[#374151] text-[10px] tracking-[0.5px] uppercase mb-1">Attached Units</div>
               <div className="flex flex-wrap gap-1">
-                {selectedCall.units.length === 0 && <span className="text-[#374151] text-[11px]">None — dispatch from units panel</span>}
+                {selectedCall.units.length === 0 && <span className="text-[#374151] text-[11px]">None * dispatch from units panel</span>}
                 {selectedCall.units.map(u => (
                   <span key={u} className="inline-flex items-center gap-1 bg-[#0f172a] border border-[#1a1e2c] rounded-sm px-1.5 py-px text-[11px] text-sky-300">
                     {u}
@@ -340,8 +340,8 @@ function NewCallForm({ onClose, dispatch }) {
         </label>
         <label><span className={lblCls}>Priority</span>
           <select value={form.priority} onChange={e => set('priority', e.target.value)} className={inpCls}>
-            <option value={1}>P1 — Emergency</option><option value={2}>P2 — Urgent</option>
-            <option value={3}>P3 — Routine</option><option value={4}>P4 — Non-urgent</option>
+            <option value={1}>P1 * Emergency</option><option value={2}>P2 * Urgent</option>
+            <option value={3}>P3 * Routine</option><option value={4}>P4 * Non-urgent</option>
           </select>
         </label>
         <label className="col-span-2"><span className={lblCls}>Location *</span>
