@@ -158,10 +158,10 @@ function PanicBtn({ onClick }) {
       onClick={onClick}
       data-tour="panic"
       title="PANIC * broadcast officer-in-distress to all units"
-      className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 min-w-[58px] h-full shrink-0 border-none cursor-pointer transition-all font-ui bg-red-600/90 hover:bg-red-500 text-white animate-pulse-red"
+      className="flex flex-col items-center justify-center gap-1 px-2.5 py-1 min-w-[54px] h-full shrink-0 border-none cursor-pointer transition-all font-ui bg-red-600/90 hover:bg-red-500 text-white animate-pulse-red"
     >
-      <MdSos size={20} />
-      <span className="text-[9px] font-extrabold uppercase tracking-[0.6px] whitespace-nowrap leading-none">PANIC</span>
+      <MdSos size={19} />
+      <span className="text-[9px] font-extrabold uppercase tracking-[0.5px] whitespace-nowrap leading-none">PANIC</span>
     </button>
   );
 }
@@ -290,12 +290,6 @@ export default function ActionBar({ onCreateCall }) {
             <StatusBtn key={s.status} Icon={s.Icon} label={s.label}
               status={s.status} myStatus={myStatus} onClick={() => setStatus(s.status)} />
           ))}
-        </>
-      )}
-
-      {/* ── Far right ── */}
-      <div className="ml-auto flex items-stretch shrink-0" data-tour="account">
-        {portal.showStatus && (
           <PanicBtn onClick={() => dispatch({
             type: 'PANIC',
             payload: {
@@ -305,7 +299,11 @@ export default function ActionBar({ onCreateCall }) {
               location: me?.location || 'LOCATION UNKNOWN',
             },
           })} />
-        )}
+        </>
+      )}
+
+      {/* ── Far right ── */}
+      <div className="ml-auto flex items-stretch shrink-0" data-tour="account">
         <Clock />
         <ToolBtn Icon={MdAccountCircle} label="Profile"
           onClick={() => go('/profile')} active={isActive('/profile')}
