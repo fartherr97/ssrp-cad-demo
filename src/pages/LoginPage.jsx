@@ -2,61 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
-
-/* ── Role SVG icons ── */
-const IconAdmin = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.07 4.93A10 10 0 1 0 4.93 19.07 10 10 0 0 0 19.07 4.93z" />
-    <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-  </svg>
-);
-
-const IconLEO = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2L3 5v6c0 5.25 3.75 10.15 9 11.25C17.25 21.15 21 16.25 21 11V5l-9-3z" />
-    <path d="M12 7l1.5 3 3.5.5-2.5 2.5.6 3.5L12 15l-3.1 1.5.6-3.5L7 10.5l3.5-.5L12 7z" />
-  </svg>
-);
-
-const IconCivilian = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-const IconBusiness = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="7" width="20" height="14" rx="1" />
-    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-    <line x1="12" y1="12" x2="12" y2="17" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-  </svg>
-);
-
-const IconFire = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17h2a2.5 2.5 0 0 0 2.5-2.5c0-1.5-.5-2-1-3a4 4 0 0 0-.5-2.5c-.5 1-1 1.5-1.5 2-1-1-1.5-2-1.5-3.5C9 8.5 8 10 8 12c0 .5 0 1.5.5 2.5z" />
-    <path d="M12 3c-1.2 5.4-4 6.5-4 10a7 7 0 1 0 14 0c0-4-3-7-5-9-1 2-2 3-5 1z" />
-    <path d="M12 19v2M10 21h4" />
-  </svg>
-);
-
-const IconDispatch = ({ color }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-  </svg>
-);
+import { MdAdminPanelSettings, MdLocalPolice, MdPeopleAlt, MdStorefront, MdLocalFireDepartment, MdHeadsetMic } from 'react-icons/md';
 
 const ROLE_ICONS = {
-  admin: IconAdmin,
-  leo: IconLEO,
-  civilian: IconCivilian,
-  business: IconBusiness,
-  fire: IconFire,
-  dispatch: IconDispatch,
+  admin:    MdAdminPanelSettings,
+  leo:      MdLocalPolice,
+  civilian: MdPeopleAlt,
+  business: MdStorefront,
+  fire:     MdLocalFireDepartment,
+  dispatch: MdHeadsetMic,
 };
 
 const ROLES = [
@@ -327,7 +281,7 @@ export default function LoginPage() {
                         }
                       }}
                     >
-                      <RoleIcon color={isActive ? role.color : 'rgba(180,210,240,0.6)'} />
+                      <RoleIcon size={42} color={isActive ? role.color : 'rgba(180,210,240,0.55)'} />
                       <span style={{
                         fontSize: 13, fontWeight: 700,
                         color: isActive ? role.color : 'rgba(200,220,240,0.85)',
