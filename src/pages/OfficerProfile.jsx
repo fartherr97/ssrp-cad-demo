@@ -376,6 +376,6 @@ function TD({ children, blue, muted, small }) {
   );
 }
 
-const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', color: '#d1d5db', padding: '7px 10px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
-const blueBtn = { background: '#0c1a2e', border: '1px solid #3b82f6', color: '#3b82f6', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 };
-const ghostBtn = { background: 'transparent', border: '1px solid #1f2937', color: '#4b5563', padding: '7px 12px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif' };
+const inputBase = { width: '100%', background: '#090b10', border: '1px solid #1e2533', borderRadius: 4, color: '#d1d5db', padding: '8px 11px', fontSize: '13px', fontFamily: 'Ubuntu, sans-serif', boxSizing: 'border-box' };
+const blueBtn = { background: 'linear-gradient(180deg, #4d97ff, #2f7fe8)', border: 'none', borderRadius: 4, color: '#fff', padding: '9px 16px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600, boxShadow: '0 2px 10px rgba(47,127,232,0.45)' };
+const ghostBtn = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 4, color: '#9ca3af', padding: '9px 16px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Ubuntu, sans-serif', fontWeight: 600 };
