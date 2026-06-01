@@ -91,7 +91,8 @@ export default function LoginPage() {
           lineHeight: 1.6, marginBottom: 28, maxWidth: 340,
           fontFamily: "'Ubuntu', sans-serif",
         }}>
-          Dispatch operations for TPD, HCSO, FHP, HCFR, and FDOT.
+          Unified platform for Emergency Services, Civilian Operations,
+          and Command — TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.
           All activity is logged and subject to command review.
         </div>
 
