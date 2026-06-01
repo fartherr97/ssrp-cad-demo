@@ -23,7 +23,7 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <div className="flex items-center px-3.5 h-full border-l border-[#1a3050] font-mono text-[12px] font-semibold text-sky-400/80 tracking-[0.3px] shrink-0 whitespace-nowrap">
+    <div className="flex items-center justify-center px-3.5 h-full border-l border-[#1a3050] font-mono text-[12px] font-semibold text-sky-400/80 tracking-[0.3px] shrink-0 whitespace-nowrap leading-none">
       {time}
     </div>
   );
