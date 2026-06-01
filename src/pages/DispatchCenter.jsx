@@ -219,13 +219,13 @@ export default function DispatchCenter() {
         <div className="flex-1 overflow-auto">
           <table className="w-full border-collapse table-fixed">
             <colgroup>
-              <col style={{ width:90 }} /><col style={{ width:72 }} /><col style={{ width:84 }} />
-              <col style={{ width:68 }} /><col style={{ width:200 }} /><col />
+              <col style={{ width:120 }} /><col style={{ width:120 }} /><col style={{ width:100 }} />
+              <col style={{ width:100 }} /><col style={{ width:240 }} /><col />
             </colgroup>
             <thead>
               <tr className="bg-app-bg">
                 {['UNIT','STATUS','CALL #','AGENCY','LOCATION','NAME / RANK'].map(h => (
-                  <th key={h} className={`${S_TABLE_TH} whitespace-nowrap z-[1]`}>{h}</th>
+                  <th key={h} className={`${S_TABLE_TH} !px-3.5 whitespace-nowrap z-[1]`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -241,12 +241,12 @@ export default function DispatchCenter() {
                   onMouseLeave={trHoverOff}
                   onClick={() => o.callId && navigate('/cad/' + o.callId)}
                 >
-                  <td className={`${S_TABLE_TD} font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
-                  <td className={S_TABLE_TD}><StatusBadge status={o.status} /></td>
-                  <td className={`${S_TABLE_TD} font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '*'}</td>
-                  <td className={`${S_TABLE_TD} text-white font-semibold`}>{o.deptShort}</td>
-                  <td className={`${S_TABLE_TD} text-slate-300`}>{o.location}</td>
-                  <td className={`${S_TABLE_TD} text-white font-medium`}>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 font-mono font-bold`} style={{ color: unitStatusColor[o.status] || '#ffffff' }}>{o.unitId}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2`}><StatusBadge status={o.status} /></td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 font-mono font-semibold ${o.callId ? 'text-yellow-300' : 'text-slate-500'}`}>{o.callId || '*'}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-white font-semibold`}>{o.deptShort}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-slate-300`}>{o.location}</td>
+                  <td className={`${S_TABLE_TD} !px-3.5 !py-2 text-white font-medium`}>
                     {o.name}
                     {o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}
                   </td>
