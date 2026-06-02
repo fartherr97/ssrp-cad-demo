@@ -38,13 +38,14 @@ function DeptCard({ d, onSave, onDelete }) {
         </div>
         {open && (
           <div className="expand-section grid grid-cols-2 gap-[10px]">
-            <div>
+            <div className="col-span-2">
               <label style={SON_LABEL}>Type</label>
-              <input style={SON_INPUT} value={draft.type || ''} onChange={e => set({ type: e.target.value })} />
-            </div>
-            <div>
-              <label style={SON_LABEL}>Radio Channel</label>
-              <input style={SON_INPUT} value={draft.radioChannel || ''} onChange={e => set({ radioChannel: e.target.value })} />
+              <select style={SON_INPUT} value={draft.type || 'Law Enforcement'} onChange={e => set({ type: e.target.value })}>
+                <option>Civilian</option>
+                <option>Law Enforcement</option>
+                <option>Fire &amp; EMS</option>
+                <option>Dispatch</option>
+              </select>
             </div>
             <div className="col-span-2">
               <label style={SON_LABEL}>Sub-departments (comma separated)</label>
