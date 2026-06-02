@@ -434,6 +434,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
         </select>
       ) : (
         <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''} ${isSupOnly ? 'border-red-500/40' : ''}`}
+          style={f.type === 'datetime' || f.type === 'date' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       )}
     </div>
