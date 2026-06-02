@@ -31,7 +31,7 @@ function StatusPill({ status }) {
    FULL RECORD EDITOR (opened when a row is clicked)
    Uses the same dark ReportForm the officer fills out
 ══════════════════════════════════ */
-function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, onBack, onSave }) {
+function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, departments, onBack, onSave }) {
   const [editData, setEditData]     = useState({ ...(entry.formData || {}) });
   const [status, setStatus]         = useState(entry.status || 'Pending Review');
   const [supSig, setSupSig]         = useState(entry.supervisorSignature || '');
@@ -61,8 +61,8 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         status,
         dateTime: entry.date,
         officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—'),
-        agency: officer?.deptShort || communityConfig?.name || 'SSRP',
-        logoUrl: communityConfig?.logoUrl,
+        agency: departments?.find(d => d.short === officer?.deptShort)?.name || officer?.deptShort || communityConfig?.name || 'SSRP',
+        logoUrl: departments?.find(d => d.short === officer?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         officerSignature: entry.officerSignature,
         supervisorSignature: supSig || entry.supervisorSignature,
       });
@@ -344,7 +344,7 @@ export default function Supervisor() {
   const { state, dispatch } = useCAD();
   const {
     reports, records, officers, currentUser,
-    reportTemplates = [], recordTemplates = [], communityConfig,
+    reportTemplates = [], recordTemplates = [], communityConfig, departments = [],
   } = state;
 
   const [deptFilter, setDeptFilter]     = useState('All');
@@ -434,6 +434,7 @@ export default function Supervisor() {
         currentUser={currentUser}
         allOfficers={officers}
         communityConfig={communityConfig}
+        departments={departments}
         onBack={() => setOpenEntry(null)}
         onSave={saveEntry}
       />

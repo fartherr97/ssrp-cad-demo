@@ -130,7 +130,7 @@ export default function RecordsCenter() {
           status: 'Draft',
           dateTime: now.toLocaleString(),
           officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
-          agency: me?.deptShort || communityConfig?.name || 'SSRP',
+          agency: departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || 'SSRP',
           logoUrl: departments?.find(d => d.short === me?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         });
       } finally { setPdfLoading(false); }

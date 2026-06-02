@@ -182,7 +182,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
             <Image src={meta.logoUrl} style={styles.logoBox} />
           ) : null}
           <View style={styles.headerLeft}>
-            <Text style={styles.agencyName}>{template?.agency || 'Sunshine State RP Law Enforcement'}</Text>
+            <Text style={styles.agencyName}>{meta.agency || template?.agency || 'Sunshine State RP Law Enforcement'}</Text>
             {template?.formCode && <Text style={styles.formCode}>Form: {template.formCode}</Text>}
             <Text style={styles.reportType}>{template?.name || 'Report'}</Text>
           </View>
