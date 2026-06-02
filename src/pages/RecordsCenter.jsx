@@ -4,7 +4,7 @@ import { useCAD } from '../store/cadStore';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
-  MdDescription, MdArrowBack, MdSave, MdDownload, MdDeleteOutline, MdCheckCircle,
+  MdDescription, MdArrowBack, MdDownload, MdDeleteOutline, MdCheckCircle,
   MdShield, MdPerson, MdInventory2,
 } from 'react-icons/md';
 import {
@@ -230,7 +230,6 @@ export default function RecordsCenter() {
         <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base p-3 md:px-4 md:py-2.5">
           <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center">
             <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
-            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={saveDraftNow}><MdSave size={15} /> Save Draft</button>
             <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
               <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
