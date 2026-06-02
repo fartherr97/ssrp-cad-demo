@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
+import ReportForm from '../components/ReportForm';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
@@ -56,7 +57,7 @@ const SEARCH_TYPES = [
 
 export default function RecordsBureau() {
   const { state } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [] } = state;
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
@@ -304,56 +305,57 @@ export default function RecordsBureau() {
             </div>
           ) : selCase ? (
             /* ── CASE DETAIL ── */
-            <div className="flex-1 overflow-y-auto p-5">
-              <div className="flex items-start gap-3 mb-5">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${selCaseKind === 'report' ? 'bg-blue-500/15' : 'bg-emerald-500/15'}`}>
+            <>
+              {/* Compact header */}
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-border-faint shrink-0">
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${selCaseKind === 'report' ? 'bg-blue-500/15' : 'bg-emerald-500/15'}`}>
                   {selCaseKind === 'report'
-                    ? <MdDescription size={20} className="text-blue-400" />
-                    : <MdFolder size={20} className="text-emerald-400" />}
+                    ? <MdDescription size={18} className="text-blue-400" />
+                    : <MdFolder size={18} className="text-emerald-400" />}
                 </div>
-                <div className="min-w-0">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5">
-                    {selCaseKind === 'report' ? 'Report' : 'Record'}
-                  </div>
-                  <div className="text-[18px] font-extrabold text-white leading-tight">{selCase.type}</div>
-                  <div className="text-[11px] font-mono text-brand-bright mt-0.5">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[15px] font-extrabold text-white leading-tight truncate">{selCase.type}</div>
+                  <div className="text-[10px] font-mono text-brand-bright">
                     {selCaseKind === 'report' ? selCase.caseNumber : selCase.recordNumber}
+                    {selCase.date ? <span className="text-slate-500 ml-2">{selCase.date}</span> : null}
                   </div>
                 </div>
-                <div className="ml-auto shrink-0 pt-1">
-                  <StatusChip status={selCase.status} />
-                </div>
+                <StatusChip status={selCase.status} />
               </div>
 
-              <div className="grid gap-4">
-                <InfoCard title="Details">
-                  <Row label="Status"       value={<StatusChip status={selCase.status} />} />
-                  <Row label="Date"         value={selCase.date || '—'} mono />
-                  <Row label="Officer"      value={selCase.officerBadge || '—'} mono />
-                  {selCaseKind === 'report' && <Row label="Call ID" value={selCase.callId || '—'} mono />}
-                </InfoCard>
-
-                {(selCase.summary || selCase.formData?.summary) && (
-                  <InfoCard title="Summary">
-                    <div className="text-[12.5px] text-slate-300 leading-relaxed">
-                      {selCase.summary || selCase.formData?.summary}
+              {/* Form document body */}
+              <div className="flex-1 overflow-y-auto">
+                {(() => {
+                  const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
+                  const tpl = templates.find(t => t.name === selCase.type);
+                  if (tpl && selCase.formData) {
+                    return (
+                      <div className="p-4">
+                        <ReportForm template={tpl} data={selCase.formData} readOnly />
+                      </div>
+                    );
+                  }
+                  // Fallback: plain field list when no matching template
+                  return (
+                    <div className="p-5 grid gap-4">
+                      <InfoCard title="Details">
+                        <Row label="Status"  value={<StatusChip status={selCase.status} />} />
+                        <Row label="Date"    value={selCase.date || '—'} mono />
+                        <Row label="Officer" value={selCase.officerBadge || '—'} mono />
+                        {selCaseKind === 'report' && <Row label="Call ID" value={selCase.callId || '—'} mono />}
+                      </InfoCard>
+                      {(selCase.summary || selCase.formData?.summary) && (
+                        <InfoCard title="Summary">
+                          <div className="text-[12.5px] text-slate-300 leading-relaxed">
+                            {selCase.summary || selCase.formData?.summary}
+                          </div>
+                        </InfoCard>
+                      )}
                     </div>
-                  </InfoCard>
-                )}
-
-                {selCase.formData && Object.keys(selCase.formData).filter(k => k !== 'summary' && selCase.formData[k]).length > 0 && (
-                  <InfoCard title="Form Data">
-                    <div className="grid grid-cols-1 gap-2">
-                      {Object.entries(selCase.formData)
-                        .filter(([k, v]) => k !== 'summary' && v && typeof v !== 'object')
-                        .map(([k, v]) => (
-                          <Row key={k} label={k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())} value={String(v)} />
-                        ))}
-                    </div>
-                  </InfoCard>
-                )}
+                  );
+                })()}
               </div>
-            </div>
+            </>
           ) : (
             <>
               {/* Header */}
