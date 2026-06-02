@@ -133,7 +133,6 @@ export default function OfficerProfile() {
             </div>
           </div>
           <div className="text-right shrink-0">
-            <StatusBadge status={myOfficer.status} />
             {myOfficer.callId && <div className="text-amber-400 text-xs mt-1.5">On Call: {myOfficer.callId}</div>}
           </div>
         </div>
