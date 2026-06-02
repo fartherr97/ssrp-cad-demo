@@ -1,28 +1,375 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import { useResponsive } from '../hooks/useResponsive';
-import StatusBadge from '../components/StatusBadge';
+import {
+  MdSearch, MdPerson, MdDirectionsCar, MdPhone, MdReportProblem,
+  MdAdd, MdManageSearch, MdGavel, MdWarning, MdDescription,
+} from 'react-icons/md';
 
-const SEARCH_TABS = ['PERSON', 'VEHICLE', 'PHONE', 'INCIDENT'];
+/* ─── helpers ─────────────────────────────────────────────── */
+function age(dob) {
+  if (!dob) return '?';
+  const d = new Date(dob);
+  if (isNaN(d)) return '?';
+  const today = new Date();
+  let a = today.getFullYear() - d.getFullYear();
+  if (today < new Date(today.getFullYear(), d.getMonth(), d.getDate())) a--;
+  return a;
+}
+function fmtDate(raw) {
+  if (!raw) return 'N/A';
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+}
+function fmtDateTime(raw) {
+  if (!raw) return 'N/A';
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return `${fmtDate(raw)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function maskSSN(ssn) {
+  if (!ssn) return 'N/A';
+  const digits = ssn.replace(/\D/g,'');
+  return `***-**-${digits.slice(-4)}`;
+}
 
-const RECORD_TABS = [
-  'SUMMARY', 'DETAILS', 'ADDRESSES', 'CONTACTS',
-  'ASSOCIATES', 'INCIDENTS', 'CITATIONS', 'WARRANTS',
-  'VEHICLES', 'PROPERTY', 'REPORTS',
+const SEARCH_TABS = [
+  { key: 'PERSON',   Icon: MdPerson },
+  { key: 'VEHICLE',  Icon: MdDirectionsCar },
+  { key: 'PHONE',    Icon: MdPhone },
+  { key: 'INCIDENT', Icon: MdReportProblem },
 ];
 
+const RECORD_TABS = [
+  'SUMMARY','DETAILS','ADDRESSES','CONTACTS','ASSOCIATES',
+  'INCIDENTS','CITATIONS','WARRANTS','VEHICLES','PROPERTY','REPORTS',
+];
+
+/* ─── shared primitives ───────────────────────────────────── */
+function FieldCard({ title, children, accent }) {
+  return (
+    <div className="rounded-lg overflow-hidden flex flex-col"
+      style={{ background: '#0c1828', border: `1px solid ${accent ? accent + '30' : 'rgba(255,255,255,0.07)'}` }}>
+      <div className="px-3 py-1.5 text-[9.5px] font-bold uppercase tracking-[1px] shrink-0"
+        style={{ background: accent ? accent + '14' : '#0a1420', color: accent || '#3d5470', borderBottom: `1px solid ${accent ? accent + '20' : 'rgba(255,255,255,0.06)'}` }}>
+        {title}
+      </div>
+      <div className="p-3 flex-1">{children}</div>
+    </div>
+  );
+}
+
+function InfoRow({ label, value, valueColor, mono }) {
+  return (
+    <div className="flex gap-2 mb-[3px]">
+      <span className="text-[11px] shrink-0" style={{ color: '#3d5470', minWidth: 108 }}>{label}</span>
+      <span className="text-[11px]" style={{ color: valueColor || '#c8d5e8', fontFamily: mono ? 'var(--font-mono)' : undefined }}>
+        {value || 'N/A'}
+      </span>
+    </div>
+  );
+}
+
+/* ─── SUMMARY tab ─────────────────────────────────────────── */
+function SummaryTab({ civ, civVehicles, civHistory, activeWarrants }) {
+  return (
+    <div className="flex flex-col gap-3">
+
+      {/* Row 1: Personal | Addresses | Additional */}
+      <div className="grid grid-cols-3 gap-3">
+        <FieldCard title="Personal Information">
+          <InfoRow label="Full Name"       value={`${civ.firstName} ${civ.lastName}`} />
+          <InfoRow label="DOB"             value={`${fmtDate(civ.dob)} (${age(civ.dob)})`} />
+          <InfoRow label="Gender"          value={civ.gender} />
+          <InfoRow label="Race"            value={civ.ethnicity} />
+          <InfoRow label="Height / Weight" value={civ.height && civ.weight ? `${civ.height} / ${civ.weight}` : 'N/A'} />
+          <InfoRow label="Hair / Eyes"     value={civ.hair && civ.eyes ? `${civ.hair} / ${civ.eyes}` : 'N/A'} />
+          <InfoRow label="SSN"             value={maskSSN(civ.ssn)} mono />
+          <InfoRow label="DL Number"       value={civ.dlNumber} mono
+            valueColor={civ.dlStatus === 'SUSPENDED' ? '#f87171' : undefined} />
+          <InfoRow label="State ID"        value={civ.stateId || 'N/A'} mono />
+          <InfoRow label="FBI Number"      value={civ.fbiNumber || 'N/A'} mono />
+        </FieldCard>
+
+        <FieldCard title="Address(es)">
+          {civ.address ? (
+            <>
+              <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] mb-1" style={{ color: '#3d5470' }}>Primary Address</div>
+              <div className="text-[12px] leading-[1.7] mb-3" style={{ color: '#c8d5e8' }}>{civ.address}</div>
+              <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] mb-1" style={{ color: '#3d5470' }}>County</div>
+              <div className="text-[11px] mb-3" style={{ color: '#6b8299' }}>{civ.county || 'N/A'}</div>
+              {civ.mailingAddress && (
+                <>
+                  <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] mb-1" style={{ color: '#3d5470' }}>Mailing Address</div>
+                  <div className="text-[12px] leading-[1.7]" style={{ color: '#c8d5e8' }}>{civ.mailingAddress}</div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="text-[11px]" style={{ color: '#2d3f52' }}>No address on file</div>
+          )}
+        </FieldCard>
+
+        <FieldCard title="Additional Information">
+          <InfoRow label="Citizenship"    value={civ.citizenship || 'United States'} />
+          <InfoRow label="Place of Birth" value={civ.birthPlace || 'N/A'} />
+          <InfoRow label="Occupation"     value={civ.occupation || 'Unknown'} />
+          <InfoRow label="Employer"       value={civ.employer || 'N/A'} />
+          <InfoRow label="Marital Status" value={civ.maritalStatus || 'Unknown'} />
+          <InfoRow label="Known Aliases"  value={civ.aliases?.join(', ') || 'None'} />
+          <InfoRow label="Gang Affiliation" value={civ.gang || 'None'} />
+          {civ.flags?.length > 0 ? (
+            <div className="mt-2">
+              <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] mb-1" style={{ color: '#3d5470' }}>Caution(s)</div>
+              <div className="flex flex-wrap gap-1">
+                {civ.flags.map(f => (
+                  <span key={f} className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                    style={{ background: 'rgba(239,68,68,0.14)', color: '#f87171', border: '1px solid rgba(239,68,68,0.28)' }}>
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <InfoRow label="Caution(s)" value="None" />
+          )}
+        </FieldCard>
+      </div>
+
+      {/* Row 2: Photo | Active Warrants | BOLOs */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: '160px 1fr 1fr' }}>
+
+        <FieldCard title="Photo">
+          <div className="rounded-lg overflow-hidden flex items-center justify-center"
+            style={{ height: 130, background: '#070e1a', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {civ.photoUrl
+              ? <img src={civ.photoUrl} alt="Mugshot" className="w-full h-full object-cover" />
+              : <MdPerson size={52} style={{ color: '#1e2d40' }} />
+            }
+          </div>
+        </FieldCard>
+
+        <FieldCard title={`Active Warrants (${activeWarrants.length})`}
+          accent={activeWarrants.length > 0 ? '#ef4444' : undefined}>
+          {activeWarrants.length === 0 ? (
+            <div className="text-[11px] py-2" style={{ color: '#2d3f52' }}>No active warrants on file.</div>
+          ) : activeWarrants.map(w => (
+            <div key={w.id} className="mb-3 last:mb-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11.5px] font-bold" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>
+                  WARRANT #{String(w.id).padStart(2,'0')}CR{w.issuedDate?.replace(/-/g,'').slice(2) || '000000'}
+                </span>
+                <span className="text-[10px]" style={{ color: '#3d5470' }}>{fmtDate(w.issuedDate)}</span>
+              </div>
+              <InfoRow label="Charge" value={w.charge} valueColor="#fca5a5" />
+              <InfoRow label="Bond"   value={w.bond ? `$${Number(w.bond).toLocaleString()}.00` : 'N/A'} />
+              <InfoRow label="Issuing Agency" value={w.issuedBy} />
+              <span className="mt-1 inline-block px-2 py-0.5 rounded text-[9px] font-bold"
+                style={{ background: 'rgba(239,68,68,0.18)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.32)' }}>
+                {w.type?.toUpperCase().includes('BENCH') ? 'BENCH WARRANT' : 'FELONY'}
+              </span>
+            </div>
+          ))}
+        </FieldCard>
+
+        <FieldCard title={`Active BOLOs / Locations (${civ.bolos?.length || 0})`}>
+          {!civ.bolos?.length ? (
+            <div className="text-[11px] py-2" style={{ color: '#2d3f52' }}>No active BOLOs or lookout notices.</div>
+          ) : civ.bolos.map((b, i) => (
+            <div key={i} className="mb-2 text-[11px]" style={{ color: '#fbbf24' }}>{b}</div>
+          ))}
+        </FieldCard>
+      </div>
+
+      {/* Row 3: Recent Incidents */}
+      <FieldCard title="Recent Incidents">
+        {civHistory.length === 0 ? (
+          <div className="text-[11px] py-1" style={{ color: '#2d3f52' }}>No incidents on file.</div>
+        ) : (
+          <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
+            <thead>
+              <tr>
+                {['Date / Time', 'Incident #', 'Type', 'Location', 'Disposition'].map(h => (
+                  <th key={h} className="px-2 py-1.5 text-left text-[9.5px] font-bold uppercase tracking-[0.6px] whitespace-nowrap"
+                    style={{ color: '#3d5470', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {civHistory.slice(0, 8).map((h, i) => (
+                <tr key={h.id} style={{ background: i % 2 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                  <td className="px-2 py-1.5 text-[11px]" style={{ color: '#4a6070' }}>{fmtDateTime(h.date)}</td>
+                  <td className="px-2 py-1.5 text-[11px] font-bold" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>
+                    {h.caseNumber || h.callId || 'N/A'}
+                  </td>
+                  <td className="px-2 py-1.5 text-[11px]" style={{ color: '#9ab0c4' }}>
+                    {Array.isArray(h.charges) ? h.charges[0] : h.charges}
+                  </td>
+                  <td className="px-2 py-1.5 text-[11px]" style={{ color: '#4a6070' }}>
+                    {h.location || 'N/A'}
+                  </td>
+                  <td className="px-2 py-1.5">
+                    <DispositionBadge d={h.disposition} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </FieldCard>
+    </div>
+  );
+}
+
+function DispositionBadge({ d }) {
+  const lc = (d || '').toLowerCase();
+  let bg = 'rgba(100,116,139,0.18)', color = '#64748b', border = 'rgba(100,116,139,0.28)';
+  if (lc.includes('arrest')) { bg = 'rgba(239,68,68,0.14)'; color = '#f87171'; border = 'rgba(239,68,68,0.3)'; }
+  else if (lc.includes('cit')) { bg = 'rgba(251,191,36,0.14)'; color = '#fbbf24'; border = 'rgba(251,191,36,0.3)'; }
+  else if (lc.includes('warn')) { bg = 'rgba(249,115,22,0.14)'; color = '#fb923c'; border = 'rgba(249,115,22,0.3)'; }
+  else if (lc.includes('clear') || lc.includes('ok')) { bg = 'rgba(34,197,94,0.12)'; color = '#4ade80'; border = 'rgba(34,197,94,0.28)'; }
+  return (
+    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase"
+      style={{ background: bg, color, border: `1px solid ${border}` }}>
+      {d || 'Unknown'}
+    </span>
+  );
+}
+
+/* ─── INCIDENTS tab ───────────────────────────────────────── */
+function IncidentsTab({ civHistory }) {
+  if (!civHistory.length) {
+    return (
+      <div className="px-4 py-3 rounded-lg text-[11.5px] font-bold"
+        style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', color: '#4ade80', fontFamily: 'var(--font-mono)' }}>
+        *** SUBJECT RETURNS CLEAR · NO CRIMINAL HISTORY ON FILE ***
+      </div>
+    );
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-[11px]">
+        <thead>
+          <tr style={{ background: '#0a1420' }}>
+            {['Date','Case #','Charges','Officer','Agency','Disposition','Sentence','Notes'].map(h => (
+              <th key={h} className="px-3 py-2 text-left font-bold uppercase tracking-[0.6px] whitespace-nowrap"
+                style={{ color: '#3d5470', borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: 9.5 }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {civHistory.map((h, i) => (
+            <tr key={h.id} style={{ background: i % 2 ? '#0a1520' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <td className="px-3 py-2 whitespace-nowrap" style={{ color: '#4a6070' }}>{fmtDate(h.date)}</td>
+              <td className="px-3 py-2 font-bold whitespace-nowrap" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>{h.caseNumber}</td>
+              <td className="px-3 py-2" style={{ color: '#c8d5e8', maxWidth: 220 }}>
+                {Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}
+              </td>
+              <td className="px-3 py-2 whitespace-nowrap" style={{ color: '#4a6070' }}>{h.officerBadge}</td>
+              <td className="px-3 py-2 whitespace-nowrap" style={{ color: '#4a6070' }}>{h.agency}</td>
+              <td className="px-3 py-2 whitespace-nowrap"><DispositionBadge d={h.disposition} /></td>
+              <td className="px-3 py-2" style={{ color: '#4a6070' }}>{h.sentence || '—'}</td>
+              <td className="px-3 py-2 text-[10.5px]" style={{ color: '#3d5470', maxWidth: 200 }}>{h.notes || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ─── WARRANTS tab ────────────────────────────────────────── */
+function WarrantsTab({ civWarrants }) {
+  if (!civWarrants.length) {
+    return (
+      <div className="px-4 py-3 rounded-lg text-[11.5px] font-bold"
+        style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', color: '#4ade80', fontFamily: 'var(--font-mono)' }}>
+        *** SUBJECT RETURNS CLEAR · NO WARRANTS ON FILE ***
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-3">
+      {civWarrants.map(w => (
+        <div key={w.id} className="rounded-lg px-4 py-3"
+          style={{ background: '#0c1828', border: `1px solid ${w.status === 'ACTIVE' ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.07)'}` }}>
+          <div className="flex items-center gap-3 mb-2.5">
+            <span className="text-[13px] font-bold" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>WARRANT #{w.id}</span>
+            <span className="px-2 py-0.5 rounded text-[9px] font-bold"
+              style={{ background: w.status === 'ACTIVE' ? 'rgba(239,68,68,0.18)' : 'rgba(100,116,139,0.14)', color: w.status === 'ACTIVE' ? '#f87171' : '#64748b', border: `1px solid ${w.status === 'ACTIVE' ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)'}` }}>
+              {w.status}
+            </span>
+            <span className="ml-auto text-[10.5px]" style={{ color: '#3d5470' }}>{fmtDate(w.issuedDate)}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-x-6">
+            <InfoRow label="Type"       value={w.type} />
+            <InfoRow label="Issued By"  value={w.issuedBy} />
+            <InfoRow label="Charge"     value={w.charge} valueColor="#fca5a5" />
+            {w.notes && <InfoRow label="Notes" value={w.notes} />}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── VEHICLES tab ────────────────────────────────────────── */
+function VehiclesTab({ civVehicles }) {
+  if (!civVehicles.length) {
+    return <div className="text-[11.5px]" style={{ color: '#2d3f52' }}>No vehicles registered to this subject.</div>;
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-[11px]">
+        <thead>
+          <tr style={{ background: '#0a1420' }}>
+            {['Plate','Year','Make','Model','Color','Reg Status','Stolen','Flags'].map(h => (
+              <th key={h} className="px-3 py-2 text-left font-bold uppercase tracking-[0.6px] whitespace-nowrap"
+                style={{ color: '#3d5470', borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: 9.5 }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {civVehicles.map((v, i) => (
+            <tr key={v.id} style={{ background: i % 2 ? '#0a1520' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <td className="px-3 py-2 font-bold" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>{v.plate}</td>
+              <td className="px-3 py-2" style={{ color: '#6b8299' }}>{v.year}</td>
+              <td className="px-3 py-2" style={{ color: '#c8d5e8' }}>{v.make}</td>
+              <td className="px-3 py-2" style={{ color: '#c8d5e8' }}>{v.model}</td>
+              <td className="px-3 py-2" style={{ color: '#9ab0c4' }}>{v.color}</td>
+              <td className="px-3 py-2">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                  style={{ background: v.regStatus === 'VALID' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.14)', color: v.regStatus === 'VALID' ? '#4ade80' : '#f87171', border: `1px solid ${v.regStatus === 'VALID' ? 'rgba(34,197,94,0.28)' : 'rgba(239,68,68,0.3)'}` }}>
+                  {v.regStatus}
+                </span>
+              </td>
+              <td className="px-3 py-2">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                  style={{ background: v.stolen ? 'rgba(239,68,68,0.14)' : 'rgba(34,197,94,0.12)', color: v.stolen ? '#f87171' : '#4ade80', border: `1px solid ${v.stolen ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.28)'}` }}>
+                  {v.stolen ? 'YES' : 'NO'}
+                </span>
+              </td>
+              <td className="px-3 py-2" style={{ color: '#4a6070' }}>{v.flags?.join(', ') || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ─── Main page ───────────────────────────────────────────── */
 export default function SearchPage() {
   const { state } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reportTemplates, recordTemplates } = state;
 
-  const { isMobile } = useResponsive();
-  const [searchTab,   setSearchTab]   = useState('PERSON');
-  const [query,       setQuery]       = useState('');
-  const [results,     setResults]     = useState([]);
-  const [selected,    setSelected]    = useState(null);
-  const [selectedVeh, setSelectedVeh] = useState(null);
-  const [recordTab,   setRecordTab]   = useState('SUMMARY');
-  const [mobilePanel, setMobilePanel] = useState('search');
+  const [searchTab, setSearchTab] = useState('PERSON');
+  const [query,     setQuery]     = useState('');
+  const [results,   setResults]   = useState([]);
+  const [selected,  setSelected]  = useState(null);
+  const [recordTab, setRecordTab] = useState('SUMMARY');
 
   const runSearch = () => {
     const q = query.trim().toUpperCase();
@@ -30,578 +377,249 @@ export default function SearchPage() {
     if (searchTab === 'PERSON') {
       const found = civilians.filter(c =>
         `${c.firstName} ${c.lastName}`.toUpperCase().includes(q) ||
-        (c.ssn || '').replace(/-/g, '').includes(q.replace(/-/g, ''))
+        (c.ssn || '').replace(/-/g, '').includes(q.replace(/-/g, '')) ||
+        fmtDate(c.dob).includes(q)
       );
       setResults(found);
       setSelected(found[0] || null);
-      setSelectedVeh(null);
-      if (isMobile && found.length > 0) setMobilePanel('record');
+      setRecordTab('SUMMARY');
     } else if (searchTab === 'VEHICLE') {
       const found = vehicles.filter(v => v.plate.toUpperCase().includes(q));
-      if (found.length > 0) {
-        setSelectedVeh(found[0]);
+      if (found.length) {
         const owner = civilians.find(c => c.id === found[0].ownerId);
-        setSelected(owner || null);
         setResults(owner ? [owner] : []);
-        if (isMobile) setMobilePanel('record');
+        setSelected(owner || null);
+        setRecordTab('VEHICLES');
       } else {
         setResults([]);
         setSelected(null);
-        setSelectedVeh(null);
       }
     }
   };
 
-  const selectCiv = civ => {
+  const selectCiv = (civ) => {
     setSelected(civ);
-    setSelectedVeh(null);
     setRecordTab('SUMMARY');
-    if (isMobile) setMobilePanel('record');
   };
 
-  const civWarrants  = selected ? warrants.filter(w => w.civilianId === selected.id)           : [];
-  const civHistory   = selected ? criminalHistory.filter(h => h.civilianId === selected.id)    : [];
-  const civVehicles  = selected ? vehicles.filter(v => selected.vehicles?.includes(v.id))       : [];
-
+  const civWarrants  = selected ? warrants.filter(w => w.civilianId === selected.id) : [];
+  const civHistory   = selected ? criminalHistory.filter(h => h.civilianId === selected.id) : [];
+  const civVehicles  = selected ? vehicles.filter(v => selected.vehicles?.includes(v.id)) : [];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
 
   return (
-    <div
-      className="h-full overflow-hidden bg-[#080b12] font-mono"
-      style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
-    >
+    <div className="h-full overflow-hidden flex font-ui" style={{ background: '#07101c' }}>
 
-      {isMobile && (
-        <div className="flex border-b border-[#141720] bg-[#0d1117] shrink-0">
-          {[['search', 'SEARCH'], ['record', 'RECORD'], ['activity', 'ACTIVITY']].map(([v, l]) => (
-            <button key={v} onClick={() => setMobilePanel(v)}
-              className={`flex-1 bg-transparent border-none py-2.5 px-1 text-[11px] tracking-[0.5px] cursor-pointer font-mono
-                ${mobilePanel === v ? 'border-b-2 border-blue-700 text-sky-300 font-bold' : 'border-b-2 border-transparent text-[#4b5563] font-medium'}`}>
-              {l}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* ── LEFT: Search panel (260px) ── */}
+      <div className="shrink-0 flex flex-col overflow-hidden"
+        style={{ width: 260, background: '#080f1c', borderRight: '1px solid rgba(255,255,255,0.07)' }}>
 
-      {/* ── LEFT: Search panel ── */}
-      <div
-        className="bg-[#09090f] flex-col overflow-hidden"
-        style={{
-          ...(isMobile ? {
-            display: mobilePanel === 'search' ? 'flex' : 'none',
-            flex: 1,
-          } : {
-            display: 'flex',
-            width: 260,
-            flexShrink: 0,
-            borderRight: '1px solid #141720',
-          }),
-        }}
-      >
-        {/* Panel header */}
-        <div className="px-2.5 py-2 border-b border-[#141720] bg-[#0d1117]">
-          <div className="text-[#374151] text-[10px] tracking-[1.5px] uppercase mb-1.5">Search</div>
-          {/* Search type tabs */}
-          <div className="flex gap-0.5 mb-2">
-            {SEARCH_TABS.map(t => (
-              <button
-                key={t}
-                onClick={() => setSearchTab(t)}
-                className={`flex-1 rounded-sm py-[3px] px-0.5 text-[9px] font-bold tracking-[0.5px] cursor-pointer border transition-colors
-                  ${searchTab === t
-                    ? 'bg-[#1e3a5f] border-blue-700 text-sky-300'
-                    : 'bg-transparent border-[#1a1e2c] text-[#374151]'}`}
-              >
-                {t}
+        {/* Header */}
+        <div className="shrink-0 px-3 pt-3 pb-2.5"
+          style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <MdSearch size={13} style={{ color: '#3d5470' }} />
+            <span className="text-[9px] font-bold uppercase tracking-[1.2px]" style={{ color: '#3d5470' }}>Search</span>
+          </div>
+
+          {/* Type tabs */}
+          <div className="flex gap-0.5 mb-2.5">
+            {SEARCH_TABS.map(({ key, Icon }) => (
+              <button key={key} type="button" onClick={() => { setSearchTab(key); setResults([]); setSelected(null); }}
+                className="flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-md border-none cursor-pointer transition-colors text-[8.5px] font-bold uppercase tracking-[0.4px]"
+                style={{
+                  background: searchTab === key ? 'rgba(61,130,240,0.2)' : 'rgba(255,255,255,0.04)',
+                  color: searchTab === key ? '#3d82f0' : '#3d5470',
+                  border: `1px solid ${searchTab === key ? 'rgba(61,130,240,0.35)' : 'rgba(255,255,255,0.07)'}`,
+                }}>
+                <Icon size={13} />
+                {key}
               </button>
             ))}
           </div>
+
           {/* Search input */}
-          <div className="flex gap-1">
+          <div className="text-[9px] font-semibold mb-1" style={{ color: '#3d5470' }}>
+            {searchTab === 'PERSON' ? 'Search by Name, DOB, or SSN' :
+             searchTab === 'VEHICLE' ? 'Search by Plate Number' :
+             searchTab === 'PHONE' ? 'Search by Phone Number' :
+             'Search by Incident Number'}
+          </div>
+          <div className="flex gap-1.5">
             <input
+              className="flex-1 rounded-lg text-[11.5px] outline-none"
+              style={{ background: '#060d18', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+              placeholder={searchTab === 'PERSON' ? 'Full name or SSN…' : searchTab === 'VEHICLE' ? 'ABC-1234' : 'Search…'}
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && runSearch()}
-              placeholder={
-                searchTab === 'PERSON'   ? 'Name, DOB, or SSN...'  :
-                searchTab === 'VEHICLE'  ? 'Plate number...'        :
-                searchTab === 'PHONE'    ? 'Phone number...'        :
-                                          'Incident number...'
-              }
-              className="flex-1 bg-[#06070c] border border-[#1a1e2c] rounded-sm text-slate-300 py-[5px] px-[7px] text-[11px] font-mono outline-none"
             />
-            <button
-              onClick={runSearch}
-              className="bg-[#1e3a5f] border border-blue-700 rounded-sm text-sky-300 px-2 py-[5px] text-[11px] font-bold cursor-pointer"
-            >
+            <button type="button" onClick={runSearch}
+              className="rounded-lg px-3 text-[11px] font-bold border-none cursor-pointer"
+              style={{ background: 'rgba(61,130,240,0.2)', color: '#3d82f0', border: '1px solid rgba(61,130,240,0.35)' }}>
               GO
             </button>
           </div>
-          <button
-            onClick={runSearch}
-            className="w-full mt-1 bg-[#0d1117] border border-[#1a1e2c] rounded-sm text-[#374151] py-1 text-[10px] cursor-pointer"
-          >
-            Narrow Search
+
+          <button type="button"
+            className="w-full mt-1.5 py-1 rounded-md text-[9.5px] font-semibold border-none cursor-pointer flex items-center justify-center gap-1"
+            style={{ background: 'rgba(255,255,255,0.04)', color: '#3d5470', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <MdManageSearch size={11} /> Narrow Search
           </button>
         </div>
 
-        {/* Results */}
+        {/* Results count */}
+        {results.length > 0 && (
+          <div className="shrink-0 px-3 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.6px]"
+            style={{ color: '#3d5470', background: '#060d18', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            Results ({results.length})
+          </div>
+        )}
+
+        {/* Result list */}
         <div className="flex-1 overflow-y-auto">
           {results.length === 0 && query && (
-            <div className="px-2.5 py-3 text-red-600 text-[11px]">
-              *** NO RECORDS FOUND ***
+            <div className="px-3 py-4 text-center text-[11px]" style={{ color: '#2d3f52' }}>
+              No records found
             </div>
           )}
-          {results.map(civ => (
-            <div
-              key={civ.id}
-              onClick={() => selectCiv(civ)}
-              className="px-2.5 py-2 cursor-pointer border-b border-[#141720] hover:bg-[#0d1117] transition-colors"
-              style={{
-                borderLeft: `3px solid ${selected?.id === civ.id ? '#1d4ed8' : 'transparent'}`,
-                background: selected?.id === civ.id ? '#0f172a' : 'transparent',
-              }}
-            >
-              <div className={`text-[12px] font-semibold ${selected?.id === civ.id ? 'text-slate-200' : 'text-[#9ca3af]'}`}>
-                {civ.firstName} {civ.lastName}
-              </div>
-              <div className="text-[#374151] text-[10px] mt-0.5">DOB: {civ.dob}</div>
-              <div className="text-[#374151] text-[10px]">SSN: ***-**-{(civ.ssn || '').slice(-4)}</div>
-              {civ.flags?.length > 0 && (
-                <div className="mt-[3px] flex gap-[3px] flex-wrap">
-                  {civ.flags.map(f => (
-                    <span key={f} className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-1 font-bold">
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              )}
+          {results.length === 0 && !query && (
+            <div className="px-3 py-4 text-center text-[11px]" style={{ color: '#1e2d3d' }}>
+              Enter a name, SSN, or plate to search
             </div>
-          ))}
+          )}
+          {results.map(civ => {
+            const isActive = selected?.id === civ.id;
+            const hasWarrant = warrants.some(w => w.civilianId === civ.id && w.status === 'ACTIVE');
+            return (
+              <div key={civ.id} onClick={() => selectCiv(civ)}
+                className="px-3 py-2.5 cursor-pointer transition-colors"
+                style={{
+                  background: isActive ? 'rgba(61,130,240,0.1)' : 'transparent',
+                  borderLeft: `2px solid ${isActive ? '#3d82f0' : 'transparent'}`,
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                }}>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12.5px] font-bold" style={{ color: isActive ? '#e2eaf8' : '#8da0b5' }}>
+                    {civ.firstName} {civ.lastName}
+                  </span>
+                  {hasWarrant && <MdGavel size={11} style={{ color: '#ef4444', flexShrink: 0 }} />}
+                </div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#3d5470' }}>DOB: {fmtDate(civ.dob)}</div>
+                <div className="text-[10px]" style={{ color: '#3d5470' }}>SSN: {maskSSN(civ.ssn)}</div>
+                {civ.flags?.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {civ.flags.map(f => (
+                      <span key={f} className="px-1 py-0.5 rounded text-[8.5px] font-bold"
+                        style={{ background: 'rgba(239,68,68,0.14)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Bottom actions */}
-        <div className="px-2 py-1.5 border-t border-[#141720] flex gap-1">
-          <button
-            onClick={() => { setQuery(''); setResults([]); setSelected(null); setSelectedVeh(null); }}
-            className="flex-1 bg-[#0d1117] border border-[#1a1e2c] rounded-sm text-[#374151] py-1 text-[10px] cursor-pointer"
-          >
-            Clear
+        {/* Bottom quick actions */}
+        <div className="shrink-0 px-2.5 py-2.5 flex flex-col gap-1.5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0b1627' }}>
+          <button type="button"
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10.5px] font-semibold border-none cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.04)', color: '#6b8299', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <MdAdd size={13} style={{ color: '#3d82f0' }} /> Create New Record
+          </button>
+          <button type="button"
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10.5px] font-semibold border-none cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.04)', color: '#6b8299', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <MdManageSearch size={13} style={{ color: '#3d82f0' }} /> Advanced Search
           </button>
         </div>
       </div>
 
-      {/* ── CENTER: Record workspace ── */}
-      <div
-        className="flex-col overflow-hidden min-w-0"
-        style={isMobile
-          ? { display: mobilePanel === 'record' ? 'flex' : 'none', flex: 1 }
-          : { display: 'flex', flex: 1 }}
-      >
+      {/* ── RIGHT: Record workspace ── */}
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+
         {!selected ? (
-          <div className="flex-1 flex items-center justify-center flex-col gap-2.5 text-[#1f2937]">
-            <div className="text-[13px] font-bold tracking-[1px]">RECORDS SEARCH</div>
-            <div className="text-[11px]">Enter a name, SSN, or plate to begin a search</div>
+          <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{ color: '#1e2d3d' }}>
+            <MdSearch size={48} style={{ opacity: 0.15 }} />
+            <div className="text-[13px] font-bold tracking-[0.5px]" style={{ color: '#2d3f52' }}>Records Search</div>
+            <div className="text-[11.5px]">Enter a name, SSN, or plate number to begin</div>
           </div>
         ) : (
           <>
             {/* Record header */}
-            <div className="bg-[#0d1117] border-b border-[#141720] px-3.5 py-2 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#1a1e2c] border border-[#374151] flex items-center justify-center shrink-0">
-                  <span className="text-[#6b7280] text-[14px]">👤</span>
-                </div>
-                <div>
-                  <div className="text-slate-200 font-bold text-[16px] tracking-[0.3px]">
-                    {selected.firstName} {selected.lastName}
-                  </div>
-                  <div className="flex gap-2.5 mt-px">
-                    <span className="text-[#374151] text-[11px]">DOB: <span className="text-[#9ca3af]">{selected.dob}</span></span>
-                    <span className="text-[#374151] text-[11px]">SSN: <span className="text-[#9ca3af]">{selected.ssn}</span></span>
-                  </div>
-                </div>
-                {activeWarrants.length > 0 && (
-                  <span className="ml-auto bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm px-2 py-0.5 text-[11px] font-bold">
-                    WANTED * {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
-                  </span>
-                )}
+            <div className="shrink-0 flex items-center gap-3 px-5 py-3"
+              style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(61,130,240,0.14)', border: '1px solid rgba(61,130,240,0.28)' }}>
+                <MdPerson size={20} style={{ color: '#3d82f0' }} />
               </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[20px] font-extrabold tracking-[-0.3px]" style={{ color: '#e2eaf8' }}>
+                  {selected.firstName} {selected.lastName}
+                </div>
+                <div className="flex items-center gap-4 mt-px">
+                  <span className="text-[11px]" style={{ color: '#3d5470' }}>
+                    DOB: <span style={{ color: '#6b8299' }}>{fmtDate(selected.dob)}</span>
+                  </span>
+                  <span className="text-[11px]" style={{ color: '#3d5470' }}>
+                    SSN: <span style={{ color: '#6b8299', fontFamily: 'var(--font-mono)' }}>{maskSSN(selected.ssn)}</span>
+                  </span>
+                </div>
+              </div>
+              {activeWarrants.length > 0 && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0"
+                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  <MdWarning size={14} style={{ color: '#ef4444' }} />
+                  <span className="text-[11px] font-bold" style={{ color: '#f87171' }}>
+                    WANTED · {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Record tabs */}
-            <div className="bg-[#090b10] border-b border-[#141720] flex shrink-0 overflow-x-auto">
+            {/* Tab bar */}
+            <div className="shrink-0 flex overflow-x-auto"
+              style={{ background: '#08111c', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
               {RECORD_TABS.map(t => (
-                <button
-                  key={t}
-                  onClick={() => setRecordTab(t)}
-                  className={`bg-transparent border-none py-[7px] px-3 text-[11px] tracking-[0.5px] cursor-pointer whitespace-nowrap shrink-0
-                    ${recordTab === t
-                      ? 'border-b-2 border-blue-700 text-sky-300 font-bold'
-                      : 'border-b-2 border-transparent text-[#374151] font-medium'}`}
-                >
+                <button key={t} type="button" onClick={() => setRecordTab(t)}
+                  className="px-3.5 py-2.5 text-[11px] font-bold tracking-[0.4px] border-none cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                  style={{
+                    background: 'transparent',
+                    color: recordTab === t ? '#3d82f0' : '#3d5470',
+                    borderBottom: `2px solid ${recordTab === t ? '#3d82f0' : 'transparent'}`,
+                  }}>
                   {t}
                 </button>
               ))}
             </div>
 
             {/* Tab content */}
-            <div className="flex-1 overflow-y-auto px-3.5 py-3">
-
+            <div className="flex-1 overflow-y-auto px-5 py-4">
               {recordTab === 'SUMMARY' && (
-                <SummaryTab civ={selected} civVehicles={civVehicles} activeWarrants={activeWarrants} />
+                <SummaryTab
+                  civ={selected}
+                  civVehicles={civVehicles}
+                  civHistory={civHistory}
+                  activeWarrants={activeWarrants}
+                />
               )}
-
-              {recordTab === 'INCIDENTS' && (
-                <HistoryTab civHistory={civHistory} />
-              )}
-
-              {recordTab === 'WARRANTS' && (
-                <WarrantsTab civWarrants={civWarrants} />
-              )}
-
-              {recordTab === 'VEHICLES' && (
-                <VehiclesTab civVehicles={civVehicles} />
-              )}
-
+              {recordTab === 'INCIDENTS' && <IncidentsTab civHistory={civHistory} />}
+              {recordTab === 'WARRANTS'  && <WarrantsTab  civWarrants={civWarrants} />}
+              {recordTab === 'VEHICLES'  && <VehiclesTab  civVehicles={civVehicles} />}
               {['DETAILS','ADDRESSES','CONTACTS','ASSOCIATES','CITATIONS','PROPERTY','REPORTS'].includes(recordTab) && (
-                <div className="text-[#1f2937] text-center pt-10 text-[12px]">
-                  {recordTab} data not available in demo
+                <div className="flex flex-col items-center justify-center gap-2 py-16" style={{ color: '#1e2d3d' }}>
+                  <MdDescription size={36} style={{ opacity: 0.18 }} />
+                  <div className="text-[12px]" style={{ color: '#2d3f52' }}>{recordTab} data not available in demo</div>
                 </div>
               )}
             </div>
           </>
         )}
       </div>
-
-      {/* ── RIGHT: Location + Activity ── */}
-      <div
-        className="flex-col overflow-hidden bg-[#09090f]"
-        style={isMobile
-          ? { display: mobilePanel === 'activity' ? 'flex' : 'none', flex: 1 }
-          : { display: 'flex', width: 320, flexShrink: 0, borderLeft: '1px solid #141720' }}
-      >
-        {/* Map placeholder */}
-        <PanelHead title="LOCATION" />
-        <div className="h-[200px] bg-[#0b0f18] border-b border-[#141720] flex items-center justify-center shrink-0 relative overflow-hidden">
-          {/* Fake map grid */}
-          <div className="absolute inset-0 opacity-15">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="absolute left-0 right-0 h-px bg-blue-700" style={{ top: `${i * 14}%` }} />
-            ))}
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="absolute top-0 bottom-0 w-px bg-blue-700" style={{ left: `${i * 11}%` }} />
-            ))}
-          </div>
-          {selected?.address ? (
-            <div className="text-center z-[1]">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white mx-auto mb-1.5 shadow-[0_0_8px_theme(colors.blue.500)]" />
-              <div className="text-[#9ca3af] text-[10px] font-mono">{selected.address}</div>
-            </div>
-          ) : (
-            <span className="text-[#1f2937] text-[11px]">No location data</span>
-          )}
-        </div>
-
-        {/* Recent activity */}
-        <PanelHead title="RECENT ACTIVITY" />
-        <div className="flex-1 overflow-y-auto">
-          {civHistory.length === 0 && civWarrants.length === 0 ? (
-            <div className="px-2.5 py-3 text-[#1f2937] text-[11px]">No recent activity on record.</div>
-          ) : (
-            <>
-              {civWarrants.map(w => (
-                <ActivityRow
-                  key={w.id}
-                  time={w.issuedDate}
-                  label={w.status === 'ACTIVE' ? 'Warrant Active' : 'Warrant Served'}
-                  detail={w.charge}
-                  color={w.status === 'ACTIVE' ? '#dc2626' : '#374151'}
-                />
-              ))}
-              {civHistory.slice(0, 8).map(h => (
-                <ActivityRow
-                  key={h.id}
-                  time={h.date}
-                  label={h.disposition}
-                  detail={Array.isArray(h.charges) ? h.charges[0] : h.charges}
-                  color="#fbbf24"
-                />
-              ))}
-            </>
-          )}
-        </div>
-      </div>
     </div>
   );
-}
-
-/* ── Sub-tabs ── */
-
-function SummaryTab({ civ, civVehicles, activeWarrants }) {
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Top 3-column grid */}
-      <div className="grid grid-cols-3 gap-2.5">
-
-        <FieldCard title="PERSONAL INFORMATION">
-          <InfoRow label="Full Name"       value={`${civ.firstName} ${civ.lastName}`} />
-          <InfoRow label="DOB"             value={`${civ.dob} (${age(civ.dob)})`} />
-          <InfoRow label="Gender"          value={civ.gender} />
-          <InfoRow label="Race"            value={civ.ethnicity} />
-          <InfoRow label="Height / Weight" value={`${civ.height} / ${civ.weight} lbs`} />
-          <InfoRow label="Hair / Eyes"     value={`${civ.hair} / ${civ.eyes}`} />
-          <InfoRow label="SSN"             value={civ.ssn} />
-          <InfoRow label="DL Number"       value={civ.dlNumber} />
-          <InfoRow label="DL Status"       value={civ.dlStatus} valueColor={civ.dlStatus === 'ACTIVE' ? '#4ade80' : '#f87171'} />
-          <InfoRow label="DL Expiry"       value={civ.dlExpiry} />
-        </FieldCard>
-
-        <FieldCard title="ADDRESS(ES)">
-          <div className="text-[#374151] text-[10px] tracking-[0.5px] mb-1">Primary Address</div>
-          <div className="text-slate-300 text-[12px] leading-[1.6]">{civ.address || 'N/A'}</div>
-          {civ.phone && (
-            <>
-              <div className="border-t border-[#141720] mt-2.5 pt-2 text-[#374151] text-[10px] tracking-[0.5px] mb-1">Phone</div>
-              <div className="text-slate-300 text-[12px]">{civ.phone}</div>
-            </>
-          )}
-        </FieldCard>
-
-        <FieldCard title="ADDITIONAL INFORMATION">
-          <InfoRow label="Citizenship"   value="United States" />
-          <InfoRow label="Occupation"    value="Unknown" />
-          <InfoRow label="Employer"      value="N/A" />
-          <InfoRow label="DL Class"      value={civ.dlClass || 'C'} />
-          {civ.flags?.length > 0 && (
-            <div className="mt-1.5">
-              <div className="text-[#374151] text-[10px] mb-1">Cautions</div>
-              <div className="flex flex-wrap gap-[3px]">
-                {civ.flags.map(f => (
-                  <span key={f} className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-[5px] py-px font-bold">
-                    {f}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </FieldCard>
-      </div>
-
-      {/* Photo + Warrants + BOLOs row */}
-      <div className="grid gap-2.5" style={{ gridTemplateColumns: '140px 1fr 1fr' }}>
-        <FieldCard title="PHOTO">
-          <div className="h-[100px] bg-[#0d1117] border border-[#1a1e2c] rounded-sm flex items-center justify-center">
-            <span className="text-[#374151] text-[28px]">👤</span>
-          </div>
-        </FieldCard>
-
-        <FieldCard title={`ACTIVE WARRANTS (${activeWarrants.length})`}>
-          {activeWarrants.length === 0 ? (
-            <div className="text-[#374151] text-[11px] py-1">None</div>
-          ) : (
-            activeWarrants.map(w => (
-              <div key={w.id} className="mb-2 pb-2 border-b border-[#141720]">
-                <div className="flex gap-2 items-center mb-0.5">
-                  <span className="text-sky-300 text-[11px] font-bold">WARRANT # {w.id}</span>
-                  <span className="text-[#374151] text-[10px] ml-auto">{w.issuedDate}</span>
-                </div>
-                <div className="text-[#fca5a5] text-[11px]">{w.charge}</div>
-                <div className="text-[#374151] text-[10px] mt-0.5">Issued by: {w.issuedBy}</div>
-                <span className="bg-[#450a0a] text-red-400 border border-[#991b1b] rounded-sm text-[9px] px-[5px] font-bold">FELONY</span>
-              </div>
-            ))
-          )}
-        </FieldCard>
-
-        <FieldCard title="ACTIVE BOLOs / LOCATIONS (0)">
-          <div className="text-[#374151] text-[11px] py-1">No active BOLOs or lookout notices.</div>
-        </FieldCard>
-      </div>
-
-      {/* Recent Incidents table */}
-      <FieldCard title="RECENT INCIDENTS">
-        <table className="w-full border-collapse text-[11px]">
-          <thead>
-            <tr>
-              {['DATE / TIME', 'INCIDENT #', 'TYPE', 'LOCATION', 'DISPOSITION'].map(h => (
-                <th key={h} className="px-2 py-[5px] text-left text-[#374151] text-[10px] tracking-[0.6px] border-b border-[#141720] whitespace-nowrap">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {civVehicles.length === 0 ? (
-              <tr><td colSpan={5} className="px-2 py-2.5 text-[#1f2937] text-center">No incidents on file</td></tr>
-            ) : (
-              civVehicles.slice(0, 5).map((v, i) => (
-                <tr key={v.id} className={i % 2 === 0 ? 'bg-[#0b0d14]' : ''}>
-                  <td className="px-2 py-1 text-[#374151]">*</td>
-                  <td className="px-2 py-1 text-sky-300">{v.plate}</td>
-                  <td className="px-2 py-1 text-[#9ca3af]">Vehicle on file</td>
-                  <td className="px-2 py-1 text-[#6b7280]">*</td>
-                  <td className="px-2 py-1"><StatusBadge status={v.regStatus} /></td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </FieldCard>
-    </div>
-  );
-}
-
-function HistoryTab({ civHistory }) {
-  if (civHistory.length === 0) {
-    return (
-      <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
-        *** SUBJECT RETURNS CLEAR * NO CRIMINAL HISTORY ON FILE ***
-      </div>
-    );
-  }
-  return (
-    <div className="table-scroll">
-      <table className="w-full border-collapse text-[12px]">
-        <thead>
-          <tr className="bg-[#0d1117]">
-            {['DATE', 'CASE #', 'CHARGES', 'OFFICER', 'AGENCY', 'DISPOSITION', 'SENTENCE'].map(h => (
-              <th key={h} className="px-2.5 py-1.5 text-left text-[#374151] text-[10px] tracking-[0.7px] border-b border-[#141720] whitespace-nowrap">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {civHistory.map((h, i) => (
-            <tr key={h.id} className={i % 2 === 0 ? 'bg-[#090b10]' : 'bg-[#0b0d14]'}>
-              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.date}</td>
-              <td className="px-2.5 py-[5px] text-sky-300 font-bold">{h.caseNumber}</td>
-              <td className="px-2.5 py-[5px] text-slate-200 max-w-[200px]">{Array.isArray(h.charges) ? h.charges.join(', ') : h.charges}</td>
-              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.officerBadge}</td>
-              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.agency}</td>
-              <td className="px-2.5 py-[5px]"><StatusBadge status={h.disposition} /></td>
-              <td className="px-2.5 py-[5px] text-[#6b7280]">{h.sentence}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function WarrantsTab({ civWarrants }) {
-  if (civWarrants.length === 0) {
-    return (
-      <div className="px-3 py-3 bg-[#052e16] border border-[#166534] rounded-sm text-green-400 text-[12px] font-mono">
-        *** SUBJECT RETURNS CLEAR * NO ACTIVE WARRANTS ***
-      </div>
-    );
-  }
-  return (
-    <div className="flex flex-col gap-2">
-      {civWarrants.map(w => (
-        <div key={w.id} className="bg-[#0d1117] rounded-sm px-3 py-3"
-          style={{ border: `1px solid ${w.status === 'ACTIVE' ? '#991b1b' : '#1a1e2c'}` }}
-        >
-          <div className="flex gap-2.5 items-center mb-1.5">
-            <span className="text-sky-300 font-bold text-[12px]">WARRANT #{w.id}</span>
-            <StatusBadge status={w.status} />
-            <span className="ml-auto text-[#374151] text-[11px]">{w.issuedDate}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-            <InfoRow label="Type"     value={w.type} />
-            <InfoRow label="Charge"   value={w.charge} valueColor="#fca5a5" />
-            <InfoRow label="Issued By" value={w.issuedBy} />
-          </div>
-          {w.notes && <div className="mt-1.5 text-[#4b5563] text-[11px]">{w.notes}</div>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function VehiclesTab({ civVehicles }) {
-  if (civVehicles.length === 0) {
-    return <div className="text-[#1f2937] text-[12px]">No vehicles registered to this subject.</div>;
-  }
-  return (
-    <div className="table-scroll">
-      <table className="w-full border-collapse text-[12px]">
-        <thead>
-          <tr className="bg-[#0d1117]">
-            {['PLATE', 'YEAR', 'MAKE', 'MODEL', 'COLOR', 'REG STATUS', 'STOLEN', 'FLAGS'].map(h => (
-              <th key={h} className="px-2.5 py-1.5 text-left text-[#374151] text-[10px] tracking-[0.7px] border-b border-[#141720] whitespace-nowrap">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {civVehicles.map((v, i) => (
-            <tr key={v.id} className={i % 2 === 0 ? 'bg-[#090b10]' : 'bg-[#0b0d14]'}>
-              <td className="px-2.5 py-[5px] text-sky-300 font-bold">{v.plate}</td>
-              <td className="px-2.5 py-[5px] text-[#6b7280]">{v.year}</td>
-              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.make}</td>
-              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.model}</td>
-              <td className="px-2.5 py-[5px] text-[#9ca3af]">{v.color}</td>
-              <td className="px-2.5 py-[5px]"><StatusBadge status={v.regStatus} /></td>
-              <td className="px-2.5 py-[5px]"><StatusBadge status={v.stolen ? 'ACTIVE' : 'VALID'} /></td>
-              <td className="px-2.5 py-[5px] text-[#374151]">{v.flags?.join(', ') || '*'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/* ── Shared components ── */
-
-function PanelHead({ title }) {
-  return (
-    <div className="px-2.5 py-[5px] bg-[#0d1117] border-b border-[#141720] text-[#374151] text-[10px] tracking-[1.5px] uppercase font-bold shrink-0">
-      {title}
-    </div>
-  );
-}
-
-function FieldCard({ title, children }) {
-  return (
-    <div className="bg-[#0d1117] border border-[#141720] rounded-sm overflow-hidden">
-      <div className="px-2 py-1 bg-[#0b0f18] border-b border-[#141720] text-[#374151] text-[9px] tracking-[1px] uppercase font-bold">
-        {title}
-      </div>
-      <div className="p-2">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value, valueColor }) {
-  return (
-    <div className="flex gap-1.5 mb-[3px] text-[11px]">
-      <span className="text-[#374151] min-w-[100px] shrink-0">{label}</span>
-      <span style={{ color: valueColor || '#d1d5db' }}>{value || 'N/A'}</span>
-    </div>
-  );
-}
-
-function ActivityRow({ time, label, detail, color }) {
-  return (
-    <div className="px-2.5 py-1.5 border-b border-[#141720] flex gap-2 items-baseline">
-      <span className="text-[#1f2937] text-[10px] shrink-0 font-mono">{time}</span>
-      <div className="min-w-0">
-        <div className="text-[11px] font-bold" style={{ color }}>{label}</div>
-        <div className="text-[#374151] text-[10px] overflow-hidden text-ellipsis whitespace-nowrap">{detail}</div>
-      </div>
-    </div>
-  );
-}
-
-function age(dob) {
-  if (!dob) return '?';
-  const [m, d, y] = dob.split('/').map(Number);
-  if (!y) return '?';
-  const today = new Date();
-  const birthDate = new Date(y, m - 1, d);
-  let a = today.getFullYear() - birthDate.getFullYear();
-  if (today < new Date(today.getFullYear(), m - 1, d)) a--;
-  return a;
 }
