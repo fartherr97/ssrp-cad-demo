@@ -4,7 +4,7 @@ import { useCAD } from '../store/cadStore';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
-  MdDescription, MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdCheckCircle,
+  MdDescription, MdArrowBack, MdSave, MdDownload, MdDeleteOutline, MdCheckCircle,
   MdShield, MdPerson, MdInventory2,
 } from 'react-icons/md';
 import {
@@ -227,15 +227,15 @@ export default function RecordsCenter() {
         </div>
 
         {/* ── Bottom action bar ── */}
-        <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base flex items-center flex-wrap gap-2 px-4 py-2.5">
-          <button className={xs(S_BTN_SECONDARY)} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
-          <div className="ml-auto flex flex-wrap gap-2">
-            <button className={xs(S_BTN_SECONDARY)} onClick={saveDraftNow}><MdSave size={15} /> Save Draft</button>
-            <button className={xs(S_BTN_SECONDARY)} onClick={exportPDF} disabled={pdfLoading}>
-              <MdPrint size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
+        <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base p-3 md:px-4 md:py-2.5">
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center">
+            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
+            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={saveDraftNow}><MdSave size={15} /> Save Draft</button>
+            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
+              <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
-            <button className={xs(S_BTN_GHOST)} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-            <button className={xs(S_BTN_PRIMARY)} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
+            <button className={`${S_BTN_GHOST} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
+            <button className={`${S_BTN_PRIMARY} col-span-2 w-full md:col-span-1 md:w-auto md:ml-auto`} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
           </div>
         </div>
       </div>
