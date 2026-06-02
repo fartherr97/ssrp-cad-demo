@@ -323,11 +323,11 @@ export default function ActionBar() {
         <div className="lg:hidden fixed inset-0 z-[2500]">
           <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div
-            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 overflow-auto"
-            style={{ top: 'var(--actionbar-h)', maxHeight: 'calc(100vh - var(--actionbar-h))', animation: 'expandDown 0.16s ease-out' }}
+            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 flex flex-col"
+            style={{ top: 'var(--actionbar-h)', height: 'calc(100dvh - var(--actionbar-h))', animation: 'expandDown 0.16s ease-out' }}
           >
             {/* Brand header */}
-            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint">
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint shrink-0">
               <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-8 h-8 shrink-0 object-contain" />
               <div className="leading-[1.15]">
                 <div className="text-[15px] font-extrabold text-white">
@@ -337,13 +337,12 @@ export default function ActionBar() {
               </div>
             </div>
 
-            {/* Flat grouped list */}
-            <div className="py-3">
+            {/* Flat grouped list — scrolls independently */}
+            <div className="flex-1 overflow-y-auto py-3">
               {navItems.map(item => {
                 const subItems = item.dropdown ? dropdownItems(item.dropdown) : null;
 
                 if (subItems) {
-                  // Section header + flat list of sub-items
                   return (
                     <div key={item.route}>
                       <div className="flex items-center gap-2 px-5 pt-4 pb-1.5">
@@ -362,11 +361,10 @@ export default function ActionBar() {
                   );
                 }
 
-                // Regular single item (acts as its own section row)
                 const on = isActive(item.route);
                 return (
                   <button key={item.route} onClick={() => go(item.route)}
-                    className={`w-full flex items-center gap-3 px-5 py-2.5 text-[14px] font-semibold cursor-pointer transition-colors border-none bg-transparent
+                    className={`w-full flex items-center gap-3 px-5 py-3 text-[14px] font-semibold cursor-pointer transition-colors border-none bg-transparent
                       ${on ? 'text-brand-bright' : 'text-white hover:bg-white/[0.05]'}`}>
                     {on && <span className="w-1 h-5 rounded-full bg-brand shrink-0 -ml-1" />}
                     <item.Icon size={18} className="shrink-0 text-slate-400" />
@@ -376,8 +374,8 @@ export default function ActionBar() {
               })}
             </div>
 
-            {/* Footer actions */}
-            <div className="border-t border-border-faint px-4 py-3 flex gap-2">
+            {/* Footer — always pinned at bottom */}
+            <div className="shrink-0 border-t border-border-faint px-4 py-3 flex gap-2">
               <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 text-[13px] font-semibold cursor-pointer hover:bg-white/[0.09] transition-all">
                 <MdHome size={16} /> Switch Portal
