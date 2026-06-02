@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useResponsive } from '../hooks/useResponsive';
 import {
   MdSearch, MdPerson, MdDirectionsCar, MdPhone, MdReportProblem,
-  MdAdd, MdManageSearch, MdGavel, MdWarning, MdDescription,
+  MdAdd, MdManageSearch, MdGavel, MdWarning, MdDescription, MdArrowBack,
 } from 'react-icons/md';
 
 /* ─── helpers ─────────────────────────────────────────────── */
@@ -360,16 +361,227 @@ function VehiclesTab({ civVehicles }) {
   );
 }
 
+/* ─── Mobile panels ──────────────────────────────────────── */
+function MobileSearchPanel({ searchTab, setSearchTab, query, setQuery, runSearch, results, selected, warrants, selectCiv }) {
+  return (
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#080f1c' }}>
+      {/* Header */}
+      <div className="shrink-0 px-4 pt-4 pb-3" style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <MdSearch size={15} style={{ color: '#3d5470' }} />
+          <span className="text-[11px] font-bold uppercase tracking-[1px]" style={{ color: '#3d5470' }}>Records Search</span>
+        </div>
+        <div className="flex gap-1 mb-3">
+          {SEARCH_TABS.map(({ key, Icon }) => (
+            <button key={key} type="button" onClick={() => setSearchTab(key)}
+              className="flex-1 flex flex-col items-center gap-1 py-2 rounded-lg border-none cursor-pointer text-[9px] font-bold uppercase"
+              style={{
+                background: searchTab === key ? 'rgba(61,130,240,0.2)' : 'rgba(255,255,255,0.04)',
+                color: searchTab === key ? '#3d82f0' : '#3d5470',
+                border: `1px solid ${searchTab === key ? 'rgba(61,130,240,0.35)' : 'rgba(255,255,255,0.07)'}`,
+              }}>
+              <Icon size={16} />{key}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            className="flex-1 rounded-xl text-[13px] outline-none"
+            style={{ background: '#060d18', border: '1px solid rgba(255,255,255,0.1)', padding: '10px 14px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+            placeholder={searchTab === 'PERSON' ? 'Name or SSN…' : searchTab === 'VEHICLE' ? 'Plate number…' : 'Search…'}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && runSearch()}
+          />
+          <button type="button" onClick={runSearch}
+            className="rounded-xl px-5 text-[13px] font-bold border-none cursor-pointer"
+            style={{ background: 'rgba(61,130,240,0.22)', color: '#3d82f0', border: '1px solid rgba(61,130,240,0.38)' }}>
+            GO
+          </button>
+        </div>
+      </div>
+      {/* Results */}
+      <div className="flex-1 overflow-y-auto">
+        {results.length === 0 && query && (
+          <div className="px-4 py-8 text-center text-[13px]" style={{ color: '#2d3f52' }}>No records found</div>
+        )}
+        {results.length === 0 && !query && (
+          <div className="px-4 py-8 text-center text-[13px]" style={{ color: '#1e2d3d' }}>Enter a name, SSN, or plate</div>
+        )}
+        {results.map(civ => {
+          const hasWarrant = warrants.some(w => w.civilianId === civ.id && w.status === 'ACTIVE');
+          return (
+            <div key={civ.id} onClick={() => selectCiv(civ)}
+              className="px-4 py-3.5 cursor-pointer"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: selected?.id === civ.id ? 'rgba(61,130,240,0.08)' : 'transparent' }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[14px] font-bold" style={{ color: '#c8d5e8' }}>{civ.firstName} {civ.lastName}</span>
+                {hasWarrant && <MdGavel size={13} style={{ color: '#ef4444' }} />}
+              </div>
+              <div className="text-[11.5px]" style={{ color: '#3d5470' }}>DOB: {fmtDate(civ.dob)}</div>
+              <div className="text-[11.5px]" style={{ color: '#3d5470' }}>SSN: {maskSSN(civ.ssn)}</div>
+              {civ.flags?.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {civ.flags.map(f => (
+                    <span key={f} className="px-2 py-0.5 rounded text-[10px] font-bold"
+                      style={{ background: 'rgba(239,68,68,0.14)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>{f}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {/* Quick actions */}
+      <div className="shrink-0 px-3 py-3 flex gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0b1627' }}>
+        <button type="button" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11.5px] font-semibold border-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#6b8299', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <MdAdd size={14} style={{ color: '#3d82f0' }} /> New Record
+        </button>
+        <button type="button" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11.5px] font-semibold border-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#6b8299', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <MdManageSearch size={14} style={{ color: '#3d82f0' }} /> Advanced
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MobileRecordPanel({ selected, recordTab, setRecordTab, civWarrants, civHistory, civVehicles, activeWarrants, onBack }) {
+  return (
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#07101c' }}>
+      {/* Header */}
+      <div className="shrink-0 px-4 py-3" style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <button type="button" onClick={onBack}
+          className="flex items-center gap-1.5 mb-2.5 border-none bg-transparent cursor-pointer"
+          style={{ color: '#3d5470', padding: 0 }}>
+          <MdArrowBack size={16} />
+          <span className="text-[11px] font-semibold">Back to Search</span>
+        </button>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(61,130,240,0.14)', border: '1px solid rgba(61,130,240,0.28)' }}>
+            <MdPerson size={22} style={{ color: '#3d82f0' }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[18px] font-extrabold leading-tight" style={{ color: '#e2eaf8' }}>
+              {selected.firstName} {selected.lastName}
+            </div>
+            <div className="text-[11px] mt-0.5" style={{ color: '#3d5470' }}>
+              DOB: <span style={{ color: '#6b8299' }}>{fmtDate(selected.dob)}</span>
+              {' · '}SSN: <span style={{ color: '#6b8299', fontFamily: 'var(--font-mono)' }}>{maskSSN(selected.ssn)}</span>
+            </div>
+          </div>
+          {activeWarrants.length > 0 && (
+            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg"
+              style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
+              <MdWarning size={13} style={{ color: '#ef4444' }} />
+              <span className="text-[10px] font-bold" style={{ color: '#f87171' }}>WANTED</span>
+            </div>
+          )}
+        </div>
+      </div>
+      {/* Tabs - horizontal scroll */}
+      <div className="shrink-0 flex overflow-x-auto" style={{ background: '#08111c', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        {RECORD_TABS.map(t => (
+          <button key={t} type="button" onClick={() => setRecordTab(t)}
+            className="px-4 py-3 text-[11px] font-bold whitespace-nowrap shrink-0 border-none cursor-pointer"
+            style={{ background: 'transparent', color: recordTab === t ? '#3d82f0' : '#3d5470', borderBottom: `2px solid ${recordTab === t ? '#3d82f0' : 'transparent'}` }}>
+            {t}
+          </button>
+        ))}
+      </div>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {recordTab === 'SUMMARY'  && <MobileSummaryTab civ={selected} civHistory={civHistory} activeWarrants={activeWarrants} civVehicles={civVehicles} />}
+        {recordTab === 'INCIDENTS'&& <IncidentsTab civHistory={civHistory} />}
+        {recordTab === 'WARRANTS' && <WarrantsTab  civWarrants={civWarrants} />}
+        {recordTab === 'VEHICLES' && <VehiclesTab  civVehicles={civVehicles} />}
+        {['DETAILS','ADDRESSES','CONTACTS','ASSOCIATES','CITATIONS','PROPERTY','REPORTS'].includes(recordTab) && (
+          <div className="text-center py-12 text-[12px]" style={{ color: '#2d3f52' }}>{recordTab} not available in demo</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* Mobile summary uses stacked single-column layout */
+function MobileSummaryTab({ civ, civHistory, activeWarrants, civVehicles }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <FieldCard title="Personal Information">
+        <InfoRow label="Full Name"       value={`${civ.firstName} ${civ.lastName}`} />
+        <InfoRow label="DOB"             value={`${fmtDate(civ.dob)} (${age(civ.dob)})`} />
+        <InfoRow label="Gender"          value={civ.gender} />
+        <InfoRow label="Race"            value={civ.ethnicity} />
+        <InfoRow label="Height / Weight" value={civ.height && civ.weight ? `${civ.height} / ${civ.weight}` : 'N/A'} />
+        <InfoRow label="Hair / Eyes"     value={civ.hair && civ.eyes ? `${civ.hair} / ${civ.eyes}` : 'N/A'} />
+        <InfoRow label="SSN"             value={maskSSN(civ.ssn)} mono />
+        <InfoRow label="DL Number"       value={civ.dlNumber} mono
+          valueColor={civ.dlStatus === 'SUSPENDED' ? '#f87171' : undefined} />
+        <InfoRow label="DL Status"       value={civ.dlStatus}
+          valueColor={civ.dlStatus === 'ACTIVE' ? '#4ade80' : '#f87171'} />
+      </FieldCard>
+      <FieldCard title="Address">
+        <div className="text-[12px] leading-[1.7]" style={{ color: '#c8d5e8' }}>{civ.address || 'N/A'}</div>
+      </FieldCard>
+      <FieldCard title="Additional Information">
+        <InfoRow label="Citizenship" value={civ.citizenship || 'United States'} />
+        <InfoRow label="Occupation"  value={civ.occupation || 'Unknown'} />
+        <InfoRow label="Employer"    value={civ.employer || 'N/A'} />
+        {civ.flags?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {civ.flags.map(f => (
+              <span key={f} className="px-2 py-0.5 rounded text-[9.5px] font-bold"
+                style={{ background: 'rgba(239,68,68,0.14)', color: '#f87171', border: '1px solid rgba(239,68,68,0.28)' }}>{f}</span>
+            ))}
+          </div>
+        )}
+      </FieldCard>
+      <FieldCard title={`Active Warrants (${activeWarrants.length})`} accent={activeWarrants.length > 0 ? '#ef4444' : undefined}>
+        {activeWarrants.length === 0
+          ? <div className="text-[11.5px]" style={{ color: '#2d3f52' }}>No active warrants.</div>
+          : activeWarrants.map(w => (
+            <div key={w.id} className="mb-2">
+              <div className="text-[12px] font-bold mb-1" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>WARRANT #{w.id}</div>
+              <InfoRow label="Charge" value={w.charge} valueColor="#fca5a5" />
+              <InfoRow label="Issued By" value={w.issuedBy} />
+              <InfoRow label="Date" value={fmtDate(w.issuedDate)} />
+            </div>
+          ))
+        }
+      </FieldCard>
+      <FieldCard title="Recent Incidents">
+        {civHistory.length === 0
+          ? <div className="text-[11.5px]" style={{ color: '#2d3f52' }}>No incidents on file.</div>
+          : civHistory.slice(0, 5).map(h => (
+            <div key={h.id} className="py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-[11px] font-bold" style={{ color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>{h.caseNumber}</span>
+                <DispositionBadge d={h.disposition} />
+              </div>
+              <div className="text-[11px]" style={{ color: '#9ab0c4' }}>{Array.isArray(h.charges) ? h.charges[0] : h.charges}</div>
+              <div className="text-[10.5px] mt-0.5" style={{ color: '#3d5470' }}>{fmtDate(h.date)}</div>
+            </div>
+          ))
+        }
+      </FieldCard>
+    </div>
+  );
+}
+
 /* ─── Main page ───────────────────────────────────────────── */
 export default function SearchPage() {
   const { state } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reportTemplates, recordTemplates } = state;
+  const { civilians, vehicles, warrants, criminalHistory } = state;
+  const { isMobile } = useResponsive();
 
-  const [searchTab, setSearchTab] = useState('PERSON');
-  const [query,     setQuery]     = useState('');
-  const [results,   setResults]   = useState([]);
-  const [selected,  setSelected]  = useState(null);
-  const [recordTab, setRecordTab] = useState('SUMMARY');
+  const [searchTab,    setSearchTab]    = useState('PERSON');
+  const [query,        setQuery]        = useState('');
+  const [results,      setResults]      = useState([]);
+  const [selected,     setSelected]     = useState(null);
+  const [recordTab,    setRecordTab]    = useState('SUMMARY');
+  const [mobileView,   setMobileView]   = useState('search'); // 'search' | 'record'
 
   const runSearch = () => {
     const q = query.trim().toUpperCase();
@@ -383,6 +595,7 @@ export default function SearchPage() {
       setResults(found);
       setSelected(found[0] || null);
       setRecordTab('SUMMARY');
+      if (isMobile && found.length) setMobileView('record');
     } else if (searchTab === 'VEHICLE') {
       const found = vehicles.filter(v => v.plate.toUpperCase().includes(q));
       if (found.length) {
@@ -390,6 +603,7 @@ export default function SearchPage() {
         setResults(owner ? [owner] : []);
         setSelected(owner || null);
         setRecordTab('VEHICLES');
+        if (isMobile && owner) setMobileView('record');
       } else {
         setResults([]);
         setSelected(null);
@@ -400,12 +614,35 @@ export default function SearchPage() {
   const selectCiv = (civ) => {
     setSelected(civ);
     setRecordTab('SUMMARY');
+    if (isMobile) setMobileView('record');
   };
 
   const civWarrants  = selected ? warrants.filter(w => w.civilianId === selected.id) : [];
   const civHistory   = selected ? criminalHistory.filter(h => h.civilianId === selected.id) : [];
   const civVehicles  = selected ? vehicles.filter(v => selected.vehicles?.includes(v.id)) : [];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
+
+  // Mobile: render full-screen panels one at a time
+  if (isMobile) {
+    return (
+      <div className="h-full overflow-hidden flex flex-col font-ui" style={{ background: '#07101c' }}>
+        {mobileView === 'search'
+          ? <MobileSearchPanel
+              searchTab={searchTab} setSearchTab={k => { setSearchTab(k); setResults([]); setSelected(null); }}
+              query={query} setQuery={setQuery} runSearch={runSearch}
+              results={results} selected={selected} warrants={warrants}
+              selectCiv={selectCiv}
+            />
+          : <MobileRecordPanel
+              selected={selected} recordTab={recordTab} setRecordTab={setRecordTab}
+              civWarrants={civWarrants} civHistory={civHistory} civVehicles={civVehicles}
+              activeWarrants={activeWarrants}
+              onBack={() => setMobileView('search')}
+            />
+        }
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-hidden flex font-ui" style={{ background: '#07101c' }}>
