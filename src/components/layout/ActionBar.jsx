@@ -40,7 +40,7 @@ function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMou
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       title={label}
-      className={`group relative flex flex-col items-center justify-center gap-1 px-3.5 py-1.5 min-w-[64px] rounded-lg cursor-pointer transition-all font-ui
+      className={`group relative flex flex-col items-center justify-center gap-1 px-3.5 py-1.5 min-w-[64px] rounded-lg cursor-pointer transition-all duration-75 font-ui
         ${active
           ? 'bg-brand/15 text-brand-bright'
           : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
@@ -101,7 +101,7 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
             <button
               key={item.id}
               onClick={() => { navigate(item.route); setOpen(false); }}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[12.5px] font-medium text-slate-200 cursor-pointer transition-all duration-100 hover:-translate-y-px hover:bg-white/[0.07] hover:text-white"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[12.5px] font-medium text-slate-200 cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.07] hover:text-white"
             >
               {item.name}
             </button>
@@ -129,25 +129,27 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
   const [hoveredStatus, setHoveredStatus] = useState(null);
   const ref = useRef(null);
   const menuRef = useRef(null);
+  const closeTimer = useRef(null);
+
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
 
   const MENU_W = 260;
-  const toggle = () => {
-    if (open) { setOpen(false); return; }
+  const place = () => {
     if (ref.current) {
       const r = ref.current.getBoundingClientRect();
-      setCoords({ left: Math.max(8, r.right - MENU_W), top: r.bottom + 8 });
+      setCoords({ left: Math.max(8, r.right - MENU_W), top: r.bottom + 4 });
     }
+  };
+  const doClose = () => { setOpen(false); if (__navDropdownCloser === setOpen) __navDropdownCloser = null; };
+  const openMenu = () => {
+    clearTimeout(closeTimer.current);
+    if (__navDropdownCloser && __navDropdownCloser !== setOpen) __navDropdownCloser(false);
+    __navDropdownCloser = setOpen;
+    place();
     setOpen(true);
   };
-
-  useEffect(() => {
-    if (!open) return;
-    const h = e => {
-      if (!ref.current?.contains(e.target) && !menuRef.current?.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, [open]);
+  const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
+  const toggle = () => open ? doClose() : openMenu();
 
   const dot = STATUS_COLORS[myStatus] || '#94a3b8';
   const setStatus = (s) => { dispatch({ type: 'SET_STATUS', payload: s }); };
@@ -165,10 +167,10 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
   };
 
   return (
-    <div className="relative" ref={ref} data-tour="account">
+    <div className="relative" ref={ref} data-tour="account" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <button
         onClick={toggle}
-        className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-lg cursor-pointer transition-all hover:bg-white/[0.05] border border-transparent hover:border-border-base"
+        className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-75 hover:bg-white/[0.05] border border-transparent hover:border-border-base"
       >
         <span className="relative shrink-0">
           <MdAccountCircle size={32} className="text-slate-500" />
@@ -181,12 +183,14 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
             {currentUser?.badge ? `Badge #${currentUser.badge}` : portal.label}
           </span>
         </span>
-        <MdExpandMore size={16} className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <MdExpandMore size={16} className={`text-slate-500 transition-transform duration-75 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && createPortal(
         <div
           ref={menuRef}
+          onMouseEnter={openMenu}
+          onMouseLeave={scheduleClose}
           className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl w-[260px] p-1.5"
           style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
@@ -212,13 +216,13 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
                     <button key={s.status} onClick={() => setStatus(s.status)}
                       onMouseEnter={() => setHoveredStatus(s.status)}
                       onMouseLeave={() => setHoveredStatus(null)}
-                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border"
+                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all duration-75 border"
                       style={lit
                         ? { background: `${c}22`, borderColor: `${c}55`, color: c }
                         : { borderColor: 'transparent', color: '#94a3b8' }
                       }
                     >
-                      <s.Icon size={14} style={{ color: lit ? c : '#94a3b8', transition: 'color 0.15s' }} />
+                      <s.Icon size={14} style={{ color: lit ? c : '#94a3b8', transition: 'color 0.075s' }} />
                       {s.label}
                     </button>
                   );
@@ -233,15 +237,15 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
           )}
 
           <button onClick={() => { navigate('/profile'); setOpen(false); }}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium cursor-pointer transition-colors hover:bg-white/[0.06] ${isActive('/profile') ? 'text-brand-bright' : 'text-slate-300 hover:text-white'}`}>
+            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06] ${isActive('/profile') ? 'text-brand-bright' : 'text-slate-300 hover:text-white'}`}>
             <MdPerson size={16} /> My Profile
           </button>
           <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-slate-300 hover:text-white cursor-pointer transition-colors hover:bg-white/[0.06]">
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-slate-300 hover:text-white cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06]">
             <MdHome size={16} /> Switch Portal
           </button>
           <button onClick={() => dispatch({ type: 'LOGOUT' })}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-red-400 hover:text-red-300 cursor-pointer transition-colors hover:bg-red-500/10">
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-red-400 hover:text-red-300 cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-red-500/10">
             <MdLogout size={16} /> Sign Out
           </button>
         </div>,
@@ -325,7 +329,7 @@ export default function ActionBar() {
         <button
           onClick={() => setShowCaseSearch(true)}
           title="Search reports & records (Ctrl+K)"
-          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 mr-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-colors border border-transparent hover:border-border-base"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 mr-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-all duration-75 border border-transparent hover:border-border-base"
         >
           <MdSearch size={15} />
           <span className="text-[10px] font-mono text-slate-600 hidden md:inline">⌘K</span>
