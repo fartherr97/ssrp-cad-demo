@@ -8,7 +8,7 @@ import {
   MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag,
-  MdManageAccounts, MdTune, MdDns, MdExpandMore,
+  MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -20,6 +20,7 @@ const GROUPS = [
       { icon: MdPeople,      label: 'Accounts',        route: '/admin/accounts' },
       { icon: MdFingerprint, label: 'Identifiers',     route: '/admin/identifiers' },
       { icon: MdVpnKey,      label: 'Permission Keys', route: '/admin/permission-keys' },
+      { icon: MdStore,       label: 'Businesses',      route: '/admin/businesses' },
     ],
   },
   {

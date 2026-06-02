@@ -206,14 +206,14 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
   const assigned = officers.filter(o => call.units?.includes(o.unitId));
   return (
     <div className="flex flex-col rounded-xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}>
-      <div className="flex items-center gap-2 px-3.5 py-2.5 cursor-pointer select-none"
-        onClick={() => setOpen(v => !v)}
-        style={{ borderBottom: open ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+      style={{ background: open ? '#0f1e2f' : 'rgba(255,255,255,0.03)', border: `1px solid ${open ? 'rgba(255,255,255,0.11)' : 'rgba(255,255,255,0.07)'}` }}>
+      {/* Header */}
+      <div className="flex items-center gap-2.5 px-3.5 py-2.5 cursor-pointer select-none"
+        onClick={() => setOpen(v => !v)}>
         <PBadge p={call.priority} />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] font-bold text-white truncate">{call.nature}</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[13px] font-bold text-white">{call.nature}</span>
             <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded shrink-0"
               style={{ color: sc.color, background: `${sc.color}1a` }}>
               {sc.label}
@@ -230,22 +230,25 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
         </div>
       </div>
 
+      {/* Expanded body */}
       {open && (
-        <div className="px-3.5 py-3 flex flex-col gap-3">
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(0,0,0,0.25)' }}>
           {call.description && (
-            <p className="text-[11.5px] text-slate-400 leading-snug">{call.description}</p>
+            <div className="px-3.5 pt-3 pb-2">
+              <p className="text-[11.5px] text-slate-400 leading-relaxed">{call.description}</p>
+            </div>
           )}
-          <div>
-            <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1.5">Assigned Units</div>
+          <div className="px-3.5 pb-3">
+            <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-2">Assigned Units</div>
             <div className="flex flex-wrap gap-1.5">
-              {assigned.length === 0 && <span className="text-[11px] text-slate-600 italic">None assigned</span>}
+              {assigned.length === 0 && <span className="text-[11px] text-slate-600 italic">No units assigned</span>}
               {assigned.map(u => (
                 <div key={u.id} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px]"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   <span className="font-mono text-slate-200">{u.badge}</span>
                   <button onClick={() => onDetachUnit(call.id, u.unitId)}
                     style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 1, display: 'flex' }}>
-                    <MdClose size={10} className="text-slate-600 hover:text-red-400" />
+                    <MdClose size={10} className="text-slate-500" />
                   </button>
                 </div>
               ))}
@@ -256,7 +259,8 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
               </button>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end px-3.5 py-2"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <button onClick={() => onClose(call.id)} type="button"
               className="text-[11px] font-bold px-3 py-1.5 rounded-lg"
               style={{ cursor: 'pointer', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.20)', color: '#ef4444' }}>
@@ -271,29 +275,50 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
 
 // ─── Unit card ─────────────────────────────────────────────────────────────────
 
-function UnitCard({ unit, groups }) {
+function UnitCard({ unit, groups, onStatusChange }) {
+  const [editStatus, setEditStatus] = useState(false);
   const myGroup = groups.find(g => g.units.includes(unit.unitId));
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+    <div className="flex flex-col rounded-lg overflow-hidden"
       style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="flex flex-col flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[12px] font-bold text-slate-200 truncate">{unit.name}</span>
-          <StatusChip status={unit.status} />
+      <div className="flex items-center gap-2 px-3 py-2">
+        <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[12px] font-bold text-slate-200 truncate">{unit.name}</span>
+            <button onClick={() => setEditStatus(v => !v)} type="button"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+              <StatusChip status={unit.status} />
+            </button>
+          </div>
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            <span className="text-[10.5px] font-mono text-slate-500">{unit.badge}</span>
+            <span className="text-[10px] text-slate-600">{unit.subdivision}</span>
+            {myGroup && (
+              <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
+                style={{ color: myGroup.color, background: `${myGroup.color}18`, border: `1px solid ${myGroup.color}30` }}>
+                {myGroup.name}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          <span className="text-[10.5px] font-mono text-slate-500">{unit.badge}</span>
-          <span className="text-[10px] text-slate-600">{unit.subdivision}</span>
-          {myGroup && (
-            <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
-              style={{ color: myGroup.color, background: `${myGroup.color}18`, border: `1px solid ${myGroup.color}30` }}>
-              {myGroup.name}
-            </span>
-          )}
-        </div>
+        {unit.callId && <span className="text-[10px] font-mono text-slate-600 shrink-0">{unit.callId}</span>}
       </div>
-      {unit.callId && (
-        <span className="text-[10px] font-mono text-slate-600 shrink-0">{unit.callId}</span>
+      {editStatus && (
+        <div className="px-3 pb-2.5 pt-2 flex flex-wrap gap-1.5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.18)' }}>
+          <div className="w-full text-[9px] font-bold uppercase tracking-[0.5px] text-slate-700 mb-0.5">Set Status</div>
+          {Object.entries(ST_CFG).map(([key, cfg]) => {
+            const active = unit.status === key;
+            return (
+              <button key={key} type="button"
+                onClick={() => { onStatusChange(unit.unitId, key); setEditStatus(false); }}
+                className="text-[9.5px] font-bold px-2 py-1 rounded"
+                style={{ cursor: 'pointer', background: active ? cfg.bg : 'rgba(255,255,255,0.03)', color: active ? cfg.color : '#4a5568', border: `1px solid ${active ? cfg.color + '40' : 'rgba(255,255,255,0.07)'}` }}>
+                {cfg.label}
+              </button>
+            );
+          })}
+        </div>
       )}
     </div>
   );
@@ -702,6 +727,10 @@ export default function DispatchPortal() {
     if (grp) dispatch({ type: 'UPDATE_UNIT_GROUP', payload: { id: groupId, changes: { units: grp.units.filter(u => u !== unitId) } } });
   };
 
+  const handleStatusChange = (unitId, status) => {
+    dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status } });
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0" style={{ background: '#0a1520' }}>
       {/* Top bar */}
@@ -777,7 +806,7 @@ export default function DispatchPortal() {
           {unitTab === 'UNITS' && (
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1.5">
               {onDutyOfficers.map(u => (
-                <UnitCard key={u.id} unit={u} groups={unitGroups} />
+                <UnitCard key={u.id} unit={u} groups={unitGroups} onStatusChange={handleStatusChange} />
               ))}
             </div>
           )}

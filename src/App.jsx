@@ -66,6 +66,7 @@ import Servers from './pages/admin/sections/Servers';
 import Addresses from './pages/admin/sections/Addresses';
 import LookupTypes from './pages/admin/sections/LookupTypes';
 import ToneBoard from './pages/admin/sections/ToneBoard';
+import AdminBusinesses from './pages/admin/sections/AdminBusinesses';
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -157,6 +158,7 @@ function CADApp() {
           <Route path="community-id"       element={<CommunityId />} />
           <Route path="authenticate"       element={<Authenticate />} />
           <Route path="transfer"           element={<Transfer />} />
+          <Route path="businesses"         element={<AdminBusinesses />} />
           <Route path="community-info"     element={<CommunityInfo />} />
           <Route path="geographical"       element={<Geographical />} />
           <Route path="status-codes"       element={<StatusCodes />} />

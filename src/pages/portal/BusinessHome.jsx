@@ -6,6 +6,7 @@ import {
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
+import AccessDenied from './AccessDenied';
 
 const ACCENT = 'brand';
 
@@ -18,36 +19,15 @@ const QUICK_ACTIONS = [
 
 export default function BusinessHome() {
   const { state } = useCAD();
+  const { currentUser } = state;
   const navigate = useNavigate();
-  const myBiz = state.businesses.find(b => b.ownedByPlayer);
+  const myBiz = state.businesses.find(b =>
+    b.ownedByPlayer ||
+    (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
+    (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
+  );
 
-  if (!myBiz) {
-    return (
-      <PortalPage>
-        <PortalHeader
-          icon={MdStore}
-          title="Business Portal"
-          subtitle="Register your business to access the self-service dashboard."
-          accent={ACCENT}
-        />
-        <PortalCard accent={ACCENT} className="text-center p-12">
-          <div className="w-16 h-16 rounded-[16px] mx-auto mb-[18px] flex items-center justify-center bg-brand/15 border border-brand/30">
-            <MdStore size={34} className="text-brand-bright" />
-          </div>
-          <div className="text-lg font-extrabold text-white mb-2">
-            Welcome * let's get you set up
-          </div>
-          <div className="text-sm text-slate-400 max-w-[440px] mx-auto mb-[22px] leading-relaxed">
-            You don't have a registered business yet. Register one to manage your profile,
-            employees, and track incidents filed by law enforcement.
-          </div>
-          <button className={S_BTN_PRIMARY} onClick={() => navigate('/portal/my-business')}>
-            Register your business
-          </button>
-        </PortalCard>
-      </PortalPage>
-    );
-  }
+  if (!myBiz) return <AccessDenied portalName="the Business Center" />;
 
   const openIncidents = myBiz.incidents.filter(i => i.status === 'Open').length;
   const recentIncidents = [...myBiz.incidents]

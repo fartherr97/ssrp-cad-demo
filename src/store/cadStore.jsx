@@ -508,8 +508,8 @@ function reducer(state, action) {
 
     /* ─── Business portal ─── */
     case 'ADD_BUSINESS': {
-      const b = { ...action.payload, id: state.nextId, employees: [], incidents: [], ownedByPlayer: true, status: 'ACTIVE' };
-      const audit = addAuditEntry(state, `Registered business: ${b.name}`, 'Business');
+      const b = { ...action.payload, id: state.nextId, employees: [], incidents: [], status: 'ACTIVE' };
+      const audit = addAuditEntry(state, `Created business: ${b.name}`, 'Admin');
       return { ...state, businesses: [...state.businesses, b], nextId: state.nextId + 1, ...audit };
     }
     case 'UPDATE_BUSINESS': {
@@ -529,6 +529,11 @@ function reducer(state, action) {
         b.id === businessId ? { ...b, employees: b.employees.filter(e => e.id !== employeeId) } : b
       );
       return { ...state, businesses };
+    }
+    case 'DELETE_BUSINESS': {
+      const businesses = state.businesses.filter(b => b.id !== action.payload);
+      const audit = addAuditEntry(state, `Deleted business ID ${action.payload}`, 'Admin');
+      return { ...state, businesses, ...audit };
     }
     case 'UPDATE_REPORT_STATUS': {
       const { id, status, supervisorSignature } = action.payload;

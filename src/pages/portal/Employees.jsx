@@ -4,6 +4,7 @@ import { useCAD } from '../../store/cadStore';
 import { MdGroup, MdAdd, MdDelete, MdBusiness } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
+import AccessDenied from './AccessDenied';
 
 const ACCENT = 'brand';
 const ROLES = ['Manager', 'Employee', 'Driver', 'Security', 'Dispatcher'];
@@ -11,28 +12,19 @@ const BLANK = { name: '', role: 'Employee', phone: '', since: '' };
 
 export default function Employees() {
   const { state, dispatch } = useCAD();
+  const { currentUser } = state;
   const navigate = useNavigate();
-  const myBiz = state.businesses.find(b => b.ownedByPlayer);
+  const myBiz = state.businesses.find(b =>
+    b.ownedByPlayer ||
+    (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
+    (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
+  );
 
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(BLANK);
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  if (!myBiz) {
-    return (
-      <PortalPage>
-        <PortalHeader icon={MdGroup} title="Employees" subtitle="Manage your business staff roster." accent={ACCENT} />
-        <PortalCard accent={ACCENT} className="text-center px-6 py-[44px]">
-          <div className="text-sm text-slate-400 mb-[18px]">
-            You need to register a business before you can manage employees.
-          </div>
-          <button className={`${S_BTN_PRIMARY} inline-flex items-center gap-1.5`} onClick={() => navigate('/portal/my-business')}>
-            <MdBusiness size={16} /> Register your business
-          </button>
-        </PortalCard>
-      </PortalPage>
-    );
-  }
+  if (!myBiz) return <AccessDenied portalName="the Business Center" />;
 
   const canSubmit = form.name.trim() && form.role && form.phone.trim();
   const addEmployee = () => {

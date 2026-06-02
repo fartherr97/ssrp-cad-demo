@@ -595,16 +595,16 @@ export const WHITELIST_APPS = [
 export const BUSINESSES = [
   {
     id: 1, name: "Bayshore Auto & Towing", type: "Automotive / Towing",
-    owner: "Jordan Maxwell", ein: "FL-88-2210445", phone: "555-0710",
+    owner: "Jordan Maxwell", ownerDiscordId: "205947291", ein: "FL-88-2210445", phone: "555-0710",
     address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
     license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
-      { id: 1, name: "Michael Torres", role: "Manager",   phone: "555-0192", since: "2024-02-01" },
-      { id: 2, name: "Amanda Chen",    role: "Dispatcher", phone: "555-0334", since: "2025-01-15" },
-      { id: 3, name: "Luis Romero",    role: "Driver",     phone: "555-0911", since: "2025-06-20" },
+      { id: 1, name: "Michael Torres", discordId: "419283746", role: "Manager",    phone: "555-0192", since: "2024-02-01" },
+      { id: 2, name: "Amanda Chen",    discordId: "309182746", role: "Dispatcher", phone: "555-0334", since: "2025-01-15" },
+      { id: 3, name: "Luis Romero",    discordId: "",          role: "Driver",     phone: "555-0911", since: "2025-06-20" },
     ],
     incidents: [
-      { id: 1, date: "2026-05-22", type: "Theft Report",    summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
+      { id: 1, date: "2026-05-22", type: "Theft Report",     summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
       { id: 2, date: "2026-04-10", type: "Alarm Activation", summary: "Silent alarm tripped 03:14, units responded, false alarm.", status: "Closed" },
     ],
   },
