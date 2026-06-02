@@ -36,15 +36,11 @@ export default function OfficerProfile() {
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
 
-  const today = new Date();
-  const weekAgo  = new Date(today.getTime() - 7  * 24 * 60 * 60 * 1000);
-  const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const parseTs = (s) => s ? new Date(s.replace(' ', 'T')) : new Date(0);
-  const weekMins  = myCallHistory.filter(c => parseTs(c.timestamp) >= weekAgo).length  * 30
-                  + myReports.filter(r => parseTs(r.date) >= weekAgo).length            * 20;
-  const monthMins = myCallHistory.filter(c => parseTs(c.timestamp) >= monthAgo).length * 30
-                  + myReports.filter(r => parseTs(r.date) >= monthAgo).length           * 20;
+  // Activity time sourced from Nexum duty-log integration (not yet wired)
+  const nexumWeekly  = myOfficer?.dutyTimeWeek  ?? null; // minutes
+  const nexumMonthly = myOfficer?.dutyTimeMonth ?? null; // minutes
   const fmtTime = (m) => {
+    if (m === null || m === undefined) return '—';
     const h = Math.floor(m / 60), min = m % 60;
     if (!m) return '0m';
     if (!h) return `${min}m`;
@@ -158,8 +154,8 @@ export default function OfficerProfile() {
           {[
             { label: 'Reports Filed',       val: myReports.length },
             { label: 'Calls Attended',      val: myCallHistory.length },
-            { label: 'Activity This Week',  val: fmtTime(weekMins) },
-            { label: 'Activity This Month', val: fmtTime(monthMins) },
+            { label: 'Activity This Week',  val: fmtTime(nexumWeekly) },
+            { label: 'Activity This Month', val: fmtTime(nexumMonthly) },
           ].map(s => (
             <div key={s.label} className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-3.5 py-3">
               <div className="text-white text-2xl font-extrabold leading-none">{s.val}</div>
