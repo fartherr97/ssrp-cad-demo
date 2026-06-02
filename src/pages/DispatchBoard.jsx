@@ -106,52 +106,82 @@ export default function DispatchBoard() {
             {filtered.length === 0 ? (
               <div className="p-8 text-center text-slate-600 text-[12px]">No calls matching filter</div>
             ) : (
-              <div className="overflow-x-auto">
-              <table className={S_TABLE}>
-                <thead>
-                  <tr>
-                    {['Call #','Pri','Nature','Location','City','Status','Units','Time'].map(h => (
-                      <th key={h} className={S_TABLE_TH}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* ── Mobile card list ── */}
+                <div className="lg:hidden flex flex-col divide-y divide-border-faint">
                   {filtered.sort((a,b) => a.priority - b.priority).map(c => (
-                    <tr key={c.id}
-                      className="cursor-pointer transition-colors"
+                    <div key={c.id}
+                      className="px-3.5 py-3 cursor-pointer transition-colors active:bg-white/[0.04]"
                       style={{
-                        background: selectedCall === c.id ? 'rgba(61,130,240,0.12)' : '',
-                        boxShadow: selectedCall === c.id ? 'inset 2px 0 0 #3d82f0' : '',
                         borderLeft: `3px solid ${priLeft[c.priority] || 'transparent'}`,
+                        background: selectedCall === c.id ? 'rgba(61,130,240,0.10)' : '',
                       }}
-                      onMouseEnter={selectedCall === c.id ? undefined : trHoverOn}
-                      onMouseLeave={selectedCall === c.id ? undefined : trHoverOff}
-                      onClick={() => setSelectedCall(c.id)}>
-                      <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
-                      <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
-                      <td className={`${S_TABLE_TD} font-medium text-slate-200`}>{c.nature}</td>
-                      <td className={`${S_TABLE_TD} text-slate-400 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap`}>{c.location}</td>
-                      <td className={`${S_TABLE_TD} text-slate-400 text-[11px]`}>{c.city}</td>
-                      <td className={S_TABLE_TD}><span className={cadCallStatus(c.status)}>{c.status}</span></td>
-                      <td className={`${S_TABLE_TD} font-mono text-[10px] ${c.units.length > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
-                      </td>
-                      <td className={`${S_TABLE_TD} font-mono text-[10px] text-slate-500`}>
-                        {c.timestamp?.split(' ')[1] || '—'}
-                      </td>
-                    </tr>
+                      onClick={() => setSelectedCall(selectedCall === c.id ? null : c.id)}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={S_DATA + ' text-[11px]'}>{c.id}</span>
+                        <PriBadge p={c.priority} />
+                        <span className={cadCallStatus(c.status) + ' ml-auto'}>{c.status}</span>
+                      </div>
+                      <div className="text-[13px] font-semibold text-slate-100 mb-0.5">{c.nature}</div>
+                      <div className="text-[11px] text-slate-400">{c.location}{c.city ? `, ${c.city}` : ''}</div>
+                      <div className="flex items-center gap-3 mt-1.5 text-[10px] font-mono">
+                        <span className={c.units.length > 0 ? 'text-emerald-400' : 'text-amber-400'}>
+                          {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
+                        </span>
+                        <span className="text-slate-600 ml-auto">{c.timestamp?.split(' ')[1] || '—'}</span>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-              </div>
+                </div>
+
+                {/* ── Desktop table ── */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className={S_TABLE}>
+                    <thead>
+                      <tr>
+                        {['Call #','Pri','Nature','Location','City','Status','Units','Time'].map(h => (
+                          <th key={h} className={S_TABLE_TH}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.sort((a,b) => a.priority - b.priority).map(c => (
+                        <tr key={c.id}
+                          className="cursor-pointer transition-colors"
+                          style={{
+                            background: selectedCall === c.id ? 'rgba(61,130,240,0.12)' : '',
+                            boxShadow: selectedCall === c.id ? 'inset 2px 0 0 #3d82f0' : '',
+                            borderLeft: `3px solid ${priLeft[c.priority] || 'transparent'}`,
+                          }}
+                          onMouseEnter={selectedCall === c.id ? undefined : trHoverOn}
+                          onMouseLeave={selectedCall === c.id ? undefined : trHoverOff}
+                          onClick={() => setSelectedCall(c.id)}>
+                          <td className={S_TABLE_TD}><span className={S_DATA}>{c.id}</span></td>
+                          <td className={S_TABLE_TD}><PriBadge p={c.priority} /></td>
+                          <td className={`${S_TABLE_TD} font-medium text-slate-200`}>{c.nature}</td>
+                          <td className={`${S_TABLE_TD} text-slate-400 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap`}>{c.location}</td>
+                          <td className={`${S_TABLE_TD} text-slate-400 text-[11px]`}>{c.city}</td>
+                          <td className={S_TABLE_TD}><span className={cadCallStatus(c.status)}>{c.status}</span></td>
+                          <td className={`${S_TABLE_TD} font-mono text-[10px] ${c.units.length > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
+                          </td>
+                          <td className={`${S_TABLE_TD} font-mono text-[10px] text-slate-500`}>
+                            {c.timestamp?.split(' ')[1] || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
 
           {/* Call detail strip */}
           {selCall && (
             <div className="border-t border-border-faint px-4 py-3 bg-app-card/70 shrink-0">
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-2.5 sm:gap-3">
+                <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-white mb-0.5">
                     {selCall.nature} <span className="text-slate-400 font-normal">· {selCall.location}, {selCall.city}</span>
                   </div>
@@ -161,7 +191,7 @@ export default function DispatchBoard() {
                   </div>
                 </div>
                 {me && !selCall.units.includes(me.unitId) && (
-                  <button className={sm(S_BTN_SUCCESS)} onClick={selfAssign}>
+                  <button className={`${sm(S_BTN_SUCCESS)} shrink-0 w-full sm:w-auto`} onClick={selfAssign}>
                     Self-Assign
                   </button>
                 )}
