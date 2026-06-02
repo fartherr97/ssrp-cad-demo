@@ -253,11 +253,11 @@ export default function ActionBar() {
   const me       = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
 
-  const go       = (route) => navigate(route);
+  const go       = (route) => { navigate(route); setMobileOpen(false); };
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
 
-  // Close the mobile drawer whenever the route changes
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  // Close the mobile drawer on any navigation (including same-path query param changes)
+  useEffect(() => { setMobileOpen(false); }, [location.key]);
 
   const dropdownItems = (kind) => {
     if (kind === 'reports') {
