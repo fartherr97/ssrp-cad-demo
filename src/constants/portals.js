@@ -69,6 +69,7 @@ export const PORTALS = {
       { Icon: MdDirectionsCar, label: 'Vehicles',    route: '/portal/vehicles'    },
       { Icon: MdBadge,         label: 'Licenses',    route: '/portal/licenses'    },
       { Icon: MdReportProblem, label: 'File Report', route: '/portal/file-report' },
+      { Icon: MdGavel,         label: 'Complaint',   route: '/portal/complaint'   },
       { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'        },
     ],
   },
