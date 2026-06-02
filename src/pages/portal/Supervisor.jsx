@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import {
-  MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight, MdExpandMore,
+  MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
-  MdSave, MdCheckCircle,
+  MdSave, MdCheckCircle, MdShield,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
-import { FormDocWrap, ReportDocument } from '../../components/FormDocument';
+import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
-import { S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
+import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
 
 /* ── Status helpers ── */
 const STATUS_META = {
@@ -29,15 +29,22 @@ function StatusPill({ status }) {
 
 /* ══════════════════════════════════
    FULL RECORD EDITOR (opened when a row is clicked)
+   Uses the same dark ReportForm the officer fills out
 ══════════════════════════════════ */
 function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, onBack, onSave }) {
-  const [editData, setEditData]   = useState({ ...(entry.formData || {}) });
-  const [status, setStatus]       = useState(entry.status || 'Submitted');
-  const [supSig, setSupSig]       = useState(entry.supervisorSignature || '');
-  const [saved, setSaved]         = useState(false);
+  const [editData, setEditData]     = useState({ ...(entry.formData || {}) });
+  const [status, setStatus]         = useState(entry.status || 'Submitted');
+  const [supSig, setSupSig]         = useState(entry.supervisorSignature || '');
+  const [saved, setSaved]           = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  const handleChange = (key, val) => setEditData(prev => ({ ...prev, [key]: val }));
+  const sectionTitles = template?.sections?.map(s => s.title) || [];
+  const tabs = ['Report', ...sectionTitles, 'Status'];
+
+  const scrollTo = (title) => {
+    const sel = title === 'Report' ? '[data-doc-top]' : `[data-section="${title}"]`;
+    document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const buildSupSig = () => {
     const me = allOfficers.find(o => o.id === currentUser?.id);
@@ -45,20 +52,10 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
     return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
   };
 
-  const signAndApprove = () => {
-    const sig = buildSupSig();
-    setSupSig(sig);
-    setStatus('Approved');
-  };
+  const signAndApprove = () => { setSupSig(buildSupSig()); setStatus('Approved'); };
 
   const handleSave = () => {
-    onSave({
-      id: entry.id,
-      kind: entry.kind,
-      formData: editData,
-      status,
-      supervisorSignature: supSig || undefined,
-    });
+    onSave({ id: entry.id, kind: entry.kind, formData: editData, status, supervisorSignature: supSig || undefined });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -77,42 +74,25 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         officerSignature: entry.officerSignature,
         supervisorSignature: supSig || entry.supervisorSignature,
       });
-    } finally {
-      setPdfLoading(false);
-    }
-  };
-
-  const meta = {
-    caseNumber: entry.caseNumber,
-    status,
-    officerSignature: entry.officerSignature,
-    supervisorSignature: supSig,
+    } finally { setPdfLoading(false); }
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden font-ui">
 
-      {/* ── Toolbar ── */}
-      <div className="shrink-0 bg-app-toolbar/90 backdrop-blur-md border-b border-border-base">
-        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 py-2.5">
+      {/* ── Top bar — mirrors ReportsCenter exactly ── */}
+      <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
+        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 pt-2.5 pb-1.5">
           <button type="button" onClick={onBack}
-            className={`${xs(S_BTN_GHOST)} gap-1.5`}>
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors mr-1">
             <MdArrowBack size={14} /> Back
           </button>
-          <div className="h-4 w-px bg-border-base" />
-          <div className="flex items-center gap-2 min-w-0">
-            {entry.kind === 'report'
-              ? <MdDescription size={15} className="text-sky-500 shrink-0" />
-              : <MdFolder size={15} className="text-violet-400 shrink-0" />}
-            <span className="text-[13px] font-bold text-white uppercase tracking-[0.3px] truncate">
-              {entry.type}
-            </span>
-            {entry.caseNumber && (
-              <span className="text-[11px] font-mono text-slate-500 shrink-0">{entry.caseNumber}</span>
-            )}
-          </div>
-
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
+          {entry.kind === 'report'
+            ? <MdDescription size={18} className="text-brand-bright shrink-0" />
+            : <MdFolder size={18} className="text-violet-400 shrink-0" />}
+          <span className="text-[13px] font-bold text-white uppercase tracking-[0.4px]">Supervisor Review</span>
+          <span className="text-[11px] text-slate-500">{entry.type}</span>
+          <span className="ml-auto flex items-center gap-2">
             {saved && (
               <span className="flex items-center gap-1 text-[11px] text-green-400 font-semibold">
                 <MdCheckCircle size={13} /> Saved
@@ -120,140 +100,200 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             )}
             <button type="button" onClick={handleExport} disabled={pdfLoading}
               className={xs(S_BTN_SECONDARY)}>
-              <MdDownload size={13} /> {pdfLoading ? 'Generating…' : 'PDF'}
+              <MdDownload size={13} /> {pdfLoading ? '…' : 'PDF'}
             </button>
             <button type="button" onClick={handleSave}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
               <MdSave size={13} /> Save Changes
             </button>
-          </div>
+          </span>
+        </div>
+        {/* Section tabs */}
+        <div className="flex items-center gap-0.5 px-3 overflow-x-auto n-tabs-wrap">
+          {tabs.map(t => (
+            <button key={t} onClick={() => scrollTo(t)}
+              className="relative px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.3px] whitespace-nowrap cursor-pointer transition-colors text-slate-500 hover:text-slate-300">
+              {t}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* ── Scrollable form body ── */}
-      <div className="flex-1 overflow-auto bg-slate-200">
-        {/* Paper document */}
-        <FormDocWrap meta={meta}>
-          <ReportDocument
-            type={entry.type}
-            template={template}
-            data={editData}
-            editable
-            onChange={handleChange}
-            meta={meta}
-          />
-        </FormDocWrap>
+      {/* ── Body: left sidebar + center form + right sidebar ── */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[240px_minmax(0,1fr)_260px] overflow-auto xl:overflow-hidden">
 
-        {/* ── Status / Signature section (outside the white paper, styled like Sonoran) ── */}
-        <div style={{
-          margin: '0 auto 32px', maxWidth: 900, padding: '0 16px',
-        }}>
-          <div style={{
-            background: '#1a1c24', border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 10, overflow: 'hidden',
-          }}>
-            {/* Section header */}
-            <div style={{
-              background: '#dc2626', padding: '6px 14px',
-              fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.7px',
-              color: '#fff',
-            }}>
-              Status
+        {/* LEFT: case meta */}
+        <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
+          <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
+          <div className="px-4">
+            {[
+              { label: 'Case #',    value: entry.caseNumber || '—' },
+              { label: 'Type',      value: entry.type },
+              { label: 'Date',      value: entry.date },
+              { label: 'Officer',   value: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—') },
+              { label: 'Dept',      value: officer?.deptShort || '—' },
+            ].map(d => (
+              <div key={d.label} className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
+                <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{d.label}</span>
+                <span className="text-[12.5px] text-slate-200">{d.value}</span>
+              </div>
+            ))}
+            <div className="flex flex-col gap-0.5 py-2">
+              <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">Status</span>
+              <StatusPill status={status} />
             </div>
+          </div>
+          {sectionTitles.length > 0 && (
+            <div className="px-2 py-3 mt-1">
+              <div className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Sections</div>
+              {sectionTitles.map(t => (
+                <button key={t} onClick={() => scrollTo(t)}
+                  className="w-full text-left px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-colors text-slate-400 hover:bg-white/[0.04] hover:text-slate-200">
+                  {t}
+                </button>
+              ))}
+            </div>
+          )}
+        </aside>
 
-            <div style={{ padding: 14, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'stretch' }}>
-              {/* Status dropdown */}
-              <div style={{
-                flex: '0 0 auto', background: '#111318', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 6, padding: '8px 12px', minWidth: 140,
-                display: 'flex', flexDirection: 'column', gap: 6,
-              }}>
-                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
-                  Status
-                </div>
-                <select
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
-                  style={{
-                    background: 'transparent', border: 'none', outline: 'none', cursor: 'pointer',
-                    color: '#e2e8f0', fontSize: 13, fontWeight: 700, padding: 0,
-                  }}
-                >
-                  {ALL_STATUSES.map(s => <option key={s} value={s} style={{ background: '#1a1c24' }}>{s}</option>)}
-                </select>
+        {/* CENTER: dark form (same as report writing) */}
+        <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
+          {/* Status bar */}
+          <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
+            <div>
+              <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div>
+              <div className="mt-1"><StatusPill status={status} /></div>
+            </div>
+            <div>
+              <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div>
+              <div className="text-[12.5px] text-slate-200 mt-0.5">{entry.date}</div>
+            </div>
+            <div>
+              <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Case #</div>
+              <div className="text-[12.5px] font-mono text-slate-200 mt-0.5">{entry.caseNumber || '—'}</div>
+            </div>
+            <div>
+              <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Sup. Signed</div>
+              <div className="text-[12.5px] text-slate-200 mt-0.5">{supSig ? '✓ Signed' : 'Not signed'}</div>
+            </div>
+          </div>
+
+          {/* Form fields */}
+          <div data-doc-top className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
+            {template ? (
+              <ReportForm
+                template={template}
+                data={editData}
+                onChange={(k, v) => setEditData(p => ({ ...p, [k]: v }))}
+                onBulkChange={(obj) => setEditData(p => ({ ...p, ...obj }))}
+              />
+            ) : (
+              <div className="text-slate-500 text-sm italic">
+                No matching template found for "{entry.type}". The form data is stored but cannot be displayed.
               </div>
+            )}
 
-              {/* Officer signature (amber) */}
-              <div style={{
-                flex: 1, minWidth: 200, background: 'rgba(120,80,0,0.2)',
-                border: '1px solid rgba(180,120,0,0.35)', borderRadius: 6, padding: '8px 12px',
-                display: 'flex', flexDirection: 'column', gap: 6,
-              }}>
-                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#d97706' }}>
-                  Observing Officer's Signature
-                </div>
-                <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#fbbf24' }}>
-                  {entry.officerSignature || '—'}
-                </div>
+            {/* ── Status / Signature section at bottom of form ── */}
+            <div data-section="Status" className="mt-6 rounded-xl overflow-hidden border border-border-base">
+              <div className="bg-red-600 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.7px] text-white">
+                Status
               </div>
+              <div className="bg-app-panel/80 p-4 flex flex-wrap gap-3">
 
-              {/* Supervisor signature */}
-              <div style={{ flex: 1, minWidth: 200 }}>
-                {supSig ? (
-                  <div style={{
-                    background: 'rgba(0,80,30,0.2)', border: '1px solid rgba(0,150,60,0.35)',
-                    borderRadius: 6, padding: '8px 12px', height: '100%', minHeight: 56,
-                    display: 'flex', flexDirection: 'column', gap: 6,
-                  }}>
-                    <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22c55e' }}>
-                      Supervisor Signature
+                {/* Status selector */}
+                <div className="flex-none min-w-[130px] bg-app-bg/60 border border-border-base rounded-lg p-3">
+                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Status</div>
+                  <select
+                    value={status}
+                    onChange={e => setStatus(e.target.value)}
+                    className="w-full bg-transparent text-[13px] font-bold text-slate-200 outline-none cursor-pointer border-0"
+                  >
+                    {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                {/* Officer signature (amber) */}
+                <div className="flex-1 min-w-[180px] rounded-lg p-3"
+                  style={{ background: 'rgba(120,80,0,0.2)', border: '1px solid rgba(180,120,0,0.35)' }}>
+                  <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#d97706', marginBottom: 6 }}>
+                    Observing Officer's Signature
+                  </div>
+                  <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#fbbf24' }}>
+                    {entry.officerSignature || '—'}
+                  </div>
+                </div>
+
+                {/* Supervisor signature */}
+                <div className="flex-1 min-w-[180px]">
+                  {supSig ? (
+                    <div className="rounded-lg p-3 h-full"
+                      style={{ background: 'rgba(0,80,30,0.2)', border: '1px solid rgba(0,150,60,0.35)' }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22c55e', marginBottom: 6 }}>
+                        Supervisor Signature
+                      </div>
+                      <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#86efac' }}>
+                        {supSig}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setSupSig(''); }}
+                        className="mt-1 text-[10px] text-slate-500 hover:text-slate-300 cursor-pointer underline bg-transparent border-0">
+                        Clear
+                      </button>
                     </div>
-                    <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#86efac' }}>
-                      {supSig}
-                    </div>
+                  ) : (
                     <button
                       type="button"
-                      onClick={() => { setSupSig(''); setStatus(entry.status === 'Approved' ? 'Submitted' : entry.status); }}
-                      style={{ alignSelf: 'flex-start', fontSize: 10, color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-                    >
-                      Clear signature
+                      onClick={signAndApprove}
+                      className="w-full h-full min-h-[56px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[13px] uppercase tracking-[0.7px] cursor-pointer transition-colors border-0">
+                      Supervisor Signature
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={signAndApprove}
-                    style={{
-                      width: '100%', minHeight: 56, background: '#dc2626',
-                      border: '1px solid rgba(220,38,38,0.5)', borderRadius: 6,
-                      color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer',
-                      textTransform: 'uppercase', letterSpacing: '0.7px',
-                      transition: 'background .15s', display: 'block',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#b91c1c'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#dc2626'; }}
-                  >
-                    Supervisor Signature
-                  </button>
-                )}
-              </div>
-
-              {/* Date */}
-              <div style={{
-                flex: '0 0 auto', background: '#111318', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 6, padding: '8px 12px', minWidth: 110,
-                display: 'flex', flexDirection: 'column', gap: 6,
-              }}>
-                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
-                  Date
+                  )}
                 </div>
-                <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, color: '#94a3b8' }}>
-                  {entry.date || new Date().toLocaleDateString()}
+
+                {/* Date */}
+                <div className="flex-none min-w-[110px] bg-app-bg/60 border border-border-base rounded-lg p-3">
+                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Date</div>
+                  <div className="font-mono text-[13px] text-slate-300">{entry.date || new Date().toLocaleDateString()}</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </main>
+
+        {/* RIGHT: officer / record info */}
+        <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
+          <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Info</div>
+          <div className="p-3 flex flex-col gap-3">
+            {/* Submitting officer */}
+            <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
+              <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Submitted By</div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0">
+                  <MdShield size={18} className="text-slate-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[12.5px] font-semibold text-white truncate">{officer?.name || entry.officerBadge || '—'}</div>
+                  <div className="text-[10.5px] text-slate-500">#{officer?.badge || entry.officerBadge} · {officer?.deptShort || '—'}</div>
+                </div>
+              </div>
+            </div>
+            {/* Sig status */}
+            <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
+              <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Signatures</div>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${entry.officerSignature ? 'bg-amber-400' : 'bg-slate-600'}`} />
+                  <span className="text-[11px] text-slate-400">Officer</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${supSig ? 'bg-green-400' : 'bg-slate-600'}`} />
+                  <span className="text-[11px] text-slate-400">Supervisor</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
