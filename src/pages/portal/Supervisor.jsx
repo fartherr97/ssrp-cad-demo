@@ -1,18 +1,22 @@
 import { useState, useMemo } from 'react';
 import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight, MdExpandMore,
-  MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdEdit,
+  MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
+  MdSave, MdCheckCircle,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
+import { FormDocWrap, ReportDocument } from '../../components/FormDocument';
 import { downloadReportPDF } from '../../components/ReportPDF';
+import { S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
 
 /* ── Status helpers ── */
 const STATUS_META = {
-  'Submitted':      { pill: 'bg-sky-500/15 text-sky-400 border-sky-500/30',    active: 'bg-sky-500 text-white border-sky-500' },
+  'Submitted':      { pill: 'bg-sky-500/15 text-sky-400 border-sky-500/30',       active: 'bg-sky-500 text-white border-sky-500' },
   'Pending Review': { pill: 'bg-amber-500/15 text-amber-400 border-amber-500/30', active: 'bg-amber-500 text-white border-amber-500' },
   'Approved':       { pill: 'bg-green-500/15 text-green-400 border-green-500/30',  active: 'bg-green-600 text-white border-green-600' },
   'Rejected':       { pill: 'bg-red-500/15 text-red-400 border-red-500/30',        active: 'bg-red-600 text-white border-red-600' },
 };
+const ALL_STATUSES = ['Submitted', 'Pending Review', 'Approved', 'Rejected'];
 
 function StatusPill({ status }) {
   const m = STATUS_META[status] || { pill: 'bg-slate-500/15 text-slate-400 border-slate-500/30' };
@@ -23,163 +27,283 @@ function StatusPill({ status }) {
   );
 }
 
-/* ── Signature cell ── */
-function SigCell({ label, value, amber }) {
+/* ══════════════════════════════════
+   FULL RECORD EDITOR (opened when a row is clicked)
+══════════════════════════════════ */
+function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, onBack, onSave }) {
+  const [editData, setEditData]   = useState({ ...(entry.formData || {}) });
+  const [status, setStatus]       = useState(entry.status || 'Submitted');
+  const [supSig, setSupSig]       = useState(entry.supervisorSignature || '');
+  const [saved, setSaved]         = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleChange = (key, val) => setEditData(prev => ({ ...prev, [key]: val }));
+
+  const buildSupSig = () => {
+    const me = allOfficers.find(o => o.id === currentUser?.id);
+    if (me) return `${me.badge} | ${(me.rank || me.role || 'SUPERVISOR').toUpperCase()} | ${me.name.toUpperCase()}`;
+    return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
+  };
+
+  const signAndApprove = () => {
+    const sig = buildSupSig();
+    setSupSig(sig);
+    setStatus('Approved');
+  };
+
+  const handleSave = () => {
+    onSave({
+      id: entry.id,
+      kind: entry.kind,
+      formData: editData,
+      status,
+      supervisorSignature: supSig || undefined,
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleExport = async () => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      await downloadReportPDF(template || { name: entry.type }, editData, {
+        caseNumber: entry.caseNumber,
+        status,
+        dateTime: entry.date,
+        officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—'),
+        agency: officer?.deptShort || communityConfig?.name || 'SSRP',
+        logoUrl: communityConfig?.logoUrl,
+        officerSignature: entry.officerSignature,
+        supervisorSignature: supSig || entry.supervisorSignature,
+      });
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const meta = {
+    caseNumber: entry.caseNumber,
+    status,
+    officerSignature: entry.officerSignature,
+    supervisorSignature: supSig,
+  };
+
   return (
-    <div style={{
-      flex: 1, background: amber ? 'rgba(120,90,0,0.18)' : 'rgba(0,80,30,0.12)',
-      border: `1px solid ${amber ? 'rgba(180,130,0,0.35)' : 'rgba(0,150,60,0.30)'}`,
-      borderRadius: 6, padding: '6px 10px', minHeight: 52,
-      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-    }}>
-      <div style={{
-        fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',
-        color: amber ? '#d97706' : '#22c55e', marginBottom: 4,
-      }}>
-        {label}
-      </div>
-      <div style={{
-        fontFamily: 'Courier New, monospace', fontSize: 12, fontWeight: 700,
-        color: amber ? '#fbbf24' : '#86efac', letterSpacing: '0.3px',
-      }}>
-        {value || '—'}
-      </div>
-    </div>
-  );
-}
+    <div className="flex flex-col h-full overflow-hidden font-ui">
 
-/* ── Detail panel with Sonoran-style signature section ── */
-function DetailPanel({ entry, officer, onSign, onRequestChanges, onExport }) {
-  const rows = [
-    { label: 'Case #',  value: entry.caseNumber },
-    { label: 'Type',    value: entry.type },
-    { label: 'Date',    value: entry.date },
-    { label: 'Status',  value: <StatusPill status={entry.status} /> },
-    { label: 'Officer', value: officer ? `${officer.name} · ${officer.badge}` : entry.officerBadge },
-    { label: 'Dept',    value: officer?.deptShort || '—' },
-    { label: 'Rank',    value: officer?.rank || '—' },
-    ...(entry.callId ? [{ label: 'Call ID', value: entry.callId }] : []),
-  ];
-
-  const extraFields = entry.formData
-    ? Object.entries(entry.formData).filter(([, v]) => v && typeof v === 'string' && v.trim()).slice(0, 6)
-    : [];
-
-  const alreadySigned = !!entry.supervisorSignature;
-
-  return (
-    <div className="px-4 pb-4 pt-3 bg-white/[0.02] border-t border-border-faint">
-      {/* Detail grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 mb-4 max-w-3xl">
-        {rows.map(r => (
-          <div key={r.label} className="flex items-start gap-2 py-1.5 border-b border-border-faint last:border-0">
-            <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 w-20 shrink-0 pt-0.5">{r.label}</span>
-            <span className="text-[12.5px] text-slate-200 flex-1">{r.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Summary */}
-      {entry.summary && (
-        <div className="mb-4">
-          <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Summary</div>
-          <div className="text-[12.5px] text-slate-300 leading-relaxed bg-app-bg/40 rounded-lg px-3 py-2.5 border border-border-faint">
-            {entry.summary}
-          </div>
-        </div>
-      )}
-
-      {/* Extra form fields */}
-      {extraFields.length > 0 && (
-        <div className="mb-4">
-          <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Form Data</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-            {extraFields.map(([k, v]) => (
-              <div key={k} className="flex items-start gap-2 py-1 border-b border-border-faint last:border-0">
-                <span className="text-[10px] font-bold uppercase tracking-[0.4px] text-slate-600 w-20 shrink-0 pt-0.5 truncate">{k}</span>
-                <span className="text-[11.5px] text-slate-400 flex-1 break-words">{String(v).slice(0, 120)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Sonoran-style STATUS / SIGNATURE section ── */}
-      <div className="mb-3">
-        <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Status</div>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          {/* Status chip */}
-          <div style={{
-            flex: '0 0 auto', background: 'rgba(30,35,50,0.7)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 6, padding: '6px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 100,
-          }}>
-            <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', marginBottom: 3 }}>Status</div>
-            <StatusPill status={entry.status} />
-          </div>
-
-          {/* Officer signature (amber) */}
-          <SigCell label="Observing Officer's Signature" value={entry.officerSignature} amber />
-
-          {/* Supervisor signature — red button or filled value */}
-          <div style={{ flex: 1, minWidth: 160 }}>
-            {alreadySigned ? (
-              <SigCell label="Supervisor Signature" value={entry.supervisorSignature} />
-            ) : (
-              <button
-                type="button"
-                onClick={onSign}
-                style={{
-                  width: '100%', minHeight: 52, background: '#dc2626',
-                  border: '1px solid rgba(220,38,38,0.5)', borderRadius: 6,
-                  color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer',
-                  textTransform: 'uppercase', letterSpacing: '0.7px', transition: 'background .15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#b91c1c'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#dc2626'; }}
-              >
-                Supervisor Signature
-              </button>
+      {/* ── Toolbar ── */}
+      <div className="shrink-0 bg-app-toolbar/90 backdrop-blur-md border-b border-border-base">
+        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 py-2.5">
+          <button type="button" onClick={onBack}
+            className={`${xs(S_BTN_GHOST)} gap-1.5`}>
+            <MdArrowBack size={14} /> Back
+          </button>
+          <div className="h-4 w-px bg-border-base" />
+          <div className="flex items-center gap-2 min-w-0">
+            {entry.kind === 'report'
+              ? <MdDescription size={15} className="text-sky-500 shrink-0" />
+              : <MdFolder size={15} className="text-violet-400 shrink-0" />}
+            <span className="text-[13px] font-bold text-white uppercase tracking-[0.3px] truncate">
+              {entry.type}
+            </span>
+            {entry.caseNumber && (
+              <span className="text-[11px] font-mono text-slate-500 shrink-0">{entry.caseNumber}</span>
             )}
           </div>
 
-          {/* Date */}
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            {saved && (
+              <span className="flex items-center gap-1 text-[11px] text-green-400 font-semibold">
+                <MdCheckCircle size={13} /> Saved
+              </span>
+            )}
+            <button type="button" onClick={handleExport} disabled={pdfLoading}
+              className={xs(S_BTN_SECONDARY)}>
+              <MdDownload size={13} /> {pdfLoading ? 'Generating…' : 'PDF'}
+            </button>
+            <button type="button" onClick={handleSave}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
+              <MdSave size={13} /> Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Scrollable form body ── */}
+      <div className="flex-1 overflow-auto bg-slate-200">
+        {/* Paper document */}
+        <FormDocWrap meta={meta}>
+          <ReportDocument
+            type={entry.type}
+            template={template}
+            data={editData}
+            editable
+            onChange={handleChange}
+            meta={meta}
+          />
+        </FormDocWrap>
+
+        {/* ── Status / Signature section (outside the white paper, styled like Sonoran) ── */}
+        <div style={{
+          margin: '0 auto 32px', maxWidth: 900, padding: '0 16px',
+        }}>
           <div style={{
-            flex: '0 0 auto', background: 'rgba(30,35,50,0.7)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 6, padding: '6px 10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 110,
+            background: '#1a1c24', border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 10, overflow: 'hidden',
           }}>
-            <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', marginBottom: 4 }}>Date</div>
-            <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#94a3b8' }}>
-              {entry.date || new Date().toLocaleDateString()}
+            {/* Section header */}
+            <div style={{
+              background: '#dc2626', padding: '6px 14px',
+              fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.7px',
+              color: '#fff',
+            }}>
+              Status
+            </div>
+
+            <div style={{ padding: 14, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'stretch' }}>
+              {/* Status dropdown */}
+              <div style={{
+                flex: '0 0 auto', background: '#111318', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 6, padding: '8px 12px', minWidth: 140,
+                display: 'flex', flexDirection: 'column', gap: 6,
+              }}>
+                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
+                  Status
+                </div>
+                <select
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                  style={{
+                    background: 'transparent', border: 'none', outline: 'none', cursor: 'pointer',
+                    color: '#e2e8f0', fontSize: 13, fontWeight: 700, padding: 0,
+                  }}
+                >
+                  {ALL_STATUSES.map(s => <option key={s} value={s} style={{ background: '#1a1c24' }}>{s}</option>)}
+                </select>
+              </div>
+
+              {/* Officer signature (amber) */}
+              <div style={{
+                flex: 1, minWidth: 200, background: 'rgba(120,80,0,0.2)',
+                border: '1px solid rgba(180,120,0,0.35)', borderRadius: 6, padding: '8px 12px',
+                display: 'flex', flexDirection: 'column', gap: 6,
+              }}>
+                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#d97706' }}>
+                  Observing Officer's Signature
+                </div>
+                <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#fbbf24' }}>
+                  {entry.officerSignature || '—'}
+                </div>
+              </div>
+
+              {/* Supervisor signature */}
+              <div style={{ flex: 1, minWidth: 200 }}>
+                {supSig ? (
+                  <div style={{
+                    background: 'rgba(0,80,30,0.2)', border: '1px solid rgba(0,150,60,0.35)',
+                    borderRadius: 6, padding: '8px 12px', height: '100%', minHeight: 56,
+                    display: 'flex', flexDirection: 'column', gap: 6,
+                  }}>
+                    <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22c55e' }}>
+                      Supervisor Signature
+                    </div>
+                    <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#86efac' }}>
+                      {supSig}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setSupSig(''); setStatus(entry.status === 'Approved' ? 'Submitted' : entry.status); }}
+                      style={{ alignSelf: 'flex-start', fontSize: 10, color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                    >
+                      Clear signature
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={signAndApprove}
+                    style={{
+                      width: '100%', minHeight: 56, background: '#dc2626',
+                      border: '1px solid rgba(220,38,38,0.5)', borderRadius: 6,
+                      color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer',
+                      textTransform: 'uppercase', letterSpacing: '0.7px',
+                      transition: 'background .15s', display: 'block',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#b91c1c'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#dc2626'; }}
+                  >
+                    Supervisor Signature
+                  </button>
+                )}
+              </div>
+
+              {/* Date */}
+              <div style={{
+                flex: '0 0 auto', background: '#111318', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 6, padding: '8px 12px', minWidth: 110,
+                display: 'flex', flexDirection: 'column', gap: 6,
+              }}>
+                <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
+                  Date
+                </div>
+                <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, color: '#94a3b8' }}>
+                  {entry.date || new Date().toLocaleDateString()}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Request Changes + Export row */}
-      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border-faint">
-        {!alreadySigned && (
-          <button type="button" onClick={onRequestChanges}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 text-[11.5px] font-bold cursor-pointer transition-all border border-amber-500/30">
-            <MdEdit size={13} /> Request Changes
-          </button>
-        )}
-        <div className="ml-auto">
-          <button type="button" onClick={onExport}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-app-elevated border border-border-base text-slate-300 hover:text-white text-[11.5px] font-semibold cursor-pointer transition-all hover:bg-white/[0.07]">
-            <MdDownload size={14} /> Download PDF
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
 
-/* ── Mobile card ── */
-function SubmissionCard({ entry, officer, isExpanded, onToggle, onSign, onRequestChanges, onExport }) {
+/* ══════════════════════════════════
+   LIST ROW
+══════════════════════════════════ */
+function EntryRow({ entry, officer, onClick, idx }) {
+  const rowBg = idx % 2 === 0 ? '' : 'bg-white/[0.02]';
   return (
-    <div className={`rounded-xl border overflow-hidden transition-colors mb-2 ${isExpanded ? 'border-brand/40 bg-brand/[0.04]' : 'border-border-base bg-app-elevated'}`}>
-      <button type="button" onClick={onToggle}
-        className="w-full text-left px-4 py-3 flex items-start gap-3 cursor-pointer">
+    <tr onClick={onClick}
+      className={`cursor-pointer transition-colors hover:bg-white/[0.05] ${rowBg}`}>
+      <td className="px-4 py-3 text-[12px] text-slate-400 border-b border-border-faint whitespace-nowrap font-mono">{entry.date}</td>
+      <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">{entry.caseNumber || '—'}</td>
+      <td className="px-4 py-3 border-b border-border-faint">
+        <div className="flex items-center gap-1.5">
+          {entry.kind === 'report'
+            ? <MdDescription size={13} className="text-sky-500 shrink-0" />
+            : <MdFolder size={13} className="text-violet-400 shrink-0" />}
+          <span className="text-[12.5px] text-slate-200 whitespace-nowrap">{entry.type}</span>
+        </div>
+      </td>
+      <td className="px-4 py-3 border-b border-border-faint">
+        <span className="text-[12px] text-slate-300 font-mono">{officer?.deptShort || '—'}</span>
+      </td>
+      <td className="px-4 py-3 border-b border-border-faint">
+        {officer ? (
+          <div className="min-w-0">
+            <div className="text-[12.5px] text-slate-200 whitespace-nowrap">{officer.name}</div>
+            <div className="text-[10px] text-slate-500 font-mono">{officer.badge}</div>
+          </div>
+        ) : (
+          <span className="text-[12px] text-slate-500 font-mono">{entry.officerBadge || '—'}</span>
+        )}
+      </td>
+      <td className="px-4 py-3 border-b border-border-faint"><StatusPill status={entry.status} /></td>
+      <td className="px-3 py-3 border-b border-border-faint text-slate-500 w-8">
+        <MdChevronRight size={16} />
+      </td>
+    </tr>
+  );
+}
+
+/* Mobile card */
+function MobileCard({ entry, officer, onClick }) {
+  return (
+    <div onClick={onClick}
+      className="rounded-xl border border-border-base bg-app-elevated mb-2 cursor-pointer hover:border-brand/40 transition-colors">
+      <div className="px-4 py-3 flex items-start gap-3">
         <div className="mt-0.5 shrink-0">
           {entry.kind === 'report'
             ? <MdDescription size={15} className="text-sky-500" />
@@ -197,19 +321,8 @@ function SubmissionCard({ entry, officer, isExpanded, onToggle, onSign, onReques
             <div className="text-[11px] text-slate-400 mt-0.5">{officer.name} · {officer.badge}</div>
           )}
         </div>
-        <div className="text-slate-500 shrink-0 mt-0.5">
-          {isExpanded ? <MdExpandMore size={16} /> : <MdChevronRight size={16} />}
-        </div>
-      </button>
-      {isExpanded && (
-        <DetailPanel
-          entry={entry}
-          officer={officer}
-          onSign={onSign}
-          onRequestChanges={onRequestChanges}
-          onExport={onExport}
-        />
-      )}
+        <MdChevronRight size={16} className="text-slate-500 shrink-0 mt-0.5" />
+      </div>
     </div>
   );
 }
@@ -219,14 +332,16 @@ function SubmissionCard({ entry, officer, isExpanded, onToggle, onSign, onReques
 ══════════════════════════════════ */
 export default function Supervisor() {
   const { state, dispatch } = useCAD();
-  const { reports, records, officers, currentUser, reportTemplates = [], recordTemplates = [], communityConfig } = state;
+  const {
+    reports, records, officers, currentUser,
+    reportTemplates = [], recordTemplates = [], communityConfig,
+  } = state;
 
   const [deptFilter, setDeptFilter]     = useState('All');
   const [typeFilter, setTypeFilter]     = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [search, setSearch]             = useState('');
-  const [expandedId, setExpandedId]     = useState(null);
-  const [pdfLoading, setPdfLoading]     = useState(false);
+  const [openEntry, setOpenEntry]       = useState(null); // null = list, object = edit
 
   const combined = useMemo(() => [
     ...reports.map(r => ({ ...r, kind: 'report' })),
@@ -269,56 +384,53 @@ export default function Supervisor() {
 
   const reportCount = filtered.filter(e => e.kind === 'report').length;
   const recordCount = filtered.filter(e => e.kind === 'record').length;
-
   const STATUS_PILLS = ['All', 'Submitted', 'Pending Review', 'Approved', 'Rejected'];
 
-  /* Build supervisor signature from current user */
-  const buildSupervisorSig = () => {
-    const me = officers.find(o => o.id === currentUser?.id);
-    if (me) return `${me.badge} | ${(me.rank || me.role || 'SUPERVISOR').toUpperCase()} | ${me.name.toUpperCase()}`;
-    return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
+  /* ── Open / save handlers ── */
+  const openRecord = (entry) => {
+    // Re-hydrate from current state so edits made mid-session are reflected
+    const latest = entry.kind === 'report'
+      ? reports.find(r => r.id === entry.id)
+      : records.find(r => r.id === entry.id);
+    setOpenEntry({ ...(latest || entry), kind: entry.kind });
   };
 
-  const signEntry = (entry) => {
-    const sig = buildSupervisorSig();
-    if (entry.kind === 'report') {
-      dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: entry.id, status: 'Approved', supervisorSignature: sig } });
-    } else {
-      dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: entry.id, status: 'Approved', supervisorSignature: sig } });
-    }
-  };
-
-  const requestChanges = (entry) => {
-    if (entry.kind === 'report') {
-      dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: entry.id, status: 'Pending Review' } });
-    } else {
-      dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: entry.id, status: 'Pending Review' } });
-    }
-  };
-
-  const exportEntry = async (entry, officer) => {
-    if (pdfLoading) return;
-    setPdfLoading(true);
-    try {
-      const allTpls = [...reportTemplates, ...recordTemplates];
-      const template = allTpls.find(t => t.name === entry.type) || { name: entry.type };
-      await downloadReportPDF(template, entry.formData || {}, {
-        caseNumber: entry.caseNumber,
-        status: entry.status,
-        dateTime: entry.date,
-        officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—'),
-        agency: officer?.deptShort || communityConfig?.name || 'SSRP',
-        logoUrl: communityConfig?.logoUrl,
-        officerSignature: entry.officerSignature,
-        supervisorSignature: entry.supervisorSignature,
+  const saveEntry = ({ id, kind, formData, status, supervisorSignature }) => {
+    if (kind === 'report') {
+      dispatch({
+        type: 'UPDATE_REPORT',
+        payload: { id, formData, status, ...(supervisorSignature ? { supervisorSignature } : {}) },
       });
-    } finally {
-      setPdfLoading(false);
+    } else {
+      dispatch({
+        type: 'UPDATE_RECORD',
+        payload: { id, formData, status, ...(supervisorSignature ? { supervisorSignature } : {}) },
+      });
     }
+    // Update the open entry to reflect saved state
+    setOpenEntry(prev => ({ ...prev, formData, status, ...(supervisorSignature ? { supervisorSignature } : {}) }));
   };
 
-  const toggleRow = (uid) => setExpandedId(prev => prev === uid ? null : uid);
+  /* ── If a record is open, show full editor ── */
+  if (openEntry) {
+    const allTpls = [...reportTemplates, ...recordTemplates];
+    const template = allTpls.find(t => t.name === openEntry.type);
+    const officer = officerByBadge[openEntry.officerBadge];
+    return (
+      <RecordEditor
+        entry={openEntry}
+        officer={officer}
+        template={template}
+        currentUser={currentUser}
+        allOfficers={officers}
+        communityConfig={communityConfig}
+        onBack={() => setOpenEntry(null)}
+        onSave={saveEntry}
+      />
+    );
+  }
 
+  /* ── List view ── */
   return (
     <div className="flex-1 overflow-auto p-4 lg:p-5 font-ui">
 
@@ -329,7 +441,7 @@ export default function Supervisor() {
         </div>
         <div className="min-w-0">
           <h1 className="text-[15px] font-bold text-white leading-none">Supervisor Portal</h1>
-          <p className="text-[11px] text-slate-500 mt-0.5">Review all submitted reports and records</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Click any row to open the full editable record</p>
         </div>
         <div className="ml-auto shrink-0 text-[11.5px] text-slate-500 font-mono">
           <span className="text-sky-400 font-bold">{reportCount}</span>R&nbsp;·&nbsp;
@@ -360,7 +472,7 @@ export default function Supervisor() {
             )}
           </div>
           <select
-            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer focus:border-brand/60 shrink-0"
+            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
             value={deptFilter}
             onChange={e => setDeptFilter(e.target.value)}
           >
@@ -371,7 +483,7 @@ export default function Supervisor() {
 
         <div className="grid grid-cols-2 gap-2 px-4 pt-2">
           <select
-            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer focus:border-brand/60 w-full"
+            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer w-full"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
           >
@@ -379,14 +491,12 @@ export default function Supervisor() {
             {typeOptions.slice(1).map(t => <option key={t} value={t}>{t}</option>)}
           </select>
           <select
-            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer focus:border-brand/60 w-full"
+            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer w-full"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
           >
             <option value="All">All Statuses</option>
-            {['Submitted', 'Pending Review', 'Approved', 'Rejected'].map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+            {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
 
@@ -442,83 +552,29 @@ export default function Supervisor() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((entry, idx) => {
-                    const uid = `${entry.kind}-${entry.id}`;
-                    const officer = officerByBadge[entry.officerBadge];
-                    const isExpanded = expandedId === uid;
-                    const rowBg = idx % 2 === 0 ? '' : 'bg-white/[0.02]';
-
-                    return [
-                      <tr
-                        key={uid}
-                        onClick={() => toggleRow(uid)}
-                        className={`cursor-pointer transition-colors hover:bg-white/[0.05] ${rowBg} ${isExpanded ? 'bg-brand/[0.06]' : ''}`}
-                      >
-                        <td className="px-4 py-3 text-[12px] text-slate-400 border-b border-border-faint whitespace-nowrap font-mono">{entry.date}</td>
-                        <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">{entry.caseNumber || '—'}</td>
-                        <td className="px-4 py-3 border-b border-border-faint">
-                          <div className="flex items-center gap-1.5">
-                            {entry.kind === 'report'
-                              ? <MdDescription size={13} className="text-sky-500 shrink-0" />
-                              : <MdFolder size={13} className="text-violet-400 shrink-0" />}
-                            <span className="text-[12.5px] text-slate-200 whitespace-nowrap">{entry.type}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 border-b border-border-faint">
-                          <span className="text-[12px] text-slate-300 font-mono">{officer?.deptShort || '—'}</span>
-                        </td>
-                        <td className="px-4 py-3 border-b border-border-faint">
-                          {officer ? (
-                            <div className="min-w-0">
-                              <div className="text-[12.5px] text-slate-200 whitespace-nowrap">{officer.name}</div>
-                              <div className="text-[10px] text-slate-500 font-mono">{officer.badge}</div>
-                            </div>
-                          ) : (
-                            <span className="text-[12px] text-slate-500 font-mono">{entry.officerBadge || '—'}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 border-b border-border-faint"><StatusPill status={entry.status} /></td>
-                        <td className="px-3 py-3 border-b border-border-faint text-slate-500 w-8">
-                          {isExpanded ? <MdExpandMore size={16} /> : <MdChevronRight size={16} />}
-                        </td>
-                      </tr>,
-                      isExpanded && (
-                        <tr key={`${uid}-detail`}>
-                          <td colSpan={7} className="border-b border-border-base">
-                            <DetailPanel
-                              entry={entry}
-                              officer={officer}
-                              onSign={() => signEntry(entry)}
-                              onRequestChanges={() => requestChanges(entry)}
-                              onExport={() => exportEntry(entry, officer)}
-                            />
-                          </td>
-                        </tr>
-                      ),
-                    ];
-                  })}
+                  {filtered.map((entry, idx) => (
+                    <EntryRow
+                      key={`${entry.kind}-${entry.id}`}
+                      entry={entry}
+                      officer={officerByBadge[entry.officerBadge]}
+                      idx={idx}
+                      onClick={() => openRecord(entry)}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile cards */}
             <div className="block sm:hidden p-3">
-              {filtered.map(entry => {
-                const uid = `${entry.kind}-${entry.id}`;
-                const officer = officerByBadge[entry.officerBadge];
-                return (
-                  <SubmissionCard
-                    key={uid}
-                    entry={entry}
-                    officer={officer}
-                    isExpanded={expandedId === uid}
-                    onToggle={() => toggleRow(uid)}
-                    onSign={() => signEntry(entry)}
-                    onRequestChanges={() => requestChanges(entry)}
-                    onExport={() => exportEntry(entry, officer)}
-                  />
-                );
-              })}
+              {filtered.map(entry => (
+                <MobileCard
+                  key={`${entry.kind}-${entry.id}`}
+                  entry={entry}
+                  officer={officerByBadge[entry.officerBadge]}
+                  onClick={() => openRecord(entry)}
+                />
+              ))}
             </div>
           </>
         )}

@@ -485,6 +485,19 @@ function reducer(state, action) {
       const newRecord = { ...action.payload, id: state.nextId, date: new Date().toLocaleDateString() };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
     }
+    case 'UPDATE_REPORT': {
+      const reports = state.reports.map(r =>
+        r.id === action.payload.id ? { ...r, ...action.payload } : r
+      );
+      const audit = addAuditEntry(state, `Updated report ID ${action.payload.id}`, 'Reports');
+      return { ...state, reports, ...audit };
+    }
+    case 'UPDATE_RECORD': {
+      const records = state.records.map(r =>
+        r.id === action.payload.id ? { ...r, ...action.payload } : r
+      );
+      return { ...state, records };
+    }
     case 'UPDATE_RECORD_STATUS': {
       const { id: rid, status: rstatus, supervisorSignature: rsig } = action.payload;
       return {
