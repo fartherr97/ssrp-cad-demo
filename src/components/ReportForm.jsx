@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -121,12 +121,37 @@ function SectionLookup({ sec, data, onBulk }) {
   const boxRef = useRef(null);
   const kind = sec.lookup;
 
-  const results = query.trim().length >= 1 ? searchData(kind, query, state) : [];
+  // For vehicle section: scope to the civilian already filled in ci_first + ci_last
+  const sectionCiv = kind === 'vehicle' ? (() => {
+    const fn = (data.ci_first || '').trim().toLowerCase();
+    const ln = (data.ci_last || '').trim().toLowerCase();
+    if (!fn && !ln) return null;
+    return (state.civilians || []).find(c =>
+      c.firstName.toLowerCase() === fn && c.lastName.toLowerCase() === ln
+    ) || null;
+  })() : null;
+
+  let results = [];
+  let ownerIds = new Set();
+  if (open) {
+    if (kind === 'vehicle') {
+      const all = state.vehicles || [];
+      const q = query.trim().toLowerCase();
+      const ownerVeh = sectionCiv ? all.filter(v => v.ownerId === sectionCiv.id) : [];
+      ownerIds = new Set(ownerVeh.map(v => v.id));
+      const match = v => v.plate?.toLowerCase().includes(q) || `${v.year} ${v.make} ${v.model}`.toLowerCase().includes(q);
+      results = q
+        ? [...ownerVeh.filter(match), ...searchData('vehicle', query, state).filter(v => !ownerIds.has(v.id))].slice(0, 8)
+        : (ownerVeh.length ? ownerVeh : all).slice(0, 8);
+    } else if (query.trim()) {
+      results = searchData(kind, query, state);
+    }
+  }
 
   const place = () => {
     if (inputRef.current) {
       const r = inputRef.current.getBoundingClientRect();
-      setCoords({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 280) });
+      setCoords({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 300) });
     }
   };
 
@@ -147,7 +172,9 @@ function SectionLookup({ sec, data, onBulk }) {
   };
 
   const Icon = kind === 'civilian' ? MdPerson : MdDirectionsCar;
-  const placeholder = kind === 'civilian' ? 'Name, SSN, DL #…' : 'Plate, make, model…';
+  const placeholder = kind === 'civilian'
+    ? 'Name, SSN, DL #…'
+    : (sectionCiv ? `${sectionCiv.firstName}'s vehicles or any plate…` : 'Plate, make, model…');
 
   return (
     <div className="ml-auto flex items-center gap-1.5">
@@ -157,10 +184,11 @@ function SectionLookup({ sec, data, onBulk }) {
             <MdSearch size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
             <input
               autoFocus
-              className="bg-app-input border border-brand/40 rounded-lg pl-7 pr-3 py-1 text-[12px] text-white outline-none focus:border-brand w-52"
+              className="bg-app-input border border-brand/40 rounded-lg pl-7 pr-3 py-1 text-[12px] text-white outline-none focus:border-brand w-56"
               placeholder={placeholder}
               value={query}
               onChange={e => { setQuery(e.target.value); place(); }}
+              onFocus={place}
               onKeyDown={e => { if (e.key === 'Escape') { setOpen(false); setQuery(''); } }}
             />
           </div>
@@ -170,17 +198,15 @@ function SectionLookup({ sec, data, onBulk }) {
           </button>
         </>
       ) : (
-        <button
-          onClick={() => setOpen(true)}
-          className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[9px] font-bold tracking-[0.4px] uppercase hover:bg-brand/20 hover:border-brand/50 transition-all duration-75"
-        >
+        <button onClick={() => setOpen(true)}
+          className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[9px] font-bold tracking-[0.4px] uppercase hover:bg-brand/20 hover:border-brand/50 transition-all duration-75">
           <Icon size={11} />
           Search
         </button>
       )}
       {open && results.length > 0 && coords && createPortal(
         <div ref={boxRef}
-          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[280px] overflow-auto"
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[300px] overflow-auto"
           style={{ left: coords.left, top: coords.top, width: coords.width, animation: 'dropdownFadeIn 0.12s ease-out' }}>
           {results.map(rec => (
             <button key={rec.id} type="button" onMouseDown={e => { e.preventDefault(); pick(rec); }}
@@ -193,7 +219,10 @@ function SectionLookup({ sec, data, onBulk }) {
                   {rec.flags?.length > 0 && <div className="mt-0.5"><FlagRow flags={rec.flags} /></div>}
                 </>)}
                 {kind === 'vehicle' && (<>
-                  <div className="text-[12.5px] font-semibold text-white font-mono">{rec.plate}</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[12.5px] font-semibold text-white font-mono">{rec.plate}</span>
+                    {ownerIds.has(rec.id) && <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[8px] font-bold tracking-[0.4px]">REGISTERED</span>}
+                  </div>
                   <div className="text-[10.5px] text-slate-500">{rec.year} {rec.make} {rec.model} · {rec.color}</div>
                 </>)}
               </div>
@@ -337,6 +366,8 @@ const CHARGE_TYPE_STYLE = {
   Infraction: { bg: 'rgba(34,197,94,0.12)',   color: '#4ade80', border: 'rgba(34,197,94,0.30)' },
 };
 
+const BOND_TYPES = ['No Bail', 'Bond Available', 'Cash Only', 'ROR', 'No Bond'];
+
 function ChargesField({ f, value, onChange, readOnly }) {
   const { state } = useCAD();
   const [query, setQuery] = useState('');
@@ -374,45 +405,139 @@ function ChargesField({ f, value, onChange, readOnly }) {
   }, [open]);
 
   const addCharge = (charge) => {
-    onChange(f.id, [...charges, { id: charge.id, code: charge.code, name: charge.name, type: charge.type, fine: charge.fine, jailTime: charge.jailTime }]);
+    onChange(f.id, [...charges, {
+      id: charge.id,
+      code: charge.code,
+      name: charge.name,
+      type: charge.type,
+      fine: charge.fine,
+      jailTime: charge.jailTime,
+      bondType: charge.fine > 0 ? 'Bond Available' : 'No Bail',
+      bondAmount: String(charge.fine || 0),
+      counts: '1',
+    }]);
     setQuery('');
   };
 
   const removeCharge = (id) => onChange(f.id, charges.filter(c => c.id !== id));
 
+  const updateCharge = (id, field, val) =>
+    onChange(f.id, charges.map(c => c.id === id ? { ...c, [field]: val } : c));
+
+  const totalFine = charges.reduce((sum, c) => {
+    return sum + (parseFloat(c.bondAmount) || 0) * (parseInt(c.counts) || 1);
+  }, 0);
+
   const typeStyle = (t) => CHARGE_TYPE_STYLE[t] || CHARGE_TYPE_STYLE.Infraction;
+
+  const InlineInput = ({ chId, field, val, placeholder, mono, type: iType = 'text' }) => (
+    <input
+      type={iType}
+      className="w-full bg-transparent text-[11.5px] text-slate-200 placeholder:text-slate-600 outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5"
+      value={val ?? ''}
+      placeholder={placeholder}
+      readOnly={readOnly}
+      onChange={e => updateCharge(chId, field, e.target.value)}
+      style={mono ? { fontFamily: 'monospace' } : undefined}
+    />
+  );
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Selected charges */}
+      {/* Fine total bar */}
       {charges.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          {charges.map((c) => {
-            const ts = typeStyle(c.type);
-            return (
-              <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-lg border"
-                style={{ background: ts.bg, borderColor: ts.border }}>
-                <MdGavel size={13} style={{ color: ts.color, flexShrink: 0 }} />
-                <div className="flex-1 min-w-0">
-                  <span className="text-[12px] font-semibold text-white">{c.name}</span>
-                  <span className="ml-2 text-[10px] font-mono text-slate-400">{c.code}</span>
-                </div>
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }}>
-                  {c.type}
-                </span>
-                {c.fine > 0 && <span className="text-[9px] text-slate-500 shrink-0">${c.fine.toLocaleString()}</span>}
-                {c.jailTime !== 'None' && <span className="text-[9px] text-slate-500 shrink-0">{c.jailTime}</span>}
-                {!readOnly && (
-                  <button type="button" onClick={() => removeCharge(c.id)}
-                    className="w-5 h-5 rounded flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 cursor-pointer border-none bg-transparent transition-colors shrink-0">
-                    <MdClose size={13} />
-                  </button>
-                )}
-              </div>
-            );
-          })}
+        <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-white/[0.03] border border-border-faint">
+          <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500">Fine Total</span>
+          <span className="text-[13px] font-bold text-emerald-400 font-mono">
+            ${totalFine.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
         </div>
       )}
+
+      {/* Charge cards */}
+      {charges.map((c, idx) => {
+        const ts = typeStyle(c.type);
+        return (
+          <div key={c.id} className="flex rounded-xl border overflow-hidden" style={{ borderColor: ts.border }}>
+            {/* Left sidebar — number + delete */}
+            <div className="flex flex-col items-center justify-between px-2.5 py-2.5 shrink-0 gap-2"
+              style={{ background: ts.bg, minWidth: 38 }}>
+              <span className="text-[10px] font-bold font-mono" style={{ color: ts.color }}>#{idx + 1}</span>
+              {!readOnly && (
+                <button type="button" onClick={() => removeCharge(c.id)}
+                  className="w-5 h-5 rounded flex items-center justify-center transition-colors hover:bg-red-500/20 border-none bg-transparent cursor-pointer shrink-0"
+                  title="Remove">
+                  <MdDelete size={12} className="text-slate-500 hover:text-red-400" />
+                </button>
+              )}
+            </div>
+
+            {/* Field grid — 2 rows × 4 cols */}
+            <div className="flex-1 min-w-0 p-2.5 grid grid-cols-4 gap-x-4 gap-y-2.5"
+              style={{ background: 'rgba(255,255,255,0.015)' }}>
+              {/* Row 1: CHARGE (×2) | TYPE | COUNTS */}
+              <div className="col-span-2 flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Charge</span>
+                <InlineInput chId={c.id} field="name" val={c.name} placeholder="Charge name" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Charge Type</span>
+                {readOnly ? (
+                  <span className="text-[11.5px] font-semibold" style={{ color: ts.color }}>{c.type || '—'}</span>
+                ) : (
+                  <select
+                    className="w-full bg-transparent text-[11.5px] outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5 cursor-pointer"
+                    style={{ color: ts.color }}
+                    value={c.type || ''}
+                    onChange={e => updateCharge(c.id, 'type', e.target.value)}
+                  >
+                    {['Felony', 'Misdemeanor', 'Infraction'].map(t => (
+                      <option key={t} value={t} style={{ color: '#e2e8f0', background: '#1e2430' }}>{t}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Counts</span>
+                <InlineInput chId={c.id} field="counts" val={c.counts} placeholder="1" type="number" />
+              </div>
+
+              {/* Row 2: CODE | BOND TYPE | BOND / FINE | JAIL TIME */}
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Code</span>
+                <InlineInput chId={c.id} field="code" val={c.code} placeholder="§ Code" mono />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Bond Type</span>
+                {readOnly ? (
+                  <span className="text-[11.5px] text-slate-300">{c.bondType || '—'}</span>
+                ) : (
+                  <select
+                    className="w-full bg-transparent text-[11.5px] text-slate-300 outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5 cursor-pointer"
+                    value={c.bondType || ''}
+                    onChange={e => updateCharge(c.id, 'bondType', e.target.value)}
+                  >
+                    {BOND_TYPES.map(t => (
+                      <option key={t} value={t} style={{ background: '#1e2430' }}>{t}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Bond / Fine</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-[10px] text-slate-600 shrink-0">$</span>
+                  <InlineInput chId={c.id} field="bondAmount" val={c.bondAmount} placeholder="0.00" type="number" />
+                </div>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Jail Time</span>
+                <InlineInput chId={c.id} field="jailTime" val={c.jailTime} placeholder="None" />
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {/* Search input */}
       {!readOnly && (
@@ -576,10 +701,15 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
       <div data-doc-top />
       {sections.map(sec => (
         <section key={sec.id} data-section={sec.title}
-          className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm scroll-mt-4">
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-faint text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+          className={`border rounded-xl backdrop-blur-sm scroll-mt-4 ${sec.supervisorOnly ? 'bg-red-500/[0.03] border-red-500/25' : 'bg-app-card/70 border-border-base'}`}>
+          <div className={`flex items-center gap-2 px-4 py-2.5 border-b text-[11px] font-bold uppercase tracking-[0.7px] ${sec.supervisorOnly ? 'border-red-500/20 text-red-400/80' : 'border-border-faint text-slate-300'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${sec.supervisorOnly ? 'bg-red-500' : 'bg-brand'}`} />
             {sec.title}
+            {sec.supervisorOnly && (
+              <span className="ml-0.5 px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">
+                Supervisor Only
+              </span>
+            )}
             {sec.lookup && !readOnly && (
               <SectionLookup sec={sec} data={data} onBulk={bulkFill} />
             )}

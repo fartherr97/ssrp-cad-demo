@@ -32,11 +32,23 @@ function StatusPill({ status }) {
    Uses the same dark ReportForm the officer fills out
 ══════════════════════════════════ */
 function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, departments, onBack, onSave }) {
-  const [editData, setEditData]     = useState({ ...(entry.formData || {}) });
+  const hasSReview = !!template?.sections?.some(s => s.id === 'sReview');
+
+  const [editData, setEditData] = useState(() => {
+    const base = { ...(entry.formData || {}) };
+    if (hasSReview) {
+      if (!base.rv_status) base.rv_status = entry.status || 'Pending Review';
+      if (base.rv_sig == null) base.rv_sig = entry.supervisorSignature || '';
+    }
+    return base;
+  });
   const [status, setStatus]         = useState(entry.status || 'Pending Review');
   const [supSig, setSupSig]         = useState(entry.supervisorSignature || '');
   const [saved, setSaved]           = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+
+  const effectiveStatus = hasSReview ? (editData.rv_status || status) : status;
+  const effectiveSupSig = hasSReview ? (editData.rv_sig || supSig) : supSig;
 
   const buildSupSig = () => {
     const me = allOfficers.find(o => o.id === currentUser?.id);
@@ -44,10 +56,17 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
     return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
   };
 
-  const signAndApprove = () => { setSupSig(buildSupSig()); setStatus('Approved'); };
+  const signAndApprove = () => {
+    const sig = buildSupSig();
+    if (hasSReview) {
+      setEditData(p => ({ ...p, rv_status: 'Approved', rv_sig: sig }));
+    }
+    setSupSig(sig);
+    setStatus('Approved');
+  };
 
   const handleSave = () => {
-    onSave({ id: entry.id, kind: entry.kind, formData: editData, status, supervisorSignature: supSig || undefined });
+    onSave({ id: entry.id, kind: entry.kind, formData: editData, status: effectiveStatus, supervisorSignature: effectiveSupSig || undefined });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -132,7 +151,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
           <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div>
-              <div className="mt-1"><StatusPill status={status} /></div>
+              <div className="mt-1"><StatusPill status={effectiveStatus} /></div>
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div>
@@ -144,7 +163,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Sup. Signed</div>
-              <div className="text-[12.5px] text-slate-200 mt-0.5">{supSig ? '✓ Signed' : 'Not signed'}</div>
+              <div className="text-[12.5px] text-slate-200 mt-0.5">{effectiveSupSig ? '✓ Signed' : 'Not signed'}</div>
             </div>
           </div>
 
@@ -163,8 +182,8 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
               </div>
             )}
 
-            {/* ── Status / Signature section at bottom of form ── */}
-            <div data-section="Status" className="mt-6 rounded-xl overflow-hidden border border-border-base">
+            {/* ── Status / Signature section at bottom of form — hidden when template has sReview ── */}
+            {!hasSReview && <div data-section="Status" className="mt-6 rounded-xl overflow-hidden border border-border-base">
               <div className="bg-red-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.7px] text-white">
                 Status
               </div>
@@ -227,7 +246,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                   )}
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
         </main>
 
@@ -257,7 +276,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                   <span className="text-[11px] text-slate-400">Officer</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${supSig ? 'bg-green-400' : 'bg-slate-600'}`} />
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${effectiveSupSig ? 'bg-green-400' : 'bg-slate-600'}`} />
                   <span className="text-[11px] text-slate-400">Supervisor</span>
                 </div>
               </div>
