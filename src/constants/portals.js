@@ -7,7 +7,7 @@ import {
 } from 'react-icons/md';
 
 export const PORTALS = {
-  leo: { id: 'leo', label: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
+  leo: { id: 'leo', label: 'Law Enforcement', subtitle: 'Law Enforcement', color: '#3a88e8', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',      route: '/cad'      },
@@ -21,7 +21,7 @@ export const PORTALS = {
     ],
   },
 
-  dispatch: { id: 'dispatch', label: 'Dispatch', color: '#3aaa44', landing: '/cad',
+  dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard, label: 'CAD',    route: '/cad'    },
@@ -32,7 +32,7 @@ export const PORTALS = {
     ],
   },
 
-  fire: { id: 'fire', label: 'Fire & EMS', color: '#e04020', landing: '/fire',
+  fire: { id: 'fire', label: 'Fire & EMS', subtitle: 'Fire & EMS', color: '#e04020', landing: '/fire',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
       { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'     },
@@ -44,7 +44,7 @@ export const PORTALS = {
     ],
   },
 
-  admin: { id: 'admin', label: 'Administration', color: '#c09010', landing: '/admin',
+  admin: { id: 'admin', label: 'Administration', subtitle: 'Administration', color: '#c09010', landing: '/admin',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
       { Icon: MdDashboard,    label: 'CAD',       route: '/cad'       },
@@ -61,7 +61,7 @@ export const PORTALS = {
     ],
   },
 
-  civilian: { id: 'civilian', label: 'Civilian Services', color: '#9090cc', landing: '/portal/civilian',
+  civilian: { id: 'civilian', label: 'Civilian Services', subtitle: 'Civilian Portal', color: '#9090cc', landing: '/portal/civilian',
     showStatus: false, showCalls: false, showNewCall: false,
     nav: [
       { Icon: MdHome,          label: 'Home',        route: '/portal/civilian'    },
@@ -74,7 +74,7 @@ export const PORTALS = {
     ],
   },
 
-  business: { id: 'business', label: 'Business Services', color: '#44aacc', landing: '/portal/business',
+  business: { id: 'business', label: 'Business Services', subtitle: 'Business Center', color: '#44aacc', landing: '/portal/business',
     showStatus: false, showCalls: false, showNewCall: false,
     nav: [
       { Icon: MdHome,       label: 'Home',        route: '/portal/business'    },

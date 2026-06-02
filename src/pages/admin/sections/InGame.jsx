@@ -91,18 +91,6 @@ function ApiTab() {
         </div>
       </div>
 
-      <AdminPanel title="Documentation">
-        <div className="flex flex-wrap gap-2">
-          <a href="https://docs.sonoransoftware.com/cad/api-integration" target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-app-elevated border border-border-base text-[12px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.07] cursor-pointer transition-all">
-            <MdApi size={15} className="text-brand-bright" /> API Reference <MdOpenInNew size={12} className="text-slate-500" />
-          </a>
-          <a href="https://docs.sonoransoftware.com/cad/integration-plugins/in-game-integration" target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-app-elevated border border-border-base text-[12px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.07] cursor-pointer transition-all">
-            <MdGamepad size={15} className="text-brand-bright" /> Plugin Docs <MdOpenInNew size={12} className="text-slate-500" />
-          </a>
-        </div>
-      </AdminPanel>
     </div>
   );
 }
@@ -110,7 +98,7 @@ function ApiTab() {
 /* ══════════════════════════════════
    SHARED: Setup wizard (FiveM / ER:LC)
 ══════════════════════════════════ */
-function SetupWizard({ platform, steps, docsUrl, resourceUrl }) {
+function SetupWizard({ platform, steps, resourceUrl }) {
   return (
     <div className="flex flex-col gap-4">
       <AdminPanel title={`${platform} Plugin Setup`} subtitle={`Connect your ${platform} server to the CAD in 3 steps.`}>
@@ -140,18 +128,16 @@ function SetupWizard({ platform, steps, docsUrl, resourceUrl }) {
         </ol>
       </AdminPanel>
 
-      <AdminPanel title="Resources">
-        <div className="flex flex-wrap gap-2">
-          <a href={docsUrl} target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-app-elevated border border-border-base text-[12px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.07] cursor-pointer transition-all">
-            📄 Documentation <MdOpenInNew size={12} className="text-slate-500" />
-          </a>
-          <a href={resourceUrl} target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-app-elevated border border-border-base text-[12px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.07] cursor-pointer transition-all">
-            ⬇ Download Resource <MdOpenInNew size={12} className="text-slate-500" />
-          </a>
-        </div>
-      </AdminPanel>
+      {resourceUrl && resourceUrl !== '#' && (
+        <AdminPanel title="Resources">
+          <div className="flex flex-wrap gap-2">
+            <a href={resourceUrl} target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-app-elevated border border-border-base text-[12px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.07] cursor-pointer transition-all">
+              ⬇ Download Resource <MdOpenInNew size={12} className="text-slate-500" />
+            </a>
+          </div>
+        </AdminPanel>
+      )}
     </div>
   );
 }
@@ -611,20 +597,10 @@ export default function InGame() {
 
       {tab === 'api'     && <ApiTab />}
       {tab === 'fivem'   && (
-        <SetupWizard
-          platform="FiveM"
-          steps={FIVEM_STEPS}
-          docsUrl="https://docs.sonoransoftware.com/cad/integration-plugins/in-game-integration"
-          resourceUrl="#"
-        />
+        <SetupWizard platform="FiveM" steps={FIVEM_STEPS} resourceUrl="#" />
       )}
       {tab === 'erlc'    && (
-        <SetupWizard
-          platform="ER:LC"
-          steps={ERLC_STEPS}
-          docsUrl="https://docs.sonoransoftware.com/cad/integration-plugins/in-game-integration"
-          resourceUrl="#"
-        />
+        <SetupWizard platform="ER:LC" steps={ERLC_STEPS} resourceUrl="#" />
       )}
       {tab === 'dbsync'  && <DatabaseSyncTab />}
       {tab === 'livemap' && <LiveMapTab />}

@@ -298,7 +298,7 @@ export default function ActionBar() {
           <div className="text-[15px] lg:text-[16px] font-extrabold tracking-[-0.3px] text-white">
             Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
           </div>
-          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Computer Aided Dispatch</div>
+          <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">{portal.subtitle || portal.label}</div>
         </div>
       </div>
 
