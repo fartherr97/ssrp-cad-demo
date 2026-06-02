@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
-  AdminPanel, SonButton, SonIconBtn, SON_INPUT, SON_LABEL, ADMIN,
+  AdminPanel, SonButton, SonIconBtn, SonField, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
 import { MdAdd, MdClose } from 'react-icons/md';
 
@@ -50,11 +50,59 @@ export default function Geographical() {
   const addVal = (field, v) => persist({ ...draft, [field]: [...draft[field], v] });
   const removeVal = (field, idx) => persist({ ...draft, [field]: draft[field].filter((_, i) => i !== idx) });
 
+  const handleCode = (field, value) => {
+    const next = { ...draft, [field]: value };
+    setDraft(next);
+    dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
+  };
+
   return (
-    <AdminPanel title="Geographical Settings" subtitle="Cities, counties and postal codes used across the CAD.">
-      <ChipSection title="Cities" field="cities" values={draft.cities} onAdd={addVal} onRemove={removeVal} />
-      <ChipSection title="Counties" field="counties" values={draft.counties} onAdd={addVal} onRemove={removeVal} />
-      <ChipSection title="Postal Codes" field="postals" values={draft.postals} onAdd={addVal} onRemove={removeVal} />
-    </AdminPanel>
+    <>
+      <AdminPanel
+        title="CAD Naming & Codes"
+        subtitle="Configure terminology and emergency codes used across the CAD."
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <SonField label="Emergency Code">
+            <input
+              style={SON_INPUT}
+              placeholder="911"
+              value={draft.emergencyCode ?? '911'}
+              onChange={e => handleCode('emergencyCode', e.target.value)}
+            />
+          </SonField>
+          <SonField label="Penal Code Name">
+            <input
+              style={SON_INPUT}
+              placeholder="Statutes"
+              value={draft.penalCodeName ?? 'Statutes'}
+              onChange={e => handleCode('penalCodeName', e.target.value)}
+            />
+          </SonField>
+          <SonField label="Ten Code Name">
+            <input
+              style={SON_INPUT}
+              placeholder="10-Codes"
+              value={draft.tenCodeName ?? '10-Codes'}
+              onChange={e => handleCode('tenCodeName', e.target.value)}
+            />
+          </SonField>
+          <SonField label="Currency Delimiter">
+            <input
+              style={SON_INPUT}
+              placeholder="$"
+              value={draft.currencyDelimiter ?? '$'}
+              onChange={e => handleCode('currencyDelimiter', e.target.value)}
+            />
+          </SonField>
+        </div>
+      </AdminPanel>
+
+      <AdminPanel title="Geographical Settings" subtitle="Cities, counties and postal codes used across the CAD.">
+        <ChipSection title="Cities" field="cities" values={draft.cities} onAdd={addVal} onRemove={removeVal} />
+        <ChipSection title="Counties" field="counties" values={draft.counties} onAdd={addVal} onRemove={removeVal} />
+        <ChipSection title="Postal Codes" field="postals" values={draft.postals} onAdd={addVal} onRemove={removeVal} />
+      </AdminPanel>
+    </>
   );
 }

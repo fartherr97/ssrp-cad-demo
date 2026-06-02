@@ -10,6 +10,7 @@ import {
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
   ADMIN_SERVERS, LOOKUP_TYPES, ADMIN_ADDRESSES, COMMUNITY_CONFIG,
   GEO_SETTINGS, LOGIN_PAGE_CONFIG, ACCOUNT_RESTRICTIONS, DISCORD_PRESENCE,
+  LIMITS_CONFIG,
 } from '../data/adminData';
 
 const initialState = {
@@ -58,6 +59,18 @@ const initialState = {
   loginPageConfig: LOGIN_PAGE_CONFIG,
   accountRestrictions: ACCOUNT_RESTRICTIONS,
   discordPresence: DISCORD_PRESENCE,
+  limitsConfig: LIMITS_CONFIG,
+  inGameConfig: {
+    apiKey: 'a3f9e2b1-7c84-4d56-b012-9e3a7f2c10d8',
+    liveMapEnabled: true,
+    staticUrlOnly: false,
+    mapType: 'CUSTOM',
+    liveMapServers: [
+      { id: 1, name: 'Server 1', ip: '40.160.51.62', gamePort: 30120, outboundIp: '' },
+      { id: 2, name: 'Server 2', ip: '40.160.51.62', gamePort: 30121, outboundIp: '' },
+      { id: 3, name: 'Server 3', ip: '40.160.51.62', gamePort: 30122, outboundIp: '' },
+    ],
+  },
   // ─── Custom civilian flags ───
   customFlags: [
     { id: 'WARRANT',  name: 'Warrant',          color: '#ef4444', description: 'Active arrest warrant on file' },

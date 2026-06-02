@@ -3,7 +3,7 @@ import { useCAD } from '../../../store/cadStore';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonSearch, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete } from 'react-icons/md';
+import { MdAdd, MdDelete, MdUploadFile, MdDownload, MdHelpOutline } from 'react-icons/md';
 
 export default function Addresses() {
   const { state, dispatch } = useCAD();
@@ -20,6 +20,15 @@ export default function Addresses() {
     setName(''); setStreet(''); setArea(''); setPostal('');
   };
 
+  const handleExport = () => {
+    const rows = [['Name','Street','Area','Postal'], ...adminAddresses.map(a => [a.name, a.street, a.area, a.postal])];
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'addresses.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const q = query.toLowerCase();
   const filtered = adminAddresses.filter(a =>
     !q ||
@@ -31,7 +40,20 @@ export default function Addresses() {
     <AdminPanel
       title="Addresses"
       subtitle={`${filtered.length} addresses`}
-      right={<SonSearch value={query} onChange={setQuery} placeholder="Search name / street / area…" />}
+      right={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <SonSearch value={query} onChange={setQuery} placeholder="Search name / street / area…" />
+          <SonButton variant="ghost" onClick={() => {}} title="Import from CSV">
+            <MdUploadFile size={15} /> Import
+          </SonButton>
+          <SonButton variant="ghost" onClick={() => handleExport()} title="Export to CSV">
+            <MdDownload size={15} /> Export
+          </SonButton>
+          <SonButton variant="ghost" onClick={() => {}} title="Tutorial">
+            <MdHelpOutline size={15} /> Tutorial
+          </SonButton>
+        </div>
+      }
     >
       {/* New row */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
