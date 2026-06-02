@@ -1,8 +1,9 @@
+import { createPortal } from 'react-dom';
 import { MdClose, MdBadge } from 'react-icons/md';
 import IdentifierEditor from './IdentifierEditor';
 
 export default function ModifyIdentifier({ onClose }) {
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
       <div
@@ -22,10 +23,11 @@ export default function ModifyIdentifier({ onClose }) {
         </div>
 
         {/* Form */}
-        <div className="px-5 py-4">
+        <div className="px-5 py-4 overflow-y-auto max-h-[80vh]">
           <IdentifierEditor onClose={onClose} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
