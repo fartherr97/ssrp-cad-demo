@@ -313,12 +313,12 @@ function reducer(state, action) {
       const newReport = {
         ...action.payload,
         id: state.nextId,
-        status: 'Submitted',
+        status: 'Pending Review',
         date: new Date().toLocaleDateString(),
         officerSignature,
         supervisorSignature: null,
       };
-      const audit = addAuditEntry(state, `Submitted ${newReport.type} report`, 'Reports');
+      const audit = addAuditEntry(state, `Filed ${newReport.type} report`, 'Reports');
       return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, ...audit };
     }
 
@@ -482,7 +482,7 @@ function reducer(state, action) {
     }
 
     case 'ADD_RECORD': {
-      const newRecord = { ...action.payload, id: state.nextId, date: new Date().toLocaleDateString() };
+      const newRecord = { ...action.payload, id: state.nextId, status: 'Pending Review', date: new Date().toLocaleDateString() };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
     }
     case 'UPDATE_REPORT': {

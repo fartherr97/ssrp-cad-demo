@@ -188,5 +188,5 @@ export const DISCORD_PRESENCE = {
 };
 
 export const LIMITS_CONFIG = {
-  maxCivilianCharacters: 5,
+  maxCivilianCharacters: 0,
 };

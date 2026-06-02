@@ -98,7 +98,7 @@ export const PENAL_CODE = [
 ];
 
 export const REPORTS = [
-  { id: 1, type: "Traffic Stop",   caseNumber: "TPD-2026-1042", officerBadge: "TPD-819", date: "2026-06-01", status: "Submitted",      callId: "26-1042", civilianId: null, summary: "Traffic stop on Elm St. Driver showed signs of impairment. Field sobriety conducted." },
+  { id: 1, type: "Traffic Stop",   caseNumber: "TPD-2026-1042", officerBadge: "TPD-819", date: "2026-06-01", status: "Pending Review", callId: "26-1042", civilianId: null, summary: "Traffic stop on Elm St. Driver showed signs of impairment. Field sobriety conducted." },
   { id: 2, type: "Arrest Report",  caseNumber: "TPD-2026-0401", officerBadge: "TPD-831", date: "2026-04-01", status: "Approved",        callId: "26-0401", civilianId: 3,    summary: "Arrest of Darnell Washington on narcotics charges following foot pursuit." },
   { id: 3, type: "Use of Force",   caseNumber: "TPD-2026-0401-UOF", officerBadge: "TPD-831", date: "2026-04-01", status: "Pending Review",  callId: "26-0401", civilianId: 3, summary: "Use of force during arrest. Subject resisted, officer used takedown technique." },
   { id: 4, type: "Incident Report",caseNumber: "TPD-2026-0503", officerBadge: "TPD-807", date: "2026-05-03", status: "Approved",        callId: "26-1038", civilianId: null, summary: "MVA at Oak & 5th. No injuries. Both drivers exchanged information." },

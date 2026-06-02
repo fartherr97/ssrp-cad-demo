@@ -11,12 +11,12 @@ import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles'
 
 /* ── Status helpers ── */
 const STATUS_META = {
-  'Submitted':      { pill: 'bg-sky-500/15 text-sky-400 border-sky-500/30',       active: 'bg-sky-500 text-white border-sky-500' },
-  'Pending Review': { pill: 'bg-amber-500/15 text-amber-400 border-amber-500/30', active: 'bg-amber-500 text-white border-amber-500' },
-  'Approved':       { pill: 'bg-green-500/15 text-green-400 border-green-500/30',  active: 'bg-green-600 text-white border-green-600' },
-  'Rejected':       { pill: 'bg-red-500/15 text-red-400 border-red-500/30',        active: 'bg-red-600 text-white border-red-600' },
+  'Pending Review':  { pill: 'bg-amber-500/15 text-amber-400 border-amber-500/30',  active: 'bg-amber-500 text-white border-amber-500' },
+  'Pending Changes': { pill: 'bg-orange-500/15 text-orange-400 border-orange-500/30', active: 'bg-orange-500 text-white border-orange-500' },
+  'Approved':        { pill: 'bg-green-500/15 text-green-400 border-green-500/30',   active: 'bg-green-600 text-white border-green-600' },
+  'Rejected':        { pill: 'bg-red-500/15 text-red-400 border-red-500/30',         active: 'bg-red-600 text-white border-red-600' },
 };
-const ALL_STATUSES = ['Submitted', 'Pending Review', 'Approved', 'Rejected'];
+const ALL_STATUSES = ['Pending Review', 'Pending Changes', 'Approved', 'Rejected'];
 
 function StatusPill({ status }) {
   const m = STATUS_META[status] || { pill: 'bg-slate-500/15 text-slate-400 border-slate-500/30' };
@@ -33,18 +33,10 @@ function StatusPill({ status }) {
 ══════════════════════════════════ */
 function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, onBack, onSave }) {
   const [editData, setEditData]     = useState({ ...(entry.formData || {}) });
-  const [status, setStatus]         = useState(entry.status || 'Submitted');
+  const [status, setStatus]         = useState(entry.status || 'Pending Review');
   const [supSig, setSupSig]         = useState(entry.supervisorSignature || '');
   const [saved, setSaved]           = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
-
-  const sectionTitles = template?.sections?.map(s => s.title) || [];
-  const tabs = ['Report', ...sectionTitles, 'Status'];
-
-  const scrollTo = (title) => {
-    const sel = title === 'Report' ? '[data-doc-top]' : `[data-section="${title}"]`;
-    document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const buildSupSig = () => {
     const me = allOfficers.find(o => o.id === currentUser?.id);
@@ -108,15 +100,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </button>
           </span>
         </div>
-        {/* Section tabs */}
-        <div className="flex items-center gap-0.5 px-3 overflow-x-auto n-tabs-wrap">
-          {tabs.map(t => (
-            <button key={t} onClick={() => scrollTo(t)}
-              className="relative px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.3px] whitespace-nowrap cursor-pointer transition-colors text-slate-500 hover:text-slate-300">
-              {t}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ── Body: left sidebar + center form + right sidebar ──
@@ -145,17 +128,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
               <StatusPill status={status} />
             </div>
           </div>
-          {sectionTitles.length > 0 && (
-            <div className="px-2 py-3 mt-1">
-              <div className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Sections</div>
-              {sectionTitles.map(t => (
-                <button key={t} onClick={() => scrollTo(t)}
-                  className="w-full text-left px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-colors text-slate-400 hover:bg-white/[0.04] hover:text-slate-200">
-                  {t}
-                </button>
-              ))}
-            </div>
-          )}
         </aside>
 
         {/* CENTER: dark form (same as report writing) */}
@@ -426,7 +398,7 @@ export default function Supervisor() {
 
   const reportCount = filtered.filter(e => e.kind === 'report').length;
   const recordCount = filtered.filter(e => e.kind === 'record').length;
-  const STATUS_PILLS = ['All', 'Submitted', 'Pending Review', 'Approved', 'Rejected'];
+  const STATUS_PILLS = ['All', 'Pending Review', 'Pending Changes', 'Approved', 'Rejected'];
 
   /* ── Open / save handlers ── */
   const openRecord = (entry) => {

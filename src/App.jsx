@@ -57,15 +57,12 @@ import StatusCodes from './pages/admin/sections/StatusCodes';
 import LoginPageEditor from './pages/admin/sections/LoginPageEditor';
 import QuickLinks from './pages/admin/sections/QuickLinks';
 import NotificationTones from './pages/admin/sections/NotificationTones';
-import Emails from './pages/admin/sections/Emails';
 import Restrictions from './pages/admin/sections/Restrictions';
 import DiscordPresence from './pages/admin/sections/DiscordPresence';
 import Servers from './pages/admin/sections/Servers';
 import Addresses from './pages/admin/sections/Addresses';
 import LookupTypes from './pages/admin/sections/LookupTypes';
 import ToneBoard from './pages/admin/sections/ToneBoard';
-import RapidIQ from './pages/admin/sections/RapidIQ';
-import InfernoPagers from './pages/admin/sections/InfernoPagers';
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -136,15 +133,12 @@ function CADApp() {
           <Route path="login-page"         element={<LoginPageEditor />} />
           <Route path="quick-links"        element={<QuickLinks />} />
           <Route path="notification-tones" element={<NotificationTones />} />
-          <Route path="emails"             element={<Emails />} />
           <Route path="restrictions"       element={<Restrictions />} />
           <Route path="discord-presence"   element={<DiscordPresence />} />
           <Route path="servers"            element={<Servers />} />
           <Route path="addresses"          element={<Addresses />} />
           <Route path="lookup-types"       element={<LookupTypes />} />
           <Route path="tone-board"         element={<ToneBoard />} />
-          <Route path="rapidiq"            element={<RapidIQ />} />
-          <Route path="inferno-pagers"     element={<InfernoPagers />} />
         </Route>
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />

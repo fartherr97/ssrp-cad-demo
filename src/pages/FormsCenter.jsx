@@ -44,7 +44,7 @@ export default function FormsCenter() {
           <div className="mt-3.5">
             <div className="mb-3 flex gap-2 flex-wrap">
               <StatusSummary label="Total"    count={reports.length}                                            color="#3b82f6" />
-              <StatusSummary label="Pending"  count={reports.filter(r => r.status === 'Submitted').length}     color="#fbbf24" />
+              <StatusSummary label="Pending"  count={reports.filter(r => r.status === 'Pending Review' || r.status === 'Pending Changes').length} color="#fbbf24" />
               <StatusSummary label="Approved" count={reports.filter(r => r.status === 'Approved').length}      color="#22c55e" />
               <StatusSummary label="Review"   count={reports.filter(r => r.status === 'Pending Review').length} color="#ef4444" />
             </div>
@@ -131,7 +131,7 @@ export default function FormsCenter() {
               <div className="bg-[#090b10] border border-[#1f2937] p-3 text-[#9ca3af] leading-[1.6] text-[13px]">
                 {reviewReport.summary}
               </div>
-              {isAdmin && reviewReport.status === 'Submitted' && (
+              {isAdmin && reviewReport.status !== 'Approved' && (
                 <div className="flex gap-2 mt-1">
                   <button
                     onClick={() => { dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: reviewReport.id, status: 'Approved' } }); setReviewReport(null); }}
@@ -497,7 +497,7 @@ function TemplateBuilder({ reportTemplates, dispatch }) {
 }
 
 function ReviewQueue({ reports, dispatch }) {
-  const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
+  const pending = reports.filter(r => r.status === 'Pending Review' || r.status === 'Pending Changes');
   return (
     <div className="mt-3.5">
       <div className="text-amber-400 text-[12px] font-bold tracking-[1.5px] mb-3">SUPERVISOR REVIEW QUEUE * {pending.length} pending</div>

@@ -26,10 +26,10 @@ const TEMPLATE_ICONS = {
 const BUILTIN_NAMES = Object.keys(TEMPLATE_ICONS);
 
 const STATUS_BADGE = {
-  'Submitted':      BADGE.blue,
-  'Approved':       BADGE.green,
-  'Pending Review': BADGE.orange,
-  'Denied':         BADGE.red,
+  'Pending Review':  BADGE.orange,
+  'Pending Changes': BADGE.yellow,
+  'Approved':        BADGE.green,
+  'Rejected':        BADGE.red,
 };
 
 const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
@@ -83,7 +83,7 @@ export default function ReportsCenter() {
   const isAdmin   = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const me        = officers.find(o => o.id === currentUser?.id);
   const myReports = reports.filter(r => r.officerBadge === me?.badge);
-  const pendingReports = reports.filter(r => r.status === 'Submitted' || r.status === 'Pending Review');
+  const pendingReports = reports.filter(r => r.status === 'Pending Review' || r.status === 'Pending Changes');
 
   const displayedReports =
     reportTab === 'MINE'    ? myReports :
@@ -401,14 +401,9 @@ export default function ReportsCenter() {
                       Approve
                     </button>
                   )}
-                  {selReport.status === 'Submitted' && (
-                    <button className={xs(S_BTN_WARNING)} onClick={() => reviewReport(selReport.id, 'Pending Review')}>
-                      Flag for Review
-                    </button>
-                  )}
-                  {selReport.status !== 'Submitted' && (
-                    <button className={xs(S_BTN_SECONDARY)} onClick={() => reviewReport(selReport.id, 'Submitted')}>
-                      Reset
+                  {selReport.status !== 'Rejected' && (
+                    <button className={xs(S_BTN_SECONDARY)} onClick={() => reviewReport(selReport.id, 'Rejected')}>
+                      Reject
                     </button>
                   )}
                 </div>
@@ -459,7 +454,6 @@ export default function ReportsCenter() {
           </div>
           <div className="flex gap-1.5">
             {[
-              { label: 'Submitted', count: reports.filter(r => r.status === 'Submitted').length, color: 'text-brand-bright', border: 'border-brand/20' },
               { label: 'Pending',   count: pendingReports.length,                                  color: 'text-amber-400', border: 'border-amber-500/20' },
               { label: 'Approved',  count: reports.filter(r => r.status === 'Approved').length,   color: 'text-green-400', border: 'border-green-500/20' },
             ].map(s => (
@@ -532,10 +526,10 @@ export default function ReportsCenter() {
                 onClick={() => reviewReport(selReport.id, 'Approved')}>
                 Approve
               </button>
-              {selReport.status === 'Submitted' && (
-                <button className={`${xs(S_BTN_WARNING)} flex-1`}
-                  onClick={() => reviewReport(selReport.id, 'Pending Review')}>
-                  Flag
+              {selReport.status !== 'Rejected' && (
+                <button className={`${xs(S_BTN_SECONDARY)} flex-1`}
+                  onClick={() => reviewReport(selReport.id, 'Rejected')}>
+                  Reject
                 </button>
               )}
             </div>
