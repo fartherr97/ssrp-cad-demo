@@ -13,8 +13,9 @@ import {
 import {
   MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong, MdCampaign,
   MdGpsFixed, MdSos, MdCheckCircle, MdDirectionsCar, MdWarningAmber,
-  MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive,
+  MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
 } from 'react-icons/md';
+import ModifyIdentifier from '../components/ModifyIdentifier';
 
 /* ─── Elapsed timer ─── */
 function Elapsed({ createdAt }) {
@@ -113,6 +114,7 @@ export default function DispatchCenter() {
   const [priFilter, setPriFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [unitFilter, setUnitFilter] = useState('ALL');
+  const [showIdentifier, setShowIdentifier] = useState(false);
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -173,10 +175,12 @@ export default function DispatchCenter() {
           <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
             <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5 px-1">Quick Actions</div>
             {canDispatch && <QuickAction Icon={MdAddCall} label="Create Call" onClick={openCreate} />}
+            <QuickAction Icon={MdBadge} label="Swap Identifier" onClick={() => setShowIdentifier(true)} />
             <QuickAction Icon={MdDescription} label="New Report" onClick={() => navigate('/forms')} />
             <QuickAction Icon={MdReceiptLong} label="Records" onClick={() => navigate('/records')} />
             <QuickAction Icon={MdSearch} label="Search" onClick={() => navigate('/search')} />
             <QuickAction Icon={MdMap} label="Live Map" onClick={() => navigate('/map')} />
+            {showIdentifier && <ModifyIdentifier onClose={() => setShowIdentifier(false)} />}
           </div>
 
           {/* Filters */}

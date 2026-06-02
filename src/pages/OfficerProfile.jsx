@@ -4,8 +4,8 @@ import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
-import { S_BTN_PRIMARY } from '../constants/styles';
-import { MdCameraAlt } from 'react-icons/md';
+import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_INPUT, S_LABEL } from '../constants/styles';
+import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit } from 'react-icons/md';
 
 function resizeToDataUrl(file, maxPx = 300) {
   return new Promise((resolve) => {
@@ -124,7 +124,7 @@ export default function OfficerProfile() {
 
       {/* Tabs */}
       <div className="flex gap-0.5 border-b border-border-faint mb-4 max-w-[900px] overflow-x-auto n-tabs-wrap">
-        {[['info','My Info'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
+        {[['info','My Info'],['identifiers','Identifiers'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -156,6 +156,10 @@ export default function OfficerProfile() {
               </a>
             </InfoCard>
           </div>
+        )}
+
+        {tab === 'identifiers' && (
+          <IdentifiersTab officer={myOfficer} accentColor={accentColor} />
         )}
 
         {tab === 'reports' && (
@@ -221,6 +225,168 @@ export default function OfficerProfile() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function IdentifiersTab({ officer, accentColor }) {
+  const { state, dispatch } = useCAD();
+  const { departments, unitStatusCodes } = state;
+  const identifiers = officer.identifiers || [];
+  const [editing, setEditing] = useState(null); // null | 'new' | id
+  const blankDraft = { label: '', unitId: '', rank: '', status: 'AVAILABLE', location: '', aop: '', dept: '', subdivision: '' };
+  const [draft, setDraft] = useState(blankDraft);
+
+  const openNew = () => {
+    setDraft({
+      label: '', unitId: officer.unitId || '', rank: officer.rank || '',
+      status: officer.status || 'AVAILABLE', location: officer.location || '',
+      aop: officer.aop || '', dept: officer.dept || '', subdivision: officer.subdivision || '',
+    });
+    setEditing('new');
+  };
+
+  const openEdit = (ident) => {
+    setDraft({ ...ident });
+    setEditing(ident.id);
+  };
+
+  const saveCurrentAsNew = () => {
+    const label = `Identifier ${identifiers.length + 1}`;
+    dispatch({ type: 'SAVE_IDENTIFIER', payload: {
+      label, unitId: officer.unitId, rank: officer.rank, status: officer.status,
+      location: officer.location || '', aop: officer.aop || '',
+      dept: officer.dept, deptShort: officer.deptShort, subdivision: officer.subdivision,
+    }});
+  };
+
+  const submitDraft = () => {
+    if (!draft.label.trim()) return;
+    const deptObj = departments.find(d => d.id === Number(draft.dept));
+    dispatch({ type: 'SAVE_IDENTIFIER', payload: {
+      ...draft,
+      id: editing !== 'new' ? editing : undefined,
+      dept: Number(draft.dept),
+      deptShort: deptObj?.short || officer.deptShort || '',
+    }});
+    setEditing(null);
+  };
+
+  const setDraftField = (k, v) => setDraft(p => ({ ...p, [k]: v }));
+  const selectedDeptSubs = departments.find(d => d.id === Number(draft.dept))?.subdivisions || [];
+
+  return (
+    <div className="grid gap-3">
+      {/* Saved identifier cards */}
+      {identifiers.length === 0 && editing === null && (
+        <div className="text-slate-500 text-sm text-center py-6 bg-app-panel/60 border border-border-base rounded-xl">
+          No saved identifiers yet. Save your current one or create a new one.
+        </div>
+      )}
+      {identifiers.map(ident => {
+        const deptObj = departments.find(d => d.id === ident.dept);
+        const isActive = officer.unitId === ident.unitId && officer.subdivision === ident.subdivision && officer.dept === ident.dept;
+        return (
+          <div key={ident.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm"
+            style={{ background: 'rgba(255,255,255,0.02)', borderColor: isActive ? accentColor : 'var(--border-base)' }}>
+            <MdBadge size={20} style={{ color: isActive ? accentColor : '#475569', flexShrink: 0 }} />
+            <div className="flex-1 min-w-0">
+              <div className="text-[13px] font-semibold text-slate-200 flex items-center gap-2">
+                {ident.label}
+                {isActive && <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded" style={{ background: `${accentColor}22`, color: accentColor }}>Active</span>}
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {ident.unitId} · {ident.rank} · {deptObj?.short || ident.deptShort}{ident.subdivision ? ` / ${ident.subdivision}` : ''}
+              </div>
+            </div>
+            <div className="flex gap-1.5 shrink-0">
+              {!isActive && (
+                <button className={S_BTN_PRIMARY + ' !px-3 !py-1.5 !text-xs'} onClick={() => dispatch({ type: 'LOAD_IDENTIFIER', payload: ident.id })}>
+                  <MdCheckCircle size={13} style={{ display: 'inline', marginRight: 4 }} />Activate
+                </button>
+              )}
+              <button className={S_BTN_SECONDARY + ' !px-3 !py-1.5 !text-xs'} onClick={() => openEdit(ident)}>
+                <MdEdit size={13} style={{ display: 'inline', marginRight: 4 }} />Edit
+              </button>
+              <button className={S_BTN_DANGER + ' !px-2 !py-1.5 !text-xs'} onClick={() => dispatch({ type: 'DELETE_IDENTIFIER', payload: ident.id })}>
+                <MdDelete size={13} />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Edit / New form */}
+      {editing !== null && (
+        <div className="bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm px-4 py-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.9px] mb-3" style={{ color: accentColor }}>
+            {editing === 'new' ? 'New Identifier' : 'Edit Identifier'}
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <label className={S_LABEL}>Label / Nickname</label>
+              <input className={S_INPUT} value={draft.label} onChange={e => setDraftField('label', e.target.value)} placeholder="e.g. Patrol Unit, K9 Handler…" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={S_LABEL}>Unit Number</label>
+                <input className={S_INPUT} value={draft.unitId} onChange={e => setDraftField('unitId', e.target.value)} placeholder="e.g. TPD-831" />
+              </div>
+              <div>
+                <label className={S_LABEL}>Rank</label>
+                <input className={S_INPUT} value={draft.rank} onChange={e => setDraftField('rank', e.target.value)} placeholder="e.g. Officer" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={S_LABEL}>Status</label>
+                <select className={S_INPUT} value={draft.status} onChange={e => setDraftField('status', e.target.value)}>
+                  {unitStatusCodes.map(s => <option key={s.code} value={s.code}>{s.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={S_LABEL}>AOP</label>
+                <input className={S_INPUT} value={draft.aop} onChange={e => setDraftField('aop', e.target.value)} placeholder="Area of Patrol" />
+              </div>
+            </div>
+            <div>
+              <label className={S_LABEL}>Agency</label>
+              <select className={S_INPUT} value={draft.dept} onChange={e => {
+                const dept = departments.find(d => d.id === Number(e.target.value));
+                setDraft(p => ({ ...p, dept: Number(e.target.value), subdivision: dept?.subdivisions?.[0] || '' }));
+              }}>
+                <option value="">— Select Agency —</option>
+                {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            </div>
+            {selectedDeptSubs.length > 0 && (
+              <div>
+                <label className={S_LABEL}>Subdivision</label>
+                <select className={S_INPUT} value={draft.subdivision} onChange={e => setDraftField('subdivision', e.target.value)}>
+                  <option value="">— None —</option>
+                  {selectedDeptSubs.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            )}
+            <div className="flex gap-2 pt-1">
+              <button className={S_BTN_PRIMARY} onClick={submitDraft} disabled={!draft.label.trim()}>Save</button>
+              <button className={S_BTN_SECONDARY} onClick={() => setEditing(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {editing === null && (
+        <div className="flex gap-2 flex-wrap">
+          <button className={S_BTN_PRIMARY} onClick={openNew}>
+            <MdAdd size={15} style={{ display: 'inline', marginRight: 5 }} />New Identifier
+          </button>
+          <button className={S_BTN_SECONDARY} onClick={saveCurrentAsNew}>
+            Save Current as New
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -193,6 +193,42 @@ function reducer(state, action) {
       return { ...state, officers, ...log, ...audit };
     }
 
+    case 'SAVE_IDENTIFIER': {
+      // payload: { label, unitId, rank, dept, deptShort, subdivision, status, location, aop, id? }
+      const { id, ...fields } = action.payload;
+      const officers = state.officers.map(o => {
+        if (o.id !== state.currentUser?.id) return o;
+        const existing = o.identifiers || [];
+        if (id) {
+          return { ...o, identifiers: existing.map(x => x.id === id ? { ...x, ...fields } : x) };
+        }
+        return { ...o, identifiers: [...existing, { ...fields, id: Date.now() }] };
+      });
+      return { ...state, officers };
+    }
+
+    case 'DELETE_IDENTIFIER': {
+      const officers = state.officers.map(o =>
+        o.id === state.currentUser?.id
+          ? { ...o, identifiers: (o.identifiers || []).filter(x => x.id !== action.payload) }
+          : o
+      );
+      return { ...state, officers };
+    }
+
+    case 'LOAD_IDENTIFIER': {
+      // Apply a saved identifier's fields to the officer's active record
+      const me = state.officers.find(o => o.id === state.currentUser?.id);
+      const ident = (me?.identifiers || []).find(x => x.id === action.payload);
+      if (!me || !ident) return state;
+      const { label, id: _id, ...fields } = ident;
+      const officers = state.officers.map(o =>
+        o.id === state.currentUser?.id ? { ...o, ...fields } : o
+      );
+      const log = addDispatchLog(state, `Unit ${fields.unitId} (${me.name}) → activated identifier "${label}"`, 'unit');
+      return { ...state, officers, ...log };
+    }
+
     case 'CREATE_CALL': {
       const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), createdAt: Date.now(), units: [] };
       const audit = addAuditEntry(state, `Created call ${newCall.id} (${newCall.nature})`, 'Dispatch');
