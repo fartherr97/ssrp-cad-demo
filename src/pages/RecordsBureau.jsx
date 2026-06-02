@@ -452,11 +452,6 @@ export default function RecordsBureau() {
             <>
               {/* Header */}
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border-faint shrink-0">
-                <div className="flex items-center justify-center w-11 h-11 rounded-full bg-app-elevated border border-border-base shrink-0">
-                  {selCiv ? <MdPerson size={24} className="text-slate-400" />
-                    : selVeh ? <MdDirectionsCar size={24} className="text-slate-400" />
-                    : <MdGavel size={24} className="text-slate-400" />}
-                </div>
                 <div className="min-w-0">
                   <div className="text-[18px] font-extrabold text-white tracking-[-0.2px] truncate">
                     {selCiv ? `${selCiv.firstName} ${selCiv.lastName}`
