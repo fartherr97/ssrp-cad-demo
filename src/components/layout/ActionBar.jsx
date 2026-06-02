@@ -261,7 +261,22 @@ export default function ActionBar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
+  // For unambiguous routes, derive portal from URL so browser back/forward shows the correct subtitle
+  const PATH_PORTAL_MAP = [
+    ['/portal/civilian',    'civilian'],
+    ['/portal/characters',  'civilian'],
+    ['/portal/vehicles',    'civilian'],
+    ['/portal/licenses',    'civilian'],
+    ['/portal/file-report', 'civilian'],
+    ['/portal/complaint',   'civilian'],
+    ['/portal/business',    'business'],
+    ['/portal/my-business', 'business'],
+    ['/portal/employees',   'business'],
+    ['/portal/incidents',   'business'],
+    ['/fire',               'fire'],
+  ];
+  const pathPortalId = (PATH_PORTAL_MAP.find(([p]) => location.pathname.startsWith(p)) || [])[1];
+  const portal = PORTALS[pathPortalId || currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
   const me       = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
 

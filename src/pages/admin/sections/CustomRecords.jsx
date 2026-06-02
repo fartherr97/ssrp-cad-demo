@@ -169,18 +169,21 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           onChange={e => onUpdate({ ...field, label: e.target.value })}
         />
 
-        {/* Width slider */}
-        <div className="flex items-center gap-1.5 shrink-0" style={{ width: 72 }}>
-          <input
-            type="range" min={1} max={4} step={1}
-            value={field.span || 2}
-            onChange={e => onUpdate({ ...field, span: Number(e.target.value) })}
-            className="flex-1 cursor-pointer accent-brand"
-            style={{ height: 4 }}
-          />
-          <span className="text-[10px] font-bold tabular-nums shrink-0" style={{ color: '#6b7280', minWidth: 14 }}>
-            {field.span || 2}
-          </span>
+        {/* Width span buttons */}
+        <div className="flex gap-0.5 shrink-0">
+          {[1,2,3,4].map(n => (
+            <button key={n} type="button"
+              onClick={() => onUpdate({ ...field, span: n })}
+              className="rounded text-[10px] font-bold border-none cursor-pointer"
+              style={{
+                width: 18, height: 22,
+                background: (field.span || 2) === n ? 'rgba(61,130,240,0.25)' : 'rgba(255,255,255,0.05)',
+                color: (field.span || 2) === n ? '#3d82f0' : '#4a5568',
+                border: `1px solid ${(field.span || 2) === n ? 'rgba(61,130,240,0.4)' : 'rgba(255,255,255,0.08)'}`,
+              }}>
+              {n}
+            </button>
+          ))}
         </div>
 
         {/* Property toggles */}
@@ -631,28 +634,13 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Meta (form code + agency) */}
-      <div className="shrink-0 px-4 py-2 grid grid-cols-2 gap-3"
+      {/* Meta (form code — auto-assigned, read-only) */}
+      <div className="shrink-0 px-4 py-2 flex items-center gap-3"
         style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div>
-          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#3d5470' }}>Form Code</div>
-          <input
-            className="w-full rounded-lg text-[12px] outline-none"
-            style={{ background: '#070e1c', border: '1px solid rgba(255,255,255,0.08)', padding: '5px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
-            placeholder="e.g. TPD-ARR-001"
-            value={draft.formCode || ''}
-            onChange={e => up({ formCode: e.target.value })}
-          />
-        </div>
-        <div>
-          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#3d5470' }}>Agency</div>
-          <input
-            className="w-full rounded-lg text-[12px] outline-none"
-            style={{ background: '#070e1c', border: '1px solid rgba(255,255,255,0.08)', padding: '5px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
-            placeholder="e.g. Tampa Police Dept."
-            value={draft.agency || ''}
-            onChange={e => up({ agency: e.target.value })}
-          />
+        <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Form Code</div>
+        <div className="text-[12px] font-bold tabular-nums px-2.5 py-1 rounded-md"
+          style={{ color: '#3d82f0', background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
+          #{draft.formCode || '—'}
         </div>
       </div>
 
@@ -730,7 +718,8 @@ export default function CustomRecords() {
   };
 
   const createTemplate = (isReport) => {
-    const blank = { id: `tpl_${Date.now()}`, name: '', formCode: '', agency: '', sections: [] };
+    const nextCode = String(allTemplates.length + 1).padStart(4, '0');
+    const blank = { id: `tpl_${Date.now()}`, name: '', formCode: nextCode, sections: [] };
     setDraft(blank);
     setEditingMeta({ id: blank.id, isReport, isNew: true });
   };
