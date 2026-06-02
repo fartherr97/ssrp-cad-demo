@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
+import { ReportDocument } from '../components/FormDocument';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_INPUT, S_LABEL } from '../constants/styles';
-import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit, MdClose } from 'react-icons/md';
+import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit, MdClose, MdDescription } from 'react-icons/md';
 
 function resizeToDataUrl(file, maxPx = 300) {
   return new Promise((resolve) => {
@@ -28,7 +30,7 @@ function resizeToDataUrl(file, maxPx = 300) {
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, departments, reports, calls } = state;
+  const { currentUser, officers, departments, reports, calls, reportTemplates = [] } = state;
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myDept = departments.find(d => d.id === myOfficer?.dept);
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
@@ -36,6 +38,7 @@ export default function OfficerProfile() {
   const [tab, setTab] = useState('info');
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
+  const [viewReport, setViewReport] = useState(null);
   const { isMobile } = useResponsive();
   const fileRef = useRef();
   const nameInputRef = useRef();
@@ -213,7 +216,14 @@ export default function OfficerProfile() {
               <tbody>
                 {myReports.map((r, i) => (
                   <tr key={r.id} className={i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}>
-                    <TD blue>{r.caseNumber}</TD>
+                    <td className="px-3 py-2 border-b border-border-faint">
+                      <button
+                        onClick={() => setViewReport(r)}
+                        className="text-brand-bright font-bold hover:underline hover:text-white transition-colors duration-75 text-left"
+                      >
+                        {r.caseNumber}
+                      </button>
+                    </td>
                     <TD>{r.type}</TD>
                     <TD muted>{r.date}</TD>
                     <td className="px-3 py-2 border-b border-border-faint"><StatusBadge status={r.status} /></td>
@@ -252,6 +262,71 @@ export default function OfficerProfile() {
         )}
 
       </div>
+
+      {/* PDF Report Viewer Modal */}
+      {viewReport && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col"
+          style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(4px)' }}
+        >
+          {/* Modal header bar */}
+          <div className="flex items-center gap-3 px-5 py-3 border-b border-white/10 bg-[#1a1c22] shrink-0">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/15 border border-blue-500/25 shrink-0">
+              <MdDescription size={16} className="text-blue-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[14px] font-extrabold text-white leading-tight truncate">{viewReport.type}</div>
+              <div className="text-[10px] font-mono text-brand-bright">{viewReport.caseNumber}</div>
+            </div>
+            <button
+              onClick={() => setViewReport(null)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all duration-75"
+              title="Close"
+            >
+              <MdClose size={18} />
+            </button>
+          </div>
+
+          {/* Paper document */}
+          <div className="flex-1 overflow-y-auto bg-[#36363a] p-6">
+            {(() => {
+              const tpl = reportTemplates.find(t => t.name === viewReport.type);
+              const data = {
+                ...(viewReport.formData || {}),
+                ...(viewReport.summary && !viewReport.formData?.f10 ? { f10: viewReport.summary } : {}),
+              };
+              return (
+                <div style={{
+                  background: '#ffffff',
+                  color: '#000',
+                  fontFamily: "'Arial','Helvetica',sans-serif",
+                  fontSize: 11,
+                  width: '100%',
+                  maxWidth: 816,
+                  minHeight: 1056,
+                  margin: '0 auto',
+                  border: '1px solid #888',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+                }}>
+                  <ReportDocument
+                    type={viewReport.type}
+                    template={tpl}
+                    data={data}
+                    editable={false}
+                    meta={{
+                      caseNumber: viewReport.caseNumber,
+                      status: viewReport.status,
+                      officer: viewReport.officerBadge,
+                      dateTime: viewReport.date,
+                    }}
+                  />
+                </div>
+              );
+            })()}
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
