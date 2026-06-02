@@ -60,8 +60,21 @@ function GroupDropdown({ group, isActive, onNavigate }) {
   const btnRef = useRef(null);
   const menuRef = useRef(null);
   const closeTimer = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => {
+      if (!containerRef.current?.contains(e.target) && !menuRef.current?.contains(e.target)) {
+        doClose();
+      }
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [open]);
 
   const anyActive = group.items.some(item => isActive(item));
   const GroupIcon = group.Icon;
@@ -81,11 +94,13 @@ function GroupDropdown({ group, isActive, onNavigate }) {
     setOpen(true);
   };
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
+  const toggle = () => open ? doClose() : openMenu();
 
   return (
-    <div className="relative flex items-stretch" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
+    <div ref={containerRef} className="relative flex items-stretch" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <button
         ref={btnRef}
+        onClick={toggle}
         className={`relative flex items-center gap-1.5 my-2 px-3.5 rounded-lg whitespace-nowrap cursor-pointer border-none text-[13px] tracking-[0.2px] shrink-0 transition-all duration-75 font-ui
           ${anyActive || open
             ? 'font-bold bg-brand/15 text-brand-bright'
