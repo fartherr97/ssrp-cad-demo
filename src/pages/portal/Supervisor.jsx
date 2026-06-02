@@ -169,36 +169,36 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
 
             {/* ── Status / Signature section at bottom of form ── */}
             <div data-section="Status" className="mt-6 rounded-xl overflow-hidden border border-border-base">
-              <div className="bg-red-600 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.7px] text-white">
+              <div className="bg-red-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.7px] text-white">
                 Status
               </div>
-              <div className="bg-app-panel/80 p-4 grid grid-cols-2 gap-3">
+              <div className="bg-app-panel/80 p-2.5 grid grid-cols-2 gap-2">
 
                 {/* Status selector */}
-                <div className="min-w-0 bg-app-bg/60 border border-border-base rounded-lg p-3">
-                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Status</div>
+                <div className="min-w-0 bg-app-bg/60 border border-border-base rounded-lg px-2.5 py-2">
+                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1">Status</div>
                   <select
                     value={status}
                     onChange={e => setStatus(e.target.value)}
-                    className="w-full bg-transparent text-[13px] font-bold text-slate-200 outline-none cursor-pointer border-0"
+                    className="w-full bg-transparent text-[11.5px] font-bold text-slate-200 outline-none cursor-pointer border-0"
                   >
                     {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
 
                 {/* Date */}
-                <div className="min-w-0 overflow-hidden bg-app-bg/60 border border-border-base rounded-lg p-3">
-                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Date</div>
-                  <div className="font-mono text-[13px] text-slate-300 break-words">{entry.date || new Date().toLocaleDateString()}</div>
+                <div className="min-w-0 overflow-hidden bg-app-bg/60 border border-border-base rounded-lg px-2.5 py-2">
+                  <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1">Date</div>
+                  <div className="font-mono text-[11.5px] text-slate-300 break-words">{entry.date || new Date().toLocaleDateString()}</div>
                 </div>
 
                 {/* Officer signature (amber) */}
-                <div className="min-w-0 rounded-lg p-3"
+                <div className="min-w-0 rounded-lg px-2.5 py-2"
                   style={{ background: 'rgba(120,80,0,0.2)', border: '1px solid rgba(180,120,0,0.35)' }}>
-                  <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#d97706', marginBottom: 6 }}>
-                    Observing Officer's Signature
+                  <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#d97706', marginBottom: 4 }}>
+                    Officer Signature
                   </div>
-                  <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#fbbf24', wordBreak: 'break-word' }}>
+                  <div style={{ fontFamily: 'Courier New, monospace', fontSize: 11, fontWeight: 700, color: '#fbbf24', wordBreak: 'break-word' }}>
                     {entry.officerSignature || '—'}
                   </div>
                 </div>
@@ -206,18 +206,18 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 {/* Supervisor signature */}
                 <div className="min-w-0">
                   {supSig ? (
-                    <div className="rounded-lg p-3 h-full"
+                    <div className="rounded-lg px-2.5 py-2 h-full"
                       style={{ background: 'rgba(0,80,30,0.2)', border: '1px solid rgba(0,150,60,0.35)' }}>
-                      <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22c55e', marginBottom: 6 }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#22c55e', marginBottom: 4 }}>
                         Supervisor Signature
                       </div>
-                      <div style={{ fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: 700, color: '#86efac', wordBreak: 'break-word' }}>
+                      <div style={{ fontFamily: 'Courier New, monospace', fontSize: 11, fontWeight: 700, color: '#86efac', wordBreak: 'break-word' }}>
                         {supSig}
                       </div>
                       <button
                         type="button"
                         onClick={() => { setSupSig(''); }}
-                        className="mt-1 text-[10px] text-slate-500 hover:text-slate-300 cursor-pointer underline bg-transparent border-0">
+                        className="mt-1 text-[9px] text-slate-500 hover:text-slate-300 cursor-pointer underline bg-transparent border-0">
                         Clear
                       </button>
                     </div>
@@ -225,7 +225,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                     <button
                       type="button"
                       onClick={signAndApprove}
-                      className="w-full h-full min-h-[56px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[13px] uppercase tracking-[0.7px] cursor-pointer transition-colors border-0">
+                      className="w-full h-full min-h-[44px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] uppercase tracking-[0.5px] cursor-pointer transition-colors border-0">
                       Supervisor Signature
                     </button>
                   )}

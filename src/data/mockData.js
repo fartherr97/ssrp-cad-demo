@@ -415,7 +415,7 @@ export const BUSINESSES = [
 
 export const RECORD_TEMPLATES = [
   {
-    id: 'r1', name: 'Hunting License', category: 'License',
+    id: 'r1', name: 'Hunting License',
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-HL-001',
     sections: [
@@ -433,7 +433,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r2', name: 'Fishing License', category: 'License',
+    id: 'r2', name: 'Fishing License',
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-FL-001',
     sections: [
@@ -451,7 +451,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r3', name: 'Trespass Notice', category: 'Notice',
+    id: 'r3', name: 'Trespass Notice',
     agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
     formCode: 'HCLE-TN-001',
     sections: [
@@ -475,7 +475,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r4', name: 'CCW Permit', category: 'License',
+    id: 'r4', name: 'CCW Permit',
     agency: 'FLORIDA DEPARTMENT OF AGRICULTURE AND CONSUMER SERVICES',
     formCode: 'FDACS-CCW-001',
     sections: [
@@ -492,7 +492,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r5', name: 'Warrant', category: 'Legal',
+    id: 'r5', name: 'Warrant',
     agency: 'HILLSBOROUGH COUNTY CIRCUIT COURT',
     formCode: 'HCCC-WR-001',
     sections: [
@@ -512,7 +512,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r6', name: 'Florida Traffic Citation', category: 'Citation',
+    id: 'r6', name: 'Florida Traffic Citation',
     agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
     formCode: 'FL-UFTC-001',
     sections: [
@@ -534,7 +534,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r7', name: 'Firearm Registration', category: 'Registration',
+    id: 'r7', name: 'Firearm Registration',
     agency: 'HILLSBOROUGH COUNTY SHERIFF\'S OFFICE',
     formCode: 'HCSO-FR-001',
     sections: [
@@ -553,7 +553,7 @@ export const RECORD_TEMPLATES = [
     ],
   },
   {
-    id: 'r8', name: 'License Suspension', category: 'Notice',
+    id: 'r8', name: 'License Suspension',
     agency: 'FLORIDA DEPARTMENT OF HIGHWAY SAFETY AND MOTOR VEHICLES',
     formCode: 'DHSMV-LS-001',
     sections: [

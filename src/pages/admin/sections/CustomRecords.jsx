@@ -67,7 +67,6 @@ const SECTION_STYLES = [
   { key: 'amber', label: 'Amber', color: '#3a2a0a' },
 ];
 
-const CATEGORY_OPTIONS = ['Incident', 'License', 'Legal', 'Citation', 'Notice', 'Registration'];
 
 const uid = () => `f${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 const sid = () => `s${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -329,16 +328,6 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
           <input style={SON_INPUT} value={draft.formCode || ''} onChange={e => up({ formCode: e.target.value })} placeholder="e.g. TPD-UOF-001" />
         </div>
         <div>
-          <label style={SON_LABEL}>Category</label>
-          <select style={SON_INPUT} value={draft.category || ''} onChange={e => up({ category: e.target.value })}>
-            <option value="">-- Select Category --</option>
-            {(isReport
-              ? ['Incident','Citation','Notice']
-              : CATEGORY_OPTIONS
-            ).map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
           <label style={SON_LABEL}>Issuing Agency</label>
           <input style={SON_INPUT} value={draft.agency || ''} onChange={e => up({ agency: e.target.value })} placeholder="e.g. Tampa Police Department" />
         </div>
@@ -496,7 +485,7 @@ export default function CustomRecords() {
         <table className="w-full border-collapse text-[13px]">
           <thead>
             <tr style={{ background: ADMIN.panel2 }}>
-              {['Name', 'Type', 'Category', 'Form Code', 'Sections', 'Actions'].map((h, i) => (
+              {['Name', 'Type', 'Form Code', 'Sections', 'Actions'].map((h, i) => (
                 <th key={i} className="text-[11px] font-bold tracking-[0.5px] uppercase py-[11px] px-[14px] text-left whitespace-nowrap"
                   style={{ color: ADMIN.textDim, borderBottom: `1px solid ${ADMIN.border}` }}>
                   {h}
@@ -530,9 +519,6 @@ export default function CustomRecords() {
                   <SonBadge color={t._kind === 'report' ? ADMIN.blue : ADMIN.green}>
                     {t._kind === 'report' ? 'Report' : 'Record'}
                   </SonBadge>
-                </td>
-                <td className="py-[10px] px-[14px] text-[12px]" style={{ borderBottom: `1px solid ${ADMIN.border}`, color: ADMIN.textDim }}>
-                  {t.category || <span style={{ color: ADMIN.textMute }}>*</span>}
                 </td>
                 <td className="py-[10px] px-[14px]" style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
                   <span className="text-[11px] font-mono" style={{ color: ADMIN.textMute }}>{t.formCode || '*'}</span>

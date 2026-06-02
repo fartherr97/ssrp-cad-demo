@@ -4,23 +4,13 @@ import { useCAD } from '../store/cadStore';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
-  MdBadge, MdGavel, MdDirectionsCar, MdWarning, MdDescription, MdAssignment,
-  MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdCheckCircle,
+  MdDescription, MdArrowBack, MdSave, MdPrint, MdDeleteOutline, MdCheckCircle,
   MdShield, MdPerson, MdInventory2,
 } from 'react-icons/md';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, xs,
 } from '../constants/styles';
 
-const CATEGORY_ICONS = {
-  License:      MdBadge,
-  Legal:        MdGavel,
-  Citation:     MdDirectionsCar,
-  Notice:       MdWarning,
-  Registration: MdAssignment,
-};
-
-const CATEGORY_ORDER = ['License', 'Legal', 'Citation', 'Notice', 'Registration'];
 
 const STATUS_BADGE = {
   'Active':   BADGE.green,
@@ -97,7 +87,6 @@ export default function RecordsCenter() {
       type: 'ADD_RECORD',
       payload: {
         type: selectedTemplate.name,
-        category: selectedTemplate.category,
         recordNumber: recNum,
         officerBadge: me?.badge || currentUser?.badge || '*',
         status: 'Active',
@@ -189,7 +178,6 @@ export default function RecordsCenter() {
             <div className="px-4">
               <Detail label="Record #" value={draftMeta.caseNumber} />
               <Detail label="Record Type" value={tpl.name} />
-              <Detail label="Category" value={tpl.category || 'General'} />
               <Detail label="Date / Time" value={now.toLocaleString()} />
               <Detail label="Issuing Officer" value={`${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`} />
               <Detail label="Status" value={<span className={BADGE.gray}>Draft</span>} />
@@ -209,7 +197,6 @@ export default function RecordsCenter() {
           <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
             <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
-              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Category</div><div className="text-[12.5px] text-slate-200 mt-0.5">{tpl.category || 'General'}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
@@ -263,14 +250,7 @@ export default function RecordsCenter() {
     );
   }
 
-  const groupedTemplates = {};
-  (recordTemplates || []).forEach(t => {
-    const cat = t.category || 'General';
-    (groupedTemplates[cat] ||= []).push(t);
-  });
-  const sortedCats = Object.keys(groupedTemplates).sort(
-    (a, b) => (CATEGORY_ORDER.indexOf(a) + 1 || 99) - (CATEGORY_ORDER.indexOf(b) + 1 || 99)
-  );
+  const sortedTemplates = [...(recordTemplates || [])].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="flex flex-col lg:flex-row h-full overflow-hidden font-ui">
@@ -299,37 +279,27 @@ export default function RecordsCenter() {
         </div>
 
         <div className="flex-1 overflow-y-auto py-2 px-2">
-          {sortedCats.map(cat => {
-            const IconComp = CATEGORY_ICONS[cat] || MdDescription;
+          {sortedTemplates.map(t => {
+            const isSelected = selectedTemplate?.id === t.id;
             return (
-              <div key={cat}>
-                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-600 px-1.5 pb-2 pt-3 first:pt-1">
-                  {cat}
+              <button key={t.id}
+                onClick={() => openTemplate(t)}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 mb-0.5 rounded-lg text-left cursor-pointer border-l-[3px] transition-all ${
+                  isSelected
+                    ? 'bg-brand/15 border-l-brand text-brand-bright'
+                    : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.05]'
+                }`}
+              >
+                <MdDescription size={17} className="shrink-0 opacity-75" />
+                <div className="min-w-0">
+                  <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-brand-bright' : 'font-medium text-cad-text'}`}>
+                    {t.name}
+                  </div>
+                  {t.formCode && (
+                    <div className="text-[9px] text-cad-muted font-mono mt-px">{t.formCode}</div>
+                  )}
                 </div>
-                {groupedTemplates[cat].map(t => {
-                  const isSelected = selectedTemplate?.id === t.id;
-                  return (
-                    <button key={t.id}
-                      onClick={() => openTemplate(t)}
-                      className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 mb-0.5 rounded-lg text-left cursor-pointer border-l-[3px] transition-all ${
-                        isSelected
-                          ? 'bg-brand/15 border-l-brand text-brand-bright'
-                          : 'bg-transparent border-l-transparent text-cad-text hover:bg-white/[0.05]'
-                      }`}
-                    >
-                      <IconComp size={17} className="shrink-0 opacity-75" />
-                      <div className="min-w-0">
-                        <div className={`text-[12px] leading-[1.3] ${isSelected ? 'font-bold text-brand-bright' : 'font-medium text-cad-text'}`}>
-                          {t.name}
-                        </div>
-                        {t.formCode && (
-                          <div className="text-[9px] text-cad-muted font-mono mt-px">{t.formCode}</div>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              </button>
             );
           })}
 
