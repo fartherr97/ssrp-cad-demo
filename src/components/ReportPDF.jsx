@@ -1,7 +1,7 @@
 /* Generates a government-document-style PDF for reports and records.
    Uses @react-pdf/renderer — all layout is React PDF primitives, no Tailwind. */
 
-import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 
 const navy  = '#0f2040';
 const blue  = '#1a4a8a';
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
 
   // ── Header ──
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', borderBottom: `2px solid ${navy}`, paddingBottom: 10, marginBottom: 14 },
+  logoBox: { width: 48, height: 48, marginRight: 10, flexShrink: 0, borderRadius: 4 },
   headerLeft: { flex: 1 },
   agencyName: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: navy, textTransform: 'uppercase', letterSpacing: 0.8 },
   formCode: { fontSize: 8, color: gray, marginTop: 2, fontFamily: 'Courier' },
@@ -79,10 +80,15 @@ const styles = StyleSheet.create({
   // Signature lines
   sigsWrap: { marginTop: 14, borderTop: `1px solid ${lgray}`, paddingTop: 10 },
   sigTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 0.5, color: gray, marginBottom: 10 },
-  sigRow: { flexDirection: 'row', gap: 16 },
-  sigBlock: { flex: 1 },
+  sigRow: { flexDirection: 'row', gap: 8 },
+  sigBlock: { flex: 1, border: `0.5px solid ${lgray}`, borderRadius: 3, padding: '4px 6px', minHeight: 40 },
+  sigBlockOfficer: { flex: 1, border: `1px solid #c49a00`, borderRadius: 3, padding: '4px 6px', minHeight: 40, backgroundColor: '#fffdf0' },
+  sigBlockSuper: { flex: 1, border: `1px solid #b91c1c`, borderRadius: 3, padding: '4px 6px', minHeight: 40, backgroundColor: '#fff5f5' },
+  sigLabel: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 0.4, color: gray, marginBottom: 4 },
+  sigLabelOfficer: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 0.4, color: '#b45309', marginBottom: 4 },
+  sigLabelSuper: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 0.4, color: '#b91c1c', marginBottom: 4 },
+  sigValue: { fontSize: 9, fontFamily: 'Courier', color: black },
   sigLine: { borderBottom: `0.5px solid ${black}`, height: 22, marginBottom: 3 },
-  sigLabel: { fontSize: 7, color: gray },
 
   // Footer
   footer: { position: 'absolute', bottom: 20, left: 44, right: 44, flexDirection: 'row', justifyContent: 'space-between', borderTop: `0.5px solid ${lgray}`, paddingTop: 5 },
@@ -172,6 +178,9 @@ function ReportPDF({ template, data = {}, meta = {} }) {
 
         {/* Header */}
         <View style={styles.headerRow}>
+          {meta.logoUrl ? (
+            <Image src={meta.logoUrl} style={styles.logoBox} />
+          ) : null}
           <View style={styles.headerLeft}>
             <Text style={styles.agencyName}>{template?.agency || 'Sunshine State RP Law Enforcement'}</Text>
             {template?.formCode && <Text style={styles.formCode}>Form: {template.formCode}</Text>}
@@ -263,19 +272,26 @@ function ReportPDF({ template, data = {}, meta = {} }) {
         })}
 
         {/* Signature lines */}
-        {template?.signatureSlots?.length > 0 && (
-          <View style={styles.sigsWrap}>
-            <Text style={styles.sigTitle}>Signatures</Text>
-            <View style={styles.sigRow}>
-              {template.signatureSlots.map((slot, i) => (
-                <View key={i} style={styles.sigBlock}>
-                  <View style={styles.sigLine} />
-                  <Text style={styles.sigLabel}>{slot}</Text>
-                </View>
-              ))}
+        <View style={styles.sigsWrap}>
+          <Text style={styles.sigTitle}>Signatures</Text>
+          <View style={styles.sigRow}>
+            {/* Officer signature */}
+            <View style={styles.sigBlockOfficer}>
+              <Text style={styles.sigLabelOfficer}>Observing Officer's Signature</Text>
+              <Text style={styles.sigValue}>{meta.officerSignature || (meta.officer || '—')}</Text>
+            </View>
+            {/* Supervisor signature */}
+            <View style={styles.sigBlockSuper}>
+              <Text style={styles.sigLabelSuper}>Supervisor Signature</Text>
+              <Text style={styles.sigValue}>{meta.supervisorSignature || '— Pending Supervisor Review —'}</Text>
+            </View>
+            {/* Date */}
+            <View style={styles.sigBlock}>
+              <Text style={styles.sigLabel}>Date</Text>
+              <Text style={styles.sigValue}>{meta.dateTime || now.toLocaleDateString()}</Text>
             </View>
           </View>
-        )}
+        </View>
 
         {/* Footer */}
         <View style={styles.footer} fixed>

@@ -216,16 +216,40 @@ export function FormCheckboxes({ label, items, values = {}, onChange, editable }
   );
 }
 
-/* Signature row */
-export function FormSignatureRow({ slots }) {
+/* Signature row — slots: string labels; values: { officerSignature, supervisorSignature, date } */
+export function FormSignatureRow({ slots, meta = {} }) {
+  const slotValues = [meta.officerSignature, meta.supervisorSignature, meta.dateTime || meta.date];
   return (
     <div style={{ display: 'flex', borderBottom: '1px solid #ccc', minHeight: 56 }}>
-      {slots.map((s, i) => (
-        <div key={i} style={{ flex: 1, borderRight: i < slots.length - 1 ? '1px solid #ccc' : 'none', padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          <div style={{ borderBottom: '1px solid #000', marginBottom: 6, minHeight: 28 }} />
-          <div style={{ fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#555', fontWeight: 700, fontFamily: 'Arial, sans-serif' }}>{s}</div>
-        </div>
-      ))}
+      {slots.map((s, i) => {
+        const isSupervisor = s.toLowerCase().includes('supervisor');
+        const isOfficer    = i === 0;
+        const filled       = slotValues[i];
+        return (
+          <div key={i} style={{
+            flex: 1,
+            borderRight: i < slots.length - 1 ? '1px solid #ccc' : 'none',
+            padding: '5px 8px',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+            background: isSupervisor && !filled ? '#fff5f5' : isOfficer && filled ? '#fffdf0' : undefined,
+          }}>
+            {filled ? (
+              <div style={{
+                fontFamily: 'Courier New, monospace', fontSize: 11, fontWeight: 700,
+                color: isSupervisor ? '#15803d' : '#92400e',
+                marginBottom: 4, wordBreak: 'break-all',
+              }}>{filled}</div>
+            ) : (
+              <div style={{ borderBottom: isSupervisor ? '1px dashed #dc2626' : '1px solid #000', marginBottom: 6, minHeight: 22 }} />
+            )}
+            <div style={{
+              fontSize: 7, textTransform: 'uppercase', letterSpacing: '0.5px',
+              color: isSupervisor ? '#dc2626' : '#555',
+              fontWeight: 700, fontFamily: 'Arial, sans-serif',
+            }}>{s}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
