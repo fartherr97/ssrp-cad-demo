@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../../store/cadStore';
+import ModifyIdentifier from '../ModifyIdentifier';
 
 function Clock() {
   const [time, setTime] = useState('');
@@ -40,6 +41,7 @@ const PAGE_LABELS = {
 export default function TopBar() {
   const { state } = useCAD();
   const { currentUser, currentPage, officers, calls } = state;
+  const [showIdentifier, setShowIdentifier] = useState(false);
 
   const me = officers.find(o => o.id === currentUser?.id);
   const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
@@ -97,21 +99,27 @@ export default function TopBar() {
 
       <div className="w-px h-6 bg-border-base shrink-0" />
 
-      {/* User info */}
-      <div className="flex items-center gap-2">
+      {/* User info — click to modify identifier */}
+      <button
+        onClick={() => setShowIdentifier(true)}
+        className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/[0.06] transition-colors cursor-pointer group"
+        title="Modify Identifier"
+      >
         <div
           className="w-2 h-2 rounded-full shrink-0"
           style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
         />
         <div className="text-right">
-          <div className="text-[11px] font-semibold text-cad-text tracking-wide">
+          <div className="text-[11px] font-semibold text-cad-text tracking-wide group-hover:text-white transition-colors">
             {me?.rank ? `${me.rank.toUpperCase().slice(0, 3)}. ` : ''}{currentUser?.name}
           </div>
           <div className="text-[9px] font-mono text-cad-muted tracking-wide">
-            {me?.badge || '*'} · {me?.deptShort || '*'} · {myStatus}
+            {me?.unitId || me?.badge || '*'} · {me?.deptShort || '*'} · {myStatus}
           </div>
         </div>
-      </div>
+      </button>
+
+      {showIdentifier && <ModifyIdentifier onClose={() => setShowIdentifier(false)} />}
     </header>
   );
 }

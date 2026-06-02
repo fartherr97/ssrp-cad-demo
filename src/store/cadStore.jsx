@@ -175,6 +175,24 @@ function reducer(state, action) {
       return { ...state, officers, ...audit, ...log };
     }
 
+    case 'PATCH_OFFICER': {
+      const prev = state.officers.find(o => o.id === state.currentUser?.id);
+      const officers = state.officers.map(o =>
+        o.id === state.currentUser?.id ? { ...o, ...action.payload } : o
+      );
+      const next = officers.find(o => o.id === state.currentUser?.id);
+      const statusChanged = prev?.status !== next?.status;
+      const log = next ? addDispatchLog(
+        state,
+        statusChanged
+          ? `Unit ${next.unitId} (${next.name}) → ${next.status}`
+          : `Unit ${next.unitId} (${next.name}) identifier updated`,
+        statusChanged ? 'status' : 'unit'
+      ) : {};
+      const audit = addAuditEntry(state, `Identifier updated for ${next?.name}`, 'CAD');
+      return { ...state, officers, ...log, ...audit };
+    }
+
     case 'CREATE_CALL': {
       const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), createdAt: Date.now(), units: [] };
       const audit = addAuditEntry(state, `Created call ${newCall.id} (${newCall.nature})`, 'Dispatch');

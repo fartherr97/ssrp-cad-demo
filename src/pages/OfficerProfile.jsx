@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
+import IdentifierEditor from '../components/IdentifierEditor';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import {
@@ -54,9 +55,9 @@ export default function OfficerProfile() {
               {myOfficer.rank} &bull; {myDept?.short ? <DeptTag code={myDept.short} /> : (myDept?.name || 'Unknown Department')}
             </div>
             <div className="text-slate-500 text-xs mt-1">
-              Badge: <span className="text-brand-bright font-semibold">{myOfficer.badge}</span>
-              &nbsp;&bull;&nbsp;Unit: <span className="text-brand-bright font-semibold">{myOfficer.unitId}</span>
+              Unit: <span className="text-brand-bright font-semibold">{myOfficer.unitId}</span>
               &nbsp;&bull;&nbsp;{myOfficer.subdivision}
+              {myOfficer.aop && <>&nbsp;&bull;&nbsp;AOP: {myOfficer.aop}</>}
             </div>
           </div>
           <div className="text-right shrink-0">
@@ -106,10 +107,8 @@ export default function OfficerProfile() {
             className="grid gap-3.5"
             style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}
           >
-            <InfoCard title="ASSIGNMENT" accentColor={accentColor}>
-              {[['Department', myDept?.name], ['Short Name', myDept?.short], ['Subdivision', myOfficer.subdivision], ['Rank', myOfficer.rank], ['Badge Number', myOfficer.badge], ['Unit Identifier', myOfficer.unitId], ['Radio Channel', myDept?.radioChannel || '*']].map(([k,v]) => (
-                <InfoRow key={k} label={k} value={v || '*'} />
-              ))}
+            <InfoCard title="IDENTIFIER" accentColor={accentColor}>
+              <IdentifierEditor />
             </InfoCard>
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
               {!requestingTransfer ? (
