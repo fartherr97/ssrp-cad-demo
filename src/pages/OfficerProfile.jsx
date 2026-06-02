@@ -188,7 +188,7 @@ export default function OfficerProfile() {
                 </div>
                 <div>
                   <div className="text-[15px] font-extrabold text-white mb-2 leading-snug">
-                    Looking to Transfer to Another LE Department?
+                    Looking to Transfer to Another ES Department?
                   </div>
                   <div className="text-[12.5px] text-slate-400 leading-relaxed">
                     Head on over to our Transfer Portal to submit your request and be directed to the correct place.
