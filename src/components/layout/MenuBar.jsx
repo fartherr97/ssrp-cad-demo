@@ -68,7 +68,7 @@ export default function MenuBar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  useEffect(() => { setMobileOpen(false); }, [location.key]);
 
   const me = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';

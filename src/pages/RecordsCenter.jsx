@@ -8,7 +8,7 @@ import {
   MdShield, MdPerson, MdInventory2,
 } from 'react-icons/md';
 import {
-  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, xs,
+  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, xs,
 } from '../constants/styles';
 
 
@@ -234,7 +234,7 @@ export default function RecordsCenter() {
             <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
               <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
-            <button className={`${S_BTN_GHOST} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
+            <button className={`${S_BTN_DANGER} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
             <button className={`${S_BTN_PRIMARY} col-span-2 w-full md:col-span-1 md:w-auto md:ml-auto`} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
           </div>
         </div>
