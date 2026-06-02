@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { CADProvider, useCAD } from './store/cadStore';
 import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
@@ -70,10 +70,13 @@ function landingFor(user) {
 
 function AuthShell() {
   const { state } = useCAD();
+  const location = useLocation();
   if (!state.currentUser) return <Navigate to="/" replace />;
   return (
     <AppShell>
-      <Outlet />
+      <div key={location.key} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <Outlet />
+      </div>
     </AppShell>
   );
 }
