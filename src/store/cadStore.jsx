@@ -306,7 +306,18 @@ function reducer(state, action) {
     }
 
     case 'ADD_REPORT': {
-      const newReport = { ...action.payload, id: state.nextId, status: 'Submitted', date: new Date().toLocaleDateString() };
+      const officer = state.officers.find(o => o.badge === action.payload.officerBadge);
+      const officerSignature = officer
+        ? `${officer.badge} | ${(officer.rank || officer.role || 'OFFICER').toUpperCase()} | ${officer.name.toUpperCase()}`
+        : (action.payload.officerBadge || '—');
+      const newReport = {
+        ...action.payload,
+        id: state.nextId,
+        status: 'Submitted',
+        date: new Date().toLocaleDateString(),
+        officerSignature,
+        supervisorSignature: null,
+      };
       const audit = addAuditEntry(state, `Submitted ${newReport.type} report`, 'Reports');
       return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, ...audit };
     }
@@ -450,8 +461,11 @@ function reducer(state, action) {
       return { ...state, businesses };
     }
     case 'UPDATE_REPORT_STATUS': {
-      const reports = state.reports.map(r => r.id === action.payload.id ? { ...r, status: action.payload.status } : r);
-      const audit = addAuditEntry(state, `${action.payload.status} report ID ${action.payload.id}`, 'Reports');
+      const { id, status, supervisorSignature } = action.payload;
+      const reports = state.reports.map(r =>
+        r.id === id ? { ...r, status, ...(supervisorSignature ? { supervisorSignature } : {}) } : r
+      );
+      const audit = addAuditEntry(state, `${status} report ID ${id}`, 'Reports');
       return { ...state, reports, ...audit };
     }
     case 'ADD_REPORT_TEMPLATE': {
@@ -471,8 +485,15 @@ function reducer(state, action) {
       const newRecord = { ...action.payload, id: state.nextId, date: new Date().toLocaleDateString() };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
     }
-    case 'UPDATE_RECORD_STATUS':
-      return { ...state, records: state.records.map(r => r.id === action.payload.id ? { ...r, status: action.payload.status } : r) };
+    case 'UPDATE_RECORD_STATUS': {
+      const { id: rid, status: rstatus, supervisorSignature: rsig } = action.payload;
+      return {
+        ...state,
+        records: state.records.map(r =>
+          r.id === rid ? { ...r, status: rstatus, ...(rsig ? { supervisorSignature: rsig } : {}) } : r
+        ),
+      };
+    }
 
     case 'ADD_RECORD_TEMPLATE':
       return { ...state, recordTemplates: [...state.recordTemplates, { ...action.payload, id: `r${Date.now()}` }] };

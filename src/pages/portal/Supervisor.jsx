@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight, MdExpandMore,
-  MdDescription, MdFolder, MdDownload, MdCheckCircle, MdCancel, MdEdit,
-  MdOutlineRateReview,
+  MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdEdit,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
+import { downloadReportPDF } from '../../components/ReportPDF';
 
 /* ── Status helpers ── */
 const STATUS_META = {
@@ -23,80 +23,49 @@ function StatusPill({ status }) {
   );
 }
 
-/* ── PDF export ── */
-function exportPdf(entry, officer) {
-  const rows = [
-    ['Case #',     entry.caseNumber || '—'],
-    ['Type',       entry.type || '—'],
-    ['Date',       entry.date || '—'],
-    ['Status',     entry.status || '—'],
-    ['Officer',    officer ? `${officer.name} · ${officer.badge}` : (entry.officerBadge || '—')],
-    ['Department', officer?.deptShort || '—'],
-    ['Rank',       officer?.rank || '—'],
-    ...(entry.callId ? [['Call ID', entry.callId]] : []),
-  ];
-
-  const extraRows = entry.formValues
-    ? Object.entries(entry.formValues).filter(([, v]) => v && String(v).trim()).slice(0, 8)
-    : [];
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<title>${entry.type} — ${entry.caseNumber}</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff;padding:40px;max-width:760px;margin:0 auto}
-  h1{font-size:22px;font-weight:700;margin-bottom:4px}
-  .sub{color:#666;font-size:12px;margin-bottom:28px}
-  table{width:100%;border-collapse:collapse;margin-bottom:20px}
-  td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}
-  td:first-child{font-weight:700;width:140px;color:#444;white-space:nowrap}
-  .section{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#888;margin:22px 0 8px}
-  .summary{padding:14px;background:#f6f6f6;border-radius:6px;font-size:13px;line-height:1.6;border:1px solid #e0e0e0}
-  @media print{body{padding:20px}}
-</style>
-</head>
-<body>
-<h1>${entry.type || 'Report'} — ${entry.caseNumber || 'No Case #'}</h1>
-<div class="sub">Generated ${new Date().toLocaleString()} · SSRP CAD</div>
-<div class="section">Case Details</div>
-<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
-${entry.summary ? `<div class="section">Summary</div><div class="summary">${entry.summary}</div>` : ''}
-${extraRows.length ? `<div class="section">Form Data</div><table>${extraRows.map(([k, v]) => `<tr><td>${k}</td><td>${String(v).slice(0, 300)}</td></tr>`).join('')}</table>` : ''}
-<div style="margin-top:40px;border-top:1px solid #ddd;padding-top:16px;font-size:11px;color:#aaa">
-  Sunshine State Roleplay · Computer Aided Dispatch · ${new Date().toLocaleDateString()}
-</div>
-</body>
-</html>`;
-
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const w = window.open(url, '_blank');
-  w?.addEventListener('load', () => w.print());
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+/* ── Signature cell ── */
+function SigCell({ label, value, amber }) {
+  return (
+    <div style={{
+      flex: 1, background: amber ? 'rgba(120,90,0,0.18)' : 'rgba(0,80,30,0.12)',
+      border: `1px solid ${amber ? 'rgba(180,130,0,0.35)' : 'rgba(0,150,60,0.30)'}`,
+      borderRadius: 6, padding: '6px 10px', minHeight: 52,
+      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+    }}>
+      <div style={{
+        fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',
+        color: amber ? '#d97706' : '#22c55e', marginBottom: 4,
+      }}>
+        {label}
+      </div>
+      <div style={{
+        fontFamily: 'Courier New, monospace', fontSize: 12, fontWeight: 700,
+        color: amber ? '#fbbf24' : '#86efac', letterSpacing: '0.3px',
+      }}>
+        {value || '—'}
+      </div>
+    </div>
+  );
 }
 
-/* ── Expanded detail panel ── */
-function DetailPanel({ entry, officer, onSignOff }) {
+/* ── Detail panel with Sonoran-style signature section ── */
+function DetailPanel({ entry, officer, onSign, onRequestChanges, onExport }) {
   const rows = [
-    { label: 'Case #',     value: entry.caseNumber },
-    { label: 'Type',       value: entry.type },
-    { label: 'Date',       value: entry.date },
-    { label: 'Status',     value: <StatusPill status={entry.status} /> },
-    { label: 'Officer',    value: officer ? `${officer.name} · ${officer.badge}` : entry.officerBadge },
-    { label: 'Dept',       value: officer?.deptShort || '—' },
-    { label: 'Rank',       value: officer?.rank || '—' },
+    { label: 'Case #',  value: entry.caseNumber },
+    { label: 'Type',    value: entry.type },
+    { label: 'Date',    value: entry.date },
+    { label: 'Status',  value: <StatusPill status={entry.status} /> },
+    { label: 'Officer', value: officer ? `${officer.name} · ${officer.badge}` : entry.officerBadge },
+    { label: 'Dept',    value: officer?.deptShort || '—' },
+    { label: 'Rank',    value: officer?.rank || '—' },
     ...(entry.callId ? [{ label: 'Call ID', value: entry.callId }] : []),
   ];
 
-  const extraFields = entry.formValues
-    ? Object.entries(entry.formValues).filter(([, v]) => v && typeof v === 'string' && v.trim()).slice(0, 6)
+  const extraFields = entry.formData
+    ? Object.entries(entry.formData).filter(([, v]) => v && typeof v === 'string' && v.trim()).slice(0, 6)
     : [];
 
-  const canApprove = entry.status !== 'Approved';
-  const canReject  = entry.status !== 'Rejected';
+  const alreadySigned = !!entry.supervisorSignature;
 
   return (
     <div className="px-4 pb-4 pt-3 bg-white/[0.02] border-t border-border-faint">
@@ -135,29 +104,67 @@ function DetailPanel({ entry, officer, onSignOff }) {
         </div>
       )}
 
-      {/* Action bar */}
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border-faint">
-        <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mr-1">Sign Off:</span>
+      {/* ── Sonoran-style STATUS / SIGNATURE section ── */}
+      <div className="mb-3">
+        <div className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">Status</div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {/* Status chip */}
+          <div style={{
+            flex: '0 0 auto', background: 'rgba(30,35,50,0.7)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 6, padding: '6px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 100,
+          }}>
+            <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', marginBottom: 3 }}>Status</div>
+            <StatusPill status={entry.status} />
+          </div>
 
-        {canApprove && (
-          <button type="button" onClick={() => onSignOff('Approved')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
-            <MdCheckCircle size={14} /> Approve
+          {/* Officer signature (amber) */}
+          <SigCell label="Observing Officer's Signature" value={entry.officerSignature} amber />
+
+          {/* Supervisor signature — red button or filled value */}
+          <div style={{ flex: 1, minWidth: 160 }}>
+            {alreadySigned ? (
+              <SigCell label="Supervisor Signature" value={entry.supervisorSignature} />
+            ) : (
+              <button
+                type="button"
+                onClick={onSign}
+                style={{
+                  width: '100%', minHeight: 52, background: '#dc2626',
+                  border: '1px solid rgba(220,38,38,0.5)', borderRadius: 6,
+                  color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  textTransform: 'uppercase', letterSpacing: '0.7px', transition: 'background .15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#b91c1c'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#dc2626'; }}
+              >
+                Supervisor Signature
+              </button>
+            )}
+          </div>
+
+          {/* Date */}
+          <div style={{
+            flex: '0 0 auto', background: 'rgba(30,35,50,0.7)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 6, padding: '6px 10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 110,
+          }}>
+            <div style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', marginBottom: 4 }}>Date</div>
+            <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#94a3b8' }}>
+              {entry.date || new Date().toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Request Changes + Export row */}
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border-faint">
+        {!alreadySigned && (
+          <button type="button" onClick={onRequestChanges}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 text-[11.5px] font-bold cursor-pointer transition-all border border-amber-500/30">
+            <MdEdit size={13} /> Request Changes
           </button>
         )}
-        {canReject && (
-          <button type="button" onClick={() => onSignOff('Rejected')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
-            <MdCancel size={14} /> Reject
-          </button>
-        )}
-        <button type="button" onClick={() => onSignOff('Pending Review')}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 text-[11.5px] font-bold cursor-pointer transition-all border border-amber-500/30">
-          <MdEdit size={13} /> Request Changes
-        </button>
-
         <div className="ml-auto">
-          <button type="button" onClick={() => exportPdf(entry, officer)}
+          <button type="button" onClick={onExport}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-app-elevated border border-border-base text-slate-300 hover:text-white text-[11.5px] font-semibold cursor-pointer transition-all hover:bg-white/[0.07]">
             <MdDownload size={14} /> Download PDF
           </button>
@@ -168,8 +175,7 @@ function DetailPanel({ entry, officer, onSignOff }) {
 }
 
 /* ── Mobile card ── */
-function SubmissionCard({ entry, officer, isExpanded, onToggle, onSignOff }) {
-  const m = STATUS_META[entry.status] || { pill: 'bg-slate-500/15 text-slate-400 border-slate-500/30' };
+function SubmissionCard({ entry, officer, isExpanded, onToggle, onSign, onRequestChanges, onExport }) {
   return (
     <div className={`rounded-xl border overflow-hidden transition-colors mb-2 ${isExpanded ? 'border-brand/40 bg-brand/[0.04]' : 'border-border-base bg-app-elevated'}`}>
       <button type="button" onClick={onToggle}
@@ -195,7 +201,15 @@ function SubmissionCard({ entry, officer, isExpanded, onToggle, onSignOff }) {
           {isExpanded ? <MdExpandMore size={16} /> : <MdChevronRight size={16} />}
         </div>
       </button>
-      {isExpanded && <DetailPanel entry={entry} officer={officer} onSignOff={onSignOff} />}
+      {isExpanded && (
+        <DetailPanel
+          entry={entry}
+          officer={officer}
+          onSign={onSign}
+          onRequestChanges={onRequestChanges}
+          onExport={onExport}
+        />
+      )}
     </div>
   );
 }
@@ -205,13 +219,14 @@ function SubmissionCard({ entry, officer, isExpanded, onToggle, onSignOff }) {
 ══════════════════════════════════ */
 export default function Supervisor() {
   const { state, dispatch } = useCAD();
-  const { reports, records, officers } = state;
+  const { reports, records, officers, currentUser, reportTemplates = [], recordTemplates = [], communityConfig } = state;
 
   const [deptFilter, setDeptFilter]     = useState('All');
   const [typeFilter, setTypeFilter]     = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [search, setSearch]             = useState('');
   const [expandedId, setExpandedId]     = useState(null);
+  const [pdfLoading, setPdfLoading]     = useState(false);
 
   const combined = useMemo(() => [
     ...reports.map(r => ({ ...r, kind: 'report' })),
@@ -257,11 +272,48 @@ export default function Supervisor() {
 
   const STATUS_PILLS = ['All', 'Submitted', 'Pending Review', 'Approved', 'Rejected'];
 
-  const signOff = (entry, newStatus) => {
+  /* Build supervisor signature from current user */
+  const buildSupervisorSig = () => {
+    const me = officers.find(o => o.id === currentUser?.id);
+    if (me) return `${me.badge} | ${(me.rank || me.role || 'SUPERVISOR').toUpperCase()} | ${me.name.toUpperCase()}`;
+    return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
+  };
+
+  const signEntry = (entry) => {
+    const sig = buildSupervisorSig();
     if (entry.kind === 'report') {
-      dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: entry.id, status: newStatus } });
+      dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: entry.id, status: 'Approved', supervisorSignature: sig } });
     } else {
-      dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: entry.id, status: newStatus } });
+      dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: entry.id, status: 'Approved', supervisorSignature: sig } });
+    }
+  };
+
+  const requestChanges = (entry) => {
+    if (entry.kind === 'report') {
+      dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: entry.id, status: 'Pending Review' } });
+    } else {
+      dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: entry.id, status: 'Pending Review' } });
+    }
+  };
+
+  const exportEntry = async (entry, officer) => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      const allTpls = [...reportTemplates, ...recordTemplates];
+      const template = allTpls.find(t => t.name === entry.type) || { name: entry.type };
+      await downloadReportPDF(template, entry.formData || {}, {
+        caseNumber: entry.caseNumber,
+        status: entry.status,
+        dateTime: entry.date,
+        officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—'),
+        agency: officer?.deptShort || communityConfig?.name || 'SSRP',
+        logoUrl: communityConfig?.logoUrl,
+        officerSignature: entry.officerSignature,
+        supervisorSignature: entry.supervisorSignature,
+      });
+    } finally {
+      setPdfLoading(false);
     }
   };
 
@@ -293,7 +345,6 @@ export default function Supervisor() {
           <span className="text-[10.5px] font-bold uppercase tracking-[0.6px] text-slate-400">Filters</span>
         </div>
 
-        {/* Row 1: search + dept */}
         <div className="flex items-center gap-2 px-4 pt-3">
           <div className="flex items-center gap-2 flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-3 py-2">
             <MdSearch size={14} className="text-slate-500 shrink-0" />
@@ -318,7 +369,6 @@ export default function Supervisor() {
           </select>
         </div>
 
-        {/* Row 2: type + status */}
         <div className="grid grid-cols-2 gap-2 px-4 pt-2">
           <select
             className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer focus:border-brand/60 w-full"
@@ -340,7 +390,6 @@ export default function Supervisor() {
           </select>
         </div>
 
-        {/* Row 3: quick status pills */}
         <div className="flex gap-1.5 px-4 py-3 overflow-x-auto">
           {STATUS_PILLS.map(s => {
             const active = statusFilter === s;
@@ -405,12 +454,8 @@ export default function Supervisor() {
                         onClick={() => toggleRow(uid)}
                         className={`cursor-pointer transition-colors hover:bg-white/[0.05] ${rowBg} ${isExpanded ? 'bg-brand/[0.06]' : ''}`}
                       >
-                        <td className="px-4 py-3 text-[12px] text-slate-400 border-b border-border-faint whitespace-nowrap font-mono">
-                          {entry.date}
-                        </td>
-                        <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">
-                          {entry.caseNumber || '—'}
-                        </td>
+                        <td className="px-4 py-3 text-[12px] text-slate-400 border-b border-border-faint whitespace-nowrap font-mono">{entry.date}</td>
+                        <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">{entry.caseNumber || '—'}</td>
                         <td className="px-4 py-3 border-b border-border-faint">
                           <div className="flex items-center gap-1.5">
                             {entry.kind === 'report'
@@ -432,9 +477,7 @@ export default function Supervisor() {
                             <span className="text-[12px] text-slate-500 font-mono">{entry.officerBadge || '—'}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 border-b border-border-faint">
-                          <StatusPill status={entry.status} />
-                        </td>
+                        <td className="px-4 py-3 border-b border-border-faint"><StatusPill status={entry.status} /></td>
                         <td className="px-3 py-3 border-b border-border-faint text-slate-500 w-8">
                           {isExpanded ? <MdExpandMore size={16} /> : <MdChevronRight size={16} />}
                         </td>
@@ -445,7 +488,9 @@ export default function Supervisor() {
                             <DetailPanel
                               entry={entry}
                               officer={officer}
-                              onSignOff={(newStatus) => signOff(entry, newStatus)}
+                              onSign={() => signEntry(entry)}
+                              onRequestChanges={() => requestChanges(entry)}
+                              onExport={() => exportEntry(entry, officer)}
                             />
                           </td>
                         </tr>
@@ -468,7 +513,9 @@ export default function Supervisor() {
                     officer={officer}
                     isExpanded={expandedId === uid}
                     onToggle={() => toggleRow(uid)}
-                    onSignOff={(newStatus) => signOff(entry, newStatus)}
+                    onSign={() => signEntry(entry)}
+                    onRequestChanges={() => requestChanges(entry)}
+                    onExport={() => exportEntry(entry, officer)}
                   />
                 );
               })}
