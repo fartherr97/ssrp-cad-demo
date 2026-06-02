@@ -169,8 +169,10 @@ function MobileDrawer({ open, onClose, groups, isActive, onNavigate, onHome, onL
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
             className="w-8 h-8 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
           <div className="flex-1 leading-[1.15]">
-            <div className="text-[14px] font-extrabold text-white tracking-[-0.3px]">Admin Panel</div>
-            <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Navigation</div>
+            <div className="text-[14px] font-extrabold text-white tracking-[-0.3px]">
+              Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
+            </div>
+            <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Administration</div>
           </div>
           <button onClick={onClose}
             className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 border-none cursor-pointer transition-all duration-75">
@@ -246,8 +248,10 @@ export default function AdminShell() {
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
             className="w-9 h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
           <div className="leading-[1.15] whitespace-nowrap">
-            <div className="text-[15px] font-extrabold text-white tracking-[-0.3px]">Admin Panel</div>
-            <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">{community}</div>
+            <div className="text-[15px] font-extrabold text-white tracking-[-0.3px]">
+              Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
+            </div>
+            <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Administration</div>
           </div>
         </div>
 
