@@ -8,8 +8,9 @@ import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
-  MdMenu, MdClose,
+  MdMenu, MdClose, MdSearch,
 } from 'react-icons/md';
+import ReportRecordSearch from '../ReportRecordSearch';
 
 /* ─── Clock (date over time) ─── */
 function Clock() {
@@ -248,6 +249,13 @@ export default function ActionBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showCaseSearch, setShowCaseSearch] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setShowCaseSearch(v => !v); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const portal = PORTALS[currentUser?.portal] || PORTALS[DEFAULT_PORTAL];
   const me       = officers.find(o => o.id === currentUser?.id);
@@ -304,8 +312,16 @@ export default function ActionBar() {
         )}
       </nav>
 
-      {/* ── Far right: clock + user + mobile menu ── */}
+      {/* ── Far right: clock + search + user + mobile menu ── */}
       <div className="ml-auto flex items-center shrink-0 pl-2">
+        <button
+          onClick={() => setShowCaseSearch(true)}
+          title="Search reports & records (Ctrl+K)"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 mr-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-colors border border-transparent hover:border-border-base"
+        >
+          <MdSearch size={15} />
+          <span className="text-[10px] font-mono text-slate-600 hidden md:inline">⌘K</span>
+        </button>
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus}
@@ -389,6 +405,8 @@ export default function ActionBar() {
         </div>,
         document.body
       )}
+
+      {showCaseSearch && <ReportRecordSearch onClose={() => setShowCaseSearch(false)} />}
     </div>
   );
 }

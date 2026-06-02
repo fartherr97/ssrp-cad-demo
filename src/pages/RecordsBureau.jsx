@@ -3,9 +3,10 @@ import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
+import ReportRecordSearch from '../components/ReportRecordSearch';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
-  MdWarningAmber, MdBadge,
+  MdWarningAmber, MdBadge, MdFolder,
 } from 'react-icons/md';
 
 function age(dob) {
@@ -40,6 +41,7 @@ const SEARCH_TYPES = [
   { id: 'PERSON',  label: 'Person',  Icon: MdPerson },
   { id: 'VEHICLE', label: 'Vehicle', Icon: MdDirectionsCar },
   { id: 'WARRANT', label: 'Warrant', Icon: MdGavel },
+  { id: 'CASES',   label: 'Reports & Records', Icon: MdFolder },
 ];
 
 export default function RecordsBureau() {
@@ -47,6 +49,7 @@ export default function RecordsBureau() {
   const { civilians, vehicles, warrants, criminalHistory } = state;
 
   const [searchType, setSearchType] = useState('PERSON');
+  const [showCaseSearch, setShowCaseSearch] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -103,18 +106,23 @@ export default function RecordsBureau() {
           </div>
 
           {/* Type tabs */}
-          <div className="flex gap-1 p-2 border-b border-border-faint shrink-0">
+          <div className="flex flex-wrap gap-1 p-2 border-b border-border-faint shrink-0">
             {SEARCH_TYPES.map(t => {
               const on = searchType === t.id;
               return (
                 <button key={t.id}
-                  onClick={() => { setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}
+                  onClick={() => {
+                    if (t.id === 'CASES') { setShowCaseSearch(true); return; }
+                    setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery('');
+                  }}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
                   <t.Icon size={15} /> {t.label}
                 </button>
               );
             })}
           </div>
+
+          {showCaseSearch && <ReportRecordSearch onClose={() => setShowCaseSearch(false)} />}
 
           {/* Search input */}
           <div className="p-3 border-b border-border-faint shrink-0">
