@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { CADProvider, useCAD } from './store/cadStore';
 import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
@@ -68,15 +69,38 @@ function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
 }
 
+/* Mounts invisible then transitions in via rAF so mobile browsers
+   always see the start state before animating (CSS-only animations
+   are skipped on mobile when insertion + paint happen in one frame). */
+function PageWrapper({ children }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <div
+      className="flex flex-col flex-1 min-h-0 overflow-hidden"
+      style={{
+        transition: 'opacity 280ms cubic-bezier(0.22,1,0.36,1), transform 280ms cubic-bezier(0.22,1,0.36,1)',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(14px) scale(0.99)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function AuthShell() {
   const { state } = useCAD();
   const location = useLocation();
   if (!state.currentUser) return <Navigate to="/" replace />;
   return (
     <AppShell>
-      <div key={location.key} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <PageWrapper key={location.key}>
         <Outlet />
-      </div>
+      </PageWrapper>
     </AppShell>
   );
 }
