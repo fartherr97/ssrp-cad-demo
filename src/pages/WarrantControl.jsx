@@ -55,8 +55,8 @@ export default function WarrantControl() {
   return (
     <div className={`${S_PAGE} overflow-hidden !p-3 md:!p-5`}>
       {/* Header — stat widgets + actions */}
-      <div className="flex flex-wrap gap-3 items-center shrink-0">
-        <div className="grid grid-cols-3 gap-3 flex-1 min-w-0 sm:min-w-[240px]">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+        <div className="grid grid-cols-3 gap-3 sm:flex-1 sm:min-w-0">
           {[
             { label: 'Active', value: activeCount, color: '#f87171' },
             { label: 'Served', value: warrants.filter(w => w.status === 'SERVED').length, color: '#4ade80' },
@@ -68,7 +68,7 @@ export default function WarrantControl() {
             </div>
           ))}
         </div>
-        <div className="ml-auto flex flex-wrap gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center sm:ml-auto">
           {['ALL','ACTIVE','SERVED'].map(f => (
             <button key={f} className={sm(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>
