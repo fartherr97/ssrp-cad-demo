@@ -48,7 +48,7 @@ function countFields(t) {
   return t.fields?.length || 0;
 }
 
-const BLANK_NEW_FIELD = { label: '', type: 'text', span: 1, required: false, mono: false, options: '' };
+const BLANK_NEW_FIELD = { label: '', type: 'text', span: 1, required: false, mono: false, supervisorOnly: false, options: '' };
 
 /* ── Add-field inline form ──────────────────────────────────────── */
 function AddFieldForm({ value, onChange, onAdd, onCancel }) {
@@ -93,10 +93,16 @@ function AddFieldForm({ value, onChange, onAdd, onCancel }) {
         </div>
       )}
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
-          <input type="checkbox" checked={value.required} onChange={e => onChange(v => ({ ...v, required: e.target.checked }))} className="accent-brand" />
-          Required
-        </label>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
+            <input type="checkbox" checked={value.required} onChange={e => onChange(v => ({ ...v, required: e.target.checked }))} className="accent-brand" />
+            Required
+          </label>
+          <label className="flex items-center gap-1 cursor-pointer text-[9px] uppercase tracking-[0.4px] text-red-400">
+            <input type="checkbox" checked={value.supervisorOnly || false} onChange={e => onChange(v => ({ ...v, supervisorOnly: e.target.checked }))} className="accent-red-500" />
+            Sup. Only
+          </label>
+        </div>
         <div className="flex gap-1.5">
           <button className={xs(S_BTN_GHOST)} onClick={onCancel}>Cancel</button>
           <button className={xs(S_BTN_PRIMARY)} onClick={onAdd} disabled={!value.label.trim()}>Add Field</button>
@@ -137,7 +143,7 @@ function FieldEditor({ field, onChange }) {
         </div>
       )}
 
-      <div className="flex items-center gap-4 pt-1">
+      <div className="flex items-center gap-4 pt-1 flex-wrap">
         <label className="flex items-center gap-1 cursor-pointer text-[9px] text-cad-text uppercase tracking-[0.4px]">
           <input type="checkbox" checked={!!field.required} onChange={e => onChange({ required: e.target.checked })} className="accent-brand" />
           Required
@@ -148,6 +154,10 @@ function FieldEditor({ field, onChange }) {
             Monospace
           </label>
         )}
+        <label className="flex items-center gap-1 cursor-pointer text-[9px] uppercase tracking-[0.4px] text-red-400">
+          <input type="checkbox" checked={!!field.supervisorOnly} onChange={e => onChange({ supervisorOnly: e.target.checked })} className="accent-red-500" />
+          Supervisor Only
+        </label>
       </div>
 
       {field.type === 'dropdown' && (

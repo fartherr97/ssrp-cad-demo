@@ -357,6 +357,11 @@ function ChargesField({ f, value, onChange, readOnly }) {
 }
 
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
+  const { state } = useCAD();
+  const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
+  const isSupOnly = !!f.supervisorOnly;
+  const effectiveReadOnly = readOnly || (isSupOnly && !isSupervisor);
+
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
 
@@ -367,11 +372,16 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
         <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
           <MdGavel size={12} />
           {f.label || 'Charges'}{f.required && <span className="text-red-400"> *</span>}
-          {!readOnly && (
+          {isSupOnly && (
+            <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">
+              {isSupervisor ? 'SUP ONLY' : 'RESTRICTED'}
+            </span>
+          )}
+          {!effectiveReadOnly && (
             <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">PENAL CODE</span>
           )}
         </label>
-        <ChargesField f={f} value={value} onChange={onChange} readOnly={readOnly} />
+        <ChargesField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />
       </div>
     );
   }
@@ -379,11 +389,13 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   // Checkbox — compact toggle row
   if (f.type === 'checkbox') {
     return (
-      <label className={`${SPAN[span]} flex items-center gap-2.5 self-end px-3 py-2.5 rounded-lg bg-app-input border border-border-base text-[12.5px] text-slate-200 ${readOnly ? '' : 'cursor-pointer hover:border-border-strong'} transition-colors`}>
-        <input type="checkbox" checked={!!value} disabled={readOnly}
+      <label className={`${SPAN[span]} flex items-center gap-2.5 self-end px-3 py-2.5 rounded-lg border text-[12.5px] text-slate-200 ${effectiveReadOnly ? '' : 'cursor-pointer hover:border-border-strong'} transition-colors
+        ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
+        <input type="checkbox" checked={!!value} disabled={effectiveReadOnly}
           onChange={e => onChange(f.id, e.target.checked)}
           className="w-4 h-4 accent-brand cursor-pointer disabled:cursor-default" />
         {f.label}
+        {isSupOnly && <span className="ml-auto px-1 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold">{isSupervisor ? 'SUP' : '🔒'}</span>}
       </label>
     );
   }
@@ -395,27 +407,33 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
     <div className={`flex flex-col ${cls}`}>
       <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
         {f.label}{f.required && <span className="text-red-400"> *</span>}
-        {lookupKind && !readOnly && (
+        {isSupOnly && (
+          <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">
+            {isSupervisor ? 'SUP ONLY' : 'RESTRICTED'}
+          </span>
+        )}
+        {lookupKind && !effectiveReadOnly && (
           <span className="px-1.5 py-0.5 rounded bg-brand/15 text-brand-bright text-[8px] font-bold tracking-[0.4px] normal-case">LOOKUP</span>
         )}
       </label>
 
-      {readOnly ? (
-        <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg bg-app-input border border-border-base text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}`}>
+      {effectiveReadOnly ? (
+        <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg border text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}
+          ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
           {value || <span className="text-slate-600">—</span>}
         </div>
       ) : lookupKind ? (
         <LookupField f={f} kind={lookupKind} value={value} data={data} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
       ) : isNarr ? (
-        <textarea className={S_TEXTAREA} rows={f.minRows || 4}
+        <textarea className={`${S_TEXTAREA} ${isSupOnly ? 'border-red-500/40' : ''}`} rows={f.minRows || 4}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
-        <select className={S_SELECT} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
+        <select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
           <option value="">—</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (
-        <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''}`}
+        <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''} ${isSupOnly ? 'border-red-500/40' : ''}`}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       )}
     </div>
