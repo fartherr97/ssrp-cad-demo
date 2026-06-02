@@ -3,21 +3,18 @@ import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
-import ReportRecordSearch from '../components/ReportRecordSearch';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
-  MdWarningAmber, MdBadge, MdFolder,
+  MdWarningAmber, MdFolder, MdDescription,
 } from 'react-icons/md';
 
 function age(dob) {
   if (!dob) return '';
   const d = new Date(dob);
   if (isNaN(d)) return '';
-  const diff = Date.now() - d.getTime();
-  return Math.abs(new Date(diff).getUTCFullYear() - 1970);
+  return Math.abs(new Date(Date.now() - d.getTime()).getUTCFullYear() - 1970);
 }
 
-/* Card shell for the summary grid */
 function InfoCard({ title, children, className = '' }) {
   return (
     <div className={`flex flex-col bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm ${className}`}>
@@ -27,7 +24,6 @@ function InfoCard({ title, children, className = '' }) {
   );
 }
 
-/* Label / value row inside a card */
 function Row({ label, value, mono }) {
   return (
     <div className="flex items-start justify-between gap-3">
@@ -37,26 +33,48 @@ function Row({ label, value, mono }) {
   );
 }
 
+const STATUS_CHIP = {
+  'Pending Review':  'text-amber-400 bg-amber-400/10 border-amber-400/30',
+  'Approved':        'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+  'Rejected':        'text-red-400 bg-red-400/10 border-red-400/30',
+  'Pending Changes': 'text-orange-400 bg-orange-400/10 border-orange-400/30',
+  'Active':          'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+  'Expired':         'text-slate-400 bg-slate-400/10 border-slate-400/30',
+  'Revoked':         'text-red-400 bg-red-400/10 border-red-400/30',
+  'Draft':           'text-slate-500 bg-slate-500/10 border-slate-500/30',
+};
+function StatusChip({ status }) {
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold tracking-wide ${STATUS_CHIP[status] || 'text-slate-400 bg-slate-400/10 border-slate-400/30'}`}>{status}</span>;
+}
+
 const SEARCH_TYPES = [
-  { id: 'PERSON',  label: 'Person',  Icon: MdPerson },
-  { id: 'VEHICLE', label: 'Vehicle', Icon: MdDirectionsCar },
-  { id: 'WARRANT', label: 'Warrant', Icon: MdGavel },
-  { id: 'CASES',   label: 'Reports & Records', Icon: MdFolder },
+  { id: 'PERSON',  label: 'Person',            Icon: MdPerson },
+  { id: 'VEHICLE', label: 'Vehicle',            Icon: MdDirectionsCar },
+  { id: 'WARRANT', label: 'Warrant',            Icon: MdGavel },
+  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder },
 ];
 
 export default function RecordsBureau() {
   const { state } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [] } = state;
 
   const [searchType, setSearchType] = useState('PERSON');
-  const [showCaseSearch, setShowCaseSearch] = useState(false);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [tab, setTab] = useState('SUMMARY');
-  const [searched, setSearched] = useState(false);
+  const [query, setQuery]           = useState('');
+  const [results, setResults]       = useState([]);
+  const [selected, setSelected]     = useState(null); // for PERSON/VEHICLE/WARRANT: id; for CASES: "report:id" | "record:id"
+  const [tab, setTab]               = useState('SUMMARY');
+  const [searched, setSearched]     = useState(false);
+
+  // CASES-specific filters (live — no need to press search)
+  const [caseKind, setCaseKind]     = useState('ALL');   // ALL | REPORTS | RECORDS
+  const [caseStatus, setCaseStatus] = useState('ALL');
 
   const doSearch = () => {
+    if (searchType === 'CASES') {
+      setSearched(true);
+      runCaseSearch(query, caseKind, caseStatus);
+      return;
+    }
     if (!query.trim()) return;
     setSearched(true);
     const q = query.trim().toLowerCase();
@@ -76,23 +94,54 @@ export default function RecordsBureau() {
     setTab(searchType === 'PERSON' ? 'SUMMARY' : 'RETURN');
   };
 
-  const selCiv = selected && searchType === 'PERSON' ? civilians.find(c => c.id === selected) : null;
-  const selVeh = selected && searchType === 'VEHICLE' ? vehicles.find(v => v.id === selected) : null;
+  const runCaseSearch = (q, kind, status) => {
+    const term = q.trim().toLowerCase();
+    const all = [
+      ...reports.map(r => ({ ...r, _kind: 'report', _number: r.caseNumber })),
+      ...records.map(r => ({ ...r, _kind: 'record', _number: r.recordNumber })),
+    ];
+    setResults(all.filter(item => {
+      const matchQ      = !term || item._number?.toLowerCase().includes(term) || item.type?.toLowerCase().includes(term);
+      const matchKind   = kind === 'ALL' || (kind === 'REPORTS' ? item._kind === 'report' : item._kind === 'record');
+      const matchStatus = status === 'ALL' || item.status === status;
+      return matchQ && matchKind && matchStatus;
+    }).sort((a, b) => (b.date || '').localeCompare(a.date || '')));
+    setSelected(null);
+  };
+
+  // When CASES filters change, re-run search live
+  const updateCaseKind = (v) => { setCaseKind(v); if (searched) runCaseSearch(query, v, caseStatus); };
+  const updateCaseStatus = (v) => { setCaseStatus(v); if (searched) runCaseSearch(query, caseKind, v); };
+
+  // Selected item resolution
+  const selCiv     = selected && searchType === 'PERSON'  ? civilians.find(c => c.id === selected) : null;
+  const selVeh     = selected && searchType === 'VEHICLE' ? vehicles.find(v => v.id === selected) : null;
   const selWarrant = selected && searchType === 'WARRANT' ? warrants.find(w => w.id === selected) : null;
+  const selCase    = selected && searchType === 'CASES'   ? (() => {
+    const [kind, id] = selected.split(':');
+    const numId = Number(id);
+    return kind === 'report' ? reports.find(r => r.id === numId || r.id === id)
+                              : records.find(r => r.id === numId || r.id === id);
+  })() : null;
+  const selCaseKind = selected?.startsWith('report') ? 'report' : 'record';
 
   const civVehicles = selCiv ? vehicles.filter(v => selCiv.vehicles?.includes(v.id)) : [];
   const civWarrants = selCiv ? warrants.filter(w => w.civilianId === selCiv.id) : [];
-  const civHistory = selCiv ? criminalHistory.filter(h => h.civilianId === selCiv.id) : [];
-  const vehOwner = selVeh ? civilians.find(c => c.id === selVeh.ownerId) : null;
+  const civHistory  = selCiv ? criminalHistory.filter(h => h.civilianId === selCiv.id) : [];
+  const vehOwner    = selVeh ? civilians.find(c => c.id === selVeh.ownerId) : null;
   const vehWarrants = vehOwner ? warrants.filter(w => w.civilianId === vehOwner.id) : [];
 
   const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES'];
-  const vehTabs = ['RETURN', 'FLAGS'];
+  const vehTabs    = ['RETURN', 'FLAGS'];
   const activeTabs = selCiv ? personTabs : selVeh ? vehTabs : ['RETURN'];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
 
-  const placeholder = searchType === 'PERSON' ? 'Name, DOB, SSN or DL #'
-    : searchType === 'VEHICLE' ? 'Plate or make / model' : 'Subject name or charge';
+  const allCaseStatuses = [...new Set([...reports, ...records].map(i => i.status).filter(Boolean))].sort();
+
+  const placeholder = searchType === 'CASES'   ? 'Case #, record #, or type…'
+    : searchType === 'PERSON'  ? 'Name, DOB, SSN or DL #'
+    : searchType === 'VEHICLE' ? 'Plate or make / model'
+    : 'Subject name or charge';
 
   return (
     <div className="flex-1 overflow-hidden p-4 lg:p-5">
@@ -111,10 +160,7 @@ export default function RecordsBureau() {
               const on = searchType === t.id;
               return (
                 <button key={t.id}
-                  onClick={() => {
-                    if (t.id === 'CASES') { setShowCaseSearch(true); return; }
-                    setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery('');
-                  }}
+                  onClick={() => { setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
                   <t.Icon size={15} /> {t.label}
                 </button>
@@ -122,10 +168,27 @@ export default function RecordsBureau() {
             })}
           </div>
 
-          {showCaseSearch && <ReportRecordSearch onClose={() => setShowCaseSearch(false)} />}
+          {/* CASES: inline kind + status filters */}
+          {searchType === 'CASES' && (
+            <div className="flex gap-1.5 px-2 pt-2 shrink-0 flex-wrap">
+              {[['ALL','All'],['REPORTS','Reports'],['RECORDS','Records']].map(([v,l]) => (
+                <button key={v}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all ${caseKind === v ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-border-faint text-slate-500 hover:text-slate-300'}`}
+                  onClick={() => updateCaseKind(v)}>{l}</button>
+              ))}
+              <select
+                className="ml-auto bg-app-input border border-border-faint rounded-lg px-2 py-1 text-[10px] text-slate-400 outline-none cursor-pointer"
+                value={caseStatus}
+                onChange={e => updateCaseStatus(e.target.value)}
+              >
+                <option value="ALL">All Statuses</option>
+                {allCaseStatuses.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
 
           {/* Search input */}
-          <div className="p-3 border-b border-border-faint shrink-0">
+          <div className={`p-3 border-b border-border-faint shrink-0 ${searchType === 'CASES' ? 'pt-2' : ''}`}>
             <div className="flex gap-2">
               <input
                 className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all"
@@ -146,11 +209,24 @@ export default function RecordsBureau() {
             {searched && <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600">Results ({results.length})</div>}
             {!searched && (
               <div className="p-4 text-slate-500 text-[11px] leading-[1.9]">
-                <div className="text-[10px] font-bold uppercase tracking-[0.7px] mb-1.5 text-slate-600">Search by</div>
-                <div>• Full or partial name</div>
-                <div>• SSN or DL number</div>
-                <div>• Vehicle plate or description</div>
-                <div>• Warrant by name or charge</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.7px] mb-1.5 text-slate-600">
+                  {searchType === 'CASES' ? 'Search by' : 'Search by'}
+                </div>
+                {searchType === 'CASES' ? (
+                  <>
+                    <div>• Case or record number</div>
+                    <div>• Partial number (e.g. TPD-2026)</div>
+                    <div>• Report or record type</div>
+                    <div>• Filter by status above</div>
+                  </>
+                ) : (
+                  <>
+                    <div>• Full or partial name</div>
+                    <div>• SSN or DL number</div>
+                    <div>• Vehicle plate or description</div>
+                    <div>• Warrant by name or charge</div>
+                  </>
+                )}
               </div>
             )}
             {searched && results.length === 0 && (
@@ -158,8 +234,25 @@ export default function RecordsBureau() {
             )}
             <div className="flex flex-col gap-1.5 p-2">
               {results.map(r => {
-                const on = selected === r.id;
+                const key = searchType === 'CASES' ? `${r._kind}-${r.id}` : r.id;
+                const selKey = searchType === 'CASES' ? `${r._kind}:${r.id}` : r.id;
+                const on = selected === selKey;
                 const base = `text-left px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${on ? 'bg-brand/15 border-brand/40' : 'bg-white/[0.02] border-border-faint hover:bg-white/[0.05] hover:border-border-base'}`;
+
+                if (searchType === 'CASES') return (
+                  <button key={key} className={base} onClick={() => setSelected(selKey)}>
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      {r._kind === 'report'
+                        ? <MdDescription size={12} className="text-blue-400 shrink-0" />
+                        : <MdFolder size={12} className="text-emerald-400 shrink-0" />}
+                      <span className="text-[11px] font-mono text-brand-bright">{r._number}</span>
+                      <StatusChip status={r.status} />
+                    </div>
+                    <div className="text-[12.5px] font-semibold text-white leading-tight">{r.type}</div>
+                    <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '—'}</div>
+                  </button>
+                );
+
                 if (searchType === 'PERSON') return (
                   <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('SUMMARY'); }}>
                     <div className="text-[12.5px] font-bold text-white">{r.firstName} {r.lastName}</div>
@@ -209,6 +302,58 @@ export default function RecordsBureau() {
                 <div className="text-[11px] text-slate-600">Run a query and pick a result</div>
               </div>
             </div>
+          ) : selCase ? (
+            /* ── CASE DETAIL ── */
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="flex items-start gap-3 mb-5">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${selCaseKind === 'report' ? 'bg-blue-500/15' : 'bg-emerald-500/15'}`}>
+                  {selCaseKind === 'report'
+                    ? <MdDescription size={20} className="text-blue-400" />
+                    : <MdFolder size={20} className="text-emerald-400" />}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5">
+                    {selCaseKind === 'report' ? 'Report' : 'Record'}
+                  </div>
+                  <div className="text-[18px] font-extrabold text-white leading-tight">{selCase.type}</div>
+                  <div className="text-[11px] font-mono text-brand-bright mt-0.5">
+                    {selCaseKind === 'report' ? selCase.caseNumber : selCase.recordNumber}
+                  </div>
+                </div>
+                <div className="ml-auto shrink-0 pt-1">
+                  <StatusChip status={selCase.status} />
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <InfoCard title="Details">
+                  <Row label="Status"       value={<StatusChip status={selCase.status} />} />
+                  <Row label="Date"         value={selCase.date || '—'} mono />
+                  <Row label="Officer"      value={selCase.officerBadge || '—'} mono />
+                  {selCaseKind === 'report' && <Row label="Call ID" value={selCase.callId || '—'} mono />}
+                </InfoCard>
+
+                {(selCase.summary || selCase.formData?.summary) && (
+                  <InfoCard title="Summary">
+                    <div className="text-[12.5px] text-slate-300 leading-relaxed">
+                      {selCase.summary || selCase.formData?.summary}
+                    </div>
+                  </InfoCard>
+                )}
+
+                {selCase.formData && Object.keys(selCase.formData).filter(k => k !== 'summary' && selCase.formData[k]).length > 0 && (
+                  <InfoCard title="Form Data">
+                    <div className="grid grid-cols-1 gap-2">
+                      {Object.entries(selCase.formData)
+                        .filter(([k, v]) => k !== 'summary' && v && typeof v !== 'object')
+                        .map(([k, v]) => (
+                          <Row key={k} label={k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())} value={String(v)} />
+                        ))}
+                    </div>
+                  </InfoCard>
+                )}
+              </div>
+            </div>
           ) : (
             <>
               {/* Header */}
@@ -255,26 +400,23 @@ export default function RecordsBureau() {
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-5">
-
-                {/* PERSON · SUMMARY */}
                 {tab === 'SUMMARY' && selCiv && (
                   <div className="flex flex-col gap-4">
                     <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
                       <InfoCard title="Personal Information" className="lg:col-span-2">
                         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                          <Row label="Full Name" value={`${selCiv.firstName} ${selCiv.lastName}`} />
-                          <Row label="DOB" value={`${selCiv.dob} (${age(selCiv.dob)})`} />
-                          <Row label="Gender" value={selCiv.gender} />
-                          <Row label="Ethnicity" value={selCiv.ethnicity} />
+                          <Row label="Full Name"      value={`${selCiv.firstName} ${selCiv.lastName}`} />
+                          <Row label="DOB"            value={`${selCiv.dob} (${age(selCiv.dob)})`} />
+                          <Row label="Gender"         value={selCiv.gender} />
+                          <Row label="Ethnicity"      value={selCiv.ethnicity} />
                           <Row label="Height / Weight" value={`${selCiv.height} · ${selCiv.weight}`} />
-                          <Row label="Hair / Eyes" value={`${selCiv.hair} / ${selCiv.eyes}`} />
-                          <Row label="SSN" value={selCiv.ssn} mono />
-                          <Row label="Phone" value={selCiv.phone} mono />
-                          <Row label="DL Number" value={selCiv.dlNumber} mono />
-                          <Row label="DL Class" value={selCiv.dlClass} />
+                          <Row label="Hair / Eyes"    value={`${selCiv.hair} / ${selCiv.eyes}`} />
+                          <Row label="SSN"            value={selCiv.ssn} mono />
+                          <Row label="Phone"          value={selCiv.phone} mono />
+                          <Row label="DL Number"      value={selCiv.dlNumber} mono />
+                          <Row label="DL Class"       value={selCiv.dlClass} />
                         </div>
                       </InfoCard>
-
                       <div className="flex flex-col gap-4">
                         <InfoCard title="Photo" className="items-center">
                           <div className="flex items-center justify-center w-full aspect-[4/5] max-h-[180px] rounded-lg bg-app-elevated border border-border-base">
@@ -283,18 +425,15 @@ export default function RecordsBureau() {
                         </InfoCard>
                       </div>
                     </div>
-
                     <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
                       <InfoCard title="License & Permits">
-                        <Row label="DL Status" value={<span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus}</span>} />
-                        <Row label="DL Expiry" value={selCiv.dlExpiry} mono />
-                        <Row label="Weapon Permit" value={selCiv.weaponPermit ? <span className={statusBadge(selCiv.weaponPermit)}>{selCiv.weaponPermit}</span> : '—'} />
+                        <Row label="DL Status"      value={<span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus}</span>} />
+                        <Row label="DL Expiry"      value={selCiv.dlExpiry} mono />
+                        <Row label="Weapon Permit"  value={selCiv.weaponPermit ? <span className={statusBadge(selCiv.weaponPermit)}>{selCiv.weaponPermit}</span> : '—'} />
                       </InfoCard>
-
                       <InfoCard title="Address">
                         <div className="text-[12.5px] text-slate-200 leading-relaxed">{selCiv.address || '—'}</div>
                       </InfoCard>
-
                       <InfoCard title="Active Warrants">
                         {activeWarrants.length === 0
                           ? <div className="text-[12px] text-slate-500">No active warrants</div>
@@ -309,19 +448,15 @@ export default function RecordsBureau() {
                           ))}
                       </InfoCard>
                     </div>
-
-                    {/* Recent incidents */}
                     <InfoCard title="Recent Incidents">
                       {civHistory.length === 0
                         ? <div className="text-[12px] text-slate-500">No criminal history on file</div>
                         : (
                           <table className="w-full border-collapse -mx-1">
                             <thead>
-                              <tr>
-                                {['DATE','CASE #','CHARGES','DISPOSITION','AGENCY'].map(h => (
-                                  <th key={h} className="px-1.5 py-1.5 text-left text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 border-b border-border-faint">{h}</th>
-                                ))}
-                              </tr>
+                              <tr>{['DATE','CASE #','CHARGES','DISPOSITION','AGENCY'].map(h => (
+                                <th key={h} className="px-1.5 py-1.5 text-left text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 border-b border-border-faint">{h}</th>
+                              ))}</tr>
                             </thead>
                             <tbody>
                               {civHistory.map(h => (
@@ -340,20 +475,18 @@ export default function RecordsBureau() {
                   </div>
                 )}
 
-                {/* RETURN (NCIC teletype) */}
-                {tab === 'RETURN' && selCiv && <RecordReturn type="PERSON" data={selCiv} />}
-                {tab === 'RETURN' && selVeh && <RecordReturn type="VEHICLE" data={selVeh} subject={vehOwner} />}
+                {tab === 'RETURN' && selCiv     && <RecordReturn type="PERSON"  data={selCiv} />}
+                {tab === 'RETURN' && selVeh     && <RecordReturn type="VEHICLE" data={selVeh} subject={vehOwner} />}
                 {tab === 'RETURN' && selWarrant && <RecordReturn type="WARRANT" data={selWarrant} />}
 
-                {/* CRIMINAL HISTORY */}
                 {tab === 'CRIMINAL HISTORY' && selCiv && (
                   <div className="flex flex-col gap-3">
                     {civHistory.length === 0
                       ? <div className="text-slate-500 text-[12px] p-4 text-center">No criminal history on file</div>
                       : civHistory.map(h => (
                         <InfoCard key={h.id} title={`Case ${h.caseNumber} · ${h.date}`}>
-                          <Row label="Disposition" value={h.disposition} />
-                          <Row label="Agency" value={h.agency} />
+                          <Row label="Disposition"   value={h.disposition} />
+                          <Row label="Agency"        value={h.agency} />
                           <Row label="Officer Badge" value={h.officerBadge} mono />
                           {h.sentence && <Row label="Sentence" value={h.sentence} />}
                           <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">Charges</div>
@@ -364,7 +497,6 @@ export default function RecordsBureau() {
                   </div>
                 )}
 
-                {/* WARRANTS */}
                 {tab === 'WARRANTS' && selCiv && (
                   <div className="flex flex-col gap-3">
                     {civWarrants.length === 0
@@ -373,7 +505,6 @@ export default function RecordsBureau() {
                   </div>
                 )}
 
-                {/* VEHICLES */}
                 {tab === 'VEHICLES' && selCiv && (
                   <div className="flex flex-col gap-3">
                     {civVehicles.length === 0
@@ -382,7 +513,6 @@ export default function RecordsBureau() {
                   </div>
                 )}
 
-                {/* Vehicle FLAGS */}
                 {tab === 'FLAGS' && selVeh && (
                   <InfoCard title={`Vehicle Flags · ${selVeh.plate}`}>
                     {!selVeh.stolen && (!selVeh.flags || selVeh.flags.length === 0) && !vehWarrants.some(w => w.status === 'ACTIVE')
