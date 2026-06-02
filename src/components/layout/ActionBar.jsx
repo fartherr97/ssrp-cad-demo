@@ -323,20 +323,69 @@ export default function ActionBar() {
         <div className="lg:hidden fixed inset-0 z-[2500]">
           <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div
-            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 p-2.5 max-h-[78vh] overflow-auto"
-            style={{ top: 'var(--actionbar-h)', animation: 'expandDown 0.16s ease-out' }}
+            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 overflow-auto"
+            style={{ top: 'var(--actionbar-h)', maxHeight: 'calc(100vh - var(--actionbar-h))', animation: 'expandDown 0.16s ease-out' }}
           >
-            <div className="px-1.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.7px] text-slate-600">Navigation</div>
-            <div className="grid grid-cols-2 gap-1.5">
+            {/* Brand header */}
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint">
+              <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-8 h-8 shrink-0 object-contain" />
+              <div className="leading-[1.15]">
+                <div className="text-[15px] font-extrabold text-white">
+                  Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
+                </div>
+                <div className="text-[9px] font-bold tracking-[1.1px] uppercase text-slate-500">Computer Aided Dispatch</div>
+              </div>
+            </div>
+
+            {/* Flat grouped list */}
+            <div className="py-3">
               {navItems.map(item => {
+                const subItems = item.dropdown ? dropdownItems(item.dropdown) : null;
+
+                if (subItems) {
+                  // Section header + flat list of sub-items
+                  return (
+                    <div key={item.route}>
+                      <div className="flex items-center gap-2 px-5 pt-4 pb-1.5">
+                        <item.Icon size={13} className="shrink-0 text-slate-500" />
+                        <span className="text-[10px] font-bold uppercase tracking-[1px] text-slate-500">{item.label}</span>
+                      </div>
+                      {subItems.length === 0 ? (
+                        <div className="px-5 py-2 text-[12px] text-slate-600 italic">No templates yet</div>
+                      ) : subItems.map(sub => (
+                        <button key={sub.id} onClick={() => go(sub.route)}
+                          className="w-full text-left px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-white/[0.05] cursor-pointer transition-colors border-none bg-transparent">
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                }
+
+                // Regular single item (acts as its own section row)
                 const on = isActive(item.route);
                 return (
                   <button key={item.route} onClick={() => go(item.route)}
-                    className={`flex items-center gap-2.5 px-3 py-3 rounded-lg text-[13px] font-semibold cursor-pointer transition-all border ${on ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-white/[0.03] border-border-base text-slate-300 hover:bg-white/[0.06]'}`}>
-                    <item.Icon size={19} className="shrink-0" /> {item.label}
+                    className={`w-full flex items-center gap-3 px-5 py-2.5 text-[14px] font-semibold cursor-pointer transition-colors border-none bg-transparent
+                      ${on ? 'text-brand-bright' : 'text-white hover:bg-white/[0.05]'}`}>
+                    {on && <span className="w-1 h-5 rounded-full bg-brand shrink-0 -ml-1" />}
+                    <item.Icon size={18} className="shrink-0 text-slate-400" />
+                    {item.label}
                   </button>
                 );
               })}
+            </div>
+
+            {/* Footer actions */}
+            <div className="border-t border-border-faint px-4 py-3 flex gap-2">
+              <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 text-[13px] font-semibold cursor-pointer hover:bg-white/[0.09] transition-all">
+                <MdHome size={16} /> Switch Portal
+              </button>
+              <button onClick={() => dispatch({ type: 'LOGOUT' })}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[13px] font-semibold cursor-pointer hover:bg-red-500/20 transition-all">
+                <MdLogout size={16} /> Sign Out
+              </button>
             </div>
           </div>
         </div>,
