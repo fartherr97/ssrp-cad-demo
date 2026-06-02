@@ -67,11 +67,6 @@ export default function OfficerProfile() {
     </div>
   );
 
-  const commendations = [
-    { id: 1, type: 'Commendation', date: '2023-09-15', from: 'Lt. Commander', note: 'Outstanding work on the Washington arrest. Demonstrated excellent tactical judgment.' },
-    { id: 2, type: 'Commendation', date: '2023-08-02', from: 'Chief of Police', note: 'Community outreach award * monthly food drive coordination.' },
-  ];
-  const complaints = [];
 
   const initials = myOfficer.name.split(' ').map(n => n[0]).join('').slice(0, 2);
   const accentColor = myDept?.color || '#3b82f6';
@@ -143,8 +138,6 @@ export default function OfficerProfile() {
           {[
             { label: 'Reports Filed', val: myReports.length },
             { label: 'Calls Attended', val: myCallHistory.length },
-            { label: 'Commendations', val: commendations.length },
-            { label: 'Complaints', val: complaints.length },
           ].map(s => (
             <div key={s.label} className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-3.5 py-3">
               <div className="text-white text-2xl font-extrabold leading-none">{s.val}</div>
@@ -156,7 +149,7 @@ export default function OfficerProfile() {
 
       {/* Tabs */}
       <div className="flex gap-0.5 border-b border-border-faint mb-4 max-w-[900px] overflow-x-auto n-tabs-wrap">
-        {[['info','My Info'],['identifiers','Identifiers'],['reports','My Reports'],['calls','Call History'],['commendations','Commendations']].map(([k,l]) => (
+        {[['info','My Info'],['identifiers','Identifiers'],['reports','My Reports'],['calls','Call History']].map(([k,l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -258,23 +251,6 @@ export default function OfficerProfile() {
           </div>
         )}
 
-        {tab === 'commendations' && (
-          <div>
-            {commendations.map(c => (
-              <div key={c.id} className="bg-emerald-500/[0.07] border border-emerald-500/25 rounded-xl border-l-[3px] border-l-emerald-500 px-4 py-3.5 mb-2.5 backdrop-blur-sm">
-                <div className="flex justify-between mb-1.5">
-                  <span className="text-emerald-400 font-bold text-sm">{c.type.toUpperCase()}</span>
-                  <span className="text-slate-500 text-[11px]">{c.date}</span>
-                </div>
-                <div className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.5px] mb-1">From: {c.from}</div>
-                <div className="text-slate-300 text-sm leading-relaxed">{c.note}</div>
-              </div>
-            ))}
-            {complaints.length === 0 && commendations.length > 0 && (
-              <div className="text-emerald-400/80 text-sm mt-1 bg-emerald-500/[0.07] border border-emerald-500/25 rounded-xl px-4 py-3 backdrop-blur-sm">NO COMPLAINTS ON RECORD</div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
