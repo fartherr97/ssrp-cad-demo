@@ -178,15 +178,19 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           onChange={e => onUpdate({ ...field, placeholder: e.target.value })}
         />
 
-        {/* Width */}
-        <select
-          value={field.span || 2}
-          onChange={e => onUpdate({ ...field, span: Number(e.target.value) })}
-          className="rounded text-[10.5px] border-none outline-none cursor-pointer shrink-0"
-          style={{ background: 'rgba(255,255,255,0.06)', color: '#6b7280', padding: '3px 5px', border: '1px solid rgba(255,255,255,0.09)', fontFamily: 'var(--font-ui)', minWidth: 56 }}
-        >
-          {[1,2,3,4].map(n => <option key={n} value={n} style={{ background: '#0d1827' }}>W {n}</option>)}
-        </select>
+        {/* Width slider */}
+        <div className="flex items-center gap-1.5 shrink-0" style={{ width: 72 }}>
+          <input
+            type="range" min={1} max={4} step={1}
+            value={field.span || 2}
+            onChange={e => onUpdate({ ...field, span: Number(e.target.value) })}
+            className="flex-1 cursor-pointer accent-brand"
+            style={{ height: 4 }}
+          />
+          <span className="text-[10px] font-bold tabular-nums shrink-0" style={{ color: '#6b7280', minWidth: 14 }}>
+            {field.span || 2}
+          </span>
+        </div>
 
         {/* Property toggles */}
         <div className="flex gap-0.5 shrink-0">
