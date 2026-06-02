@@ -192,7 +192,6 @@ export default function LicensePoints() {
 
   const setField = (k, v) => setCfg(p => ({ ...p, [k]: v }));
   const setSched = (id, patch) => setCfg(p => ({ ...p, schedule: p.schedule.map(s => s.id === id ? { ...s, ...patch } : s) }));
-  const addSched = () => setCfg(p => ({ ...p, schedule: [...p.schedule, { id: `v${Date.now()}`, label: 'Custom Violation', points: 1 }] }));
   const delSched = (id) => setCfg(p => ({ ...p, schedule: p.schedule.filter(s => s.id !== id) }));
 
   const handleImport = (entries) => {
@@ -264,10 +263,7 @@ export default function LicensePoints() {
         title="Points Schedule"
         subtitle="Point value applied per violation type. Import directly from the penal code or add custom violations."
         right={
-          <div className="flex gap-2">
-            <SonButton size="sm" variant="ghost" onClick={addSched}><MdAdd size={15} /> Custom</SonButton>
-            <SonButton size="sm" onClick={() => setShowImport(true)}><MdGavel size={14} /> Import from Penal Code</SonButton>
-          </div>
+          <SonButton size="sm" onClick={() => setShowImport(true)}><MdGavel size={14} /> Import from Penal Code</SonButton>
         }
       >
         <SonTable columns={[
