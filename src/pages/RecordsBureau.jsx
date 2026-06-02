@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import { RecordReturn, FormDocWrap, ReportDocument } from '../components/FormDocument';
+import { RecordReturn, ReportDocument } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
@@ -329,18 +329,27 @@ export default function RecordsBureau() {
                 <StatusChip status={selCase.status} />
               </div>
 
-              {/* Form document body */}
-              <div className="flex-1 overflow-y-auto">
+              {/* Form document body — paper-constrained */}
+              <div className="flex-1 overflow-y-auto bg-[#36363a] p-6">
                 {(() => {
                   const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
                   const tpl = templates.find(t => t.name === selCase.type);
-                  // Merge any top-level summary into formData so narrative fields show it
                   const data = {
                     ...(selCase.formData || {}),
                     ...(selCase.summary && !selCase.formData?.f10 ? { f10: selCase.summary } : {}),
                   };
                   return (
-                    <FormDocWrap>
+                    <div style={{
+                      background: '#ffffff',
+                      color: '#000',
+                      fontFamily: "'Arial','Helvetica',sans-serif",
+                      fontSize: 11,
+                      width: '100%',
+                      maxWidth: 816,
+                      margin: '0 auto',
+                      border: '1px solid #888',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+                    }}>
                       <ReportDocument
                         type={selCase.type}
                         template={tpl}
@@ -353,7 +362,7 @@ export default function RecordsBureau() {
                           dateTime: selCase.date,
                         }}
                       />
-                    </FormDocWrap>
+                    </div>
                   );
                 })()}
               </div>
