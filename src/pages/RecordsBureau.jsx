@@ -6,7 +6,7 @@ import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
-  MdWarningAmber, MdFolder, MdDescription,
+  MdWarningAmber, MdFolder, MdDescription, MdExpandMore, MdExpandLess,
 } from 'react-icons/md';
 
 function age(dob) {
@@ -30,6 +30,71 @@ function Row({ label, value, mono }) {
     <div className="flex items-start justify-between gap-3">
       <span className="text-[11px] text-slate-500 shrink-0">{label}</span>
       <span className={`text-[12.5px] text-slate-200 text-right ${mono ? 'font-mono' : 'font-medium'}`}>{value || '—'}</span>
+    </div>
+  );
+}
+
+const DISP_COLOR = {
+  'Guilty':          'text-red-400/80 bg-red-400/[0.08] border-red-400/20',
+  'Convicted':       'text-red-400/80 bg-red-400/[0.08] border-red-400/20',
+  'Not Guilty':      'text-emerald-400/75 bg-emerald-400/[0.07] border-emerald-400/18',
+  'Dismissed':       'text-sky-400/75 bg-sky-400/[0.07] border-sky-400/20',
+  'Pending':         'text-amber-400/80 bg-amber-400/[0.08] border-amber-400/20',
+  'Plea Deal':       'text-purple-400/75 bg-purple-400/[0.08] border-purple-400/22',
+};
+
+function CollapsibleHistoryCard({ h }) {
+  const [open, setOpen] = useState(false);
+  const dispClass = DISP_COLOR[h.disposition] || 'text-slate-400/80 bg-slate-400/[0.07] border-slate-400/20';
+  return (
+    <div className="flex flex-col bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
+      {/* Collapsed header — always visible */}
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left cursor-pointer"
+        style={{ background: 'transparent', border: 'none' }}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="text-[11px] font-mono text-slate-300 font-bold shrink-0">{h.caseNumber}</span>
+          <span className="text-[10.5px] text-slate-500 shrink-0">{h.date}</span>
+          {h.charges?.length > 0 && (
+            <span className="text-[10px] text-slate-500 truncate hidden sm:block">
+              {h.charges.slice(0, 2).join(', ')}{h.charges.length > 2 ? ` +${h.charges.length - 2}` : ''}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {h.disposition && (
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${dispClass}`}>
+              {h.disposition}
+            </span>
+          )}
+          <span className="text-slate-600" style={{ fontSize: 16 }}>
+            {open ? <MdExpandLess /> : <MdExpandMore />}
+          </span>
+        </div>
+      </button>
+
+      {/* Expandable body */}
+      {open && (
+        <div className="px-4 pb-4 flex flex-col gap-2 border-t border-border-faint">
+          <div className="pt-2 flex flex-col gap-2">
+            <Row label="Agency"        value={h.agency} />
+            <Row label="Officer Badge" value={h.officerBadge} mono />
+            {h.sentence && <Row label="Sentence" value={h.sentence} />}
+          </div>
+          {h.charges?.length > 0 && (
+            <>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">Charges</div>
+              {h.charges.map((c, i) => (
+                <div key={i} className="text-[12.5px] text-slate-200">• {c}</div>
+              ))}
+            </>
+          )}
+          {h.notes && <div className="mt-1 text-[12px] text-slate-400 italic">{h.notes}</div>}
+        </div>
+      )}
     </div>
   );
 }
@@ -531,19 +596,16 @@ export default function RecordsBureau() {
                 {tab === 'RETURN' && selWarrant && <RecordReturn type="WARRANT" data={selWarrant} />}
 
                 {tab === 'CRIMINAL HISTORY' && selCiv && (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between px-1 pb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">
+                        {civHistory.length} {civHistory.length === 1 ? 'Entry' : 'Entries'}
+                      </span>
+                    </div>
                     {civHistory.length === 0
                       ? <div className="text-slate-500 text-[12px] p-4 text-center">No criminal history on file</div>
                       : civHistory.map(h => (
-                        <InfoCard key={h.id} title={`Case ${h.caseNumber} · ${h.date}`}>
-                          <Row label="Disposition"   value={h.disposition} />
-                          <Row label="Agency"        value={h.agency} />
-                          <Row label="Officer Badge" value={h.officerBadge} mono />
-                          {h.sentence && <Row label="Sentence" value={h.sentence} />}
-                          <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">Charges</div>
-                          {h.charges?.map((c, i) => <div key={i} className="text-[12.5px] text-slate-200">• {c}</div>)}
-                          {h.notes && <div className="mt-1 text-[12px] text-slate-400 italic">{h.notes}</div>}
-                        </InfoCard>
+                        <CollapsibleHistoryCard key={h.id} h={h} />
                       ))}
                   </div>
                 )}
