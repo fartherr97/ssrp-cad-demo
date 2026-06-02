@@ -404,7 +404,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const cls = isNarr ? FULL : (SPAN[span] || SPAN[1]);
 
   return (
-    <div className={`flex flex-col ${cls}`}>
+    <div className={`flex flex-col min-w-0 ${cls}`}>
       <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
         {f.label}{f.required && <span className="text-red-400"> *</span>}
         {isSupOnly && (
@@ -466,7 +466,7 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
             <span className="w-1.5 h-1.5 rounded-full bg-brand" />
             {sec.title}
           </div>
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5">
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5 overflow-hidden">
             {sec.fields.map(f => (
               <Field key={f.id} f={f} value={data[f.id]} data={data}
                 onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly} />
