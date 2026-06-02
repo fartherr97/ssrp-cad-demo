@@ -14,6 +14,7 @@ import {
   MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong, MdCampaign,
   MdGpsFixed, MdSos, MdCheckCircle, MdDirectionsCar, MdWarningAmber,
   MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
+  MdPhone, MdSend, MdClose, MdAdd,
 } from 'react-icons/md';
 import ModifyIdentifier from '../components/ModifyIdentifier';
 
@@ -135,9 +136,215 @@ const CALL_NATURES = [
   'Theft - Shoplifting','Road Hazard','Trespassing','Other',
 ];
 
+/* ─── 911 urgency timer card ─── */
+function IncomingCallCard({ call, onDispatch, onDismiss }) {
+  const [elapsed, setElapsed] = useState('00:00');
+  const [urgency, setUrgency] = useState(0);
+  useEffect(() => {
+    const tick = () => {
+      const s = Math.floor((Date.now() - call.receivedAt) / 1000);
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      setElapsed(`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`);
+      setUrgency(m >= 5 ? 2 : m >= 2 ? 1 : 0);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [call.receivedAt]);
+  const bg    = ['rgba(255,255,255,0.04)','rgba(251,146,60,0.10)','rgba(248,113,113,0.13)'][urgency];
+  const bdr   = ['rgba(255,255,255,0.07)','rgba(251,146,60,0.35)','rgba(248,113,113,0.45)'][urgency];
+  const clr   = ['#94a3b8','#fb923c','#f87171'][urgency];
+  return (
+    <div className="rounded-lg p-2.5 flex flex-col gap-1.5" style={{ background: bg, border: `1px solid ${bdr}` }}>
+      <div className="flex items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="text-[12px] font-semibold text-white leading-snug line-clamp-2">{call.message}</div>
+          <div className="text-[10.5px] text-slate-400 truncate mt-0.5">{call.location}</div>
+        </div>
+        <span className="font-mono text-[11px] font-bold shrink-0 mt-0.5" style={{ color: clr }}>{elapsed}</span>
+      </div>
+      {call.caller && (
+        <div className="text-[10px] text-slate-500">
+          Caller: <span className="text-slate-400">{call.caller}</span>
+          {call.callbackNumber && <span className="ml-1 text-slate-600">· {call.callbackNumber}</span>}
+        </div>
+      )}
+      <div className="flex gap-1.5 mt-0.5">
+        <button onClick={onDispatch}
+          className="flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
+          style={{ background: 'rgba(58,136,232,0.22)', border: '1px solid rgba(58,136,232,0.38)', color: '#93c5fd' }}>
+          <MdSend size={11} /> Dispatch
+        </button>
+        <button onClick={onDismiss}
+          className="px-2 py-1 rounded-md text-slate-500 hover:text-red-400 cursor-pointer transition-colors"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <MdClose size={13} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Create call from 911 ─── */
+function Dispatch911Modal({ call, onClose }) {
+  const { dispatch } = useCAD();
+  const [form, setForm] = useState({
+    nature: '',
+    location: call.location || '',
+    city: 'Tampa',
+    priority: call.priority || 1,
+    category: 'police',
+    description: call.message || '',
+    reportingParty: call.caller ? `911 - ${call.caller}${call.callbackNumber ? ` (${call.callbackNumber})` : ''}` : '911 Caller',
+  });
+  const submit = () => {
+    if (!form.nature || !form.location) return;
+    dispatch({ type: 'CREATE_CALL', payload: { ...form, status: 'PENDING' } });
+    dispatch({ type: 'REMOVE_INCOMING_911', payload: call.id });
+    onClose();
+  };
+  return (
+    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={`${S_MODAL} max-w-[600px]`}>
+        <div className={S_MODAL_HEADER}>
+          <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
+            <MdPhone size={16} className="text-red-400 shrink-0" /> Dispatch 911 Call
+          </div>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+        </div>
+        <div className={S_MODAL_BODY}>
+          {/* caller summary */}
+          <div className="px-3 py-2.5 rounded-lg mb-3 text-[12px] text-slate-300 leading-relaxed"
+            style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)' }}>
+            <span className="font-semibold text-red-400 mr-1">911 Message:</span>{call.message}
+          </div>
+          <div className="n-grid-2">
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Nature of Call *</label>
+              <select className={S_SELECT} value={form.nature} onChange={e => setForm(p => ({ ...p, nature: e.target.value }))}>
+                <option value="">Select nature...</option>
+                {CALL_NATURES.map(n => <option key={n}>{n}</option>)}
+              </select>
+            </div>
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Priority</label>
+              <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: Number(e.target.value) }))}>
+                <option value={1}>P1 — Critical / Life Safety</option>
+                <option value={2}>P2 — High</option>
+                <option value={3}>P3 — Medium</option>
+                <option value={4}>P4 — Low / Routine</option>
+              </select>
+            </div>
+          </div>
+          <div className="n-grid-2">
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Category</label>
+              <select className={S_SELECT} value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
+                <option value="police">Law Enforcement</option>
+                <option value="fire">Fire / EMS</option>
+                <option value="traffic">Traffic / FDOT</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>City</label>
+              <select className={S_SELECT} value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}>
+                {['Tampa','Brandon','Plant City','Riverview','Ruskin','Gibsonton','Temple Terrace','Unincorporated'].map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Location / Address *</label>
+            <input className={S_INPUT} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="Address or cross-streets" />
+          </div>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Reporting Party</label>
+            <input className={S_INPUT} value={form.reportingParty} onChange={e => setForm(p => ({ ...p, reportingParty: e.target.value }))} />
+          </div>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Incident Narrative</label>
+            <textarea className={S_TEXTAREA} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+          </div>
+        </div>
+        <div className={S_MODAL_FOOTER}>
+          <button className={S_BTN_SECONDARY} onClick={onClose}>Cancel</button>
+          <button className={S_BTN_PRIMARY} onClick={submit} disabled={!form.nature || !form.location}>
+            Create Incident
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Simulate an incoming 911 ─── */
+function Sim911Modal({ onClose }) {
+  const { dispatch } = useCAD();
+  const [form, setForm] = useState({ message: '', location: '', caller: '', callbackNumber: '', priority: 2 });
+  const submit = () => {
+    if (!form.message) return;
+    dispatch({ type: 'ADD_INCOMING_911', payload: {
+      id: `inc_${Date.now()}`,
+      caller: form.caller || 'Anonymous',
+      callbackNumber: form.callbackNumber || null,
+      message: form.message,
+      location: form.location,
+      receivedAt: Date.now(),
+      priority: Number(form.priority),
+    }});
+    onClose();
+  };
+  return (
+    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={`${S_MODAL} max-w-[480px]`}>
+        <div className={S_MODAL_HEADER}>
+          <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
+            <MdPhone size={16} className="text-red-400 shrink-0" /> Simulate 911 Call
+          </div>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+        </div>
+        <div className={S_MODAL_BODY}>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>911 Message *</label>
+            <textarea className={S_TEXTAREA} rows={3} placeholder="What the caller says..." value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} />
+          </div>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Location</label>
+            <input className={S_INPUT} placeholder="Address or area" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+          </div>
+          <div className="n-grid-2">
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Caller Name</label>
+              <input className={S_INPUT} placeholder="Anonymous" value={form.caller} onChange={e => setForm(p => ({ ...p, caller: e.target.value }))} />
+            </div>
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Callback #</label>
+              <input className={S_INPUT} placeholder="555-0000" value={form.callbackNumber} onChange={e => setForm(p => ({ ...p, callbackNumber: e.target.value }))} />
+            </div>
+          </div>
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Priority</label>
+            <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))}>
+              <option value={1}>P1 — Critical</option>
+              <option value={2}>P2 — High</option>
+              <option value={3}>P3 — Medium</option>
+              <option value={4}>P4 — Low</option>
+            </select>
+          </div>
+        </div>
+        <div className={S_MODAL_FOOTER}>
+          <button className={S_BTN_SECONDARY} onClick={onClose}>Cancel</button>
+          <button className={S_BTN_PRIMARY} onClick={submit} disabled={!form.message}>Add to Queue</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
-  const { calls, officers, currentUser, selfDispatch, dispatchLog = [] } = state;
+  const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [] } = state;
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -145,6 +352,8 @@ export default function DispatchCenter() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [unitFilter, setUnitFilter] = useState('ALL');
   const [showIdentifier, setShowIdentifier] = useState(false);
+  const [dispatchTarget, setDispatchTarget] = useState(null);
+  const [showSim911, setShowSim911] = useState(false);
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -157,7 +366,7 @@ export default function DispatchCenter() {
   const isDispatcher = currentUser?.portal === 'dispatch' || currentUser?.portal === 'admin';
   const canDispatch  = isDispatcher || selfDispatch;
   const showUnits    = canDispatch;
-  const showStatus   = currentUser?.portal !== 'civilian' && currentUser?.portal !== 'business';
+  const showStatus   = !isDispatcher && currentUser?.portal !== 'civilian' && currentUser?.portal !== 'business';
   const isField      = currentUser?.portal === 'leo' || currentUser?.portal === 'fire';
 
   const me = officers.find(o => o.id === currentUser?.id);
@@ -205,9 +414,9 @@ export default function DispatchCenter() {
           <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
             <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5 px-1">Quick Actions</div>
             {canDispatch && <QuickAction Icon={MdAddCall} label="Create Call" onClick={openCreate} />}
-            <QuickAction Icon={MdBadge} label="Swap Identifier" onClick={() => setShowIdentifier(true)} />
-            <QuickAction Icon={MdDescription} label="New Report" onClick={() => navigate('/forms')} />
-            <QuickAction Icon={MdReceiptLong} label="Records" onClick={() => navigate('/records')} />
+            {!isDispatcher && <QuickAction Icon={MdBadge} label="Swap Identifier" onClick={() => setShowIdentifier(true)} />}
+            {!isDispatcher && <QuickAction Icon={MdDescription} label="New Report" onClick={() => navigate('/forms')} />}
+            {!isDispatcher && <QuickAction Icon={MdReceiptLong} label="Records" onClick={() => navigate('/records')} />}
             <QuickAction Icon={MdSearch} label="Search" onClick={() => navigate('/search')} />
             <QuickAction Icon={MdMap} label="Live Map" onClick={() => navigate('/map')} />
             {showIdentifier && <ModifyIdentifier onClose={() => setShowIdentifier(false)} />}
@@ -237,6 +446,31 @@ export default function DispatchCenter() {
               </select>
             </div>
           </div>
+
+          {/* Incoming 911 — dispatcher only */}
+          {isDispatcher && (
+            <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <MdPhone size={13} className="text-red-400" />
+                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">Incoming 911</div>
+                {incoming911.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-red-500/20 text-red-400 text-[10px] font-bold leading-none">{incoming911.length}</span>
+                )}
+                <button onClick={() => setShowSim911(true)}
+                  className="ml-1 p-0.5 rounded-md text-slate-500 hover:text-slate-200 hover:bg-white/[0.07] cursor-pointer transition-colors"
+                  title="Simulate 911">
+                  <MdAdd size={14} />
+                </button>
+              </div>
+              {incoming911.length === 0 ? (
+                <div className="text-center text-slate-600 text-[11px] py-2">No incoming calls</div>
+              ) : [...incoming911].map(c => (
+                <IncomingCallCard key={c.id} call={c}
+                  onDispatch={() => setDispatchTarget(c)}
+                  onDismiss={() => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id })} />
+              ))}
+            </div>
+          )}
 
           {/* Self-dispatch + status shortcuts */}
           {showStatus && (
@@ -395,6 +629,16 @@ export default function DispatchCenter() {
           </div>
         </aside>
       </div>
+
+      {/* Dispatch 911 Modal */}
+      {dispatchTarget && (
+        <Dispatch911Modal call={dispatchTarget} onClose={() => setDispatchTarget(null)} />
+      )}
+
+      {/* Simulate 911 Modal */}
+      {showSim911 && (
+        <Sim911Modal onClose={() => setShowSim911(false)} />
+      )}
 
       {/* Create Call Modal */}
       {showCreateForm && (
