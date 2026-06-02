@@ -6,6 +6,7 @@ import {
 } from '../AdminKit';
 import {
   MdGavel, MdAdd, MdDelete, MdRestartAlt, MdLockOpen, MdSave, MdBolt,
+  MdSearch, MdClose,
 } from 'react-icons/md';
 
 const blank = (cfg) => JSON.parse(JSON.stringify(cfg));
@@ -25,21 +26,180 @@ function Toggle({ on, onClick, label, hint }) {
   );
 }
 
+const TYPE_COLOR = { Felony: '#f87171', Misdemeanor: '#fb923c', Infraction: '#4ade80' };
+
+function ImportModal({ penalCode, schedule, onImport, onClose }) {
+  const [query, setQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('ALL');
+  const [selected, setSelected] = useState(new Set());
+
+  const importedIds = new Set(schedule.filter(s => s.penalCodeId).map(s => s.penalCodeId));
+
+  const filtered = penalCode.filter(pc => {
+    const textOk = !query || pc.name.toLowerCase().includes(query.toLowerCase()) || pc.code.toLowerCase().includes(query.toLowerCase());
+    const typeOk = typeFilter === 'ALL' || pc.type === typeFilter;
+    return textOk && typeOk;
+  });
+
+  const toggle = (id) => {
+    if (importedIds.has(id)) return;
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handleImport = () => {
+    const toAdd = penalCode
+      .filter(pc => selected.has(pc.id))
+      .map(pc => ({
+        id: `pc_${pc.id}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        label: `${pc.code} – ${pc.name}`,
+        points: pc.points,
+        penalCodeId: pc.id,
+      }));
+    onImport(toAdd);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="flex flex-col bg-app-panel border border-border-base rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh]">
+
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-border-base shrink-0">
+          <MdGavel size={18} className="text-brand-bright" />
+          <div>
+            <div className="text-[14px] font-bold text-white">Import from Penal Code</div>
+            <div className="text-[11px] text-slate-500 mt-px">Select charges to add to the points schedule</div>
+          </div>
+          <button onClick={onClose} className="ml-auto text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-1">
+            <MdClose size={18} />
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-2 px-4 py-3 border-b border-border-faint shrink-0">
+          <div className="flex-1 flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2">
+            <MdSearch size={14} className="text-slate-500 shrink-0" />
+            <input
+              className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
+              placeholder="Search code or offense name…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+            />
+          </div>
+          <select
+            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12px] text-slate-200 outline-none cursor-pointer"
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+          >
+            <option value="ALL">All Types</option>
+            <option>Felony</option>
+            <option>Misdemeanor</option>
+            <option>Infraction</option>
+          </select>
+        </div>
+
+        {/* List */}
+        <div className="flex-1 overflow-y-auto">
+          <table className="w-full border-collapse text-[11.5px]">
+            <thead className="sticky top-0">
+              <tr>
+                {['', 'Code', 'Offense', 'Type', 'Pts'].map(h => (
+                  <th key={h} className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 bg-app-bg/90 border-b border-border-base whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(pc => {
+                const alreadyIn = importedIds.has(pc.id);
+                const checked = selected.has(pc.id);
+                return (
+                  <tr key={pc.id}
+                    onClick={() => toggle(pc.id)}
+                    className={`border-b border-border-faint transition-colors
+                      ${alreadyIn ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-white/[0.04]'}
+                      ${checked ? 'bg-brand/10' : ''}`}>
+                    <td className="px-3 py-2.5 w-8">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0
+                        ${alreadyIn ? 'border-slate-700 bg-transparent' :
+                          checked ? 'border-brand bg-brand' : 'border-slate-600 bg-transparent'}`}>
+                        {(checked || alreadyIn) && (
+                          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                            <path d="M1 3.5L3.5 6L8 1" stroke={alreadyIn ? '#4a5568' : 'white'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-slate-400 whitespace-nowrap">{pc.code}</td>
+                    <td className="px-3 py-2.5 text-slate-200 font-medium">
+                      {pc.name}
+                      {alreadyIn && <span className="ml-2 text-[10px] text-slate-600">(already added)</span>}
+                    </td>
+                    <td className="px-3 py-2.5 whitespace-nowrap">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full border"
+                        style={{ color: TYPE_COLOR[pc.type] || '#94a3b8', borderColor: (TYPE_COLOR[pc.type] || '#94a3b8') + '50', background: (TYPE_COLOR[pc.type] || '#94a3b8') + '18' }}>
+                        {pc.type}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-center font-mono font-bold"
+                      style={{ color: pc.points >= 7 ? '#f87171' : pc.points >= 4 ? '#fb923c' : pc.points > 0 ? '#fbbf24' : '#4b5563' }}>
+                      {pc.points}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {filtered.length === 0 && (
+            <div className="py-10 text-center text-[12px] text-slate-600">No charges match your search.</div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-border-base bg-app-bg/60 shrink-0">
+          <span className="text-[11.5px] text-slate-500">
+            {selected.size > 0
+              ? <span className="text-brand-bright font-bold">{selected.size} selected</span>
+              : 'Click rows to select charges'}
+          </span>
+          <div className="flex gap-2">
+            <SonButton variant="ghost" onClick={onClose}>Cancel</SonButton>
+            <SonButton variant="green" onClick={handleImport} disabled={selected.size === 0}>
+              <MdAdd size={15} /> Import {selected.size > 0 ? `(${selected.size})` : ''}
+            </SonButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LicensePoints() {
   const { state, dispatch } = useCAD();
   const stored = state.licensePointsConfig;
+  const penalCode = state.penalCode || [];
   const [cfg, setCfg] = useState(() => blank(stored));
-  const [selViolation, setSelViolation] = useState({}); // civId -> violationId
+  const [selViolation, setSelViolation] = useState({});
+  const [showImport, setShowImport] = useState(false);
 
   const dirty = JSON.stringify(cfg) !== JSON.stringify(stored);
   const save = () => dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } });
 
   const setField = (k, v) => setCfg(p => ({ ...p, [k]: v }));
   const setSched = (id, patch) => setCfg(p => ({ ...p, schedule: p.schedule.map(s => s.id === id ? { ...s, ...patch } : s) }));
-  const addSched = () => setCfg(p => ({ ...p, schedule: [...p.schedule, { id: `v${Date.now()}`, label: 'New Violation', points: 1 }] }));
+  const addSched = () => setCfg(p => ({ ...p, schedule: [...p.schedule, { id: `v${Date.now()}`, label: 'Custom Violation', points: 1 }] }));
   const delSched = (id) => setCfg(p => ({ ...p, schedule: p.schedule.filter(s => s.id !== id) }));
 
-  // Drivers = civilians who hold a DL
+  const handleImport = (entries) => {
+    setCfg(p => ({ ...p, schedule: [...p.schedule, ...entries] }));
+    setShowImport(false);
+  };
+
   const drivers = (state.civilians || []).filter(c => c.dlNumber);
   const threshold = stored.threshold || 0;
 
@@ -54,6 +214,15 @@ export default function LicensePoints() {
 
   return (
     <>
+      {showImport && (
+        <ImportModal
+          penalCode={penalCode}
+          schedule={cfg.schedule}
+          onImport={handleImport}
+          onClose={() => setShowImport(false)}
+        />
+      )}
+
       <AdminPageTitle right={
         <SonButton variant="red" onClick={save} disabled={!dirty}>
           <MdSave size={16} /> {dirty ? 'Save Changes' : 'Saved'}
@@ -91,14 +260,33 @@ export default function LicensePoints() {
       </AdminPanel>
 
       {/* ── Points schedule ── */}
-      <AdminPanel title="Points Schedule" subtitle="Point value applied per violation type."
-        right={<SonButton size="sm" onClick={addSched}><MdAdd size={15} /> Add Violation</SonButton>}>
-        <SonTable columns={[{ label: 'Violation' }, { label: 'Points', align: 'center', width: 120 }, { label: '', align: 'right', width: 60 }]}>
+      <AdminPanel
+        title="Points Schedule"
+        subtitle="Point value applied per violation type. Import directly from the penal code or add custom violations."
+        right={
+          <div className="flex gap-2">
+            <SonButton size="sm" variant="ghost" onClick={addSched}><MdAdd size={15} /> Custom</SonButton>
+            <SonButton size="sm" onClick={() => setShowImport(true)}><MdGavel size={14} /> Import from Penal Code</SonButton>
+          </div>
+        }
+      >
+        <SonTable columns={[
+          { label: 'Violation / Code' },
+          { label: 'Points', align: 'center', width: 120 },
+          { label: '', align: 'right', width: 60 },
+        ]}>
           {cfg.schedule.map((s, i) => (
             <SonRow key={s.id} i={i}>
               <SonCell>
-                <input style={{ ...SON_INPUT, padding: '6px 10px' }} value={s.label}
-                  onChange={e => setSched(s.id, { label: e.target.value })} />
+                <div className="flex items-center gap-2">
+                  {s.penalCodeId && (
+                    <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border border-brand/40 text-brand-bright bg-brand/10 uppercase tracking-[0.3px]">
+                      PC
+                    </span>
+                  )}
+                  <input style={{ ...SON_INPUT, padding: '6px 10px' }} value={s.label}
+                    onChange={e => setSched(s.id, { label: e.target.value })} />
+                </div>
               </SonCell>
               <SonCell align="center">
                 <input type="number" min="0" style={{ ...SON_INPUT, padding: '6px 10px', width: 80, textAlign: 'center' }}
@@ -108,8 +296,8 @@ export default function LicensePoints() {
             </SonRow>
           ))}
         </SonTable>
-        {cfg.schedule.length === 0 && <EmptyState>No violations configured.</EmptyState>}
-        {dirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes — click “Save Changes” to apply.</div>}
+        {cfg.schedule.length === 0 && <EmptyState>No violations configured. Import from the penal code or add a custom violation.</EmptyState>}
+        {dirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes — click "Save Changes" to apply.</div>}
       </AdminPanel>
 
       {/* ── Drivers ── */}
