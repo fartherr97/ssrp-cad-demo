@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -593,6 +593,83 @@ function ChargesField({ f, value, onChange, readOnly }) {
   );
 }
 
+/* ── Mugshot upload field ── */
+function MugshotField({ f, value, onChange, readOnly }) {
+  const fileRef = useRef(null);
+  const span = Math.min(f.span || 1, 4);
+  const cls = SPAN[span] || SPAN[1];
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) { alert('Image must be under 4 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => onChange(f.id, ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className={`flex flex-col min-w-0 ${cls}`}>
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+        <MdCameraAlt size={12} />
+        {f.label || 'Mugshot'}{f.required && <span className="text-red-400"> *</span>}
+      </label>
+
+      <div
+        onClick={!readOnly && !value ? () => fileRef.current?.click() : undefined}
+        className="relative rounded-xl overflow-hidden border border-border-base flex flex-col items-center justify-center transition-colors"
+        style={{
+          background: '#0a1018',
+          aspectRatio: '3 / 4',
+          maxWidth: 160,
+          cursor: !readOnly && !value ? 'pointer' : 'default',
+        }}
+        onMouseEnter={e => { if (!readOnly && !value) e.currentTarget.style.borderColor = 'rgba(61,130,240,0.5)'; }}
+        onMouseLeave={e => { if (!readOnly && !value) e.currentTarget.style.borderColor = ''; }}
+      >
+        {value ? (
+          <>
+            <img src={value} alt={f.label || 'Mugshot'}
+              className="absolute inset-0 w-full h-full object-cover" />
+            {!readOnly && (
+              <button type="button"
+                onClick={(e) => { e.stopPropagation(); onChange(f.id, null); fileRef.current && (fileRef.current.value = ''); }}
+                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer border-none z-10"
+                style={{ background: 'rgba(0,0,0,0.65)', color: '#f87171' }}
+                title="Remove photo">
+                <MdClose size={14} />
+              </button>
+            )}
+            {!readOnly && (
+              <button type="button"
+                onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
+                className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-lg cursor-pointer border-none z-10 text-[9.5px] font-bold"
+                style={{ background: 'rgba(0,0,0,0.65)', color: '#93c5fd' }}>
+                <MdCameraAlt size={11} /> Replace
+              </button>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center gap-2 select-none px-3">
+            <MdCameraAlt size={30} style={{ color: '#2d3f52' }} />
+            <span className="text-[11px] font-semibold" style={{ color: '#3d5470' }}>
+              {readOnly ? 'No photo on file' : 'Mugshot'}
+            </span>
+            {!readOnly && (
+              <span className="text-[9px]" style={{ color: '#2d3f52' }}>Click to upload</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {!readOnly && (
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+          className="hidden" onChange={handleFile} onClick={e => { e.target.value = ''; }} />
+      )}
+    </div>
+  );
+}
+
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const { state } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
@@ -601,6 +678,11 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
 
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
+
+  // Mugshot — image upload
+  if (f.type === 'mugshot') {
+    return <MugshotField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
+  }
 
   // Charges — full-width multi-select from penal code
   if (f.type === 'charges') {

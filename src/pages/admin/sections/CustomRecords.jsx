@@ -26,6 +26,7 @@ const FIELD_TYPES = [
   { type: 'vehicle_lookup',  label: 'Vehicle'       },
   { type: 'badge_lookup',    label: 'Officer Badge' },
   { type: 'charges',         label: 'Charges'       },
+  { type: 'mugshot',         label: 'Mugshot'       },
   { type: 'image',           label: 'Image'         },
 ];
 
@@ -34,7 +35,7 @@ const TYPE_COLOR = {
   date: '#fb923c', datetime: '#fb923c',
   dropdown: '#34d399', checkbox: '#34d399',
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
-  charges: '#f87171', image: '#22d3ee',
+  charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee',
 };
 
 /* ── Premade sections matching template structure ── */
@@ -86,6 +87,12 @@ const PREMADE_SECTIONS = [
     id: sid(), title: 'Charges', style: 'gray',
     fields: [
       { id: uid(), label: 'Charges', type: 'charges', span: 4 },
+    ],
+  })},
+  { key: 'mugshot', label: 'MUGSHOT', make: () => ({
+    id: sid(), title: 'Mugshot', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Mugshot', type: 'mugshot', span: 1 },
     ],
   })},
   { key: 'narrative', label: 'NARRATIVE', make: () => ({
