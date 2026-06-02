@@ -182,10 +182,29 @@ export default function OfficerProfile() {
               <IdentifierEditor />
             </InfoCard>
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
-              <div className="text-slate-500 text-sm mb-3">Submit a transfer request through the SSRP portal.</div>
-              <a href="https://transfer.ssrp.us" target="_blank" rel="noreferrer" className={S_BTN_PRIMARY}>
-                Open Transfer Portal
-              </a>
+              <div className="flex flex-col items-center justify-center text-center py-4 gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${accentColor}18`, border: `1px solid ${accentColor}40` }}>
+                  <MdBadge size={26} style={{ color: accentColor }} />
+                </div>
+                <div>
+                  <div className="text-[15px] font-extrabold text-white mb-2 leading-snug">
+                    Looking to Transfer to Another LE Department?
+                  </div>
+                  <div className="text-[12.5px] text-slate-400 leading-relaxed">
+                    Head on over to our Transfer Portal to submit your request and be directed to the correct place.
+                  </div>
+                </div>
+                <a
+                  href="https://transfer.ssrp.us"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[13px] hover:-translate-y-0.5 transition-all duration-75"
+                  style={{ background: `${accentColor}20`, border: `1px solid ${accentColor}50`, color: accentColor }}
+                >
+                  Open Transfer Portal
+                </a>
+                <p className="text-[10px] text-slate-600 font-mono">transfer.ssrp.us</p>
+              </div>
             </InfoCard>
           </div>
         )}
