@@ -346,6 +346,7 @@ export default function RecordsBureau() {
                       fontSize: 11,
                       width: '100%',
                       maxWidth: 816,
+                      minHeight: 1056,
                       margin: '0 auto',
                       border: '1px solid #888',
                       boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
