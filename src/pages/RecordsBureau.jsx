@@ -51,7 +51,7 @@ const SEARCH_TYPES = [
   { id: 'PERSON',  label: 'Person',            Icon: MdPerson },
   { id: 'VEHICLE', label: 'Vehicle',            Icon: MdDirectionsCar },
   { id: 'WARRANT', label: 'Warrant',            Icon: MdGavel },
-  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder },
+  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300' },
 ];
 
 export default function RecordsBureau() {
@@ -161,7 +161,7 @@ export default function RecordsBureau() {
               return (
                 <button key={t.id}
                   onClick={() => { setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
                   <t.Icon size={15} /> {t.label}
                 </button>
               );
