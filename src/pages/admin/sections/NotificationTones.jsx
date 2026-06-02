@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
-  AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonBadge, SON_INPUT, EmptyState, ADMIN,
+  AdminPanel, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete } from 'react-icons/md';
+import { MdAdd, MdDelete, MdPlayArrow, MdCloudUpload } from 'react-icons/md';
 
 export default function NotificationTones() {
   const { state, dispatch } = useCAD();
@@ -18,16 +18,19 @@ export default function NotificationTones() {
     setName(''); setEvent(''); setUrl('');
   };
 
-  const toggle = (t) =>
-    dispatch({ type: 'ADMIN_UPDATE', payload: { key: 'notificationTones', item: { id: t.id, enabled: !t.enabled } } });
+  const playTone = (tone) => {
+    try {
+      new Audio(tone.url).play();
+    } catch (_) { /* no-op in demo */ }
+  };
 
   return (
     <AdminPanel
       title="Notification Tones"
       subtitle="Audio cues played for CAD/MDT events."
     >
-      {/* New row */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      {/* Add form */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         <input style={{ ...SON_INPUT, width: 200 }} placeholder="Name" value={name}
           onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
         <input style={{ ...SON_INPUT, width: 200 }} placeholder="Event" value={event}
@@ -37,28 +40,78 @@ export default function NotificationTones() {
         <SonButton variant="red" onClick={add}><MdAdd size={16} /> Add</SonButton>
       </div>
 
-      {notificationTones.length === 0 ? <EmptyState>No notification tones configured.</EmptyState> : (
-        <SonTable columns={[
-          { label: 'Name' }, { label: 'Event' }, { label: 'File' },
-          { label: 'Enabled', align: 'center', width: 110 }, { label: 'Action', align: 'center', width: 90 },
-        ]}>
-          {notificationTones.map((t, i) => (
-            <SonRow key={t.id} i={i}>
-              <SonCell bold>{t.name}</SonCell>
-              <SonCell color={ADMIN.textDim}>{t.event}</SonCell>
-              <SonCell mono color={ADMIN.textMute}>{t.url}</SonCell>
-              <SonCell align="center">
-                <span style={{ cursor: 'pointer' }} onClick={() => toggle(t)} title="Click to toggle">
-                  <SonBadge color={t.enabled ? ADMIN.green : ADMIN.textMute}>{t.enabled ? 'ON' : 'OFF'}</SonBadge>
-                </span>
-              </SonCell>
-              <SonCell align="center">
-                <SonIconBtn icon={MdDelete} danger title="Delete"
-                  onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'notificationTones', id: t.id } })} />
-              </SonCell>
-            </SonRow>
+      {/* Tone rows */}
+      {notificationTones.length === 0 ? (
+        <EmptyState>No notification tones configured.</EmptyState>
+      ) : (
+        <div>
+          {notificationTones.map((tone, i) => (
+            <div key={tone.id} style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+              background: i % 2 === 0 ? ADMIN.row : ADMIN.rowAlt,
+              borderRadius: 8, marginBottom: 4,
+            }}>
+              {/* Play button */}
+              <button
+                onClick={() => playTone(tone)}
+                title="Play tone"
+                style={{
+                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
+                  color: '#f87171', cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.28)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; }}
+              >
+                <MdPlayArrow size={18} />
+              </button>
+
+              {/* Event name */}
+              <div style={{ minWidth: 120, fontWeight: 700, fontSize: 13, color: ADMIN.text }}>
+                {tone.name}
+              </div>
+
+              {/* Event label */}
+              <div style={{ minWidth: 100, fontSize: 12, color: ADMIN.textDim }}>
+                {tone.event}
+              </div>
+
+              {/* URL / path - truncated */}
+              <div style={{
+                flex: 1, fontFamily: 'var(--font-mono)', fontSize: 12, color: ADMIN.textMute,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {tone.url}
+              </div>
+
+              {/* Upload button */}
+              <button
+                title="Upload audio file"
+                style={{
+                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+                  color: ADMIN.textDim, cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.10)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+              >
+                <MdCloudUpload size={16} />
+              </button>
+
+              {/* Delete button */}
+              <SonIconBtn
+                icon={MdDelete}
+                danger
+                title="Delete"
+                onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'notificationTones', id: tone.id } })}
+              />
+            </div>
           ))}
-        </SonTable>
+        </div>
       )}
     </AdminPanel>
   );

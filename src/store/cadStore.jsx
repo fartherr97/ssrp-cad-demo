@@ -10,6 +10,7 @@ import {
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
   ADMIN_SERVERS, LOOKUP_TYPES, ADMIN_ADDRESSES, COMMUNITY_CONFIG,
   GEO_SETTINGS, LOGIN_PAGE_CONFIG, ACCOUNT_RESTRICTIONS, DISCORD_PRESENCE,
+  LIMITS_CONFIG,
 } from '../data/adminData';
 
 const initialState = {
@@ -58,6 +59,7 @@ const initialState = {
   loginPageConfig: LOGIN_PAGE_CONFIG,
   accountRestrictions: ACCOUNT_RESTRICTIONS,
   discordPresence: DISCORD_PRESENCE,
+  limitsConfig: LIMITS_CONFIG,
   inGameConfig: {
     apiKey: 'a3f9e2b1-7c84-4d56-b012-9e3a7f2c10d8',
     liveMapEnabled: true,
@@ -540,34 +542,6 @@ function reducer(state, action) {
     case 'MARK_MESSAGE_READ': {
       const messages = state.messages.map(m => m.id === action.payload ? { ...m, read: true } : m);
       return { ...state, messages };
-    }
-
-    case 'WIPE': {
-      const t = action.payload;
-      const audit = addAuditEntry(state, `Wiped records: ${t}`, 'Admin');
-      if (t === 'civilians')      return { ...state, civilians: [], vehicles: state.vehicles, ...audit };
-      if (t === 'vehicles')       return { ...state, vehicles: [], civilians: state.civilians.map(c => ({ ...c, vehicles: [] })), ...audit };
-      if (t === 'warrants')       return { ...state, warrants: [], ...audit };
-      if (t === 'criminalHistory')return { ...state, criminalHistory: [], ...audit };
-      if (t === 'calls')          return { ...state, calls: [], ...audit };
-      if (t === 'dispatchLog')    return { ...state, dispatchLog: [], ...audit };
-      if (t === 'auditLog')       return { ...state, auditLog: [] };
-      if (t === 'towLogs')        return { ...state, towLogs: [], ...audit };
-      if (t === 'activeSessions') return { ...state, activeSessions: [], ...audit };
-      if (t === 'bannedUsers')    return { ...state, bannedUsers: [], ...audit };
-      if (t === 'civilianFlags')  return { ...state, civilians: state.civilians.map(c => ({ ...c, flags: [] })), ...audit };
-      if (t === 'licensePoints')  return { ...state, civilians: state.civilians.map(c => ({ ...c, licensePoints: 0 })), ...audit };
-      if (t === 'allReports')     return { ...state, reports: [], ...audit };
-      if (t === 'allRecords')     return { ...state, records: [], ...audit };
-      if (t.startsWith('report:')) {
-        const type = t.slice(7);
-        return { ...state, reports: state.reports.filter(r => r.type !== type), ...audit };
-      }
-      if (t.startsWith('record:')) {
-        const type = t.slice(7);
-        return { ...state, records: state.records.filter(r => r.type !== type), ...audit };
-      }
-      return state;
     }
 
     default:

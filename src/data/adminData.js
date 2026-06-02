@@ -106,9 +106,9 @@ export const NOTIFICATION_TONES = [
 ];
 
 export const ADMIN_SERVERS = [
-  { id: 1, name: 'SSRP * Primary',  ip: 'play.ssrp.us:30120',  status: 'ONLINE',  players: '112 / 128', map: 'Sonoran County' },
-  { id: 2, name: 'SSRP * Overflow', ip: 'play2.ssrp.us:30120', status: 'ONLINE',  players: '38 / 64',   map: 'Sonoran County' },
-  { id: 3, name: 'SSRP * Staff',    ip: 'staff.ssrp.us:30120', status: 'OFFLINE', players: '0 / 32',    map: 'Sonoran County' },
+  { id: 1, name: 'SSRP * Primary',  description: 'Main FiveM roleplay server. Max 128 players.' },
+  { id: 2, name: 'SSRP * Overflow', description: 'Secondary server for player overflow. Max 64 players.' },
+  { id: 3, name: 'SSRP * Staff',    description: 'Staff-only testing and development server.' },
 ];
 
 export const LOOKUP_TYPES = [
@@ -134,12 +134,23 @@ export const COMMUNITY_CONFIG = {
   defaultLanguage: 'English (US)',
   maxCharacters: 5,
   description: 'Florida-based serious roleplay community * emergency services, civilian operations, and command.',
+  logoUrl: 'https://cdn.ssrp.us/images/ssrp.png',
+  subtitle: 'Florida-Based Serious Roleplay',
+  website: 'https://ssrp.us',
+  websiteEnabled: true,
+  discord: 'https://discord.gg/ssrp',
+  discordEnabled: true,
+  voiceCommandKeyword: 'CAD',
 };
 
 export const GEO_SETTINGS = {
   cities: ['Tampa', 'Brandon', 'Plant City', 'Riverview', 'Unincorporated'],
   counties: ['Hillsborough County', 'Pinellas County', 'Pasco County'],
   postals: ['33602', '33606', '33610', '33619', '33647'],
+  emergencyCode: '911',
+  penalCodeName: 'Statutes',
+  tenCodeName: '10-Codes',
+  currencyDelimiter: '$',
 };
 
 export const LOGIN_PAGE_CONFIG = {
@@ -150,6 +161,7 @@ export const LOGIN_PAGE_CONFIG = {
   primaryColor: '#3a88e8',
   backgroundStyle: 'Gradient (Deep Blue)',
   showDiscordConnect: true,
+  customDomains: ['cad.ssrp.us'],
 };
 
 export const ACCOUNT_RESTRICTIONS = {
@@ -163,8 +175,18 @@ export const ACCOUNT_RESTRICTIONS = {
 
 export const DISCORD_PRESENCE = {
   enabled: true,
+  clientId: '1234567890123456789',
+  iconName: 'ssrp_logo',
   details: 'On Duty * {department}',
   state: 'Unit {callsign}',
   largeImage: 'ssrp_logo',
   showElapsed: true,
+  buttons: [
+    { label: 'Join Community', url: 'https://discord.gg/ssrp' },
+    { label: 'Community Website', url: 'https://ssrp.us' },
+  ],
+};
+
+export const LIMITS_CONFIG = {
+  maxCivilianCharacters: 5,
 };

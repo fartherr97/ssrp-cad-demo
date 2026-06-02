@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
-  AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonBadge, SON_INPUT, EmptyState, ADMIN,
+  AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, EmptyState, ADMIN, SON_INPUT,
 } from '../AdminKit';
 import { MdAdd, MdDelete } from 'react-icons/md';
 
@@ -9,13 +9,12 @@ export default function Servers() {
   const { state, dispatch } = useCAD();
   const { adminServers } = state;
   const [name, setName] = useState('');
-  const [ip, setIp] = useState('');
-  const [map, setMap] = useState('');
+  const [description, setDescription] = useState('');
 
   const add = () => {
-    if (!name.trim() || !ip.trim()) return;
-    dispatch({ type: 'ADMIN_ADD', payload: { key: 'adminServers', item: { name: name.trim(), ip: ip.trim(), status: 'OFFLINE', players: '0 / 0', map: map.trim() } } });
-    setName(''); setIp(''); setMap('');
+    if (!name.trim()) return;
+    dispatch({ type: 'ADMIN_ADD', payload: { key: 'adminServers', item: { name: name.trim(), description: description.trim() } } });
+    setName(''); setDescription('');
   };
 
   return (
@@ -27,27 +26,26 @@ export default function Servers() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         <input style={{ ...SON_INPUT, width: 200 }} placeholder="Name" value={name}
           onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, width: 220 }} placeholder="ip:port" value={ip}
-          onChange={e => setIp(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, flex: 1, minWidth: 160 }} placeholder="Map" value={map}
-          onChange={e => setMap(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
+        <input style={{ ...SON_INPUT, flex: 1, minWidth: 260 }} placeholder="Description" value={description}
+          onChange={e => setDescription(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
         <SonButton variant="red" onClick={add}><MdAdd size={16} /> Add</SonButton>
       </div>
 
       {adminServers.length === 0 ? <EmptyState>No servers configured.</EmptyState> : (
         <SonTable columns={[
-          { label: 'Name' }, { label: 'IP' }, { label: 'Status', align: 'center', width: 110 },
-          { label: 'Players', align: 'center', width: 110 }, { label: 'Map' }, { label: 'Action', align: 'center', width: 90 },
+          { label: 'ID', width: 70 }, { label: 'Name', width: 180 }, { label: 'Description' }, { label: 'Action', align: 'center', width: 90 },
         ]}>
           {adminServers.map((s, i) => (
             <SonRow key={s.id} i={i}>
-              <SonCell bold>{s.name}</SonCell>
-              <SonCell mono color={ADMIN.textDim}>{s.ip}</SonCell>
-              <SonCell align="center">
-                <SonBadge color={s.status === 'ONLINE' ? ADMIN.green : ADMIN.red}>{s.status}</SonBadge>
+              <SonCell>
+                <span style={{
+                  fontFamily: 'var(--font-mono)', fontSize: 11, color: ADMIN.textMute,
+                  background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`,
+                  borderRadius: 4, padding: '2px 6px',
+                }}>#{s.id}</span>
               </SonCell>
-              <SonCell align="center" mono color={ADMIN.textDim}>{s.players}</SonCell>
-              <SonCell color={ADMIN.textDim}>{s.map}</SonCell>
+              <SonCell bold>{s.name}</SonCell>
+              <SonCell color={ADMIN.textDim}>{s.description}</SonCell>
               <SonCell align="center">
                 <SonIconBtn icon={MdDelete} danger title="Delete"
                   onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminServers', id: s.id } })} />

@@ -4,14 +4,15 @@ import { AdminPageTitle, AdminPanel, SonButton, ADMIN } from '../AdminKit';
 import {
   MdApi, MdGamepad, MdMap, MdSync, MdVisibility, MdVisibilityOff,
   MdContentCopy, MdCheck, MdAdd, MdDelete, MdSave, MdRefresh,
-  MdOpenInNew, MdWifi, MdStorage,
+  MdOpenInNew, MdWifi, MdStorage, MdExpandMore, MdChevronRight,
 } from 'react-icons/md';
 
 const TABS = [
-  { id: 'api',     label: 'API',          Icon: MdApi     },
-  { id: 'fivem',   label: 'FiveM',        Icon: MdGamepad },
-  { id: 'erlc',    label: 'ER:LC',        Icon: MdGamepad },
-  { id: 'livemap', label: 'Live Map',     Icon: MdMap     },
+  { id: 'api',      label: 'API',           Icon: MdApi     },
+  { id: 'fivem',    label: 'FiveM',         Icon: MdGamepad },
+  { id: 'erlc',     label: 'ER:LC',         Icon: MdGamepad },
+  { id: 'dbsync',   label: 'Database Sync', Icon: MdStorage },
+  { id: 'livemap',  label: 'Live Map',      Icon: MdMap     },
 ];
 
 /* ── Toggle switch (inline style to avoid Tailwind JIT purge) ── */
@@ -353,6 +354,233 @@ function LiveMapTab() {
 }
 
 /* ══════════════════════════════════
+   TAB: DATABASE SYNC
+══════════════════════════════════ */
+const CHAR_MAPPING = [
+  { cad: 'First Name',    col: 'firstname',    table: 'users' },
+  { cad: 'Last Name',     col: 'lastname',     table: 'users' },
+  { cad: 'Date of Birth', col: 'dateofbirth',  table: 'users' },
+  { cad: 'Gender',        col: 'gender',       table: 'users' },
+  { cad: 'Job',           col: 'job',          table: 'jobs'  },
+];
+
+const LICENSE_MAPPING = [
+  { cad: 'Driver License', col: 'license',        table: 'users' },
+  { cad: 'Weapon License', col: 'weapon_license',  table: 'users' },
+  { cad: 'Pilot License',  col: 'pilot_license',   table: 'users' },
+];
+
+const VEHICLE_MAPPING = [
+  { cad: 'Plate', col: 'plate',          table: 'owned_vehicles' },
+  { cad: 'Model', col: 'model',          table: 'owned_vehicles' },
+  { cad: 'Color', col: 'color',          table: 'owned_vehicles' },
+  { cad: 'Owner', col: 'owner',          table: 'owned_vehicles' },
+];
+
+function MappingTable({ rows }) {
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+        <thead>
+          <tr style={{ background: 'rgba(0,0,0,0.25)' }}>
+            {['CAD Field', 'SQL Column', 'Table'].map(h => (
+              <th key={h} style={{
+                textAlign: 'left', padding: '8px 14px',
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.6px',
+                textTransform: 'uppercase', color: ADMIN.textMute,
+                borderBottom: `1px solid ${ADMIN.border}`,
+              }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i} style={{ background: i % 2 ? ADMIN.rowAlt : ADMIN.row }}>
+              <td style={{ padding: '8px 14px', color: ADMIN.text, borderBottom: `1px solid rgba(255,255,255,0.05)` }}>{r.cad}</td>
+              <td style={{ padding: '8px 14px', color: '#7dd3fc', fontFamily: 'var(--font-mono)', borderBottom: `1px solid rgba(255,255,255,0.05)` }}>{r.col}</td>
+              <td style={{ padding: '8px 14px', color: ADMIN.textDim, fontFamily: 'var(--font-mono)', borderBottom: `1px solid rgba(255,255,255,0.05)` }}>{r.table}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CollapsibleSection({ title, children, open, onToggle }) {
+  return (
+    <div style={{
+      border: `1px solid ${ADMIN.border}`, borderRadius: 10,
+      overflow: 'hidden', marginBottom: 10,
+    }}>
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 8, padding: '11px 16px', background: ADMIN.panel2,
+          border: 'none', cursor: 'pointer', color: ADMIN.text,
+          fontSize: 13, fontWeight: 600, fontFamily: 'var(--font-ui)',
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <MdStorage size={14} style={{ color: ADMIN.textMute, flexShrink: 0 }} />
+          {title}
+        </span>
+        {open
+          ? <MdExpandMore size={18} style={{ color: ADMIN.textDim, flexShrink: 0 }} />
+          : <MdChevronRight size={18} style={{ color: ADMIN.textDim, flexShrink: 0 }} />
+        }
+      </button>
+      {open && (
+        <div style={{ background: ADMIN.panel, borderTop: `1px solid ${ADMIN.border}` }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const DB_INPUT = {
+  width: '100%', background: '#0d1a2c', border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: 8, color: '#dde6f1', padding: '9px 13px', fontSize: 13,
+  fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+};
+
+const DB_LABEL = {
+  display: 'block', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.5px',
+  textTransform: 'uppercase', color: ADMIN.textMute, marginBottom: 5,
+};
+
+function DatabaseSyncTab() {
+  const [creds, setCreds] = useState({
+    host: 'localhost',
+    port: '3306',
+    user: 'root',
+    password: '',
+    database: 'essentialmode',
+  });
+  const [showPw, setShowPw]     = useState(false);
+  const [testState, setTest]    = useState('idle'); // idle | testing | ok | fail
+  const [dbSaved, setDbSaved]   = useState(false);
+  const [open, setOpen]         = useState({ char: false, license: false, vehicle: false });
+
+  const set = (k, v) => { setCreds(p => ({ ...p, [k]: v })); setDbSaved(false); };
+
+  const testConn = () => {
+    setTest('testing');
+    setTimeout(() => setTest(Math.random() > 0.4 ? 'ok' : 'fail'), 1400);
+  };
+
+  const save = () => { setDbSaved(true); setTimeout(() => setDbSaved(false), 2500); };
+
+  const toggle = (k) => setOpen(o => ({ ...o, [k]: !o[k] }));
+
+  const testLabel = { idle: 'Test Connection', testing: 'Testing…', ok: '✓ Connected', fail: '✗ Failed' }[testState];
+  const testColor = { idle: '#3d82f0', testing: ADMIN.textDim, ok: ADMIN.green, fail: '#ef4444' }[testState];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <AdminPanel title="SQL Connection Credentials" subtitle="Configure your database connection for player data sync.">
+        {/* 2-col credentials grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
+          {/* Host */}
+          <div>
+            <label style={DB_LABEL}>SQL Host</label>
+            <input style={DB_INPUT} value={creds.host} onChange={e => set('host', e.target.value)} placeholder="localhost" />
+          </div>
+          {/* Port */}
+          <div>
+            <label style={DB_LABEL}>SQL Port</label>
+            <input style={DB_INPUT} value={creds.port} onChange={e => set('port', e.target.value)} placeholder="3306" />
+          </div>
+          {/* User */}
+          <div>
+            <label style={DB_LABEL}>SQL User</label>
+            <input style={DB_INPUT} value={creds.user} onChange={e => set('user', e.target.value)} placeholder="root" />
+          </div>
+          {/* Password */}
+          <div>
+            <label style={DB_LABEL}>SQL Password</label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                style={{ ...DB_INPUT, paddingRight: 38 }}
+                type={showPw ? 'text' : 'password'}
+                value={creds.password}
+                onChange={e => set('password', e.target.value)}
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(v => !v)}
+                style={{
+                  position: 'absolute', right: 10, background: 'none', border: 'none',
+                  cursor: 'pointer', color: ADMIN.textDim, display: 'flex', alignItems: 'center',
+                }}
+              >
+                {showPw ? <MdVisibilityOff size={16} /> : <MdVisibility size={16} />}
+              </button>
+            </div>
+          </div>
+          {/* Database */}
+          <div>
+            <label style={DB_LABEL}>SQL Database</label>
+            <input style={DB_INPUT} value={creds.database} onChange={e => set('database', e.target.value)} placeholder="essentialmode" />
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={testConn}
+            disabled={testState === 'testing'}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              padding: '9px 18px', borderRadius: 8, border: 'none',
+              background: testColor, color: '#fff', fontSize: 13, fontWeight: 700,
+              fontFamily: 'var(--font-ui)', cursor: testState === 'testing' ? 'default' : 'pointer',
+              opacity: testState === 'testing' ? 0.7 : 1, transition: 'all .2s',
+            }}
+          >
+            <MdWifi size={15} />
+            {testLabel}
+          </button>
+          <button
+            type="button"
+            onClick={save}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              padding: '9px 18px', borderRadius: 8, border: 'none',
+              background: dbSaved ? ADMIN.green : ADMIN.panel2,
+              border: `1px solid ${dbSaved ? ADMIN.green : ADMIN.borderHi}`,
+              color: dbSaved ? '#fff' : ADMIN.text, fontSize: 13, fontWeight: 700,
+              fontFamily: 'var(--font-ui)', cursor: 'pointer', transition: 'all .2s',
+            }}
+          >
+            <MdSave size={15} />
+            {dbSaved ? 'Saved!' : 'Save'}
+          </button>
+        </div>
+      </AdminPanel>
+
+      {/* Collapsible mapping sections */}
+      <CollapsibleSection title="Character Mapping" open={open.char} onToggle={() => toggle('char')}>
+        <MappingTable rows={CHAR_MAPPING} />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="License Mapping" open={open.license} onToggle={() => toggle('license')}>
+        <MappingTable rows={LICENSE_MAPPING} />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Vehicle Mapping" open={open.vehicle} onToggle={() => toggle('vehicle')}>
+        <MappingTable rows={VEHICLE_MAPPING} />
+      </CollapsibleSection>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
    ROOT COMPONENT
 ══════════════════════════════════ */
 export default function InGame() {
@@ -398,6 +626,7 @@ export default function InGame() {
           resourceUrl="#"
         />
       )}
+      {tab === 'dbsync'  && <DatabaseSyncTab />}
       {tab === 'livemap' && <LiveMapTab />}
     </>
   );

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
-  AdminPanel, SonButton, SonField, SON_INPUT, SON_LABEL, ADMIN,
+  AdminPanel, SonButton, SonField, SonIconBtn, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
-import { MdSave, MdCheckCircle, MdChat } from 'react-icons/md';
+import { MdSave, MdCheckCircle, MdChat, MdLanguage, MdDelete } from 'react-icons/md';
 
 const BG_STYLES = ['Gradient (Deep Blue)', 'Solid Dark', 'Image'];
 
@@ -26,11 +26,26 @@ export default function LoginPageEditor() {
   const { state, dispatch } = useCAD();
   const [draft, setDraft] = useState({ ...state.loginPageConfig });
   const [saved, setSaved] = useState(false);
+  const [newDomain, setNewDomain] = useState('');
 
   const set = (k, v) => { setDraft(d => ({ ...d, [k]: v })); setSaved(false); };
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: { ...draft } } });
     setSaved(true);
+  };
+
+  const addDomain = () => {
+    const d = newDomain.trim().toLowerCase().replace(/^https?:\/\//, '');
+    if (!d || draft.customDomains?.includes(d)) return;
+    const updated = { ...draft, customDomains: [...(draft.customDomains || []), d] };
+    setDraft(updated);
+    dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: updated } });
+    setNewDomain('');
+  };
+  const removeDomain = (domain) => {
+    const updated = { ...draft, customDomains: (draft.customDomains || []).filter(x => x !== domain) };
+    setDraft(updated);
+    dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: updated } });
   };
 
   const bgPreview = draft.backgroundStyle === 'Solid Dark'
@@ -40,6 +55,7 @@ export default function LoginPageEditor() {
       : 'linear-gradient(160deg, #0a1b35 0%, #0e2547 50%, #08101f 100%)';
 
   return (
+    <div style={{ display: 'grid', gap: 16 }}>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 16, alignItems: 'start' }}>
       <AdminPanel
         title="Custom Login Page"
@@ -123,6 +139,39 @@ export default function LoginPageEditor() {
                 <MdChat size={16} /> Connect Discord
               </button>
             )}
+          </div>
+        </div>
+      </AdminPanel>
+    </div>
+
+      <AdminPanel
+        title="Custom Domains"
+        subtitle="Point your own domain to your CAD login page."
+      >
+        <div>
+          {(draft.customDomains || []).map(domain => (
+            <div key={domain} style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+              background: ADMIN.panel2, borderRadius: 8, marginBottom: 6,
+              border: `1px solid ${ADMIN.border}`,
+            }}>
+              <MdLanguage size={16} style={{ color: ADMIN.textMute, flexShrink: 0 }} />
+              <span style={{ flex: 1, fontSize: 13, fontFamily: 'var(--font-mono)', color: ADMIN.text }}>{domain}</span>
+              <SonIconBtn icon={MdDelete} danger title="Remove" onClick={() => removeDomain(domain)} />
+            </div>
+          ))}
+          {(draft.customDomains || []).length === 0 && (
+            <div style={{ fontSize: 13, color: ADMIN.textMute, marginBottom: 14 }}>No custom domains configured.</div>
+          )}
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <input
+              style={{ ...SON_INPUT, flex: 1 }}
+              placeholder="cad.yourdomain.com"
+              value={newDomain}
+              onChange={e => setNewDomain(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addDomain()}
+            />
+            <SonButton variant="red" onClick={addDomain}>Add Domain</SonButton>
           </div>
         </div>
       </AdminPanel>
