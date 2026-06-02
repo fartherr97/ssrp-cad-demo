@@ -1,138 +1,375 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import ReportForm from '../../../components/ReportForm';
+import { ADMIN } from '../AdminKit';
 import {
-  ADMIN, AdminPageTitle, SonButton, SonSearch, SonBadge, SonIconBtn,
-  SON_INPUT, SON_LABEL,
-} from '../AdminKit';
-import {
-  MdAdd, MdDelete, MdContentCopy, MdSearch, MdArrowUpward, MdArrowDownward,
-  MdTextFields, MdCalendarToday, MdCheckBox, MdListAlt, MdNotes, MdBadge,
-  MdPerson, MdChevronRight, MdExpandMore, MdDragIndicator, MdClose,
-  MdDescription, MdDirectionsCar, MdGavel,
+  MdAdd, MdDelete, MdContentCopy, MdArrowUpward, MdArrowDownward,
+  MdDescription, MdFolder, MdSearch, MdExpandMore, MdChevronRight,
+  MdPerson, MdDirectionsCar, MdGavel, MdSave, MdLock,
+  MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar,
 } from 'react-icons/md';
 
-/* ─── Field type catalog ─── */
+/* ── uid generators ── */
+const uid  = () => `f${Date.now().toString(36)}_${Math.random().toString(36).slice(2,6)}`;
+const sid  = () => `s${Date.now().toString(36)}_${Math.random().toString(36).slice(2,6)}`;
+
+/* ── Field type catalog ── */
 const FIELD_TYPES = [
-  { type: 'text',            icon: MdTextFields,   label: 'Text'          },
-  { type: 'number',          icon: MdTextFields,   label: 'Number'        },
-  { type: 'date',            icon: MdCalendarToday,label: 'Date'          },
-  { type: 'dropdown',        icon: MdListAlt,      label: 'Dropdown'      },
-  { type: 'checkbox',        icon: MdCheckBox,     label: 'Checkbox'      },
-  { type: 'textarea',        icon: MdNotes,        label: 'Text Area'     },
-  { type: 'civilian_lookup', icon: MdPerson,       label: 'Civilian'      },
-  { type: 'badge_lookup',    icon: MdBadge,        label: 'Officer Badge' },
-  { type: 'vehicle_lookup',  icon: MdDirectionsCar,label: 'Vehicle'       },
-  { type: 'charges',         icon: MdGavel,        label: 'Charges'       },
+  { type: 'text',            label: 'Text'          },
+  { type: 'number',          label: 'Number'        },
+  { type: 'textarea',        label: 'Text Area'     },
+  { type: 'date',            label: 'Date'          },
+  { type: 'datetime',        label: 'Date & Time'   },
+  { type: 'dropdown',        label: 'Select'        },
+  { type: 'checkbox',        label: 'Checkbox'      },
+  { type: 'civilian_lookup', label: 'Civilian'      },
+  { type: 'vehicle_lookup',  label: 'Vehicle'       },
+  { type: 'badge_lookup',    label: 'Officer Badge' },
+  { type: 'charges',         label: 'Charges'       },
+  { type: 'image',           label: 'Image'         },
 ];
 
-/* ─── Premade section templates ─── */
+const TYPE_COLOR = {
+  text: '#60a5fa', number: '#60a5fa', textarea: '#60a5fa',
+  date: '#fb923c', datetime: '#fb923c',
+  dropdown: '#34d399', checkbox: '#34d399',
+  civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
+  charges: '#f87171', image: '#22d3ee',
+};
+
+/* ── Premade sections matching template structure ── */
 const PREMADE_SECTIONS = [
-  { key: 'subject', title: 'Subject Information', style: 'blue', fields: [
-    { id: 'ps_f1', label: 'Full Name',     type: 'civilian_lookup', span: 3, required: true },
-    { id: 'ps_f2', label: 'Date of Birth', type: 'date',            span: 1 },
-    { id: 'ps_f3', label: 'Address',       type: 'text',            span: 4 },
-  ]},
-  { key: 'officer', title: 'Issuing Officer', style: 'gray', fields: [
-    { id: 'ps_f4', label: 'Officer Badge #', type: 'badge_lookup', span: 2 },
-    { id: 'ps_f5', label: 'Department',      type: 'text',         span: 2 },
-  ]},
-  { key: 'supervisor', title: 'Supervisor Review', style: 'amber', fields: [
-    { id: 'ps_f6', label: 'Supervisor Badge #', type: 'badge_lookup', span: 2 },
-    { id: 'ps_f7', label: 'Approval Status',    type: 'dropdown',     span: 2, options: ['Pending','Approved','Denied'] },
-    { id: 'ps_f8', label: 'Notes',              type: 'textarea',     span: 4, minRows: 2 },
-  ]},
-  { key: 'narrative', title: 'Narrative', style: 'gray', fields: [
-    { id: 'ps_f9', label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 5 },
-  ]},
-  { key: 'vehicle', title: 'Vehicle Information', style: 'gray', fields: [
-    { id: 'ps_f10', label: 'Plate',  type: 'text', span: 1, mono: true },
-    { id: 'ps_f11', label: 'Make',   type: 'text', span: 1 },
-    { id: 'ps_f12', label: 'Model',  type: 'text', span: 1 },
-    { id: 'ps_f13', label: 'Color',  type: 'text', span: 1 },
-    { id: 'ps_f14', label: 'Year',   type: 'number', span: 1 },
-    { id: 'ps_f15', label: 'VIN',    type: 'text', span: 3, mono: true },
-  ]},
-  { key: 'charges', title: 'Charges / Violations', style: 'red', fields: [
-    { id: 'ps_f16', label: 'Primary Charge', type: 'text',     span: 3, required: true },
-    { id: 'ps_f17', label: 'Charge Type',    type: 'dropdown', span: 1, options: ['Felony','Misdemeanor','Infraction','Ordinance'] },
-    { id: 'ps_f18', label: 'Additional Charges', type: 'textarea', span: 4, minRows: 2 },
-  ]},
+  { key: 'flags', label: 'FLAGS', make: () => ({
+    id: sid(), title: 'Flags', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Escape Risk', type: 'checkbox', span: 1 },
+      { id: uid(), label: 'Armed',       type: 'checkbox', span: 1 },
+      { id: uid(), label: 'Dangerous',   type: 'checkbox', span: 1 },
+      { id: uid(), label: 'Felon',       type: 'checkbox', span: 1 },
+    ],
+  })},
+  { key: 'civilian', label: 'CIVILIAN', make: () => ({
+    id: sid(), title: 'Civilian Information', style: 'gray', lookup: 'civilian',
+    fields: [
+      { id: uid(), label: 'First Name',          type: 'civilian_lookup', span: 1 },
+      { id: uid(), label: 'Last Name',           type: 'text',            span: 1 },
+      { id: uid(), label: 'M.I.',                type: 'text',            span: 1 },
+      { id: uid(), label: 'DOB',                 type: 'date',            span: 1 },
+      { id: uid(), label: 'Age',                 type: 'number',          span: 1 },
+      { id: uid(), label: 'Sex',                 type: 'dropdown',        span: 1, options: ['Male','Female','Other'] },
+      { id: uid(), label: 'AKA / Former Names',  type: 'text',            span: 4 },
+      { id: uid(), label: 'Residence',           type: 'text',            span: 2 },
+      { id: uid(), label: 'Zip Code',            type: 'text',            span: 1 },
+      { id: uid(), label: 'Occupation',          type: 'text',            span: 1 },
+      { id: uid(), label: 'Height',              type: 'text',            span: 1 },
+      { id: uid(), label: 'Weight',              type: 'text',            span: 1 },
+      { id: uid(), label: 'Skin Tone',           type: 'dropdown',        span: 1, options: ['Light','Medium','Tan','Brown','Dark'] },
+      { id: uid(), label: 'Hair Color',          type: 'dropdown',        span: 1, options: ['Black','Brown','Blonde','Red','Gray','White','Other'] },
+      { id: uid(), label: 'Eye Color',           type: 'dropdown',        span: 1, options: ['Brown','Blue','Green','Hazel','Gray'] },
+      { id: uid(), label: 'Emergency Contact',   type: 'text',            span: 2 },
+      { id: uid(), label: 'Relationship',        type: 'text',            span: 1 },
+      { id: uid(), label: 'Contact #',           type: 'text',            span: 1 },
+    ],
+  })},
+  { key: 'vehicle', label: 'VEHICLE', make: () => ({
+    id: sid(), title: 'Vehicle Information', style: 'gray', lookup: 'vehicle',
+    fields: [
+      { id: uid(), label: 'Vehicle Type', type: 'dropdown',       span: 1, options: ['Sedan','SUV','Truck','Motorcycle','Van','Bus','Other'] },
+      { id: uid(), label: 'Plate',        type: 'vehicle_lookup', span: 1, mono: true },
+      { id: uid(), label: 'Make',         type: 'text',           span: 1 },
+      { id: uid(), label: 'Model',        type: 'text',           span: 1 },
+      { id: uid(), label: 'Color',        type: 'text',           span: 1 },
+      { id: uid(), label: 'Year',         type: 'number',         span: 1 },
+    ],
+  })},
+  { key: 'charges', label: 'CHARGES', make: () => ({
+    id: sid(), title: 'Charges', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Charges', type: 'charges', span: 4 },
+    ],
+  })},
+  { key: 'narrative', label: 'NARRATIVE', make: () => ({
+    id: sid(), title: 'Narrative', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Narrative', type: 'textarea', span: 4, minRows: 5 },
+    ],
+  })},
+  { key: 'record_link', label: 'RECORD LINK', make: () => ({
+    id: sid(), title: 'Linked Record', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Linked Case #', type: 'text',     span: 2, mono: true },
+      { id: uid(), label: 'Link Type',     type: 'dropdown', span: 2, options: ['Related','Continuation','Supplement','Reference'] },
+    ],
+  })},
+  { key: 'supervisor', label: 'SUPERVISOR REVIEW', make: () => ({
+    id: sid(), title: 'Report Review', style: 'gray', supervisorOnly: true,
+    fields: [
+      { id: uid(), label: 'Status',               type: 'dropdown', span: 1, supervisorOnly: true, options: ['Pending Review','Approved','Rejected','Pending Changes'] },
+      { id: uid(), label: 'Observing Officer',    type: 'text',     span: 2 },
+      { id: uid(), label: 'Review Date',          type: 'date',     span: 1, supervisorOnly: true },
+      { id: uid(), label: 'Supervisor Signature', type: 'text',     span: 4, supervisorOnly: true },
+    ],
+  })},
 ];
 
-const SECTION_STYLES = [
-  { key: 'blue',  label: 'Blue',  color: '#1e3a5f' },
-  { key: 'gray',  label: 'Gray',  color: '#1e2533' },
-  { key: 'green', label: 'Green', color: '#1a3a20' },
-  { key: 'red',   label: 'Red',   color: '#3a1a1a' },
-  { key: 'amber', label: 'Amber', color: '#3a2a0a' },
-];
-
-
-const uid = () => `f${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-const sid = () => `s${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-
-/* ─── Field editor row ─── */
-function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
-  const [expanded, setExpanded] = useState(false);
-  const FIcon = FIELD_TYPES.find(f => f.type === field.type)?.icon || MdTextFields;
+/* ── Tiny inline button ── */
+function IconBtn({ icon: Icon, onClick, title, active, activeColor = '#3d82f0', size = 13, bg, color }) {
   return (
-    <div style={{ border: `1px solid ${ADMIN.border}`, borderRadius: 6, marginBottom: 4, background: ADMIN.bg }}>
-      <div className="flex items-center gap-2 px-2.5 py-1.5 cursor-pointer"
-        onClick={() => setExpanded(e => !e)}
-        style={{ borderBottom: expanded ? `1px solid ${ADMIN.border}` : 'none' }}>
-        <MdDragIndicator size={14} color={ADMIN.textMute} />
-        <FIcon size={14} color={ADMIN.blue} />
-        <span className="text-[12px] font-medium flex-1" style={{ color: ADMIN.text }}>
-          {field.label || <span style={{ color: ADMIN.textMute, fontStyle: 'italic' }}>Untitled Field</span>}
-        </span>
-        <span className="text-[10px] font-mono" style={{ color: ADMIN.textMute }}>{field.type}</span>
-        {field.required && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: `${ADMIN.red}22`, color: ADMIN.red }}>Required</span>}
-        <div className="flex gap-1" onClick={e => e.stopPropagation()}>
-          <SonIconBtn icon={MdArrowUpward} onClick={onMoveUp} title="Move up" />
-          <SonIconBtn icon={MdArrowDownward} onClick={onMoveDown} title="Move down" />
-          <SonIconBtn icon={MdDelete} onClick={onDelete} danger title="Remove field" />
+    <button type="button" onClick={onClick} title={title}
+      className="rounded flex items-center justify-center border-none cursor-pointer shrink-0 transition-all"
+      style={{
+        width: 26, height: 26,
+        background: bg || (active ? `${activeColor}28` : 'rgba(255,255,255,0.05)'),
+        color: color || (active ? activeColor : '#5d6f88'),
+        border: `1px solid ${active ? activeColor + '50' : 'rgba(255,255,255,0.08)'}`,
+      }}>
+      <Icon size={size} />
+    </button>
+  );
+}
+
+/* ── Per-field row ── */
+function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
+  const [showOpts, setShowOpts] = useState(false);
+  const tc = TYPE_COLOR[field.type] || '#60a5fa';
+
+  const tog = (prop) => onUpdate({ ...field, [prop]: !field[prop] });
+
+  return (
+    <div className="rounded-lg mb-1.5 overflow-hidden"
+      style={{ border: `1px solid ${showOpts ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.07)'}` }}>
+
+      {/* Main row */}
+      <div className="flex items-center gap-1.5 px-2 py-1.5" style={{ background: '#0a1520' }}>
+
+        {/* Type selector */}
+        <select
+          value={field.type}
+          onChange={e => onUpdate({ ...field, type: e.target.value })}
+          className="rounded-md text-[10.5px] font-bold border-none outline-none cursor-pointer shrink-0"
+          style={{
+            background: `${tc}18`, color: tc, padding: '3px 6px',
+            border: `1px solid ${tc}44`, minWidth: 88,
+            fontFamily: 'var(--font-ui)',
+          }}
+        >
+          {FIELD_TYPES.map(ft => (
+            <option key={ft.type} value={ft.type} style={{ background: '#0d1827', color: '#dde6f1' }}>
+              {ft.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Label */}
+        <input
+          className="flex-1 bg-transparent text-[12px] outline-none min-w-0 border-b border-transparent focus:border-white/20 transition-colors"
+          style={{ color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+          placeholder="Field Label"
+          value={field.label || ''}
+          onChange={e => onUpdate({ ...field, label: e.target.value })}
+        />
+
+        {/* Placeholder */}
+        <input
+          className="bg-transparent text-[10.5px] outline-none border-b border-transparent focus:border-white/20 transition-colors"
+          style={{ color: '#4a5568', width: 100, fontFamily: 'var(--font-ui)' }}
+          placeholder="Placeholder…"
+          value={field.placeholder || ''}
+          onChange={e => onUpdate({ ...field, placeholder: e.target.value })}
+        />
+
+        {/* Width */}
+        <select
+          value={field.span || 2}
+          onChange={e => onUpdate({ ...field, span: Number(e.target.value) })}
+          className="rounded text-[10.5px] border-none outline-none cursor-pointer shrink-0"
+          style={{ background: 'rgba(255,255,255,0.06)', color: '#6b7280', padding: '3px 5px', border: '1px solid rgba(255,255,255,0.09)', fontFamily: 'var(--font-ui)', minWidth: 56 }}
+        >
+          {[1,2,3,4].map(n => <option key={n} value={n} style={{ background: '#0d1827' }}>W {n}</option>)}
+        </select>
+
+        {/* Property toggles */}
+        <div className="flex gap-0.5 shrink-0">
+          <IconBtn icon={MdStar}        onClick={() => tog('required')}      active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
+          <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}      active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
+          <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')}active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
+          <IconBtn icon={MdSearch}      onClick={() => tog('showInLookup')}  active={!!field.showInLookup}   activeColor="#22c55e" title="Show in Lookup"  size={12} />
+          <IconBtn icon={MdLink}        onClick={() => tog('unique')}        active={!!field.unique}         activeColor="#a78bfa" title="Unique"          size={12} />
         </div>
-        {expanded ? <MdExpandMore size={16} color={ADMIN.textDim} /> : <MdChevronRight size={16} color={ADMIN.textDim} />}
+
+        {/* Options toggle (dropdown only) */}
+        {field.type === 'dropdown' && (
+          <button type="button" onClick={() => setShowOpts(o => !o)}
+            className="px-2 py-0.5 rounded text-[9.5px] font-bold border-none cursor-pointer shrink-0 transition-colors"
+            style={{
+              background: showOpts ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)',
+              color: showOpts ? '#34d399' : '#4a5568',
+              border: `1px solid ${showOpts ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.09)'}`,
+            }}>
+            OPTS
+          </button>
+        )}
+
+        {/* Reorder + delete */}
+        <div className="flex gap-0.5 shrink-0">
+          <IconBtn icon={MdArrowUpward}   onClick={onMoveUp}   title="Move up"   size={12} />
+          <IconBtn icon={MdArrowDownward} onClick={onMoveDown} title="Move down" size={12} />
+          <IconBtn icon={MdDelete}        onClick={onDelete}   title="Remove"    size={12}
+            bg="rgba(239,68,68,0.14)" color="#ef4444" />
+        </div>
       </div>
-      {expanded && (
-        <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label style={SON_LABEL}>Field Label</label>
-            <input style={SON_INPUT} value={field.label} onChange={e => onUpdate({ ...field, label: e.target.value })} placeholder="e.g. Subject Name" />
+
+      {/* Dropdown options editor */}
+      {showOpts && field.type === 'dropdown' && (
+        <div className="px-2.5 py-2"
+          style={{ background: 'rgba(52,211,153,0.04)', borderTop: '1px solid rgba(52,211,153,0.14)' }}>
+          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>
+            Options (one per line)
           </div>
-          <div>
-            <label style={SON_LABEL}>Field Type</label>
-            <select style={SON_INPUT} value={field.type} onChange={e => onUpdate({ ...field, type: e.target.value })}>
-              {FIELD_TYPES.map(ft => <option key={ft.type} value={ft.type}>{ft.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={SON_LABEL}>Column Span (1-4)</label>
-            <select style={SON_INPUT} value={field.span || 2} onChange={e => onUpdate({ ...field, span: Number(e.target.value) })}>
-              {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
-            </select>
-          </div>
-          <div className="flex items-end gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={!!field.required} onChange={e => onUpdate({ ...field, required: e.target.checked })} />
-              <span className="text-[12px]" style={{ color: ADMIN.textDim }}>Required</span>
-            </label>
-            {field.type === 'text' && (
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={!!field.mono} onChange={e => onUpdate({ ...field, mono: e.target.checked })} />
-                <span className="text-[12px]" style={{ color: ADMIN.textDim }}>Monospace</span>
-              </label>
-            )}
-          </div>
-          {field.type === 'dropdown' && (
-            <div className="col-span-2">
-              <label style={SON_LABEL}>Options (one per line)</label>
-              <textarea
-                style={{ ...SON_INPUT, height: 80, resize: 'vertical' }}
-                value={(field.options || []).join('\n')}
-                onChange={e => onUpdate({ ...field, options: e.target.value.split('\n').filter(Boolean) })}
-                placeholder="Option 1&#10;Option 2&#10;Option 3"
-              />
+          <textarea
+            style={{
+              width: '100%', background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
+              borderRadius: 6, color: '#dde6f1', padding: '7px 10px', fontSize: 11.5,
+              fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+              resize: 'vertical', minHeight: 60,
+            }}
+            value={(field.options || []).join('\n')}
+            onChange={e => onUpdate({ ...field, options: e.target.value.split('\n') })}
+            placeholder={'Option 1\nOption 2\nOption 3'}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Section block ── */
+function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [showAddField, setShowAddField] = useState(false);
+  const dropRef = useRef(null);
+
+  useEffect(() => {
+    if (!showAddField) return;
+    const fn = (e) => { if (!dropRef.current?.contains(e.target)) setShowAddField(false); };
+    document.addEventListener('mousedown', fn);
+    return () => document.removeEventListener('mousedown', fn);
+  }, [showAddField]);
+
+  const up = (patch) => onUpdate({ ...section, ...patch });
+
+  const addField = (type) => {
+    const span = type === 'charges' || type === 'textarea' ? 4 : type === 'checkbox' ? 1 : 2;
+    up({ fields: [...(section.fields || []), { id: uid(), label: '', type, span }] });
+    setShowAddField(false);
+  };
+
+  const updateField = (idx, f) => {
+    const fields = [...(section.fields || [])];
+    fields[idx] = f;
+    up({ fields });
+  };
+
+  const deleteField   = (idx) => up({ fields: (section.fields || []).filter((_, i) => i !== idx) });
+  const moveField     = (idx, dir) => {
+    const fields = [...(section.fields || [])];
+    const j = idx + dir;
+    if (j < 0 || j >= fields.length) return;
+    [fields[idx], fields[j]] = [fields[j], fields[idx]];
+    up({ fields });
+  };
+
+  const toggleLookup  = (kind) => up({ lookup: section.lookup === kind ? undefined : kind });
+  const isSupOnly     = !!section.supervisorOnly;
+
+  return (
+    <div className="mb-2.5 rounded-xl overflow-hidden"
+      style={{ border: `1px solid ${isSupOnly ? 'rgba(239,68,68,0.28)' : 'rgba(255,255,255,0.09)'}` }}>
+
+      {/* Section header */}
+      <div className="flex items-center gap-1.5 px-2 py-2"
+        style={{ background: isSupOnly ? 'rgba(239,68,68,0.10)' : '#0f1c31' }}>
+
+        {/* Delete */}
+        <button type="button" onClick={onDelete} title="Delete section"
+          className="shrink-0 rounded flex items-center justify-center border-none cursor-pointer"
+          style={{ width: 26, height: 26, background: 'rgba(239,68,68,0.18)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>
+          <MdDelete size={13} />
+        </button>
+
+        {/* Add field dropdown */}
+        <div ref={dropRef} className="relative shrink-0">
+          <button type="button" onClick={() => setShowAddField(o => !o)} title="Add field"
+            className="rounded flex items-center justify-center border-none cursor-pointer"
+            style={{ width: 26, height: 26, background: 'rgba(20,184,166,0.18)', color: '#2dd4bf', border: '1px solid rgba(20,184,166,0.28)' }}>
+            <MdAdd size={14} />
+          </button>
+          {showAddField && (
+            <div className="absolute top-full left-0 mt-1 z-[300] rounded-xl p-1.5 shadow-2xl min-w-[200px] grid grid-cols-2 gap-0.5"
+              style={{ background: '#0d1827', border: '1px solid rgba(255,255,255,0.14)', animation: 'dropdownFadeIn 0.12s ease-out' }}>
+              {FIELD_TYPES.map(ft => (
+                <button key={ft.type} type="button" onClick={() => addField(ft.type)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-left border-none cursor-pointer text-[11px] font-semibold transition-colors"
+                  style={{ background: 'transparent', color: TYPE_COLOR[ft.type] || '#93a4bd' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = `${TYPE_COLOR[ft.type]}14`; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+                  {ft.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Civilian / vehicle lookup toggles */}
+        <IconBtn icon={MdPerson}       onClick={() => toggleLookup('civilian')} active={section.lookup === 'civilian'} activeColor="#f97316" title="Civilian lookup" />
+        <IconBtn icon={MdDirectionsCar}onClick={() => toggleLookup('vehicle')}  active={section.lookup === 'vehicle'}  activeColor="#f97316" title="Vehicle lookup"  />
+
+        {/* Supervisor-only toggle */}
+        <IconBtn icon={MdLock} onClick={() => up({ supervisorOnly: !isSupOnly })} active={isSupOnly} activeColor="#ef4444" title="Supervisor only" />
+
+        {/* Section title */}
+        <input
+          className="flex-1 bg-transparent text-[12.5px] font-bold outline-none min-w-0 border-b border-transparent focus:border-white/20 transition-colors"
+          style={{ color: isSupOnly ? '#fca5a5' : '#dde6f1', fontFamily: 'var(--font-ui)' }}
+          value={section.title || ''}
+          onChange={e => up({ title: e.target.value })}
+          placeholder="Section Title"
+        />
+
+        {/* Move + collapse */}
+        <IconBtn icon={MdArrowUpward}   onClick={onMoveUp}                title="Move up"   size={12} />
+        <IconBtn icon={MdArrowDownward} onClick={onMoveDown}              title="Move down" size={12} />
+        <IconBtn icon={collapsed ? MdChevronRight : MdExpandMore}
+          onClick={() => setCollapsed(c => !c)} title={collapsed ? 'Expand' : 'Collapse'} size={14} />
+      </div>
+
+      {/* Fields */}
+      {!collapsed && (
+        <div className="px-2.5 pt-1.5 pb-2" style={{ background: '#080f1a' }}>
+          {/* Column header labels */}
+          {(section.fields || []).length > 0 && (
+            <div className="flex items-center gap-1.5 px-2 mb-1 text-[8.5px] font-bold uppercase tracking-[0.5px]"
+              style={{ color: '#3d4f66' }}>
+              <span style={{ minWidth: 88 }}>Type</span>
+              <span className="flex-1">Label</span>
+              <span style={{ width: 100 }}>Placeholder</span>
+              <span style={{ minWidth: 56 }}>Width</span>
+              <span style={{ width: 130 }}>Req / RO / Sup / Lkp / Uniq</span>
+              <span style={{ width: 60 }}></span>
+            </div>
+          )}
+          {(section.fields || []).map((f, idx) => (
+            <FieldRow key={f.id}
+              field={f}
+              onUpdate={u => updateField(idx, u)}
+              onDelete={() => deleteField(idx)}
+              onMoveUp={() => moveField(idx, -1)}
+              onMoveDown={() => moveField(idx, 1)}
+            />
+          ))}
+          {(section.fields || []).length === 0 && (
+            <div className="py-3 text-center text-[11px]" style={{ color: '#2d3f52' }}>
+              Click + to add a field to this section
             </div>
           )}
         </div>
@@ -141,200 +378,297 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   );
 }
 
-/* ─── Section editor block ─── */
-function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [showAddField, setShowAddField] = useState(false);
-  const fieldTimer = useRef(null);
-  const styleObj = SECTION_STYLES.find(s => s.key === section.style) || SECTION_STYLES[0];
-
-  const openFieldMenu  = () => { clearTimeout(fieldTimer.current); setShowAddField(true); };
-  const closeFieldMenu = () => { fieldTimer.current = setTimeout(() => setShowAddField(false), 120); };
-
-  const addField = (type) => {
-    const newField = { id: uid(), label: '', type, span: 2 };
-    onUpdate({ ...section, fields: [...(section.fields || []), newField] });
-    setShowAddField(false);
-  };
-
-  const updateField = (idx, updated) => {
-    const fields = [...(section.fields || [])];
-    fields[idx] = updated;
-    onUpdate({ ...section, fields });
-  };
-
-  const deleteField = (idx) => {
-    const fields = (section.fields || []).filter((_, i) => i !== idx);
-    onUpdate({ ...section, fields });
-  };
-
-  const moveField = (idx, dir) => {
-    const fields = [...(section.fields || [])];
-    const swap = idx + dir;
-    if (swap < 0 || swap >= fields.length) return;
-    [fields[idx], fields[swap]] = [fields[swap], fields[idx]];
-    onUpdate({ ...section, fields });
-  };
+/* ── Live preview panel (right side) ── */
+function PreviewPanel({ draft }) {
+  const lookupCols = (draft?.sections || []).flatMap(s =>
+    (s.fields || []).filter(f => f.showInLookup).map(f => f.label)
+  );
 
   return (
-    <div className="mb-3 rounded-lg overflow-hidden" style={{ border: `1px solid ${ADMIN.borderHi}` }}>
-      {/* Section header */}
-      <div className="flex items-center gap-2 px-3 py-2" style={{ background: styleObj.color }}>
-        <MdDragIndicator size={16} color="rgba(255,255,255,0.4)" />
-        <button onClick={() => setCollapsed(c => !c)} className="flex-1 flex items-center gap-2 text-left bg-transparent border-none cursor-pointer">
-          {collapsed ? <MdChevronRight size={16} color="rgba(255,255,255,0.7)" /> : <MdExpandMore size={16} color="rgba(255,255,255,0.7)" />}
-          <input
-            value={section.title}
-            onChange={e => { e.stopPropagation(); onUpdate({ ...section, title: e.target.value }); }}
-            onClick={e => e.stopPropagation()}
-            className="bg-transparent border-none outline-none text-[13px] font-bold text-white/90 cursor-text"
-            placeholder="Section Title"
-          />
-        </button>
-        <div className="flex items-center gap-1">
-          {/* Style picker */}
-          <div className="flex gap-1 mr-1">
-            {SECTION_STYLES.map(s => (
-              <button key={s.key} onClick={() => onUpdate({ ...section, style: s.key })}
-                className="w-4 h-4 rounded-full border-2 cursor-pointer"
-                style={{ background: s.color, borderColor: section.style === s.key ? '#fff' : 'transparent' }}
-                title={s.label}
-              />
-            ))}
-          </div>
-          <SonIconBtn icon={MdArrowUpward} onClick={onMoveUp} title="Move section up" />
-          <SonIconBtn icon={MdArrowDownward} onClick={onMoveDown} title="Move section down" />
-          <SonIconBtn icon={MdDelete} onClick={onDelete} danger title="Delete section" />
+    <div className="flex flex-col h-full overflow-hidden"
+      style={{ background: '#08111d', borderLeft: '1px solid rgba(255,255,255,0.07)' }}>
+
+      {/* Header */}
+      <div className="shrink-0 px-4 py-2.5"
+        style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="text-[8.5px] font-bold uppercase tracking-[0.7px] mb-0.5" style={{ color: '#3d5470' }}>
+          Lookup Preview
+        </div>
+        <div className="text-[13px] font-bold" style={{ color: '#ef4444' }}>
+          {draft?.name?.toUpperCase() || 'UNTITLED'}
         </div>
       </div>
 
-      {/* Fields */}
-      {!collapsed && (
-        <div className="p-3" style={{ background: ADMIN.panel }}>
-          {(section.fields || []).map((field, idx) => (
-            <FieldRow key={field.id}
-              field={field}
-              onUpdate={u => updateField(idx, u)}
-              onDelete={() => deleteField(idx)}
-              onMoveUp={() => moveField(idx, -1)}
-              onMoveDown={() => moveField(idx, 1)}
-            />
+      {/* Lookup column chips */}
+      {lookupCols.length > 0 && (
+        <div className="shrink-0 flex flex-wrap gap-1 px-3 py-2"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0a1422' }}>
+          {lookupCols.map((l, i) => (
+            <span key={i} className="px-2 py-0.5 rounded text-[9.5px] font-bold uppercase tracking-[0.4px]"
+              style={{ background: 'rgba(61,130,240,0.14)', color: '#3d82f0', border: '1px solid rgba(61,130,240,0.24)' }}>
+              {l}
+            </span>
           ))}
-
-          {/* Add field */}
-          <div className="relative mt-2" onMouseEnter={openFieldMenu} onMouseLeave={closeFieldMenu}>
-            <button
-              onClick={() => (showAddField ? setShowAddField(false) : openFieldMenu())}
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-[0.4px] cursor-pointer border-dashed transition-colors"
-              style={{ background: 'transparent', border: `1px dashed ${ADMIN.border}`, color: ADMIN.textMute }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = ADMIN.blue; e.currentTarget.style.color = ADMIN.blue; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = ADMIN.border; e.currentTarget.style.color = ADMIN.textMute; }}
-            >
-              <MdAdd size={14} /> Add Field
-            </button>
-            {showAddField && (
-              <div className="absolute bottom-full left-0 mb-1 z-[100] p-2 rounded-lg shadow-2xl grid grid-cols-4 gap-1 min-w-[280px]"
-                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}`, animation: 'dropdownFadeIn 0.13s ease-out' }}>
-                {FIELD_TYPES.map(ft => {
-                  const Icon = ft.icon;
-                  return (
-                    <button key={ft.type} onClick={() => addField(ft.type)}
-                      className="flex flex-col items-center gap-1 p-2 rounded-md cursor-pointer border-none text-[10px] font-semibold"
-                      style={{ background: ADMIN.panel, color: ADMIN.textDim, transition: 'all 0.1s ease-out' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.color = ADMIN.text; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.4)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = ADMIN.panel; e.currentTarget.style.color = ADMIN.textDim; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
-                    >
-                      <Icon size={16} color={ADMIN.blue} />
-                      {ft.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
       )}
+
+      {/* Record preview label */}
+      <div className="shrink-0 px-4 py-1.5"
+        style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="text-[8.5px] font-bold uppercase tracking-[0.6px] mb-0.5" style={{ color: '#3d5470' }}>
+          Record Preview
+        </div>
+        <div className="text-[11px] font-bold" style={{ color: '#ef4444' }}>
+          {draft?.name?.toUpperCase() || 'UNTITLED'}
+        </div>
+      </div>
+
+      {/* Form preview */}
+      <div className="flex-1 overflow-y-auto p-3">
+        {!draft || (draft.sections || []).length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-32 gap-3" style={{ color: '#2d3f52' }}>
+            <MdDescription size={36} style={{ opacity: 0.25 }} />
+            <div className="text-[11.5px]">Add sections to see the live preview</div>
+          </div>
+        ) : (
+          <ReportForm template={draft} data={{}} readOnly />
+        )}
+      </div>
     </div>
   );
 }
 
-/* ─── Template builder (right panel) ─── */
-function TemplateBuilder({ template, isReport, onSave, onClose }) {
-  const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(template)));
-  const [showPremade, setShowPremade] = useState(false);
+/* ── Left panel: existing record list ── */
+function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicate, onDelete, typeFilter, onTypeFilter }) {
+  const [search, setSearch] = useState('');
+  const filtered = templates.filter(t => {
+    const q = search.toLowerCase();
+    return (!q || t.name.toLowerCase().includes(q) || (t.formCode || '').toLowerCase().includes(q)) &&
+      (typeFilter === 'all' || t._kind === typeFilter);
+  });
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden"
+      style={{ background: '#08111d', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+
+      {/* Header */}
+      <div className="shrink-0 px-3 pt-3 pb-2"
+        style={{ background: '#0b1627', borderBottom: '1px solid rgba(255,255,255,0.09)' }}>
+        <div className="text-[9px] font-bold uppercase tracking-[0.7px] mb-2" style={{ color: '#3d5470' }}>
+          Existing Custom Record Types
+        </div>
+        <input
+          className="w-full rounded-lg text-[11.5px] outline-none"
+          style={{
+            background: '#080f1a', border: '1px solid rgba(255,255,255,0.09)',
+            padding: '6px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)',
+          }}
+          placeholder="Search…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <div className="flex gap-1 mt-2">
+          {[['all','All'],['report','Reports'],['record','Records']].map(([k,l]) => (
+            <button key={k} type="button" onClick={() => onTypeFilter(k)}
+              className="flex-1 py-1 rounded text-[9.5px] font-bold uppercase tracking-[0.4px] border-none cursor-pointer transition-colors"
+              style={{
+                background: typeFilter === k ? 'rgba(61,130,240,0.22)' : 'rgba(255,255,255,0.04)',
+                color: typeFilter === k ? '#3d82f0' : '#4a5568',
+              }}>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto">
+        {filtered.length === 0 ? (
+          <div className="py-8 text-center text-[11px]" style={{ color: '#2d3f52' }}>
+            {search ? 'No matches' : 'No templates yet'}
+          </div>
+        ) : filtered.map((t, i) => (
+          <div key={t.id}
+            onClick={() => onSelect(t)}
+            className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+            style={{
+              background: selectedId === t.id ? 'rgba(61,130,240,0.10)' : i % 2 ? '#0a1422' : '#08111d',
+              borderBottom: '1px solid rgba(255,255,255,0.04)',
+              borderLeft: `2px solid ${selectedId === t.id ? '#3d82f0' : 'transparent'}`,
+              transition: 'background 0.1s',
+            }}
+            onMouseEnter={e => { if (selectedId !== t.id) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+            onMouseLeave={e => { if (selectedId !== t.id) e.currentTarget.style.background = i % 2 ? '#0a1422' : '#08111d'; }}
+          >
+            {t._kind === 'report'
+              ? <MdDescription size={13} style={{ color: '#3d82f0', flexShrink: 0 }} />
+              : <MdFolder       size={13} style={{ color: '#22c55e', flexShrink: 0 }} />
+            }
+            <div className="flex-1 min-w-0">
+              <div className="text-[11.5px] font-semibold truncate" style={{ color: '#c8d5e8' }}>
+                {t.name || <span style={{ color: '#3d5470', fontStyle: 'italic' }}>Untitled</span>}
+              </div>
+              <div className="text-[9.5px] truncate" style={{ color: '#3d5470' }}>
+                {t._kind === 'report' ? 'Police Report' : 'Police Record'} · {(t.sections || []).length} sections
+              </div>
+            </div>
+            <div className="flex gap-1 shrink-0" onClick={e => e.stopPropagation()}>
+              <button type="button" onClick={() => onDelete(t)} title="Delete"
+                className="rounded flex items-center justify-center border-none cursor-pointer"
+                style={{ width: 22, height: 22, background: 'rgba(239,68,68,0.14)', color: '#ef4444' }}>
+                <MdDelete size={11} />
+              </button>
+              <button type="button" onClick={() => onDuplicate(t)} title="Duplicate"
+                className="rounded flex items-center justify-center border-none cursor-pointer"
+                style={{ width: 22, height: 22, background: 'rgba(61,130,240,0.14)', color: '#3d82f0' }}>
+                <MdContentCopy size={11} />
+              </button>
+              <button type="button" onClick={() => onSelect(t)} title="Edit"
+                className="rounded flex items-center justify-center border-none cursor-pointer"
+                style={{ width: 22, height: 22, background: 'rgba(245,158,11,0.14)', color: '#f59e0b' }}>
+                <MdEdit size={11} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* New buttons */}
+      <div className="shrink-0 px-2.5 py-2.5 flex gap-2"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0b1627' }}>
+        <button type="button" onClick={() => onCreate(true)}
+          className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
+          style={{ background: 'rgba(61,130,240,0.18)', color: '#3d82f0', border: '1px solid rgba(61,130,240,0.28)' }}>
+          <MdAdd size={13} /> Report
+        </button>
+        <button type="button" onClick={() => onCreate(false)}
+          className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
+          style={{ background: 'rgba(34,197,94,0.14)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.24)' }}>
+          <MdAdd size={13} /> Record
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Center: template editor ── */
+function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
+  const [showPremade, setShowPremade]   = useState(false);
+  const [saved, setSaved]               = useState(false);
   const premadeRef = useRef(null);
-  const premadeTimer = useRef(null);
 
-  const openPremade  = () => { clearTimeout(premadeTimer.current); setShowPremade(true); };
-  const closePremade = () => { premadeTimer.current = setTimeout(() => setShowPremade(false), 120); };
+  useEffect(() => {
+    if (!showPremade) return;
+    const fn = (e) => { if (!premadeRef.current?.contains(e.target)) setShowPremade(false); };
+    document.addEventListener('mousedown', fn);
+    return () => document.removeEventListener('mousedown', fn);
+  }, [showPremade]);
 
-  const up = (patch) => setDraft(d => ({ ...d, ...patch }));
+  const up = (patch) => onChange({ ...draft, ...patch });
 
   const addSection = () => {
-    const newSec = { id: sid(), title: 'New Section', style: 'gray', fields: [] };
-    setDraft(d => ({ ...d, sections: [...(d.sections || []), newSec] }));
+    onChange({ ...draft, sections: [...(draft.sections || []), { id: sid(), title: 'New Section', style: 'gray', fields: [] }] });
   };
 
-  const addPremade = (premade) => {
-    const newSec = {
-      ...JSON.parse(JSON.stringify(premade)),
-      id: sid(),
-      fields: premade.fields.map(f => ({ ...f, id: uid() })),
-    };
-    setDraft(d => ({ ...d, sections: [...(d.sections || []), newSec] }));
+  const addPremade = (ps) => {
+    onChange({ ...draft, sections: [...(draft.sections || []), ps.make()] });
     setShowPremade(false);
   };
 
-  const updateSection = (idx, updated) => {
+  const updateSection = (idx, sec) => {
     const sections = [...(draft.sections || [])];
-    sections[idx] = updated;
-    setDraft(d => ({ ...d, sections }));
+    sections[idx] = sec;
+    onChange({ ...draft, sections });
   };
 
-  const deleteSection = (idx) => {
-    setDraft(d => ({ ...d, sections: (d.sections || []).filter((_, i) => i !== idx) }));
-  };
+  const deleteSection = (idx) =>
+    onChange({ ...draft, sections: (draft.sections || []).filter((_, i) => i !== idx) });
 
   const moveSection = (idx, dir) => {
     const sections = [...(draft.sections || [])];
-    const swap = idx + dir;
-    if (swap < 0 || swap >= sections.length) return;
-    [sections[idx], sections[swap]] = [sections[swap], sections[idx]];
-    setDraft(d => ({ ...d, sections }));
+    const j = idx + dir;
+    if (j < 0 || j >= sections.length) return;
+    [sections[idx], sections[j]] = [sections[j], sections[idx]];
+    onChange({ ...draft, sections });
+  };
+
+  const handleSave = () => {
+    if (!draft.name?.trim()) { alert('Template name is required.'); return; }
+    onSave();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1600);
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: ADMIN.bg }}>
-      {/* Builder header */}
-      <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ background: ADMIN.panel, borderBottom: `1px solid ${ADMIN.border}` }}>
-        <div className="flex-1 flex items-center gap-2">
-          <MdDescription size={18} color={ADMIN.red} />
-          <span className="text-[13px] font-bold" style={{ color: ADMIN.text }}>
-            {isReport ? 'Report Builder' : 'Record Builder'}: <span style={{ color: ADMIN.textDim }}>{draft.name || 'Untitled'}</span>
-          </span>
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#0b1424' }}>
+
+      {/* Toolbar */}
+      <div className="shrink-0 flex items-center gap-2.5 px-4 py-2.5"
+        style={{ background: '#0d1930', borderBottom: '1px solid rgba(255,255,255,0.09)' }}>
+        <div className="flex-1 min-w-0">
+          <div className="text-[8.5px] font-bold uppercase tracking-[0.7px] mb-1" style={{ color: '#3d5470' }}>
+            {isReport ? 'Report' : 'Record'} Builder · {isNew ? 'NEW' : 'EDITING'}
+          </div>
+          <input
+            className="text-[14px] font-bold bg-transparent border-b outline-none w-full transition-colors"
+            style={{ color: '#e2eaf8', borderColor: 'rgba(255,255,255,0.13)', paddingBottom: 2, fontFamily: 'var(--font-ui)' }}
+            placeholder="Record Type Name"
+            value={draft.name || ''}
+            onChange={e => up({ name: e.target.value })}
+          />
         </div>
-        <SonButton variant="ghost" size="sm" onClick={onClose}>Cancel</SonButton>
-        <SonButton variant="red" size="sm" onClick={() => onSave(draft)}>Save Template</SonButton>
+        <div className="flex gap-2 shrink-0">
+          <button type="button" onClick={onClose}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border-none cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.06)', color: '#6b7280' }}>
+            Cancel
+          </button>
+          <button type="button" onClick={handleSave}
+            className="px-3 py-1.5 rounded-lg text-[11.5px] font-bold border-none cursor-pointer flex items-center gap-1.5"
+            style={{
+              background: saved ? 'rgba(34,197,94,0.2)' : 'rgba(61,130,240,0.22)',
+              color: saved ? '#22c55e' : '#3d82f0',
+              border: `1px solid ${saved ? 'rgba(34,197,94,0.4)' : 'rgba(61,130,240,0.38)'}`,
+            }}>
+            {saved ? <><MdCheckCircle size={13} /> Saved!</> : <><MdSave size={13} /> Save</>}
+          </button>
+        </div>
       </div>
 
-      {/* Meta fields */}
-      <div className="px-4 pt-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-3 shrink-0" style={{ borderBottom: `1px solid ${ADMIN.border}`, background: ADMIN.panel }}>
+      {/* Meta (form code + agency) */}
+      <div className="shrink-0 px-4 py-2 grid grid-cols-2 gap-3"
+        style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div>
-          <label style={SON_LABEL}>Template Name *</label>
-          <input style={SON_INPUT} value={draft.name} onChange={e => up({ name: e.target.value })} placeholder="e.g. Use of Force Report" />
+          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#3d5470' }}>Form Code</div>
+          <input
+            className="w-full rounded-lg text-[12px] outline-none"
+            style={{ background: '#070e1c', border: '1px solid rgba(255,255,255,0.08)', padding: '5px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+            placeholder="e.g. TPD-ARR-001"
+            value={draft.formCode || ''}
+            onChange={e => up({ formCode: e.target.value })}
+          />
         </div>
         <div>
-          <label style={SON_LABEL}>Form Code</label>
-          <input style={SON_INPUT} value={draft.formCode || ''} onChange={e => up({ formCode: e.target.value })} placeholder="e.g. TPD-UOF-001" />
-        </div>
-        <div>
-          <label style={SON_LABEL}>Issuing Agency</label>
-          <input style={SON_INPUT} value={draft.agency || ''} onChange={e => up({ agency: e.target.value })} placeholder="e.g. Tampa Police Department" />
+          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#3d5470' }}>Agency</div>
+          <input
+            className="w-full rounded-lg text-[12px] outline-none"
+            style={{ background: '#070e1c', border: '1px solid rgba(255,255,255,0.08)', padding: '5px 10px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+            placeholder="e.g. Tampa Police Dept."
+            value={draft.agency || ''}
+            onChange={e => up({ agency: e.target.value })}
+          />
         </div>
       </div>
 
-      {/* Section builder (scrollable) */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      {/* Sections (scrollable body) */}
+      <div className="flex-1 overflow-y-auto px-3 py-3">
+        {(draft.sections || []).length === 0 && (
+          <div className="py-10 text-center" style={{ color: '#2d3f52' }}>
+            <MdDescription size={34} style={{ opacity: 0.18, margin: '0 auto 8px' }} />
+            <div className="text-[12px]">No sections yet — add a custom or premade section below</div>
+          </div>
+        )}
+
         {(draft.sections || []).map((sec, idx) => (
           <SectionBlock key={sec.id}
             section={sec}
@@ -345,35 +679,30 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
           />
         ))}
 
-        {(draft.sections || []).length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 gap-2 text-center" style={{ color: ADMIN.textMute }}>
-            <MdListAlt size={36} color={ADMIN.border} />
-            <div className="text-[13px]">No sections yet. Add a custom or premade section below.</div>
-          </div>
-        )}
+        {/* Add section row */}
+        <div className="flex gap-2 mt-2 flex-wrap">
+          <button type="button" onClick={addSection}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[11.5px] font-bold border-none cursor-pointer transition-colors"
+            style={{ background: 'rgba(20,184,166,0.14)', color: '#2dd4bf', border: '1px solid rgba(20,184,166,0.24)' }}>
+            <MdAdd size={15} /> ADD CUSTOM SECTION
+          </button>
 
-        {/* Add section buttons */}
-        <div className="flex gap-2 mt-2">
-          <SonButton onClick={addSection} size="sm">
-            <MdAdd size={15} /> Add Custom Section
-          </SonButton>
-          <div className="relative" ref={premadeRef} onMouseEnter={openPremade} onMouseLeave={closePremade}>
-            <SonButton onClick={() => (showPremade ? setShowPremade(false) : openPremade())} size="sm">
-              <MdAdd size={15} /> Add Premade Section <MdExpandMore size={14} />
-            </SonButton>
+          <div ref={premadeRef} className="relative">
+            <button type="button" onClick={() => setShowPremade(o => !o)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[11.5px] font-bold border-none cursor-pointer transition-colors"
+              style={{ background: 'rgba(249,115,22,0.14)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.24)' }}>
+              <MdAdd size={15} /> ADD PREMADE SECTION <MdExpandMore size={14} />
+            </button>
             {showPremade && (
-              <div className="absolute top-full left-0 mt-1 z-[100] min-w-[220px] rounded-lg p-1 shadow-2xl"
-                style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.borderHi}`, animation: 'dropdownFadeIn 0.13s ease-out' }}>
+              <div className="absolute bottom-full left-0 mb-1 z-[200] rounded-xl py-1.5 shadow-2xl min-w-[210px]"
+                style={{ background: '#0d1827', border: '1px solid rgba(255,255,255,0.14)', animation: 'dropdownFadeIn 0.12s ease-out' }}>
                 {PREMADE_SECTIONS.map(ps => (
-                  <button key={ps.key} onClick={() => addPremade(ps)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left border-none cursor-pointer text-[12px]"
-                    style={{ background: 'transparent', color: ADMIN.text, transition: 'all 0.1s ease-out' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = ADMIN.row; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.4)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
-                  >
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: SECTION_STYLES.find(s => s.key === ps.style)?.color || '#333' }} />
-                    {ps.title}
-                    <span className="ml-auto text-[9px]" style={{ color: ADMIN.textMute }}>{ps.fields.length} fields</span>
+                  <button key={ps.key} type="button" onClick={() => addPremade(ps)}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-left border-none cursor-pointer text-[11.5px] font-bold uppercase tracking-[0.4px] transition-colors"
+                    style={{ background: 'transparent', color: '#fb923c' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.10)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+                    {ps.label}
                   </button>
                 ))}
               </div>
@@ -385,161 +714,97 @@ function TemplateBuilder({ template, isReport, onSave, onClose }) {
   );
 }
 
-/* ─── Main page ─── */
+/* ── Main ── */
 export default function CustomRecords() {
   const { state, dispatch } = useCAD();
   const { reportTemplates = [], recordTemplates = [] } = state;
-  const [search, setSearch] = useState('');
-  const [editing, setEditing] = useState(null); // { template, isReport }
-  const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'report' | 'record'
+
+  const [typeFilter, setTypeFilter]       = useState('all');
+  const [draft, setDraft]                 = useState(null);
+  const [editingMeta, setEditingMeta]     = useState(null); // { id, isReport, isNew }
 
   const allTemplates = [
     ...reportTemplates.map(t => ({ ...t, _kind: 'report' })),
     ...recordTemplates.map(t => ({ ...t, _kind: 'record' })),
-  ].filter(t => {
-    const q = search.toLowerCase();
-    const matchSearch = !q || t.name.toLowerCase().includes(q) || (t.formCode || '').toLowerCase().includes(q);
-    const matchType = typeFilter === 'all' || t._kind === typeFilter;
-    return matchSearch && matchType;
-  });
+  ];
 
-  const createTemplate = (isReport) => {
-    const blank = { id: `tpl_${Date.now()}`, name: '', formCode: '', category: '', agency: '', sections: [] };
-    setEditing({ template: blank, isReport, isNew: true });
+  const selectTemplate = (t) => {
+    setDraft(JSON.parse(JSON.stringify(t)));
+    setEditingMeta({ id: t.id, isReport: t._kind === 'report', isNew: false });
   };
 
-  const duplicate = (tpl) => {
-    const copy = { ...JSON.parse(JSON.stringify(tpl)), id: `tpl_${Date.now()}`, name: `${tpl.name} (Copy)` };
-    const isReport = tpl._kind === 'report';
-    if (isReport) dispatch({ type: 'ADD_REPORT_TEMPLATE', payload: copy });
-    else dispatch({ type: 'ADD_RECORD_TEMPLATE', payload: copy });
+  const createTemplate = (isReport) => {
+    const blank = { id: `tpl_${Date.now()}`, name: '', formCode: '', agency: '', sections: [] };
+    setDraft(blank);
+    setEditingMeta({ id: blank.id, isReport, isNew: true });
+  };
+
+  const saveTemplate = () => {
+    if (!draft?.name?.trim()) { alert('Template name is required.'); return; }
+    const { isReport, isNew } = editingMeta;
+    const payload = { ...draft };
+    delete payload._kind;
+    if (isNew) {
+      dispatch({ type: isReport ? 'ADD_REPORT_TEMPLATE' : 'ADD_RECORD_TEMPLATE', payload });
+      setEditingMeta(prev => ({ ...prev, isNew: false }));
+    } else {
+      dispatch({ type: isReport ? 'UPDATE_REPORT_TEMPLATE' : 'UPDATE_RECORD_TEMPLATE', payload });
+    }
   };
 
   const deleteTemplate = (tpl) => {
-    if (!confirm(`Delete "${tpl.name}"? This cannot be undone.`)) return;
-    if (tpl._kind === 'report') dispatch({ type: 'DELETE_REPORT_TEMPLATE', payload: tpl.id });
-    else dispatch({ type: 'DELETE_RECORD_TEMPLATE', payload: tpl.id });
-    if (editing?.template?.id === tpl.id) setEditing(null);
+    if (!confirm(`Delete "${tpl.name}"?`)) return;
+    dispatch({ type: tpl._kind === 'report' ? 'DELETE_REPORT_TEMPLATE' : 'DELETE_RECORD_TEMPLATE', payload: tpl.id });
+    if (editingMeta?.id === tpl.id) { setDraft(null); setEditingMeta(null); }
   };
 
-  const saveTemplate = (draft) => {
-    if (!draft.name.trim()) return alert('Template name is required.');
-    const isReport = editing.isReport;
-    if (editing.isNew) {
-      if (isReport) dispatch({ type: 'ADD_REPORT_TEMPLATE', payload: draft });
-      else dispatch({ type: 'ADD_RECORD_TEMPLATE', payload: draft });
-    } else {
-      if (isReport) dispatch({ type: 'UPDATE_REPORT_TEMPLATE', payload: draft });
-      else dispatch({ type: 'UPDATE_RECORD_TEMPLATE', payload: draft });
-    }
-    setEditing(null);
+  const duplicateTemplate = (tpl) => {
+    const copy = { ...JSON.parse(JSON.stringify(tpl)), id: `tpl_${Date.now()}`, name: `${tpl.name} (Copy)` };
+    delete copy._kind;
+    dispatch({ type: tpl._kind === 'report' ? 'ADD_REPORT_TEMPLATE' : 'ADD_RECORD_TEMPLATE', payload: copy });
   };
-
-  if (editing) {
-    return <TemplateBuilder template={editing.template} isReport={editing.isReport} onSave={saveTemplate} onClose={() => setEditing(null)} />;
-  }
 
   return (
-    <div className="p-3 md:p-[22px]" style={{ background: ADMIN.bg, minHeight: '100%' }}>
-      <AdminPageTitle
-        right={
-          <div className="flex gap-2">
-            <SonButton size="sm" onClick={() => createTemplate(true)}>
-              <MdAdd size={15} /> New Report Template
-            </SonButton>
-            <SonButton variant="red" size="sm" onClick={() => createTemplate(false)}>
-              <MdAdd size={15} /> New Record Template
-            </SonButton>
-          </div>
-        }
-      >
-        Custom Records & Reports
-      </AdminPageTitle>
+    /* Negate AdminContent's p-6 padding so the builder is flush */
+    <div className="-m-3 md:-m-6 flex overflow-hidden font-ui"
+      style={{ height: 'calc(100vh - 56px)', background: '#08111d' }}>
 
-      {/* Filters + search */}
-      <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <SonSearch value={search} onChange={setSearch} placeholder="Search templates..." />
-        <div className="flex gap-1">
-          {[
-            { key: 'all',    label: 'All' },
-            { key: 'report', label: 'Reports' },
-            { key: 'record', label: 'Records' },
-          ].map(f => (
-            <button key={f.key} onClick={() => setTypeFilter(f.key)}
-              className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.4px] rounded-md cursor-pointer border-none transition-colors"
-              style={{
-                background: typeFilter === f.key ? ADMIN.red : ADMIN.panel2,
-                color: typeFilter === f.key ? '#fff' : ADMIN.textDim,
-              }}>
-              {f.label}
-            </button>
-          ))}
+      {/* Left: record list (260px fixed) */}
+      <div className="shrink-0 flex flex-col" style={{ width: 260 }}>
+        <RecordListPanel
+          templates={allTemplates}
+          selectedId={editingMeta?.id}
+          onSelect={selectTemplate}
+          onCreate={createTemplate}
+          onDuplicate={duplicateTemplate}
+          onDelete={deleteTemplate}
+          typeFilter={typeFilter}
+          onTypeFilter={setTypeFilter}
+        />
+      </div>
+
+      {/* Right: editor + preview (or empty state) */}
+      {draft ? (
+        <div className="flex-1 min-w-0 grid overflow-hidden" style={{ gridTemplateColumns: 'minmax(0,1fr) 400px' }}>
+          <TemplateEditor
+            key={editingMeta.id}
+            draft={draft}
+            onChange={setDraft}
+            isReport={editingMeta.isReport}
+            isNew={editingMeta.isNew}
+            onSave={saveTemplate}
+            onClose={() => { setDraft(null); setEditingMeta(null); }}
+          />
+          <PreviewPanel draft={draft} />
         </div>
-        <span className="text-[11px] ml-auto" style={{ color: ADMIN.textMute }}>
-          {allTemplates.length} template{allTemplates.length !== 1 ? 's' : ''}
-        </span>
-      </div>
-
-      {/* Template table */}
-      <div className="rounded-lg overflow-x-auto" style={{ border: `1px solid ${ADMIN.border}` }}>
-        <table className="w-full border-collapse text-[13px]">
-          <thead>
-            <tr style={{ background: ADMIN.panel2 }}>
-              {['Name', 'Type', 'Form Code', 'Sections', 'Actions'].map((h, i) => (
-                <th key={i} className="text-[11px] font-bold tracking-[0.5px] uppercase py-[11px] px-[14px] text-left whitespace-nowrap"
-                  style={{ color: ADMIN.textDim, borderBottom: `1px solid ${ADMIN.border}` }}>
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {allTemplates.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-[13px]" style={{ color: ADMIN.textMute, background: ADMIN.row }}>
-                  {search ? 'No templates match your search.' : 'No templates yet. Create your first template above.'}
-                </td>
-              </tr>
-            ) : allTemplates.map((t, i) => (
-              <tr key={t.id}
-                style={{ background: i % 2 ? ADMIN.rowAlt : ADMIN.row }}
-                onMouseEnter={e => { e.currentTarget.style.background = ADMIN.panel2; }}
-                onMouseLeave={e => { e.currentTarget.style.background = i % 2 ? ADMIN.rowAlt : ADMIN.row; }}
-              >
-                <td className="py-[10px] px-[14px]" style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
-                  <button onClick={() => setEditing({ template: { ...t }, isReport: t._kind === 'report', isNew: false })}
-                    className="text-[13px] font-semibold cursor-pointer bg-transparent border-none p-0 text-left transition-colors"
-                    style={{ color: ADMIN.text }}
-                    onMouseEnter={e => { e.currentTarget.style.color = ADMIN.blue; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = ADMIN.text; }}>
-                    {t.name || <span style={{ color: ADMIN.textMute, fontStyle: 'italic' }}>Untitled</span>}
-                  </button>
-                </td>
-                <td className="py-[10px] px-[14px]" style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
-                  <SonBadge color={t._kind === 'report' ? ADMIN.blue : ADMIN.green}>
-                    {t._kind === 'report' ? 'Report' : 'Record'}
-                  </SonBadge>
-                </td>
-                <td className="py-[10px] px-[14px]" style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
-                  <span className="text-[11px] font-mono" style={{ color: ADMIN.textMute }}>{t.formCode || '*'}</span>
-                </td>
-                <td className="py-[10px] px-[14px] text-[12px]" style={{ borderBottom: `1px solid ${ADMIN.border}`, color: ADMIN.textDim }}>
-                  {(t.sections || []).length} sections, {(t.sections || []).reduce((a, s) => a + (s.fields || []).length, 0)} fields
-                </td>
-                <td className="py-[10px] px-[14px]" style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
-                  <div className="flex gap-1.5">
-                    <SonButton size="sm" onClick={() => setEditing({ template: { ...t }, isReport: t._kind === 'report', isNew: false })}>
-                      Edit
-                    </SonButton>
-                    <SonIconBtn icon={MdContentCopy} onClick={() => duplicate(t)} title="Duplicate" />
-                    <SonIconBtn icon={MdDelete} onClick={() => deleteTemplate(t)} danger title="Delete" />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3"
+          style={{ color: '#2d3f52' }}>
+          <MdEdit size={44} style={{ opacity: 0.18 }} />
+          <div className="text-[14px] font-semibold" style={{ color: '#3d5470' }}>Select a record type to edit</div>
+          <div className="text-[11px]">or create a new Report / Record using the buttons on the left</div>
+        </div>
+      )}
     </div>
   );
 }
