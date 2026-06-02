@@ -306,9 +306,30 @@ function ReportPDF({ template, data = {}, meta = {} }) {
   );
 }
 
+/* Convert an external URL to a base64 data URI so @react-pdf/renderer
+   can embed it without making a separate (CORS-blocked) network request. */
+async function toDataUri(url) {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { mode: 'cors', cache: 'force-cache' });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 /* ── Public download helper called from page buttons ── */
 export async function downloadReportPDF(template, data, meta) {
-  const blob = await pdf(<ReportPDF template={template} data={data} meta={meta} />).toBlob();
+  const logoDataUri = await toDataUri(meta.logoUrl);
+  const resolvedMeta = { ...meta, logoUrl: logoDataUri };
+  const blob = await pdf(<ReportPDF template={template} data={data} meta={resolvedMeta} />).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
