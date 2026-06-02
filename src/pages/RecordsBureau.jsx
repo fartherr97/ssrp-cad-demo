@@ -51,7 +51,7 @@ const SEARCH_TYPES = [
   { id: 'PERSON',  label: 'Person',            Icon: MdPerson },
   { id: 'VEHICLE', label: 'Vehicle',            Icon: MdDirectionsCar },
   { id: 'WARRANT', label: 'Warrant',            Icon: MdGavel },
-  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300' },
+  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300', hoverClass: 'hover:bg-amber-400/[0.08] hover:border-amber-400/25 hover:text-amber-300' },
 ];
 
 export default function RecordsBureau() {
@@ -161,7 +161,7 @@ export default function RecordsBureau() {
               return (
                 <button key={t.id}
                   onClick={() => { setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : `bg-transparent border-transparent text-slate-400 ${t.hoverClass || 'hover:bg-white/[0.05] hover:text-slate-200'}`}`}>
                   <t.Icon size={15} /> {t.label}
                 </button>
               );
@@ -334,41 +334,26 @@ export default function RecordsBureau() {
                 {(() => {
                   const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
                   const tpl = templates.find(t => t.name === selCase.type);
-                  if (selCase.formData) {
-                    return (
-                      <FormDocWrap>
-                        <ReportDocument
-                          type={selCase.type}
-                          template={tpl}
-                          data={selCase.formData}
-                          editable={false}
-                          meta={{
-                            caseNumber: selCase.caseNumber || selCase.recordNumber,
-                            status: selCase.status,
-                            officer: selCase.officerBadge,
-                            dateTime: selCase.date,
-                          }}
-                        />
-                      </FormDocWrap>
-                    );
-                  }
-                  // Fallback: plain field list when no matching template
+                  // Merge any top-level summary into formData so narrative fields show it
+                  const data = {
+                    ...(selCase.formData || {}),
+                    ...(selCase.summary && !selCase.formData?.f10 ? { f10: selCase.summary } : {}),
+                  };
                   return (
-                    <div className="p-5 grid gap-4">
-                      <InfoCard title="Details">
-                        <Row label="Status"  value={<StatusChip status={selCase.status} />} />
-                        <Row label="Date"    value={selCase.date || '—'} mono />
-                        <Row label="Officer" value={selCase.officerBadge || '—'} mono />
-                        {selCaseKind === 'report' && <Row label="Call ID" value={selCase.callId || '—'} mono />}
-                      </InfoCard>
-                      {(selCase.summary || selCase.formData?.summary) && (
-                        <InfoCard title="Summary">
-                          <div className="text-[12.5px] text-slate-300 leading-relaxed">
-                            {selCase.summary || selCase.formData?.summary}
-                          </div>
-                        </InfoCard>
-                      )}
-                    </div>
+                    <FormDocWrap>
+                      <ReportDocument
+                        type={selCase.type}
+                        template={tpl}
+                        data={data}
+                        editable={false}
+                        meta={{
+                          caseNumber: selCase.caseNumber || selCase.recordNumber,
+                          status: selCase.status,
+                          officer: selCase.officerBadge,
+                          dateTime: selCase.date,
+                        }}
+                      />
+                    </FormDocWrap>
                   );
                 })()}
               </div>
