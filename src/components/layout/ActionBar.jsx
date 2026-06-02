@@ -264,7 +264,7 @@ export default function ActionBar() {
   const [showCaseSearch, setShowCaseSearch] = useState(false);
 
   useEffect(() => {
-    const onKey = (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setShowCaseSearch(v => !v); } };
+    const onKey = (e) => {};
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -332,7 +332,6 @@ export default function ActionBar() {
           className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 mr-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] transition-all duration-75 border border-transparent hover:border-border-base"
         >
           <MdSearch size={15} />
-          <span className="text-[10px] font-mono text-slate-600 hidden md:inline">⌘K</span>
         </button>
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />

@@ -175,6 +175,15 @@ export const REPORT_TEMPLATES = [
           { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
         ],
       },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
+        ],
+      },
     ],
   },
   {
@@ -233,6 +242,15 @@ export const REPORT_TEMPLATES = [
         id: "s4", title: "Full Narrative", style: "gray",
         fields: [
           { id: "f10", label: "Full Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
         ],
       },
     ],
@@ -306,9 +324,26 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
+        id: "sAddl", title: "Additional Information", style: "gray",
+        fields: [
+          { id: "ad_weapons",  label: "Weapon(s)",            type: "text",     span: 2 },
+          { id: "ad_arrtype",  label: "Arrest Type",          type: "dropdown", span: 1, options: ["On-View","Warrant","Probable Cause","Probation/Parole Violation"] },
+          { id: "ad_proboff",  label: "Probationary Officer", type: "text",     span: 1 },
+        ],
+      },
+      {
         id: "s5", title: "Arrest Narrative", style: "gray",
         fields: [
           { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
         ],
       },
     ],
@@ -381,6 +416,15 @@ export const REPORT_TEMPLATES = [
           { id: "f8", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
         ],
       },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
+        ],
+      },
     ],
   },
   {
@@ -438,6 +482,15 @@ export const REPORT_TEMPLATES = [
         id: "s4", title: "Notes", style: "gray",
         fields: [
           { id: "f9", label: "Additional Notes", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
         ],
       },
     ],
