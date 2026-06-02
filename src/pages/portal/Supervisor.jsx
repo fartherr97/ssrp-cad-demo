@@ -180,7 +180,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                   <select
                     value={status}
                     onChange={e => setStatus(e.target.value)}
-                    className="w-full bg-transparent text-[11.5px] font-bold text-slate-200 outline-none cursor-pointer border-0"
+                    className="w-full bg-transparent text-[11.5px] font-bold text-slate-200 outline-none cursor-pointer border-0 px-1 py-0.5 -mx-1 rounded"
                   >
                     {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
