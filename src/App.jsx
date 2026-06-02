@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import DispatchCenter from './pages/DispatchCenter';
 import IncidentDetail from './pages/IncidentDetail';
 import DispatchBoard from './pages/DispatchBoard';
+import DispatchPortal from './pages/DispatchPortal';
 import FireOpsBoard from './pages/FireOpsBoard';
 import RecordsBureau from './pages/RecordsBureau';
 import ReportsCenter from './pages/ReportsCenter';
@@ -123,6 +124,7 @@ function CADApp() {
     <Routes>
       <Route path="/" element={<LoginRoute />} />
       <Route element={<AuthShell />}>
+        <Route path="/dispatch"      element={<DispatchPortal />} />
         <Route path="/cad"           element={<DispatchCenter />} />
         <Route path="/cad/:callId"   element={<IncidentDetail />} />
         <Route path="/search"        element={<RecordsBureau />} />

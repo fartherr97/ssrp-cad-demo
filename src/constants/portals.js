@@ -3,7 +3,7 @@ import {
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
-  MdSupervisorAccount,
+  MdSupervisorAccount, MdHeadsetMic,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -21,14 +21,15 @@ export const PORTALS = {
     ],
   },
 
-  dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/cad',
-    showStatus: true, showCalls: true, showNewCall: true,
+  dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/dispatch',
+    showStatus: true, showCalls: true, showNewCall: false,
     nav: [
-      { Icon: MdDashboard, label: 'CAD',    route: '/cad'    },
-      { Icon: MdGridView,  label: 'Board',  route: '/board'  },
-      { Icon: MdGroups,    label: 'Units',  route: '/units'  },
-      { Icon: MdMap,       label: 'Map',    route: '/map'    },
-      { Icon: MdSearch,    label: 'Search', route: '/search' },
+      { Icon: MdHeadsetMic, label: 'Dispatch', route: '/dispatch' },
+      { Icon: MdDashboard,  label: 'CAD',      route: '/cad'      },
+      { Icon: MdGridView,   label: 'Board',    route: '/board'    },
+      { Icon: MdGroups,     label: 'Units',    route: '/units'    },
+      { Icon: MdMap,        label: 'Map',      route: '/map'      },
+      { Icon: MdSearch,     label: 'Search',   route: '/search'   },
     ],
   },
 

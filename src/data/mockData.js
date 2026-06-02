@@ -770,3 +770,14 @@ export const RECORD_TEMPLATES = [
   },
 ];
 
+export const INCOMING_911 = [
+  { id: 'inc_001', caller: 'Carlos Rivera',  callbackNumber: '555-0912', message: 'My neighbor is screaming and I hear things being thrown. Please send someone quick.',   location: '218 Magnolia Ave, Tampa',          receivedAt: Date.now() - 145000, priority: 1 },
+  { id: 'inc_002', caller: 'Anonymous',      callbackNumber: null,       message: 'Two guys in hoodies are breaking into a car on Dale Mabry. Black sedan.',              location: 'Dale Mabry Hwy / Hillsborough Ave', receivedAt: Date.now() - 62000,  priority: 2 },
+  { id: 'inc_003', caller: 'Beth Nguyen',    callbackNumber: '555-0443', message: 'My mother collapsed and is not breathing. We need an ambulance right now, please.',    location: '7714 Sunset Blvd Apt 2, Tampa',    receivedAt: Date.now() - 18000,  priority: 1 },
+];
+
+export const UNIT_GROUPS = [
+  { id: 'grp_001', name: 'Alpha Patrol',  color: '#3a88e8', units: ['TPD-831', 'TPD-807'] },
+  { id: 'grp_002', name: 'Traffic Unit',  color: '#f59e0b', units: ['FHP-209', 'FHP-214'] },
+];
+

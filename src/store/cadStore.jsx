@@ -3,7 +3,7 @@ import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
-  BUSINESSES, RECORD_TEMPLATES
+  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS
 } from '../data/mockData';
 import {
   TEN_CODES, CHARGE_TYPES, BOND_TYPES, STATUTES, UNIT_STATUS_CODES,
@@ -41,6 +41,8 @@ const initialState = {
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
   businesses: BUSINESSES,
+  incoming911: INCOMING_911,
+  unitGroups: UNIT_GROUPS,
   // ─── Admin customization config ───
   tenCodes: TEN_CODES,
   chargeTypes: CHARGE_TYPES,
@@ -317,6 +319,17 @@ function reducer(state, action) {
     }
     case 'SET_MY_CALL':
       return { ...state, myCallId: action.payload };
+
+    case 'ADD_INCOMING_911':
+      return { ...state, incoming911: [action.payload, ...state.incoming911] };
+    case 'REMOVE_INCOMING_911':
+      return { ...state, incoming911: state.incoming911.filter(c => c.id !== action.payload) };
+    case 'ADD_UNIT_GROUP':
+      return { ...state, unitGroups: [...state.unitGroups, action.payload] };
+    case 'UPDATE_UNIT_GROUP':
+      return { ...state, unitGroups: state.unitGroups.map(g => g.id === action.payload.id ? { ...g, ...action.payload.changes } : g) };
+    case 'DELETE_UNIT_GROUP':
+      return { ...state, unitGroups: state.unitGroups.filter(g => g.id !== action.payload) };
 
     case 'ADD_CIVILIAN': {
       const newCiv = { ...action.payload, id: state.nextId, vehicles: [], flags: [] };
