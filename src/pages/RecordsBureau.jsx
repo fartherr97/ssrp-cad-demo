@@ -130,6 +130,7 @@ export default function RecordsBureau() {
                 <MdSearch size={18} />
               </button>
             </div>
+            <p className="text-[10px] text-slate-600 mt-1.5 px-0.5">Supports exact and partial matches</p>
           </div>
 
           {/* Results */}

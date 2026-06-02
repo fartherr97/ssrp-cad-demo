@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../../store/cadStore';
 import ModifyIdentifier from '../ModifyIdentifier';
+import ReportRecordSearch from '../ReportRecordSearch';
+import { MdSearch } from 'react-icons/md';
 
 function Clock() {
   const [time, setTime] = useState('');
@@ -42,6 +44,15 @@ export default function TopBar() {
   const { state } = useCAD();
   const { currentUser, currentPage, officers, calls } = state;
   const [showIdentifier, setShowIdentifier] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setShowSearch(v => !v); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const me = officers.find(o => o.id === currentUser?.id);
   const activeCalls = calls.filter(c => c.status !== 'CLOSED').length;
@@ -99,6 +110,18 @@ export default function TopBar() {
 
       <div className="w-px h-6 bg-border-base shrink-0" />
 
+      {/* Report/Record search */}
+      <button
+        onClick={() => setShowSearch(true)}
+        title="Search reports & records (Ctrl+K)"
+        className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition-colors"
+      >
+        <MdSearch size={15} />
+        <span className="hidden sm:inline text-[10px] font-mono text-slate-600">⌘K</span>
+      </button>
+
+      <div className="w-px h-6 bg-border-base shrink-0" />
+
       {/* User info — click to modify identifier */}
       <button
         onClick={() => setShowIdentifier(true)}
@@ -121,6 +144,7 @@ export default function TopBar() {
       </button>
 
       {showIdentifier && <ModifyIdentifier onClose={() => setShowIdentifier(false)} />}
+      {showSearch && <ReportRecordSearch onClose={() => setShowSearch(false)} />}
     </header>
   );
 }
