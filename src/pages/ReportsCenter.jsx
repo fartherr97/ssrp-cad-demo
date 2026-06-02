@@ -215,15 +215,6 @@ export default function ReportsCenter() {
               <Detail label="Agency" value={me?.deptShort || 'HCSO'} />
               <Detail label="Status" value={<span className={BADGE.gray}>Draft</span>} />
             </div>
-            <div className="px-2 py-3 mt-1">
-              <div className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Sections</div>
-              {sectionTitles.map(t => (
-                <button key={t} onClick={() => scrollTo(t)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-colors ${activeTab === t ? 'bg-brand/15 text-brand-bright' : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'}`}>
-                  {t}
-                </button>
-              ))}
-            </div>
           </aside>
 
           {/* CENTER: report information + paper document */}
