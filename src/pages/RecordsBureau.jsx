@@ -431,52 +431,74 @@ export default function RecordsBureau() {
               <div className="flex-1 overflow-y-auto p-5">
                 {tab === 'SUMMARY' && selCiv && (
                   <div className="flex flex-col gap-4">
+                    {/* Row 1: Personal · Address · Additional */}
                     <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
-                      <InfoCard title="Personal Information" className="lg:col-span-2">
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                          <Row label="Full Name"      value={`${selCiv.firstName} ${selCiv.lastName}`} />
-                          <Row label="DOB"            value={`${selCiv.dob} (${age(selCiv.dob)})`} />
-                          <Row label="Gender"         value={selCiv.gender} />
-                          <Row label="Ethnicity"      value={selCiv.ethnicity} />
-                          <Row label="Height / Weight" value={`${selCiv.height} · ${selCiv.weight}`} />
-                          <Row label="Hair / Eyes"    value={`${selCiv.hair} / ${selCiv.eyes}`} />
-                          <Row label="SSN"            value={selCiv.ssn} mono />
-                          <Row label="Phone"          value={selCiv.phone} mono />
-                          <Row label="DL Number"      value={selCiv.dlNumber} mono />
-                          <Row label="DL Class"       value={selCiv.dlClass} />
+                      <InfoCard title="Personal Information">
+                        <Row label="Full Name"       value={`${selCiv.firstName} ${selCiv.lastName}`} />
+                        <Row label="DOB"             value={`${selCiv.dob} (${age(selCiv.dob)})`} />
+                        <Row label="Gender"          value={selCiv.gender} />
+                        <Row label="Ethnicity"       value={selCiv.ethnicity} />
+                        <Row label="Height / Weight" value={`${selCiv.height} · ${selCiv.weight}`} />
+                        <Row label="Hair / Eyes"     value={`${selCiv.hair} / ${selCiv.eyes}`} />
+                        <Row label="SSN"             value={selCiv.ssn} mono />
+                        <Row label="DL Number"       value={selCiv.dlNumber} mono />
+                        <Row label="DL Status"       value={<span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus}</span>} />
+                      </InfoCard>
+
+                      <InfoCard title="Address(es)">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Primary Address</div>
+                        <div className="text-[12.5px] text-slate-200 leading-relaxed mb-3">{selCiv.address || '—'}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Phone</div>
+                        <div className="text-[12.5px] text-slate-300 font-mono">{selCiv.phone || '—'}</div>
+                      </InfoCard>
+
+                      <InfoCard title="Additional Information">
+                        <Row label="Citizenship"    value={selCiv.citizenship || 'United States'} />
+                        <Row label="Occupation"     value={selCiv.occupation || 'Unknown'} />
+                        <Row label="Employer"       value={selCiv.employer || 'N/A'} />
+                        <Row label="DL Class"       value={selCiv.dlClass} />
+                        <Row label="Weapon Permit"  value={selCiv.weaponPermit ? <span className={statusBadge(selCiv.weaponPermit)}>{selCiv.weaponPermit}</span> : 'None'} />
+                        {selCiv.flags?.length > 0 && (
+                          <div className="mt-1">
+                            <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Caution(s)</div>
+                            <FlagRow flags={selCiv.flags} />
+                          </div>
+                        )}
+                      </InfoCard>
+                    </div>
+
+                    {/* Row 2: Photo (vertical) · Active Warrants · Active BOLOs */}
+                    <div className="grid gap-4" style={{ gridTemplateColumns: isMobile ? '1fr' : '180px 1fr 1fr' }}>
+                      <InfoCard title="Photo">
+                        <div className="flex items-center justify-center w-full rounded-lg bg-app-elevated border border-border-base overflow-hidden"
+                          style={{ aspectRatio: '3 / 4' }}>
+                          {selCiv.photoUrl
+                            ? <img src={selCiv.photoUrl} alt="Mugshot" className="w-full h-full object-cover" />
+                            : <MdPerson size={56} className="text-slate-700" />}
                         </div>
                       </InfoCard>
-                      <div className="flex flex-col gap-4">
-                        <InfoCard title="Photo" className="items-center">
-                          <div className="flex items-center justify-center w-full aspect-[4/5] max-h-[180px] rounded-lg bg-app-elevated border border-border-base">
-                            <MdPerson size={64} className="text-slate-700" />
-                          </div>
-                        </InfoCard>
-                      </div>
-                    </div>
-                    <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
-                      <InfoCard title="License & Permits">
-                        <Row label="DL Status"      value={<span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus}</span>} />
-                        <Row label="DL Expiry"      value={selCiv.dlExpiry} mono />
-                        <Row label="Weapon Permit"  value={selCiv.weaponPermit ? <span className={statusBadge(selCiv.weaponPermit)}>{selCiv.weaponPermit}</span> : '—'} />
-                      </InfoCard>
-                      <InfoCard title="Address">
-                        <div className="text-[12.5px] text-slate-200 leading-relaxed">{selCiv.address || '—'}</div>
-                      </InfoCard>
-                      <InfoCard title="Active Warrants">
+
+                      <InfoCard title={`Active Warrants (${activeWarrants.length})`}>
                         {activeWarrants.length === 0
-                          ? <div className="text-[12px] text-slate-500">No active warrants</div>
+                          ? <div className="text-[12px] text-slate-500">No active warrants on file.</div>
                           : activeWarrants.map(w => (
-                            <div key={w.id} className="flex items-start gap-2">
+                            <div key={w.id} className="flex items-start gap-2 mb-2 last:mb-0">
                               <MdWarningAmber size={16} className="text-red-400 mt-0.5 shrink-0" />
-                              <div>
+                              <div className="min-w-0">
                                 <div className="text-[12.5px] font-semibold text-slate-200">{w.charge}</div>
                                 <div className="text-[11px] text-slate-500">{w.type} · {w.issuedDate || w.date || ''}</div>
+                                {w.issuedBy && <div className="text-[10.5px] text-slate-600">Issued by: {w.issuedBy}</div>}
                               </div>
                             </div>
                           ))}
                       </InfoCard>
+
+                      <InfoCard title="Active BOLOs / Locations (0)">
+                        <div className="text-[12px] text-slate-500">No active BOLOs or lookout notices.</div>
+                      </InfoCard>
                     </div>
+
+                    {/* Row 3: Recent Incidents */}
                     <InfoCard title="Recent Incidents">
                       {civHistory.length === 0
                         ? <div className="text-[12px] text-slate-500">No criminal history on file</div>
