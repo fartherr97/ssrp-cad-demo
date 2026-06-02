@@ -58,6 +58,17 @@ const initialState = {
   loginPageConfig: LOGIN_PAGE_CONFIG,
   accountRestrictions: ACCOUNT_RESTRICTIONS,
   discordPresence: DISCORD_PRESENCE,
+  // ─── Custom civilian flags ───
+  customFlags: [
+    { id: 'WARRANT',  name: 'Warrant',          color: '#ef4444', description: 'Active arrest warrant on file' },
+    { id: 'VIOLENT',  name: 'Violent',           color: '#dc2626', description: 'History of violent behavior' },
+    { id: 'CAUTION',  name: 'Caution',           color: '#f59e0b', description: 'Exercise caution when approaching' },
+    { id: 'FELON',    name: 'Felon',             color: '#f97316', description: 'Convicted felon' },
+    { id: 'GANG',     name: 'Gang Affiliation',  color: '#a855f7', description: 'Known gang member or associate' },
+    { id: 'ARMED',    name: 'Armed & Dangerous', color: '#b91c1c', description: 'May be armed, approach with caution' },
+    { id: 'PAROLE',   name: 'On Parole',         color: '#3b82f6', description: 'Currently on parole or probation' },
+    { id: 'MENTAL',   name: 'Mental Health',     color: '#06b6d4', description: 'Known mental health concerns' },
+  ],
   // ─── Auto license-suspension engine (configurable in Admin) ───
   licensePointsConfig: {
     enabled: true,
@@ -336,6 +347,40 @@ function reducer(state, action) {
       const civilians = state.civilians.map(c =>
         c.id === action.payload ? { ...c, dlStatus: 'ACTIVE', licensePoints: 0, suspendedUntil: null } : c);
       return { ...state, civilians, ...addAuditEntry(state, 'License suspension lifted (reinstated)', 'License Points') };
+    }
+    // ── Custom flag definitions ──
+    case 'ADD_FLAG_DEF': {
+      const flag = { ...action.payload, id: `flag_${Date.now()}` };
+      return { ...state, customFlags: [...state.customFlags, flag] };
+    }
+    case 'UPDATE_FLAG_DEF': {
+      const customFlags = state.customFlags.map(f => f.id === action.payload.id ? { ...f, ...action.payload } : f);
+      return { ...state, customFlags };
+    }
+    case 'DELETE_FLAG_DEF': {
+      const customFlags = state.customFlags.filter(f => f.id !== action.payload);
+      // Remove this flag id from all civilians
+      const civilians = state.civilians.map(c => ({
+        ...c, flags: (c.flags || []).filter(fid => fid !== action.payload),
+      }));
+      return { ...state, customFlags, civilians };
+    }
+    // ── Civilian flag assignment ──
+    case 'ADD_CIVILIAN_FLAG': {
+      const { civilianId, flagId } = action.payload;
+      const civilians = state.civilians.map(c =>
+        c.id === civilianId
+          ? { ...c, flags: [...new Set([...(c.flags || []), flagId])] }
+          : c
+      );
+      return { ...state, civilians };
+    }
+    case 'REMOVE_CIVILIAN_FLAG': {
+      const { civilianId, flagId } = action.payload;
+      const civilians = state.civilians.map(c =>
+        c.id === civilianId ? { ...c, flags: (c.flags || []).filter(f => f !== flagId) } : c
+      );
+      return { ...state, civilians };
     }
     case 'ADMIN_ADD': {
       const { key, item } = action.payload;

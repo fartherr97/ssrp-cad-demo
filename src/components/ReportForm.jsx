@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
+import { FlagRow } from './CivilianFlags';
 
 // Static span classes so Tailwind JIT picks them up.
 const SPAN = {
@@ -194,6 +195,7 @@ function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) 
                 {kind === 'civilian' && (<>
                   <div className="text-[12.5px] font-semibold text-white truncate">{rec.firstName} {rec.lastName}</div>
                   <div className="text-[10.5px] text-slate-500 font-mono">DOB {rec.dob} · DL {rec.dlNumber}</div>
+                  {(rec.flags?.length > 0) && <div className="mt-0.5"><FlagRow flags={rec.flags} /></div>}
                 </>)}
                 {kind === 'vehicle' && (<>
                   <div className="flex items-center gap-1.5">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { FlagRow, FlagManager } from '../components/CivilianFlags';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -89,9 +90,7 @@ export default function CivilianRegistry() {
                   </div>
                   <div className={`${S_DATA} text-[10px]`}>DOB: {c.dob} · {c.gender}</div>
                   <div className="flex gap-1 mt-1 flex-wrap">
-                    {c.flags?.filter(f => f !== 'WARRANT').map(f => (
-                      <span key={f} className={`${f === 'VIOLENT' ? BADGE.fire : BADGE.orange} text-[8px]`}>{f}</span>
-                    ))}
+                    <FlagRow flags={c.flags || []} />
                   </div>
                 </div>
               );
@@ -124,12 +123,10 @@ export default function CivilianRegistry() {
                     <div className="text-[11px] font-mono text-slate-500 mt-0.5">
                       DOB: {selCiv.dob} · {selCiv.gender} · {selCiv.ethnicity}
                     </div>
-                    <div className="flex gap-1 mt-1.5">
+                    <div className="flex gap-1 mt-1.5 flex-wrap items-center">
                       {civWarrants.length > 0 && <span className={BADGE.red}>ACTIVE WARRANT</span>}
                       {selCiv.dlStatus === 'SUSPENDED' && <span className={BADGE.orange}>DL SUSPENDED</span>}
-                      {selCiv.flags?.filter(f => f !== 'WARRANT').map(f => (
-                        <span key={f} className={f === 'VIOLENT' ? BADGE.fire : BADGE.orange}>{f}</span>
-                      ))}
+                      <FlagRow flags={selCiv.flags || []} />
                     </div>
                   </div>
                   <div className="flex flex-wrap justify-end gap-1.5">
@@ -215,17 +212,8 @@ export default function CivilianRegistry() {
 
                 {tab === 'FLAGS' && (
                   <div className={S_CARD}>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">System Flags</div>
-                    {selCiv.flags?.length === 0 && civWarrants.length === 0 ? (
-                      <div className="text-[11px] text-cad-muted">No flags on record</div>
-                    ) : (
-                      <div className="flex flex-col gap-1.5">
-                        {civWarrants.length > 0 && <span className={`${BADGE.red} inline-flex w-fit`}>ACTIVE WARRANT ({civWarrants.length})</span>}
-                        {selCiv.flags?.map(f => (
-                          <span key={f} className={`${f === 'VIOLENT' ? BADGE.fire : f === 'WARRANT' ? BADGE.red : BADGE.orange} inline-flex w-fit`}>{f}</span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-3">Civilian Flags</div>
+                    <FlagManager civilianId={selCiv.id} flags={selCiv.flags || []} />
                   </div>
                 )}
               </div>
