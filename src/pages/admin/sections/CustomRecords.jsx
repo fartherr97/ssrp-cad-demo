@@ -785,7 +785,7 @@ export default function CustomRecords() {
 
       {/* Right: editor + preview (or empty state) */}
       {draft ? (
-        <div className="flex-1 min-w-0 grid overflow-hidden" style={{ gridTemplateColumns: 'minmax(0,1fr) 400px' }}>
+        <div className="flex-1 min-w-0 grid overflow-hidden" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <TemplateEditor
             key={editingMeta.id}
             draft={draft}
