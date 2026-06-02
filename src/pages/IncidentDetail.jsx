@@ -56,7 +56,7 @@ export default function IncidentDetail() {
   const [radioMsg, setRadioMsg] = useState('');
 
   const call = calls.find(c => c.id === callId);
-  const isDispatch = currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
+  const isDispatch = currentUser?.portal === 'dispatch' || currentUser?.portal === 'admin' || currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
   const onDutyOfficers = officers.filter(o => o.status !== 'OFFDUTY');
   const availableUnits = onDutyOfficers.filter(o => (o.status === 'AVAILABLE' || o.status === 'ENRT') && !call?.units.includes(o.unitId));
 

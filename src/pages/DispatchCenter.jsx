@@ -40,6 +40,36 @@ const StatusBadge = ({ status }) => <span className={cadStatus(status)}>{CAD_STA
 const CallStatus  = ({ status }) => <span className={cadCallStatus(status)}>{status}</span>;
 const PriBadge    = ({ p }) => <span className={cadPri(p)}>P{p}</span>;
 
+const UNIT_STATUSES = ['AVAILABLE','BUSY','ENRT','UNAVAILABLE','OFFDUTY'];
+
+function DispatchStatusPicker({ unit, onSet }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative inline-block">
+      <button type="button" onClick={e => { e.stopPropagation(); setOpen(v => !v); }}
+        className="cursor-pointer" style={{ background: 'none', border: 'none', padding: 0 }}>
+        <StatusBadge status={unit.status} />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-[49]" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 flex flex-col gap-0.5 p-1.5 rounded-xl shadow-2xl min-w-[130px]"
+            style={{ background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.12)' }}>
+            {UNIT_STATUSES.map(s => (
+              <button key={s} type="button"
+                onClick={e => { e.stopPropagation(); onSet(unit.unitId, s); setOpen(false); }}
+                className="text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold w-full"
+                style={{ cursor: 'pointer', background: unit.status === s ? 'rgba(58,136,232,0.15)' : 'transparent', border: 'none', color: unit.status === s ? '#3a88e8' : '#94a3b8' }}>
+                {CAD_STATUS_LABEL[s] || s}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ─── Small building blocks ─── */
 function SectionCard({ title, count, action, onAction, children, className = '' }) {
   return (
@@ -287,8 +317,7 @@ export default function DispatchCenter() {
 
           {/* Field units */}
           {showUnits && (
-            <SectionCard title="Field Units" count={onDutyOfficers.length}
-              action="View All" onAction={() => navigate('/units')}>
+            <SectionCard title="Field Units" count={onDutyOfficers.length}>
               <div className="overflow-auto max-h-[min(40vh,460px)]">
                 <table className="w-full border-collapse">
                   <thead>
@@ -309,7 +338,11 @@ export default function DispatchCenter() {
                         onClick={() => o.callId && navigate('/cad/' + o.callId)}>
                         <td className="px-4 py-2.5 text-[12.5px] font-mono font-bold text-white whitespace-nowrap"
                           style={{ color: STATUS_COLORS[o.status] || '#fff' }}>{o.unitId}</td>
-                        <td className="px-4 py-2.5"><StatusBadge status={o.status} /></td>
+                        <td className="px-4 py-2.5">
+                          {isDispatcher
+                            ? <DispatchStatusPicker unit={o} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
+                            : <StatusBadge status={o.status} />}
+                        </td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>
                         <td className="px-4 py-2.5 text-[12.5px] whitespace-nowrap"><DeptTag code={o.deptShort} /></td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 max-w-[200px] truncate">{o.location}</td>

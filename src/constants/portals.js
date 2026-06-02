@@ -21,15 +21,12 @@ export const PORTALS = {
     ],
   },
 
-  dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/dispatch',
-    showStatus: true, showCalls: true, showNewCall: false,
+  dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/cad',
+    showStatus: true, showCalls: true, showNewCall: true,
     nav: [
-      { Icon: MdHeadsetMic, label: 'Dispatch', route: '/dispatch' },
-      { Icon: MdDashboard,  label: 'CAD',      route: '/cad'      },
-      { Icon: MdGridView,   label: 'Board',    route: '/board'    },
-      { Icon: MdGroups,     label: 'Units',    route: '/units'    },
-      { Icon: MdMap,        label: 'Map',      route: '/map'      },
-      { Icon: MdSearch,     label: 'Search',   route: '/search'   },
+      { Icon: MdDashboard,  label: 'Board',   route: '/cad'    },
+      { Icon: MdMap,        label: 'Map',     route: '/map'    },
+      { Icon: MdSearch,     label: 'Search',  route: '/search' },
     ],
   },
 
