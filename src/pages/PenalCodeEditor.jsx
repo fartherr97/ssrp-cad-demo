@@ -55,7 +55,7 @@ export default function PenalCodeEditor() {
     setShowAdd(false);
   };
 
-  const typeBadge = { Felony: BADGE.red, Misdemeanor: BADGE.orange, Infraction: BADGE.yellow };
+  const typeBadge = { Felony: BADGE.red, Misdemeanor: BADGE.orange, Infraction: BADGE.green };
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>

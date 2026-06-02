@@ -222,7 +222,7 @@ function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) 
 const CHARGE_TYPE_STYLE = {
   Felony:     { bg: 'rgba(239,68,68,0.15)',   color: '#f87171', border: 'rgba(239,68,68,0.35)' },
   Misdemeanor:{ bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24', border: 'rgba(245,158,11,0.35)' },
-  Infraction: { bg: 'rgba(148,163,184,0.12)', color: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+  Infraction: { bg: 'rgba(34,197,94,0.12)',   color: '#4ade80', border: 'rgba(34,197,94,0.30)' },
 };
 
 function ChargesField({ f, value, onChange, readOnly }) {
