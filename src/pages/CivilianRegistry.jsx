@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { FlagRow, FlagManager } from '../components/CivilianFlags';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -25,6 +26,10 @@ export default function CivilianRegistry() {
     ssn: '', phone: '', address: '', dlNumber: '', dlClass: 'Class C', dlStatus: 'ACTIVE', dlExpiry: '',
   });
   const [vehForm, setVehForm] = useState({ plate: '', make: '', model: '', year: '', color: '', regStatus: 'VALID', regExpiry: '' });
+  const [createError, setCreateError] = useState('');
+  const [vehError, setVehError] = useState('');
+
+  const fieldLabel = f => ({ ssn: 'SSN', dlNumber: 'DL Number', phone: 'Phone' }[f] || f);
 
   const selCiv = selected != null ? civilians.find(c => c.id === selected) : null;
   const civVehicles = selCiv ? vehicles.filter(v => selCiv.vehicles?.includes(v.id)) : [];
@@ -36,6 +41,17 @@ export default function CivilianRegistry() {
 
   const createCivilian = () => {
     if (!form.firstName || !form.lastName) return;
+    const uniqueFields = state.uniqueIdentifiers?.civilian || [];
+    for (const field of uniqueFields) {
+      if (form[field]) {
+        const conflict = civilians.find(c => c[field] === form[field]);
+        if (conflict) {
+          setCreateError(`${fieldLabel(field)} "${form[field]}" is already in use by ${conflict.firstName} ${conflict.lastName}`);
+          return;
+        }
+      }
+    }
+    setCreateError('');
     dispatch({ type: 'ADD_CIVILIAN', payload: { ...form } });
     setForm({ firstName:'',lastName:'',dob:'',gender:'Male',ethnicity:'White',height:"5'10\"",weight:'180 lbs',hair:'Brown',eyes:'Brown',ssn:'',phone:'',address:'',dlNumber:'',dlClass:'Class C',dlStatus:'ACTIVE',dlExpiry:'' });
     setShowCreate(false);
@@ -43,6 +59,18 @@ export default function CivilianRegistry() {
 
   const addVehicle = () => {
     if (!vehForm.plate || !vehForm.make || !selCiv) return;
+    const uniqueFields = state.uniqueIdentifiers?.vehicle || [];
+    for (const field of uniqueFields) {
+      if (vehForm[field]) {
+        const conflict = vehicles.find(v => v[field] === vehForm[field]);
+        if (conflict) {
+          const owner = civilians.find(c => c.id === conflict.ownerId);
+          setVehError(`${fieldLabel(field)} "${vehForm[field]}" is already registered${owner ? ` to ${owner.firstName} ${owner.lastName}` : ''}`);
+          return;
+        }
+      }
+    }
+    setVehError('');
     dispatch({ type: 'ADD_VEHICLE', payload: { ...vehForm, ownerId: selCiv.id } });
     setVehForm({ plate:'',make:'',model:'',year:'',color:'',regStatus:'VALID',regExpiry:'' });
     setShowAddVeh(false);
@@ -89,9 +117,7 @@ export default function CivilianRegistry() {
                   </div>
                   <div className={`${S_DATA} text-[10px]`}>DOB: {c.dob} · {c.gender}</div>
                   <div className="flex gap-1 mt-1 flex-wrap">
-                    {c.flags?.filter(f => f !== 'WARRANT').map(f => (
-                      <span key={f} className={`${f === 'VIOLENT' ? BADGE.fire : BADGE.orange} text-[8px]`}>{f}</span>
-                    ))}
+                    <FlagRow flags={c.flags || []} />
                   </div>
                 </div>
               );
@@ -124,12 +150,10 @@ export default function CivilianRegistry() {
                     <div className="text-[11px] font-mono text-slate-500 mt-0.5">
                       DOB: {selCiv.dob} · {selCiv.gender} · {selCiv.ethnicity}
                     </div>
-                    <div className="flex gap-1 mt-1.5">
+                    <div className="flex gap-1 mt-1.5 flex-wrap items-center">
                       {civWarrants.length > 0 && <span className={BADGE.red}>ACTIVE WARRANT</span>}
                       {selCiv.dlStatus === 'SUSPENDED' && <span className={BADGE.orange}>DL SUSPENDED</span>}
-                      {selCiv.flags?.filter(f => f !== 'WARRANT').map(f => (
-                        <span key={f} className={f === 'VIOLENT' ? BADGE.fire : BADGE.orange}>{f}</span>
-                      ))}
+                      <FlagRow flags={selCiv.flags || []} />
                     </div>
                   </div>
                   <div className="flex flex-wrap justify-end gap-1.5">
@@ -215,17 +239,8 @@ export default function CivilianRegistry() {
 
                 {tab === 'FLAGS' && (
                   <div className={S_CARD}>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-2">System Flags</div>
-                    {selCiv.flags?.length === 0 && civWarrants.length === 0 ? (
-                      <div className="text-[11px] text-cad-muted">No flags on record</div>
-                    ) : (
-                      <div className="flex flex-col gap-1.5">
-                        {civWarrants.length > 0 && <span className={`${BADGE.red} inline-flex w-fit`}>ACTIVE WARRANT ({civWarrants.length})</span>}
-                        {selCiv.flags?.map(f => (
-                          <span key={f} className={`${f === 'VIOLENT' ? BADGE.fire : f === 'WARRANT' ? BADGE.red : BADGE.orange} inline-flex w-fit`}>{f}</span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.7px] mb-3">Civilian Flags</div>
+                    <FlagManager civilianId={selCiv.id} flags={selCiv.flags || []} />
                   </div>
                 )}
               </div>
@@ -236,11 +251,11 @@ export default function CivilianRegistry() {
 
       {/* Create Civilian Modal */}
       {showCreate && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
+        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && (setShowCreate(false), setCreateError(''))}>
           <div className={`${S_MODAL} max-w-[600px]`}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Create Civilian Record</div>
-              <button className={sm(S_BTN_GHOST)} onClick={() => setShowCreate(false)}>✕</button>
+              <button className={sm(S_BTN_GHOST)} onClick={() => { setShowCreate(false); setCreateError(''); }}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -261,8 +276,13 @@ export default function CivilianRegistry() {
                 <div className={S_FIELD}><label className={S_LABEL}>DL Status</label><select className={S_SELECT} value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></select></div>
               </div>
             </div>
+            {createError && (
+              <div className="px-5 pb-3">
+                <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{createError}</div>
+              </div>
+            )}
             <div className={S_MODAL_FOOTER}>
-              <button className={S_BTN_SECONDARY} onClick={() => setShowCreate(false)}>Cancel</button>
+              <button className={S_BTN_SECONDARY} onClick={() => { setShowCreate(false); setCreateError(''); }}>Cancel</button>
               <button className={S_BTN_PRIMARY} onClick={createCivilian} disabled={!form.firstName || !form.lastName}>Create Record</button>
             </div>
           </div>
@@ -271,11 +291,11 @@ export default function CivilianRegistry() {
 
       {/* Add Vehicle Modal */}
       {showAddVeh && selCiv && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowAddVeh(false)}>
+        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && (setShowAddVeh(false), setVehError(''))}>
           <div className={S_MODAL}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Register Vehicle * {selCiv.firstName} {selCiv.lastName}</div>
-              <button className={sm(S_BTN_GHOST)} onClick={() => setShowAddVeh(false)}>✕</button>
+              <button className={sm(S_BTN_GHOST)} onClick={() => { setShowAddVeh(false); setVehError(''); }}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -288,8 +308,13 @@ export default function CivilianRegistry() {
               </div>
               <div className={S_FIELD}><label className={S_LABEL}>Reg. Expiry Date</label><input className={S_INPUT} type="date" value={vehForm.regExpiry} onChange={e => setVehForm(p => ({...p, regExpiry: e.target.value}))} /></div>
             </div>
+            {vehError && (
+              <div className="px-5 pb-3">
+                <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{vehError}</div>
+              </div>
+            )}
             <div className={S_MODAL_FOOTER}>
-              <button className={S_BTN_SECONDARY} onClick={() => setShowAddVeh(false)}>Cancel</button>
+              <button className={S_BTN_SECONDARY} onClick={() => { setShowAddVeh(false); setVehError(''); }}>Cancel</button>
               <button className={S_BTN_PRIMARY} onClick={addVehicle} disabled={!vehForm.plate || !vehForm.make}>Register Vehicle</button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
+import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdBadge,
@@ -13,11 +14,6 @@ function age(dob) {
   if (isNaN(d)) return '';
   const diff = Date.now() - d.getTime();
   return Math.abs(new Date(diff).getUTCFullYear() - 1970);
-}
-
-function FlagBadge({ flag }) {
-  const map = { WARRANT: BADGE.red, CAUTION: BADGE.orange, VIOLENT: BADGE.fire };
-  return <span className={map[flag] || BADGE.gray}>{flag}</span>;
 }
 
 /* Card shell for the summary grid */
@@ -159,8 +155,8 @@ export default function RecordsBureau() {
                   <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('SUMMARY'); }}>
                     <div className="text-[12.5px] font-bold text-white">{r.firstName} {r.lastName}</div>
                     <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {r.dob} · {r.gender}</div>
-                    <div className="flex gap-1 mt-1.5 flex-wrap">
-                      {r.flags?.map(f => <FlagBadge key={f} flag={f} />)}
+                    <div className="flex gap-1 mt-1.5 flex-wrap items-center">
+                      <FlagRow flags={r.flags || []} />
                       {r.dlStatus === 'SUSPENDED' && <span className={BADGE.orange}>DL SUSP</span>}
                     </div>
                   </button>
@@ -226,7 +222,7 @@ export default function RecordsBureau() {
                   </div>
                 </div>
                 <div className="ml-auto flex gap-1.5 flex-wrap justify-end">
-                  {selCiv?.flags?.map(f => <FlagBadge key={f} flag={f} />)}
+                  {selCiv && <FlagRow flags={selCiv.flags || []} />}
                   {selVeh?.stolen && <span className={BADGE.red}>STOLEN</span>}
                 </div>
               </div>

@@ -20,6 +20,7 @@ import MDT from './pages/MDT';
 import FormBuilder from './pages/FormBuilder';
 import OfficerProfile from './pages/OfficerProfile';
 // Citizen portals
+import Supervisor from './pages/portal/Supervisor';
 import CivilianHome from './pages/portal/CivilianHome';
 import MyCharacters from './pages/portal/MyCharacters';
 import MyVehicles from './pages/portal/MyVehicles';
@@ -41,6 +42,7 @@ import Departments from './pages/admin/sections/Departments';
 import TenCodes from './pages/admin/sections/TenCodes';
 import Statutes from './pages/admin/sections/Statutes';
 import LicensePoints from './pages/admin/sections/LicensePoints';
+import Flags from './pages/admin/sections/Flags';
 import Logs from './pages/admin/sections/Logs';
 import InGame from './pages/admin/sections/InGame';
 import DiscordIntegration from './pages/admin/sections/DiscordIntegration';
@@ -119,6 +121,7 @@ function CADApp() {
           <Route path="ten-codes"          element={<TenCodes />} />
           <Route path="statutes"           element={<Statutes />} />
           <Route path="license-points"     element={<LicensePoints />} />
+          <Route path="flags"              element={<Flags />} />
           <Route path="logs"               element={<Logs />} />
           <Route path="in-game"            element={<InGame />} />
           <Route path="discord"            element={<DiscordIntegration />} />
@@ -155,6 +158,9 @@ function CADApp() {
         <Route path="/portal/licenses"    element={<MyLicenses />} />
         <Route path="/portal/file-report" element={<FileReport />} />
         <Route path="/portal/laws"        element={<CitizenLaws />} />
+
+        {/* ── Supervisor portal ── */}
+        <Route path="/portal/supervisor"  element={<Supervisor />} />
 
         {/* ── Business portal ── */}
         <Route path="/portal/business"    element={<BusinessHome />} />
