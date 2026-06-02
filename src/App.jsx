@@ -20,6 +20,7 @@ import MDT from './pages/MDT';
 import FormBuilder from './pages/FormBuilder';
 import OfficerProfile from './pages/OfficerProfile';
 // Citizen portals
+import Supervisor from './pages/portal/Supervisor';
 import CivilianHome from './pages/portal/CivilianHome';
 import MyCharacters from './pages/portal/MyCharacters';
 import MyVehicles from './pages/portal/MyVehicles';
@@ -157,6 +158,9 @@ function CADApp() {
         <Route path="/portal/licenses"    element={<MyLicenses />} />
         <Route path="/portal/file-report" element={<FileReport />} />
         <Route path="/portal/laws"        element={<CitizenLaws />} />
+
+        {/* ── Supervisor portal ── */}
+        <Route path="/portal/supervisor"  element={<Supervisor />} />
 
         {/* ── Business portal ── */}
         <Route path="/portal/business"    element={<BusinessHome />} />

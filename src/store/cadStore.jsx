@@ -69,6 +69,10 @@ const initialState = {
     { id: 'PAROLE',   name: 'On Parole',         color: '#3b82f6', description: 'Currently on parole or probation' },
     { id: 'MENTAL',   name: 'Mental Health',     color: '#06b6d4', description: 'Known mental health concerns' },
   ],
+  uniqueIdentifiers: {
+    civilian: ['ssn', 'dlNumber'],
+    vehicle: ['plate'],
+  },
   // ─── Auto license-suspension engine (configurable in Admin) ───
   licensePointsConfig: {
     enabled: true,
