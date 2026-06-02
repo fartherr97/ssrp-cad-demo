@@ -131,7 +131,7 @@ export default function RecordsBureau() {
     return kind === 'report' ? reports.find(r => r.id === numId || r.id === id)
                               : records.find(r => r.id === numId || r.id === id);
   })() : null;
-  const selCaseKind = selected?.startsWith('report') ? 'report' : 'record';
+  const selCaseKind = typeof selected === 'string' && selected.startsWith('report') ? 'report' : 'record';
 
   const civVehicles = selCiv ? vehicles.filter(v => selCiv.vehicles?.includes(v.id)) : [];
   const civWarrants = selCiv ? warrants.filter(w => w.civilianId === selCiv.id) : [];
