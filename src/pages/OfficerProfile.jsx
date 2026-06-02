@@ -4,9 +4,7 @@ import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
-import {
-  S_SELECT, S_TEXTAREA, S_BTN_PRIMARY, S_BTN_SECONDARY,
-} from '../constants/styles';
+import { S_BTN_PRIMARY } from '../constants/styles';
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
@@ -16,8 +14,6 @@ export default function OfficerProfile() {
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
   const [tab, setTab] = useState('info');
-  const [requestingTransfer, setRequestingTransfer] = useState(false);
-  const [transferNote, setTransferNote] = useState('');
   const { isMobile } = useResponsive();
 
   if (!myOfficer) return (
@@ -111,32 +107,10 @@ export default function OfficerProfile() {
               <IdentifierEditor />
             </InfoCard>
             <InfoCard title="TRANSFER REQUEST" accentColor={accentColor}>
-              {!requestingTransfer ? (
-                <div>
-                  <div className="text-slate-500 text-sm mb-3">Current subdivision: <span className="text-slate-300">{myOfficer.subdivision}</span></div>
-                  <button onClick={() => setRequestingTransfer(true)} className={S_BTN_PRIMARY}>
-                    Request Transfer
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Requested Subdivision</div>
-                  <select className={`${S_SELECT} mb-2`}>
-                    {(myDept?.subdivisions || []).map(s => <option key={s}>{s}</option>)}
-                  </select>
-                  <textarea
-                    value={transferNote}
-                    onChange={e => setTransferNote(e.target.value)}
-                    placeholder="Reason for transfer request..."
-                    rows={3}
-                    className={`${S_TEXTAREA} mb-2`}
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={() => setRequestingTransfer(false)} className={S_BTN_PRIMARY}>Submit</button>
-                    <button onClick={() => setRequestingTransfer(false)} className={S_BTN_SECONDARY}>Cancel</button>
-                  </div>
-                </div>
-              )}
+              <div className="text-slate-500 text-sm mb-3">Submit a transfer request through the SSRP portal.</div>
+              <a href="https://transfer.ssrp.us" target="_blank" rel="noreferrer" className={S_BTN_PRIMARY}>
+                Open Transfer Portal
+              </a>
             </InfoCard>
           </div>
         )}
