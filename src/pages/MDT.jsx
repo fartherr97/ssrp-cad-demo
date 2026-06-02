@@ -141,7 +141,7 @@ export default function MDT() {
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_5px_#2fd968] mr-1.5" />
                 Dispatch Radio Log
               </div>
-              <span className="text-[9px] text-cad-muted font-mono">CH: HILLSBOROUGH MAIN</span>
+              <span className="text-[9px] text-cad-muted font-mono">CH: SSRP MAIN</span>
             </div>
             <div className={S_PANEL_BODY}>
               {dispatchLog.map(e => (

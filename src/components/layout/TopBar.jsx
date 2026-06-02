@@ -66,7 +66,7 @@ export default function TopBar() {
           {pageLabel}
         </div>
         <div className="text-[9px] text-cad-muted font-mono tracking-wide">
-          HILLSBOROUGH CO. COMMUNICATIONS · EMERGENCY COMM. CENTER
+          SSRP COMMUNICATIONS · EMERGENCY COMM. CENTER
         </div>
       </div>
 

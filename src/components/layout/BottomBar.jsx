@@ -14,7 +14,7 @@ export default function BottomBar() {
 
   return (
     <footer className={S_STATUSBAR}>
-      <span>CH: HILLSBOROUGH MAIN</span>
+      <span>CH: SSRP MAIN</span>
       <span className={S_STATUSBAR_SEP} />
 
       <span>UNIT: <span className={S_STATUSBAR_HI}>{me?.unitId || '*'}</span></span>
@@ -50,7 +50,7 @@ export default function BottomBar() {
       <span>{me?.name || 'Unknown'} · {me?.rank || ''}</span>
 
       <span className="ml-auto text-[#1a2e44]">
-        SSRP CAD v3.0 · HILLSBOROUGH CO. ECC
+        SSRP CAD v3.0 · SSRP ECC
       </span>
     </footer>
   );

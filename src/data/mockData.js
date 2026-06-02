@@ -107,7 +107,7 @@ export const REPORTS = [
 export const REPORT_TEMPLATES = [
   {
     id: 1, name: "Traffic Stop",
-    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    agency: "TAMPA POLICE DEPARTMENT",
     formCode: "TPD-TS-001",
     signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature", "Date"],
     sections: [
@@ -146,7 +146,7 @@ export const REPORT_TEMPLATES = [
   },
   {
     id: 2, name: "Use of Force",
-    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    agency: "TAMPA POLICE DEPARTMENT",
     formCode: "TPD-UOF-001",
     signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature / Badge #", "Review Date"],
     sections: [
@@ -184,7 +184,7 @@ export const REPORT_TEMPLATES = [
   },
   {
     id: 3, name: "Arrest Report",
-    agency: "TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY",
+    agency: "TAMPA POLICE DEPARTMENT",
     formCode: "TPD-AR-001",
     signatureSlots: ["Arresting Officer / Badge #", "Supervisor / Badge #", "Booking Officer / Date"],
     sections: [
@@ -227,7 +227,7 @@ export const REPORT_TEMPLATES = [
   },
   {
     id: 4, name: "Incident Report",
-    agency: "HILLSBOROUGH COUNTY SHERIFF'S OFFICE / LAW ENFORCEMENT",
+    agency: "HCSO LAW ENFORCEMENT",
     formCode: "HCSO-IR-001",
     signatureSlots: ["Reporting Officer / Badge #", "Supervisor Signature", "Date"],
     sections: [
@@ -263,7 +263,7 @@ export const REPORT_TEMPLATES = [
   },
   {
     id: 5, name: "Field Interview",
-    agency: "HILLSBOROUGH COUNTY LAW ENFORCEMENT",
+    agency: "SSRP LAW ENFORCEMENTg",
     formCode: "HCSO-FI-001",
     signatureSlots: ["Officer Signature / Badge #", "Date"],
     sections: [
@@ -300,7 +300,7 @@ export const REPORT_TEMPLATES = [
   },
   {
     id: 6, name: "Supplement Report",
-    agency: "HILLSBOROUGH COUNTY LAW ENFORCEMENT",
+    agency: "SSRP LAW ENFORCEMENTg",
     formCode: "HCSO-SUPP-001",
     signatureSlots: ["Supplement Author / Badge #", "Supervisor Approval", "Date"],
     sections: [
@@ -452,7 +452,7 @@ export const RECORD_TEMPLATES = [
   },
   {
     id: 'r3', name: 'Trespass Notice',
-    agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
+    agency: 'SSRP LAW ENFORCEMENTg',
     formCode: 'HCLE-TN-001',
     sections: [
       { id: 's1', title: 'Subject Information', style: 'blue', fields: [
@@ -493,7 +493,7 @@ export const RECORD_TEMPLATES = [
   },
   {
     id: 'r5', name: 'Warrant',
-    agency: 'HILLSBOROUGH COUNTY CIRCUIT COURT',
+    agency: 'SUNSHINE STATE CIRCUIT COURT',
     formCode: 'HCCC-WR-001',
     sections: [
       { id: 's1', title: 'Warrant Information', style: 'blue', fields: [
@@ -513,7 +513,7 @@ export const RECORD_TEMPLATES = [
   },
   {
     id: 'r6', name: 'Florida Traffic Citation',
-    agency: 'HILLSBOROUGH COUNTY LAW ENFORCEMENT',
+    agency: 'SSRP LAW ENFORCEMENTg',
     formCode: 'FL-UFTC-001',
     sections: [
       { id: 's1', title: 'Citation Information', style: 'blue', fields: [

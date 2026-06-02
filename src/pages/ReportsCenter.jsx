@@ -36,7 +36,7 @@ const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
 
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
-  const { reports, reportTemplates, currentUser, officers, calls = [], myCallId } = state;
+  const { reports, reportTemplates, currentUser, officers, calls = [], myCallId, communityConfig, departments } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
@@ -162,7 +162,8 @@ export default function ReportsCenter() {
           status: 'Draft',
           dateTime: now.toLocaleString(),
           officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
-          agency: me?.deptShort || 'HCSO',
+          agency: me?.deptShort || communityConfig?.name || 'SSRP',
+          logoUrl: departments?.find(d => d.short === me?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         });
       } finally { setPdfLoading(false); }
     };

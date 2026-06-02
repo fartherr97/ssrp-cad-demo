@@ -95,6 +95,17 @@ export default function Departments() {
                           <input style={SON_INPUT} value={(d.subdivisions || []).join(', ')}
                             onChange={e => updateDept(d, { subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
                         </div>
+                        <div className="col-span-2">
+                          <label style={SON_LABEL}>Department Logo URL</label>
+                          <div className="flex items-center gap-3">
+                            <input style={{ ...SON_INPUT, flex: 1 }} value={d.logoUrl || ''} placeholder="https://..." onChange={e => updateDept(d, { logoUrl: e.target.value })} />
+                            {d.logoUrl && (
+                              <img src={d.logoUrl} alt="logo preview"
+                                style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 6, background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`, flexShrink: 0, padding: 3 }} />
+                            )}
+                          </div>
+                          <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 4 }}>Paste a direct image URL. Logo appears on PDF exports for this department.</div>
+                        </div>
                       </div>
                     )}
                   </div>

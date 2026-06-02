@@ -291,7 +291,7 @@ export default function AdminCenter() {
             <div className={S_CARD}>
               <div className="text-[11px] font-semibold mb-2.5 text-yellow-600">Community Configuration</div>
               <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>Community Name</label><input className={S_INPUT} defaultValue="Sunshine State RP" /></div>
-              <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>Dispatch Channel</label><input className={S_INPUT} defaultValue="Hillsborough Main" /></div>
+              <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>Dispatch Channel</label><input className={S_INPUT} defaultValue="SSRP Main" /></div>
               <div className={`${S_FIELD} mb-2`}><label className={S_LABEL}>CAD System Name</label><input className={S_INPUT} defaultValue="SSRP NEXUS CAD v2.0" /></div>
               <button className={sm(S_BTN_PRIMARY)}>Save Configuration</button>
             </div>

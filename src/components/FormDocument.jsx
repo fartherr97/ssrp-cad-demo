@@ -259,7 +259,7 @@ export function FormDocFooter({ left, right }) {
   return (
     <div style={{ ...S_FORM_DOC_FOOTER_S, display: 'flex', justifyContent: 'space-between' }}>
       <span>{left}</span>
-      <span>SSRP CAD SYSTEM * HILLSBOROUGH COUNTY</span>
+      <span>SSRP CAD SYSTEM</span>
       <span>{right}</span>
     </div>
   );
@@ -281,7 +281,7 @@ export function TrafficStopDoc({ data = {}, editable, onChange, meta = {} }) {
   return (
     <>
       <FormDocHeader
-        agency="TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY"
+        agency="TAMPA POLICE DEPARTMENT"
         title="Traffic Stop Report"
         subtitle="Form TPD-TS-001 · For Official Use Only"
         caseNo={meta.caseNumber}
@@ -330,7 +330,7 @@ export function UseOfForceDoc({ data = {}, editable, onChange, meta = {} }) {
   return (
     <>
       <FormDocHeader
-        agency="TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY"
+        agency="TAMPA POLICE DEPARTMENT"
         title="Use of Force Report"
         subtitle="Form TPD-UOF-001 · SUPERVISOR REVIEW REQUIRED"
         caseNo={meta.caseNumber}
@@ -380,7 +380,7 @@ export function ArrestReportDoc({ data = {}, editable, onChange, meta = {} }) {
   return (
     <>
       <FormDocHeader
-        agency="TAMPA POLICE DEPARTMENT / HILLSBOROUGH COUNTY"
+        agency="TAMPA POLICE DEPARTMENT"
         title="Arrest Report"
         subtitle="Form TPD-AR-001 · For Official Use Only"
         caseNo={meta.caseNumber}
@@ -430,7 +430,7 @@ export function IncidentReportDoc({ data = {}, editable, onChange, meta = {} }) 
   return (
     <>
       <FormDocHeader
-        agency="HILLSBOROUGH COUNTY SHERIFF'S OFFICE / LAW ENFORCEMENT"
+        agency="SUNSHINE STATE RP LAW ENFORCEMENT / LAW ENFORCEMENT"
         title="Incident Report"
         subtitle="Form HCSO-IR-001 · For Official Use Only"
         caseNo={meta.caseNumber}
@@ -474,7 +474,7 @@ export function FieldInterviewDoc({ data = {}, editable, onChange, meta = {} }) 
   return (
     <>
       <FormDocHeader
-        agency="HILLSBOROUGH COUNTY LAW ENFORCEMENT"
+        agency="SUNSHINE STATE RP LAW ENFORCEMENT"
         title="Field Interview Card"
         subtitle="Form HCSO-FI-001 · For Official Use Only"
         caseNo={meta.caseNumber}
@@ -513,7 +513,7 @@ export function SupplementReportDoc({ data = {}, editable, onChange, meta = {} }
   return (
     <>
       <FormDocHeader
-        agency="HILLSBOROUGH COUNTY LAW ENFORCEMENT"
+        agency="SUNSHINE STATE RP LAW ENFORCEMENT"
         title="Supplement Report"
         subtitle="Form HCSO-SUPP-001 · For Official Use Only"
         caseNo={meta.caseNumber}
@@ -550,7 +550,7 @@ export function GenericFormDoc({ template, data = {}, editable, onChange, meta =
   return (
     <>
       <FormDocHeader
-        agency="HILLSBOROUGH COUNTY LAW ENFORCEMENT"
+        agency="SUNSHINE STATE RP LAW ENFORCEMENT"
         title={template?.name || 'Report'}
         subtitle="For Official Use Only"
         caseNo={meta.caseNumber}
@@ -623,7 +623,7 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
   return (
     <>
       <FormDocHeader
-        agency={template?.agency || 'HILLSBOROUGH COUNTY LAW ENFORCEMENT'}
+        agency={template?.agency || 'SUNSHINE STATE RP LAW ENFORCEMENT'}
         title={template?.name || 'Report'}
         subtitle={template?.formCode ? `Form ${template.formCode} · For Official Use Only` : 'For Official Use Only'}
         caseNo={meta.caseNumber}

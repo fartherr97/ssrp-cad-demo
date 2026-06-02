@@ -63,7 +63,7 @@ export default function CreateCall() {
       {/* Header strip */}
       <div style={{ background: '#0b0d14', border: '1px solid #1e2533', borderBottom: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ color: '#f9fafb', fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px' }}>CREATE NEW CALL</span>
-        <span style={{ color: '#4b5563', fontSize: '11px' }}>Dispatch &bull; Hillsborough County, FL</span>
+        <span style={{ color: '#4b5563', fontSize: '11px' }}>Dispatch &bull; SSRP</span>
       </div>
 
       <form onSubmit={handleSubmit}>

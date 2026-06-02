@@ -166,7 +166,7 @@ export default function Sidebar() {
             CAD v2.0
           </div>
           <div className="text-[8px] text-cad-muted tracking-wide mt-px">
-            HILLSBOROUGH CO.
+            SSRP
           </div>
         </div>
       </div>

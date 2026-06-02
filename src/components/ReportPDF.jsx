@@ -210,57 +210,59 @@ function ReportPDF({ template, data = {}, meta = {} }) {
           ))}
         </View>
 
-        {/* Sections */}
+        {/* Sections — wrap freely so long content flows to the next page naturally */}
         {sections.map(sec => {
-          const hasCharges = sec.fields.some(f => f.type === 'charges');
           const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea');
           const textareaFields = sec.fields.filter(f => f.type === 'textarea');
           const checkboxFields = sec.fields.filter(f => f.type === 'checkbox');
           const chargeFields   = sec.fields.filter(f => f.type === 'charges');
 
           return (
-            <View key={sec.id} style={styles.section} wrap={false}>
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionDot} />
-                <Text style={styles.sectionTitle}>{sec.title}</Text>
-              </View>
-              {/* Regular fields in a row */}
-              {regularFields.length > 0 && (
-                <View style={styles.fieldsGrid}>
-                  {regularFields.map(f => renderField(f, data[f.id]))}
+            <View key={sec.id} style={styles.section}>
+              {/* Header stays with first content row so it's never orphaned at page bottom */}
+              <View wrap={false}>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.sectionDot} />
+                  <Text style={styles.sectionTitle}>{sec.title}</Text>
                 </View>
-              )}
-              {/* Checkboxes in a row */}
+                {regularFields.length > 0 && (
+                  <View style={styles.fieldsGrid}>
+                    {regularFields.map(f => renderField(f, data[f.id]))}
+                  </View>
+                )}
+              </View>
+              {/* Checkboxes */}
               {checkboxFields.length > 0 && (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: regularFields.length ? 4 : 0 }}>
+                <View wrap={false} style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: regularFields.length ? 4 : 0 }}>
                   {checkboxFields.map(f => renderField(f, data[f.id]))}
                 </View>
               )}
-              {/* Charges list */}
-              {chargeFields.map(f => (
-                <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
-                  <Text style={styles.fieldLabel}>{f.label || 'Charges'}</Text>
-                  <View style={styles.chargesWrap}>
-                    {(() => {
-                      const charges = Array.isArray(data[f.id]) ? data[f.id] : [];
-                      if (charges.length === 0) return <Text style={styles.noCharges}>No charges added.</Text>;
-                      return charges.map(c => {
-                        const ts = chargeTypeStyle(c.type);
-                        return (
-                          <View key={c.id} style={styles.chargeRow}>
-                            <Text style={styles.chargeCode}>{c.code}</Text>
-                            <Text style={styles.chargeName}>{c.name}</Text>
-                            <Text style={[styles.chargeType, { backgroundColor: ts.bg, color: ts.color }]}>{c.type}</Text>
-                            {c.fine > 0 && <Text style={styles.chargeMeta}>${c.fine.toLocaleString()} fine</Text>}
-                            {c.jailTime && c.jailTime !== 'None' && <Text style={styles.chargeMeta}>{c.jailTime}</Text>}
-                          </View>
-                        );
-                      });
-                    })()}
+              {/* Charges — each row is atomic */}
+              {chargeFields.map(f => {
+                const charges = Array.isArray(data[f.id]) ? data[f.id] : [];
+                return (
+                  <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
+                    <Text style={styles.fieldLabel}>{f.label || 'Charges'}</Text>
+                    <View style={styles.chargesWrap}>
+                      {charges.length === 0
+                        ? <Text style={styles.noCharges}>No charges added.</Text>
+                        : charges.map(c => {
+                            const ts = chargeTypeStyle(c.type);
+                            return (
+                              <View key={c.id} wrap={false} style={styles.chargeRow}>
+                                <Text style={styles.chargeCode}>{c.code}</Text>
+                                <Text style={styles.chargeName}>{c.name}</Text>
+                                <Text style={[styles.chargeType, { backgroundColor: ts.bg, color: ts.color }]}>{c.type}</Text>
+                                {c.fine > 0 && <Text style={styles.chargeMeta}>${c.fine.toLocaleString()} fine</Text>}
+                                {c.jailTime && c.jailTime !== 'None' && <Text style={styles.chargeMeta}>{c.jailTime}</Text>}
+                              </View>
+                            );
+                          })}
+                    </View>
                   </View>
-                </View>
-              ))}
-              {/* Textareas */}
+                );
+              })}
+              {/* Textareas — long narratives can span pages */}
               {textareaFields.map(f => (
                 <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
                   <Text style={styles.fieldLabel}>{f.label}</Text>
@@ -271,8 +273,8 @@ function ReportPDF({ template, data = {}, meta = {} }) {
           );
         })}
 
-        {/* Signature lines */}
-        <View style={styles.sigsWrap}>
+        {/* Signature lines — keep together, never split across pages */}
+        <View wrap={false} style={styles.sigsWrap}>
           <Text style={styles.sigTitle}>Signatures</Text>
           <View style={styles.sigRow}>
             {/* Officer signature */}

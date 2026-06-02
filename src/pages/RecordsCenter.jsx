@@ -24,7 +24,7 @@ const DRAFT_KEY = (tplId) => `ssrp_record_draft_${tplId}`;
 
 export default function RecordsCenter() {
   const { state, dispatch } = useCAD();
-  const { recordTemplates, currentUser, officers } = state;
+  const { recordTemplates, currentUser, officers, communityConfig, departments } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
@@ -130,7 +130,8 @@ export default function RecordsCenter() {
           status: 'Draft',
           dateTime: now.toLocaleString(),
           officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
-          agency: me?.deptShort || 'HCSO',
+          agency: me?.deptShort || communityConfig?.name || 'SSRP',
+          logoUrl: departments?.find(d => d.short === me?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         });
       } finally { setPdfLoading(false); }
     };

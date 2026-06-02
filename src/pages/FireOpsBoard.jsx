@@ -51,7 +51,7 @@ export default function FireOpsBoard() {
           <DeptTag code="HCFR" />
           <div>
             <div className="text-[13px] font-bold text-orange-400 tracking-[0.3px]">HCFR Operations</div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">Hillsborough County Fire Rescue</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">HCFR Fire Rescue</div>
           </div>
         </div>
         {[
