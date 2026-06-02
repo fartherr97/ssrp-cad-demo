@@ -81,7 +81,7 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
 
         {/* Filters */}
         <div className="flex gap-2 px-4 py-3 border-b border-border-faint shrink-0">
-          <div className="flex-1 flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2">
+          <div className="flex-1 min-w-0 flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2">
             <MdSearch size={14} className="text-slate-500 shrink-0" />
             <input
               className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
@@ -91,14 +91,14 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
             />
           </div>
           <select
-            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12px] text-slate-200 outline-none cursor-pointer"
+            className="shrink-0 bg-app-input border border-border-base rounded-lg px-2 py-2 text-[12px] text-slate-200 outline-none cursor-pointer"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
           >
             <option value="ALL">All Types</option>
-            <option>Felony</option>
-            <option>Misdemeanor</option>
-            <option>Infraction</option>
+            <option value="Felony">Felony</option>
+            <option value="Misdemeanor">Misd.</option>
+            <option value="Infraction">Infr.</option>
           </select>
         </div>
 
@@ -261,7 +261,7 @@ export default function LicensePoints() {
       {/* ── Points schedule ── */}
       <AdminPanel
         title="Points Schedule"
-        subtitle="Point value applied per violation type. Import directly from the penal code or add custom violations."
+        subtitle="Point value applied per violation type. Import charges directly from the penal code — edit points there if changes are needed."
         right={
           <SonButton size="sm" onClick={() => setShowImport(true)}><MdGavel size={14} /> Import from Penal Code</SonButton>
         }
@@ -275,24 +275,22 @@ export default function LicensePoints() {
             <SonRow key={s.id} i={i}>
               <SonCell>
                 <div className="flex items-center gap-2">
-                  {s.penalCodeId && (
-                    <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border border-brand/40 text-brand-bright bg-brand/10 uppercase tracking-[0.3px]">
-                      PC
-                    </span>
-                  )}
-                  <input style={{ ...SON_INPUT, padding: '6px 10px' }} value={s.label}
-                    onChange={e => setSched(s.id, { label: e.target.value })} />
+                  <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border border-brand/40 text-brand-bright bg-brand/10 uppercase tracking-[0.3px]">
+                    PC
+                  </span>
+                  <span style={{ fontSize: 13, color: ADMIN.text }}>{s.label}</span>
                 </div>
               </SonCell>
               <SonCell align="center">
-                <input type="number" min="0" style={{ ...SON_INPUT, padding: '6px 10px', width: 80, textAlign: 'center' }}
-                  value={s.points} onChange={e => setSched(s.id, { points: Number(e.target.value) })} />
+                <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-mono)', color: s.points >= 7 ? '#f87171' : s.points >= 4 ? '#fb923c' : s.points > 0 ? '#fbbf24' : ADMIN.textMute }}>
+                  {s.points}
+                </span>
               </SonCell>
               <SonCell align="right"><SonIconBtn icon={MdDelete} danger title="Remove" onClick={() => delSched(s.id)} /></SonCell>
             </SonRow>
           ))}
         </SonTable>
-        {cfg.schedule.length === 0 && <EmptyState>No violations configured. Import from the penal code or add a custom violation.</EmptyState>}
+        {cfg.schedule.length === 0 && <EmptyState>No violations configured. Use "Import from Penal Code" to add charges.</EmptyState>}
         {dirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes — click "Save Changes" to apply.</div>}
       </AdminPanel>
 
