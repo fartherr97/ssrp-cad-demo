@@ -118,7 +118,7 @@ function IconBtn({ icon: Icon, onClick, title, active, activeColor = '#3d82f0', 
     <button type="button" onClick={onClick} title={title}
       className="rounded flex items-center justify-center border-none cursor-pointer shrink-0 transition-all"
       style={{
-        width: 26, height: 26,
+        width: 22, height: 22,
         background: bg || (active ? `${activeColor}28` : 'rgba(255,255,255,0.05)'),
         color: color || (active ? activeColor : '#5d6f88'),
         border: `1px solid ${active ? activeColor + '50' : 'rgba(255,255,255,0.08)'}`,
@@ -169,15 +169,6 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           onChange={e => onUpdate({ ...field, label: e.target.value })}
         />
 
-        {/* Placeholder */}
-        <input
-          className="bg-transparent text-[10.5px] outline-none border-b border-transparent focus:border-white/20 transition-colors"
-          style={{ color: '#4a5568', width: 100, fontFamily: 'var(--font-ui)' }}
-          placeholder="Placeholder…"
-          value={field.placeholder || ''}
-          onChange={e => onUpdate({ ...field, placeholder: e.target.value })}
-        />
-
         {/* Width slider */}
         <div className="flex items-center gap-1.5 shrink-0" style={{ width: 72 }}>
           <input
@@ -201,18 +192,16 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           <IconBtn icon={MdLink}        onClick={() => tog('unique')}        active={!!field.unique}         activeColor="#a78bfa" title="Unique"          size={12} />
         </div>
 
-        {/* Options toggle (dropdown only) */}
-        {field.type === 'dropdown' && (
-          <button type="button" onClick={() => setShowOpts(o => !o)}
-            className="px-2 py-0.5 rounded text-[9.5px] font-bold border-none cursor-pointer shrink-0 transition-colors"
-            style={{
-              background: showOpts ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)',
-              color: showOpts ? '#34d399' : '#4a5568',
-              border: `1px solid ${showOpts ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.09)'}`,
-            }}>
-            OPTS
-          </button>
-        )}
+        {/* Opts toggle (all types) */}
+        <button type="button" onClick={() => setShowOpts(o => !o)}
+          className="px-2 py-0.5 rounded text-[9.5px] font-bold border-none cursor-pointer shrink-0 transition-colors"
+          style={{
+            background: showOpts ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)',
+            color: showOpts ? '#34d399' : '#4a5568',
+            border: `1px solid ${showOpts ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.09)'}`,
+          }}>
+          OPTS
+        </button>
 
         {/* Reorder + delete */}
         <div className="flex gap-0.5 shrink-0">
@@ -223,24 +212,39 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         </div>
       </div>
 
-      {/* Dropdown options editor */}
-      {showOpts && field.type === 'dropdown' && (
-        <div className="px-2.5 py-2"
+      {/* Opts expansion: placeholder + dropdown options */}
+      {showOpts && (
+        <div className="px-2.5 pt-2 pb-2.5"
           style={{ background: 'rgba(52,211,153,0.04)', borderTop: '1px solid rgba(52,211,153,0.14)' }}>
-          <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>
-            Options (one per line)
+          <div className="mb-2">
+            <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>Placeholder Text</div>
+            <input
+              style={{
+                width: '100%', background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
+                borderRadius: 6, color: '#dde6f1', padding: '6px 10px', fontSize: 11.5,
+                fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+              }}
+              placeholder="e.g. Enter value…"
+              value={field.placeholder || ''}
+              onChange={e => onUpdate({ ...field, placeholder: e.target.value })}
+            />
           </div>
-          <textarea
-            style={{
-              width: '100%', background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
-              borderRadius: 6, color: '#dde6f1', padding: '7px 10px', fontSize: 11.5,
-              fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
-              resize: 'vertical', minHeight: 60,
-            }}
-            value={(field.options || []).join('\n')}
-            onChange={e => onUpdate({ ...field, options: e.target.value.split('\n') })}
-            placeholder={'Option 1\nOption 2\nOption 3'}
-          />
+          {field.type === 'dropdown' && (
+            <div>
+              <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>Options (one per line)</div>
+              <textarea
+                style={{
+                  width: '100%', background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
+                  borderRadius: 6, color: '#dde6f1', padding: '7px 10px', fontSize: 11.5,
+                  fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+                  resize: 'vertical', minHeight: 60,
+                }}
+                value={(field.options || []).join('\n')}
+                onChange={e => onUpdate({ ...field, options: e.target.value.split('\n') })}
+                placeholder={'Option 1\nOption 2\nOption 3'}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -350,18 +354,6 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
       {/* Fields */}
       {!collapsed && (
         <div className="px-2.5 pt-1.5 pb-2" style={{ background: '#080f1a' }}>
-          {/* Column header labels */}
-          {(section.fields || []).length > 0 && (
-            <div className="flex items-center gap-1.5 px-2 mb-1 text-[8.5px] font-bold uppercase tracking-[0.5px]"
-              style={{ color: '#3d4f66' }}>
-              <span style={{ minWidth: 88 }}>Type</span>
-              <span className="flex-1">Label</span>
-              <span style={{ width: 100 }}>Placeholder</span>
-              <span style={{ minWidth: 56 }}>Width</span>
-              <span style={{ width: 130 }}>Req / RO / Sup / Lkp / Uniq</span>
-              <span style={{ width: 60 }}></span>
-            </div>
-          )}
           {(section.fields || []).map((f, idx) => (
             <FieldRow key={f.id}
               field={f}

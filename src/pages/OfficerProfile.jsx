@@ -35,6 +35,23 @@ export default function OfficerProfile() {
   const myDept = departments.find(d => d.id === myOfficer?.dept);
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
+
+  const today = new Date();
+  const weekAgo  = new Date(today.getTime() - 7  * 24 * 60 * 60 * 1000);
+  const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const parseTs = (s) => s ? new Date(s.replace(' ', 'T')) : new Date(0);
+  const weekMins  = myCallHistory.filter(c => parseTs(c.timestamp) >= weekAgo).length  * 30
+                  + myReports.filter(r => parseTs(r.date) >= weekAgo).length            * 20;
+  const monthMins = myCallHistory.filter(c => parseTs(c.timestamp) >= monthAgo).length * 30
+                  + myReports.filter(r => parseTs(r.date) >= monthAgo).length           * 20;
+  const fmtTime = (m) => {
+    const h = Math.floor(m / 60), min = m % 60;
+    if (!m) return '0m';
+    if (!h) return `${min}m`;
+    if (!min) return `${h}h`;
+    return `${h}h ${min}m`;
+  };
+
   const [tab, setTab] = useState('info');
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
@@ -139,8 +156,10 @@ export default function OfficerProfile() {
           style={{ gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)' }}
         >
           {[
-            { label: 'Reports Filed', val: myReports.length },
-            { label: 'Calls Attended', val: myCallHistory.length },
+            { label: 'Reports Filed',       val: myReports.length },
+            { label: 'Calls Attended',      val: myCallHistory.length },
+            { label: 'Activity This Week',  val: fmtTime(weekMins) },
+            { label: 'Activity This Month', val: fmtTime(monthMins) },
           ].map(s => (
             <div key={s.label} className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-3.5 py-3">
               <div className="text-white text-2xl font-extrabold leading-none">{s.val}</div>

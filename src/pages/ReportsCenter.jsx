@@ -56,6 +56,26 @@ export default function ReportsCenter() {
       const saved = localStorage.getItem(DRAFT_KEY(tpl.id));
       if (saved) restored = JSON.parse(saved);
     } catch { /* ignore */ }
+
+    // Auto-fill officer fields when opening a fresh form (no saved draft)
+    if (!Object.keys(restored).length) {
+      const officer = officers.find(o => o.id === currentUser?.id);
+      if (officer) {
+        const myDeptObj = departments?.find(d => d.id === officer.dept);
+        const allFields = (tpl.sections || []).flatMap(s => s.fields || []);
+        const autoFill = {};
+        for (const field of allFields) {
+          const l = (field.label || '').toLowerCase();
+          if (field.type === 'badge_lookup') {
+            autoFill[field.id] = officer.badge || '';
+          } else if (/department|agency|dept/.test(l) && field.type === 'text') {
+            autoFill[field.id] = myDeptObj?.name || officer.deptShort || '';
+          }
+        }
+        if (Object.keys(autoFill).length) restored = autoFill;
+      }
+    }
+
     setFormValues(restored);
     setSavedAt(null);
   };
