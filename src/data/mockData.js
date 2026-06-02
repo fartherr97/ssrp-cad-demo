@@ -54,12 +54,13 @@ export const CIVILIANS = [
 ];
 
 export const VEHICLES = [
-  { id: 1, plate: "ARC-1204", make: "Ford",            model: "F-150",    year: "2019", color: "Black",       regStatus: "VALID",     regExpiry: "2027-10-31", ownerId: 1, stolen: false, flags: [] },
-  { id: 2, plate: "TRK-8821", make: "Chevrolet",       model: "Silverado",year: "2021", color: "White",       regStatus: "VALID",     regExpiry: "2027-01-15", ownerId: 1, stolen: false, flags: [] },
-  { id: 3, plate: "GRN-5543", make: "Honda",           model: "Civic",    year: "2020", color: "Silver",      regStatus: "EXPIRED",   regExpiry: "2025-07-22", ownerId: 2, stolen: false, flags: ["EXPIRED REG"] },
-  { id: 4, plate: "SUS-1109", make: "Dodge",           model: "Charger",  year: "2018", color: "Charcoal",    regStatus: "SUSPENDED", regExpiry: "2024-09-01", ownerId: 3, stolen: false, flags: ["OWNER WANTED"] },
-  { id: 5, plate: "MAR-3012", make: "BMW",             model: "740i",     year: "2022", color: "White",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
-  { id: 6, plate: "HAR-5512", make: "Harley-Davidson", model: "Road King",year: "2020", color: "Black/Chrome",regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
+  // type added for form autofill (Vehicle Type dropdown)
+  { id: 1, plate: "ARC-1204", type: "Truck",      make: "Ford",            model: "F-150",    year: "2019", color: "Black",       regStatus: "VALID",     regExpiry: "2027-10-31", ownerId: 1, stolen: false, flags: [] },
+  { id: 2, plate: "TRK-8821", type: "Truck",      make: "Chevrolet",       model: "Silverado",year: "2021", color: "White",       regStatus: "VALID",     regExpiry: "2027-01-15", ownerId: 1, stolen: false, flags: [] },
+  { id: 3, plate: "GRN-5543", type: "Sedan",      make: "Honda",           model: "Civic",    year: "2020", color: "Silver",      regStatus: "EXPIRED",   regExpiry: "2025-07-22", ownerId: 2, stolen: false, flags: ["EXPIRED REG"] },
+  { id: 4, plate: "SUS-1109", type: "Sedan",      make: "Dodge",           model: "Charger",  year: "2018", color: "Charcoal",    regStatus: "SUSPENDED", regExpiry: "2024-09-01", ownerId: 3, stolen: false, flags: ["OWNER WANTED"] },
+  { id: 5, plate: "MAR-3012", type: "Sedan",      make: "BMW",             model: "740i",     year: "2022", color: "White",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
+  { id: 6, plate: "HAR-5512", type: "Motorcycle", make: "Harley-Davidson", model: "Road King",year: "2020", color: "Black",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
 ];
 
 export const WARRANTS = [
@@ -120,7 +121,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sCiv", title: "Civilian Information", style: "dark",
+        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
         fields: [
           { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
           { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
@@ -143,7 +144,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sVeh", title: "Vehicle Information", style: "dark",
+        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
         fields: [
           { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
           { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
@@ -191,7 +192,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sCiv", title: "Civilian Information", style: "dark",
+        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
         fields: [
           { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
           { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
@@ -251,7 +252,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sCiv", title: "Civilian Information", style: "dark",
+        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
         fields: [
           { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
           { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
@@ -274,7 +275,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sVeh", title: "Vehicle Information", style: "dark",
+        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
         fields: [
           { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
           { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
@@ -328,7 +329,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sCiv", title: "Civilian Information", style: "dark",
+        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
         fields: [
           { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
           { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
@@ -351,7 +352,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sVeh", title: "Vehicle Information", style: "dark",
+        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
         fields: [
           { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
           { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
@@ -398,7 +399,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sCiv", title: "Civilian Information", style: "dark",
+        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
         fields: [
           { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
           { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },

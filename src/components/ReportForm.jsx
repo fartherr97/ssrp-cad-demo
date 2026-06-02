@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -52,6 +52,13 @@ function searchData(kind, q, state) {
 }
 
 /* ── Map a picked record onto the section's fields by label ── */
+function calcAge(dob) {
+  if (!dob) return '';
+  const d = new Date(dob);
+  if (isNaN(d)) return '';
+  return String(Math.abs(new Date(Date.now() - d.getTime()).getUTCFullYear() - 1970));
+}
+
 function buildAutofill(kind, rec, fields, civilians) {
   const out = {};
   const has = (L, ...keys) => keys.some(k => L.includes(k));
@@ -59,25 +66,34 @@ function buildAutofill(kind, rec, fields, civilians) {
     const L = (f.label || '').toLowerCase();
     if (kind === 'civilian') {
       if (has(L, 'business')) continue;
-      if (has(L, 'name', 'holder', 'subject', 'driver', 'arrestee', 'party', 'person')) out[f.id] = `${rec.firstName} ${rec.lastName}`;
+      // Split first / last name fields get individual values
+      if (L === 'first name' || L === 'first') out[f.id] = rec.firstName;
+      else if (L === 'last name' || L === 'last') out[f.id] = rec.lastName;
+      else if (L === 'm.i.' || L === 'mi' || L === 'middle') out[f.id] = '';
+      // Full-name fields (subject name, driver name, etc.)
+      else if (has(L, 'name', 'holder', 'subject', 'driver', 'arrestee', 'party', 'person')) out[f.id] = `${rec.firstName} ${rec.lastName}`;
       else if (has(L, 'dob', 'birth')) out[f.id] = rec.dob;
+      else if (L === 'age') out[f.id] = calcAge(rec.dob);
       else if (has(L, 'residence', 'address')) out[f.id] = rec.address;
+      else if (has(L, 'zip')) out[f.id] = rec.zipCode || '';
+      else if (has(L, 'occupation')) out[f.id] = rec.occupation || '';
       else if (has(L, 'license number', 'dl number', 'dl #', 'driver license', 'license #')) out[f.id] = rec.dlNumber;
       else if (has(L, 'dl class', 'license class')) out[f.id] = rec.dlClass;
       else if (has(L, 'ssn')) out[f.id] = rec.ssn;
-      else if (has(L, 'phone')) out[f.id] = rec.phone;
+      else if (has(L, 'phone', 'contact number')) out[f.id] = rec.phone;
       else if (has(L, 'gender', 'sex')) out[f.id] = rec.gender;
-      else if (has(L, 'race', 'ethnic')) out[f.id] = rec.ethnicity;
+      else if (has(L, 'race', 'ethnic', 'skin')) out[f.id] = rec.ethnicity;
       else if (has(L, 'height')) out[f.id] = rec.height;
       else if (has(L, 'weight')) out[f.id] = rec.weight;
       else if (has(L, 'hair')) out[f.id] = rec.hair;
       else if (has(L, 'eye')) out[f.id] = rec.eyes;
     } else if (kind === 'vehicle') {
       if (has(L, 'plate', 'tag')) out[f.id] = rec.plate;
-      else if (has(L, 'make')) out[f.id] = rec.make;
-      else if (has(L, 'model')) out[f.id] = rec.model;
+      else if (L === 'make') out[f.id] = rec.make;
+      else if (L === 'model') out[f.id] = rec.model;
       else if (has(L, 'year')) out[f.id] = String(rec.year || '');
       else if (has(L, 'color', 'colour')) out[f.id] = rec.color;
+      else if (has(L, 'vehicle type', 'type')) out[f.id] = rec.type || '';
       else if (has(L, 'vin')) out[f.id] = rec.vin || '';
       else if (has(L, 'registration', 'reg ')) out[f.id] = rec.regStatus;
       else if (has(L, 'owner')) {
@@ -93,6 +109,102 @@ function buildAutofill(kind, rec, fields, civilians) {
     }
   }
   return out;
+}
+
+/* ── Section-level lookup search button + autocomplete ── */
+function SectionLookup({ sec, data, onBulk }) {
+  const { state } = useCAD();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [coords, setCoords] = useState(null);
+  const inputRef = useRef(null);
+  const boxRef = useRef(null);
+  const kind = sec.lookup;
+
+  const results = query.trim().length >= 1 ? searchData(kind, query, state) : [];
+
+  const place = () => {
+    if (inputRef.current) {
+      const r = inputRef.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 280) });
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => {
+      if (!inputRef.current?.contains(e.target) && !boxRef.current?.contains(e.target)) {
+        setOpen(false); setQuery('');
+      }
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [open]);
+
+  const pick = (rec) => {
+    onBulk(buildAutofill(kind, rec, sec.fields, state.civilians));
+    setOpen(false); setQuery('');
+  };
+
+  const Icon = kind === 'civilian' ? MdPerson : MdDirectionsCar;
+  const placeholder = kind === 'civilian' ? 'Name, SSN, DL #…' : 'Plate, make, model…';
+
+  return (
+    <div className="ml-auto flex items-center gap-1.5">
+      {open ? (
+        <>
+          <div ref={inputRef} className="relative flex items-center">
+            <MdSearch size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
+            <input
+              autoFocus
+              className="bg-app-input border border-brand/40 rounded-lg pl-7 pr-3 py-1 text-[12px] text-white outline-none focus:border-brand w-52"
+              placeholder={placeholder}
+              value={query}
+              onChange={e => { setQuery(e.target.value); place(); }}
+              onKeyDown={e => { if (e.key === 'Escape') { setOpen(false); setQuery(''); } }}
+            />
+          </div>
+          <button onClick={() => { setOpen(false); setQuery(''); }}
+            className="p-0.5 rounded text-slate-500 hover:text-slate-300 transition-colors">
+            <MdClose size={13} />
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[9px] font-bold tracking-[0.4px] uppercase hover:bg-brand/20 hover:border-brand/50 transition-all duration-75"
+        >
+          <Icon size={11} />
+          Search
+        </button>
+      )}
+      {open && results.length > 0 && coords && createPortal(
+        <div ref={boxRef}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[280px] overflow-auto"
+          style={{ left: coords.left, top: coords.top, width: coords.width, animation: 'dropdownFadeIn 0.12s ease-out' }}>
+          {results.map(rec => (
+            <button key={rec.id} type="button" onMouseDown={e => { e.preventDefault(); pick(rec); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left cursor-pointer hover:bg-white/[0.07] transition-colors">
+              <Icon size={16} className="text-slate-500 shrink-0" />
+              <div className="min-w-0 flex-1">
+                {kind === 'civilian' && (<>
+                  <div className="text-[12.5px] font-semibold text-white truncate">{rec.firstName} {rec.lastName}</div>
+                  <div className="text-[10.5px] text-slate-500 font-mono">DOB {rec.dob} · DL {rec.dlNumber}</div>
+                  {rec.flags?.length > 0 && <div className="mt-0.5"><FlagRow flags={rec.flags} /></div>}
+                </>)}
+                {kind === 'vehicle' && (<>
+                  <div className="text-[12.5px] font-semibold text-white font-mono">{rec.plate}</div>
+                  <div className="text-[10.5px] text-slate-500">{rec.year} {rec.make} {rec.model} · {rec.color}</div>
+                </>)}
+              </div>
+              <MdAutorenew size={13} className="text-brand-bright/60 shrink-0" />
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
 }
 
 function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) {
@@ -457,6 +569,8 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
     );
   }
 
+  const bulkFill = onBulkChange || ((updates) => Object.entries(updates).forEach(([k, v]) => change(k, v)));
+
   return (
     <div className="flex flex-col gap-5 max-w-[1100px] mx-auto w-full">
       <div data-doc-top />
@@ -466,6 +580,9 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-faint text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">
             <span className="w-1.5 h-1.5 rounded-full bg-brand" />
             {sec.title}
+            {sec.lookup && !readOnly && (
+              <SectionLookup sec={sec} data={data} onBulk={bulkFill} />
+            )}
           </div>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5 overflow-hidden">
             {sec.fields.map(f => (
