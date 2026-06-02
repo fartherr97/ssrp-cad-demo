@@ -1,10 +1,30 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { S_BTN_PRIMARY } from '../constants/styles';
+import { MdCameraAlt } from 'react-icons/md';
+
+function resizeToDataUrl(file, maxPx = 300) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
@@ -15,6 +35,15 @@ export default function OfficerProfile() {
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
   const [tab, setTab] = useState('info');
   const { isMobile } = useResponsive();
+  const fileRef = useRef();
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const dataUrl = await resizeToDataUrl(file);
+    dispatch({ type: 'PATCH_OFFICER', payload: { avatarUrl: dataUrl } });
+    e.target.value = '';
+  };
 
   if (!myOfficer) return (
     <div className="p-8 text-center text-slate-500">
@@ -39,11 +68,25 @@ export default function OfficerProfile() {
         style={{ borderLeft: `3px solid ${accentColor}` }}
       >
         <div className="flex items-center gap-4">
+          {/* Avatar — click to upload */}
           <div
-            className="w-14 h-14 rounded-xl bg-app-elevated flex items-center justify-center text-lg font-extrabold shrink-0 tracking-widest"
-            style={{ border: `2px solid ${accentColor}`, color: accentColor }}
+            className="relative w-14 h-14 rounded-xl shrink-0 cursor-pointer group overflow-hidden bg-app-elevated"
+            style={{ border: `2px solid ${accentColor}` }}
+            onClick={() => fileRef.current?.click()}
+            title="Upload profile picture"
           >
-            {initials}
+            {myOfficer.avatarUrl ? (
+              <img src={myOfficer.avatarUrl} alt="avatar" className="w-full h-full object-cover object-top" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-lg font-extrabold tracking-widest" style={{ color: accentColor }}>
+                {initials}
+              </div>
+            )}
+            {/* hover overlay */}
+            <div className="absolute inset-0 bg-black/55 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <MdCameraAlt size={20} className="text-white" />
+            </div>
+            <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden" onChange={handleAvatarUpload} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white text-lg font-bold tracking-[-0.2px]">{myOfficer.name}</div>

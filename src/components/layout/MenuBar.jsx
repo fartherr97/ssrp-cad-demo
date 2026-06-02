@@ -171,11 +171,15 @@ export default function MenuBar() {
 
           {/* Drawer header */}
           <div className="cad-mobile-nav-header">
-            <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-[22px] h-[22px]" />
+            {me?.avatarUrl ? (
+              <img src={me.avatarUrl} alt="avatar" className="w-[30px] h-[30px] rounded-lg object-cover object-top shrink-0" style={{ border: `1px solid ${STATUS_DOT_COLOR[myStatus]?.match(/#[0-9a-f]+/i)?.[0] || '#334155'}` }} />
+            ) : (
+              <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-[22px] h-[22px]" />
+            )}
             <div className="flex-1">
               <div className="text-[11px] font-bold text-[#c8a050] tracking-[0.3px]">Sunshine State RP</div>
               <div className="text-[9px] text-cad-muted">
-                {me?.name} · {me?.badge} · {me?.deptShort}
+                {me?.name} · {me?.unitId || me?.badge} · {me?.deptShort}
               </div>
             </div>
             <button className="cad-mobile-nav-close" onClick={() => setMobileOpen(false)}>✕</button>

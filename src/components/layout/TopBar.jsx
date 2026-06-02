@@ -105,10 +105,11 @@ export default function TopBar() {
         className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/[0.06] transition-colors cursor-pointer group"
         title="Modify Identifier"
       >
-        <div
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
-        />
+        {me?.avatarUrl ? (
+          <img src={me.avatarUrl} alt="avatar" className="w-6 h-6 rounded-md object-cover object-top shrink-0" style={{ border: `1px solid ${statusColor}` }} />
+        ) : (
+          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
+        )}
         <div className="text-right">
           <div className="text-[11px] font-semibold text-cad-text tracking-wide group-hover:text-white transition-colors">
             {me?.rank ? `${me.rank.toUpperCase().slice(0, 3)}. ` : ''}{currentUser?.name}
