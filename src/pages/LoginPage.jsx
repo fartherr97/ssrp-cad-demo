@@ -161,7 +161,7 @@ export default function LoginPage() {
           )}
           {connected && (
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: '#22ff66', boxShadow: '0 0 6px #22ff66' }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: '#22ff66', animation: 'connectedGlow 2.4s ease-in-out infinite' }} />
               <span className="text-[11px] sm:text-[12px] font-semibold text-[#22ff66]">
                 <span className="hidden sm:inline">Discord </span>Connected
               </span>
