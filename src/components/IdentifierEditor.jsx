@@ -9,6 +9,7 @@ export default function IdentifierEditor({ onClose }) {
   const me = officers.find(o => o.id === currentUser?.id);
 
   const init = () => ({
+    name:        me?.name        ?? '',
     unitId:      me?.unitId      ?? '',
     rank:        me?.rank        ?? '',
     status:      me?.status      ?? 'OFFDUTY',
@@ -44,6 +45,11 @@ export default function IdentifierEditor({ onClose }) {
 
   return (
     <div className="grid gap-3">
+      <div>
+        <label className={S_LABEL}>Display Name</label>
+        <input className={S_INPUT} value={draft.name} onChange={e => set('name', e.target.value)} placeholder="e.g. James Reeves" />
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={S_LABEL}>Unit Number</label>

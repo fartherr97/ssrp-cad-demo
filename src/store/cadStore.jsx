@@ -190,7 +190,10 @@ function reducer(state, action) {
         statusChanged ? 'status' : 'unit'
       ) : {};
       const audit = addAuditEntry(state, `Identifier updated for ${next?.name}`, 'CAD');
-      return { ...state, officers, ...log, ...audit };
+      const currentUser = action.payload.name
+        ? { ...state.currentUser, name: action.payload.name }
+        : state.currentUser;
+      return { ...state, officers, currentUser, ...log, ...audit };
     }
 
     case 'SAVE_IDENTIFIER': {

@@ -5,7 +5,7 @@ import IdentifierEditor from '../components/IdentifierEditor';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_INPUT, S_LABEL } from '../constants/styles';
-import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit } from 'react-icons/md';
+import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit, MdClose } from 'react-icons/md';
 
 function resizeToDataUrl(file, maxPx = 300) {
   return new Promise((resolve) => {
@@ -34,8 +34,24 @@ export default function OfficerProfile() {
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
   const [tab, setTab] = useState('info');
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
   const { isMobile } = useResponsive();
   const fileRef = useRef();
+  const nameInputRef = useRef();
+
+  const startEditName = () => {
+    setNameDraft(myOfficer.name);
+    setEditingName(true);
+    setTimeout(() => nameInputRef.current?.select(), 0);
+  };
+  const saveName = () => {
+    const trimmed = nameDraft.trim();
+    if (trimmed && trimmed !== myOfficer.name)
+      dispatch({ type: 'PATCH_OFFICER', payload: { name: trimmed } });
+    setEditingName(false);
+  };
+  const cancelName = () => setEditingName(false);
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -89,7 +105,24 @@ export default function OfficerProfile() {
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden" onChange={handleAvatarUpload} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white text-lg font-bold tracking-[-0.2px]">{myOfficer.name}</div>
+            {editingName ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  ref={nameInputRef}
+                  className="bg-app-input border border-brand/50 rounded-lg px-2.5 py-1 text-white text-[15px] font-bold tracking-[-0.2px] outline-none focus:border-brand w-full max-w-[220px]"
+                  value={nameDraft}
+                  onChange={e => setNameDraft(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') cancelName(); }}
+                />
+                <button onClick={saveName} className="p-1 rounded-lg text-emerald-400 hover:bg-emerald-400/10 transition-all duration-75" title="Save"><MdCheckCircle size={17} /></button>
+                <button onClick={cancelName} className="p-1 rounded-lg text-slate-500 hover:bg-white/[0.06] transition-all duration-75" title="Cancel"><MdClose size={17} /></button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 group/name">
+                <span className="text-white text-lg font-bold tracking-[-0.2px]">{myOfficer.name}</span>
+                <button onClick={startEditName} className="opacity-0 group-hover/name:opacity-100 p-0.5 rounded text-slate-500 hover:text-slate-300 transition-all duration-75" title="Edit name"><MdEdit size={13} /></button>
+              </div>
+            )}
             <div className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5">
               {myOfficer.rank} &bull; {myDept?.short ? <DeptTag code={myDept.short} /> : (myDept?.name || 'Unknown Department')}
             </div>
