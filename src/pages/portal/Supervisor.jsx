@@ -123,10 +123,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 <span className="text-[12.5px] text-slate-200">{d.value}</span>
               </div>
             ))}
-            <div className="flex flex-col gap-0.5 py-2">
-              <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">Status</span>
-              <StatusPill status={status} />
-            </div>
           </div>
         </aside>
 
