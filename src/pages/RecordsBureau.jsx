@@ -34,17 +34,23 @@ function Row({ label, value, mono }) {
 }
 
 const STATUS_CHIP = {
-  'Pending Review':  'text-amber-400 bg-amber-400/10 border-amber-400/30',
-  'Approved':        'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
-  'Rejected':        'text-red-400 bg-red-400/10 border-red-400/30',
-  'Pending Changes': 'text-orange-400 bg-orange-400/10 border-orange-400/30',
-  'Active':          'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
-  'Expired':         'text-slate-400 bg-slate-400/10 border-slate-400/30',
-  'Revoked':         'text-red-400 bg-red-400/10 border-red-400/30',
-  'Draft':           'text-slate-500 bg-slate-500/10 border-slate-500/30',
+  'Pending Review':  'text-amber-400/80 bg-amber-400/[0.08] border-amber-400/20',
+  'Approved':        'text-emerald-400/75 bg-emerald-400/[0.07] border-emerald-400/18',
+  'Rejected':        'text-red-400/80 bg-red-400/[0.08] border-red-400/20',
+  'Pending Changes': 'text-orange-400/80 bg-orange-400/[0.08] border-orange-400/20',
+  'Active':          'text-emerald-400/75 bg-emerald-400/[0.07] border-emerald-400/18',
+  'Expired':         'text-slate-400/70 bg-slate-400/[0.06] border-slate-400/18',
+  'Revoked':         'text-red-400/80 bg-red-400/[0.08] border-red-400/20',
+  'Draft':           'text-slate-500/70 bg-slate-500/[0.06] border-slate-500/18',
 };
 function StatusChip({ status }) {
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold tracking-wide ${STATUS_CHIP[status] || 'text-slate-400 bg-slate-400/10 border-slate-400/30'}`}>{status}</span>;
+  const cls = STATUS_CHIP[status] || 'text-slate-400/70 bg-slate-400/[0.06] border-slate-400/18';
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-[3px] rounded-full border text-[10px] font-medium ${cls}`}>
+      <span className="w-1 h-1 rounded-full bg-current opacity-70 shrink-0" />
+      {status}
+    </span>
+  );
 }
 
 const SEARCH_TYPES = [
