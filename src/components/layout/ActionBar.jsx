@@ -126,6 +126,7 @@ const STATUS_BTNS = [
 function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isActive }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
+  const [hoveredStatus, setHoveredStatus] = useState(null);
   const ref = useRef(null);
   const menuRef = useRef(null);
 
@@ -204,13 +205,20 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
               <div className="grid grid-cols-2 gap-1 px-1 pb-1.5">
                 {STATUS_BTNS.map(s => {
                   const on = myStatus === s.status;
+                  const hov = hoveredStatus === s.status;
                   const c = STATUS_COLORS[s.status];
+                  const lit = on || hov;
                   return (
                     <button key={s.status} onClick={() => setStatus(s.status)}
-                      className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? '' : 'border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
-                      style={on ? { background: `${c}22`, borderColor: `${c}55`, color: c } : undefined}
+                      onMouseEnter={() => setHoveredStatus(s.status)}
+                      onMouseLeave={() => setHoveredStatus(null)}
+                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border"
+                      style={lit
+                        ? { background: `${c}22`, borderColor: `${c}55`, color: c }
+                        : { borderColor: 'transparent', color: '#94a3b8' }
+                      }
                     >
-                      <s.Icon size={14} style={on ? { color: c } : undefined} />
+                      <s.Icon size={14} style={{ color: lit ? c : '#94a3b8', transition: 'color 0.15s' }} />
                       {s.label}
                     </button>
                   );
