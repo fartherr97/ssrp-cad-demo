@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
-import { RecordReturn } from '../components/FormDocument';
-import ReportForm from '../components/ReportForm';
+import { RecordReturn, FormDocWrap, ReportDocument } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
@@ -238,7 +237,14 @@ export default function RecordsBureau() {
                 const key = searchType === 'CASES' ? `${r._kind}-${r.id}` : r.id;
                 const selKey = searchType === 'CASES' ? `${r._kind}:${r.id}` : r.id;
                 const on = selected === selKey;
-                const base = `text-left px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${on ? 'bg-brand/15 border-brand/40' : 'bg-white/[0.02] border-border-faint hover:bg-white/[0.05] hover:border-border-base'}`;
+                const isCase = searchType === 'CASES';
+                const base = `text-left px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
+                  on
+                    ? isCase ? 'bg-amber-400/15 border-amber-400/40' : 'bg-brand/15 border-brand/40'
+                    : isCase
+                      ? 'bg-white/[0.02] border-border-faint hover:bg-amber-400/[0.07] hover:border-amber-400/30'
+                      : 'bg-white/[0.02] border-border-faint hover:bg-white/[0.05] hover:border-border-base'
+                }`;
 
                 if (searchType === 'CASES') return (
                   <button key={key} className={base} onClick={() => setSelected(selKey)}>
@@ -328,11 +334,22 @@ export default function RecordsBureau() {
                 {(() => {
                   const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
                   const tpl = templates.find(t => t.name === selCase.type);
-                  if (tpl && selCase.formData) {
+                  if (selCase.formData) {
                     return (
-                      <div className="p-4">
-                        <ReportForm template={tpl} data={selCase.formData} readOnly />
-                      </div>
+                      <FormDocWrap>
+                        <ReportDocument
+                          type={selCase.type}
+                          template={tpl}
+                          data={selCase.formData}
+                          editable={false}
+                          meta={{
+                            caseNumber: selCase.caseNumber || selCase.recordNumber,
+                            status: selCase.status,
+                            officer: selCase.officerBadge,
+                            dateTime: selCase.date,
+                          }}
+                        />
+                      </FormDocWrap>
                     );
                   }
                   // Fallback: plain field list when no matching template
