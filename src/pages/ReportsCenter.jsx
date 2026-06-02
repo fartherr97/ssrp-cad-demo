@@ -45,6 +45,7 @@ export default function ReportsCenter() {
   const [savedAt, setSavedAt]                   = useState(null);
   const [activeTab, setActiveTab]               = useState('Report');
   const [pdfLoading, setPdfLoading]             = useState(false);
+  const [mobileTab, setMobileTab]               = useState('new'); // 'new' | 'queue'
 
   // Open a template for editing, restoring any auto-saved draft.
   const openTemplate = (tpl) => {
@@ -294,10 +295,26 @@ export default function ReportsCenter() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden font-ui">
+    <div className="flex flex-col md:flex-row h-full overflow-hidden font-ui">
+
+      {/* ── Mobile tab bar ── */}
+      <div className="md:hidden shrink-0 flex border-b border-border-base bg-app-toolbar/80 backdrop-blur-md">
+        {[
+          { id: 'new',   label: 'New Report' },
+          { id: 'queue', label: `Reports (${reports.length})` },
+        ].map(t => (
+          <button key={t.id} onClick={() => setMobileTab(t.id)}
+            className={`relative flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.4px] cursor-pointer border-none font-ui transition-colors
+              ${mobileTab === t.id ? 'text-brand-bright' : 'bg-transparent text-slate-500 hover:text-slate-300'}`}>
+            {t.label}
+            {mobileTab === t.id && <span className="absolute bottom-0 left-4 right-4 h-[3px] rounded-full bg-brand" />}
+          </button>
+        ))}
+      </div>
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-full md:w-[230px] shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden max-h-[40vh] md:max-h-none">
+      <div className={`w-full md:w-[230px] shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden
+        ${mobileTab === 'new' ? 'flex-1 md:flex-none' : 'hidden md:flex'} md:max-h-none`}>
         {/* Header */}
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-200">File New Report</div>
@@ -358,12 +375,16 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col overflow-hidden bg-app-bg/20">
+      <div className={`flex-1 flex-col overflow-hidden bg-app-bg/20 ${showReport ? 'flex' : 'hidden md:flex'}`}>
 
         {/* ── Viewing a submitted report ── */}
         {showReport && (
           <>
             <div className="px-4 py-2.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base flex items-center flex-wrap gap-2.5 shrink-0">
+              <button className="md:hidden flex items-center gap-1 text-[12px] text-brand-bright font-semibold mr-1 cursor-pointer bg-transparent border-none"
+                onClick={() => { setSelectedReport(null); setMobileTab('queue'); }}>
+                <MdArrowBack size={15} /> Back
+              </button>
               <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selReport.type}
               </span>
@@ -428,7 +449,8 @@ export default function ReportsCenter() {
       </div>
 
       {/* ══ RIGHT: Report queue ═══════════════════════════════════ */}
-      <div className="w-full md:w-[270px] shrink-0 flex flex-col border-t md:border-t-0 md:border-l border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden max-h-[45vh] md:max-h-none">
+      <div className={`w-full md:w-[270px] shrink-0 flex flex-col border-t md:border-t-0 md:border-l border-border-base bg-app-toolbar/80 backdrop-blur-md overflow-hidden
+        ${mobileTab === 'queue' ? 'flex-1 md:flex-none' : 'hidden md:flex'} md:max-h-none`}>
         {/* Header + stats */}
         <div className="px-3 py-3 border-b border-border-faint shrink-0">
           <div className="flex items-center justify-between mb-2">
@@ -480,7 +502,7 @@ export default function ReportsCenter() {
             <div className="p-5 text-center text-cad-muted text-[11px]">No reports</div>
           ) : displayedReports.map(r => (
             <div key={r.id}
-              onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); }}
+              onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); setMobileTab('new'); }}
               className={`px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedReport === r.id
                   ? 'border-l-brand bg-brand/10'

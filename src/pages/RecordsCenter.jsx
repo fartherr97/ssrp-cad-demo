@@ -42,6 +42,7 @@ export default function RecordsCenter() {
   const [savedAt, setSavedAt]                   = useState(null);
   const [activeTab, setActiveTab]               = useState('Record');
   const [pdfLoading, setPdfLoading]             = useState(false);
+  const [mobileTab, setMobileTab]               = useState('new'); // 'new' | 'history'
 
   const openTemplate = (tpl) => {
     setSelectedTemplate(tpl);
@@ -272,10 +273,26 @@ export default function RecordsCenter() {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden font-ui">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden font-ui">
+
+      {/* ── Mobile tab bar ── */}
+      <div className="lg:hidden shrink-0 flex border-b border-border-base bg-app-toolbar/80 backdrop-blur-md">
+        {[
+          { id: 'new',     label: 'New Record' },
+          { id: 'history', label: `Records (${records.length})` },
+        ].map(t => (
+          <button key={t.id} onClick={() => setMobileTab(t.id)}
+            className={`relative flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.4px] cursor-pointer border-none font-ui transition-colors
+              ${mobileTab === t.id ? 'text-brand-bright' : 'bg-transparent text-slate-500 hover:text-slate-300'}`}>
+            {t.label}
+            {mobileTab === t.id && <span className="absolute bottom-0 left-4 right-4 h-[3px] rounded-full bg-brand" />}
+          </button>
+        ))}
+      </div>
 
       {/* ══ LEFT: Template picker ══════════════════════════════════ */}
-      <div className="w-full lg:w-[240px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden max-h-[40vh] lg:max-h-none">
+      <div className={`w-full lg:w-[240px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden
+        ${mobileTab === 'new' ? 'flex-1 lg:flex-none' : 'hidden lg:flex'} lg:max-h-none`}>
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issue New Record</div>
           <div className="text-[10px] text-slate-500 mt-0.5">Select a record type to begin</div>
@@ -322,12 +339,16 @@ export default function RecordsCenter() {
         </div>
       </div>
 
-      {/* ══ CENTER: Document area ══════════════════════════════════ */}
-      <div className="flex-1 min-h-[50vh] lg:min-h-0 flex flex-col overflow-hidden bg-app-bg/20">
+      {/* ══ CENTER: Document area ══ hidden on mobile unless a record is open */}
+      <div className={`flex-1 flex-col overflow-hidden bg-app-bg/20 ${showRecord ? 'flex' : 'hidden lg:flex'}`}>
 
         {showRecord && (
           <>
             <div className="px-3 py-1.5 bg-app-toolbar border-b border-border-base flex flex-wrap items-center gap-x-2.5 gap-y-1 shrink-0">
+              <button className="lg:hidden flex items-center gap-1 text-[12px] text-brand-bright font-semibold mr-1 cursor-pointer bg-transparent border-none"
+                onClick={() => { setSelectedRecord(null); setMobileTab('history'); }}>
+                <MdArrowBack size={15} /> Back
+              </button>
               <span className="text-[11px] font-bold text-cad-text uppercase tracking-[0.5px]">
                 {selRecord.type}
               </span>
@@ -381,7 +402,8 @@ export default function RecordsCenter() {
       </div>
 
       {/* ══ RIGHT: Record history ═════════════════════════════════ */}
-      <div className="w-full lg:w-[280px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden max-h-[40vh] lg:max-h-none">
+      <div className={`w-full lg:w-[280px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden
+        ${mobileTab === 'history' ? 'flex-1 lg:flex-none' : 'hidden lg:flex'} lg:max-h-none`}>
         <div className="px-4 py-3 border-b border-border-faint shrink-0">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400">Issued Records</span>
@@ -406,7 +428,7 @@ export default function RecordsCenter() {
             <div className="p-5 text-center text-cad-muted text-[11px]">No records issued yet</div>
           ) : records.map(r => (
             <div key={r.id}
-              onClick={() => { setSelectedRecord(r.id); setSelectedTemplate(null); setFormValues({}); }}
+              onClick={() => { setSelectedRecord(r.id); setSelectedTemplate(null); setFormValues({}); setMobileTab('new'); }}
               className={`px-3 py-2.5 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedRecord === r.id
                   ? 'border-l-brand bg-brand/15'
