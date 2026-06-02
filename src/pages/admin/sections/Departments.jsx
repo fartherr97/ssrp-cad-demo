@@ -1,9 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
   AdminPanel, SonButton, SonIconBtn, SonSearch, SON_INPUT, SON_LABEL, SonBadge, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete, MdExpandMore, MdChevronRight } from 'react-icons/md';
+import { MdAdd, MdDelete, MdExpandMore, MdChevronRight, MdSave } from 'react-icons/md';
+
+function DeptCard({ d, onSave, onDelete }) {
+  const [draft, setDraft] = useState({ ...d });
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => { setDraft({ ...d }); }, [d.id]);
+
+  const set = (patch) => setDraft(p => ({ ...p, ...patch }));
+  const dirty = JSON.stringify(draft) !== JSON.stringify(d);
+
+  return (
+    <div className="rounded-lg p-4" style={{ background: ADMIN.bg, border: `1px solid ${dirty ? ADMIN.borderHi : ADMIN.border}` }}>
+      <div className="flex items-center gap-2 mb-3">
+        <SonBadge color={ADMIN.blue}>Agency</SonBadge>
+        <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} depts</SonBadge>
+        <div className="ml-auto flex gap-1.5">
+          <SonButton variant="red" onClick={() => onSave(draft)} disabled={!dirty} style={{ padding: '4px 10px', fontSize: 12 }}>
+            <MdSave size={14} /> {dirty ? 'Save' : 'Saved'}
+          </SonButton>
+          <SonIconBtn icon={MdDelete} danger title="Delete agency" onClick={onDelete} />
+          <SonIconBtn icon={open ? MdExpandMore : MdChevronRight} title="Expand" onClick={() => setOpen(v => !v)} />
+        </div>
+      </div>
+      <div className="grid gap-[10px]">
+        <div>
+          <label style={SON_LABEL}>Name</label>
+          <input style={SON_INPUT} value={draft.name} onChange={e => set({ name: e.target.value })} />
+        </div>
+        <div>
+          <label style={SON_LABEL}>Short / Description</label>
+          <input style={SON_INPUT} value={draft.short} onChange={e => set({ short: e.target.value })} />
+        </div>
+        {open && (
+          <div className="expand-section grid grid-cols-2 gap-[10px]">
+            <div>
+              <label style={SON_LABEL}>Type</label>
+              <input style={SON_INPUT} value={draft.type || ''} onChange={e => set({ type: e.target.value })} />
+            </div>
+            <div>
+              <label style={SON_LABEL}>Radio Channel</label>
+              <input style={SON_INPUT} value={draft.radioChannel || ''} onChange={e => set({ radioChannel: e.target.value })} />
+            </div>
+            <div className="col-span-2">
+              <label style={SON_LABEL}>Sub-departments (comma separated)</label>
+              <input style={SON_INPUT} value={(draft.subdivisions || []).join(', ')}
+                onChange={e => set({ subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
+            </div>
+            <div className="col-span-2">
+              <label style={SON_LABEL}>Department Logo URL</label>
+              <div className="flex items-center gap-3">
+                <input style={{ ...SON_INPUT, flex: 1 }} value={draft.logoUrl || ''} placeholder="https://…"
+                  onChange={e => set({ logoUrl: e.target.value })} />
+                {draft.logoUrl && (
+                  <img src={draft.logoUrl} alt="logo preview"
+                    style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 6, background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`, flexShrink: 0, padding: 3 }} />
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 4 }}>Paste a direct image URL. Logo appears on PDF exports for this department.</div>
+            </div>
+          </div>
+        )}
+        {dirty && (
+          <div className="text-[11px] text-amber-400">Unsaved changes — click Save to apply.</div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Departments() {
   const { state, dispatch } = useCAD();
@@ -11,7 +79,6 @@ export default function Departments() {
   const groups = state.persistentGroups || [];
   const [groupName, setGroupName] = useState('');
   const [query, setQuery] = useState('');
-  const [expanded, setExpanded] = useState(null);
 
   const addGroup = () => {
     if (!groupName.trim()) return;
@@ -20,11 +87,12 @@ export default function Departments() {
   };
 
   const filtered = departments.filter(d => !query || d.name.toLowerCase().includes(query.toLowerCase()) || d.short.toLowerCase().includes(query.toLowerCase()));
-  const updateDept = (d, patch) => dispatch({ type: 'UPDATE_DEPARTMENT', payload: { ...d, ...patch } });
+
+  const saveDept = (updated) => dispatch({ type: 'UPDATE_DEPARTMENT', payload: updated });
+  const deleteDept = (id) => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'departments', id } });
 
   return (
     <>
-      {/* Persistent Unit Groups */}
       <AdminPanel center title="Persistent Unit Groups" subtitle="These groups always appear in dispatch, even when no units are assigned.">
         {groups.length === 0
           ? <div className="text-[12px] mb-3" style={{ color: ADMIN.textMute }}>No persistent groups configured.</div>
@@ -49,7 +117,6 @@ export default function Departments() {
         </div>
       </AdminPanel>
 
-      {/* Department editor */}
       <AdminPanel
         title="Department Editor"
         subtitle="Manage agencies, departments, and sub-departments."
@@ -57,61 +124,9 @@ export default function Departments() {
       >
         {filtered.length === 0 ? <EmptyState>No agencies match.</EmptyState> : (
           <div className="grid gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))' }}>
-            {filtered.map(d => {
-              const open = expanded === d.id;
-              return (
-                <div key={d.id} className="rounded-lg p-4" style={{ background: ADMIN.bg, border: `1px solid ${ADMIN.border}` }}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <SonBadge color={ADMIN.blue}>Agency</SonBadge>
-                    <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} depts</SonBadge>
-                    <div className="ml-auto flex gap-1.5">
-                      <SonIconBtn icon={MdDelete} danger title="Delete agency"
-                        onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'departments', id: d.id } })} />
-                      <SonIconBtn icon={open ? MdExpandMore : MdChevronRight} title="Expand"
-                        onClick={() => setExpanded(open ? null : d.id)} />
-                    </div>
-                  </div>
-                  <div className="grid gap-[10px]">
-                    <div>
-                      <label style={SON_LABEL}>Name</label>
-                      <input style={SON_INPUT} value={d.name} onChange={e => updateDept(d, { name: e.target.value })} />
-                    </div>
-                    <div>
-                      <label style={SON_LABEL}>Short / Description</label>
-                      <input style={SON_INPUT} value={d.short} onChange={e => updateDept(d, { short: e.target.value })} />
-                    </div>
-                    {open && (
-                      <div className="expand-section grid grid-cols-2 gap-[10px]">
-                        <div>
-                          <label style={SON_LABEL}>Type</label>
-                          <input style={SON_INPUT} value={d.type} onChange={e => updateDept(d, { type: e.target.value })} />
-                        </div>
-                        <div>
-                          <label style={SON_LABEL}>Radio Channel</label>
-                          <input style={SON_INPUT} value={d.radioChannel || ''} onChange={e => updateDept(d, { radioChannel: e.target.value })} />
-                        </div>
-                        <div className="col-span-2">
-                          <label style={SON_LABEL}>Sub-departments (comma separated)</label>
-                          <input style={SON_INPUT} value={(d.subdivisions || []).join(', ')}
-                            onChange={e => updateDept(d, { subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
-                        </div>
-                        <div className="col-span-2">
-                          <label style={SON_LABEL}>Department Logo URL</label>
-                          <div className="flex items-center gap-3">
-                            <input style={{ ...SON_INPUT, flex: 1 }} value={d.logoUrl || ''} placeholder="https://..." onChange={e => updateDept(d, { logoUrl: e.target.value })} />
-                            {d.logoUrl && (
-                              <img src={d.logoUrl} alt="logo preview"
-                                style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 6, background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`, flexShrink: 0, padding: 3 }} />
-                            )}
-                          </div>
-                          <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 4 }}>Paste a direct image URL. Logo appears on PDF exports for this department.</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {filtered.map(d => (
+              <DeptCard key={d.id} d={d} onSave={saveDept} onDelete={() => deleteDept(d.id)} />
+            ))}
           </div>
         )}
         <div className="mt-4">

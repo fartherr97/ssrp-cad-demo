@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import {
-  AdminPanel, SonButton, SonIconBtn, SonField, SON_INPUT, SON_LABEL, ADMIN,
+  AdminPanel, AdminPageTitle, SonButton, SonIconBtn, SonField, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdClose } from 'react-icons/md';
+import { MdAdd, MdClose, MdSave, MdPublic } from 'react-icons/md';
 
 function ChipSection({ title, field, values, onAdd, onRemove }) {
   const [val, setVal] = useState('');
@@ -43,65 +43,69 @@ export default function Geographical() {
   const { state, dispatch } = useCAD();
   const [draft, setDraft] = useState({ ...state.geoSettings });
 
-  const persist = next => {
-    setDraft(next);
-    dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
-  };
-  const addVal = (field, v) => persist({ ...draft, [field]: [...draft[field], v] });
-  const removeVal = (field, idx) => persist({ ...draft, [field]: draft[field].filter((_, i) => i !== idx) });
+  const stored = state.geoSettings;
+  const codesDirty = ['emergencyCode', 'penalCodeName', 'tenCodeName', 'currencyDelimiter']
+    .some(k => draft[k] !== stored[k]);
 
-  const handleCode = (field, value) => {
-    const next = { ...draft, [field]: value };
+  const saveCodes = () => dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: draft } });
+
+  // Chip add/remove — explicit user action, dispatch immediately
+  const addVal = (field, v) => {
+    const next = { ...draft, [field]: [...(draft[field] || []), v] };
     setDraft(next);
     dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
   };
+  const removeVal = (field, idx) => {
+    const next = { ...draft, [field]: draft[field].filter((_, i) => i !== idx) };
+    setDraft(next);
+    dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
+  };
+
+  const setCode = (field, value) => setDraft(p => ({ ...p, [field]: value }));
 
   return (
     <>
+      <AdminPageTitle right={
+        <SonButton variant="red" onClick={saveCodes} disabled={!codesDirty}>
+          <MdSave size={16} /> {codesDirty ? 'Save Changes' : 'Saved'}
+        </SonButton>
+      }>
+        <span className="inline-flex items-center gap-2"><MdPublic size={20} className="text-brand-bright" /> Geographical & CAD Settings</span>
+      </AdminPageTitle>
+
       <AdminPanel
         title="CAD Naming & Codes"
         subtitle="Configure terminology and emergency codes used across the CAD."
       >
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <SonField label="Emergency Code">
-            <input
-              style={SON_INPUT}
-              placeholder="911"
+            <input style={SON_INPUT} placeholder="911"
               value={draft.emergencyCode ?? '911'}
-              onChange={e => handleCode('emergencyCode', e.target.value)}
-            />
+              onChange={e => setCode('emergencyCode', e.target.value)} />
           </SonField>
           <SonField label="Penal Code Name">
-            <input
-              style={SON_INPUT}
-              placeholder="Statutes"
+            <input style={SON_INPUT} placeholder="Statutes"
               value={draft.penalCodeName ?? 'Statutes'}
-              onChange={e => handleCode('penalCodeName', e.target.value)}
-            />
+              onChange={e => setCode('penalCodeName', e.target.value)} />
           </SonField>
           <SonField label="Ten Code Name">
-            <input
-              style={SON_INPUT}
-              placeholder="10-Codes"
+            <input style={SON_INPUT} placeholder="10-Codes"
               value={draft.tenCodeName ?? '10-Codes'}
-              onChange={e => handleCode('tenCodeName', e.target.value)}
-            />
+              onChange={e => setCode('tenCodeName', e.target.value)} />
           </SonField>
           <SonField label="Currency Delimiter">
-            <input
-              style={SON_INPUT}
-              placeholder="$"
+            <input style={SON_INPUT} placeholder="$"
               value={draft.currencyDelimiter ?? '$'}
-              onChange={e => handleCode('currencyDelimiter', e.target.value)}
-            />
+              onChange={e => setCode('currencyDelimiter', e.target.value)} />
           </SonField>
         </div>
+        {codesDirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes — click "Save Changes" to apply.</div>}
       </AdminPanel>
 
       <AdminPanel title="Geographical Settings" subtitle="Cities, counties and postal codes used across the CAD.">
-        <ChipSection title="Cities" field="cities" values={draft.cities} onAdd={addVal} onRemove={removeVal} />
-        <ChipSection title="Counties" field="counties" values={draft.counties} onAdd={addVal} onRemove={removeVal} />
-        <ChipSection title="Postal Codes" field="postals" values={draft.postals} onAdd={addVal} onRemove={removeVal} />
+        <ChipSection title="Cities"       field="cities"   values={draft.cities   || []} onAdd={addVal} onRemove={removeVal} />
+        <ChipSection title="Counties"     field="counties" values={draft.counties || []} onAdd={addVal} onRemove={removeVal} />
+        <ChipSection title="Postal Codes" field="postals"  values={draft.postals  || []} onAdd={addVal} onRemove={removeVal} />
       </AdminPanel>
     </>
   );
