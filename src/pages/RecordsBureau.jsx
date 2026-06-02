@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useResponsive } from '../hooks/useResponsive';
 import { RecordReturn, ReportDocument } from '../components/FormDocument';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
@@ -63,6 +64,7 @@ const SEARCH_TYPES = [
 export default function RecordsBureau() {
   const { state } = useCAD();
   const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [] } = state;
+  const { isMobile } = useResponsive();
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
@@ -151,10 +153,12 @@ export default function RecordsBureau() {
 
   return (
     <div className="flex-1 overflow-hidden p-4 lg:p-5">
-      <div className="mob-two-pane grid h-full min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: 'clamp(260px,24vw,320px) 1fr' }}>
+      <div className="h-full min-h-0 grid gap-4 lg:gap-5"
+        style={{ gridTemplateColumns: isMobile ? '1fr' : 'clamp(260px,24vw,320px) 1fr' }}>
 
         {/* ─────────── LEFT: Search ─────────── */}
-        <div className={`mob-list-panel${selected ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm`}>
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm"
+          style={{ display: isMobile && selected ? 'none' : 'flex' }}>
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border-faint shrink-0">
             <MdSearch size={16} className="text-brand-bright" />
             <span className="text-[12px] font-bold uppercase tracking-[0.7px] text-slate-200">Records Search</span>
@@ -302,10 +306,15 @@ export default function RecordsBureau() {
         </div>
 
         {/* ─────────── RIGHT: Detail ─────────── */}
-        <div className={`mob-detail-panel${!selected ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm`}>
-          <button className="mob-back-btn !rounded-none" onClick={() => setSelected(null)}>
-            <MdArrowBack size={14} /> Back to results
-          </button>
+        <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm"
+          style={{ display: isMobile && !selected ? 'none' : 'flex' }}>
+          {isMobile && (
+            <button className="flex items-center gap-1.5 px-3 py-2.5 border-none border-b border-border-faint bg-app-elevated cursor-pointer shrink-0 text-[11px] text-brand-bright"
+              style={{ fontFamily: 'var(--font-ui)', width: '100%' }}
+              onClick={() => setSelected(null)}>
+              <MdArrowBack size={14} /> Back to results
+            </button>
+          )}
 
           {!selected ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-600 p-6">
