@@ -119,11 +119,13 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         </div>
       </div>
 
-      {/* ── Body: left sidebar + center form + right sidebar ── */}
+      {/* ── Body: left sidebar + center form + right sidebar ──
+           Mobile: outer div scrolls everything (overflow-auto, no inner overflow-hidden)
+           Desktop xl: each column scrolls independently (outer overflow-hidden, inner overflow-auto) ── */}
       <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[240px_minmax(0,1fr)_260px] overflow-auto xl:overflow-hidden">
 
         {/* LEFT: case meta */}
-        <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
+        <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto xl:max-h-full">
           <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
           <div className="px-4">
             {[
@@ -157,7 +159,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         </aside>
 
         {/* CENTER: dark form (same as report writing) */}
-        <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
+        <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
           {/* Status bar */}
           <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
             <div>
@@ -178,8 +180,8 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </div>
           </div>
 
-          {/* Form fields */}
-          <div data-doc-top className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
+          {/* Form fields — xl: this div scrolls; mobile: outer body div scrolls */}
+          <div data-doc-top className="xl:flex-1 xl:overflow-auto bg-app-bg/30 p-4 lg:p-6">
             {template ? (
               <ReportForm
                 template={template}
@@ -262,7 +264,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         </main>
 
         {/* RIGHT: officer / record info */}
-        <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
+        <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto xl:max-h-full">
           <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Info</div>
           <div className="p-3 flex flex-col gap-3">
             {/* Submitting officer */}
