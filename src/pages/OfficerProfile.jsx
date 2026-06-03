@@ -42,22 +42,25 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
 
   return (
     <div className="flex flex-col bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-      {/* Header — single row, title+case# stacked in the middle block */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border-base shrink-0 min-w-0"
+      {/* Header — just nav actions, no title crowding */}
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border-base shrink-0"
         style={{ background: 'rgba(251,146,60,0.05)' }}>
         <button onClick={onBack}
-          className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors shrink-0">
+          className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors">
           <MdArrowBack size={14} /> Back
         </button>
-        <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-bold text-white truncate leading-tight">{report.type}</div>
-          <div className="text-[10px] font-mono text-slate-500 truncate mt-0.5">{report.caseNumber}</div>
-        </div>
         <button onClick={handleResubmit} disabled={submitted}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-50 transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-50 transition-colors"
           style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}>
           <MdSend size={11} /> {submitted ? 'Submitted' : 'Resubmit'}
         </button>
+      </div>
+
+      {/* Report info strip */}
+      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border-faint shrink-0"
+        style={{ background: 'rgba(0,0,0,0.15)' }}>
+        <span className="text-[13px] font-bold text-white truncate flex-1">{report.type}</span>
+        <span className="text-[10.5px] font-mono text-slate-500 shrink-0">{report.caseNumber}</span>
       </div>
 
       {/* Supervisor comments banner */}
