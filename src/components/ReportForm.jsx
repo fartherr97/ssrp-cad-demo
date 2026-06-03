@@ -718,24 +718,61 @@ function ImageField({ f, value, onChange, readOnly }) {
   );
 }
 
+/* Downscale an image file in the browser before we store it. Officers can drop
+   in a huge phone/4K capture and it just works — we resize to fit within
+   MAX_EDGE px and re-encode as JPEG, so what we keep is a few hundred KB rather
+   than the multi-MB original. Keeps memory + draft auto-save well under limits. */
+const PHOTO_MAX_EDGE = 1920;   // longest side, px
+const PHOTO_QUALITY  = 0.82;   // JPEG quality
+const PHOTO_HARD_CAP = 40 * 1024 * 1024; // sanity guard against absurd files (40 MB)
+
+function downscaleImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const { width, height } = img;
+        const scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(width, height));
+        const w = Math.round(width * scale);
+        const h = Math.round(height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // PNGs with transparency would go black on JPEG — but report photos are
+        // opaque captures, so JPEG is the right call for size.
+        resolve(canvas.toDataURL('image/jpeg', PHOTO_QUALITY));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ── Multi-photo gallery field (up to `f.max` photos, default 8) ── */
 function PhotoGalleryField({ f, value, onChange, readOnly }) {
   const max = Math.min(f.max || 8, 8);
   const photos = Array.isArray(value) ? value : [];
   const fileRefs = useRef([]);
 
-  const handleFile = (idx, e) => {
+  const handleFile = async (idx, e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5 MB'); return; }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const updated = [...photos];
-      updated[idx] = ev.target.result;
-      onChange(f.id, updated.filter(Boolean));
-    };
-    reader.readAsDataURL(file);
     e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
+    if (file.size > PHOTO_HARD_CAP) { alert('That image is unusually large (over 40 MB). Please pick a smaller file.'); return; }
+    try {
+      const dataUrl = await downscaleImage(file);
+      const updated = [...photos];
+      updated[idx] = dataUrl;
+      onChange(f.id, updated.filter(Boolean));
+    } catch {
+      alert('Could not read that image. Please try a different file.');
+    }
   };
 
   const removePhoto = (idx) => {
