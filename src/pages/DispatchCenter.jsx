@@ -167,14 +167,6 @@ const NOTIF_COLOR = {
   note: '#facc15', system: '#94a3b8', info: '#94a3b8',
 };
 
-const CALL_NATURES = [
-  'Traffic Stop','Suspicious Person','Suspicious Vehicle','Domestic Disturbance',
-  'Assault','Robbery','Burglary','MVA','MVA w/ Injuries','Medical Emergency',
-  'Medical - Cardiac Arrest','Structure Fire','Vehicle Fire','Brush Fire',
-  'Officer Needs Assistance','Pursuit','Noise Complaint','Check Welfare',
-  'Armed Subject','Shooting','Stabbing','Shots Fired','Drug Activity',
-  'Theft - Shoplifting','Road Hazard','Trespassing','Other',
-];
 
 /* ─── 911 urgency timer card ─── */
 function IncomingCallCard({ call, onDispatch, onDismiss }) {
@@ -266,7 +258,7 @@ function Dispatch911Modal({ call, onClose }) {
               <label className={S_LABEL}>Nature of Call *</label>
               <select className={S_SELECT} value={form.nature} onChange={e => setForm(p => ({ ...p, nature: e.target.value }))}>
                 <option value="">Select nature...</option>
-                {CALL_NATURES.map(n => <option key={n}>{n}</option>)}
+                {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
               </select>
             </div>
             <div className={S_FIELD}>
@@ -390,7 +382,7 @@ export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [],
-    unitStatusCodes = [], tenCodes = [] } = state;
+    unitStatusCodes = [], tenCodes = [], callNatures = [] } = state;
   // Status menu/badges are driven by admin-configured unit status codes.
   const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const statusColor = (code) => unitStatusCodes.find(s => s.code === code)?.color || STATUS_COLORS[code] || '#fff';
@@ -774,7 +766,7 @@ export default function DispatchCenter() {
                   <label className={S_LABEL}>Nature of Call *</label>
                   <select className={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
                     <option value="">Select nature...</option>
-                    {CALL_NATURES.map(n => <option key={n}>{n}</option>)}
+                    {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
                   </select>
                 </div>
                 <div className={S_FIELD}>

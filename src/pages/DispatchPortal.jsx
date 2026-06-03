@@ -47,17 +47,6 @@ const CALL_STATUS_CFG = {
   CLOSED:  { color: '#6b7280', label: 'CLOSED'   },
 };
 
-const CALL_NATURES = [
-  'Domestic Disturbance', 'Suspicious Person/Vehicle', 'Assault in Progress',
-  'Robbery in Progress', 'Shots Fired', 'Burglary in Progress',
-  'Vehicle Theft', 'Drug Activity', 'Disturbance/Fight',
-  'Welfare Check', 'Vehicle Pursuit', 'DUI Driver',
-  'Traffic Stop', 'MVA - No Injury', 'MVA w/ Injuries',
-  'Noise Complaint', 'Trespassing', 'Warrant Service',
-  'Missing Person', 'Theft', 'Vandalism',
-  'Medical Emergency', 'Structure Fire', 'Brush Fire',
-  'Hazmat Incident', 'Other',
-];
 
 const GROUP_COLORS = ['#3a88e8','#22c55e','#f97316','#a855f7','#ec4899','#eab308','#06b6d4','#ef4444'];
 
@@ -460,7 +449,7 @@ function DispatchModal({ call, officers, onConfirm, onClose }) {
           className="w-full text-[12.5px] text-white rounded-lg px-3 py-2 outline-none"
           style={{ background: '#111e2d', border: '1px solid rgba(255,255,255,0.10)' }}>
           <option value="">Select nature…</option>
-          {CALL_NATURES.map(n => <option key={n} value={n}>{n}</option>)}
+          {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
           <option value="__custom__">Other (type in)</option>
         </select>
         {nature === '__custom__' && (
@@ -674,7 +663,7 @@ export default function DispatchPortal() {
   const [showSim911,        setShowSim911]        = useState(false);
   const [showNewGroup,      setShowNewGroup]      = useState(false);
 
-  const { incoming911 = [], calls, officers, unitGroups = [] } = state;
+  const { incoming911 = [], calls, officers, unitGroups = [], callNatures = [] } = state;
   const activeCalls   = calls.filter(c => c.status !== 'CLOSED');
   const onDutyOfficers = officers.filter(o => o.status !== 'OFFDUTY');
 

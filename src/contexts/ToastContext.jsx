@@ -186,7 +186,8 @@ function ToastCard({ toast, onDismiss }) {
 function ToastViewport({ toasts, onDismiss }) {
   if (typeof document === 'undefined') return null;
   return createPortal(
-    <div className="fixed z-[1600] inset-x-0 top-[16vh] flex flex-col items-center gap-3 px-4 pointer-events-none">
+    <div className="fixed z-[9999] inset-x-0 flex flex-col items-center gap-3 px-4 pointer-events-none"
+      style={{ top: 'calc(var(--actionbar-h, 72px) + 12px)' }}>
       {toasts.map(t => (
         <ToastCard key={t.id} toast={t} onDismiss={onDismiss} />
       ))}

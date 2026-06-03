@@ -71,6 +71,7 @@ import Addresses from './pages/admin/sections/Addresses';
 import LookupTypes from './pages/admin/sections/LookupTypes';
 import ToneBoard from './pages/admin/sections/ToneBoard';
 import AdminBusinesses from './pages/admin/sections/AdminBusinesses';
+import CallTypes from './pages/admin/sections/CallTypes';
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -150,6 +151,7 @@ function CADApp() {
           <Route path="permission-keys"    element={<PermissionKeys />} />
           <Route path="custom-records"     element={<CustomRecords />} />
           <Route path="departments"        element={<Departments />} />
+          <Route path="call-types"          element={<CallTypes />} />
           <Route path="ten-codes"          element={<TenCodes />} />
           <Route path="statutes"           element={<Statutes />} />
           <Route path="license-points"     element={<LicensePoints />} />

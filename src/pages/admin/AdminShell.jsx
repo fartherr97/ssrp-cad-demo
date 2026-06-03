@@ -8,7 +8,7 @@ import {
   MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag,
-  MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore,
+  MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -30,6 +30,7 @@ const GROUPS = [
       { icon: MdBrush,              label: 'Customization',  route: '/admin', exact: true },
       { icon: MdInventory2,         label: 'Custom Records', route: '/admin/custom-records' },
       { icon: MdShield,             label: 'Departments',    route: '/admin/departments' },
+      { icon: MdLocalPhone,          label: 'Call Types',     route: '/admin/call-types' },
       { icon: MdFormatListNumbered, label: '10-Codes',       route: '/admin/ten-codes' },
       { icon: MdGavel,              label: 'Penal Code',     route: '/admin/statutes' },
       { icon: MdRemoveModerator,    label: 'Auto Suspend',   route: '/admin/license-points' },

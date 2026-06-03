@@ -1,5 +1,38 @@
 /* Seed data for the Sonoran-style Admin Customization suite. */
 
+export const CALL_NATURES_DEFAULT = [
+  { id: 101, name: 'Traffic Stop',             category: 'police' },
+  { id: 102, name: 'Suspicious Person',         category: 'police' },
+  { id: 103, name: 'Suspicious Vehicle',        category: 'police' },
+  { id: 104, name: 'Domestic Disturbance',      category: 'police' },
+  { id: 105, name: 'Assault',                   category: 'police' },
+  { id: 106, name: 'Robbery',                   category: 'police' },
+  { id: 107, name: 'Burglary',                  category: 'police' },
+  { id: 108, name: 'MVA',                       category: 'police' },
+  { id: 109, name: 'MVA w/ Injuries',           category: 'fire'   },
+  { id: 110, name: 'Medical Emergency',         category: 'fire'   },
+  { id: 111, name: 'Medical - Cardiac Arrest',  category: 'fire'   },
+  { id: 112, name: 'Structure Fire',            category: 'fire'   },
+  { id: 113, name: 'Vehicle Fire',              category: 'fire'   },
+  { id: 114, name: 'Brush Fire',                category: 'fire'   },
+  { id: 115, name: 'Officer Needs Assistance',  category: 'police' },
+  { id: 116, name: 'Pursuit',                   category: 'police' },
+  { id: 117, name: 'Noise Complaint',           category: 'police' },
+  { id: 118, name: 'Check Welfare',             category: 'police' },
+  { id: 119, name: 'Armed Subject',             category: 'police' },
+  { id: 120, name: 'Shooting',                  category: 'police' },
+  { id: 121, name: 'Stabbing',                  category: 'police' },
+  { id: 122, name: 'Shots Fired',               category: 'police' },
+  { id: 123, name: 'Drug Activity',             category: 'police' },
+  { id: 124, name: 'Theft - Shoplifting',       category: 'police' },
+  { id: 125, name: 'Road Hazard',               category: 'police' },
+  { id: 126, name: 'Trespassing',               category: 'police' },
+  { id: 127, name: 'Hazmat Incident',           category: 'fire'   },
+  { id: 128, name: 'Missing Person',            category: 'police' },
+  { id: 129, name: 'DUI Driver',                category: 'police' },
+  { id: 130, name: 'Other',                     category: 'any'    },
+];
+
 export const TEN_CODES = [
   { id: 1,  code: '10-1',   label: 'Receiving Poorly' },
   { id: 2,  code: '10-2',   label: 'Receiving Well' },

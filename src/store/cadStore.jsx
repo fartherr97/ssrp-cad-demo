@@ -10,7 +10,7 @@ import {
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
   ADMIN_SERVERS, LOOKUP_TYPES, ADMIN_ADDRESSES, COMMUNITY_CONFIG,
   GEO_SETTINGS, LOGIN_PAGE_CONFIG, ACCOUNT_RESTRICTIONS, DISCORD_PRESENCE,
-  LIMITS_CONFIG,
+  LIMITS_CONFIG, CALL_NATURES_DEFAULT,
 } from '../data/adminData';
 
 const initialState = {
@@ -57,6 +57,7 @@ const initialState = {
   incoming911: INCOMING_911,
   unitGroups: UNIT_GROUPS,
   // ─── Admin customization config ───
+  callNatures: CALL_NATURES_DEFAULT,
   tenCodes: TEN_CODES,
   unitStatusCodes: UNIT_STATUS_CODES,
   adminAccounts: ADMIN_ACCOUNTS,
