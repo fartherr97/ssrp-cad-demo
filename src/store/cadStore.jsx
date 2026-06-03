@@ -567,6 +567,25 @@ function reducer(state, action) {
       const audit = addAuditEntry(state, `Updated report ID ${action.payload.id}`, 'Reports');
       return { ...state, reports, ...audit };
     }
+    case 'RETURN_REPORT': {
+      // payload: { id, comment, supervisorName, supervisorBadge }
+      const { id: rid, comment, supervisorName, supervisorBadge } = action.payload;
+      const newComment = { id: `cmt_${Date.now()}`, text: comment, supervisorName, supervisorBadge, timestamp: new Date().toLocaleString() };
+      const reports = state.reports.map(r =>
+        r.id === rid ? { ...r, status: 'Pending Changes', supervisorComments: [...(r.supervisorComments || []), newComment] } : r
+      );
+      const audit = addAuditEntry(state, `Returned report ${rid} to officer`, 'Reports');
+      return { ...state, reports, ...audit };
+    }
+    case 'RESUBMIT_REPORT': {
+      // payload: { id, formData, officerSignature }
+      const { id: rid2, formData, officerSignature } = action.payload;
+      const reports = state.reports.map(r =>
+        r.id === rid2 ? { ...r, formData, status: 'Pending Review', ...(officerSignature ? { officerSignature } : {}) } : r
+      );
+      const audit = addAuditEntry(state, `Officer resubmitted report ${rid2}`, 'Reports');
+      return { ...state, reports, ...audit };
+    }
     case 'UPDATE_RECORD': {
       const records = state.records.map(r =>
         r.id === action.payload.id ? { ...r, ...action.payload } : r

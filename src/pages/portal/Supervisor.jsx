@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
-  MdSave, MdCheckCircle, MdShield,
+  MdSave, MdCheckCircle, MdShield, MdReply, MdComment,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import ReportForm from '../../components/ReportForm';
@@ -32,6 +32,7 @@ function StatusPill({ status }) {
    Uses the same dark ReportForm the officer fills out
 ══════════════════════════════════ */
 function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, departments, onBack, onSave }) {
+  const { dispatch: cadDispatch } = useCAD();
   const hasSReview = !!template?.sections?.some(s => s.id === 'sReview');
 
   const [editData, setEditData] = useState(() => {
@@ -46,6 +47,8 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
   const [supSig, setSupSig]         = useState(entry.supervisorSignature || '');
   const [saved, setSaved]           = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [returning, setReturning]   = useState(false);
 
   const effectiveStatus = hasSReview ? (editData.rv_status || status) : status;
   const effectiveSupSig = hasSReview ? (editData.rv_sig || supSig) : supSig;
@@ -69,6 +72,21 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
     onSave({ id: entry.id, kind: entry.kind, formData: editData, status: effectiveStatus, supervisorSignature: effectiveSupSig || undefined });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleReturn = () => {
+    if (!commentDraft.trim()) return;
+    const me = allOfficers.find(o => o.id === currentUser?.id);
+    cadDispatch({
+      type: 'RETURN_REPORT',
+      payload: {
+        id: entry.id,
+        comment: commentDraft.trim(),
+        supervisorName: me?.name || currentUser?.name || 'Supervisor',
+        supervisorBadge: me?.badge || currentUser?.badge || '—',
+      },
+    });
+    onBack();
   };
 
   const handleExport = async () => {
@@ -112,6 +130,10 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             <button type="button" onClick={handleExport} disabled={pdfLoading}
               className={xs(S_BTN_SECONDARY)}>
               <MdDownload size={13} /> {pdfLoading ? '…' : 'PDF'}
+            </button>
+            <button type="button" onClick={() => setReturning(v => !v)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-all border-0 ${returning ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-400 hover:bg-amber-500/25'}`}>
+              <MdReply size={13} /> Return to Officer
             </button>
             <button type="button" onClick={handleSave}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
@@ -281,6 +303,50 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 </div>
               </div>
             </div>
+
+            {/* Previous supervisor comments */}
+            {(entry.supervisorComments || []).length > 0 && (
+              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <MdComment size={12} className="text-slate-500" />
+                  <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Prior Notes</div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {(entry.supervisorComments || []).map(c => (
+                    <div key={c.id} className="rounded-lg p-2.5" style={{ background: 'rgba(251,146,60,0.06)', border: '1px solid rgba(251,146,60,0.18)' }}>
+                      <div className="text-[11px] text-slate-300 leading-snug">{c.text}</div>
+                      <div className="text-[9.5px] text-slate-600 mt-1.5 font-mono">{c.supervisorBadge} · {c.timestamp}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Return to officer — expandable panel */}
+            {returning && (
+              <div className="rounded-xl p-3" style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.28)' }}>
+                <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-amber-500 mb-2">Return Note *</div>
+                <textarea
+                  className="w-full text-[12px] text-slate-200 rounded-lg px-2.5 py-2 resize-none outline-none placeholder:text-slate-600"
+                  style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(251,146,60,0.25)', minHeight: 80 }}
+                  placeholder="Explain what needs to be corrected…"
+                  value={commentDraft}
+                  onChange={e => setCommentDraft(e.target.value)}
+                />
+                <div className="flex gap-2 mt-2">
+                  <button type="button" onClick={() => setReturning(false)}
+                    className="flex-1 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>
+                    Cancel
+                  </button>
+                  <button type="button" onClick={handleReturn} disabled={!commentDraft.trim()}
+                    className="flex-1 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-40"
+                    style={{ background: 'rgba(251,146,60,0.18)', border: '1px solid rgba(251,146,60,0.40)', color: '#fb923c' }}>
+                    <MdReply size={11} style={{ display: 'inline', marginRight: 4 }} />Send Return
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
       </div>

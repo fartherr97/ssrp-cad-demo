@@ -127,9 +127,14 @@ const SEARCH_TYPES = [
 ];
 
 export default function RecordsBureau() {
-  const { state } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [] } = state;
+  const { state, dispatch } = useCAD();
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers } = state;
   const { isMobile } = useResponsive();
+
+  const SUP_RANKS = ['Sergeant', 'Staff Sergeant', 'Lieutenant', 'Captain', 'Major', 'Commander', 'Colonel', 'Chief', 'Corporal'];
+  const myOfficer = officers.find(o => o.id === currentUser?.id);
+  const canManageLicenses = currentUser?.portal === 'admin' || currentUser?.portal === 'dispatch'
+    || (myOfficer && SUP_RANKS.some(r => myOfficer.rank?.includes(r)));
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
@@ -502,7 +507,28 @@ export default function RecordsBureau() {
                         <Row label="Hair / Eyes"     value={`${selCiv.hair} / ${selCiv.eyes}`} />
                         <Row label="SSN"             value={selCiv.ssn} mono />
                         <Row label="DL Number"       value={selCiv.dlNumber} mono />
-                        <Row label="DL Status"       value={<span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus}</span>} />
+                        <Row label="DL Status"       value={
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus || 'ACTIVE'}</span>
+                            {canManageLicenses && (
+                              selCiv.dlStatus === 'SUSPENDED' ? (
+                                <button
+                                  onClick={() => dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: selCiv.id, dlStatus: 'ACTIVE' } })}
+                                  className="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors"
+                                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.28)', color: '#22c55e' }}>
+                                  Reinstate
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: selCiv.id, dlStatus: 'SUSPENDED' } })}
+                                  className="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors"
+                                  style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.28)', color: '#f97316' }}>
+                                  Suspend
+                                </button>
+                              )
+                            )}
+                          </div>
+                        } />
                       </InfoCard>
 
                       <InfoCard title="Address(es)">

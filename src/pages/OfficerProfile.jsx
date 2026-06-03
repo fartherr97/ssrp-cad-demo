@@ -3,11 +3,12 @@ import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
+import ReportForm from '../components/ReportForm';
 import { ReportDocument } from '../components/FormDocument';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_INPUT, S_LABEL } from '../constants/styles';
-import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit, MdClose, MdDescription } from 'react-icons/md';
+import { MdCameraAlt, MdAdd, MdDelete, MdBadge, MdCheckCircle, MdEdit, MdClose, MdDescription, MdReply, MdArrowBack, MdSend } from 'react-icons/md';
 
 function resizeToDataUrl(file, maxPx = 300) {
   return new Promise((resolve) => {
@@ -28,12 +29,73 @@ function resizeToDataUrl(file, maxPx = 300) {
   });
 }
 
+/* ── Returned report editor ── */
+function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResubmit }) {
+  const template = reportTemplates.find(t => t.name === report.type);
+  const [formData, setFormData] = useState({ ...(report.formData || {}) });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleResubmit = () => {
+    onResubmit(formData);
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="flex flex-col bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border-base shrink-0" style={{ background: 'rgba(251,146,60,0.05)' }}>
+        <button onClick={onBack}
+          className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors">
+          <MdArrowBack size={14} /> Back
+        </button>
+        <MdReply size={15} className="text-amber-400 shrink-0" />
+        <span className="text-[13px] font-bold text-white flex-1">{report.type}</span>
+        <span className="text-[11px] font-mono text-slate-500">{report.caseNumber}</span>
+        <button onClick={handleResubmit} disabled={submitted}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer disabled:opacity-50 transition-colors"
+          style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}>
+          <MdSend size={12} /> {submitted ? 'Submitted' : 'Resubmit for Review'}
+        </button>
+      </div>
+
+      {/* Supervisor comments banner */}
+      {(report.supervisorComments || []).length > 0 && (
+        <div className="px-4 py-3 border-b border-border-faint flex flex-col gap-2" style={{ background: 'rgba(251,146,60,0.04)' }}>
+          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-amber-500">Supervisor Notes — Please Address Before Resubmitting</div>
+          {(report.supervisorComments || []).map(c => (
+            <div key={c.id} className="rounded-lg px-3 py-2.5 text-[12px] text-slate-300 leading-relaxed"
+              style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}>
+              <div>{c.text}</div>
+              <div className="text-[10px] text-slate-600 font-mono mt-1">{c.supervisorBadge} · {c.timestamp}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Editable form */}
+      <div className="p-4 lg:p-6 overflow-auto">
+        {template ? (
+          <ReportForm
+            template={template}
+            data={formData}
+            onChange={(k, v) => setFormData(p => ({ ...p, [k]: v }))}
+            onBulkChange={obj => setFormData(p => ({ ...p, ...obj }))}
+          />
+        ) : (
+          <div className="text-slate-500 text-sm italic">No matching template found for "{report.type}".</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
   const { currentUser, officers, departments, reports, calls, reportTemplates = [] } = state;
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myDept = departments.find(d => d.id === myOfficer?.dept);
-  const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge);
+  const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge && r.status !== 'Pending Changes');
+  const returnedReports = reports.filter(r => r.officerBadge === myOfficer?.badge && r.status === 'Pending Changes');
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
 
   // Activity time sourced from Nexum duty-log integration (not yet wired)
@@ -52,6 +114,7 @@ export default function OfficerProfile() {
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
   const [viewReport, setViewReport] = useState(null);
+  const [editingReturned, setEditingReturned] = useState(null);
   const { isMobile } = useResponsive();
   const fileRef = useRef();
   const nameInputRef = useRef();
@@ -167,17 +230,28 @@ export default function OfficerProfile() {
 
       {/* Tabs */}
       <div className="flex gap-0.5 border-b border-border-faint mb-4 max-w-[900px] overflow-x-auto n-tabs-wrap">
-        {[['info','My Info'],['identifiers','Identifiers'],['reports','My Reports'],['calls','Call History']].map(([k,l]) => (
+        {[
+          ['info',      'My Info'],
+          ['identifiers','Identifiers'],
+          ['reports',   'My Reports'],
+          ['returned',  'Returned'],
+          ['calls',     'Call History'],
+        ].map(([k, l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
             className={`relative px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.4px] whitespace-nowrap cursor-pointer transition-colors ${
-              tab === k
-                ? 'text-brand-bright'
-                : 'text-slate-500 hover:text-slate-300'
+              tab === k ? 'text-brand-bright' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
-            {l}
+            <span className="flex items-center gap-1.5">
+              {l}
+              {k === 'returned' && returnedReports.length > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none bg-amber-500/20 text-amber-400">
+                  {returnedReports.length}
+                </span>
+              )}
+            </span>
             {tab === k && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
           </button>
         ))}
@@ -249,6 +323,63 @@ export default function OfficerProfile() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {tab === 'returned' && (
+          editingReturned ? (
+            <ReturnedReportEditor
+              report={editingReturned}
+              reportTemplates={reportTemplates}
+              officer={myOfficer}
+              onBack={() => setEditingReturned(null)}
+              onResubmit={(formData) => {
+                dispatch({ type: 'RESUBMIT_REPORT', payload: { id: editingReturned.id, formData } });
+                setEditingReturned(null);
+              }}
+            />
+          ) : (
+            <div className="flex flex-col gap-3">
+              {returnedReports.length === 0 ? (
+                <div className="bg-app-panel/80 border border-border-base rounded-xl p-10 text-center text-slate-600 text-[13px]">
+                  No returned reports — you&apos;re all clear.
+                </div>
+              ) : returnedReports.map(r => {
+                const latestComment = (r.supervisorComments || []).slice(-1)[0];
+                return (
+                  <div key={r.id} className="bg-app-panel/80 border rounded-xl overflow-hidden backdrop-blur-sm"
+                    style={{ borderColor: 'rgba(251,146,60,0.30)' }}>
+                    <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'rgba(251,146,60,0.15)', background: 'rgba(251,146,60,0.05)' }}>
+                      <MdReply size={16} className="text-amber-400 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[13px] font-bold text-white">{r.type}</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">Pending Changes</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 font-mono mt-0.5">{r.caseNumber} · {r.date}</div>
+                      </div>
+                      <button onClick={() => setEditingReturned(r)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer transition-colors"
+                        style={{ background: 'rgba(58,136,232,0.12)', border: '1px solid rgba(58,136,232,0.28)', color: '#3a88e8' }}>
+                        <MdEdit size={12} /> Edit & Resubmit
+                      </button>
+                    </div>
+                    {(r.supervisorComments || []).length > 0 && (
+                      <div className="px-4 py-3 flex flex-col gap-2">
+                        <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600">Supervisor Notes</div>
+                        {(r.supervisorComments || []).map(c => (
+                          <div key={c.id} className="rounded-lg px-3 py-2.5 text-[12px] text-slate-300 leading-relaxed"
+                            style={{ background: 'rgba(251,146,60,0.06)', border: '1px solid rgba(251,146,60,0.15)' }}>
+                            <div>{c.text}</div>
+                            <div className="text-[10px] text-slate-600 font-mono mt-1.5">{c.supervisorBadge} · {c.timestamp}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )
         )}
 
         {tab === 'calls' && (
