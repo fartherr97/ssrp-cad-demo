@@ -128,7 +128,8 @@ const SEARCH_TYPES = [
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers, licensePointsConfig = {} } = state;
+  const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
   const SUP_RANKS = ['Sergeant', 'Staff Sergeant', 'Lieutenant', 'Captain', 'Major', 'Commander', 'Colonel', 'Chief', 'Corporal'];
@@ -507,6 +508,20 @@ export default function RecordsBureau() {
                         <Row label="Hair / Eyes"     value={`${selCiv.hair} / ${selCiv.eyes}`} />
                         <Row label="SSN"             value={selCiv.ssn} mono />
                         <Row label="DL Number"       value={selCiv.dlNumber} mono />
+                        <Row label="DL Points" value={(() => {
+                          const pts = selCiv.licensePoints || 0;
+                          const pct = ptThreshold > 0 ? pts / ptThreshold : 0;
+                          const color = pts === 0 ? '#4ade80' : pct >= 1 ? '#f87171' : pct >= 0.7 ? '#fb923c' : pct >= 0.4 ? '#facc15' : '#4ade80';
+                          return (
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono font-bold" style={{ color }}>{pts}</span>
+                              <span className="text-[11px] text-slate-500">/ {ptThreshold} pts</span>
+                              <span className="h-1.5 w-14 rounded-full bg-white/10 overflow-hidden">
+                                <span className="h-full block rounded-full transition-all" style={{ width: `${Math.min(pct * 100, 100)}%`, background: color }} />
+                              </span>
+                            </span>
+                          );
+                        })()} />
                         <Row label="DL Status"       value={
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus || 'ACTIVE'}</span>
