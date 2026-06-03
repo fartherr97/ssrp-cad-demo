@@ -144,10 +144,58 @@ function TenCodeReference({ codes }) {
   );
 }
 
+/* Persistent reference for every unresolved officer panic — so LEOs can still
+   see who hit their panic after the toast disappears. */
+function ActivePanicsPanel({ panics, onClear, onLocate, canClear }) {
+  if (!panics.length) return null;
+  return (
+    <div className="rounded-xl overflow-hidden border border-red-500/45 shadow-lg shadow-red-900/20"
+      style={{ background: 'rgba(239,68,68,0.07)' }}>
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-red-500/25" style={{ background: 'rgba(239,68,68,0.15)' }}>
+        <MdSos size={16} className="text-red-400 shrink-0 animate-pulse" />
+        <span className="text-[11px] font-bold uppercase tracking-[0.7px] text-red-300">Active Panics</span>
+        <span className="ml-auto text-[11px] font-bold text-red-200 tabular-nums px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.25)' }}>
+          {panics.length}
+        </span>
+      </div>
+      <div className="flex flex-col">
+        {panics.map((p, i) => (
+          <div key={p.id} className={`flex items-center gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-red-500/15' : ''}`}>
+            <span className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border border-red-500/40" style={{ background: 'rgba(239,68,68,0.2)' }}>
+              <MdSos size={15} className="text-red-400" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[12.5px] font-bold text-red-200 truncate">
+                {p.unit || 'UNIT'}{p.name && <span className="text-red-300/60 font-normal ml-1.5">· {p.name}</span>}
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-red-300/70 truncate">
+                <MdLocationOn size={12} className="shrink-0" /> {p.location || 'Location unknown'}
+                {p.time && <span className="text-red-300/40 ml-1">· {p.time}</span>}
+              </div>
+            </div>
+            <button onClick={() => onLocate(p)}
+              className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-red-200 cursor-pointer border border-red-500/35 hover:bg-red-500/15 transition-colors"
+              style={{ background: 'rgba(239,68,68,0.08)' }} title="Show on live map">
+              <MdLocationOn size={13} /> Locate
+            </button>
+            {canClear(p) && (
+              <button onClick={() => onClear(p.officerId)}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-300 cursor-pointer border border-border-base hover:bg-white/[0.07] hover:text-white transition-colors"
+                style={{ background: 'rgba(255,255,255,0.03)' }} title="Mark this panic resolved">
+                <MdCheckCircle size={13} /> Clear
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function QuickAction({ Icon, label, onClick }) {
   return (
     <button onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] font-normal text-slate-200 bg-white/[0.03] hover:bg-white/[0.07] border border-border-base hover:border-border-strong cursor-pointer transition-all">
+      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] font-normal text-slate-200 bg-white/[0.03] hover:bg-white/[0.07] border border-border-base hover:border-border-strong cursor-pointer transition-colors">
       <Icon size={17} className="text-brand-bright shrink-0" />
       <span className="text-left">{label}</span>
     </button>
@@ -187,7 +235,13 @@ function Reveal({ show, children, duration = 300 }) {
   return (
     <div
       className={`grid ease-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
-      style={{ transitionProperty: 'grid-template-rows, opacity', transitionDuration: `${duration}ms` }}
+      style={{
+        transitionProperty: 'grid-template-rows, opacity',
+        transitionDuration: `${duration}ms`,
+        // Isolate layout/paint so a heavy child (the Field Units table) can't
+        // thrash the rest of the page while its height animates.
+        contain: 'layout paint',
+      }}
     >
       <div className="overflow-hidden min-h-0">{children}</div>
     </div>
@@ -416,7 +470,7 @@ export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [],
-    unitStatusCodes = [], tenCodes = [], callNatures = [] } = state;
+    unitStatusCodes = [], tenCodes = [], callNatures = [], activePanics = [] } = state;
   // Status menu/badges are driven by admin-configured unit status codes.
   const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const statusColor = (code) => unitStatusCodes.find(s => s.code === code)?.color || STATUS_COLORS[code] || '#fff';
@@ -611,6 +665,14 @@ export default function DispatchCenter() {
 
         {/* ─────────── CENTER ─────────── */}
         <div className="flex flex-col gap-4 lg:gap-5 min-w-0 order-1 xl:order-none">
+          {/* Active panics — persists after the toast clears */}
+          <ActivePanicsPanel
+            panics={activePanics}
+            canClear={(p) => isDispatcher || ['admin', 'supervisor'].includes(currentUser?.role) || p.officerId === currentUser?.id}
+            onClear={(officerId) => { dispatch({ type: 'CLEAR_PANIC', payload: officerId }); toast.success('Panic cleared'); }}
+            onLocate={() => navigate('/map')}
+          />
+
           {/* Active calls */}
           <SectionCard title="Active Calls" count={sortedCalls.length}
             action="View All" onAction={() => navigate('/board')}>

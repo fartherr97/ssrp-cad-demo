@@ -140,6 +140,9 @@ const initialState = {
   radioSeen: 0,
   lastRadio: null,
   panicAlert: null,
+  // Every unresolved officer panic, newest first — drives the Active Panics
+  // panel so LEOs can reference a panic after its toast is gone.
+  activePanics: [],
   dispatchLog: [
     { id: 'seed-6', time: '15:04:11', kind: 'call',   text: 'Call 26-1051 created * Road Hazard (I-275 SB / Sligh Ave)' },
     { id: 'seed-5', time: '15:01:44', kind: 'call',   text: 'Call 26-1050 created * Theft / Shoplifting (4302 W Boy Scout Blvd)' },
@@ -342,18 +345,24 @@ function reducer(state, action) {
       const log = addDispatchLog(state, `[PANIC] ${text}`, 'alert');
       const officers = state.officers.map(o => o.id === officerId ? { ...o, panic: true } : o);
       const id = `${Date.now()}`;
+      const panicEntry = { officerId, unit, name, location, x, y, z, time: nowTime(), id };
+      // Replace any prior unresolved panic from the same officer, newest first.
+      const activePanics = [panicEntry, ...(state.activePanics || []).filter(p => p.officerId !== officerId)];
       return {
         ...state,
         ...log,
         officers,
         radioCount: state.radioCount + 1,
         lastRadio: { text, time: nowTime(), id, panic: true },
-        panicAlert: { officerId, unit, name, location, x, y, z, time: nowTime(), id },
+        panicAlert: panicEntry,
+        activePanics,
       };
     }
     case 'CLEAR_PANIC': {
       const officers = state.officers.map(o => o.id === action.payload ? { ...o, panic: false } : o);
-      return { ...state, officers, panicAlert: null };
+      const activePanics = (state.activePanics || []).filter(p => p.officerId !== action.payload);
+      const panicAlert = state.panicAlert?.officerId === action.payload ? null : state.panicAlert;
+      return { ...state, officers, activePanics, panicAlert };
     }
     case 'DISMISS_PANIC_MAP':
       return { ...state, panicAlert: null };

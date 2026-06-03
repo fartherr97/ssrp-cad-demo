@@ -32,6 +32,7 @@ const VARIANTS = {
 };
 
 const EXIT_MS = 260;
+const MAX_TOASTS = 4;   // cap on-screen toasts so spamming stays smooth
 let __seq = 0;
 
 /* Accept either toast('text') or toast({ title, message, variant, duration }) */
@@ -76,7 +77,22 @@ export function ToastProvider({ children }) {
       ...opts,
     };
     if (t.variant === 'loading' && opts.duration === undefined) t.duration = 0;
-    setToasts(ts => [...ts, t]);
+    setToasts(ts => {
+      const next = [...ts, t];
+      // Hard-cap the stack: when spammed, drop the oldest instantly (no exit
+      // animation) so we never pile up a dozen blurred cards animating at once.
+      if (next.length > MAX_TOASTS) {
+        const overflow = next.slice(0, next.length - MAX_TOASTS);
+        overflow.forEach(o => {
+          clearTimeout(timers.current[o.id]);
+          clearTimeout(timers.current[`x${o.id}`]);
+          delete timers.current[o.id];
+          delete timers.current[`x${o.id}`];
+        });
+        return next.slice(next.length - MAX_TOASTS);
+      }
+      return next;
+    });
     arm(id, t.duration);
 
     const handle = {
@@ -140,12 +156,13 @@ function ToastCard({ toast, onDismiss }) {
     <div
       role="status"
       onClick={() => onDismiss(toast.id)}
-      className={`group pointer-events-auto relative flex items-center gap-3.5 w-[calc(100vw-2rem)] max-w-[400px] px-5 pt-4 pb-[22px] rounded-2xl cursor-pointer overflow-hidden backdrop-blur-xl
+      className={`group pointer-events-auto relative flex items-center gap-3.5 w-[calc(100vw-2rem)] max-w-[400px] px-5 pt-4 pb-[22px] rounded-2xl cursor-pointer overflow-hidden backdrop-blur-sm
         ${toast.leaving ? 'toast-pop-out' : 'toast-pop-in'}`}
       style={{
-        background: `linear-gradient(135deg, ${color}1c 0%, rgba(10,16,26,0.94) 60%)`,
+        background: `linear-gradient(135deg, ${color}1c 0%, rgba(10,16,26,0.96) 60%)`,
         border: `1px solid ${color}55`,
-        boxShadow: `0 10px 44px -8px ${color}40, 0 8px 30px rgba(0,0,0,0.55)`,
+        boxShadow: `0 10px 30px -10px ${color}33, 0 6px 20px rgba(0,0,0,0.5)`,
+        willChange: 'transform, opacity',
       }}
     >
       <span
