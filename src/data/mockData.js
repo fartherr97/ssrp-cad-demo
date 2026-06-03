@@ -640,9 +640,9 @@ export const BUSINESSES = [
     ],
     license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
-      { id: 1, name: "Michael Torres", discordId: "419283746", role: "Manager",    phone: "555-0192", since: "2024-02-01" },
-      { id: 2, name: "Amanda Chen",    discordId: "309182746", role: "Dispatcher", phone: "555-0334", since: "2025-01-15" },
-      { id: 3, name: "Luis Romero",    discordId: "",          role: "Driver",     phone: "555-0911", since: "2025-06-20" },
+      { id: 1, name: "Michael Torres", discordId: "419283746", roles: ["Manager", "Driver"],    phone: "555-0192", since: "2024-02-01" },
+      { id: 2, name: "Amanda Chen",    discordId: "309182746", roles: ["Dispatcher"],             phone: "555-0334", since: "2025-01-15" },
+      { id: 3, name: "Luis Romero",    discordId: "",          roles: ["Driver"],                 phone: "555-0911", since: "2025-06-20" },
     ],
     incidents: [
       { id: 1, date: "2026-05-22", type: "Theft Report",     summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
@@ -660,8 +660,8 @@ export const BUSINESSES = [
     ],
     license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
-      { id: 1, name: "Ray Calhoun",   discordId: "100200305", role: "Inspector",  phone: "813-975-6200", since: "2022-01-01" },
-      { id: 2, name: "Jordan Maxwell", discordId: "205947291", role: "Supervisor", phone: "555-0192",    since: "2024-06-01" },
+      { id: 1, name: "Ray Calhoun",    discordId: "100200305", roles: ["Inspector", "Supervisor"], phone: "813-975-6200", since: "2022-01-01" },
+      { id: 2, name: "Jordan Maxwell", discordId: "205947291", roles: ["Supervisor", "Dispatcher"], phone: "555-0192",    since: "2024-06-01" },
     ],
     incidents: [],
   },

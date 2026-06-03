@@ -500,6 +500,88 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
   );
 }
 
+/* ── Quick Dispatch Modal — pick a unit, send it en route ── */
+function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCancel }) {
+  const [selectedUnitId, setSelectedUnitId] = useState(
+    availableUnits.length === 1 ? availableUnits[0].id : null
+  );
+
+  const handleConfirm = () => {
+    if (!selectedUnitId) return;
+    onConfirm(req, selectedUnitId);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+      onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full sm:max-w-[460px] rounded-t-2xl sm:rounded-2xl flex flex-col gap-4 anim-sheet-in sm:anim-modal-in"
+        style={{ background: '#0c1929', border: '1px solid rgba(249,115,22,0.3)', padding: '20px' }}>
+
+        {/* Header */}
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center shrink-0">
+            <MdEngineering size={20} className="text-orange-400" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[15px] font-bold text-white">Dispatch Unit</div>
+            <div className="text-[11.5px] text-slate-400 mt-0.5 truncate">{req.assistType} · {req.location}</div>
+          </div>
+        </div>
+
+        {/* Unit list */}
+        {availableUnits.length === 0 ? (
+          <div className="py-6 text-center text-[13px] text-slate-500">
+            No signed-on units available. Have a driver sign on first.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Unit</div>
+            {availableUnits.map(u => {
+              const active = selectedUnitId === u.id;
+              return (
+                <button key={u.id} type="button" onClick={() => setSelectedUnitId(u.id)}
+                  className="press w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all cursor-pointer"
+                  style={{
+                    background: active ? 'rgba(249,115,22,0.12)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                  }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: active ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.06)' }}>
+                    <MdLocalShipping size={16} style={{ color: active ? '#fb923c' : '#64748b' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-bold text-slate-100">{u.truckName}</div>
+                    {u.operatorName && <div className="text-[11px] text-slate-400">{u.operatorName}</div>}
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">
+                    {u.status || 'AVAILABLE'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-1">
+          <button type="button" onClick={onCancel}
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            Cancel
+          </button>
+          <button type="button" onClick={handleConfirm} disabled={!selectedUnitId}
+            className="press flex-[2] py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer transition-colors border-0 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: selectedUnitId ? '#f97316' : '#f9731650', color: '#0c0f14' }}>
+            <span className="flex items-center justify-center gap-1.5">
+              <MdArrowForward size={14} /> Dispatch En Route
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── FDOT assistance request card (FDOT inbound queue) ── */
 const FDOT_REQ_META = {
   PENDING:      { label: 'Pending',      color: '#f59e0b' },
@@ -597,12 +679,13 @@ export default function TowCAD() {
     [fdotRequests]
   );
 
-  const [showForm,      setShowForm]    = useState(false);
-  const [showSignOn,    setShowSignOn]  = useState(false);
-  const [statusFilter,  setStatus]      = useState('ALL');
-  const [companyFilter, setCompany]     = useState('ALL');
-  const [formInitial,   setFormInitial] = useState(null);
-  const [pendingReqId,  setPendingReqId] = useState(null);
+  const [showForm,       setShowForm]       = useState(false);
+  const [showSignOn,     setShowSignOn]     = useState(false);
+  const [statusFilter,   setStatus]         = useState('ALL');
+  const [companyFilter,  setCompany]        = useState('ALL');
+  const [formInitial,    setFormInitial]    = useState(null);
+  const [pendingReqId,   setPendingReqId]   = useState(null);
+  const [dispatchingReq, setDispatchingReq] = useState(null);
 
   const myUnit = useMemo(() =>
     towUnits.find(u =>
@@ -682,19 +765,32 @@ export default function TowCAD() {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
     toast.warning(`Declined — ${req.assistType}`, { title: 'FDOT' });
   };
-  const dispatchFromRequest = (req) => {
-    setFormInitial({
-      location:     req.location,
-      pickupPostal: req.postal || '',
-      towType:      'FDOT Clearance',
-      priority:     req.priority || 2,
-      zone:         'Roaming',
-      notes:        `[FDOT Assist] ${req.assistType} — ${req.description}`,
-      callId:       req.callId || '',
-      companyId:    fdotCompany?.id || '',
+  const dispatchFromRequest = (req) => setDispatchingReq(req);
+
+  const confirmQuickDispatch = (req, unitId) => {
+    const unit = towUnits.find(u => u.id === unitId);
+    dispatch({
+      type: 'ADD_TOW_JOB',
+      payload: {
+        location:    req.location,
+        pickupPostal: req.postal || '',
+        towType:     'FDOT Clearance',
+        priority:    req.priority || 2,
+        zone:        'Roaming',
+        notes:       `[FDOT Assist] ${req.assistType} — ${req.description}`,
+        callId:      req.callId || '',
+        companyId:   fdotCompany?.id,
+        companyName: fdotCompany?.name || 'FDOT',
+        unitId,
+        driverName:  unit?.operatorName || '',
+        status:      'EN_ROUTE',
+        plate:       '',
+      },
     });
-    setPendingReqId(req.id);
-    setShowForm(true);
+    dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
+    toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
+    setDispatchingReq(null);
   };
 
   return (
@@ -707,6 +803,16 @@ export default function TowCAD() {
           currentUser={currentUser}
           onSignOn={handleSignOn}
           onCancel={() => setShowSignOn(false)}
+        />
+      )}
+
+      {dispatchingReq && (
+        <QuickDispatchModal
+          req={dispatchingReq}
+          availableUnits={visibleUnits.filter(u => !['ON_CALL'].includes(u.status))}
+          fdotCompany={fdotCompany}
+          onConfirm={confirmQuickDispatch}
+          onCancel={() => setDispatchingReq(null)}
         />
       )}
 
