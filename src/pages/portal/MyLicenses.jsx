@@ -253,7 +253,25 @@ export default function MyLicenses() {
                 <div className="flex gap-3.5 flex-wrap">
                   {/* Driver License column */}
                   <div className="flex-1 min-w-[240px]">
-                    {mode === 'applying' ? (
+                    {c.dlStatus === 'SUSPENDED' && mode !== 'applying' && mode !== 'renewing' ? (
+                      /* Suspended — block all paths regardless of whether dlNumber exists */
+                      <div className="flex-1 min-w-[240px] rounded-xl border p-5 backdrop-blur-sm flex flex-col gap-3"
+                        style={{ background: 'rgba(248,113,113,0.05)', borderColor: 'rgba(248,113,113,0.3)' }}>
+                        <div className="flex items-center gap-2">
+                          <MdWarningAmber size={18} className="text-red-400 shrink-0" />
+                          <span className="text-[13px] font-bold text-red-400">License Suspended</span>
+                        </div>
+                        {c.dlNumber && (
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                            <Field label="DL Number" value={c.dlNumber} mono />
+                            <Field label="Class" value={c.dlClass} />
+                          </div>
+                        )}
+                        <div className="text-[11.5px] text-slate-400 leading-relaxed">
+                          Your license has been suspended. You cannot apply for or renew a license while under suspension. Contact your server administrator to appeal.
+                        </div>
+                      </div>
+                    ) : mode === 'applying' ? (
                       <DLForm
                         civ={c}
                         isRenewal={false}

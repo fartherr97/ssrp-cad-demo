@@ -340,7 +340,7 @@ function reducer(state, action) {
     case 'ISSUE_DRIVER_LICENSE': {
       const { civilianId, dlClass } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
-      if (!civ) return state;
+      if (!civ || civ.dlStatus === 'SUSPENDED') return state;
       const prefix = (civ.lastName?.[0] || 'X').toUpperCase();
       const dlNumber = prefix + Math.floor(Math.random() * 9000000 + 1000000);
       const today = new Date();
@@ -360,7 +360,7 @@ function reducer(state, action) {
     case 'RENEW_DRIVER_LICENSE': {
       const { civilianId, dlClass } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
-      if (!civ) return state;
+      if (!civ || civ.dlStatus === 'SUSPENDED') return state;
       const today = new Date();
       const expiry = new Date(today);
       expiry.setFullYear(expiry.getFullYear() + 1);
