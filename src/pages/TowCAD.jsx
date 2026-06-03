@@ -443,7 +443,7 @@ export default function TowCAD() {
         <div className="flex items-start gap-3 mb-5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
           <MdWarning size={18} className="text-amber-400 shrink-0 mt-0.5" />
           <div className="text-[12.5px] text-amber-300 leading-relaxed">
-            <span className="font-bold">Active road incidents detected.</span> Road Hazard or MVA calls are in the dispatch queue — consider linking new tow jobs to those calls for coordinated response.
+            <span className="font-bold">Active road incidents detected.</span> Road Hazard or MVA calls are in the dispatch queue * consider linking new tow jobs to those calls for coordinated response.
           </div>
         </div>
       )}
