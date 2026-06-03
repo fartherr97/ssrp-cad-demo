@@ -9,6 +9,7 @@ import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose,
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
+import { useMountTransition } from './ui/Modal';
 
 // Static span classes so Tailwind JIT picks them up.
 const SPAN = {
@@ -754,8 +755,16 @@ function downscaleImage(file) {
 }
 
 /* ── Full-screen image viewer (lightbox) ── */
-function PhotoLightbox({ photos, index, onClose, onNavigate }) {
+function PhotoLightbox({ open, photos, index, onClose, onNavigate }) {
+  const { mounted, show } = useMountTransition(open, 200);
+  // Hold the last index we displayed so the image doesn't flicker to a stale
+  // src during the close animation (parent clears the index as it closes).
+  const lastIndex = useRef(index);
+  if (open && index != null) lastIndex.current = index;
+  const idx = open ? index : lastIndex.current;
+
   useEffect(() => {
+    if (!open) return undefined;
     const onKey = (e) => {
       if (e.key === 'Escape') onClose();
       else if (e.key === 'ArrowLeft') onNavigate(-1);
@@ -763,14 +772,16 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose, onNavigate]);
+  }, [open, onClose, onNavigate]);
+
+  if (!mounted || photos[idx] == null) return null;
 
   const multi = photos.length > 1;
 
   return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10"
+      className={`fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10 ${show ? 'anim-overlay-in' : 'anim-overlay-out'}`}
       style={{ background: 'rgba(3,7,12,0.92)', backdropFilter: 'blur(4px)' }}
     >
       {/* Close */}
@@ -810,10 +821,11 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }) {
 
       {/* Image — object-contain so nothing is cropped */}
       <img
-        src={photos[index]}
-        alt={`Photo ${index + 1}`}
+        key={idx}
+        src={photos[idx]}
+        alt={`Photo ${idx + 1}`}
         onClick={(e) => e.stopPropagation()}
-        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+        className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl ${show ? 'anim-modal-in' : 'anim-modal-out'}`}
       />
 
       {/* Counter */}
@@ -821,7 +833,7 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }) {
         className="absolute bottom-5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full text-[12px] font-semibold text-slate-200"
         style={{ background: 'rgba(255,255,255,0.08)' }}
       >
-        Photo {index + 1} of {photos.length}
+        Photo {idx + 1} of {photos.length}
       </div>
     </div>,
     document.body,
@@ -923,14 +935,13 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
         )}
       </div>
 
-      {viewerIdx != null && photos[viewerIdx] && (
-        <PhotoLightbox
-          photos={photos}
-          index={viewerIdx}
-          onClose={() => setViewerIdx(null)}
-          onNavigate={(dir) => setViewerIdx(i => (i + dir + photos.length) % photos.length)}
-        />
-      )}
+      <PhotoLightbox
+        open={viewerIdx != null}
+        photos={photos}
+        index={viewerIdx}
+        onClose={() => setViewerIdx(null)}
+        onNavigate={(dir) => setViewerIdx(i => (i + dir + photos.length) % photos.length)}
+      />
     </div>
   );
 }
