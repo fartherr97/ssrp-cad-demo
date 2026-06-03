@@ -598,6 +598,11 @@ export const BUSINESSES = [
     owner: "Jordan Maxwell", ownerDiscordId: "205947291", ein: "FL-88-2210445", phone: "555-0710",
     address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
     isTowCompany: true,
+    fleet: [
+      { id: 1, name: 'T1 — Light Duty',  spawnCode: 'towtruck',  type: 'Light Duty'  },
+      { id: 2, name: 'T2 — Medium Duty', spawnCode: 'towtruck2', type: 'Medium Duty' },
+      { id: 3, name: 'T3 — Flatbed',     spawnCode: 'flatbed',   type: 'Flatbed'     },
+    ],
     license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
       { id: 1, name: "Michael Torres", discordId: "419283746", role: "Manager",    phone: "555-0192", since: "2024-02-01" },
@@ -614,6 +619,10 @@ export const BUSINESSES = [
     owner: "State of Florida – FDOT District 7", ownerDiscordId: "100200305", ein: "FL-GOV-FDOT-TOW-7", phone: "800-511-0000",
     address: "FDOT District 7 HQ, 11201 N Malcolm McKinley Dr, Tampa", status: "ACTIVE",
     isTowCompany: true, isFDOT: true,
+    fleet: [
+      { id: 1, name: 'FDOT-T1 — Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
+      { id: 2, name: 'FDOT-T2 — Medium Duty',   spawnCode: 'towtruck2', type: 'Medium Duty' },
+    ],
     license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: false,
     employees: [
       { id: 1, name: "Ray Calhoun",   discordId: "100200305", role: "Inspector",  phone: "813-975-6200", since: "2022-01-01" },

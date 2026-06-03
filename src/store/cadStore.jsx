@@ -38,6 +38,7 @@ const initialState = {
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
   towJobs: [],
+  towUnits: [],
   departments: DEPARTMENTS,
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
@@ -713,6 +714,22 @@ function reducer(state, action) {
     case 'CANCEL_TOW_JOB': {
       const towJobs = state.towJobs.map(j => j.id === action.payload ? { ...j, status: 'CANCELLED' } : j);
       return { ...state, towJobs };
+    }
+    case 'ADD_TOW_UNIT': {
+      // payload: { operatorName, discordId, companyId, companyName, truckId, truckName, zone }
+      const unit = { ...action.payload, id: state.nextId, status: 'AVAILABLE', signedOnAt: Date.now() };
+      const log = addDispatchLog(state, `Tow unit online: ${unit.operatorName} (${unit.truckName}) — ${unit.zone}`, 'unit');
+      return { ...state, towUnits: [...state.towUnits, unit], nextId: state.nextId + 1, ...log };
+    }
+    case 'UPDATE_TOW_UNIT': {
+      const towUnits = state.towUnits.map(u => u.id === action.payload.id ? { ...u, ...action.payload } : u);
+      return { ...state, towUnits };
+    }
+    case 'REMOVE_TOW_UNIT': {
+      const unit = state.towUnits.find(u => u.id === action.payload);
+      const towUnits = state.towUnits.filter(u => u.id !== action.payload);
+      const log = unit ? addDispatchLog(state, `Tow unit offline: ${unit.operatorName} (${unit.truckName})`, 'unit') : {};
+      return { ...state, towUnits, ...log };
     }
 
     case 'ADD_CUSTOM_RECORD_TYPE': {

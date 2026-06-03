@@ -258,7 +258,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
 
 export default function ActionBar() {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, reportTemplates, recordTemplates, unitStatusCodes = [] } = state;
+  const { currentUser, officers, reportTemplates, recordTemplates, unitStatusCodes = [], businesses = [] } = state;
   const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const navigate = useNavigate();
   const location = useLocation();
@@ -303,7 +303,18 @@ export default function ActionBar() {
     return [];
   };
 
-  const navItems = [...portal.nav, ...(portal.adminNav || [])];
+  const hasTowBiz = portal.id === 'business' && businesses.some(b =>
+    b.isTowCompany && (
+      b.ownedByPlayer ||
+      (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
+      (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
+    )
+  );
+
+  const navItems = [...portal.nav, ...(portal.adminNav || [])].filter(item => {
+    if (item.route === '/tow-cad' && portal.id === 'business') return hasTowBiz;
+    return true;
+  });
 
   return (
     <div className="cad-actionbar flex items-center gap-1 px-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
