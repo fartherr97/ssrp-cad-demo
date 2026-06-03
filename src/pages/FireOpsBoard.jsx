@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -13,11 +14,176 @@ import {
 } from '../constants/styles';
 import {
   MdLocalHospital, MdSearch, MdWarningAmber, MdPerson, MdShield,
+  MdLocalFireDepartment, MdCheckCircle, MdThumbDownAlt, MdArrowForward,
+  MdLocationOn, MdLink, MdClose,
 } from 'react-icons/md';
 
 function PriBadge({ p }) {
   const badgeMap = { 1: BADGE.p1, 2: BADGE.p2, 3: BADGE.p3, 4: BADGE.p4 };
   return <span className={badgeMap[p] || BADGE.gray}>P{p}</span>;
+}
+
+function elapsed(ts) {
+  const mins = Math.floor((Date.now() - ts) / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  return `${Math.floor(mins / 60)}h ${mins % 60}m ago`;
+}
+
+const PRIORITY_BADGE = {
+  1: 'bg-red-500/15 border border-red-500/30 text-red-400',
+  2: 'bg-amber-500/15 border border-amber-500/30 text-amber-400',
+  3: 'bg-slate-500/15 border border-slate-500/30 text-slate-400',
+};
+
+/* ── HCFR Quick Dispatch Modal ── */
+function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
+  const [selectedId, setSelectedId] = useState(
+    availableUnits.length === 1 ? availableUnits[0].id : null
+  );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+      onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full sm:max-w-[460px] rounded-t-2xl sm:rounded-2xl flex flex-col gap-4 anim-sheet-in sm:anim-modal-in"
+        style={{ background: '#0c1929', border: '1px solid rgba(239,68,68,0.35)', padding: '20px' }}>
+
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)' }}>
+            <MdLocalFireDepartment size={20} color="#ef4444" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[15px] font-bold text-white">Dispatch Apparatus</div>
+            <div className="text-[11.5px] text-slate-400 mt-0.5 truncate">{req.assistType} · {req.location}</div>
+          </div>
+          <button onClick={onCancel} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+            <MdClose size={18} className="text-slate-500 hover:text-slate-300" />
+          </button>
+        </div>
+
+        {availableUnits.length === 0 ? (
+          <div className="py-6 text-center text-[13px] text-slate-500">
+            No available HCFR units. Mark a unit as Available first.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Apparatus</div>
+            {availableUnits.map(u => {
+              const active = selectedId === u.id;
+              return (
+                <button key={u.id} type="button" onClick={() => setSelectedId(u.id)}
+                  className="press w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all cursor-pointer"
+                  style={{
+                    background: active ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${active ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                  }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: active ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)' }}>
+                    <MdLocalFireDepartment size={16} style={{ color: active ? '#ef4444' : '#64748b' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-bold text-slate-100">{u.unitId}</div>
+                    <div className="text-[11px] text-slate-400">{u.name} · {u.subdivision || u.rank}</div>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">
+                    {u.status}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-1">
+          <button type="button" onClick={onCancel}
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-[rgba(255,255,255,0.1)] bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            Cancel
+          </button>
+          <button type="button" onClick={() => selectedId && onConfirm(req, selectedId)}
+            disabled={!selectedId}
+            className="press flex-[2] py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer transition-colors border-0 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: selectedId ? '#ef4444' : '#ef444450', color: '#fff' }}>
+            <span className="flex items-center justify-center gap-1.5">
+              <MdArrowForward size={14} /> Dispatch En Route
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── HCFR incoming request card ── */
+const HCFR_REQ_META = {
+  PENDING:      { label: 'Pending',      color: '#ef4444' },
+  ACKNOWLEDGED: { label: 'Acknowledged', color: '#06b6d4' },
+};
+
+function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
+  const m = HCFR_REQ_META[req.status] || HCFR_REQ_META.PENDING;
+  const linkedCall = req.callId ? calls.find(c => c.id === req.callId) : null;
+
+  return (
+    <div className="bg-app-panel/80 border rounded-xl p-4 flex flex-col gap-3"
+      style={{ borderColor: `${m.color}55`, borderLeft: `3px solid ${m.color}` }}>
+      <div className="flex justify-between items-start gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+            style={{ color: m.color, borderColor: `${m.color}55`, background: `${m.color}14` }}>
+            {m.label}
+          </span>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${PRIORITY_BADGE[req.priority]}`}>
+            P{req.priority}
+          </span>
+          <span className="text-[11px] text-slate-500 font-mono">#{req.id}</span>
+        </div>
+        <span className="text-[10px] text-slate-500">{elapsed(req.createdAt)}</span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <MdLocalFireDepartment size={16} className="text-red-400 shrink-0" />
+        <span className="text-[14px] font-extrabold text-slate-100">{req.assistType}</span>
+      </div>
+
+      <div className="flex items-start gap-2">
+        <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
+        <div className="min-w-0">
+          <span className="text-xs text-slate-300 leading-relaxed">{req.location}</span>
+          {req.postal && <span className="text-[11px] text-slate-500 font-mono ml-2">({req.postal})</span>}
+        </div>
+      </div>
+
+      <div className="text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
+
+      <div className="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap">
+        <MdPerson size={13} className="shrink-0" />
+        <span>{req.requestedBy}{req.requestedByUnit ? ` · ${req.requestedByUnit}` : ''}</span>
+        {linkedCall && (
+          <span className="inline-flex items-center gap-1 ml-auto text-amber-400/80">
+            <MdLink size={12} /> Call {linkedCall.id}
+          </span>
+        )}
+      </div>
+
+      <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? '1fr 2fr 1fr' : '1fr auto' }}>
+        {req.status === 'PENDING' && (
+          <button onClick={() => onAcknowledge(req)}
+            className="press-sm inline-flex items-center justify-center gap-1 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors whitespace-nowrap">
+            <MdCheckCircle size={14} /> Acknowledge
+          </button>
+        )}
+        <button onClick={() => onDispatch(req)}
+          className="press inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-red-600 hover:bg-red-500 text-white transition-colors whitespace-nowrap">
+          <MdArrowForward size={14} /> Dispatch Unit
+        </button>
+        <button onClick={() => onDecline(req)}
+          className="press-sm inline-flex items-center justify-center gap-1 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors whitespace-nowrap">
+          <MdThumbDownAlt size={14} /> Decline
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function MedicalLookup({ civilians }) {
@@ -40,7 +206,6 @@ function MedicalLookup({ civilians }) {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Search input */}
       <div className="p-3 border-b border-border-faint shrink-0">
         <div className="flex gap-2">
           <input
@@ -71,7 +236,6 @@ function MedicalLookup({ civilians }) {
 
         {result && (
           <div className="flex flex-col gap-3">
-            {/* Patient header */}
             <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-app-elevated border border-border-base">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.3)' }}>
@@ -87,7 +251,6 @@ function MedicalLookup({ civilians }) {
               <div className="text-center py-6 text-slate-600 text-[12px]">No medical profile on file</div>
             ) : (
               <>
-                {/* Blood type + critical flags */}
                 <div className="flex flex-wrap gap-2">
                   {mp.bloodType && (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
@@ -111,7 +274,6 @@ function MedicalLookup({ civilians }) {
                   )}
                 </div>
 
-                {/* Conditions */}
                 {mp.conditions?.length > 0 && (
                   <div>
                     <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-1.5">Conditions</div>
@@ -123,7 +285,6 @@ function MedicalLookup({ civilians }) {
                   </div>
                 )}
 
-                {/* Allergies */}
                 {mp.allergies?.length > 0 && (
                   <div>
                     <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-red-400/70 mb-1.5">Allergies</div>
@@ -135,7 +296,6 @@ function MedicalLookup({ civilians }) {
                   </div>
                 )}
 
-                {/* Medications */}
                 {mp.medications?.length > 0 && (
                   <div>
                     <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-1.5">Current Medications</div>
@@ -149,7 +309,6 @@ function MedicalLookup({ civilians }) {
                   </div>
                 )}
 
-                {/* Emergency contact */}
                 {mp.emergencyContact?.name && (
                   <div className="rounded-xl px-3 py-2.5 bg-app-elevated border border-border-base">
                     <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-1">Emergency Contact</div>
@@ -159,7 +318,6 @@ function MedicalLookup({ civilians }) {
                   </div>
                 )}
 
-                {/* Safety notes (for fire awareness) */}
                 {mp.safetyNotes && (
                   <div className="rounded-xl px-3 py-2.5"
                     style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)' }}>
@@ -171,7 +329,6 @@ function MedicalLookup({ civilians }) {
                   </div>
                 )}
 
-                {/* EMS / Fire notes */}
                 {mp.notes && (
                   <div className="rounded-xl px-3 py-2.5"
                     style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)' }}>
@@ -193,9 +350,11 @@ function MedicalLookup({ civilians }) {
 
 export default function FireOpsBoard() {
   const { state, dispatch } = useCAD();
-  const { calls, officers, currentUser } = state;
+  const toast = useToast();
+  const { calls, officers, currentUser, hcfrRequests = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
   const [rosterTab, setRosterTab] = useState('APPARATUS');
+  const [dispatchingReq, setDispatchingReq] = useState(null);
 
   const me = officers.find(o => o.id === currentUser?.id);
 
@@ -204,10 +363,48 @@ export default function FireOpsBoard() {
 
   const selCall = selectedCall ? calls.find(c => c.id === selectedCall) : null;
 
+  const inboundRequests = useMemo(
+    () => hcfrRequests.filter(r => r.status === 'PENDING' || r.status === 'ACKNOWLEDGED'),
+    [hcfrRequests]
+  );
+
+  const availableUnits = useMemo(
+    () => fireUnits.filter(u => u.status === 'AVAILABLE'),
+    [fireUnits]
+  );
+
   const selfAssign = () => {
     if (!selectedCall || !me) return;
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall, unitId: me.unitId } });
     dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
+  };
+
+  const acknowledgeRequest = (req) => {
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
+    toast.info(`Acknowledged — ${req.assistType}`, { title: 'HCFR' });
+    dispatch({
+      type: 'DISPATCH_RADIO',
+      payload: `HCFR has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is responding.`,
+    });
+  };
+
+  const declineRequest = (req) => {
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
+    toast.warning(`Declined — ${req.assistType}`, { title: 'HCFR' });
+  };
+
+  const confirmQuickDispatch = (req, unitId) => {
+    const unit = fireUnits.find(u => u.id === unitId);
+    if (req.callId) {
+      dispatch({ type: 'ASSIGN_UNIT', payload: { callId: req.callId, unitId: unit?.unitId || String(unitId) } });
+    }
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
+    toast.success(`${unit?.name || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
+    dispatch({
+      type: 'DISPATCH_RADIO',
+      payload: `HCFR has dispatched ${unit?.name || 'a unit'} (${unit?.unitId || ''}) to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.`,
+    });
+    setDispatchingReq(null);
   };
 
   const APPARATUS_TYPES = [
@@ -220,6 +417,16 @@ export default function FireOpsBoard() {
 
   return (
     <div className={`${S_PAGE} !p-4 lg:!p-5 overflow-hidden !gap-4 lg:!gap-5`}>
+
+      {dispatchingReq && (
+        <HCFRDispatchModal
+          req={dispatchingReq}
+          availableUnits={availableUnits}
+          onConfirm={confirmQuickDispatch}
+          onCancel={() => setDispatchingReq(null)}
+        />
+      )}
+
       {/* Header stats */}
       <div className="flex flex-wrap gap-4 lg:gap-6 items-center px-4 py-3 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 shrink-0">
         <div className="flex items-center gap-3">
@@ -234,6 +441,7 @@ export default function FireOpsBoard() {
           { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
           { label: 'Apparatus On Duty', value: fireUnits.length, colorClass: 'text-white' },
           { label: 'Available', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-emerald-400' },
+          ...(inboundRequests.length > 0 ? [{ label: 'LE Requests', value: inboundRequests.length, colorClass: 'text-red-400' }] : []),
         ].map(s => (
           <div key={s.label} className="flex flex-col gap-1 pl-4 border-l border-border-base">
             <span className={`font-extrabold text-[24px] leading-none tabular-nums ${s.colorClass}`}>{s.value}</span>
@@ -241,6 +449,23 @@ export default function FireOpsBoard() {
           </div>
         ))}
       </div>
+
+      {/* Incoming LE assistance requests */}
+      {inboundRequests.length > 0 && (
+        <div className="shrink-0">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-red-400 mb-3 flex items-center gap-2">
+            <MdLocalFireDepartment size={14} /> Incoming LE Assistance Requests ({inboundRequests.length})
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 12 }}>
+            {inboundRequests.map(req => (
+              <HCFRRequestCard key={req.id} req={req} calls={calls}
+                onAcknowledge={acknowledgeRequest}
+                onDispatch={r => setDispatchingReq(r)}
+                onDecline={declineRequest} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="split-3 flex-1 min-h-0 gap-4 lg:gap-5">
         {/* Fire Incidents */}
@@ -354,7 +579,6 @@ export default function FireOpsBoard() {
 
         {/* Apparatus Roster + Medical Lookup */}
         <div className={S_PANEL}>
-          {/* Tab strip */}
           <div className="flex border-b border-border-faint shrink-0">
             {[
               { id: 'APPARATUS', label: 'Apparatus' },

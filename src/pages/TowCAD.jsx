@@ -638,7 +638,7 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
             className="press-sm inline-flex items-center justify-center gap-1 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors whitespace-nowrap">
-            <MdCheckCircle size={14} /> Ack
+            <MdCheckCircle size={14} /> Acknowledge
           </button>
         )}
         <button onClick={() => onDispatch(req)}
@@ -760,6 +760,10 @@ export default function TowCAD() {
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
     toast.info(`Acknowledged — ${req.assistType}`, { title: 'FDOT' });
+    dispatch({
+      type: 'DISPATCH_RADIO',
+      payload: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.`,
+    });
   };
   const declineRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
