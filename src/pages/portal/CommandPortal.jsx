@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   MdShield, MdSearch, MdPerson, MdWarningAmber,
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
-  MdFilterList,
+  MdFilterList, MdTimer, MdDirectionsRun, MdInfoOutline,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -691,15 +691,181 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
 }
 
 /* ══════════════════════════════════
+   TAB 5: RESPONSE TIMES
+══════════════════════════════════ */
+function fmtMin(m) {
+  if (m == null || isNaN(m)) return '—';
+  const mins = Math.floor(m);
+  const secs = Math.round((m - mins) * 60);
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+}
+
+function avg(arr, key) {
+  const vals = arr.map(l => l[key]).filter(v => v != null && !isNaN(v));
+  if (!vals.length) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+const RT_PERIODS = [
+  { label: 'Today',    days: 0  },
+  { label: '7 Days',   days: 7  },
+  { label: '30 Days',  days: 30 },
+  { label: 'All Time', days: null },
+];
+
+const PRIORITY_LABELS = { 1: 'Priority 1', 2: 'Priority 2', 3: 'Priority 3', 4: 'Priority 4' };
+const PRIORITY_COLORS = { 1: '#e04020', 2: '#f59e0b', 3: '#3a88e8', 4: '#6b7280' };
+
+function FilterPill({ active, onClick, children }) {
+  return (
+    <button type="button" onClick={onClick}
+      className={`press-sm px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all border ${
+        active
+          ? 'bg-violet-400/20 border-violet-400/50 text-violet-300'
+          : 'border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'
+      }`}>
+      {children}
+    </button>
+  );
+}
+
+function ResponseTimesTab({ callLogs }) {
+  const allDepts = useMemo(() => {
+    const seen = new Set(callLogs.map(l => l.respondingDept).filter(Boolean));
+    return ['All', ...Array.from(seen).sort()];
+  }, [callLogs]);
+
+  const [deptFilter, setDeptFilter] = useState('All');
+  const [period,     setPeriod]     = useState('7 Days');
+
+  const filtered = useMemo(() => {
+    let logs = callLogs;
+    const p = RT_PERIODS.find(x => x.label === period);
+    if (p && p.days != null) {
+      const cutoff = p.days === 0 ? todayStr() : daysAgoStr(p.days);
+      logs = p.days === 0
+        ? logs.filter(l => l.date === cutoff)
+        : logs.filter(l => l.date >= cutoff);
+    }
+    if (deptFilter !== 'All') logs = logs.filter(l => l.respondingDept === deptFilter);
+    return logs;
+  }, [callLogs, deptFilter, period]);
+
+  const avgAssigned = avg(filtered, 'assignedMin');
+  const avgOnScene  = avg(filtered, 'onSceneMin');
+
+  const deptBreakdown = useMemo(() => {
+    const depts = [...new Set(filtered.map(l => l.respondingDept))].sort();
+    return depts.map(d => {
+      const rows = filtered.filter(l => l.respondingDept === d);
+      return { dept: d, count: rows.length, avgAssigned: avg(rows, 'assignedMin'), avgOnScene: avg(rows, 'onSceneMin') };
+    });
+  }, [filtered]);
+
+  const priorityBreakdown = useMemo(() => {
+    const prios = [...new Set(filtered.map(l => l.priority))].sort();
+    return prios.map(p => {
+      const rows = filtered.filter(l => l.priority === p);
+      return { priority: p, count: rows.length, avgAssigned: avg(rows, 'assignedMin'), avgOnScene: avg(rows, 'onSceneMin') };
+    });
+  }, [filtered]);
+
+  return (
+    <div className="flex flex-col gap-5">
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0 mr-0.5">Dept</span>
+          {allDepts.map(d => (
+            <FilterPill key={d} active={deptFilter === d} onClick={() => setDeptFilter(d)}>{d}</FilterPill>
+          ))}
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0 mr-0.5">Period</span>
+          {RT_PERIODS.map(p => (
+            <FilterPill key={p.label} active={period === p.label} onClick={() => setPeriod(p.label)}>{p.label}</FilterPill>
+          ))}
+        </div>
+      </div>
+
+      {/* Hero stat cards */}
+      <div className="flex gap-4 flex-wrap">
+        <StatCard
+          icon={MdTimer}
+          label="Avg Time to Assignment"
+          value={fmtMin(avgAssigned)}
+          accent="violet"
+          hint={filtered.length ? `${filtered.length} call${filtered.length !== 1 ? 's' : ''} in period` : 'No data'}
+        />
+        <StatCard
+          icon={MdDirectionsRun}
+          label="Avg Time to On-Scene"
+          value={fmtMin(avgOnScene)}
+          accent="violet"
+          hint={filtered.length ? `First unit on scene` : 'No data'}
+        />
+      </div>
+
+      {/* Department breakdown */}
+      <PortalCard accent="violet">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
+          {deptFilter === 'All' ? 'By Department' : `${deptFilter} — By Priority`}
+        </div>
+        {filtered.length === 0 ? (
+          <div className="text-center py-8 text-slate-500 text-[13px]">No closed calls in this period.</div>
+        ) : (
+          <table className="w-full text-[12.5px]">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                <th className="pb-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  {deptFilter === 'All' ? 'Department' : 'Priority'}
+                </th>
+                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Avg Assignment</th>
+                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Avg On-Scene</th>
+                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Calls</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(deptFilter === 'All' ? deptBreakdown : priorityBreakdown).map(row => {
+                const key   = deptFilter === 'All' ? row.dept : row.priority;
+                const label = deptFilter === 'All' ? row.dept : (PRIORITY_LABELS[row.priority] || `P${row.priority}`);
+                const color = deptFilter !== 'All' ? PRIORITY_COLORS[row.priority] : null;
+                return (
+                  <tr key={key} className="border-b border-white/[0.04] last:border-0">
+                    <td className="py-2.5 font-bold" style={color ? { color } : { color: '#e2e8f0' }}>
+                      {label}
+                    </td>
+                    <td className="py-2.5 text-right font-mono text-violet-300">{fmtMin(row.avgAssigned)}</td>
+                    <td className="py-2.5 text-right font-mono text-violet-300">{fmtMin(row.avgOnScene)}</td>
+                    <td className="py-2.5 text-right text-slate-400">{row.count}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </PortalCard>
+
+      {/* Disclaimer */}
+      <div className="flex items-start gap-2 px-4 py-3 rounded-xl border border-border-faint text-[11px] text-slate-500">
+        <MdInfoOutline size={14} className="shrink-0 mt-0.5 text-slate-500" />
+        Response times are calculated from CAD event logs. Accuracy depends on units actively updating their status in the CAD system in real time.
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
    MAIN: COMMAND PORTAL
 ══════════════════════════════════ */
-const TABS = ['Overview', 'By Officer', 'By Department', 'Report Tracker'];
+const TABS = ['Overview', 'By Officer', 'By Department', 'Report Tracker', 'Response Times'];
 
 export default function CommandPortal() {
   const { state } = useCAD();
   const {
     reports = [], officers = [], departments = [], calls = [],
-    reportTemplates = [], currentUser,
+    reportTemplates = [], currentUser, callLogs = [],
   } = state;
 
   /* ── Access control ── */
@@ -837,6 +1003,9 @@ export default function CommandPortal() {
           reportTypes={reportTypes}
           onOpenReport={r => setModalReport(r)}
         />
+      )}
+      {activeTab === 'Response Times' && (
+        <ResponseTimesTab callLogs={callLogs} />
       )}
 
       {modalReport && (

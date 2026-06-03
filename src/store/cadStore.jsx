@@ -3,7 +3,7 @@ import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
-  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS
+  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS
 } from '../data/mockData';
 import {
   TEN_CODES, UNIT_STATUS_CODES,
@@ -23,6 +23,7 @@ const initialState = {
   // Stamp each seed call with a staggered creation time (most recent first) so
   // the live elapsed-time clocks in the console read realistically.
   calls: CALLS.map((c, i) => ({ ...c, createdAt: Date.now() - (i * 6 + 3) * 60000 })),
+  callLogs: CALL_RESPONSE_LOGS,
   civilians: CIVILIANS,
   vehicles: VEHICLES,
   warrants: WARRANTS,

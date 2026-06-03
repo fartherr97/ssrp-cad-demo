@@ -838,3 +838,56 @@ export const UNIT_GROUPS = [
   { id: 'grp_002', name: 'Traffic Unit',  color: '#f59e0b', units: ['FHP-209', 'FHP-214'] },
 ];
 
+/* ── Call Response Time Logs ──────────────────────────────────────────────
+   Historical closed calls used by the Command Portal Response Times tab.
+   assignedMin: minutes from call received to first unit assigned.
+   onSceneMin:  minutes from call received to first unit on scene.
+   Dates are computed at import time so "Today / 7 Days / 30 Days" filters
+   always work relative to the actual session date.
+*/
+function _dAgo(n) { return new Date(Date.now() - n * 86400000).toISOString().slice(0, 10); }
+
+export const CALL_RESPONSE_LOGS = [
+  // ── TODAY ──────────────────────────────────────────────────────────────
+  { id: 'RL-001', date: _dAgo(0), nature: 'Traffic Stop',           category: 'police', respondingDept: 'TPD',  priority: 3, assignedMin: 3,  onSceneMin: 7  },
+  { id: 'RL-002', date: _dAgo(0), nature: 'Disturbance',             category: 'police', respondingDept: 'TPD',  priority: 2, assignedMin: 5,  onSceneMin: 11 },
+  { id: 'RL-003', date: _dAgo(0), nature: 'Domestic Disturbance',   category: 'police', respondingDept: 'HCSO', priority: 1, assignedMin: 4,  onSceneMin: 13 },
+  { id: 'RL-004', date: _dAgo(0), nature: 'Medical - Chest Pain',   category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 6  },
+  { id: 'RL-005', date: _dAgo(0), nature: 'MVA w/ Injuries',         category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 3,  onSceneMin: 8  },
+  { id: 'RL-006', date: _dAgo(0), nature: 'Traffic Stop',            category: 'police', respondingDept: 'FHP',  priority: 3, assignedMin: 3,  onSceneMin: 8  },
+
+  // ── YESTERDAY ──────────────────────────────────────────────────────────
+  { id: 'RL-007', date: _dAgo(1), nature: 'Robbery',                 category: 'police', respondingDept: 'TPD',  priority: 1, assignedMin: 4,  onSceneMin: 9  },
+  { id: 'RL-008', date: _dAgo(1), nature: 'Noise Complaint',         category: 'police', respondingDept: 'TPD',  priority: 4, assignedMin: 7,  onSceneMin: 14 },
+  { id: 'RL-009', date: _dAgo(1), nature: 'Theft - Shoplifting',     category: 'police', respondingDept: 'HCSO', priority: 3, assignedMin: 6,  onSceneMin: 15 },
+  { id: 'RL-010', date: _dAgo(1), nature: 'Suspicious Vehicle',      category: 'police', respondingDept: 'HCSO', priority: 2, assignedMin: 5,  onSceneMin: 11 },
+  { id: 'RL-011', date: _dAgo(1), nature: 'Structure Fire',          category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 7  },
+  { id: 'RL-012', date: _dAgo(1), nature: 'Medical - Seizure',       category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 6  },
+  { id: 'RL-013', date: _dAgo(1), nature: 'MVA No Injuries',         category: 'police', respondingDept: 'FHP',  priority: 3, assignedMin: 3,  onSceneMin: 9  },
+  { id: 'RL-014', date: _dAgo(1), nature: 'Reckless Driver',         category: 'police', respondingDept: 'FHP',  priority: 2, assignedMin: 4,  onSceneMin: 11 },
+
+  // ── LAST 7 DAYS ────────────────────────────────────────────────────────
+  { id: 'RL-015', date: _dAgo(2), nature: 'Assault',                 category: 'police', respondingDept: 'TPD',  priority: 1, assignedMin: 4,  onSceneMin: 8  },
+  { id: 'RL-016', date: _dAgo(2), nature: 'Traffic Stop',            category: 'police', respondingDept: 'TPD',  priority: 3, assignedMin: 3,  onSceneMin: 7  },
+  { id: 'RL-017', date: _dAgo(3), nature: 'Burglary',                category: 'police', respondingDept: 'TPD',  priority: 1, assignedMin: 5,  onSceneMin: 11 },
+  { id: 'RL-018', date: _dAgo(3), nature: 'Warrant Service',         category: 'police', respondingDept: 'HCSO', priority: 2, assignedMin: 6,  onSceneMin: 14 },
+  { id: 'RL-019', date: _dAgo(4), nature: 'DUI',                     category: 'police', respondingDept: 'HCSO', priority: 2, assignedMin: 5,  onSceneMin: 12 },
+  { id: 'RL-020', date: _dAgo(4), nature: 'Brush Fire',              category: 'fire',   respondingDept: 'HCFR', priority: 2, assignedMin: 2,  onSceneMin: 9  },
+  { id: 'RL-021', date: _dAgo(5), nature: 'Medical - Cardiac Arrest',category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 7  },
+  { id: 'RL-022', date: _dAgo(5), nature: 'MVA Fatal',               category: 'fire',   respondingDept: 'FHP',  priority: 1, assignedMin: 3,  onSceneMin: 10 },
+  { id: 'RL-023', date: _dAgo(6), nature: 'Vehicle Pursuit',         category: 'police', respondingDept: 'FHP',  priority: 1, assignedMin: 2,  onSceneMin: 6  },
+  { id: 'RL-024', date: _dAgo(6), nature: 'Traffic Enforcement',     category: 'police', respondingDept: 'FHP',  priority: 3, assignedMin: 4,  onSceneMin: 9  },
+
+  // ── LAST 30 DAYS ───────────────────────────────────────────────────────
+  { id: 'RL-025', date: _dAgo(10), nature: 'Robbery',                category: 'police', respondingDept: 'TPD',  priority: 1, assignedMin: 5,  onSceneMin: 11 },
+  { id: 'RL-026', date: _dAgo(12), nature: 'Domestic Violence',      category: 'police', respondingDept: 'HCSO', priority: 1, assignedMin: 7,  onSceneMin: 15 },
+  { id: 'RL-027', date: _dAgo(14), nature: 'Structure Fire',         category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 8  },
+  { id: 'RL-028', date: _dAgo(16), nature: 'MVA w/ Injuries',        category: 'fire',   respondingDept: 'FHP',  priority: 2, assignedMin: 3,  onSceneMin: 10 },
+  { id: 'RL-029', date: _dAgo(18), nature: 'Theft - Grand',          category: 'police', respondingDept: 'TPD',  priority: 3, assignedMin: 4,  onSceneMin: 9  },
+  { id: 'RL-030', date: _dAgo(20), nature: 'Drug Arrest',            category: 'police', respondingDept: 'HCSO', priority: 2, assignedMin: 6,  onSceneMin: 16 },
+  { id: 'RL-031', date: _dAgo(22), nature: 'Medical - Overdose',     category: 'fire',   respondingDept: 'HCFR', priority: 1, assignedMin: 2,  onSceneMin: 5  },
+  { id: 'RL-032', date: _dAgo(25), nature: 'Traffic Stop',           category: 'police', respondingDept: 'FHP',  priority: 3, assignedMin: 3,  onSceneMin: 7  },
+  { id: 'RL-033', date: _dAgo(27), nature: 'Noise Complaint',        category: 'police', respondingDept: 'TPD',  priority: 4, assignedMin: 8,  onSceneMin: 16 },
+  { id: 'RL-034', date: _dAgo(29), nature: 'Suspicious Person',      category: 'police', respondingDept: 'HCSO', priority: 3, assignedMin: 5,  onSceneMin: 13 },
+];
+
