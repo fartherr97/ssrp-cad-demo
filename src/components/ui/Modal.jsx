@@ -18,10 +18,12 @@ export function useMountTransition(open, exitMs = 240) {
   useEffect(() => {
     clearTimeout(timer.current);
     if (open) {
+      // Mount and enter in the same commit. CSS keyframe animations play from
+      // their `from` state on insertion, so no rAF defer is needed — deferring
+      // would leave one frame in the non-animated state and cause a flicker.
       setMounted(true);
-      // next frame so the enter animation starts from its initial state
-      const raf = requestAnimationFrame(() => setShow(true));
-      return () => cancelAnimationFrame(raf);
+      setShow(true);
+      return undefined;
     }
     setShow(false);
     timer.current = setTimeout(() => setMounted(false), exitMs);
