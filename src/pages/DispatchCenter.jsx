@@ -163,6 +163,37 @@ function Stat({ label, value, color = '#ffffff' }) {
   );
 }
 
+/* Smoothly reveal/hide a block by animating its height (grid-rows 0fr↔1fr)
+   plus a fade. Mounts on show, stays mounted through the collapse, then
+   unmounts — so surrounding layout slides instead of snapping. */
+function Reveal({ show, children, duration = 300 }) {
+  const [mounted, setMounted] = useState(show);
+  const [open, setOpen]       = useState(show);
+
+  useEffect(() => {
+    if (show) {
+      setMounted(true);
+      // Paint the collapsed state first, then flip open so the transition runs.
+      const r = requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)));
+      return () => cancelAnimationFrame(r);
+    }
+    setOpen(false);
+    const t = setTimeout(() => setMounted(false), duration);
+    return () => clearTimeout(t);
+  }, [show, duration]);
+
+  if (!mounted) return null;
+
+  return (
+    <div
+      className={`grid ease-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      style={{ transitionProperty: 'grid-template-rows, opacity', transitionDuration: `${duration}ms` }}
+    >
+      <div className="overflow-hidden min-h-0">{children}</div>
+    </div>
+  );
+}
+
 const NOTIF_COLOR = {
   alert: '#f87171', call: '#fb923c', unit: '#4ade80',
   status: '#5a97f5', dispatch: '#5a97f5', officer: '#4ade80',
@@ -466,7 +497,7 @@ export default function DispatchCenter() {
           {/* Quick actions */}
           <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
             <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5 px-1">Quick Actions</div>
-            {canDispatch && <QuickAction Icon={MdAddCall} label="Create Call" onClick={openCreate} />}
+            <Reveal show={canDispatch}><QuickAction Icon={MdAddCall} label="Create Call" onClick={openCreate} /></Reveal>
             {!isDispatcher && <QuickAction Icon={MdBadge} label="Swap Identifier" onClick={() => setShowIdentifier(true)} />}
             {!isDispatcher && <QuickAction Icon={MdDescription} label="New Report" onClick={() => navigate('/forms')} />}
             {!isDispatcher && <QuickAction Icon={MdReceiptLong} label="Records" onClick={() => navigate('/records')} />}
@@ -650,7 +681,7 @@ export default function DispatchCenter() {
           </SectionCard>
 
           {/* Field units */}
-          {showUnits && (
+          <Reveal show={showUnits}>
             <SectionCard title="Field Units" count={onDutyOfficers.length}>
               {/* Desktop table */}
               <div className="hidden lg:block overflow-auto max-h-[min(40vh,460px)]">
@@ -717,7 +748,7 @@ export default function DispatchCenter() {
                 ))}
               </div>
             </SectionCard>
-          )}
+          </Reveal>
         </div>
 
         {/* ─────────── RIGHT RAIL ─────────── */}
