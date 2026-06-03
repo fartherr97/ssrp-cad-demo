@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import {
   MdBadge, MdDriveEta, MdGppGood, MdPerson, MdLock,
-  MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline,
+  MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
 } from 'react-icons/md';
 import {
   PortalPage, PortalHeader, PortalCard, Field,
@@ -34,95 +34,197 @@ function WeaponPermitBlock({ civ }) {
   );
 }
 
-/* ── DL Application / Renewal form ── */
-function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
-  const [dlClass, setDlClass] = useState(civ.dlClass || 'Class C');
+const DL_STATUSES = [
+  { value: 'ACTIVE',    label: 'Active',    color: '#4ade80' },
+  { value: 'EXPIRED',   label: 'Expired',   color: '#fb923c' },
+  { value: 'SUSPENDED', label: 'Suspended', color: '#f87171' },
+  { value: 'REVOKED',   label: 'Revoked',   color: '#e879f9' },
+];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(dlClass);
-  };
+const defaultExpiry = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().split('T')[0];
+};
 
+/* ── Confirmation modal ── */
+function ConfirmModal({ onConfirm, onCancel }) {
   return (
-    <div className="bg-app-card/70 border border-border-base rounded-xl p-5 backdrop-blur-sm">
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className="w-9 h-9 rounded-lg bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
-          <MdDriveEta size={20} color="#3d82f0" />
-        </div>
-        <div>
-          <div className="text-[14px] font-bold text-white">
-            {isRenewal ? 'Renew Driver License' : 'Apply for Driver License'}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.3)' }}>
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+            <MdErrorOutline size={22} className="text-amber-400" />
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
-            {isRenewal ? 'Your license will be renewed for 1 year.' : 'Your license will be issued immediately upon submission.'}
-          </div>
-        </div>
-      </div>
-
-      {/* Read-only applicant info */}
-      <div className="bg-app-bg/40 border border-border-faint rounded-lg p-4 mb-5">
-        <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3">Applicant Information</div>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-          <Field label="Full Name" value={`${civ.firstName} ${civ.lastName}`} />
-          <Field label="Date of Birth" value={civ.dob} />
-          <Field label="Address" value={civ.address} />
-          <Field label="Gender" value={civ.gender} />
-        </div>
-        <div className="mt-3 flex items-center gap-1.5 text-[10.5px] text-slate-600">
-          <MdLock size={11} />
-          Pre-filled from your character profile. Update your character to change these.
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <div className="mb-5">
-          <label className={PORTAL_LABEL}>License Class</label>
-          <div className="flex flex-col gap-2">
-            {DL_CLASSES.map(cls => (
-              <label key={cls.value}
-                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all
-                  ${dlClass === cls.value
-                    ? 'bg-brand/10 border-brand/50'
-                    : 'bg-app-bg/40 border-border-faint hover:border-border-base'
-                  }`}>
-                <input
-                  type="radio"
-                  name="dlClass"
-                  value={cls.value}
-                  checked={dlClass === cls.value}
-                  onChange={() => setDlClass(cls.value)}
-                  className="mt-0.5 accent-blue-500 shrink-0"
-                />
-                <div>
-                  <div className="text-[13px] font-semibold text-slate-200">{cls.label}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">{cls.desc}</div>
-                </div>
-              </label>
-            ))}
+          <div>
+            <div className="text-[15px] font-bold text-white mb-1">Are you sure?</div>
+            <div className="text-[12.5px] text-slate-400 leading-relaxed">
+              Once submitted, <span className="text-white font-semibold">you will not be able to edit your license</span>. Only server administrators can make changes after issuance.
+            </div>
           </div>
         </div>
-
         <div className="flex gap-3">
-          {onCancel && (
-            <button type="button" onClick={onCancel}
-              className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
-              Cancel
-            </button>
-          )}
-          <button type="submit"
-            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors">
-            {isRenewal ? 'Renew License' : 'Submit Application'}
+          <button type="button" onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            Go Back
+          </button>
+          <button type="button" onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
+            Yes, Submit
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
 
-/* ── Active / Expired / Suspended DL card ── */
+/* ── DL Application / Renewal form ── */
+function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
+  const [dlClass,   setDlClass]   = useState(civ.dlClass    || 'Class C');
+  const [dlStatus,  setDlStatus]  = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
+  const [dlExpiry,  setDlExpiry]  = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
+  const [confirming, setConfirming] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setConfirming(true);
+  };
+
+  const handleConfirm = () => {
+    setConfirming(false);
+    onSubmit({ dlClass, dlStatus, dlExpiry });
+  };
+
+  const statusMeta = DL_STATUSES.find(s => s.value === dlStatus);
+
+  return (
+    <>
+      {confirming && <ConfirmModal onConfirm={handleConfirm} onCancel={() => setConfirming(false)} />}
+
+      <div className="bg-app-card/70 border border-border-base rounded-xl p-5 backdrop-blur-sm">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-9 h-9 rounded-lg bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
+            <MdDriveEta size={20} color="#3d82f0" />
+          </div>
+          <div>
+            <div className="text-[14px] font-bold text-white">
+              {isRenewal ? 'Renew Driver License' : 'Apply for Driver License'}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              Your license will be issued immediately. This cannot be undone.
+            </div>
+          </div>
+        </div>
+
+        {/* Read-only applicant info */}
+        <div className="bg-app-bg/40 border border-border-faint rounded-lg p-4 mb-5">
+          <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3">Applicant Information</div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+            <Field label="Full Name" value={`${civ.firstName} ${civ.lastName}`} />
+            <Field label="Date of Birth" value={civ.dob} />
+            <Field label="Address" value={civ.address} />
+            <Field label="Gender" value={civ.gender} />
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-[10.5px] text-slate-600">
+            <MdLock size={11} />
+            Pre-filled from your character profile. Update your character to change these.
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* License Class */}
+          <div className="mb-5">
+            <label className={PORTAL_LABEL}>License Class</label>
+            <div className="flex flex-col gap-2">
+              {DL_CLASSES.map(cls => (
+                <label key={cls.value}
+                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all
+                    ${dlClass === cls.value
+                      ? 'bg-brand/10 border-brand/50'
+                      : 'bg-app-bg/40 border-border-faint hover:border-border-base'
+                    }`}>
+                  <input type="radio" name="dlClass" value={cls.value}
+                    checked={dlClass === cls.value} onChange={() => setDlClass(cls.value)}
+                    className="mt-0.5 accent-blue-500 shrink-0" />
+                  <div>
+                    <div className="text-[13px] font-semibold text-slate-200">{cls.label}</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">{cls.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Status + Expiry row */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <div>
+              <label className={PORTAL_LABEL}>Initial Status</label>
+              <select
+                value={dlStatus}
+                onChange={e => setDlStatus(e.target.value)}
+                className={PORTAL_INPUT}
+                style={{ color: statusMeta?.color }}
+              >
+                {DL_STATUSES.map(s => (
+                  <option key={s.value} value={s.value} style={{ color: s.color }}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={PORTAL_LABEL}>Expiration Date</label>
+              <input
+                type="date"
+                required
+                value={dlExpiry}
+                onChange={e => setDlExpiry(e.target.value)}
+                className={PORTAL_INPUT}
+              />
+            </div>
+          </div>
+
+          {/* Suspension warning */}
+          {dlStatus === 'SUSPENDED' && (
+            <div className="flex items-start gap-2 p-3 rounded-lg mb-4 text-[11.5px]"
+              style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)', color: '#fca5a5' }}>
+              <MdWarningAmber size={14} className="shrink-0 mt-0.5" />
+              Setting status to Suspended will immediately lock this license. You won't be able to renew or replace it without administrator assistance.
+            </div>
+          )}
+          {dlStatus === 'REVOKED' && (
+            <div className="flex items-start gap-2 p-3 rounded-lg mb-4 text-[11.5px]"
+              style={{ background: 'rgba(232,121,249,0.08)', border: '1px solid rgba(232,121,249,0.25)', color: '#f0abfc' }}>
+              <MdWarningAmber size={14} className="shrink-0 mt-0.5" />
+              A revoked license cannot be renewed. Only an administrator can reinstate it.
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            {onCancel && (
+              <button type="button" onClick={onCancel}
+                className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+                Cancel
+              </button>
+            )}
+            <button type="submit"
+              className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors">
+              {isRenewal ? 'Renew License' : 'Submit Application'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+}
+
+/* ── Active / Expired / Suspended / Revoked DL card ── */
 function DLCard({ civ, onRenew }) {
   const isExpired   = civ.dlExpiry && new Date(civ.dlExpiry) < new Date();
   const isSuspended = civ.dlStatus === 'SUSPENDED';
+  const isRevoked   = civ.dlStatus === 'REVOKED';
+  const isLocked    = isSuspended || isRevoked;
   const isActive    = civ.dlStatus === 'ACTIVE' && !isExpired;
 
   const daysUntilExpiry = civ.dlExpiry
@@ -130,9 +232,8 @@ function DLCard({ civ, onRenew }) {
     : null;
   const nearExpiry = isActive && daysUntilExpiry !== null && daysUntilExpiry <= 30;
 
-  const statusLabel = isSuspended ? 'SUSPENDED' : isExpired ? 'EXPIRED' : civ.dlStatus || 'ACTIVE';
-  const statusColor = isSuspended ? 'text-red-400' : isExpired ? 'text-amber-400' : 'text-green-400';
-  const borderColor = isSuspended ? '#f87171' : isExpired ? '#fb923c' : nearExpiry ? '#facc15' : '#4ade80';
+  const statusLabel = isRevoked ? 'REVOKED' : isSuspended ? 'SUSPENDED' : isExpired ? 'EXPIRED' : civ.dlStatus || 'ACTIVE';
+  const borderColor = isRevoked ? '#e879f9' : isSuspended ? '#f87171' : isExpired ? '#fb923c' : nearExpiry ? '#facc15' : '#4ade80';
 
   return (
     <div className="flex-1 min-w-[240px] rounded-xl border p-4 backdrop-blur-sm"
@@ -168,11 +269,17 @@ function DLCard({ civ, onRenew }) {
       )}
 
       {/* Footer */}
-      {isSuspended ? (
+      {isLocked ? (
         <div className="flex items-start gap-2 p-2.5 rounded-lg text-[11px]"
-          style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', color: '#fca5a5' }}>
+          style={{
+            background: isRevoked ? 'rgba(232,121,249,0.08)' : 'rgba(248,113,113,0.08)',
+            border: `1px solid ${isRevoked ? 'rgba(232,121,249,0.2)' : 'rgba(248,113,113,0.2)'}`,
+            color: isRevoked ? '#f0abfc' : '#fca5a5',
+          }}>
           <MdLock size={13} className="shrink-0 mt-0.5" />
-          Your license is suspended. Contact your server administrator to appeal.
+          {isRevoked
+            ? 'Your license has been revoked. Contact your server administrator to appeal.'
+            : 'Your license is suspended. Contact your server administrator to appeal.'}
         </div>
       ) : isExpired ? (
         <button type="button" onClick={onRenew}
@@ -205,13 +312,13 @@ export default function MyLicenses() {
   // Per-character UI state: null | 'applying' | 'renewing'
   const [formMode, setFormMode] = useState({});
 
-  const handleIssue = (civilianId, dlClass) => {
-    dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass } });
+  const handleIssue = (civilianId, { dlClass, dlStatus, dlExpiry }) => {
+    dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
     setFormMode(p => ({ ...p, [civilianId]: null }));
   };
 
-  const handleRenew = (civilianId, dlClass) => {
-    dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass } });
+  const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry }) => {
+    dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
     setFormMode(p => ({ ...p, [civilianId]: null }));
   };
 
@@ -253,36 +360,46 @@ export default function MyLicenses() {
                 <div className="flex gap-3.5 flex-wrap">
                   {/* Driver License column */}
                   <div className="flex-1 min-w-[240px]">
-                    {c.dlStatus === 'SUSPENDED' && mode !== 'applying' && mode !== 'renewing' ? (
-                      /* Suspended — block all paths regardless of whether dlNumber exists */
-                      <div className="flex-1 min-w-[240px] rounded-xl border p-5 backdrop-blur-sm flex flex-col gap-3"
-                        style={{ background: 'rgba(248,113,113,0.05)', borderColor: 'rgba(248,113,113,0.3)' }}>
-                        <div className="flex items-center gap-2">
-                          <MdWarningAmber size={18} className="text-red-400 shrink-0" />
-                          <span className="text-[13px] font-bold text-red-400">License Suspended</span>
-                        </div>
-                        {c.dlNumber && (
-                          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                            <Field label="DL Number" value={c.dlNumber} mono />
-                            <Field label="Class" value={c.dlClass} />
+                    {(c.dlStatus === 'SUSPENDED' || c.dlStatus === 'REVOKED') && mode !== 'applying' && mode !== 'renewing' ? (
+                      /* Suspended / Revoked — block all paths regardless of whether dlNumber exists */
+                      (() => {
+                        const isRev = c.dlStatus === 'REVOKED';
+                        const bg = isRev ? 'rgba(232,121,249,0.05)' : 'rgba(248,113,113,0.05)';
+                        const bc = isRev ? 'rgba(232,121,249,0.3)' : 'rgba(248,113,113,0.3)';
+                        const tc = isRev ? 'text-fuchsia-400' : 'text-red-400';
+                        return (
+                          <div className="flex-1 min-w-[240px] rounded-xl border p-5 backdrop-blur-sm flex flex-col gap-3"
+                            style={{ background: bg, borderColor: bc }}>
+                            <div className="flex items-center gap-2">
+                              <MdWarningAmber size={18} className={`${tc} shrink-0`} />
+                              <span className={`text-[13px] font-bold ${tc}`}>License {isRev ? 'Revoked' : 'Suspended'}</span>
+                            </div>
+                            {c.dlNumber && (
+                              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                                <Field label="DL Number" value={c.dlNumber} mono />
+                                <Field label="Class" value={c.dlClass} />
+                              </div>
+                            )}
+                            <div className="text-[11.5px] text-slate-400 leading-relaxed">
+                              {isRev
+                                ? 'Your license has been revoked. You cannot apply for or renew a license. Contact your server administrator to appeal.'
+                                : 'Your license has been suspended. You cannot apply for or renew a license while under suspension. Contact your server administrator to appeal.'}
+                            </div>
                           </div>
-                        )}
-                        <div className="text-[11.5px] text-slate-400 leading-relaxed">
-                          Your license has been suspended. You cannot apply for or renew a license while under suspension. Contact your server administrator to appeal.
-                        </div>
-                      </div>
+                        );
+                      })()
                     ) : mode === 'applying' ? (
                       <DLForm
                         civ={c}
                         isRenewal={false}
-                        onSubmit={(dlClass) => handleIssue(c.id, dlClass)}
+                        onSubmit={(payload) => handleIssue(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
                       />
                     ) : mode === 'renewing' ? (
                       <DLForm
                         civ={c}
                         isRenewal={true}
-                        onSubmit={(dlClass) => handleRenew(c.id, dlClass)}
+                        onSubmit={(payload) => handleRenew(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
                       />
                     ) : hasDL ? (

@@ -338,38 +338,35 @@ function reducer(state, action) {
       return { ...state, civilians };
     }
     case 'ISSUE_DRIVER_LICENSE': {
-      const { civilianId, dlClass } = action.payload;
+      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
-      if (!civ || civ.dlStatus === 'SUSPENDED') return state;
+      // Block if they already have a DL that's suspended or revoked
+      if (!civ || (civ.dlNumber && (civ.dlStatus === 'SUSPENDED' || civ.dlStatus === 'REVOKED'))) return state;
       const prefix = (civ.lastName?.[0] || 'X').toUpperCase();
       const dlNumber = prefix + Math.floor(Math.random() * 9000000 + 1000000);
-      const today = new Date();
-      const expiry = new Date(today);
-      expiry.setFullYear(expiry.getFullYear() + 1);
+      const today = new Date().toISOString().split('T')[0];
       const civilians = state.civilians.map(c => c.id === civilianId ? {
         ...c,
         dlNumber,
         dlClass,
-        dlStatus: 'ACTIVE',
-        dlIssuedAt: today.toISOString().split('T')[0],
-        dlExpiry: expiry.toISOString().split('T')[0],
+        dlStatus,
+        dlIssuedAt: today,
+        dlExpiry: dlExpiry || (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })(),
         licensePoints: 0,
       } : c);
       return { ...state, civilians };
     }
     case 'RENEW_DRIVER_LICENSE': {
-      const { civilianId, dlClass } = action.payload;
+      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
-      if (!civ || civ.dlStatus === 'SUSPENDED') return state;
-      const today = new Date();
-      const expiry = new Date(today);
-      expiry.setFullYear(expiry.getFullYear() + 1);
+      if (!civ || civ.dlStatus === 'SUSPENDED' || civ.dlStatus === 'REVOKED') return state;
+      const today = new Date().toISOString().split('T')[0];
       const civilians = state.civilians.map(c => c.id === civilianId ? {
         ...c,
         dlClass,
-        dlStatus: 'ACTIVE',
-        dlIssuedAt: today.toISOString().split('T')[0],
-        dlExpiry: expiry.toISOString().split('T')[0],
+        dlStatus,
+        dlIssuedAt: today,
+        dlExpiry: dlExpiry || (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })(),
         licensePoints: 0,
       } : c);
       return { ...state, civilians };
