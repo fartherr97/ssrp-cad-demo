@@ -111,17 +111,16 @@ function buildAutofill(kind, rec, fields, civilians) {
   return out;
 }
 
-/* ── Section-level lookup search button + autocomplete ── */
-function SectionLookup({ sec, data, onBulk }) {
+/* ── Inline section-level autosuggest (replaces Search button) ── */
+function SectionInlineSearch({ sec, data, onBulk }) {
   const { state } = useCAD();
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState(null);
-  const inputRef = useRef(null);
+  const ref = useRef(null);
   const boxRef = useRef(null);
   const kind = sec.lookup;
 
-  // For vehicle section: scope to the civilian already filled in ci_first + ci_last
   const sectionCiv = kind === 'vehicle' ? (() => {
     const fn = (data.ci_first || '').trim().toLowerCase();
     const ln = (data.ci_last || '').trim().toLowerCase();
@@ -149,17 +148,17 @@ function SectionLookup({ sec, data, onBulk }) {
   }
 
   const place = () => {
-    if (inputRef.current) {
-      const r = inputRef.current.getBoundingClientRect();
-      setCoords({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 300) });
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 4, width: r.width });
     }
   };
 
   useEffect(() => {
     if (!open) return;
     const h = (e) => {
-      if (!inputRef.current?.contains(e.target) && !boxRef.current?.contains(e.target)) {
-        setOpen(false); setQuery('');
+      if (!ref.current?.contains(e.target) && !boxRef.current?.contains(e.target)) {
+        setOpen(false);
       }
     };
     document.addEventListener('mousedown', h);
@@ -168,42 +167,34 @@ function SectionLookup({ sec, data, onBulk }) {
 
   const pick = (rec) => {
     onBulk(buildAutofill(kind, rec, sec.fields, state.civilians));
-    setOpen(false); setQuery('');
+    setQuery('');
+    setOpen(false);
   };
 
   const Icon = kind === 'civilian' ? MdPerson : MdDirectionsCar;
   const placeholder = kind === 'civilian'
-    ? 'Name, SSN, DL #…'
-    : (sectionCiv ? `${sectionCiv.firstName}'s vehicles or any plate…` : 'Plate, make, model…');
+    ? 'Search by name, SSN or DL #…'
+    : (sectionCiv ? `Search ${sectionCiv.firstName}'s vehicles or any plate…` : 'Search plate, make or model…');
 
   return (
-    <div className="ml-auto flex items-center gap-1.5">
-      {open ? (
-        <>
-          <div ref={inputRef} className="relative flex items-center">
-            <MdSearch size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
-            <input
-              autoFocus
-              className="bg-app-input border border-brand/40 rounded-lg pl-7 pr-3 py-1 text-[12px] text-white outline-none focus:border-brand w-56"
-              placeholder={placeholder}
-              value={query}
-              onChange={e => { setQuery(e.target.value); place(); }}
-              onFocus={place}
-              onKeyDown={e => { if (e.key === 'Escape') { setOpen(false); setQuery(''); } }}
-            />
-          </div>
-          <button onClick={() => { setOpen(false); setQuery(''); }}
-            className="p-0.5 rounded text-slate-500 hover:text-slate-300 transition-colors">
-            <MdClose size={13} />
+    <div className="col-span-full" ref={ref}>
+      <div className="relative">
+        <Icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
+        <input
+          className="w-full bg-app-input border border-border-base focus:border-brand/50 rounded-lg pl-8 pr-8 py-2 text-[12.5px] text-white placeholder:text-slate-600 outline-none transition-colors"
+          placeholder={placeholder}
+          value={query}
+          onChange={e => { setQuery(e.target.value); place(); setOpen(true); }}
+          onFocus={() => { place(); setOpen(true); }}
+          onKeyDown={e => e.key === 'Escape' && setOpen(false)}
+        />
+        {query && (
+          <button type="button" onClick={() => { setQuery(''); setOpen(false); }}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+            <MdClose size={14} />
           </button>
-        </>
-      ) : (
-        <button onClick={() => setOpen(true)}
-          className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[9px] font-bold tracking-[0.4px] uppercase hover:bg-brand/20 hover:border-brand/50 transition-all duration-75">
-          <Icon size={11} />
-          Search
-        </button>
-      )}
+        )}
+      </div>
       {open && results.length > 0 && coords && createPortal(
         <div ref={boxRef}
           className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl p-1.5 max-h-[300px] overflow-auto"
@@ -792,11 +783,11 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
                 Supervisor Only
               </span>
             )}
-            {sec.lookup && !readOnly && (
-              <SectionLookup sec={sec} data={data} onBulk={bulkFill} />
-            )}
           </div>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5 overflow-hidden">
+            {sec.lookup && !readOnly && (
+              <SectionInlineSearch sec={sec} data={data} onBulk={bulkFill} />
+            )}
             {sec.fields.map(f => (
               <Field key={f.id} f={f} value={data[f.id]} data={data}
                 onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly} />
