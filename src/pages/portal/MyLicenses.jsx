@@ -87,7 +87,8 @@ function ConfirmModal({ onConfirm, onCancel }) {
 
 /* ── DL Application / Renewal form ── */
 function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
-  const [dlClass,          setDlClass]         = useState(civ.dlClass    || 'Class E');
+  const activeClasses = (dlTemplate?.dlClasses?.length > 0) ? dlTemplate.dlClasses : DL_CLASSES;
+  const [dlClass,          setDlClass]         = useState(civ.dlClass || activeClasses[0]?.value || 'Class E');
   const [dlStatus,         setDlStatus]        = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
   const [dlExpiry,         setDlExpiry]        = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
   const [templateFormData, setTemplateFormData] = useState({});
@@ -144,7 +145,7 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
           <div className="mb-5">
             <label className={PORTAL_LABEL}>License Class</label>
             <div className="flex flex-col gap-2">
-              {DL_CLASSES.map(cls => (
+              {activeClasses.map(cls => (
                 <label key={cls.value}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all
                     ${dlClass === cls.value

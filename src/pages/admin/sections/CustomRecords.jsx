@@ -549,6 +549,92 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
   );
 }
 
+/* ── DL Class Editor (shown inside TemplateEditor when dlTemplate is active) ── */
+function DLClassEditor({ draft, onChange }) {
+  const classes = draft.dlClasses || [];
+
+  const add = () => onChange({
+    dlClasses: [...classes, { value: `Class ${classes.length + 1}`, label: `Class ${classes.length + 1}`, desc: '' }],
+  });
+
+  const update = (idx, patch) => {
+    const updated = classes.map((c, i) => {
+      if (i !== idx) return c;
+      const merged = { ...c, ...patch };
+      if (patch.label !== undefined) merged.value = patch.label; // keep value in sync with label
+      return merged;
+    });
+    onChange({ dlClasses: updated });
+  };
+
+  const remove = (idx) => onChange({ dlClasses: classes.filter((_, i) => i !== idx) });
+
+  return (
+    <div className="mb-4 rounded-xl overflow-hidden"
+      style={{ border: '1px solid rgba(74,222,128,0.2)', background: 'rgba(74,222,128,0.04)' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5"
+        style={{ background: 'rgba(74,222,128,0.08)', borderBottom: '1px solid rgba(74,222,128,0.15)' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">🪪</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.6px]" style={{ color: '#4ade80' }}>
+            License Classes
+          </span>
+          <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal ml-1">
+            — defines the class options civilians see when applying
+          </span>
+        </div>
+        <button type="button" onClick={add}
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border-none"
+          style={{ background: 'rgba(74,222,128,0.15)', color: '#4ade80' }}>
+          <MdAdd size={13} /> Add Class
+        </button>
+      </div>
+
+      {/* Class rows */}
+      <div className="p-3 flex flex-col gap-2">
+        {classes.length === 0 && (
+          <div className="text-[11px] text-slate-600 py-2 text-center italic">
+            No classes defined — civilians will see the default Florida classes.
+          </div>
+        )}
+        {classes.map((cls, idx) => (
+          <div key={idx} className="flex items-start gap-2 p-2 rounded-lg"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Label</div>
+                  <input
+                    className="w-full bg-app-input border border-border-faint rounded px-2 py-1.5 text-[12px] font-bold text-slate-200 outline-none focus:border-brand/50"
+                    value={cls.label}
+                    placeholder="e.g. Class E"
+                    onChange={e => update(idx, { label: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Description</div>
+                <input
+                  className="w-full bg-app-input border border-border-faint rounded px-2 py-1.5 text-[12px] text-slate-300 outline-none focus:border-brand/50"
+                  value={cls.desc || ''}
+                  placeholder="e.g. Standard license for vehicles under 26,001 lbs"
+                  onChange={e => update(idx, { desc: e.target.value })}
+                />
+              </div>
+            </div>
+            <button type="button" onClick={() => remove(idx)}
+              className="shrink-0 mt-5 p-1.5 rounded-lg cursor-pointer border-none"
+              style={{ background: 'rgba(248,113,113,0.12)', color: '#f87171' }}>
+              <MdDelete size={13} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── DL template meta bar (inside TemplateEditor) ── */
 function DLTemplateMetaBar({ draft, onChange, isReport }) {
   const { dispatch } = useCAD();
@@ -686,6 +772,11 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
 
       {/* Sections (scrollable body) */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
+        {/* DL class editor — only visible when this template is the DL template */}
+        {draft.dlTemplate && (
+          <DLClassEditor draft={draft} onChange={up} />
+        )}
+
         {(draft.sections || []).length === 0 && (
           <div className="py-10 text-center" style={{ color: '#2d3f52' }}>
             <MdDescription size={34} style={{ opacity: 0.18, margin: '0 auto 8px' }} />
