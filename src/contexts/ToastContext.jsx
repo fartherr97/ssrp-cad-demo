@@ -130,7 +130,10 @@ export function useToast() {
 /* ── Single toast card ── */
 function ToastCard({ toast, onDismiss }) {
   const meta = VARIANTS[toast.variant] || VARIANTS.info;
-  const { Icon, color } = meta;
+  const { Icon } = meta;
+  // A caller can tint a toast to an arbitrary accent (e.g. unit-status colors)
+  // by passing `color`; otherwise it falls back to the variant's color.
+  const color = toast.color || meta.color;
   const loading = toast.variant === 'loading';
 
   return (

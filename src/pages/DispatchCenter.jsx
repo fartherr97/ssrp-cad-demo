@@ -418,11 +418,11 @@ export default function DispatchCenter() {
   const statusLabel = (code) => unitStatusCodes.find(s => s.code === code)?.label || CAD_STATUS_LABEL[code] || code;
   const setStatus = (s) => {
     dispatch({ type: 'SET_STATUS', payload: s });
-    toast.info(`Status set to ${statusLabel(s)}`);
+    toast.info(`Status set to ${statusLabel(s)}`, { color: statusColor(s) });
   };
   const setUnitStatus = (unitId, s) => {
     dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } });
-    toast.info(`${unitId} → ${statusLabel(s)}`);
+    toast.info(`${unitId} → ${statusLabel(s)}`, { color: statusColor(s) });
   };
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED' && c.status !== 'CANCELLED');
@@ -534,7 +534,7 @@ export default function DispatchCenter() {
               <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-0.5 px-1">My Status</div>
               {isField && (
                 <button onClick={() => dispatch({ type: 'TOGGLE_SELF_DISPATCH' })}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold cursor-pointer transition-all border mb-1 ${selfDispatch ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-white/[0.03] border-border-base text-slate-300 hover:bg-white/[0.07]'}`}>
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold cursor-pointer transition-all border mb-1 ${selfDispatch ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-white/[0.03] border-border-base text-slate-300 hover:bg-white/[0.07]'}`}>
                   <MdGpsFixed size={16} /> Self-Dispatch {selfDispatch ? 'ON' : 'OFF'}
                 </button>
               )}
