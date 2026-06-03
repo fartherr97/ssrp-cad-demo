@@ -191,6 +191,7 @@ const MAP_TYPES = ['CUSTOM', 'GTA V', 'FiveM Default', 'Sonoran County'];
 
 function LiveMapTab() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const cfg = state.inGameConfig || {};
   const [local, setLocal] = useState({
     liveMapEnabled: cfg.liveMapEnabled ?? true,
@@ -213,6 +214,7 @@ function LiveMapTab() {
 
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'inGameConfig', value: { ...cfg, ...local } } });
+    toast.success('Live map settings saved.');
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -242,7 +244,7 @@ function LiveMapTab() {
           <MdRefresh size={14} /> UNDO
         </button>
         <button type="button" onClick={save}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand hover:bg-brand-bright text-white text-[12px] font-bold cursor-pointer transition-all">
+          className="press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand hover:bg-brand-bright text-white text-[12px] font-bold cursor-pointer transition-all">
           <MdSave size={14} /> {saved ? 'SAVED!' : 'SAVE'}
         </button>
       </div>
@@ -278,7 +280,7 @@ function LiveMapTab() {
         subtitle="Add each game server that should push live data to the CAD."
         right={
           <button type="button" onClick={addServer}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[11.5px] font-bold cursor-pointer hover:bg-brand/20 transition-all">
+            className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand/10 border border-brand/25 text-brand-bright text-[11.5px] font-bold cursor-pointer hover:bg-brand/20 transition-all">
             <MdAdd size={14} /> Add Server
           </button>
         }
@@ -298,7 +300,7 @@ function LiveMapTab() {
                     placeholder={`Server ${i + 1}`}
                   />
                   <button type="button" onClick={() => removeServer(s.id)}
-                    className="text-slate-600 hover:text-red-400 cursor-pointer transition-colors">
+                    className="press-sm text-slate-600 hover:text-red-400 cursor-pointer transition-colors">
                     <MdDelete size={15} />
                   </button>
                 </div>
@@ -440,6 +442,7 @@ const DB_LABEL = {
 };
 
 function DatabaseSyncTab() {
+  const toast = useToast();
   const [creds, setCreds] = useState({
     host: 'localhost',
     port: '3306',
@@ -459,7 +462,7 @@ function DatabaseSyncTab() {
     setTimeout(() => setTest(Math.random() > 0.4 ? 'ok' : 'fail'), 1400);
   };
 
-  const save = () => { setDbSaved(true); setTimeout(() => setDbSaved(false), 2500); };
+  const save = () => { setDbSaved(true); toast.success('Database settings saved.'); setTimeout(() => setDbSaved(false), 2500); };
 
   const toggle = (k) => setOpen(o => ({ ...o, [k]: !o[k] }));
 
@@ -536,6 +539,7 @@ function DatabaseSyncTab() {
           <button
             type="button"
             onClick={save}
+            className="press"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
               padding: '9px 18px', borderRadius: 8, border: 'none',

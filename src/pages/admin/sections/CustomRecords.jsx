@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import ReportForm from '../../../components/ReportForm';
 import { ADMIN } from '../AdminKit';
 import {
@@ -535,12 +536,12 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
       <div className="shrink-0 px-2.5 py-2.5 flex gap-2"
         style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0b1627' }}>
         <button type="button" onClick={() => onCreate(true)}
-          className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
+          className="press flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
           style={{ background: 'rgba(61,130,240,0.18)', color: '#3d82f0', border: '1px solid rgba(61,130,240,0.28)' }}>
           <MdAdd size={13} /> Report
         </button>
         <button type="button" onClick={() => onCreate(false)}
-          className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
+          className="press flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
           style={{ background: 'rgba(34,197,94,0.14)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.24)' }}>
           <MdAdd size={13} /> Record
         </button>
@@ -644,6 +645,7 @@ const RECORD_ROLES = [
 
 function RecordRoleToggles({ draft, onChange, isReport }) {
   const { dispatch } = useCAD();
+  const toast = useToast();
 
   const toggle = (flag) => {
     const next = !draft[flag];
@@ -654,6 +656,8 @@ function RecordRoleToggles({ draft, onChange, isReport }) {
       dispatch({ type: 'SET_TEMPLATE_FLAG', payload: { flag, templateId } });
     }
     onChange({ [flag]: next });
+    const roleLabel = RECORD_ROLES.find(r => r.flag === flag)?.label || 'Role';
+    toast.success(`${roleLabel} ${next ? 'enabled' : 'disabled'}.`);
   };
 
   return (
@@ -760,7 +764,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
             Cancel
           </button>
           <button type="button" onClick={handleSave}
-            className="px-3 py-1.5 rounded-lg text-[11.5px] font-bold border-none cursor-pointer flex items-center gap-1.5"
+            className="press px-3 py-1.5 rounded-lg text-[11.5px] font-bold border-none cursor-pointer flex items-center gap-1.5"
             style={{
               background: saved ? 'rgba(34,197,94,0.2)' : 'rgba(61,130,240,0.22)',
               color: saved ? '#22c55e' : '#3d82f0',
@@ -836,6 +840,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
 /* ── Main ── */
 export default function CustomRecords() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { reportTemplates = [], recordTemplates = [] } = state;
 
   const [typeFilter, setTypeFilter]       = useState('all');
@@ -869,15 +874,18 @@ export default function CustomRecords() {
     delete payload._kind;
     if (isNew) {
       dispatch({ type: isReport ? 'ADD_REPORT_TEMPLATE' : 'ADD_RECORD_TEMPLATE', payload });
+      toast.success('Template created.', { title: payload.name.trim() });
       setEditingMeta(prev => ({ ...prev, isNew: false }));
     } else {
       dispatch({ type: isReport ? 'UPDATE_REPORT_TEMPLATE' : 'UPDATE_RECORD_TEMPLATE', payload });
+      toast.success('Template saved.');
     }
   };
 
   const deleteTemplate = (tpl) => {
     if (!confirm(`Delete "${tpl.name}"?`)) return;
     dispatch({ type: tpl._kind === 'report' ? 'DELETE_REPORT_TEMPLATE' : 'DELETE_RECORD_TEMPLATE', payload: tpl.id });
+    toast.success('Template deleted.');
     if (editingMeta?.id === tpl.id) { setDraft(null); setEditingMeta(null); setMobileView('list'); }
   };
 
@@ -891,6 +899,7 @@ export default function CustomRecords() {
     const copy = { ...JSON.parse(JSON.stringify(tpl)), id: `tpl_${Date.now()}`, name: `${tpl.name} (Copy)` };
     delete copy._kind;
     dispatch({ type: tpl._kind === 'report' ? 'ADD_REPORT_TEMPLATE' : 'ADD_RECORD_TEMPLATE', payload: copy });
+    toast.success('Template duplicated.');
   };
 
   return (
