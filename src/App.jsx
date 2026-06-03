@@ -37,6 +37,7 @@ import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
 import BusinessFleet from './pages/portal/BusinessFleet';
 import TowCAD from './pages/TowCAD';
+import PanicMapModal from './components/PanicMapModal';
 import { BusinessProvider } from './contexts/BusinessContext';
 import { ToastProvider } from './contexts/ToastContext';
 // Admin (Sonoran-style customization suite)
@@ -110,6 +111,7 @@ function AuthShell() {
       <PageWrapper key={location.key}>
         <Outlet />
       </PageWrapper>
+      <PanicMapModal />
     </AppShell>
   );
 }

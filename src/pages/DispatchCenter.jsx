@@ -549,9 +549,20 @@ export default function DispatchCenter() {
                 })}
               </div>
               <button onClick={() => {
+                const mockCoords = [
+                  { x:  428,  y:  -980, z:  30, area: 'Mission Row'    },
+                  { x: -640,  y:  -820, z:  23, area: 'Del Perro'      },
+                  { x: 1960,  y:  3740, z:  32, area: 'Sandy Shores'   },
+                  { x: -2000, y:   700, z: 140, area: 'Vinewood Hills' },
+                  { x:  120,  y: -1630, z:  30, area: 'Strawberry'     },
+                  { x: -1034, y: -2733, z:  20, area: 'LSIA'           },
+                  { x: -140,  y:  6280, z:  31, area: 'Paleto Bay'     },
+                  { x: 1140,  y:  2660, z:  45, area: 'Route 68'       },
+                ];
+                const c = mockCoords[Math.floor(Math.random() * mockCoords.length)];
                 dispatch({
                   type: 'PANIC',
-                  payload: { officerId: me?.id, unit: me?.unitId || currentUser?.badge || 'UNIT', name: me?.name || currentUser?.name, location: me?.location || 'LOCATION UNKNOWN' },
+                  payload: { officerId: me?.id, unit: me?.unitId || currentUser?.badge || 'UNIT', name: me?.name || currentUser?.name, location: me?.location || c.area, x: c.x, y: c.y, z: c.z },
                 });
                 toast.error('Panic alert broadcast', { title: 'Officer in distress' });
               }}

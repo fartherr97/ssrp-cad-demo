@@ -135,6 +135,7 @@ const initialState = {
   radioCount: 0,
   radioSeen: 0,
   lastRadio: null,
+  panicAlert: null,
   dispatchLog: [
     { id: 'seed-6', time: '15:04:11', kind: 'call',   text: 'Call 26-1051 created * Road Hazard (I-275 SB / Sligh Ave)' },
     { id: 'seed-5', time: '15:01:44', kind: 'call',   text: 'Call 26-1050 created * Theft / Shoplifting (4302 W Boy Scout Blvd)' },
@@ -323,23 +324,26 @@ function reducer(state, action) {
       return { ...state, radioSeen: state.radioCount };
 
     case 'PANIC': {
-      const { unit, name, location, officerId } = action.payload || {};
+      const { unit, name, location, officerId, x, y, z } = action.payload || {};
       const text = `OFFICER PANIC * ${unit || 'UNIT'}${name ? ` (${name})` : ''} * ${location || 'LOCATION UNKNOWN'} * ALL UNITS RESPOND`;
       const log = addDispatchLog(state, `[PANIC] ${text}`, 'alert');
-      // Flag the officer so the unit roster can highlight them.
       const officers = state.officers.map(o => o.id === officerId ? { ...o, panic: true } : o);
+      const id = `${Date.now()}`;
       return {
         ...state,
         ...log,
         officers,
         radioCount: state.radioCount + 1,
-        lastRadio: { text, time: nowTime(), id: `${Date.now()}`, panic: true },
+        lastRadio: { text, time: nowTime(), id, panic: true },
+        panicAlert: { officerId, unit, name, location, x, y, z, time: nowTime(), id },
       };
     }
     case 'CLEAR_PANIC': {
       const officers = state.officers.map(o => o.id === action.payload ? { ...o, panic: false } : o);
-      return { ...state, officers };
+      return { ...state, officers, panicAlert: null };
     }
+    case 'DISMISS_PANIC_MAP':
+      return { ...state, panicAlert: null };
     case 'SET_MY_CALL':
       return { ...state, myCallId: action.payload };
 
