@@ -9,14 +9,14 @@
 // matching border that brightens + lifts on hover (see .btn-glossy in index.css).
 const _BTN_BASE = 'btn-glossy inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer font-semibold rounded-lg border disabled:opacity-40 disabled:cursor-not-allowed';
 
-export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/12 hover:bg-blue-500/22 text-blue-200 border-blue-400/35 hover:border-blue-300/55`;
-export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border-white/10 hover:border-white/20`;
-export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-500/12 hover:bg-emerald-500/22 text-emerald-200 border-emerald-400/35 hover:border-emerald-300/55`;
-export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-500/12 hover:bg-red-500/22 text-red-200 border-red-400/35 hover:border-red-300/55`;
-export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/12 hover:bg-amber-500/22 text-amber-200 border-amber-400/35 hover:border-amber-300/55`;
+export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/12 hover:bg-blue-500/20 text-blue-200 border-transparent`;
+export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.05] hover:bg-white/[0.09] text-slate-200 border-transparent`;
+export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-500/12 hover:bg-emerald-500/20 text-emerald-200 border-transparent`;
+export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-500/12 hover:bg-red-500/20 text-red-200 border-transparent`;
+export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/12 hover:bg-amber-500/20 text-amber-200 border-transparent`;
 export const S_BTN_GHOST     = `${_BTN_BASE} px-3 py-1.5 text-sm bg-transparent hover:bg-white/[0.06] text-slate-400 hover:text-slate-200 border-transparent`;
-export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/35 hover:border-amber-400/55`;
-export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-500/12 hover:bg-orange-500/22 text-orange-200 border-orange-400/35 hover:border-orange-300/55`;
+export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/15 hover:bg-amber-500/22 text-amber-300 border-transparent`;
+export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-500/12 hover:bg-orange-500/20 text-orange-200 border-transparent`;
 
 // sm / xs * append smaller padding/size to any button class string
 export const sm = (base) => base.replace('px-4 py-2 text-sm', 'px-3 py-1.5 text-xs');
@@ -68,9 +68,9 @@ export const S_CARD         = 'bg-app-card/70 border border-border-base rounded-
 
 // ─── Form controls ─────────────────────────────────────────
 
-export const S_INPUT    = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
-export const S_SELECT   = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
-export const S_TEXTAREA = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[90px] focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
+export const S_INPUT    = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
+export const S_SELECT   = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
+export const S_TEXTAREA = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[90px] focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
 export const S_LABEL    = 'block text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5';
 export const S_FIELD    = 'flex flex-col gap-0.5';
 

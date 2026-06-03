@@ -41,7 +41,7 @@ export function BusinessSwitcher() {
       <MdSwapHoriz size={20} className="text-brand-bright shrink-0" />
       <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0">Active Business</span>
       <select
-        className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm text-cad-text outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all"
+        className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm text-cad-text outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
         value={activeBiz?.id ?? ''}
         onChange={e => setActiveBizId(Number(e.target.value))}
       >
