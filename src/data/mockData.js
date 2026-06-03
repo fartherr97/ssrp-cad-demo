@@ -617,7 +617,7 @@ export const BUSINESSES = [
     license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: false,
     employees: [
       { id: 1, name: "Ray Calhoun",   discordId: "100200305", role: "Inspector",  phone: "813-975-6200", since: "2022-01-01" },
-      { id: 2, name: "James Reeves",  discordId: "205947291", role: "Supervisor", phone: "555-0192",    since: "2024-06-01" },
+      { id: 2, name: "Jordan Maxwell", discordId: "205947291", role: "Supervisor", phone: "555-0192",    since: "2024-06-01" },
     ],
     incidents: [],
   },
