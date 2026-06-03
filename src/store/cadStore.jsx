@@ -13,13 +13,60 @@ import {
   LIMITS_CONFIG, CALL_NATURES_DEFAULT,
 } from '../data/adminData';
 
+/* ── Subdivision duty-hour tracking ───────────────────────────────────────
+   Time accrues while an officer is on duty (any status except OFFDUTY) under a
+   specialised subdivision — anything other than "Patrol". We bank elapsed
+   seconds into the subdivision they were accrued under on each transition and
+   keep a running start stamp; a subdivision's live total is its banked seconds
+   plus (now − start) for whoever is currently clocked into it.
+
+   Only the active session's officer runs a live clock (started via DUTY_SYNC);
+   everyone else shows their banked baseline. An idle guard in the app auto-sets
+   the current officer OFFDUTY after inactivity so nobody farms hours by leaving
+   the CAD open while not actually playing. */
+const DUTY_TRACKED = (sub) => !!sub && sub !== 'Patrol';
+
+function syncDutyClock(o, now = Date.now()) {
+  const tracking = o.status !== 'OFFDUTY' && DUTY_TRACKED(o.subdivision);
+  let next = o;
+  // Bank any running time into the subdivision it was accrued under.
+  if (o.dutyClockStart != null) {
+    const elapsed = Math.floor((now - o.dutyClockStart) / 1000);
+    const sub = o.dutyClockSubdiv;
+    if (elapsed > 0 && sub) {
+      next = { ...next, dutyBySubdiv: { ...(next.dutyBySubdiv || {}), [sub]: (next.dutyBySubdiv?.[sub] || 0) + elapsed } };
+    }
+    next = { ...next, dutyClockStart: null, dutyClockSubdiv: null };
+  }
+  // (Re)start the clock if the officer is currently in a tracked state.
+  if (tracking) {
+    next = { ...next, dutyClockStart: now, dutyClockSubdiv: o.subdivision };
+  }
+  return next;
+}
+
+// Believable baseline hours (this week) per specialised subdivision so the
+// Command Portal reads as populated in the demo. Patrol is never tracked.
+const _DUTY_SEED_HOURS = {
+  Command: 21, Detectives: 18, K9: 26, Traffic: 31, Engine: 28,
+  Ladder: 24, Rescue: 30, Hazmat: 16, 'Road Ops': 27, Dispatch: 14,
+};
+function seedDutyOfficers(officers) {
+  return officers.map(o => {
+    const base = { ...o, dutyBySubdiv: {}, dutyClockStart: null, dutyClockSubdiv: null };
+    if (!DUTY_TRACKED(o.subdivision)) return base;
+    const seedH = (_DUTY_SEED_HOURS[o.subdivision] ?? 12) + ((o.id * 7) % 9) - 4;
+    return { ...base, dutyBySubdiv: { [o.subdivision]: Math.max(1, seedH) * 3600 } };
+  });
+}
+
 const initialState = {
   currentUser: null,
   currentPage: 'login',
   discordConnected: false,
   discordAccount: null,
   selfDispatch: false,
-  officers: OFFICERS,
+  officers: seedDutyOfficers(OFFICERS),
   // Stamp each seed call with a staggered creation time (most recent first) so
   // the live elapsed-time clocks in the console read realistically.
   calls: CALLS.map((c, i) => ({ ...c, createdAt: Date.now() - (i * 6 + 3) * 60000 })),
@@ -198,10 +245,19 @@ function reducer(state, action) {
     case 'SET_PAGE':
       return { ...state, currentPage: action.payload };
 
+    case 'DUTY_SYNC': {
+      // Reconcile the current officer's duty clock (e.g. on login or focus) so a
+      // tracked on-duty officer starts accruing without needing a status change.
+      if (!state.currentUser?.id) return state;
+      const officers = state.officers.map(o =>
+        o.id === state.currentUser.id ? syncDutyClock(o) : o
+      );
+      return { ...state, officers };
+    }
     case 'SET_STATUS': {
       const me = state.officers.find(o => o.id === state.currentUser?.id);
       const officers = state.officers.map(o =>
-        o.id === state.currentUser?.id ? { ...o, status: action.payload } : o
+        o.id === state.currentUser?.id ? syncDutyClock({ ...o, status: action.payload }) : o
       );
       const audit = addAuditEntry(state, `Status changed to ${action.payload}`, 'CAD');
       const log = me ? addDispatchLog(state, `Unit ${me.unitId} (${me.name}) → ${action.payload}`, 'status') : {};
@@ -211,7 +267,7 @@ function reducer(state, action) {
     case 'PATCH_OFFICER': {
       const prev = state.officers.find(o => o.id === state.currentUser?.id);
       const officers = state.officers.map(o =>
-        o.id === state.currentUser?.id ? { ...o, ...action.payload } : o
+        o.id === state.currentUser?.id ? syncDutyClock({ ...o, ...action.payload }) : o
       );
       const next = officers.find(o => o.id === state.currentUser?.id);
       const statusChanged = prev?.status !== next?.status;
@@ -259,7 +315,7 @@ function reducer(state, action) {
       if (!me || !ident) return state;
       const { label, id: _id, ...fields } = ident;
       const officers = state.officers.map(o =>
-        o.id === state.currentUser?.id ? { ...o, ...fields } : o
+        o.id === state.currentUser?.id ? syncDutyClock({ ...o, ...fields }) : o
       );
       const log = addDispatchLog(state, `Unit ${fields.unitId} (${me.name}) → activated identifier "${label}"`, 'unit');
       return { ...state, officers, ...log };
@@ -313,7 +369,7 @@ function reducer(state, action) {
     case 'SET_UNIT_STATUS': {
       const { unitId, status } = action.payload;
       const target = state.officers.find(o => o.unitId === unitId);
-      const officers = state.officers.map(o => o.unitId === unitId ? { ...o, status } : o);
+      const officers = state.officers.map(o => o.unitId === unitId ? syncDutyClock({ ...o, status }) : o);
       const audit = addAuditEntry(state, `Set unit ${unitId} status to ${status}`, 'Dispatch');
       const log = addDispatchLog(state, `Unit ${unitId}${target ? ` (${target.name})` : ''} → ${status}`, 'status');
       return { ...state, officers, ...audit, ...log };

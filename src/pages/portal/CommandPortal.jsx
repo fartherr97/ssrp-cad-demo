@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   MdShield, MdSearch, MdPerson, MdWarningAmber,
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
   MdFilterList, MdTimer, MdDirectionsRun, MdInfoOutline,
+  MdAccessTime, MdFiberManualRecord,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -857,9 +858,138 @@ function ResponseTimesTab({ callLogs }) {
 }
 
 /* ══════════════════════════════════
+   TAB 6: SUBDIVISION HOURS
+══════════════════════════════════ */
+function fmtDuty(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${h}h ${String(m).padStart(2, '0')}m`;
+}
+
+// Live seconds an officer has logged under a given subdivision (banked + any
+// currently-running clock for that subdivision).
+function dutySecondsFor(o, sub, now) {
+  let s = o.dutyBySubdiv?.[sub] || 0;
+  if (o.dutyClockStart != null && o.dutyClockSubdiv === sub) {
+    s += Math.floor((now - o.dutyClockStart) / 1000);
+  }
+  return s;
+}
+
+const SUBDIV_ACCENTS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#f472b6', '#60a5fa', '#fb923c', '#4ade80'];
+
+function SubdivisionHoursTab({ officers }) {
+  // Tick once a second so the running clocks count up live.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const i = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(i);
+  }, []);
+  const now = Date.now();
+
+  // Build per-subdivision rows from every officer's banked + live duty time.
+  const rows = useMemo(() => {
+    const map = {};
+    officers.forEach(o => {
+      const subs = new Set([
+        ...Object.keys(o.dutyBySubdiv || {}),
+        ...(o.dutyClockSubdiv ? [o.dutyClockSubdiv] : []),
+      ]);
+      subs.forEach(sub => {
+        const seconds = dutySecondsFor(o, sub, now);
+        if (seconds <= 0) return;
+        if (!map[sub]) map[sub] = { sub, total: 0, officers: [], liveCount: 0 };
+        const live = o.dutyClockStart != null && o.dutyClockSubdiv === sub;
+        map[sub].total += seconds;
+        map[sub].officers.push({ officer: o, seconds, live });
+        if (live) map[sub].liveCount += 1;
+      });
+    });
+    return Object.values(map)
+      .map(r => ({ ...r, officers: r.officers.sort((a, b) => b.seconds - a.seconds) }))
+      .sort((a, b) => b.total - a.total);
+  }, [officers, now]);
+
+  const grandTotal = rows.reduce((s, r) => s + r.total, 0);
+  const liveOfficers = rows.reduce((s, r) => s + r.liveCount, 0);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Summary cards */}
+      <div className="flex flex-wrap gap-3">
+        <StatCard label="Tracked Hours" value={fmtDuty(grandTotal)} accent="violet" icon={MdAccessTime} hint="All specialised subdivisions" />
+        <StatCard label="Subdivisions" value={rows.length} accent="cyan" icon={MdShield} hint="With logged time" />
+        <StatCard label="Clocked In Now" value={liveOfficers} accent="green" icon={MdDirectionsRun} hint="Accruing live" />
+      </div>
+
+      {rows.length === 0 ? (
+        <PortalCard>
+          <div className="text-[13px] text-slate-500 py-6 text-center">
+            No subdivision hours logged yet. Time accrues once an officer goes on duty under a subdivision other than Patrol.
+          </div>
+        </PortalCard>
+      ) : (
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+          {rows.map((r, idx) => {
+            const color = SUBDIV_ACCENTS[idx % SUBDIV_ACCENTS.length];
+            const pct = grandTotal > 0 ? Math.round((r.total / grandTotal) * 100) : 0;
+            return (
+              <PortalCard key={r.sub}>
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: `${color}1e`, border: `1px solid ${color}55` }}>
+                    <MdShield size={17} style={{ color }} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13.5px] font-bold text-white truncate">{r.sub}</div>
+                    <div className="text-[10.5px] text-slate-500">{r.officers.length} officer{r.officers.length !== 1 ? 's' : ''} · {pct}% of total</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[18px] font-extrabold font-mono leading-none" style={{ color }}>{fmtDuty(r.total)}</div>
+                    {r.liveCount > 0 && (
+                      <div className="flex items-center justify-end gap-1 mt-1 text-[9.5px] font-bold text-green-400">
+                        <MdFiberManualRecord size={8} className="animate-pulse" /> {r.liveCount} ON NOW
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="h-1.5 w-full rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                </div>
+
+                <div className="flex flex-col">
+                  {r.officers.map(({ officer: o, seconds, live }, i) => (
+                    <div key={o.id} className={`flex items-center gap-2.5 py-1.5 ${i > 0 ? 'border-t border-border-faint' : ''}`}>
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: live ? '#4ade80' : '#475569' }} />
+                      <span className="text-[12px] text-slate-200 truncate flex-1">{o.name}</span>
+                      <span className="font-mono text-[10.5px] text-slate-500 shrink-0">{o.badge}</span>
+                      <span className="font-mono text-[12px] font-bold shrink-0" style={{ color: live ? '#4ade80' : '#cbd5e1' }}>{fmtDuty(seconds)}</span>
+                    </div>
+                  ))}
+                </div>
+              </PortalCard>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Anti-abuse note */}
+      <div className="flex items-start gap-2 px-4 py-3 rounded-xl border border-border-faint text-[11px] text-slate-500">
+        <MdInfoOutline size={14} className="shrink-0 mt-0.5" />
+        Hours accrue for any status except Off Duty, only under specialised subdivisions (anything but Patrol). To prevent
+        inactive farming, an officer who leaves the CAD idle for 15 minutes is automatically set Off Duty, and closing the
+        tab clocks them out. Persisting totals across sessions requires the production backend.
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
    MAIN: COMMAND PORTAL
 ══════════════════════════════════ */
-const TABS = ['Overview', 'By Officer', 'By Department', 'Report Tracker', 'Response Times'];
+const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'Report Tracker', 'Response Times'];
 
 export default function CommandPortal() {
   const { state } = useCAD();
@@ -995,6 +1125,9 @@ export default function CommandPortal() {
           departments={scopedDepts}
           reportTypes={reportTypes}
         />
+      )}
+      {activeTab === 'Subdivision Hours' && (
+        <SubdivisionHoursTab officers={scopedOfficers} />
       )}
       {activeTab === 'Report Tracker' && (
         <ReportTrackerTab

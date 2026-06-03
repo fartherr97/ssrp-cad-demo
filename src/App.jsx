@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { CADProvider, useCAD } from './store/cadStore';
 import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
+import DutyGuard from './components/DutyGuard';
 import LoginPage from './pages/LoginPage';
 import DispatchCenter from './pages/DispatchCenter';
 import IncidentDetail from './pages/IncidentDetail';
@@ -106,6 +107,7 @@ function AuthShell() {
   if (!state.currentUser) return <Navigate to="/" replace />;
   return (
     <AppShell>
+      <DutyGuard />
       <PageWrapper key={location.key}>
         <Outlet />
       </PageWrapper>
