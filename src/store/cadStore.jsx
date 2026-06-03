@@ -588,8 +588,14 @@ function reducer(state, action) {
     }
 
     case 'ADD_RECORD': {
-      const newRecord = { ...action.payload, id: state.nextId, status: 'Pending Review', date: new Date().toLocaleDateString() };
+      const newRecord = { ...action.payload, id: state.nextId, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString() };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
+    }
+    case 'SET_DL_TEMPLATE': {
+      // Sets dlTemplate:true on one record template, clears all others. Pass null to clear.
+      const { templateId } = action.payload;
+      const recordTemplates = state.recordTemplates.map(t => ({ ...t, dlTemplate: t.id === templateId }));
+      return { ...state, recordTemplates };
     }
     case 'UPDATE_REPORT': {
       const reports = state.reports.map(r =>

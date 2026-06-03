@@ -549,6 +549,54 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
   );
 }
 
+/* ── DL template meta bar (inside TemplateEditor) ── */
+function DLTemplateMetaBar({ draft, onChange, isReport }) {
+  const { dispatch } = useCAD();
+  const isActive = !!draft.dlTemplate;
+
+  const handleToggle = () => {
+    if (isActive) {
+      // Clear the flag on this template
+      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId: null } });
+      onChange({ dlTemplate: false });
+    } else {
+      // Set this template as the DL template (clears all others in the store)
+      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId: draft.id } });
+      onChange({ dlTemplate: true });
+    }
+  };
+
+  return (
+    <div className="shrink-0 px-4 py-2 flex items-center gap-3 flex-wrap"
+      style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Form Code</div>
+      <div className="text-[12px] font-bold tabular-nums px-2.5 py-1 rounded-md"
+        style={{ color: '#3d82f0', background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
+        #{draft.formCode || '—'}
+      </div>
+      {!isReport && (
+        <>
+          <div className="h-3.5 w-px ml-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <button
+            type="button"
+            onClick={handleToggle}
+            title={isActive ? 'Remove Driver License template designation' : 'Use this template as the civilian Driver License form'}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-bold cursor-pointer transition-all border"
+            style={isActive
+              ? { background: 'rgba(74,222,128,0.12)', color: '#4ade80', borderColor: 'rgba(74,222,128,0.3)' }
+              : { background: 'rgba(255,255,255,0.04)', color: '#4b5563', borderColor: 'rgba(255,255,255,0.08)' }
+            }>
+            🪪 {isActive ? 'Driver License Template ✓' : 'Set as Driver License Template'}
+          </button>
+          {isActive && (
+            <span className="text-[9.5px] text-slate-600 italic">Civilians use this form to file their DL</span>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ── Center: template editor ── */
 function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
   const [showPremade, setShowPremade]   = useState(false);
@@ -633,15 +681,8 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Meta (form code — auto-assigned, read-only) */}
-      <div className="shrink-0 px-4 py-2 flex items-center gap-3"
-        style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Form Code</div>
-        <div className="text-[12px] font-bold tabular-nums px-2.5 py-1 rounded-md"
-          style={{ color: '#3d82f0', background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
-          #{draft.formCode || '—'}
-        </div>
-      </div>
+      {/* Meta (form code + DL template toggle) */}
+      <DLTemplateMetaBar draft={draft} onChange={up} isReport={isReport} />
 
       {/* Sections (scrollable body) */}
       <div className="flex-1 overflow-y-auto px-3 py-3">

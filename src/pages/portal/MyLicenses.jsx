@@ -9,6 +9,7 @@ import {
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
 import { statusBadge } from '../../constants/styles';
+import ReportForm from '../../components/ReportForm';
 
 const DL_CLASSES = [
   { value: 'Class E',     label: 'Class E',         desc: 'Standard license — non-commercial vehicles under 26,001 lbs (most common)' },
@@ -85,11 +86,12 @@ function ConfirmModal({ onConfirm, onCancel }) {
 }
 
 /* ── DL Application / Renewal form ── */
-function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
-  const [dlClass,   setDlClass]   = useState(civ.dlClass    || 'Class E');
-  const [dlStatus,  setDlStatus]  = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
-  const [dlExpiry,  setDlExpiry]  = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
-  const [confirming, setConfirming] = useState(false);
+function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
+  const [dlClass,          setDlClass]         = useState(civ.dlClass    || 'Class E');
+  const [dlStatus,         setDlStatus]        = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
+  const [dlExpiry,         setDlExpiry]        = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
+  const [templateFormData, setTemplateFormData] = useState({});
+  const [confirming,       setConfirming]      = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -98,7 +100,7 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
 
   const handleConfirm = () => {
     setConfirming(false);
-    onSubmit({ dlClass, dlStatus, dlExpiry });
+    onSubmit({ dlClass, dlStatus, dlExpiry, templateFormData });
   };
 
   const statusMeta = DL_STATUSES.find(s => s.value === dlStatus);
@@ -187,6 +189,21 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
               />
             </div>
           </div>
+
+          {/* Custom template fields */}
+          {dlTemplate && (
+            <div className="mb-5 border-t border-border-faint pt-5">
+              <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3 flex items-center gap-2">
+                🪪 <span>{dlTemplate.name} — Additional Fields</span>
+              </div>
+              <ReportForm
+                template={dlTemplate}
+                data={templateFormData}
+                onChange={(k, v) => setTemplateFormData(p => ({ ...p, [k]: v }))}
+                onBulkChange={(obj) => setTemplateFormData(p => ({ ...p, ...obj }))}
+              />
+            </div>
+          )}
 
           {/* Suspension warning */}
           {dlStatus === 'SUSPENDED' && (
@@ -310,18 +327,35 @@ function DLCard({ civ, onRenew }) {
 ══════════════════════════════════ */
 export default function MyLicenses() {
   const { state, dispatch } = useCAD();
-  const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const myChars   = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const dlTemplate = useMemo(() => (state.recordTemplates || []).find(t => t.dlTemplate) || null, [state.recordTemplates]);
 
   // Per-character UI state: null | 'applying' | 'renewing'
   const [formMode, setFormMode] = useState({});
 
-  const handleIssue = (civilianId, { dlClass, dlStatus, dlExpiry }) => {
+  const storeDLRecord = (civilianId, templateFormData) => {
+    if (!dlTemplate) return;
+    dispatch({
+      type: 'ADD_RECORD',
+      payload: {
+        type: dlTemplate.name,
+        civilianId,
+        isDL: true,
+        status: 'Approved',
+        formData: templateFormData || {},
+      },
+    });
+  };
+
+  const handleIssue = (civilianId, { dlClass, dlStatus, dlExpiry, templateFormData }) => {
     dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
+    storeDLRecord(civilianId, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
   };
 
-  const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry }) => {
+  const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry, templateFormData }) => {
     dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
+    storeDLRecord(civilianId, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
   };
 
@@ -397,6 +431,7 @@ export default function MyLicenses() {
                         isRenewal={false}
                         onSubmit={(payload) => handleIssue(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
+                        dlTemplate={dlTemplate}
                       />
                     ) : mode === 'renewing' ? (
                       <DLForm
@@ -404,6 +439,7 @@ export default function MyLicenses() {
                         isRenewal={true}
                         onSubmit={(payload) => handleRenew(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
+                        dlTemplate={dlTemplate}
                       />
                     ) : hasDL ? (
                       <DLCard
