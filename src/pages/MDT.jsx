@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
+import ActivePanicsPanel from '../components/ActivePanicsPanel';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_FIELD, S_LABEL, S_SELECT, S_INPUT,
@@ -70,6 +71,9 @@ export default function MDT() {
           </button>
         ))}
       </div>
+
+      {/* Active panics — always visible across MDT tabs while unresolved */}
+      <ActivePanicsPanel className="shrink-0 m-2" />
 
       <div className="flex-1 overflow-hidden flex">
         {/* MESSAGES */}
