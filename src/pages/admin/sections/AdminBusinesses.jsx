@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
-import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck } from 'react-icons/md';
+import { useResponsive } from '../../../hooks/useResponsive';
+import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack } from 'react-icons/md';
 
 const BUSINESS_TYPES = [
   'Automotive / Towing', 'Restaurant / Food Service', 'Retail / Shop',
@@ -32,7 +33,7 @@ function StatusBadge({ status }) {
 
 function FInput({ label, value, onChange, placeholder, mono, span2 }) {
   return (
-    <div className={span2 ? 'col-span-2' : ''}>
+    <div className={span2 ? 'col-span-1 sm:col-span-2' : ''}>
       <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">{label}</div>
       <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         className={`w-full text-[12.5px] text-white rounded-lg px-3 py-2 outline-none ${mono ? 'font-mono' : ''}`}
@@ -43,7 +44,7 @@ function FInput({ label, value, onChange, placeholder, mono, span2 }) {
 
 function FSelect({ label, value, onChange, options, span2 }) {
   return (
-    <div className={span2 ? 'col-span-2' : ''}>
+    <div className={span2 ? 'col-span-1 sm:col-span-2' : ''}>
       <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">{label}</div>
       <select value={value} onChange={e => onChange(e.target.value)}
         className="w-full text-[12.5px] text-white rounded-lg px-3 py-2 outline-none"
@@ -59,6 +60,7 @@ function FSelect({ label, value, onChange, options, span2 }) {
 export default function AdminBusinesses() {
   const { state, dispatch } = useCAD();
   const { businesses, officers } = state;
+  const { isMobile } = useResponsive();
 
   const [selected,      setSelected]      = useState(null);
   const [form,          setForm]          = useState(BLANK_BIZ);
@@ -72,6 +74,8 @@ export default function AdminBusinesses() {
 
   const selectedBiz = businesses.find(b => b.id === selected);
   const panelOpen   = isNew || selected !== null;
+
+  const closePanel = () => { setSelected(null); setIsNew(false); };
 
   const openNew = () => {
     setForm({ ...BLANK_BIZ });
@@ -118,78 +122,97 @@ export default function AdminBusinesses() {
     dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: bizId, employeeId: empId } });
   };
 
+  /* On mobile: show list OR form, never both side by side */
+  const showList = !isMobile || !panelOpen;
+  const showForm = panelOpen;
+
   return (
     <div className="flex h-full min-h-0" style={{ background: '#08111c' }}>
 
       {/* ── Left: list ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col min-h-0 shrink-0"
-        style={{ width: panelOpen ? 340 : '100%', borderRight: panelOpen ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+      {showList && (
+        <div className="flex flex-col min-h-0 shrink-0"
+          style={{
+            width: (!isMobile && panelOpen) ? 340 : '100%',
+            borderRight: (!isMobile && panelOpen) ? '1px solid rgba(255,255,255,0.07)' : 'none',
+          }}>
 
-        <div className="flex items-center justify-between px-5 py-3.5 shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#060e18' }}>
-          <div className="flex items-center gap-2">
-            <MdStore size={16} style={{ color: '#3a88e8' }} />
-            <span className="text-[13px] font-extrabold text-white">Business Management</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-              style={{ background: 'rgba(255,255,255,0.05)', color: '#4a5568', border: '1px solid rgba(255,255,255,0.07)' }}>
-              {businesses.length}
-            </span>
-          </div>
-          <button onClick={openNew} type="button"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold"
-            style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.12)', border: '1px solid rgba(58,136,232,0.28)', color: '#3a88e8' }}>
-            <MdAdd size={14} /> New Business
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-          {businesses.length === 0 && (
-            <div className="text-center py-12 text-[12px] text-slate-600">No businesses registered.</div>
-          )}
-          {businesses.map(biz => {
-            const isActive = selected === biz.id && !isNew;
-            return (
-              <div key={biz.id} onClick={() => openEdit(biz)} className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer"
-                style={{ background: isActive ? 'rgba(58,136,232,0.10)' : 'rgba(255,255,255,0.025)', border: `1px solid ${isActive ? 'rgba(58,136,232,0.28)' : 'rgba(255,255,255,0.07)'}` }}>
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(58,136,232,0.10)', border: '1px solid rgba(58,136,232,0.18)' }}>
-                  <MdStore size={17} style={{ color: '#3a88e8' }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-white truncate">{biz.name}</div>
-                  <div className="text-[11px] text-slate-500 truncate">{biz.type}</div>
-                </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <StatusBadge status={biz.status} />
-                  <span className="text-[10px] text-slate-600">{biz.employees?.length || 0} emp</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Right: form panel ────────────────────────────────────────────────── */}
-      {panelOpen && (
-        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-
-          <div className="flex items-center justify-between px-5 py-3.5 shrink-0"
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 shrink-0"
             style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#060e18' }}>
-            <span className="text-[13px] font-extrabold text-white">
-              {isNew ? 'New Business' : selectedBiz?.name}
-            </span>
-            <button onClick={() => { setSelected(null); setIsNew(false); }} type="button"
-              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}>
-              <MdClose size={18} className="text-slate-600" />
+            <div className="flex items-center gap-2">
+              <MdStore size={16} style={{ color: '#3a88e8' }} />
+              <span className="text-[13px] font-extrabold text-white">Business Management</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#4a5568', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {businesses.length}
+              </span>
+            </div>
+            <button onClick={openNew} type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold"
+              style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.12)', border: '1px solid rgba(58,136,232,0.28)', color: '#3a88e8' }}>
+              <MdAdd size={14} /> New Business
             </button>
           </div>
 
-          <div className="p-5 flex flex-col gap-6">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+            {businesses.length === 0 && (
+              <div className="text-center py-12 text-[12px] text-slate-600">No businesses registered.</div>
+            )}
+            {businesses.map(biz => {
+              const isActive = selected === biz.id && !isNew;
+              return (
+                <div key={biz.id} onClick={() => openEdit(biz)} className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer"
+                  style={{ background: isActive ? 'rgba(58,136,232,0.10)' : 'rgba(255,255,255,0.025)', border: `1px solid ${isActive ? 'rgba(58,136,232,0.28)' : 'rgba(255,255,255,0.07)'}` }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(58,136,232,0.10)', border: '1px solid rgba(58,136,232,0.18)' }}>
+                    <MdStore size={17} style={{ color: '#3a88e8' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-bold text-white truncate">{biz.name}</div>
+                    <div className="text-[11px] text-slate-500 truncate">{biz.type}</div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <StatusBadge status={biz.status} />
+                    <span className="text-[10px] text-slate-600">{biz.employees?.length || 0} emp</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Right: form panel ────────────────────────────────────────────────── */}
+      {showForm && (
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 shrink-0"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#060e18' }}>
+            <div className="flex items-center gap-2 min-w-0">
+              {isMobile && (
+                <button onClick={closePanel} type="button"
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', marginRight: 4 }}>
+                  <MdArrowBack size={18} className="text-slate-400" />
+                </button>
+              )}
+              <span className="text-[13px] font-extrabold text-white truncate">
+                {isNew ? 'New Business' : selectedBiz?.name}
+              </span>
+            </div>
+            {!isMobile && (
+              <button onClick={closePanel} type="button"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}>
+                <MdClose size={18} className="text-slate-600" />
+              </button>
+            )}
+          </div>
+
+          <div className="p-4 sm:p-5 flex flex-col gap-6">
 
             {/* Business details */}
             <section>
               <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-3">Business Details</div>
-              <div className="grid gap-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <FInput label="Business Name" value={form.name} onChange={sf('name')} placeholder="e.g. Bayshore Auto & Towing" span2 />
                 <FSelect label="Type" value={form.type} onChange={sf('type')} options={['', ...BUSINESS_TYPES]} />
                 <FSelect label="Status" value={form.status} onChange={sf('status')} options={['ACTIVE','SUSPENDED','REVOKED']} />
@@ -204,12 +227,12 @@ export default function AdminBusinesses() {
             {/* Owner assignment */}
             <section>
               <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-3">Owner Assignment</div>
-              <div className="grid gap-3 mb-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <FInput label="Owner Name" value={form.owner} onChange={sf('owner')} placeholder="Full name" />
                 <FInput label="Owner Discord ID" value={form.ownerDiscordId} onChange={sf('ownerDiscordId')} placeholder="Discord snowflake" mono />
               </div>
               <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1.5">Quick-assign from accounts</div>
-              <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded-xl"
+              <div className="flex flex-col gap-0 max-h-40 overflow-y-auto rounded-xl"
                 style={{ border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
                 {officers.map(o => {
                   const active = form.ownerDiscordId === o.discordId;
@@ -244,7 +267,7 @@ export default function AdminBusinesses() {
                 {addingEmp && (
                   <div className="flex flex-col gap-2.5 p-3 rounded-xl mb-3"
                     style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="grid gap-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <FInput label="Name"       value={empForm.name}      onChange={se('name')}      placeholder="Full name" />
                       <FSelect label="Role"      value={empForm.role}      onChange={se('role')}      options={EMP_ROLES} />
                       <FInput label="Discord ID" value={empForm.discordId} onChange={se('discordId')} placeholder="Snowflake ID" mono />
@@ -293,7 +316,7 @@ export default function AdminBusinesses() {
             <div className="flex gap-3">
               {!isNew && (
                 deleteConfirm === selected ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[11px] text-red-400">Confirm delete?</span>
                     <button onClick={() => handleDelete(selected)} type="button"
                       className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
