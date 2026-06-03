@@ -102,7 +102,7 @@ export default function IncidentDetail() {
   };
   const sendRadio = () => {
     if (!radioMsg.trim()) return;
-    dispatch({ type:'DISPATCH_RADIO', payload:radioMsg.trim() });
+    dispatch({ type:'DISPATCH_RADIO', payload:{ from: currentUser?.id, text: radioMsg.trim() } });
     toast.info('Radio broadcast sent');
     setRadioMsg('');
   };

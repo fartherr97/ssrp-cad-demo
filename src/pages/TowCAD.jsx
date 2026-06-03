@@ -657,7 +657,7 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
 /* ── Main page ── */
 export default function TowCAD() {
   const { state, dispatch } = useCAD();
-  const { towJobs, towUnits = [], calls, businesses, currentUser, fdotRequests = [] } = state;
+  const { towJobs, towUnits = [], calls, businesses, currentUser, officers = [], fdotRequests = [] } = state;
   const bizCtx = useActiveBusiness();
   const toast = useToast();
 
@@ -757,12 +757,20 @@ export default function TowCAD() {
   };
 
   /* ── FDOT request actions ── */
+  // Officer ids to notify: units attached to that scene's call, plus the
+  // officer who made the request (matched by unit/badge).
+  const recipientsFor = (req) => {
+    const ids = officers.filter(o => req.callId && o.callId === req.callId).map(o => o.id);
+    const requester = officers.find(o => o.unitId === req.requestedByUnit || o.badge === req.requestedByBadge);
+    if (requester && !ids.includes(requester.id)) ids.push(requester.id);
+    return ids;
+  };
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
     toast.info(`Acknowledged — ${req.assistType}`, { title: 'FDOT' });
     dispatch({
       type: 'DISPATCH_RADIO',
-      payload: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.`,
+      payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.` },
     });
   };
   const declineRequest = (req) => {
@@ -794,6 +802,10 @@ export default function TowCAD() {
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
     toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
+    dispatch({
+      type: 'DISPATCH_RADIO',
+      payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has dispatched ${unit?.truckName || 'a unit'} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
+    });
     setDispatchingReq(null);
   };
 

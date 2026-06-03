@@ -19,11 +19,17 @@ export default function RadioToast() {
     seenId.current = lastRadio.id;
 
     const panic = !!lastRadio.panic;
-    // Normal radio traffic still hides for the dispatcher who sent it; panic
-    // alerts go to everyone. (Panic also fires its own toast at the trigger
-    // site with unit+location, so skip here to avoid a duplicate.)
-    const isSender = currentUser.portal === 'dispatch';
+    // Skip echoing a broadcast back to whoever sent it — they already got a
+    // local confirmation toast. Panic alerts also fire their own unit+location
+    // toast at the trigger site, so skip those here too.
+    const isSender = lastRadio.from != null && lastRadio.from === currentUser.id;
     if (panic || isSender) return;
+
+    // Targeted broadcasts (e.g. HCFR/FDOT acknowledging a scene) carry a `to`
+    // list of recipient officer ids — only on-scene units get the toast.
+    // A null/empty `to` means a general broadcast to everyone.
+    const targeted = Array.isArray(lastRadio.to) && lastRadio.to.length > 0;
+    if (targeted && !lastRadio.to.includes(currentUser.id)) return;
 
     toast.info(lastRadio.text, { title: 'Dispatch Radio', duration: 6000 });
   }, [lastRadio, currentUser, toast]);

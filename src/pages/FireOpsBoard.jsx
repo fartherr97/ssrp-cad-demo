@@ -379,12 +379,21 @@ export default function FireOpsBoard() {
     dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
   };
 
+  // Officer ids to notify for a request: units attached to that scene's call,
+  // plus the officer who made the request (matched by unit/badge).
+  const recipientsFor = (req) => {
+    const ids = officers.filter(o => req.callId && o.callId === req.callId).map(o => o.id);
+    const requester = officers.find(o => o.unitId === req.requestedByUnit || o.badge === req.requestedByBadge);
+    if (requester && !ids.includes(requester.id)) ids.push(requester.id);
+    return ids;
+  };
+
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
     toast.info(`Acknowledged — ${req.assistType}`, { title: 'HCFR' });
     dispatch({
       type: 'DISPATCH_RADIO',
-      payload: `HCFR has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is responding.`,
+      payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is responding.` },
     });
   };
 
@@ -402,7 +411,7 @@ export default function FireOpsBoard() {
     toast.success(`${unit?.name || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
     dispatch({
       type: 'DISPATCH_RADIO',
-      payload: `HCFR has dispatched ${unit?.name || 'a unit'} (${unit?.unitId || ''}) to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.`,
+      payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has dispatched ${unit?.name || 'a unit'} (${unit?.unitId || ''}) to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
     });
     setDispatchingReq(null);
   };

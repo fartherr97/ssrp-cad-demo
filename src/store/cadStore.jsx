@@ -312,12 +312,21 @@ function reducer(state, action) {
       return { ...state, officers, ...audit, ...log };
     }
     case 'DISPATCH_RADIO': {
-      const log = addDispatchLog(state, `[RADIO] ${action.payload}`, 'alert');
+      // Payload may be a plain string (legacy) or { text, from, to }:
+      //   from — sender's user id; the bridge never echoes a broadcast back to
+      //          whoever sent it.
+      //   to   — optional array of recipient officer ids. When present, only
+      //          those users see the toast (units attached to the scene); when
+      //          absent/null the broadcast goes to everyone (general radio).
+      const text = typeof action.payload === 'string' ? action.payload : action.payload?.text;
+      const from = typeof action.payload === 'string' ? null : (action.payload?.from ?? null);
+      const to   = typeof action.payload === 'string' ? null : (action.payload?.to ?? null);
+      const log = addDispatchLog(state, `[RADIO] ${text}`, 'alert');
       return {
         ...state,
         ...log,
         radioCount: state.radioCount + 1,
-        lastRadio: { text: action.payload, time: nowTime(), id: `${Date.now()}` },
+        lastRadio: { text, time: nowTime(), id: `${Date.now()}`, from, to },
       };
     }
     case 'MARK_RADIO_SEEN':
