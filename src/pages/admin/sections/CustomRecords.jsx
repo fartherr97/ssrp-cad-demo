@@ -513,17 +513,17 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
             </div>
             <div className="flex gap-1 shrink-0" onClick={e => e.stopPropagation()}>
               <button type="button" onClick={() => onDelete(t)} title="Delete"
-                className="rounded flex items-center justify-center border-none cursor-pointer"
+                className="press-sm rounded flex items-center justify-center border-none cursor-pointer"
                 style={{ width: 22, height: 22, background: 'rgba(239,68,68,0.14)', color: '#ef4444' }}>
                 <MdDelete size={11} />
               </button>
               <button type="button" onClick={() => onDuplicate(t)} title="Duplicate"
-                className="rounded flex items-center justify-center border-none cursor-pointer"
+                className="press-sm rounded flex items-center justify-center border-none cursor-pointer"
                 style={{ width: 22, height: 22, background: 'rgba(61,130,240,0.14)', color: '#3d82f0' }}>
                 <MdContentCopy size={11} />
               </button>
               <button type="button" onClick={() => onSelect(t)} title="Edit"
-                className="rounded flex items-center justify-center border-none cursor-pointer"
+                className="press-sm rounded flex items-center justify-center border-none cursor-pointer"
                 style={{ width: 22, height: 22, background: 'rgba(245,158,11,0.14)', color: '#f59e0b' }}>
                 <MdEdit size={11} />
               </button>
