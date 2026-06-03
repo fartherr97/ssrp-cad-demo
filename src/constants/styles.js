@@ -9,14 +9,14 @@
 // matching border that brightens + lifts on hover (see .btn-glossy in index.css).
 const _BTN_BASE = 'btn-glossy inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer font-semibold rounded-lg border disabled:opacity-40 disabled:cursor-not-allowed';
 
-export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/12 hover:bg-blue-500/20 text-blue-200 border-transparent`;
-export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.05] hover:bg-white/[0.09] text-slate-200 border-transparent`;
-export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-500/12 hover:bg-emerald-500/20 text-emerald-200 border-transparent`;
-export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-500/12 hover:bg-red-500/20 text-red-200 border-transparent`;
-export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/12 hover:bg-amber-500/20 text-amber-200 border-transparent`;
+export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-transparent`;
+export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.08] hover:bg-white/[0.14] text-slate-200 border-transparent`;
+export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border-transparent`;
+export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-500/20 hover:bg-red-500/30 text-red-200 border-transparent`;
+export const S_BTN_WARNING   = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-transparent`;
 export const S_BTN_GHOST     = `${_BTN_BASE} px-3 py-1.5 text-sm bg-transparent hover:bg-white/[0.06] text-slate-400 hover:text-slate-200 border-transparent`;
-export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/15 hover:bg-amber-500/22 text-amber-300 border-transparent`;
-export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-500/12 hover:bg-orange-500/20 text-orange-200 border-transparent`;
+export const S_BTN_GOLD      = `${_BTN_BASE} px-4 py-2 text-sm bg-amber-500/22 hover:bg-amber-500/32 text-amber-300 border-transparent`;
+export const S_BTN_FIRE      = `${_BTN_BASE} px-4 py-2 text-sm bg-orange-500/20 hover:bg-orange-500/30 text-orange-200 border-transparent`;
 
 // sm / xs * append smaller padding/size to any button class string
 export const sm = (base) => base.replace('px-4 py-2 text-sm', 'px-3 py-1.5 text-xs');

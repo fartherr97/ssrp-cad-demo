@@ -169,7 +169,7 @@ function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
       <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? 'repeat(3, 1fr)' : '1fr 1fr' }}>
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
-            className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-transparent bg-cyan-500/12 text-cyan-200 hover:bg-cyan-500/20 whitespace-nowrap">
+            className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-transparent bg-cyan-500/20 text-cyan-200 hover:bg-cyan-500/30 whitespace-nowrap">
             <MdCheckCircle size={14} className="shrink-0" /> Acknowledge
           </button>
         )}
