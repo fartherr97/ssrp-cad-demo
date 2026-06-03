@@ -169,16 +169,16 @@ function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
       <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? 'repeat(3, 1fr)' : '1fr 1fr' }}>
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
-            className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-colors whitespace-nowrap">
+            className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-400/35 bg-cyan-500/12 text-cyan-200 hover:bg-cyan-500/22 hover:border-cyan-300/55 whitespace-nowrap">
             <MdCheckCircle size={14} className="shrink-0" /> Acknowledge
           </button>
         )}
         <button onClick={() => onDispatch(req)}
-          className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-red-500/40 bg-red-600 hover:bg-red-500 text-white transition-colors whitespace-nowrap">
+          className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-red-400/35 bg-red-500/15 text-red-200 hover:bg-red-500/25 hover:border-red-300/55 whitespace-nowrap">
           <MdArrowForward size={14} className="shrink-0" /> Dispatch
         </button>
         <button onClick={() => onDecline(req)}
-          className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors whitespace-nowrap">
+          className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap">
           <MdThumbDownAlt size={14} className="shrink-0" /> Decline
         </button>
       </div>
@@ -209,7 +209,7 @@ function MedicalLookup({ civilians }) {
       <div className="p-3 border-b border-border-faint shrink-0">
         <div className="flex gap-2">
           <input
-            className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-orange-500/50 transition-all"
+            className="flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-orange-500/50 transition-all"
             placeholder="Name, DOB, or SSN"
             value={query}
             onChange={e => setQuery(e.target.value)}

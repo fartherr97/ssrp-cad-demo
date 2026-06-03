@@ -637,16 +637,16 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
       <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? 'repeat(3, 1fr)' : '1fr 1fr' }}>
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
-            className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-colors whitespace-nowrap">
+            className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-400/35 bg-cyan-500/12 text-cyan-200 hover:bg-cyan-500/22 hover:border-cyan-300/55 whitespace-nowrap">
             <MdCheckCircle size={14} className="shrink-0" /> Acknowledge
           </button>
         )}
         <button onClick={() => onDispatch(req)}
-          className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-amber-400/40 bg-orange-500 hover:bg-orange-400 text-black transition-colors whitespace-nowrap">
+          className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-amber-400/35 bg-amber-500/15 text-amber-200 hover:bg-amber-500/25 hover:border-amber-300/55 whitespace-nowrap">
           <MdArrowForward size={14} className="shrink-0" /> Dispatch
         </button>
         <button onClick={() => onDecline(req)}
-          className="press-sm inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors whitespace-nowrap">
+          className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap">
           <MdThumbDownAlt size={14} className="shrink-0" /> Decline
         </button>
       </div>

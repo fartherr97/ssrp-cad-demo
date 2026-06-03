@@ -290,36 +290,22 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   animation: spinnerSpin 0.7s linear infinite;
 }
 
-/* Tap/press feedback + glossy sheen.
-   A soft top-highlight overlay gives every action button a tactile "glossy"
-   finish over whatever color it already has, plus a subtle hover lift. Rides
-   on .press / .press-sm (already on most buttons) and the .btn-glossy helper
-   so the look stays consistent across the whole site. */
-.press, .press-sm, .btn-glossy {
-  position: relative;
-  transition: transform 0.12s cubic-bezier(0.4,0,0.2,1), box-shadow 0.16s ease, filter 0.16s ease;
+/* Tap/press feedback — pairs with transition for a springy push */
+.press { transition: transform 0.09s cubic-bezier(0.4,0,0.2,1); }
+.press:active { transform: scale(0.94); }
+.press-sm { transition: transform 0.09s cubic-bezier(0.4,0,0.2,1); }
+.press-sm:active { transform: scale(0.97); }
+
+/* Shared button finish — mirrors the login role-select buttons exactly:
+   a clean translucent surface (set per-button via Tailwind tint classes)
+   that simply lifts on hover. No glossy sheen. */
+.btn-glossy {
+  transition: transform 0.15s ease, background-color 0.15s ease,
+              border-color 0.15s ease, color 0.15s ease;
 }
-.press::before, .press-sm::before, .btn-glossy::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(to bottom,
-    rgba(255,255,255,0.18) 0%,
-    rgba(255,255,255,0.04) 45%,
-    rgba(255,255,255,0) 58%,
-    rgba(0,0,0,0.05) 100%);
-}
-.press:hover, .press-sm:hover, .btn-glossy:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 16px -6px rgba(0,0,0,0.55);
-  filter: brightness(1.06);
-}
-.press:active, .press-sm:active, .btn-glossy:active {
-  transform: translateY(0) scale(0.96);
-  filter: brightness(0.98);
-}
+.btn-glossy:hover { transform: translateY(-2px); }
+.btn-glossy:active { transform: translateY(0) scale(0.97); }
+.btn-glossy:disabled { transform: none; cursor: not-allowed; }
 
 /* Subtle lift used on interactive cards */
 .lift { transition: transform 0.16s cubic-bezier(0.16,1,0.3,1), box-shadow 0.16s ease, border-color 0.16s ease; }
