@@ -22,6 +22,7 @@ import MDT from './pages/MDT';
 import OfficerProfile from './pages/OfficerProfile';
 // Citizen portals
 import Supervisor from './pages/portal/Supervisor';
+import CommandPortal from './pages/portal/CommandPortal';
 import CivilianHome from './pages/portal/CivilianHome';
 import MyCharacters from './pages/portal/MyCharacters';
 import MyVehicles from './pages/portal/MyVehicles';
@@ -188,6 +189,9 @@ function CADApp() {
 
         {/* ── Supervisor portal ── */}
         <Route path="/portal/supervisor"  element={<Supervisor />} />
+
+        {/* ── Command portal ── */}
+        <Route path="/portal/command"     element={<CommandPortal />} />
 
         {/* ── Business portal ── */}
         <Route path="/portal/business"    element={<BusinessHome />} />

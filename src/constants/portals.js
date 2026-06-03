@@ -3,7 +3,7 @@ import {
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
-  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping,
+  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping, MdShield,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -18,6 +18,7 @@ export const PORTALS = {
       { Icon: MdGavel,              label: 'Warrants',   route: '/warrants'          },
       { Icon: MdMap,                label: 'Map',        route: '/map'               },
       { Icon: MdLocalShipping,      label: 'Tow CAD',    route: '/tow-cad'           },
+      { Icon: MdShield,             label: 'Command',    route: '/portal/command'    },
       { Icon: MdSupervisorAccount,  label: 'Supervisor', route: '/portal/supervisor' },
     ],
   },
@@ -58,6 +59,7 @@ export const PORTALS = {
       { Icon: MdPeopleAlt,         label: 'Civilians',  route: '/civilians'         },
       { Icon: MdPhoneAndroid,      label: 'MDT',        route: '/mdt'               },
       { Icon: MdSupervisorAccount, label: 'Supervisor', route: '/portal/supervisor' },
+      { Icon: MdShield,            label: 'Command',    route: '/portal/command'    },
     ],
   },
 
