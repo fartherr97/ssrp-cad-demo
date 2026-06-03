@@ -469,7 +469,7 @@ function MobileCard({ entry, officer, onClick }) {
 /* ══════════════════════════════════
    OFFICER PROFILE VIEW
 ══════════════════════════════════ */
-function OfficerProfileView({ officer, submissions, departments }) {
+function OfficerProfileView({ officer, submissions, departments, onOpenEntry }) {
   const dept = departments.find(d => d.short === officer.deptShort);
   const pending  = submissions.filter(r => r.status === 'Pending Review').length;
   const approved = submissions.filter(r => r.status === 'Approved').length;
@@ -519,16 +519,19 @@ function OfficerProfileView({ officer, submissions, departments }) {
         {submissions.length === 0
           ? <div className="text-[12px] text-slate-600 py-3 text-center">No submissions on file</div>
           : submissions.slice(0, 10).map(r => (
-            <div key={`${r.kind}-${r.id}`} className="flex items-center gap-3 py-2 border-b border-border-faint last:border-0">
+            <button key={`${r.kind}-${r.id}`} type="button"
+              onClick={() => onOpenEntry?.(r)}
+              className="w-full text-left flex items-center gap-3 py-2 border-b border-border-faint last:border-0 hover:bg-white/[0.04] rounded-lg px-1 -mx-1 cursor-pointer transition-colors group">
               {r.kind === 'report'
                 ? <MdDescription size={13} className="text-sky-400 shrink-0" />
                 : <MdFolder size={13} className="text-violet-400 shrink-0" />}
               <div className="flex-1 min-w-0">
-                <div className="text-[12px] text-slate-200 truncate">{r.type}</div>
+                <div className="text-[12px] text-slate-200 truncate group-hover:text-white transition-colors">{r.type}</div>
                 <div className="text-[10px] text-slate-600 font-mono">{r.caseNumber || r.recordNumber} · {r.date}</div>
               </div>
               <StatusPill status={r.status} />
-            </div>
+              <MdChevronRight size={13} className="text-slate-600 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
           ))}
       </div>
     </div>
@@ -538,7 +541,7 @@ function OfficerProfileView({ officer, submissions, departments }) {
 /* ══════════════════════════════════
    CIVILIAN PROFILE VIEW
 ══════════════════════════════════ */
-function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold }) {
+function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold, reports = [], records = [], onOpenEntry }) {
   const pts = civilian.licensePoints || 0;
   const pct = ptThreshold > 0 ? pts / ptThreshold : 0;
   const ptC = pts === 0 ? '#4ade80' : pct >= 1 ? '#f87171' : pct >= 0.7 ? '#fb923c' : pct >= 0.4 ? '#facc15' : '#4ade80';
@@ -628,15 +631,28 @@ function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold
           <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Criminal History ({civHistory.length})</div>
           {civHistory.length === 0
             ? <div className="text-[12px] text-slate-600">No criminal history on file</div>
-            : civHistory.slice(0, 6).map(h => (
-              <div key={h.id} className="flex items-start justify-between gap-2 py-2 border-b border-border-faint last:border-0">
-                <div className="min-w-0">
-                  <div className="text-[12px] text-slate-200 truncate">{h.charges?.join(', ')}</div>
-                  <div className="text-[10px] text-slate-600 font-mono mt-0.5">{h.caseNumber} · {h.date}</div>
-                </div>
-                {h.disposition && <span className="shrink-0 text-[9.5px] px-1.5 py-0.5 rounded border text-slate-400 border-border-faint whitespace-nowrap">{h.disposition}</span>}
-              </div>
-            ))}
+            : civHistory.slice(0, 6).map(h => {
+              const linkedReport =
+                (h.caseNumber && reports.find(r => r.caseNumber === h.caseNumber)) ||
+                (h.caseNumber && records.find(r => r.recordNumber === h.caseNumber));
+              const canOpen = !!linkedReport && !!onOpenEntry;
+              const entry = linkedReport ? { ...linkedReport, kind: reports.includes(linkedReport) ? 'report' : 'record' } : null;
+              return (
+                <button key={h.id} type="button" disabled={!canOpen}
+                  onClick={() => canOpen && onOpenEntry(entry)}
+                  className={`w-full text-left flex items-start justify-between gap-2 py-2 border-b border-border-faint last:border-0 rounded-lg px-1 -mx-1 transition-colors group
+                    ${canOpen ? 'cursor-pointer hover:bg-white/[0.04]' : 'cursor-default'}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] text-slate-200 truncate group-hover:text-white transition-colors">{h.charges?.join(', ')}</div>
+                    <div className="text-[10px] text-slate-600 font-mono mt-0.5">{h.caseNumber} · {h.date}</div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {h.disposition && <span className="text-[9.5px] px-1.5 py-0.5 rounded border text-slate-400 border-border-faint whitespace-nowrap">{h.disposition}</span>}
+                    {canOpen && <MdChevronRight size={13} className="text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  </div>
+                </button>
+              );
+            })}
         </div>
       </div>
     </div>
@@ -646,7 +662,7 @@ function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold
 /* ══════════════════════════════════
    PERSONNEL LOOKUP
 ══════════════════════════════════ */
-function PersonnelLookup({ officers, civilians, warrants, criminalHistory, reports, records, licensePointsConfig, departments }) {
+function PersonnelLookup({ officers, civilians, warrants, criminalHistory, reports, records, licensePointsConfig, departments, onOpenEntry }) {
   const [type, setType]           = useState('officers');
   const [query, setQuery]         = useState('');
   const [results, setResults]     = useState([]);
@@ -763,9 +779,9 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
             <div className="text-[12px] text-slate-500">Select a person to view their profile</div>
           </div>
         ) : selOfficer ? (
-          <OfficerProfileView officer={selOfficer} submissions={officerSubmissions} departments={departments} />
+          <OfficerProfileView officer={selOfficer} submissions={officerSubmissions} departments={departments} onOpenEntry={onOpenEntry} />
         ) : selCivilian ? (
-          <CivilianProfileView civilian={selCivilian} activeWarrants={activeWarrants} civHistory={civHistory} ptThreshold={ptThreshold} />
+          <CivilianProfileView civilian={selCivilian} activeWarrants={activeWarrants} civHistory={civHistory} ptThreshold={ptThreshold} reports={reports} records={records} onOpenEntry={onOpenEntry} />
         ) : null}
       </div>
     </div>
@@ -931,6 +947,7 @@ export default function Supervisor() {
           records={records}
           licensePointsConfig={licensePointsConfig}
           departments={departments}
+          onOpenEntry={openRecord}
         />
       )}
 
