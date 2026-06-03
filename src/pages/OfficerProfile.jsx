@@ -42,20 +42,26 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
 
   return (
     <div className="flex flex-col bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border-base shrink-0" style={{ background: 'rgba(251,146,60,0.05)' }}>
-        <button onClick={onBack}
-          className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors">
-          <MdArrowBack size={14} /> Back
-        </button>
-        <MdReply size={15} className="text-amber-400 shrink-0" />
-        <span className="text-[13px] font-bold text-white flex-1">{report.type}</span>
-        <span className="text-[11px] font-mono text-slate-500">{report.caseNumber}</span>
-        <button onClick={handleResubmit} disabled={submitted}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer disabled:opacity-50 transition-colors"
-          style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}>
-          <MdSend size={12} /> {submitted ? 'Submitted' : 'Resubmit for Review'}
-        </button>
+      {/* Header — two rows so title never wraps */}
+      <div className="shrink-0 border-b border-border-base" style={{ background: 'rgba(251,146,60,0.05)' }}>
+        {/* Row 1: back + icon + title + case# */}
+        <div className="flex items-center gap-2 px-4 pt-3 pb-1 min-w-0">
+          <button onClick={onBack}
+            className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors shrink-0">
+            <MdArrowBack size={14} /> Back
+          </button>
+          <MdReply size={14} className="text-amber-400 shrink-0" />
+          <span className="text-[13px] font-bold text-white truncate min-w-0 flex-1">{report.type}</span>
+          <span className="text-[10px] font-mono text-slate-500 shrink-0 ml-2 truncate max-w-[140px]">{report.caseNumber}</span>
+        </div>
+        {/* Row 2: action button */}
+        <div className="flex items-center justify-end px-4 pb-3 pt-1">
+          <button onClick={handleResubmit} disabled={submitted}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer disabled:opacity-50 transition-colors"
+            style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}>
+            <MdSend size={12} /> {submitted ? 'Submitted' : 'Resubmit for Review'}
+          </button>
+        </div>
       </div>
 
       {/* Supervisor comments banner */}
@@ -351,11 +357,11 @@ export default function OfficerProfile() {
                     <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'rgba(251,146,60,0.15)', background: 'rgba(251,146,60,0.05)' }}>
                       <MdReply size={16} className="text-amber-400 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[13px] font-bold text-white">{r.type}</span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">Pending Changes</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-[13px] font-bold text-white truncate">{r.type}</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0">Returned</span>
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono mt-0.5">{r.caseNumber} · {r.date}</div>
+                        <div className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">{r.caseNumber} · {r.date}</div>
                       </div>
                       <button onClick={() => setEditingReturned(r)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer transition-colors"
