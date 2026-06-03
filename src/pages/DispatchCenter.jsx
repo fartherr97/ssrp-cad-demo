@@ -222,7 +222,8 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
 
 /* ─── Create call from 911 ─── */
 function Dispatch911Modal({ call, onClose }) {
-  const { dispatch } = useCAD();
+  const { state, dispatch } = useCAD();
+  const { callNatures = [] } = state;
   const toast = useToast();
   const [form, setForm] = useState({
     nature: '',

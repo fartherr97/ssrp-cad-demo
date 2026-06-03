@@ -39,7 +39,7 @@ const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { reports, reportTemplates, currentUser, officers, calls = [], myCallId, communityConfig, departments } = state;
+  const { reports, reportTemplates, currentUser, officers, calls = [], myCallId, communityConfig, departments, reportSeq = 1 } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
@@ -128,7 +128,9 @@ export default function ReportsCenter() {
 
   const submitReport = () => {
     if (!selectedTemplate) return;
-    const caseNum = `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
+    // Sequential report number — the store stamps the authoritative value; we
+    // mirror it here for the confirmation toast.
+    const caseNum = String(reportSeq).padStart(4, '0');
     dispatch({
       type: 'ADD_REPORT',
       payload: {
@@ -158,7 +160,7 @@ export default function ReportsCenter() {
   const showReport = !showForm && selReport !== null;
 
   const draftMeta = {
-    caseNumber: `${me?.deptShort || 'RMS'}-${new Date().getFullYear()}-DRAFT`,
+    caseNumber: String(reportSeq).padStart(4, '0'),
     status: 'Draft',
   };
 

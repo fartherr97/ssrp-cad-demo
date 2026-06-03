@@ -129,6 +129,10 @@ const initialState = {
   },
   myCallId: null,
   nextId: 1000,
+  // Sequential report/record number. Every report or record filed through the
+  // CAD is stamped with the next value, zero-padded to 4 digits — the first
+  // one ever submitted is 0001 and it climbs from there.
+  reportSeq: 1,
   // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
   // the running total of dispatcher radio broadcasts; `radioSeen` is how many
   // the current viewer has acknowledged (by opening the MDT Radio feed).
@@ -459,16 +463,19 @@ function reducer(state, action) {
       const officerSignature = officer
         ? `${officer.badge} | ${(officer.rank || officer.role || 'OFFICER').toUpperCase()} | ${officer.name.toUpperCase()}`
         : (action.payload.officerBadge || '—');
+      const reportNumber = String(state.reportSeq).padStart(4, '0');
       const newReport = {
         ...action.payload,
         id: state.nextId,
+        reportNumber,
+        caseNumber: reportNumber,
         status: 'Pending Review',
         date: new Date().toLocaleDateString(),
         officerSignature,
         supervisorSignature: null,
       };
-      const audit = addAuditEntry(state, `Filed ${newReport.type} report`, 'Reports');
-      return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, ...audit };
+      const audit = addAuditEntry(state, `Filed ${newReport.type} report ${reportNumber}`, 'Reports');
+      return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit };
     }
 
     /* ─── Generic admin-customization CRUD ───
@@ -636,8 +643,9 @@ function reducer(state, action) {
     }
 
     case 'ADD_RECORD': {
-      const newRecord = { ...action.payload, id: state.nextId, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString() };
-      return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
+      const recordNumber = String(state.reportSeq).padStart(4, '0');
+      const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString() };
+      return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
     }
     case 'SET_DL_TEMPLATE': {
       const { templateId } = action.payload;

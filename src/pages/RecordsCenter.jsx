@@ -26,7 +26,7 @@ const DRAFT_KEY = (tplId) => `ssrp_record_draft_${tplId}`;
 export default function RecordsCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { recordTemplates, currentUser, officers, communityConfig, departments } = state;
+  const { recordTemplates, currentUser, officers, communityConfig, departments, reportSeq = 1 } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
@@ -84,7 +84,8 @@ export default function RecordsCenter() {
 
   const submitRecord = () => {
     if (!selectedTemplate) return;
-    const recNum = `REC-${new Date().getFullYear()}-${String(Date.now()).slice(-5)}`;
+    // Shares the global sequential report number — store stamps the value.
+    const recNum = String(reportSeq).padStart(4, '0');
     dispatch({
       type: 'ADD_RECORD',
       payload: {
@@ -106,7 +107,7 @@ export default function RecordsCenter() {
   const showRecord = !showForm && selRecord !== null;
 
   const draftMeta = {
-    caseNumber: `REC-${new Date().getFullYear()}-DRAFT`,
+    caseNumber: String(reportSeq).padStart(4, '0'),
     status: 'Draft',
   };
 

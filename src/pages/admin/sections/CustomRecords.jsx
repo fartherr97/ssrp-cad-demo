@@ -7,7 +7,7 @@ import {
   MdAdd, MdDelete, MdContentCopy, MdArrowUpward, MdArrowDownward,
   MdDescription, MdFolder, MdSearch, MdExpandMore, MdChevronRight,
   MdPerson, MdDirectionsCar, MdGavel, MdSave, MdLock,
-  MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar,
+  MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar, MdCode,
 } from 'react-icons/md';
 
 /* ── uid generators ── */
@@ -195,6 +195,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         </div>
         <div className="flex gap-0.5">
           <IconBtn icon={MdStar}        onClick={() => tog('required')}       active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
+          <IconBtn icon={MdCode}        onClick={() => tog('mono')}           active={!!field.mono}           activeColor="#22d3ee" title="Monospace (IDs / plates / case #)" size={12} />
           <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}       active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
           <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')} active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
           <IconBtn icon={MdSearch}      onClick={() => tog('showInLookup')}   active={!!field.showInLookup}   activeColor="#22c55e" title="Show in Lookup"  size={12} />
@@ -247,6 +248,34 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
                 value={(field.options || []).join('\n')}
                 onChange={e => onUpdate({ ...field, options: e.target.value.split('\n') })}
                 placeholder={'Option 1\nOption 2\nOption 3'}
+              />
+            </div>
+          )}
+          {field.type === 'textarea' && (
+            <div>
+              <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>Visible Rows</div>
+              <input type="number" min={2} max={20}
+                style={{
+                  width: 90, background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
+                  borderRadius: 6, color: '#dde6f1', padding: '6px 10px', fontSize: 11.5,
+                  fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+                }}
+                value={field.minRows || 4}
+                onChange={e => onUpdate({ ...field, minRows: Math.max(2, Math.min(20, Number(e.target.value) || 4)) })}
+              />
+            </div>
+          )}
+          {field.type === 'photos' && (
+            <div>
+              <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] mb-1" style={{ color: '#34d399' }}>Max Photos (1–8)</div>
+              <input type="number" min={1} max={8}
+                style={{
+                  width: 90, background: '#080f1a', border: '1px solid rgba(52,211,153,0.2)',
+                  borderRadius: 6, color: '#dde6f1', padding: '6px 10px', fontSize: 11.5,
+                  fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+                }}
+                value={field.max || 8}
+                onChange={e => onUpdate({ ...field, max: Math.max(1, Math.min(8, Number(e.target.value) || 8)) })}
               />
             </div>
           )}
@@ -646,8 +675,9 @@ const RECORD_ROLES = [
 ];
 
 function RecordRoleToggles({ draft, onChange, isReport }) {
-  const { dispatch } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
+  const nextReportNumber = String(state.reportSeq || 1).padStart(4, '0');
 
   const toggle = (flag) => {
     const next = !draft[flag];
@@ -665,10 +695,16 @@ function RecordRoleToggles({ draft, onChange, isReport }) {
   return (
     <div className="shrink-0 px-4 py-2 flex items-center gap-3 flex-wrap"
       style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Form Code</div>
-      <div className="text-[12px] font-bold tabular-nums px-2.5 py-1 rounded-md"
-        style={{ color: '#3d82f0', background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
-        #{draft.formCode || '—'}
+      <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Report Number</div>
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
+        style={{ background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)' }}
+        title="Report numbers are auto-assigned sequentially when a report is filed — starting at 0001.">
+        <span className="text-[12px] font-bold tabular-nums" style={{ color: '#3d82f0', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
+          #{nextReportNumber}
+        </span>
+        <span className="text-[8px] font-bold uppercase tracking-[0.4px] px-1 py-0.5 rounded" style={{ color: '#3d5470', background: 'rgba(255,255,255,0.05)' }}>
+          next · auto
+        </span>
       </div>
       {!isReport && (
         <>
@@ -758,6 +794,13 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
             value={draft.name || ''}
             onChange={e => up({ name: e.target.value })}
           />
+          <input
+            className="text-[10.5px] bg-transparent border-b border-transparent focus:border-white/20 outline-none w-full transition-colors mt-1.5"
+            style={{ color: '#93a4bd', paddingBottom: 1, fontFamily: 'var(--font-ui)' }}
+            placeholder="Issuing Agency (appears in the document header) — e.g. Tampa Police Department"
+            value={draft.agency || ''}
+            onChange={e => up({ agency: e.target.value })}
+          />
         </div>
         <div className="flex gap-2 shrink-0">
           <button type="button" onClick={onClose}
@@ -819,7 +862,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
               <MdAdd size={15} /> ADD PREMADE SECTION <MdExpandMore size={14} />
             </button>
             {showPremade && (
-              <div className="absolute bottom-full left-0 mb-1 z-[200] rounded-xl py-1.5 shadow-2xl min-w-[210px]"
+              <div className="absolute top-full left-0 mt-1 z-[200] rounded-xl py-1.5 shadow-2xl min-w-[210px] max-h-[300px] overflow-y-auto"
                 style={{ background: '#0d1827', border: '1px solid rgba(255,255,255,0.14)', animation: 'dropdownFadeIn 0.12s ease-out' }}>
                 {PREMADE_SECTIONS.map(ps => (
                   <button key={ps.key} type="button" onClick={() => addPremade(ps)}
@@ -832,6 +875,28 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Signature line labels — shown on the printed document footer */}
+        <div className="mt-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.09)' }}>
+          <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: '#0f1c31', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <MdEdit size={13} style={{ color: '#93a4bd' }} />
+            <span className="text-[11px] font-bold uppercase tracking-[0.5px]" style={{ color: '#dde6f1' }}>Signature Lines</span>
+            <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal">— labels on the printed document footer, one per line</span>
+          </div>
+          <div className="p-3">
+            <textarea
+              style={{
+                width: '100%', background: '#080f1a', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 8, color: '#dde6f1', padding: '8px 11px', fontSize: 11.5,
+                fontFamily: 'var(--font-ui)', boxSizing: 'border-box', outline: 'none',
+                resize: 'vertical', minHeight: 56,
+              }}
+              value={(draft.signatureSlots || []).join('\n')}
+              onChange={e => up({ signatureSlots: e.target.value.split('\n') })}
+              placeholder={'Officer Signature / Badge #\nSupervisor Signature\nDate'}
+            />
           </div>
         </div>
       </div>
