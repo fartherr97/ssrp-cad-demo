@@ -807,7 +807,7 @@ function ResponseTimesTab({ callLogs }) {
         />
       </div>
 
-      {/* Department breakdown */}
+      {/* Breakdown rows */}
       <PortalCard accent="violet">
         <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
           {deptFilter === 'All' ? 'By Department' : `${deptFilter} — By Priority`}
@@ -815,35 +815,35 @@ function ResponseTimesTab({ callLogs }) {
         {filtered.length === 0 ? (
           <div className="text-center py-8 text-slate-500 text-[13px]">No closed calls in this period.</div>
         ) : (
-          <table className="w-full text-[12.5px]">
-            <thead>
-              <tr className="border-b border-white/[0.06]">
-                <th className="pb-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                  {deptFilter === 'All' ? 'Department' : 'Priority'}
-                </th>
-                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Avg Assignment</th>
-                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Avg On-Scene</th>
-                <th className="pb-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Calls</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(deptFilter === 'All' ? deptBreakdown : priorityBreakdown).map(row => {
-                const key   = deptFilter === 'All' ? row.dept : row.priority;
-                const label = deptFilter === 'All' ? row.dept : (PRIORITY_LABELS[row.priority] || `P${row.priority}`);
-                const color = deptFilter !== 'All' ? PRIORITY_COLORS[row.priority] : null;
-                return (
-                  <tr key={key} className="border-b border-white/[0.04] last:border-0">
-                    <td className="py-2.5 font-bold" style={color ? { color } : { color: '#e2e8f0' }}>
-                      {label}
-                    </td>
-                    <td className="py-2.5 text-right font-mono text-violet-300">{fmtMin(row.avgAssigned)}</td>
-                    <td className="py-2.5 text-right font-mono text-violet-300">{fmtMin(row.avgOnScene)}</td>
-                    <td className="py-2.5 text-right text-slate-400">{row.count}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="flex flex-col divide-y divide-white/[0.05]">
+            {(deptFilter === 'All' ? deptBreakdown : priorityBreakdown).map(row => {
+              const key   = deptFilter === 'All' ? row.dept : row.priority;
+              const label = deptFilter === 'All' ? row.dept : (PRIORITY_LABELS[row.priority] || `P${row.priority}`);
+              const color = deptFilter !== 'All' ? (PRIORITY_COLORS[row.priority] || '#e2e8f0') : '#e2e8f0';
+              return (
+                <div key={key} className="py-3 first:pt-0 last:pb-0">
+                  {/* Name + call count */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[13px] font-extrabold" style={{ color }}>{label}</span>
+                    <span className="text-[10.5px] text-slate-500 font-semibold">
+                      {row.count} call{row.count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  {/* Two metric cells */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.15)' }}>
+                      <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Assignment</div>
+                      <div className="text-[15px] font-extrabold font-mono text-violet-300 leading-none">{fmtMin(row.avgAssigned)}</div>
+                    </div>
+                    <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.15)' }}>
+                      <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">On-Scene</div>
+                      <div className="text-[15px] font-extrabold font-mono text-violet-300 leading-none">{fmtMin(row.avgOnScene)}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </PortalCard>
 
