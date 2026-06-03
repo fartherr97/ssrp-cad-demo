@@ -398,6 +398,9 @@ function reducer(state, action) {
 
     case 'ADD_VEHICLE': {
       const newVeh = { ...action.payload, id: state.nextId, flags: [], stolen: false };
+      if (action.payload.businessOwnerId) {
+        return { ...state, vehicles: [...state.vehicles, newVeh], nextId: state.nextId + 1 };
+      }
       const civilians = state.civilians.map(c => c.id === action.payload.ownerId ? { ...c, vehicles: [...c.vehicles, state.nextId] } : c);
       return { ...state, vehicles: [...state.vehicles, newVeh], civilians, nextId: state.nextId + 1 };
     }

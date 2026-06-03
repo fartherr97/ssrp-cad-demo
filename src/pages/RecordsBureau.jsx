@@ -129,7 +129,7 @@ const SEARCH_TYPES = [
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers, licensePointsConfig = {} } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers, licensePointsConfig = {}, businesses = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
@@ -209,6 +209,7 @@ export default function RecordsBureau() {
   const civWarrants = selCiv ? warrants.filter(w => w.civilianId === selCiv.id) : [];
   const civHistory  = selCiv ? criminalHistory.filter(h => h.civilianId === selCiv.id) : [];
   const vehOwner    = selVeh ? civilians.find(c => c.id === selVeh.ownerId) : null;
+  const vehBizOwner = selVeh?.businessOwnerId ? businesses.find(b => b.id === selVeh.businessOwnerId) : null;
   const vehWarrants = vehOwner ? warrants.filter(w => w.civilianId === vehOwner.id) : [];
 
   const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES', 'MEDICAL'];
@@ -352,16 +353,21 @@ export default function RecordsBureau() {
                     </div>
                   </button>
                 );
-                if (searchType === 'VEHICLE') return (
-                  <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
-                    <div className="text-[13px] font-bold font-mono text-brand-bright">{r.plate}</div>
-                    <div className="text-[11px] text-slate-300 mt-0.5">{r.year} {r.make} {r.model} · {r.color}</div>
-                    <div className="flex gap-1 mt-1.5">
-                      {r.stolen && <span className={BADGE.red}>STOLEN</span>}
-                      {r.regStatus !== 'VALID' && <span className={BADGE.orange}>REG {r.regStatus}</span>}
-                    </div>
-                  </button>
-                );
+                if (searchType === 'VEHICLE') {
+                  const bizOwner = r.businessOwnerId ? businesses.find(b => b.id === r.businessOwnerId) : null;
+                  return (
+                    <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                      <div className="text-[13px] font-bold font-mono text-brand-bright">{r.plate}</div>
+                      <div className="text-[11px] text-slate-300 mt-0.5">{r.year} {r.make} {r.model} · {r.color}</div>
+                      {bizOwner && <div className="text-[10.5px] text-cyan-400 mt-0.5">{bizOwner.name}</div>}
+                      <div className="flex gap-1 mt-1.5">
+                        {r.stolen && <span className={BADGE.red}>STOLEN</span>}
+                        {r.regStatus !== 'VALID' && <span className={BADGE.orange}>REG {r.regStatus}</span>}
+                        {bizOwner && <span className={BADGE.blue}>COMMERCIAL</span>}
+                      </div>
+                    </button>
+                  );
+                }
                 return (
                   <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
                     <div className="text-[12.5px] font-semibold text-white">{r.civilianName}</div>
@@ -467,13 +473,19 @@ export default function RecordsBureau() {
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
                     {selCiv ? `DOB ${selCiv.dob} (${age(selCiv.dob)}) · ${selCiv.gender}`
-                      : selVeh ? `${selVeh.year} ${selVeh.make} ${selVeh.model} · ${selVeh.color}`
+                      : selVeh ? (
+                          <>
+                            {selVeh.year} {selVeh.make} {selVeh.model} · {selVeh.color}
+                            {vehBizOwner && <span className="ml-2 text-cyan-400">Registered to: {vehBizOwner.name} · EIN {vehBizOwner.ein}</span>}
+                          </>
+                        )
                       : selWarrant?.charge}
                   </div>
                 </div>
                 <div className="ml-auto flex gap-1.5 flex-wrap justify-end">
                   {selCiv && <FlagRow flags={selCiv.flags || []} />}
                   {selVeh?.stolen && <span className={BADGE.red}>STOLEN</span>}
+                  {vehBizOwner && <span className={BADGE.blue}>COMMERCIAL</span>}
                 </div>
               </div>
 
@@ -629,7 +641,7 @@ export default function RecordsBureau() {
                 )}
 
                 {tab === 'RETURN' && selCiv     && <RecordReturn type="PERSON"  data={selCiv} />}
-                {tab === 'RETURN' && selVeh     && <RecordReturn type="VEHICLE" data={selVeh} subject={vehOwner} />}
+                {tab === 'RETURN' && selVeh && <RecordReturn type="VEHICLE" data={selVeh} subject={vehOwner || (vehBizOwner ? { firstName: vehBizOwner.name, lastName: '', dob: '', address: vehBizOwner.address, phone: vehBizOwner.phone } : null)} />}
                 {tab === 'RETURN' && selWarrant && <RecordReturn type="WARRANT" data={selWarrant} />}
 
                 {tab === 'CRIMINAL HISTORY' && selCiv && (

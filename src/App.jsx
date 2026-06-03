@@ -35,6 +35,7 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
+import BusinessFleet from './pages/portal/BusinessFleet';
 import TowCAD from './pages/TowCAD';
 import { BusinessProvider } from './contexts/BusinessContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -199,10 +200,11 @@ function CADApp() {
         <Route path="/portal/command"     element={<CommandPortal />} />
 
         {/* ── Business portal ── */}
-        <Route path="/portal/business"    element={<BusinessHome />} />
-        <Route path="/portal/my-business" element={<MyBusiness />} />
-        <Route path="/portal/employees"   element={<Employees />} />
-        <Route path="/portal/incidents"   element={<BusinessIncidents />} />
+        <Route path="/portal/business"        element={<BusinessHome />} />
+        <Route path="/portal/my-business"     element={<MyBusiness />} />
+        <Route path="/portal/employees"       element={<Employees />} />
+        <Route path="/portal/business-fleet"  element={<BusinessFleet />} />
+        <Route path="/portal/incidents"       element={<BusinessIncidents />} />
 
         {/* ── Tow CAD ── */}
         <Route path="/tow-cad"            element={<TowCAD />} />

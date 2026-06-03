@@ -65,12 +65,19 @@ export const CIVILIANS = [
 
 export const VEHICLES = [
   // type added for form autofill (Vehicle Type dropdown)
-  { id: 1, plate: "ARC-1204", type: "Truck",      make: "Ford",            model: "F-150",    year: "2019", color: "Black",       regStatus: "VALID",     regExpiry: "2027-10-31", ownerId: 1, stolen: false, flags: [] },
-  { id: 2, plate: "TRK-8821", type: "Truck",      make: "Chevrolet",       model: "Silverado",year: "2021", color: "White",       regStatus: "VALID",     regExpiry: "2027-01-15", ownerId: 1, stolen: false, flags: [] },
-  { id: 3, plate: "GRN-5543", type: "Sedan",      make: "Honda",           model: "Civic",    year: "2020", color: "Silver",      regStatus: "EXPIRED",   regExpiry: "2025-07-22", ownerId: 2, stolen: false, flags: ["EXPIRED REG"] },
-  { id: 4, plate: "SUS-1109", type: "Sedan",      make: "Dodge",           model: "Charger",  year: "2018", color: "Charcoal",    regStatus: "SUSPENDED", regExpiry: "2024-09-01", ownerId: 3, stolen: false, flags: ["OWNER WANTED"] },
-  { id: 5, plate: "MAR-3012", type: "Sedan",      make: "BMW",             model: "740i",     year: "2022", color: "White",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
-  { id: 6, plate: "HAR-5512", type: "Motorcycle", make: "Harley-Davidson", model: "Road King",year: "2020", color: "Black",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, stolen: false, flags: [] },
+  { id: 1, plate: "ARC-1204", type: "Truck",      make: "Ford",            model: "F-150",    year: "2019", color: "Black",       regStatus: "VALID",     regExpiry: "2027-10-31", ownerId: 1, businessOwnerId: null, stolen: false, flags: [] },
+  { id: 2, plate: "TRK-8821", type: "Truck",      make: "Chevrolet",       model: "Silverado",year: "2021", color: "White",       regStatus: "VALID",     regExpiry: "2027-01-15", ownerId: 1, businessOwnerId: null, stolen: false, flags: [] },
+  { id: 3, plate: "GRN-5543", type: "Sedan",      make: "Honda",           model: "Civic",    year: "2020", color: "Silver",      regStatus: "EXPIRED",   regExpiry: "2025-07-22", ownerId: 2, businessOwnerId: null, stolen: false, flags: ["EXPIRED REG"] },
+  { id: 4, plate: "SUS-1109", type: "Sedan",      make: "Dodge",           model: "Charger",  year: "2018", color: "Charcoal",    regStatus: "SUSPENDED", regExpiry: "2024-09-01", ownerId: 3, businessOwnerId: null, stolen: false, flags: ["OWNER WANTED"] },
+  { id: 5, plate: "MAR-3012", type: "Sedan",      make: "BMW",             model: "740i",     year: "2022", color: "White",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, businessOwnerId: null, stolen: false, flags: [] },
+  { id: 6, plate: "HAR-5512", type: "Motorcycle", make: "Harley-Davidson", model: "Road King",year: "2020", color: "Black",       regStatus: "VALID",     regExpiry: "2027-09-30", ownerId: 5, businessOwnerId: null, stolen: false, flags: [] },
+  // Batavia Tow fleet (businessOwnerId: 1)
+  { id: 7,  plate: "BAT-101", type: "Tow Truck", make: "Ford",      model: "F-450",   year: "2022", color: "White / Orange", regStatus: "VALID", regExpiry: "2027-06-01", ownerId: null, businessOwnerId: 1, stolen: false, flags: [] },
+  { id: 8,  plate: "BAT-102", type: "Flatbed",   make: "Ram",       model: "5500",    year: "2021", color: "White",          regStatus: "VALID", regExpiry: "2027-04-15", ownerId: null, businessOwnerId: 1, stolen: false, flags: [] },
+  { id: 9,  plate: "BAT-103", type: "Rollback",  make: "Kenworth",  model: "T270",    year: "2020", color: "Silver",         regStatus: "VALID", regExpiry: "2026-11-30", ownerId: null, businessOwnerId: 1, stolen: false, flags: [] },
+  // FDOT Tow Operations fleet (businessOwnerId: 2)
+  { id: 10, plate: "FDT-201", type: "Pickup",    make: "Ford",      model: "F-350",   year: "2023", color: "Orange / Yellow",regStatus: "VALID", regExpiry: "2027-12-31", ownerId: null, businessOwnerId: 2, stolen: false, flags: [] },
+  { id: 11, plate: "FDT-202", type: "Heavy Tow", make: "Peterbilt", model: "367",     year: "2022", color: "Orange",         regStatus: "VALID", regExpiry: "2027-12-31", ownerId: null, businessOwnerId: 2, stolen: false, flags: [] },
 ];
 
 export const WARRANTS = [
@@ -651,7 +658,7 @@ export const BUSINESSES = [
       { id: 1, name: 'FDOT-T1 — Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
       { id: 2, name: 'FDOT-T2 — Medium Duty',   spawnCode: 'towtruck2', type: 'Medium Duty' },
     ],
-    license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: false,
+    license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
       { id: 1, name: "Ray Calhoun",   discordId: "100200305", role: "Inspector",  phone: "813-975-6200", since: "2022-01-01" },
       { id: 2, name: "Jordan Maxwell", discordId: "205947291", role: "Supervisor", phone: "555-0192",    since: "2024-06-01" },
