@@ -36,6 +36,7 @@ import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
 import TowCAD from './pages/TowCAD';
 import { BusinessProvider } from './contexts/BusinessContext';
+import { ToastProvider } from './contexts/ToastContext';
 // Admin (Sonoran-style customization suite)
 import AdminShell from './pages/admin/AdminShell';
 import CustomizationHub from './pages/admin/sections/CustomizationHub';
@@ -211,11 +212,13 @@ function CADApp() {
 export default function App() {
   return (
     <CADProvider>
-      <BrowserRouter>
-        <BusinessProvider>
-          <CADApp />
-        </BusinessProvider>
-      </BrowserRouter>
+      <ToastProvider>
+        <BrowserRouter>
+          <BusinessProvider>
+            <CADApp />
+          </BusinessProvider>
+        </BrowserRouter>
+      </ToastProvider>
     </CADProvider>
   );
 }

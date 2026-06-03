@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
+import { useMountTransition } from '../ui/Modal';
 import { STATUS_COLORS } from '../../constants/statusColors';
 import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import {
@@ -263,6 +264,7 @@ export default function ActionBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const drawer = useMountTransition(mobileOpen, 240);
 
   // For unambiguous routes, derive portal from URL so browser back/forward shows the correct subtitle
   const PATH_PORTAL_MAP = [
@@ -353,19 +355,27 @@ export default function ActionBar() {
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}
         <button onClick={() => setMobileOpen(o => !o)}
-          className="lg:hidden flex items-center justify-center w-10 h-10 ml-1 rounded-lg text-slate-300 hover:bg-white/[0.06] cursor-pointer transition-colors"
+          className="press lg:hidden relative flex items-center justify-center w-10 h-10 ml-1 rounded-lg text-slate-300 hover:bg-white/[0.06] cursor-pointer transition-colors"
           aria-label="Menu">
-          {mobileOpen ? <MdClose size={22} /> : <MdMenu size={22} />}
+          <MdMenu size={22}
+            className="absolute transition-all duration-200"
+            style={{ opacity: mobileOpen ? 0 : 1, transform: mobileOpen ? 'rotate(-90deg) scale(0.7)' : 'rotate(0) scale(1)' }} />
+          <MdClose size={22}
+            className="absolute transition-all duration-200"
+            style={{ opacity: mobileOpen ? 1 : 0, transform: mobileOpen ? 'rotate(0) scale(1)' : 'rotate(90deg) scale(0.7)' }} />
         </button>
       </div>
 
       {/* ── Mobile nav drawer ── */}
-      {mobileOpen && createPortal(
+      {drawer.mounted && createPortal(
         <div className="lg:hidden fixed inset-0 z-[2500]">
-          <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div
-            className="absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 flex flex-col"
-            style={{ top: 'var(--actionbar-h)', height: 'calc(100dvh - var(--actionbar-h))', animation: 'expandDown 0.16s ease-out' }}
+            className={`absolute inset-0 bg-black/55 backdrop-blur-sm ${drawer.show ? 'anim-overlay-in' : 'anim-overlay-out'}`}
+            onClick={() => setMobileOpen(false)}
+          />
+          <div
+            className={`absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 flex flex-col ${drawer.show ? 'anim-drawer-in' : 'anim-drawer-out'}`}
+            style={{ top: 'var(--actionbar-h)', height: 'calc(100dvh - var(--actionbar-h))' }}
           >
             {/* Brand header */}
             <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint shrink-0">
@@ -378,14 +388,14 @@ export default function ActionBar() {
               </div>
             </div>
 
-            {/* Flat grouped list — scrolls independently */}
+            {/* Flat grouped list — scrolls independently, items stagger in */}
             <div className="flex-1 overflow-y-auto py-3">
-              {navItems.map(item => {
+              {navItems.map((item, idx) => {
                 const subItems = item.dropdown ? dropdownItems(item.dropdown) : null;
 
                 if (subItems) {
                   return (
-                    <div key={item.route}>
+                    <div key={item.route} className={drawer.show ? 'stagger-item' : ''} style={{ '--i': idx }}>
                       <div className="flex items-center gap-2 px-5 pt-4 pb-1.5">
                         <item.Icon size={13} className="shrink-0 text-slate-500" />
                         <span className="text-[10px] font-bold uppercase tracking-[1px] text-slate-500">{item.label}</span>
@@ -394,7 +404,7 @@ export default function ActionBar() {
                         <div className="px-5 py-2 text-[12px] text-slate-600 italic">No templates yet</div>
                       ) : subItems.map(sub => (
                         <button key={sub.id} onClick={() => go(sub.route)}
-                          className="w-full text-left px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-white/[0.05] cursor-pointer transition-colors border-none bg-transparent">
+                          className="press-sm w-full text-left px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-white/[0.05] active:bg-white/[0.08] cursor-pointer transition-colors border-none bg-transparent">
                           {sub.name}
                         </button>
                       ))}
@@ -405,8 +415,10 @@ export default function ActionBar() {
                 const on = isActive(item.route);
                 return (
                   <button key={item.route} onClick={() => go(item.route)}
-                    className={`w-full flex items-center gap-3 px-5 py-3 text-[14px] font-semibold cursor-pointer transition-colors border-none bg-transparent
-                      ${on ? 'text-brand-bright' : 'text-white hover:bg-white/[0.05]'}`}>
+                    style={{ '--i': idx }}
+                    className={`press-sm w-full flex items-center gap-3 px-5 py-3 text-[14px] font-semibold cursor-pointer transition-colors border-none bg-transparent
+                      ${drawer.show ? 'stagger-item' : ''}
+                      ${on ? 'text-brand-bright' : 'text-white hover:bg-white/[0.05] active:bg-white/[0.08]'}`}>
                     {on && <span className="w-1 h-5 rounded-full bg-brand shrink-0 -ml-1" />}
                     <item.Icon size={18} className="shrink-0 text-slate-400" />
                     {item.label}
@@ -418,11 +430,11 @@ export default function ActionBar() {
             {/* Footer — always pinned at bottom */}
             <div className="shrink-0 border-t border-border-faint px-4 py-3 flex gap-2">
               <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 text-[13px] font-semibold cursor-pointer hover:bg-white/[0.09] transition-all">
+                className="press flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 text-[13px] font-semibold cursor-pointer hover:bg-white/[0.09] transition-all">
                 <MdHome size={16} /> Switch Portal
               </button>
               <button onClick={() => dispatch({ type: 'LOGOUT' })}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[13px] font-semibold cursor-pointer hover:bg-red-500/20 transition-all">
+                className="press flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[13px] font-semibold cursor-pointer hover:bg-red-500/20 transition-all">
                 <MdLogout size={16} /> Sign Out
               </button>
             </div>

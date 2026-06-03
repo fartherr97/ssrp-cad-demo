@@ -232,11 +232,69 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   50%     { opacity: 0.55; box-shadow: 0 0 2px 0px #22ff66; }
 }
 
+/* ── Overlay / modal / drawer / toast motion ── */
+@keyframes overlayIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlayOut  { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modalIn      { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes modalOut     { from { opacity: 1; transform: translateY(0) scale(1); }       to { opacity: 0; transform: translateY(10px) scale(0.97); } }
+@keyframes sheetIn      { from { opacity: 0; transform: translateY(100%); }              to { opacity: 1; transform: translateY(0); } }
+@keyframes sheetOut     { from { opacity: 1; transform: translateY(0); }                 to { opacity: 0; transform: translateY(100%); } }
+@keyframes drawerIn     { from { opacity: 0; transform: translateY(-10px); }             to { opacity: 1; transform: translateY(0); } }
+@keyframes drawerOut    { from { opacity: 1; transform: translateY(0); }                 to { opacity: 0; transform: translateY(-10px); } }
+@keyframes toastInRight { from { opacity: 0; transform: translateX(26px) scale(0.95); }  to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes toastInUp    { from { opacity: 0; transform: translateY(22px) scale(0.97); }  to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toastOut     { from { opacity: 1; transform: translateX(0) scale(1); max-height: 120px; } to { opacity: 0; transform: translateX(26px) scale(0.95); max-height: 0; margin-bottom: 0; } }
+@keyframes toastOutUp   { from { opacity: 1; transform: translateY(0) scale(1); max-height: 120px; } to { opacity: 0; transform: translateY(16px) scale(0.97); max-height: 0; margin-bottom: 0; } }
+@keyframes staggerIn    { from { opacity: 0; transform: translateY(8px); }               to { opacity: 1; transform: translateY(0); } }
+@keyframes spinnerSpin  { to { transform: rotate(360deg); } }
+@keyframes barGrow      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
 /* Convenience animation utility classes */
 .anim-slide-in { animation: slideInRight 0.15s ease-out; }
 .anim-fade-in  { animation: fadeIn 0.15s ease-out; }
 .p1-pulse      { animation: pulseRed 1.5s ease-in-out infinite; }
 .blink         { animation: blink 1s step-end infinite; }
+
+/* Overlay + surface entrances */
+.anim-overlay-in  { animation: overlayIn 0.18s ease-out; }
+.anim-overlay-out { animation: overlayOut 0.18s ease-in forwards; }
+.anim-modal-in    { animation: modalIn 0.26s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-modal-out   { animation: modalOut 0.18s ease-in forwards; }
+.anim-sheet-in    { animation: sheetIn 0.30s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-sheet-out   { animation: sheetOut 0.22s ease-in forwards; }
+.anim-drawer-in   { animation: drawerIn 0.22s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-drawer-out  { animation: drawerOut 0.18s ease-in forwards; }
+
+/* Toast entrances/exits */
+.toast-in-right { animation: toastInRight 0.32s cubic-bezier(0.16,1,0.3,1) both; }
+.toast-in-up    { animation: toastInUp 0.32s cubic-bezier(0.16,1,0.3,1) both; }
+.toast-out      { animation: toastOut 0.26s ease-in forwards; }
+.toast-out-up   { animation: toastOutUp 0.26s ease-in forwards; }
+
+/* Staggered list-item entrance — set --i on each child for delay */
+.stagger-item {
+  animation: staggerIn 0.34s cubic-bezier(0.16,1,0.3,1) both;
+  animation-delay: calc(var(--i, 0) * 32ms);
+}
+
+/* Spinner for loading toasts/buttons */
+.ui-spinner {
+  display: inline-block;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spinnerSpin 0.7s linear infinite;
+}
+
+/* Tap/press feedback — pairs with transition for a springy push */
+.press { transition: transform 0.09s cubic-bezier(0.4,0,0.2,1); }
+.press:active { transform: scale(0.94); }
+.press-sm { transition: transform 0.09s cubic-bezier(0.4,0,0.2,1); }
+.press-sm:active { transform: scale(0.97); }
+
+/* Subtle lift used on interactive cards */
+.lift { transition: transform 0.16s cubic-bezier(0.16,1,0.3,1), box-shadow 0.16s ease, border-color 0.16s ease; }
+.lift:hover { transform: translateY(-2px); }
 
 /* ════════════════════════════════════════
    RESPONSIVE * mobile overrides

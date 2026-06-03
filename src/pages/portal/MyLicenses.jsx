@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import {
   MdBadge, MdDriveEta, MdPerson, MdLock,
   MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
@@ -35,10 +36,10 @@ const defaultExpiry = () => {
 /* ── Confirmation modal ── */
 function ConfirmModal({ onConfirm, onCancel }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
       onClick={e => e.target === e.currentTarget && onCancel()}>
-      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5"
+      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5 anim-sheet-in sm:anim-modal-in"
         style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.3)' }}>
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
@@ -53,11 +54,11 @@ function ConfirmModal({ onConfirm, onCancel }) {
         </div>
         <div className="flex gap-3">
           <button type="button" onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
             Go Back
           </button>
           <button type="button" onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
             Yes, Submit
           </button>
         </div>
@@ -309,6 +310,7 @@ function DLCard({ civ, onRenew }) {
 ══════════════════════════════════ */
 export default function MyLicenses() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const myChars   = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
   const dlTemplate = useMemo(() => (state.recordTemplates || []).find(t => t.dlTemplate) || null, [state.recordTemplates]);
 
@@ -333,12 +335,14 @@ export default function MyLicenses() {
     dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
     storeDLRecord(civilianId, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
+    toast.success(`${dlClass} license issued.`, { title: 'License Issued' });
   };
 
   const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry, templateFormData }) => {
     dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
     storeDLRecord(civilianId, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
+    toast.success(`License renewed — valid through ${dlExpiry}.`, { title: 'License Renewed' });
   };
 
   return (
