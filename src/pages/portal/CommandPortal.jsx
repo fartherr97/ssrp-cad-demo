@@ -8,6 +8,13 @@ import { useResponsive } from '../../hooks/useResponsive';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
 } from './PortalKit';
+import AccessDenied from './AccessDenied';
+
+/* Ranks that are considered command-level */
+const COMMAND_RANKS = [
+  'Sergeant', 'Lieutenant', 'Captain',
+  'Deputy Chief', 'Chief', 'Commander', 'Battalion Chief',
+];
 
 /* ── Status pill ── */
 const STATUS_META = {
@@ -613,10 +620,50 @@ export default function CommandPortal() {
   const { state } = useCAD();
   const {
     reports = [], officers = [], departments = [], calls = [],
-    reportTemplates = [], communityConfig,
+    currentUser,
   } = state;
 
-  const [activeTab, setActiveTab] = useState('Overview');
+  /* ── Access control ── */
+  const isAdmin = currentUser?.role === 'admin';
+  const myOfficer = useMemo(
+    () => officers.find(o => o.id === currentUser?.id),
+    [officers, currentUser]
+  );
+  const hasCommandAccess = isAdmin || (myOfficer && COMMAND_RANKS.includes(myOfficer.rank));
+
+  if (!hasCommandAccess) return <AccessDenied portalName="the Command Portal" />;
+
+  /* ── Department scoping ── */
+  const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
+
+  // Admins get a picker; everyone else is locked to their own dept
+  const [adminDeptId, setAdminDeptId] = useState(null); // null = all for admins
+
+  const scopeDeptId = isAdmin ? adminDeptId : (myOfficer?.dept ?? null);
+  const scopeDept   = departments.find(d => d.id === scopeDeptId) ?? null;
+
+  const scopedOfficers = useMemo(() => {
+    if (!scopeDeptId) return officers;
+    return officers.filter(o => o.dept === scopeDeptId);
+  }, [officers, scopeDeptId]);
+
+  const scopedBadges = useMemo(
+    () => new Set(scopedOfficers.map(o => o.badge)),
+    [scopedOfficers]
+  );
+
+  const scopedReports = useMemo(
+    () => reports.filter(r => scopedBadges.has(r.officerBadge)),
+    [reports, scopedBadges]
+  );
+
+  const scopedDepts = useMemo(() => {
+    if (!scopeDeptId) return departments;
+    return departments.filter(d => d.id === scopeDeptId);
+  }, [departments, scopeDeptId]);
+
+  /* ── UI state ── */
+  const [activeTab,   setActiveTab]   = useState('Overview');
   const [modalReport, setModalReport] = useState(null);
 
   const officerByBadge = useMemo(() => {
@@ -628,13 +675,30 @@ export default function CommandPortal() {
   const openReport = (r) => setModalReport(r);
   const closeModal = () => setModalReport(null);
 
+  /* ── Subtitle scope label ── */
+  const scopeLabel = scopeDept
+    ? `Viewing: ${scopeDept.short}`
+    : 'Viewing: All Departments';
+
+  const deptPicker = isAdmin && (
+    <select
+      className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer"
+      value={adminDeptId ?? ''}
+      onChange={e => setAdminDeptId(e.target.value ? Number(e.target.value) : null)}
+    >
+      <option value="">All Departments</option>
+      {leoDepts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+    </select>
+  );
+
   return (
     <PortalPage>
       <PortalHeader
         icon={MdShield}
         title="Command Portal"
-        subtitle="Officer compliance, report oversight, and force tracking."
+        subtitle={`Officer compliance, report oversight, and force tracking. · ${scopeLabel}`}
         accent="violet"
+        action={deptPicker}
       />
 
       {/* Tab bar */}
@@ -658,36 +722,36 @@ export default function CommandPortal() {
         })}
       </div>
 
-      {/* Tab content */}
+      {/* Tab content — all tabs receive scoped data */}
       {activeTab === 'Overview' && (
         <OverviewTab
-          reports={reports}
-          officers={officers}
-          departments={departments}
+          reports={scopedReports}
+          officers={scopedOfficers}
+          departments={scopedDepts}
           calls={calls}
           onOpenReport={openReport}
         />
       )}
       {activeTab === 'By Officer' && (
         <ByOfficerTab
-          reports={reports}
-          officers={officers}
-          departments={departments}
+          reports={scopedReports}
+          officers={scopedOfficers}
+          departments={scopedDepts}
           calls={calls}
           onOpenReport={openReport}
         />
       )}
       {activeTab === 'By Department' && (
         <ByDeptTab
-          reports={reports}
-          officers={officers}
-          departments={departments}
+          reports={scopedReports}
+          officers={scopedOfficers}
+          departments={scopedDepts}
         />
       )}
       {activeTab === 'UOF Tracker' && (
         <UofTrackerTab
-          reports={reports}
-          officers={officers}
+          reports={scopedReports}
+          officers={scopedOfficers}
           calls={calls}
           onOpenReport={openReport}
         />
