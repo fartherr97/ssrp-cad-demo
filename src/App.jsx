@@ -19,7 +19,6 @@ import PenalCodeEditor from './pages/PenalCodeEditor';
 import BanManagement from './pages/BanManagement';
 import LiveMap from './pages/LiveMap';
 import MDT from './pages/MDT';
-import FormBuilder from './pages/FormBuilder';
 import OfficerProfile from './pages/OfficerProfile';
 // Citizen portals
 import Supervisor from './pages/portal/Supervisor';
@@ -174,7 +173,6 @@ function CADApp() {
         </Route>
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />
-        <Route path="/builder"       element={<FormBuilder />} />
         <Route path="/profile"       element={<OfficerProfile />} />
 
         {/* ── Civilian portal ── */}

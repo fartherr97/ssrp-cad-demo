@@ -661,18 +661,81 @@ function MugshotField({ f, value, onChange, readOnly }) {
   );
 }
 
+/* ── Generic image upload field (landscape; spans by f.span) ── */
+function ImageField({ f, value, onChange, readOnly }) {
+  const fileRef = useRef(null);
+  const span = Math.min(f.span || 2, 4);
+  const cls = SPAN[span] || SPAN[2];
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) { alert('Image must be under 4 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => onChange(f.id, ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className={`flex flex-col min-w-0 ${cls}`}>
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+        <MdCameraAlt size={12} />
+        {f.label || 'Image'}{f.required && <span className="text-red-400"> *</span>}
+      </label>
+      <div
+        onClick={!readOnly && !value ? () => fileRef.current?.click() : undefined}
+        className="relative rounded-xl overflow-hidden border border-border-base flex flex-col items-center justify-center transition-colors"
+        style={{ background: '#0a1018', aspectRatio: '16 / 9', cursor: !readOnly && !value ? 'pointer' : 'default' }}
+        onMouseEnter={e => { if (!readOnly && !value) e.currentTarget.style.borderColor = 'rgba(61,130,240,0.5)'; }}
+        onMouseLeave={e => { if (!readOnly && !value) e.currentTarget.style.borderColor = ''; }}
+      >
+        {value ? (
+          <>
+            <img src={value} alt={f.label || 'Image'} className="absolute inset-0 w-full h-full object-cover" />
+            {!readOnly && (
+              <button type="button"
+                onClick={(e) => { e.stopPropagation(); onChange(f.id, null); fileRef.current && (fileRef.current.value = ''); }}
+                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer border-none z-10"
+                style={{ background: 'rgba(0,0,0,0.65)', color: '#f87171' }} title="Remove image">
+                <MdClose size={14} />
+              </button>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center gap-2 select-none px-3">
+            <MdCameraAlt size={28} style={{ color: '#2d3f52' }} />
+            <span className="text-[11px] font-semibold" style={{ color: '#3d5470' }}>
+              {readOnly ? 'No image on file' : (f.placeholder || 'Click to upload')}
+            </span>
+          </div>
+        )}
+      </div>
+      {!readOnly && (
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+          className="hidden" onChange={handleFile} onClick={e => { e.target.value = ''; }} />
+      )}
+    </div>
+  );
+}
+
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const { state } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
   const isSupOnly = !!f.supervisorOnly;
-  const effectiveReadOnly = readOnly || (isSupOnly && !isSupervisor);
+  // Honor the builder's field-level read-only flag in addition to supervisor gating.
+  const effectiveReadOnly = readOnly || !!f.readOnly || (isSupOnly && !isSupervisor);
 
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
 
-  // Mugshot — image upload
+  // Mugshot — portrait image upload
   if (f.type === 'mugshot') {
     return <MugshotField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
+  }
+
+  // Image — generic landscape image upload
+  if (f.type === 'image') {
+    return <ImageField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
   // Charges — full-width multi-select from penal code
@@ -736,15 +799,17 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
         <LookupField f={f} kind={lookupKind} value={value} data={data} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
       ) : isNarr ? (
         <textarea className={`${S_TEXTAREA} ${isSupOnly ? 'border-red-500/40' : ''}`} rows={f.minRows || 4}
+          placeholder={f.placeholder || ''}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
         <select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
-          <option value="">—</option>
+          <option value="">{f.placeholder || '—'}</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (
         <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''} ${isSupOnly ? 'border-red-500/40' : ''}`}
           style={f.type === 'datetime' || f.type === 'date' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}
+          placeholder={f.placeholder || ''}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       )}
     </div>
