@@ -109,47 +109,62 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
   return (
     <div className="flex flex-col h-full overflow-hidden font-ui">
 
-      {/* ── Top bar — mirrors ReportsCenter exactly ── */}
+      {/* ── Top bar ── */}
       <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
-        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 pt-2.5 pb-1.5">
+        {/* Row 1: back + title */}
+        <div className="flex items-center gap-2 px-4 pt-2.5 pb-1">
           <button type="button" onClick={onBack}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors mr-1">
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors shrink-0">
             <MdArrowBack size={14} /> Back
           </button>
+          <span className="text-slate-700 mx-1 hidden sm:block">|</span>
           {entry.kind === 'report'
-            ? <MdDescription size={18} className="text-brand-bright shrink-0" />
-            : <MdFolder size={18} className="text-violet-400 shrink-0" />}
-          <span className="text-[13px] font-bold text-white uppercase tracking-[0.4px]">Supervisor Review</span>
-          <span className="text-[11px] text-slate-500">{entry.type}</span>
-          <span className="ml-auto flex items-center gap-2">
-            {saved && (
-              <span className="flex items-center gap-1 text-[11px] text-green-400 font-semibold">
-                <MdCheckCircle size={13} /> Saved
-              </span>
-            )}
-            <button type="button" onClick={handleExport} disabled={pdfLoading}
-              className={xs(S_BTN_SECONDARY)}>
-              <MdDownload size={13} /> {pdfLoading ? '…' : 'PDF'}
-            </button>
-            <button type="button" onClick={() => setReturning(v => !v)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-all border-0 ${returning ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-400 hover:bg-amber-500/25'}`}>
-              <MdReply size={13} /> Return to Officer
-            </button>
-            <button type="button" onClick={handleSave}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0">
-              <MdSave size={13} /> Save Changes
-            </button>
-          </span>
+            ? <MdDescription size={16} className="text-brand-bright shrink-0 hidden sm:block" />
+            : <MdFolder size={16} className="text-violet-400 shrink-0 hidden sm:block" />}
+          <span className="text-[12px] font-bold text-white uppercase tracking-[0.4px] truncate">Supervisor Review</span>
+          <span className="text-[11px] text-slate-500 truncate hidden sm:block">{entry.type}</span>
+          {saved && (
+            <span className="ml-auto flex items-center gap-1 text-[10px] text-green-400 font-semibold shrink-0">
+              <MdCheckCircle size={12} /> Saved
+            </span>
+          )}
+        </div>
+        {/* Row 2: actions */}
+        <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto">
+          <span className="text-[11px] text-slate-500 truncate mr-auto sm:hidden">{entry.type}</span>
+          <button type="button" onClick={handleExport} disabled={pdfLoading}
+            className={xs(S_BTN_SECONDARY) + ' shrink-0'}>
+            <MdDownload size={13} /> {pdfLoading ? '…' : 'PDF'}
+          </button>
+          <button type="button" onClick={() => setReturning(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25">
+            <MdReply size={13} /> Return to Officer
+          </button>
+          <button type="button" onClick={handleSave}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0">
+            <MdSave size={13} /> Save Changes
+          </button>
         </div>
       </div>
 
+      {/* ── Mobile-only compact meta strip ── */}
+      <div className="xl:hidden shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-border-faint overflow-x-auto"
+        style={{ background: 'rgba(0,0,0,0.2)' }}>
+        <StatusPill status={effectiveStatus} />
+        <span className="text-[11px] font-mono text-slate-400 shrink-0">{entry.caseNumber || '—'}</span>
+        <span className="text-[11px] text-slate-500 shrink-0">·</span>
+        <span className="text-[11px] text-slate-400 shrink-0">
+          {officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—')}
+        </span>
+        {effectiveSupSig && <span className="text-[10px] text-green-400 font-bold shrink-0 ml-auto">✓ Signed</span>}
+      </div>
+
       {/* ── Body: left sidebar + center form + right sidebar ──
-           Mobile: outer div scrolls everything (overflow-auto, no inner overflow-hidden)
-           Desktop xl: each column scrolls independently (outer overflow-hidden, inner overflow-auto) ── */}
+           Mobile: outer div scrolls everything; xl: each col scrolls independently ── */}
       <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[240px_minmax(0,1fr)_260px] overflow-auto xl:overflow-hidden">
 
-        {/* LEFT: case meta */}
-        <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto xl:max-h-full">
+        {/* LEFT: case meta — desktop only */}
+        <aside className="hidden xl:flex flex-col border-r border-border-base bg-app-panel/60 overflow-y-auto max-h-full">
           <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
           <div className="px-4">
             {[
@@ -169,8 +184,8 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
 
         {/* CENTER: dark form (same as report writing) */}
         <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
-          {/* Status bar */}
-          <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
+          {/* Status bar — hidden on mobile (compact strip above handles it) */}
+          <div className="hidden xl:grid shrink-0 grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div>
               <div className="mt-1"><StatusPill status={effectiveStatus} /></div>
@@ -272,11 +287,10 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
           </div>
         </main>
 
-        {/* RIGHT: officer / record info */}
-        <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto xl:max-h-full">
+        {/* RIGHT: officer / record info — desktop only */}
+        <aside className="hidden xl:flex flex-col border-l border-border-base bg-app-panel/60 overflow-y-auto max-h-full">
           <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Info</div>
           <div className="p-3 flex flex-col gap-3">
-            {/* Submitting officer */}
             <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
               <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Submitted By</div>
               <div className="flex items-center gap-2.5">
@@ -289,7 +303,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 </div>
               </div>
             </div>
-            {/* Sig status */}
             <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
               <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Signatures</div>
               <div className="flex flex-col gap-1.5">
@@ -303,8 +316,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 </div>
               </div>
             </div>
-
-            {/* Previous supervisor comments */}
             {(entry.supervisorComments || []).length > 0 && (
               <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
@@ -321,35 +332,67 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 </div>
               </div>
             )}
-
-            {/* Return to officer — expandable panel */}
-            {returning && (
-              <div className="rounded-xl p-3" style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.28)' }}>
-                <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-amber-500 mb-2">Return Note *</div>
-                <textarea
-                  className="w-full text-[12px] text-slate-200 rounded-lg px-2.5 py-2 resize-none outline-none placeholder:text-slate-600"
-                  style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(251,146,60,0.25)', minHeight: 80 }}
-                  placeholder="Explain what needs to be corrected…"
-                  value={commentDraft}
-                  onChange={e => setCommentDraft(e.target.value)}
-                />
-                <div className="flex gap-2 mt-2">
-                  <button type="button" onClick={() => setReturning(false)}
-                    className="flex-1 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>
-                    Cancel
-                  </button>
-                  <button type="button" onClick={handleReturn} disabled={!commentDraft.trim()}
-                    className="flex-1 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-40"
-                    style={{ background: 'rgba(251,146,60,0.18)', border: '1px solid rgba(251,146,60,0.40)', color: '#fb923c' }}>
-                    <MdReply size={11} style={{ display: 'inline', marginRight: 4 }} />Send Return
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </aside>
       </div>
+
+      {/* ── Return to Officer modal — works on all screen sizes ── */}
+      {returning && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)' }}
+          onClick={e => e.target === e.currentTarget && setReturning(false)}>
+          <div className="w-full sm:max-w-[480px] rounded-t-2xl sm:rounded-xl p-5 flex flex-col gap-4"
+            style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.25)' }}>
+            <div className="flex items-center gap-2">
+              <MdReply size={18} className="text-amber-400 shrink-0" />
+              <span className="text-[14px] font-bold text-white flex-1">Return Report to Officer</span>
+              <button type="button" onClick={() => setReturning(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 4 }}>
+                <MdComment size={16} className="text-slate-500 hover:text-slate-300" />
+              </button>
+            </div>
+            <div className="text-[11.5px] text-slate-400 -mt-1">
+              <span className="font-semibold text-amber-400">{officer?.name || entry.officerBadge}</span>
+              &nbsp;· {entry.type} · {entry.caseNumber}
+            </div>
+            {/* Show prior notes if any */}
+            {(entry.supervisorComments || []).length > 0 && (
+              <div className="flex flex-col gap-1.5 max-h-28 overflow-y-auto rounded-lg px-3 py-2.5"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Prior notes</div>
+                {(entry.supervisorComments || []).map(c => (
+                  <div key={c.id} className="text-[11px] text-slate-400 leading-snug">
+                    <span className="text-slate-500 font-mono">{c.supervisorBadge}:</span> {c.text}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-amber-500 mb-2">What needs to be corrected? *</div>
+              <textarea
+                autoFocus
+                className="w-full text-[13px] text-slate-200 rounded-xl px-3.5 py-3 resize-none outline-none placeholder:text-slate-600"
+                style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(251,146,60,0.28)', minHeight: 100 }}
+                placeholder="Describe what the officer needs to fix before this report can be approved…"
+                value={commentDraft}
+                onChange={e => setCommentDraft(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setReturning(false)}
+                className="flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>
+                Cancel
+              </button>
+              <button type="button" onClick={handleReturn} disabled={!commentDraft.trim()}
+                className="flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40"
+                style={{ background: 'rgba(251,146,60,0.20)', border: '1px solid rgba(251,146,60,0.45)', color: '#fb923c' }}>
+                <MdReply size={13} style={{ display: 'inline', marginRight: 5 }} />Send Return
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
