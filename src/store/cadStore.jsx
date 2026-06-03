@@ -51,6 +51,17 @@ const initialState = {
       status: 'PENDING', createdAt: Date.now() - 8 * 60000,
     },
   ],
+  // LEO → HCFR assistance requests (seed one tied to the domestic call)
+  hcfrRequests: [
+    {
+      id: 'HCFR-2601', assistType: 'Medical Assist',
+      location: '412 Oakwood Ave', postal: '348', priority: 1,
+      description: 'Subject on scene may have sustained injuries during domestic incident. Requesting EMS evaluation before transport.',
+      callId: '26-1043', callNature: 'Domestic Disturbance',
+      requestedBy: 'James Reeves', requestedByBadge: 'TPD-831', requestedByUnit: 'TPD-831',
+      status: 'PENDING', createdAt: Date.now() - 5 * 60000,
+    },
+  ],
   departments: DEPARTMENTS,
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
@@ -781,6 +792,33 @@ function reducer(state, action) {
         );
       }
       return { ...state, fdotRequests, ...log };
+    }
+
+    case 'ADD_HCFR_REQUEST': {
+      const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+      const log = addDispatchLog(
+        state,
+        `HCFR assistance requested — ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        'alert'
+      );
+      return { ...state, hcfrRequests: [req, ...(state.hcfrRequests || [])], nextId: state.nextId + 1, ...log };
+    }
+    case 'UPDATE_HCFR_REQUEST': {
+      const prev = (state.hcfrRequests || []).find(r => r.id === action.payload.id);
+      const hcfrRequests = (state.hcfrRequests || []).map(r => r.id === action.payload.id ? { ...r, ...action.payload } : r);
+      let log = {};
+      if (prev && action.payload.status && action.payload.status !== prev.status) {
+        const verb = {
+          ACKNOWLEDGED: 'acknowledged', DISPATCHED: 'dispatched a unit for',
+          DECLINED: 'declined', COMPLETED: 'completed',
+        }[action.payload.status] || 'updated';
+        log = addDispatchLog(
+          state,
+          `HCFR ${verb} assistance request${prev.callId ? ` for Call ${prev.callId}` : ''} (${prev.assistType || 'Assist'} @ ${prev.location})`,
+          action.payload.status === 'DECLINED' ? 'alert' : 'unit'
+        );
+      }
+      return { ...state, hcfrRequests, ...log };
     }
 
     case 'ADD_CUSTOM_RECORD_TYPE': {

@@ -4,7 +4,8 @@ import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import RequestFDOTModal from '../components/RequestFDOTModal';
-import { MdEngineering } from 'react-icons/md';
+import RequestHCFRModal from '../components/RequestHCFRModal';
+import { MdEngineering, MdLocalFireDepartment } from 'react-icons/md';
 import {
   cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL,
   S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_PRIMARY, sm,
@@ -61,17 +62,19 @@ const FDOT_REQ_META = {
 export default function IncidentDetail() {
   const { callId } = useParams();
   const { state, dispatch } = useCAD();
-  const { calls, officers, dispatchLog, currentUser, fdotRequests = [] } = state;
+  const { calls, officers, dispatchLog, currentUser, fdotRequests = [], hcfrRequests = [] } = state;
   const navigate = useNavigate();
   const toast = useToast();
 
   const [radioMsg, setRadioMsg] = useState('');
-  const [showFdot, setShowFdot] = useState(false);
+  const [showFdot, setShowFdot]   = useState(false);
+  const [showHcfr, setShowHcfr]   = useState(false);
 
   const call = calls.find(c => c.id === callId);
   const me = officers.find(o => o.id === currentUser?.id);
   // Most recent FDOT request tied to this call (any status).
-  const fdotReq = fdotRequests.find(r => r.callId === callId);
+  const fdotReq  = fdotRequests.find(r => r.callId === callId);
+  const hcfrReq  = hcfrRequests.find(r => r.callId === callId);
   const isDispatch = currentUser?.portal === 'dispatch' || currentUser?.portal === 'admin' || currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
   const onDutyOfficers = officers.filter(o => o.status !== 'OFFDUTY');
   const availableUnits = onDutyOfficers.filter(o => (o.status === 'AVAILABLE' || o.status === 'ENRT') && !call?.units.includes(o.unitId));
@@ -161,6 +164,15 @@ export default function IncidentDetail() {
           <MdEngineering size={15} /> REQUEST FDOT
         </button>
 
+        <button
+          onClick={() => setShowHcfr(true)}
+          disabled={!!hcfrReq && !['DECLINED', 'COMPLETED'].includes(hcfrReq.status)}
+          title={hcfrReq && !['DECLINED', 'COMPLETED'].includes(hcfrReq.status) ? 'HCFR already requested for this call' : 'Request HCFR assistance'}
+          className="press shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer bg-red-500/15 border border-red-500/35 text-red-400 hover:bg-red-500/25 transition-colors disabled:opacity-45 disabled:cursor-default"
+        >
+          <MdLocalFireDepartment size={15} /> REQUEST HCFR
+        </button>
+
         {isDispatch && (
           <button
             className={`press ${sm(S_BTN_DANGER)} shrink-0`}
@@ -193,8 +205,40 @@ export default function IncidentDetail() {
         );
       })()}
 
+      {/* ── HCFR request status banner ── */}
+      {hcfrReq && (() => {
+        const HCFR_META = {
+          PENDING:      { label: 'HCFR Requested — Pending',  color: '#ef4444' },
+          ACKNOWLEDGED: { label: 'HCFR Acknowledged',         color: '#06b6d4' },
+          DISPATCHED:   { label: 'HCFR Unit Dispatched',      color: '#22c55e' },
+          COMPLETED:    { label: 'HCFR Assist Completed',     color: '#6b7280' },
+          DECLINED:     { label: 'HCFR Declined Request',     color: '#ef4444' },
+        };
+        const m = HCFR_META[hcfrReq.status] || HCFR_META.PENDING;
+        return (
+          <div className="shrink-0 flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: `${m.color}14`, border: `1px solid ${m.color}40`, borderLeft: `3px solid ${m.color}` }}>
+            <MdLocalFireDepartment size={18} style={{ color: m.color }} className="shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[12.5px] font-bold" style={{ color: m.color }}>{m.label}</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/[0.06] text-slate-400">P{hcfrReq.priority}</span>
+                <span className="text-[11px] text-slate-500">{hcfrReq.assistType}</span>
+              </div>
+              <div className="text-[11.5px] text-slate-400 mt-0.5 leading-relaxed">{hcfrReq.description}</div>
+              <div className="text-[10.5px] text-slate-600 mt-0.5">
+                Requested by {hcfrReq.requestedBy}{hcfrReq.requestedByUnit ? ` (${hcfrReq.requestedByUnit})` : ''}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {showFdot && (
         <RequestFDOTModal call={call} officer={me} onClose={() => setShowFdot(false)} />
+      )}
+      {showHcfr && (
+        <RequestHCFRModal call={call} officer={me} onClose={() => setShowHcfr(false)} />
       )}
 
       {/* ── Body: 3-column layout ── */}
