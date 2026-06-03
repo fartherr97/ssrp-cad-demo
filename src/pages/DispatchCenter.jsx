@@ -14,7 +14,7 @@ import {
   MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong, MdCampaign,
   MdGpsFixed, MdSos, MdCheckCircle, MdDirectionsCar, MdWarningAmber,
   MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
-  MdPhone, MdSend, MdClose, MdAdd,
+  MdPhone, MdSend, MdClose, MdAdd, MdCircle, MdRadio,
 } from 'react-icons/md';
 import ModifyIdentifier from '../components/ModifyIdentifier';
 
@@ -41,9 +41,18 @@ const StatusBadge = ({ status }) => <span className={cadStatus(status)}>{CAD_STA
 const CallStatus  = ({ status }) => <span className={cadCallStatus(status)}>{status}</span>;
 const PriBadge    = ({ p }) => <span className={cadPri(p)}>P{p}</span>;
 
-const UNIT_STATUSES = ['AVAILABLE','BUSY','ENRT','UNAVAILABLE','OFFDUTY'];
+// Icons are matched to the standard status codes; admin-defined custom codes
+// fall back to a neutral dot. Labels/colors/order come from admin config.
+const STATUS_ICONS = {
+  AVAILABLE:   MdCheckCircle,
+  ENRT:        MdDirectionsCar,
+  BUSY:        MdWarningAmber,
+  ARRVD:       MdLocationOn,
+  UNAVAILABLE: MdDoNotDisturb,
+  OFFDUTY:     MdPowerSettingsNew,
+};
 
-function DispatchStatusPicker({ unit, onSet }) {
+function DispatchStatusPicker({ unit, onSet, options }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative inline-block">
@@ -56,14 +65,17 @@ function DispatchStatusPicker({ unit, onSet }) {
           <div className="fixed inset-0 z-[49]" onClick={() => setOpen(false)} />
           <div className="absolute left-0 top-full mt-1 z-50 flex flex-col gap-0.5 p-1.5 rounded-xl shadow-2xl min-w-[130px]"
             style={{ background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.12)' }}>
-            {UNIT_STATUSES.map(s => (
-              <button key={s} type="button"
-                onClick={e => { e.stopPropagation(); onSet(unit.unitId, s); setOpen(false); }}
-                className="text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold w-full"
-                style={{ cursor: 'pointer', background: unit.status === s ? 'rgba(58,136,232,0.15)' : 'transparent', border: 'none', color: unit.status === s ? '#3a88e8' : '#94a3b8' }}>
-                {CAD_STATUS_LABEL[s] || s}
-              </button>
-            ))}
+            {options.map(s => {
+              const on = unit.status === s.code;
+              return (
+                <button key={s.code} type="button"
+                  onClick={e => { e.stopPropagation(); onSet(unit.unitId, s.code); setOpen(false); }}
+                  className="text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold w-full"
+                  style={{ cursor: 'pointer', background: on ? `${s.color}22` : 'transparent', border: 'none', color: on ? s.color : '#94a3b8' }}>
+                  {s.label}
+                </button>
+              );
+            })}
           </div>
         </>
       )}
@@ -92,6 +104,42 @@ function SectionCard({ title, count, action, onAction, children, className = '' 
   );
 }
 
+/* Admin-configured 10-code radio reference (collapsible + searchable). */
+function TenCodeReference({ codes }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  if (!codes.length) return null;
+  const filtered = q.trim()
+    ? codes.filter(c => c.code.toLowerCase().includes(q.toLowerCase()) || c.label.toLowerCase().includes(q.toLowerCase()))
+    : codes;
+  return (
+    <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
+      <button onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0 text-left">
+        <MdRadio size={13} className="text-brand-bright" />
+        <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">10-Codes</div>
+        <span className="px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[10px] font-bold leading-none">{codes.length}</span>
+        <MdAdd size={14} className={`text-slate-500 transition-transform ${open ? 'rotate-45' : ''}`} />
+      </button>
+      {open && (
+        <>
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search codes…"
+            className="w-full bg-app-input border border-border-base focus:border-brand/50 rounded-lg px-2.5 py-1.5 text-[11.5px] text-white placeholder:text-slate-600 outline-none" />
+          <div className="flex flex-col gap-0.5 max-h-[260px] overflow-y-auto -mx-1 px-1">
+            {filtered.map(c => (
+              <div key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.04]">
+                <span className="font-mono font-bold text-[11px] text-brand-bright shrink-0 w-12">{c.code}</span>
+                <span className="text-[11.5px] text-slate-300 truncate">{c.label}</span>
+              </div>
+            ))}
+            {filtered.length === 0 && <div className="text-center text-slate-600 text-[11px] py-2">No codes match</div>}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function QuickAction({ Icon, label, onClick }) {
   return (
     <button onClick={onClick}
@@ -111,15 +159,6 @@ function Stat({ label, value, sub, color = '#ffffff' }) {
     </div>
   );
 }
-
-const STATUS_BTNS = [
-  { status: 'AVAILABLE',   label: 'Available',   Icon: MdCheckCircle      },
-  { status: 'ENRT',        label: 'En Route',    Icon: MdDirectionsCar    },
-  { status: 'BUSY',        label: 'Busy',        Icon: MdWarningAmber     },
-  { status: 'ARRVD',       label: 'On Scene',    Icon: MdLocationOn       },
-  { status: 'UNAVAILABLE', label: 'Unavailable', Icon: MdDoNotDisturb     },
-  { status: 'OFFDUTY',     label: 'Off Duty',    Icon: MdPowerSettingsNew },
-];
 
 const NOTIF_COLOR = {
   alert: '#f87171', call: '#fb923c', unit: '#4ade80',
@@ -344,7 +383,11 @@ function Sim911Modal({ onClose }) {
 
 export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
-  const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [] } = state;
+  const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [],
+    unitStatusCodes = [], tenCodes = [] } = state;
+  // Status menu/badges are driven by admin-configured unit status codes.
+  const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
+  const statusColor = (code) => unitStatusCodes.find(s => s.code === code)?.color || STATUS_COLORS[code] || '#fff';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -447,6 +490,9 @@ export default function DispatchCenter() {
             </div>
           </div>
 
+          {/* 10-code radio reference (admin-configured) */}
+          <TenCodeReference codes={tenCodes} />
+
           {/* Incoming 911 — dispatcher only */}
           {isDispatcher && (
             <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
@@ -483,11 +529,11 @@ export default function DispatchCenter() {
                 </button>
               )}
               <div className="grid grid-cols-2 gap-1.5">
-                {STATUS_BTNS.map(s => {
-                  const on = myStatus === s.status;
-                  const c = STATUS_COLORS[s.status];
+                {statusOptions.map(s => {
+                  const on = myStatus === s.code;
+                  const c = s.color;
                   return (
-                    <button key={s.status} onClick={() => setStatus(s.status)}
+                    <button key={s.code} onClick={() => setStatus(s.code)}
                       className={`flex items-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? '' : 'border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
                       style={on ? { background: `${c}22`, borderColor: `${c}55`, color: c } : undefined}>
                       <s.Icon size={14} style={on ? { color: c } : undefined} /> {s.label}
@@ -571,10 +617,10 @@ export default function DispatchCenter() {
                         onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                         onClick={() => o.callId && navigate('/cad/' + o.callId)}>
                         <td className="px-4 py-2.5 text-[12.5px] font-mono font-bold text-white whitespace-nowrap"
-                          style={{ color: STATUS_COLORS[o.status] || '#fff' }}>{o.unitId}</td>
+                          style={{ color: statusColor(o.status) }}>{o.unitId}</td>
                         <td className="px-4 py-2.5">
                           {isDispatcher
-                            ? <DispatchStatusPicker unit={o} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
+                            ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
                             : <StatusBadge status={o.status} />}
                         </td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>

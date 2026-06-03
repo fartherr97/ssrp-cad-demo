@@ -8,8 +8,18 @@ import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
-  MdMenu, MdClose,
+  MdMenu, MdClose, MdCircle,
 } from 'react-icons/md';
+
+// Icons matched to standard status codes; custom admin codes fall back to a dot.
+const STATUS_ICONS = {
+  AVAILABLE:   MdCheckCircle,
+  ENRT:        MdDirectionsCar,
+  BUSY:        MdWarningAmber,
+  ARRVD:       MdLocationOn,
+  UNAVAILABLE: MdDoNotDisturb,
+  OFFDUTY:     MdPowerSettingsNew,
+};
 
 /* ─── Clock (date over time) ─── */
 function Clock() {
@@ -112,17 +122,8 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
   );
 }
 
-const STATUS_BTNS = [
-  { status: 'AVAILABLE',   label: 'Available',   Icon: MdCheckCircle      },
-  { status: 'ENRT',        label: 'En Route',    Icon: MdDirectionsCar    },
-  { status: 'BUSY',        label: 'Busy',        Icon: MdWarningAmber     },
-  { status: 'ARRVD',       label: 'On Scene',    Icon: MdLocationOn       },
-  { status: 'UNAVAILABLE', label: 'Unavailable', Icon: MdDoNotDisturb     },
-  { status: 'OFFDUTY',     label: 'Off Duty',    Icon: MdPowerSettingsNew },
-];
-
 /* ─── User chip with dropdown (status, panic, profile, portal, sign-out) ─── */
-function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isActive }) {
+function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, navigate, isActive }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const [hoveredStatus, setHoveredStatus] = useState(null);
@@ -150,7 +151,7 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
   const toggle = () => open ? doClose() : openMenu();
 
-  const dot = STATUS_COLORS[myStatus] || '#94a3b8';
+  const dot = statusOptions.find(s => s.code === myStatus)?.color || STATUS_COLORS[myStatus] || '#94a3b8';
   const setStatus = (s) => { dispatch({ type: 'SET_STATUS', payload: s }); };
   const triggerPanic = () => {
     dispatch({
@@ -206,14 +207,15 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
             <>
               <div className="px-2.5 pt-1.5 pb-1 text-[9px] font-bold uppercase tracking-[0.6px] text-slate-600">Set Status</div>
               <div className="grid grid-cols-2 gap-1 px-1 pb-1.5">
-                {STATUS_BTNS.map(s => {
-                  const on = myStatus === s.status;
-                  const hov = hoveredStatus === s.status;
-                  const c = STATUS_COLORS[s.status];
+                {statusOptions.map(s => {
+                  const on = myStatus === s.code;
+                  const hov = hoveredStatus === s.code;
+                  const c = s.color;
                   const lit = on || hov;
+                  const Icon = s.Icon;
                   return (
-                    <button key={s.status} onClick={() => setStatus(s.status)}
-                      onMouseEnter={() => setHoveredStatus(s.status)}
+                    <button key={s.code} onClick={() => setStatus(s.code)}
+                      onMouseEnter={() => setHoveredStatus(s.code)}
                       onMouseLeave={() => setHoveredStatus(null)}
                       className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all duration-75 border"
                       style={lit
@@ -221,7 +223,7 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
                         : { borderColor: 'transparent', color: '#94a3b8' }
                       }
                     >
-                      <s.Icon size={14} style={{ color: lit ? c : '#94a3b8', transition: 'color 0.075s' }} />
+                      <Icon size={14} style={{ color: lit ? c : '#94a3b8', transition: 'color 0.075s' }} />
                       {s.label}
                     </button>
                   );
@@ -256,7 +258,8 @@ function UserChip({ currentUser, portal, me, myStatus, dispatch, navigate, isAct
 
 export default function ActionBar() {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, reportTemplates, recordTemplates } = state;
+  const { currentUser, officers, reportTemplates, recordTemplates, unitStatusCodes = [] } = state;
+  const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -335,7 +338,7 @@ export default function ActionBar() {
       <div className="ml-auto flex items-center shrink-0 pl-2">
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
-        <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus}
+        <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}
         <button onClick={() => setMobileOpen(o => !o)}
