@@ -154,7 +154,7 @@ function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
         </div>
       </div>
 
-      <div className="text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
+      <div className="flex-1 text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
 
       <div className="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap">
         <MdPerson size={13} className="shrink-0" />
@@ -166,7 +166,7 @@ function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
         )}
       </div>
 
-      <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? 'repeat(3, 1fr)' : '1fr 1fr' }}>
+      <div className="mt-auto grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? 'repeat(3, 1fr)' : '1fr 1fr' }}>
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
             className="btn-glossy inline-flex items-center justify-center gap-1 px-2 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-transparent bg-cyan-500/20 text-cyan-200 hover:bg-cyan-500/30 whitespace-nowrap">
