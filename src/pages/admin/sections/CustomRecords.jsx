@@ -146,10 +146,8 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
     <div className="rounded-lg mb-1.5 overflow-hidden"
       style={{ border: `1px solid ${showOpts ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.07)'}` }}>
 
-      {/* Main row */}
-      <div className="flex items-center gap-1.5 px-2 py-1.5" style={{ background: '#0a1520' }}>
-
-        {/* Type selector */}
+      {/* Row 1: type selector + label */}
+      <div className="flex items-center gap-1.5 px-2 pt-1.5 pb-1" style={{ background: '#0a1520' }}>
         <select
           value={field.type}
           onChange={e => onUpdate({ ...field, type: e.target.value })}
@@ -166,8 +164,6 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
             </option>
           ))}
         </select>
-
-        {/* Label */}
         <input
           className="flex-1 bg-transparent text-[12px] outline-none min-w-0 border-b border-transparent focus:border-white/20 transition-colors"
           style={{ color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
@@ -175,15 +171,17 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           value={field.label || ''}
           onChange={e => onUpdate({ ...field, label: e.target.value })}
         />
+      </div>
 
-        {/* Width span buttons */}
-        <div className="flex gap-0.5 shrink-0">
+      {/* Row 2: span buttons | toggles | opts | reorder/delete */}
+      <div className="flex items-center gap-1 px-2 pb-1.5" style={{ background: '#0a1520' }}>
+        <div className="flex gap-0.5 mr-auto">
           {[1,2,3,4].map(n => (
             <button key={n} type="button"
               onClick={() => onUpdate({ ...field, span: n })}
               className="rounded text-[10px] font-bold border-none cursor-pointer"
               style={{
-                width: 18, height: 22,
+                width: 20, height: 22,
                 background: (field.span || 2) === n ? 'rgba(61,130,240,0.25)' : 'rgba(255,255,255,0.05)',
                 color: (field.span || 2) === n ? '#3d82f0' : '#4a5568',
                 border: `1px solid ${(field.span || 2) === n ? 'rgba(61,130,240,0.4)' : 'rgba(255,255,255,0.08)'}`,
@@ -192,17 +190,13 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
             </button>
           ))}
         </div>
-
-        {/* Property toggles */}
-        <div className="flex gap-0.5 shrink-0">
-          <IconBtn icon={MdStar}        onClick={() => tog('required')}      active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
-          <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}      active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
-          <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')}active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
-          <IconBtn icon={MdSearch}      onClick={() => tog('showInLookup')}  active={!!field.showInLookup}   activeColor="#22c55e" title="Show in Lookup"  size={12} />
-          <IconBtn icon={MdLink}        onClick={() => tog('unique')}        active={!!field.unique}         activeColor="#a78bfa" title="Unique"          size={12} />
+        <div className="flex gap-0.5">
+          <IconBtn icon={MdStar}        onClick={() => tog('required')}       active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
+          <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}       active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
+          <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')} active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
+          <IconBtn icon={MdSearch}      onClick={() => tog('showInLookup')}   active={!!field.showInLookup}   activeColor="#22c55e" title="Show in Lookup"  size={12} />
+          <IconBtn icon={MdLink}        onClick={() => tog('unique')}         active={!!field.unique}         activeColor="#a78bfa" title="Unique"          size={12} />
         </div>
-
-        {/* Opts toggle (all types) */}
         <button type="button" onClick={() => setShowOpts(o => !o)}
           className="px-2 py-0.5 rounded text-[9.5px] font-bold border-none cursor-pointer shrink-0 transition-colors"
           style={{
@@ -212,9 +206,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
           }}>
           OPTS
         </button>
-
-        {/* Reorder + delete */}
-        <div className="flex gap-0.5 shrink-0">
+        <div className="flex gap-0.5">
           <IconBtn icon={MdArrowUpward}   onClick={onMoveUp}   title="Move up"   size={12} />
           <IconBtn icon={MdArrowDownward} onClick={onMoveDown} title="Move down" size={12} />
           <IconBtn icon={MdDelete}        onClick={onDelete}   title="Remove"    size={12}
@@ -713,6 +705,7 @@ export default function CustomRecords() {
   const [typeFilter, setTypeFilter]       = useState('all');
   const [draft, setDraft]                 = useState(null);
   const [editingMeta, setEditingMeta]     = useState(null); // { id, isReport, isNew }
+  const [mobileView, setMobileView]       = useState('list'); // 'list' | 'editor' | 'preview'
 
   const allTemplates = [
     ...reportTemplates.map(t => ({ ...t, _kind: 'report' })),
@@ -722,6 +715,7 @@ export default function CustomRecords() {
   const selectTemplate = (t) => {
     setDraft(JSON.parse(JSON.stringify(t)));
     setEditingMeta({ id: t.id, isReport: t._kind === 'report', isNew: false });
+    setMobileView('editor');
   };
 
   const createTemplate = (isReport) => {
@@ -729,6 +723,7 @@ export default function CustomRecords() {
     const blank = { id: `tpl_${Date.now()}`, name: '', formCode: nextCode, sections: [] };
     setDraft(blank);
     setEditingMeta({ id: blank.id, isReport, isNew: true });
+    setMobileView('editor');
   };
 
   const saveTemplate = () => {
@@ -747,7 +742,13 @@ export default function CustomRecords() {
   const deleteTemplate = (tpl) => {
     if (!confirm(`Delete "${tpl.name}"?`)) return;
     dispatch({ type: tpl._kind === 'report' ? 'DELETE_REPORT_TEMPLATE' : 'DELETE_RECORD_TEMPLATE', payload: tpl.id });
-    if (editingMeta?.id === tpl.id) { setDraft(null); setEditingMeta(null); }
+    if (editingMeta?.id === tpl.id) { setDraft(null); setEditingMeta(null); setMobileView('list'); }
+  };
+
+  const handleClose = () => {
+    setDraft(null);
+    setEditingMeta(null);
+    setMobileView('list');
   };
 
   const duplicateTemplate = (tpl) => {
@@ -757,12 +758,11 @@ export default function CustomRecords() {
   };
 
   return (
-    /* Negate AdminContent's p-6 padding so the builder is flush */
     <div className="-m-3 md:-m-6 flex overflow-hidden font-ui"
       style={{ height: 'calc(100vh - 56px)', background: '#08111d' }}>
 
-      {/* Left: record list (260px fixed) */}
-      <div className="shrink-0 flex flex-col" style={{ width: 260 }}>
+      {/* LIST PANEL — mobile: full width on 'list' view; xl+: fixed 260px sidebar */}
+      <div className={`flex-col overflow-hidden xl:flex xl:shrink-0 xl:w-[260px] ${mobileView === 'list' ? 'flex flex-1' : 'hidden xl:flex'}`}>
         <RecordListPanel
           templates={allTemplates}
           selectedId={editingMeta?.id}
@@ -775,28 +775,57 @@ export default function CustomRecords() {
         />
       </div>
 
-      {/* Right: editor + preview (or empty state) */}
-      {draft ? (
-        <div className="flex-1 min-w-0 grid overflow-hidden" style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <TemplateEditor
-            key={editingMeta.id}
-            draft={draft}
-            onChange={setDraft}
-            isReport={editingMeta.isReport}
-            isNew={editingMeta.isNew}
-            onSave={saveTemplate}
-            onClose={() => { setDraft(null); setEditingMeta(null); }}
-          />
-          <PreviewPanel draft={draft} />
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3"
-          style={{ color: '#2d3f52' }}>
-          <MdEdit size={44} style={{ opacity: 0.18 }} />
-          <div className="text-[14px] font-semibold" style={{ color: '#3d5470' }}>Select a record type to edit</div>
-          <div className="text-[11px]">or create a new Report / Record using the buttons on the left</div>
-        </div>
-      )}
+      {/* BUILDER + PREVIEW AREA — mobile: hidden on list view; xl+: always flex-1 */}
+      <div className={`xl:flex xl:flex-col xl:flex-1 xl:min-w-0 xl:overflow-hidden ${mobileView !== 'list' ? 'flex flex-col flex-1 min-w-0 overflow-hidden' : 'hidden xl:flex'}`}>
+        {draft ? (
+          <>
+            {/* Mobile top nav: Back button + Builder/Preview tabs */}
+            <div className="xl:hidden shrink-0 flex items-center border-b"
+              style={{ background: '#0d1930', borderColor: 'rgba(255,255,255,0.09)' }}>
+              <button type="button" onClick={() => setMobileView('list')}
+                className="flex items-center gap-1 px-3 py-2.5 text-[11px] font-bold shrink-0 border-r"
+                style={{ color: '#4a5568', borderColor: 'rgba(255,255,255,0.08)' }}>
+                <MdChevronRight size={14} style={{ transform: 'rotate(180deg)' }} /> Back
+              </button>
+              {['editor', 'preview'].map(v => (
+                <button key={v} type="button" onClick={() => setMobileView(v)}
+                  className="flex-1 py-2.5 text-[11px] font-bold uppercase tracking-[0.5px] border-b-2 transition-colors"
+                  style={{
+                    color: mobileView === v ? (v === 'editor' ? '#3d82f0' : '#ef4444') : '#4a5568',
+                    borderColor: mobileView === v ? (v === 'editor' ? '#3d82f0' : '#ef4444') : 'transparent',
+                  }}>
+                  {v === 'editor' ? 'Builder' : 'Preview'}
+                </button>
+              ))}
+            </div>
+
+            {/* Editor + Preview: grid on xl, single-panel on mobile */}
+            <div className="flex-1 min-h-0 flex flex-col xl:grid xl:grid-cols-2 overflow-hidden">
+              <div className={`flex-col overflow-hidden ${mobileView === 'editor' ? 'flex flex-1' : 'hidden xl:flex'}`}>
+                <TemplateEditor
+                  key={editingMeta.id}
+                  draft={draft}
+                  onChange={setDraft}
+                  isReport={editingMeta.isReport}
+                  isNew={editingMeta.isNew}
+                  onSave={saveTemplate}
+                  onClose={handleClose}
+                />
+              </div>
+              <div className={`flex-col overflow-hidden ${mobileView === 'preview' ? 'flex flex-1' : 'hidden xl:flex'}`}>
+                <PreviewPanel draft={draft} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3"
+            style={{ color: '#2d3f52' }}>
+            <MdEdit size={44} style={{ opacity: 0.18 }} />
+            <div className="text-[14px] font-semibold" style={{ color: '#3d5470' }}>Select a record type to edit</div>
+            <div className="text-[11px]">or create a new Report / Record using the buttons on the left</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
