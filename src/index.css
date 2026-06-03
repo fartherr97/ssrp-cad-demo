@@ -245,6 +245,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 @keyframes toastInUp    { from { opacity: 0; transform: translateY(22px) scale(0.97); }  to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes toastOut     { from { opacity: 1; transform: translateX(0) scale(1); max-height: 120px; } to { opacity: 0; transform: translateX(26px) scale(0.95); max-height: 0; margin-bottom: 0; } }
 @keyframes toastOutUp   { from { opacity: 1; transform: translateY(0) scale(1); max-height: 120px; } to { opacity: 0; transform: translateY(16px) scale(0.97); max-height: 0; margin-bottom: 0; } }
+@keyframes toastPopIn   { from { opacity: 0; transform: translateY(-14px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toastPopOut  { from { opacity: 1; transform: translateY(0) scale(1); max-height: 200px; margin-top: 0; } to { opacity: 0; transform: translateY(-10px) scale(0.95); max-height: 0; margin-top: 0; } }
 @keyframes staggerIn    { from { opacity: 0; transform: translateY(8px); }               to { opacity: 1; transform: translateY(0); } }
 @keyframes spinnerSpin  { to { transform: rotate(360deg); } }
 @keyframes barGrow      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -270,6 +272,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .toast-in-up    { animation: toastInUp 0.32s cubic-bezier(0.16,1,0.3,1) both; }
 .toast-out      { animation: toastOut 0.26s ease-in forwards; }
 .toast-out-up   { animation: toastOutUp 0.26s ease-in forwards; }
+.toast-pop-in   { animation: toastPopIn 0.34s cubic-bezier(0.16,1,0.3,1) both; }
+.toast-pop-out  { animation: toastPopOut 0.24s ease-in forwards; }
 
 /* Staggered list-item entrance — set --i on each child for delay */
 .stagger-item {

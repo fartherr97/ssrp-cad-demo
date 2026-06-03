@@ -137,43 +137,43 @@ function ToastCard({ toast, onDismiss }) {
     <div
       role="status"
       onClick={() => onDismiss(toast.id)}
-      className={`group pointer-events-auto relative flex items-start gap-3 w-full sm:w-[340px] px-3.5 py-3 rounded-xl cursor-pointer overflow-hidden
-        bg-app-card/95 backdrop-blur-md border border-border-strong shadow-2xl shadow-black/50
-        ${toast.leaving
-          ? 'toast-out-up sm:toast-out'
-          : 'toast-in-up sm:toast-in-right'}`}
-      style={{ borderLeft: `4px solid ${color}` }}
+      className={`group pointer-events-auto relative flex items-center gap-3.5 w-[calc(100vw-2rem)] max-w-[400px] px-5 py-4 rounded-2xl cursor-pointer overflow-hidden backdrop-blur-xl
+        ${toast.leaving ? 'toast-pop-out' : 'toast-pop-in'}`}
+      style={{
+        background: `linear-gradient(135deg, ${color}1c 0%, rgba(10,16,26,0.94) 60%)`,
+        border: `1px solid ${color}55`,
+        boxShadow: `0 10px 44px -8px ${color}40, 0 8px 30px rgba(0,0,0,0.55)`,
+      }}
     >
       <span
-        className="flex items-center justify-center w-7 h-7 rounded-lg shrink-0 mt-0.5"
-        style={{ background: `${color}22`, color }}
+        className="flex items-center justify-center w-11 h-11 rounded-xl shrink-0"
+        style={{ background: `${color}24`, border: `1px solid ${color}50`, color }}
       >
         {loading
-          ? <span className="ui-spinner" style={{ width: 15, height: 15 }} />
-          : <Icon size={17} />}
+          ? <span className="ui-spinner" style={{ width: 20, height: 20 }} />
+          : <Icon size={24} />}
       </span>
 
       <div className="min-w-0 flex-1">
         {toast.title && (
-          <div className="text-[12.5px] font-bold text-white leading-tight mb-0.5">{toast.title}</div>
+          <div className="text-[14px] font-extrabold leading-tight mb-0.5" style={{ color }}>{toast.title}</div>
         )}
         {toast.message && (
-          <div className={`text-[12px] leading-[1.45] ${toast.title ? 'text-slate-400' : 'text-slate-200'}`}>
+          <div className={`text-[12.5px] leading-[1.45] ${toast.title ? 'text-slate-300' : 'text-slate-100 font-semibold'}`}>
             {toast.message}
           </div>
         )}
       </div>
 
-      <MdClose size={15} className="shrink-0 mt-0.5 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <MdClose size={16} className="shrink-0 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* progress bar for timed toasts */}
+      {/* progress bar for timed toasts — inset + rounded to match the card */}
       {!loading && toast.duration > 0 && !toast.leaving && (
         <span
-          className="absolute left-0 bottom-0 h-[2px] origin-left"
+          className="absolute left-4 right-4 bottom-2 h-[3px] rounded-full origin-left"
           style={{
-            width: '100%',
             background: color,
-            opacity: 0.6,
+            opacity: 0.5,
             animation: `barGrow ${toast.duration}ms linear reverse forwards`,
           }}
         />
@@ -182,11 +182,11 @@ function ToastCard({ toast, onDismiss }) {
   );
 }
 
-/* ── Stacked viewport (portaled to body) ── */
+/* ── Centered viewport (portaled to body) — same on desktop and mobile ── */
 function ToastViewport({ toasts, onDismiss }) {
   if (typeof document === 'undefined') return null;
   return createPortal(
-    <div className="fixed z-[1600] inset-x-3 bottom-4 sm:inset-x-auto sm:right-5 sm:bottom-24 flex flex-col items-stretch sm:items-end gap-2.5 pointer-events-none">
+    <div className="fixed z-[1600] inset-x-0 top-[16vh] flex flex-col items-center gap-3 px-4 pointer-events-none">
       {toasts.map(t => (
         <ToastCard key={t.id} toast={t} onDismiss={onDismiss} />
       ))}
