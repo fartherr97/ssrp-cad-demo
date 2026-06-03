@@ -700,11 +700,11 @@ export default function TowCAD() {
   // job is linked (e.g. by dispatching the matching FDOT request), the call
   // drops off this list — and the alert banner clears when none remain.
   const unhandledRoadCalls = useMemo(
-    () => activeCalls.filter(c =>
-      (c.nature.includes('Road Hazard') || c.nature.includes('MVA')) &&
-      !towJobs.some(j => j.callId === c.id)
+    () => fdotRequests.filter(req =>
+      req.status !== 'DECLINED' &&
+      !towJobs.some(j => j.callId === req.callId)
     ),
-    [activeCalls, towJobs]
+    [fdotRequests, towJobs]
   );
   const visibleUnits  = useMemo(() =>
     towUnits.filter(u => visibleCompanyIds.length === 0 || visibleCompanyIds.includes(u.companyId)),
