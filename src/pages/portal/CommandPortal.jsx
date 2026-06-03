@@ -697,7 +697,10 @@ const TABS = ['Overview', 'By Officer', 'By Department', 'Report Tracker'];
 
 export default function CommandPortal() {
   const { state } = useCAD();
-  const { reports = [], officers = [], departments = [], calls = [], currentUser } = state;
+  const {
+    reports = [], officers = [], departments = [], calls = [],
+    reportTemplates = [], currentUser,
+  } = state;
 
   /* ── Access control ── */
   const isAdmin   = currentUser?.role === 'admin';
@@ -736,11 +739,14 @@ export default function CommandPortal() {
     return departments.filter(d => d.id === scopeDeptId);
   }, [departments, scopeDeptId]);
 
-  /* Derive all unique report types from scoped data */
+  /* Report types come from the admin record builder (reportTemplates).
+     Any types found on submitted reports that no longer have a template
+     are included as a fallback so historical data stays visible. */
   const reportTypes = useMemo(() => {
-    const types = new Set(scopedReports.map(r => r.type).filter(Boolean));
-    return [...types].sort();
-  }, [scopedReports]);
+    const fromTemplates = reportTemplates.map(t => t.name);
+    const fromReports   = scopedReports.map(r => r.type).filter(Boolean);
+    return [...new Set([...fromTemplates, ...fromReports])].sort();
+  }, [reportTemplates, scopedReports]);
 
   /* ── UI state ── */
   const [activeTab,   setActiveTab]   = useState('Overview');
