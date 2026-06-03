@@ -634,19 +634,19 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
         )}
       </div>
 
-      <div className="flex gap-2 flex-wrap pt-1">
+      <div className="grid gap-2 pt-1" style={{ gridTemplateColumns: req.status === 'PENDING' ? '1fr 2fr 1fr' : '1fr auto' }}>
         {req.status === 'PENDING' && (
           <button onClick={() => onAcknowledge(req)}
-            className="press-sm inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors">
-            <MdCheckCircle size={14} /> Acknowledge
+            className="press-sm inline-flex items-center justify-center gap-1 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors whitespace-nowrap">
+            <MdCheckCircle size={14} /> Ack
           </button>
         )}
         <button onClick={() => onDispatch(req)}
-          className="press flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-orange-500 hover:bg-orange-400 text-black transition-colors">
+          className="press inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-orange-500 hover:bg-orange-400 text-black transition-colors whitespace-nowrap">
           <MdArrowForward size={14} /> Dispatch Unit
         </button>
         <button onClick={() => onDecline(req)}
-          className="press-sm inline-flex items-center gap-1 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors">
+          className="press-sm inline-flex items-center justify-center gap-1 py-2.5 rounded-lg text-[11.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors whitespace-nowrap">
           <MdThumbDownAlt size={14} /> Decline
         </button>
       </div>
