@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonBadge, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,12 +9,14 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 export default function PermissionKeys() {
   const { state, dispatch } = useCAD();
   const { permissionKeys } = state;
+  const toast = useToast();
   const [name, setName] = useState('');
   const [scope, setScope] = useState('');
 
   const add = () => {
     if (!name.trim() || !scope.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'permissionKeys', item: { name: name.trim(), scope: scope.trim(), members: 0 } } });
+    toast.success('Permission key added.');
     setName(''); setScope('');
   };
 
@@ -44,7 +47,7 @@ export default function PermissionKeys() {
               <SonCell align="center"><SonBadge color={ADMIN.blue}>{p.members}</SonBadge></SonCell>
               <SonCell align="center">
                 <SonIconBtn icon={MdDelete} danger title="Delete"
-                  onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'permissionKeys', id: p.id } })} />
+                  onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'permissionKeys', id: p.id } }); toast.success('Permission key deleted.'); }} />
               </SonCell>
             </SonRow>
           ))}

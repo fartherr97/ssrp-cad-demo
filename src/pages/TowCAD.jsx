@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useActiveBusiness } from '../contexts/BusinessContext';
+import { useToast } from '../contexts/ToastContext';
 import {
   MdLocalShipping, MdAdd, MdClose, MdFilterList, MdLink,
   MdCancel, MdDirectionsCar, MdLocationOn,
@@ -95,10 +96,10 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
       onClick={e => e.target === e.currentTarget && onCancel()}>
-      <div className="w-full sm:max-w-[420px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5"
+      <div className="w-full sm:max-w-[420px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5 anim-sheet-in sm:anim-modal-in"
         style={{ background: '#0c1929', border: '1px solid rgba(249,115,22,0.3)' }}>
         <div className="flex items-center justify-between">
           <div className="text-[16px] font-extrabold text-white flex items-center gap-2">
@@ -150,7 +151,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
               Cancel
             </button>
             <button type="submit" disabled={!canSubmit}
-              className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0 disabled:opacity-40">
+              className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0 disabled:opacity-40">
               Sign On
             </button>
           </div>
@@ -161,7 +162,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
 }
 
 /* ── Active unit card ── */
-function UnitCard({ unit, isMe, dispatch }) {
+function UnitCard({ unit, isMe, dispatch, toast }) {
   const m = UNIT_STATUS_META[unit.status] || UNIT_STATUS_META.AVAILABLE;
   return (
     <div className={`flex flex-col gap-2 px-3.5 py-3 rounded-xl border ${m.bg} ${m.border}`}>
@@ -189,14 +190,20 @@ function UnitCard({ unit, isMe, dispatch }) {
         <div className="flex gap-1.5 flex-wrap pt-0.5">
           {['AVAILABLE', 'ON_CALL', 'BREAK'].filter(s => s !== unit.status).map(s => (
             <button key={s} type="button"
-              onClick={() => dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unit.id, status: s } })}
-              className="px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border border-[rgba(255,255,255,0.1)] bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+              onClick={() => {
+                dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unit.id, status: s } });
+                toast.info(`Status set to ${UNIT_STATUS_META[s].label}`);
+              }}
+              className="press-sm px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border border-[rgba(255,255,255,0.1)] bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
               → {UNIT_STATUS_META[s].label}
             </button>
           ))}
           <button type="button"
-            onClick={() => dispatch({ type: 'REMOVE_TOW_UNIT', payload: unit.id })}
-            className="ml-auto px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 transition-colors flex items-center gap-1">
+            onClick={() => {
+              dispatch({ type: 'REMOVE_TOW_UNIT', payload: unit.id });
+              toast.success('Signed off duty');
+            }}
+            className="press-sm ml-auto px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 transition-colors flex items-center gap-1">
             <MdLogout size={12} /> Sign Off
           </button>
         </div>
@@ -206,7 +213,7 @@ function UnitCard({ unit, isMe, dispatch }) {
 }
 
 /* ── Job card ── */
-function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch }) {
+function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toast }) {
   const sm           = statusMeta(job.status);
   const company      = companies.find(b => b.id === job.companyId);
   const linkedCall   = job.callId ? calls.find(c => c.id === job.callId) : null;
@@ -217,6 +224,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch }) {
   const advance = () => {
     if (!nextStatus) return;
     dispatch({ type: 'UPDATE_TOW_JOB', payload: { id: job.id, status: nextStatus } });
+    toast.success(`Job #${job.id} → ${statusMeta(nextStatus).label}`);
     if (job.unitId) {
       dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: job.unitId, status: nextStatus === 'COMPLETED' ? 'AVAILABLE' : 'ON_CALL' } });
     }
@@ -224,6 +232,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch }) {
 
   const cancel = () => {
     dispatch({ type: 'CANCEL_TOW_JOB', payload: job.id });
+    toast.warning(`Job #${job.id} cancelled`);
     if (job.unitId) dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: job.unitId, status: 'AVAILABLE' } });
   };
 
@@ -232,6 +241,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch }) {
     const unit = towUnits.find(u => u.id === currentUnitId);
     dispatch({ type: 'UPDATE_TOW_JOB', payload: { id: job.id, unitId: currentUnitId, status: 'EN_ROUTE', driverName: unit?.operatorName || '' } });
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: currentUnitId, status: 'ON_CALL' } });
+    toast.success(`Took job #${job.id}`);
   };
 
   return (
@@ -323,19 +333,19 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch }) {
         <div className="flex gap-2 flex-wrap pt-1">
           {job.status === 'PENDING' && currentUnitId && !isMyJob && (
             <button onClick={takeJob}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-orange-500 hover:bg-orange-400 text-black transition-colors">
+              className="press flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-orange-500 hover:bg-orange-400 text-black transition-colors">
               <MdPerson size={14} /> Take Job
             </button>
           )}
           {(isMyJob || !job.unitId) && nextStatus && (
             <button onClick={advance}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 transition-colors"
+              className="press flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 transition-colors"
               style={{ background: sm.color, color: '#000' }}>
               <MdArrowForward size={14} /> {STATUS_NEXT_LABEL[job.status]}
             </button>
           )}
           <button onClick={cancel}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors">
+            className="press-sm inline-flex items-center gap-1 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors">
             <MdCancel size={14} /> Cancel
           </button>
         </div>
@@ -384,7 +394,7 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
       <div className="flex justify-between items-center mb-4">
         <div className="text-[15px] font-extrabold text-slate-100">New Tow Job</div>
         <button onClick={onCancel}
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+          className="press-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
           <MdClose size={15} /> Cancel
         </button>
       </div>
@@ -473,7 +483,7 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
         </div>
         <div className="flex gap-3 mt-4">
           <button type="submit"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0">
+            className="press inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0">
             <MdLocalShipping size={15} /> Create Job
           </button>
         </div>
@@ -487,6 +497,7 @@ export default function TowCAD() {
   const { state, dispatch } = useCAD();
   const { towJobs, towUnits = [], calls, businesses, currentUser } = state;
   const bizCtx = useActiveBusiness();
+  const toast = useToast();
 
   const isBusinessPortal = currentUser?.portal === 'business';
   const towCompanies = useMemo(() => businesses.filter(b => b.isTowCompany), [businesses]);
@@ -549,12 +560,14 @@ export default function TowCAD() {
         driverName:  assignedUnit?.operatorName || '',
       },
     });
+    toast.success(`Tow job created for ${form.plate || 'vehicle'}`, { title: 'Job created' });
     if (form.unitId) dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: form.unitId, status: 'ON_CALL' } });
     setShowForm(false);
   };
 
   const handleSignOn = (data) => {
     dispatch({ type: 'ADD_TOW_UNIT', payload: data });
+    toast.success(`Signed on — ${data.truckName}`, { title: 'On duty' });
     setShowSignOn(false);
   };
 
@@ -583,13 +596,13 @@ export default function TowCAD() {
         <div className="flex gap-2">
           {!myUnit && (
             <button onClick={() => setShowSignOn(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-green-600 hover:bg-green-500 text-white transition-colors border-0">
+              className="press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-green-600 hover:bg-green-500 text-white transition-colors border-0">
               <MdLogin size={16} /> Sign On
             </button>
           )}
           {!showForm && (
             <button onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-white transition-colors border-0">
+              className="press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-white transition-colors border-0">
               <MdAdd size={18} /> New Job
             </button>
           )}
@@ -604,7 +617,7 @@ export default function TowCAD() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))', gap: 10 }}>
             {visibleUnits.map(u => (
-              <UnitCard key={u.id} unit={u} isMe={myUnit?.id === u.id} dispatch={dispatch} />
+              <UnitCard key={u.id} unit={u} isMe={myUnit?.id === u.id} dispatch={dispatch} toast={toast} />
             ))}
           </div>
         </div>
@@ -683,7 +696,7 @@ export default function TowCAD() {
           </div>
           {!showForm && (
             <button onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0 mt-4">
+              className="press inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-orange-500 hover:bg-orange-400 text-black transition-colors border-0 mt-4">
               <MdAdd size={16} /> New Tow Job
             </button>
           )}
@@ -692,7 +705,7 @@ export default function TowCAD() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 14 }}>
           {filtered.map(job => (
             <JobCard key={job.id} job={job} companies={towCompanies} calls={activeCalls}
-              towUnits={towUnits} currentUnitId={myUnit?.id} dispatch={dispatch} />
+              towUnits={towUnits} currentUnitId={myUnit?.id} dispatch={dispatch} toast={toast} />
           ))}
         </div>
       )}

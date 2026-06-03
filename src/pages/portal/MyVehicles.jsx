@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import {
   MdDirectionsCar, MdAdd, MdClose, MdPerson, MdLock, MdErrorOutline,
 } from 'react-icons/md';
@@ -19,10 +20,10 @@ const defaultExpiry = () => {
 /* ── Confirmation modal (same pattern as MyLicenses) ── */
 function ConfirmModal({ onConfirm, onCancel }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
       onClick={e => e.target === e.currentTarget && onCancel()}>
-      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5"
+      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5 anim-sheet-in sm:anim-modal-in"
         style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.3)' }}>
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
@@ -37,11 +38,11 @@ function ConfirmModal({ onConfirm, onCancel }) {
         </div>
         <div className="flex gap-3">
           <button type="button" onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
             Go Back
           </button>
           <button type="button" onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
+            className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
             Yes, Register
           </button>
         </div>
@@ -52,6 +53,7 @@ function ConfirmModal({ onConfirm, onCancel }) {
 
 export default function MyVehicles() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { civilians, vehicles } = state;
 
   const vehicleTemplate = useMemo(
@@ -113,6 +115,7 @@ export default function MyVehicles() {
         },
       });
     }
+    toast.success(`${form.plate} registered.`, { title: 'Vehicle Registered' });
     closeForm();
   };
 
@@ -128,7 +131,7 @@ export default function MyVehicles() {
         action={
           !showForm && myChars.length > 0 && (
             <button
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0"
+              className="press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0"
               onClick={openNew}>
               <MdAdd size={18} /> Register Vehicle
             </button>
@@ -201,7 +204,7 @@ export default function MyVehicles() {
 
             <div className="mt-[18px] flex gap-3 items-center">
               <button type="submit"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0">
+                className="press inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0">
                 <MdDirectionsCar size={15} /> Register Vehicle
               </button>
               <span className="text-[10.5px] text-slate-600 flex items-center gap-1">
@@ -224,7 +227,7 @@ export default function MyVehicles() {
             </div>
             {myChars.length > 0 && (
               <button
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0 mt-[18px]"
+                className="press inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0 mt-[18px]"
                 onClick={openNew}>
                 <MdAdd size={18} /> Register Vehicle
               </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { FlagRow, FlagManager } from '../components/CivilianFlags';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -13,6 +14,7 @@ import { MdArrowBack } from 'react-icons/md';
 
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { civilians, vehicles, warrants } = state;
 
   const [selected, setSelected] = useState(null);
@@ -53,6 +55,7 @@ export default function CivilianRegistry() {
     }
     setCreateError('');
     dispatch({ type: 'ADD_CIVILIAN', payload: { ...form } });
+    toast.success(`${form.firstName} ${form.lastName} added`, { title: 'Civilian created' });
     setForm({ firstName:'',lastName:'',dob:'',gender:'Male',ethnicity:'White',height:"5'10\"",weight:'180 lbs',hair:'Brown',eyes:'Brown',ssn:'',phone:'',address:'',dlNumber:'',dlClass:'Class C',dlStatus:'ACTIVE',dlExpiry:'' });
     setShowCreate(false);
   };
@@ -72,6 +75,7 @@ export default function CivilianRegistry() {
     }
     setVehError('');
     dispatch({ type: 'ADD_VEHICLE', payload: { ...vehForm, ownerId: selCiv.id } });
+    toast.success(`${vehForm.plate} registered`, { title: 'Vehicle added' });
     setVehForm({ plate:'',make:'',model:'',year:'',color:'',regStatus:'VALID',regExpiry:'' });
     setShowAddVeh(false);
   };
@@ -79,6 +83,7 @@ export default function CivilianRegistry() {
   const deleteCiv = (id) => {
     if (confirm('Delete this civilian record?')) {
       dispatch({ type: 'DELETE_CIVILIAN', payload: id });
+      toast.success('Civilian record deleted');
       setSelected(null);
     }
   };
@@ -90,7 +95,7 @@ export default function CivilianRegistry() {
         <div className={`mob-list-panel${selected != null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Civilian Registry</div>
-            <button className={`${xs(S_BTN_PRIMARY)} ml-auto`} onClick={() => setShowCreate(true)}>+ New</button>
+            <button className={`press-sm ${xs(S_BTN_PRIMARY)} ml-auto`} onClick={() => setShowCreate(true)}>+ New</button>
           </div>
           <div className="px-3 py-2.5 border-b border-border-faint shrink-0">
             <input className={S_INPUT} placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} />
@@ -139,7 +144,7 @@ export default function CivilianRegistry() {
                 <div className="text-[12px] font-medium text-slate-500 mb-0.5">No civilian selected</div>
                 <div className="text-[10px] text-cad-muted">Select a record or create a new civilian</div>
               </div>
-              <button className={S_BTN_PRIMARY} onClick={() => setShowCreate(true)}>Create New Civilian</button>
+              <button className={`press ${S_BTN_PRIMARY}`} onClick={() => setShowCreate(true)}>Create New Civilian</button>
             </div>
           ) : (
             <>
@@ -157,8 +162,8 @@ export default function CivilianRegistry() {
                     </div>
                   </div>
                   <div className="flex flex-wrap justify-end gap-1.5">
-                    <button className={sm(S_BTN_SECONDARY)} onClick={() => setShowAddVeh(true)}>+ Vehicle</button>
-                    <button className={sm(S_BTN_DANGER)} onClick={() => deleteCiv(selCiv.id)}>Delete</button>
+                    <button className={`press-sm ${sm(S_BTN_SECONDARY)}`} onClick={() => setShowAddVeh(true)}>+ Vehicle</button>
+                    <button className={`press-sm ${sm(S_BTN_DANGER)}`} onClick={() => deleteCiv(selCiv.id)}>Delete</button>
                   </div>
                 </div>
               </div>
@@ -219,7 +224,7 @@ export default function CivilianRegistry() {
                       <div className="text-center p-6 text-cad-muted text-[11px]">
                         No vehicles registered
                         <br />
-                        <button className={`${S_BTN_PRIMARY} mt-2.5`} onClick={() => setShowAddVeh(true)}>Add Vehicle</button>
+                        <button className={`press ${S_BTN_PRIMARY} mt-2.5`} onClick={() => setShowAddVeh(true)}>Add Vehicle</button>
                       </div>
                     ) : civVehicles.map(v => (
                       <div key={v.id} className={S_CARD}>
@@ -251,7 +256,7 @@ export default function CivilianRegistry() {
 
       {/* Create Civilian Modal */}
       {showCreate && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && (setShowCreate(false), setCreateError(''))}>
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && (setShowCreate(false), setCreateError(''))}>
           <div className={`${S_MODAL} max-w-[600px]`}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Create Civilian Record</div>
@@ -283,7 +288,7 @@ export default function CivilianRegistry() {
             )}
             <div className={S_MODAL_FOOTER}>
               <button className={S_BTN_SECONDARY} onClick={() => { setShowCreate(false); setCreateError(''); }}>Cancel</button>
-              <button className={S_BTN_PRIMARY} onClick={createCivilian} disabled={!form.firstName || !form.lastName}>Create Record</button>
+              <button className={`press ${S_BTN_PRIMARY}`} onClick={createCivilian} disabled={!form.firstName || !form.lastName}>Create Record</button>
             </div>
           </div>
         </div>
@@ -291,7 +296,7 @@ export default function CivilianRegistry() {
 
       {/* Add Vehicle Modal */}
       {showAddVeh && selCiv && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && (setShowAddVeh(false), setVehError(''))}>
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && (setShowAddVeh(false), setVehError(''))}>
           <div className={S_MODAL}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Register Vehicle * {selCiv.firstName} {selCiv.lastName}</div>
@@ -315,7 +320,7 @@ export default function CivilianRegistry() {
             )}
             <div className={S_MODAL_FOOTER}>
               <button className={S_BTN_SECONDARY} onClick={() => { setShowAddVeh(false); setVehError(''); }}>Cancel</button>
-              <button className={S_BTN_PRIMARY} onClick={addVehicle} disabled={!vehForm.plate || !vehForm.make}>Register Vehicle</button>
+              <button className={`press ${S_BTN_PRIMARY}`} onClick={addVehicle} disabled={!vehForm.plate || !vehForm.make}>Register Vehicle</button>
             </div>
           </div>
         </div>

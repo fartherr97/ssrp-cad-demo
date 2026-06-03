@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import {
   BADGE, S_PAGE, S_PANEL_HEADER, S_PANEL_TITLE,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -13,6 +14,7 @@ import { MdArrowBack } from 'react-icons/md';
 
 export default function WarrantControl() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { warrants, civilians, officers, currentUser } = state;
   const [filter, setFilter] = useState('ACTIVE');
   const [selected, setSelected] = useState(null);
@@ -42,6 +44,7 @@ export default function WarrantControl() {
         notes: form.notes,
       },
     });
+    toast.success(`Warrant issued — ${civ ? `${civ.firstName} ${civ.lastName}` : 'subject'}`, { title: 'Warrant active' });
     setForm({ civilianId: '', type: 'Arrest Warrant', charge: '', notes: '' });
     setShowIssue(false);
     setFilter('ACTIVE');
@@ -49,6 +52,7 @@ export default function WarrantControl() {
 
   const serveWarrant = (id) => {
     dispatch({ type: 'SERVE_WARRANT', payload: id });
+    toast.success('Warrant marked served');
     setSelected(null);
   };
 
@@ -73,7 +77,7 @@ export default function WarrantControl() {
             <button key={f} className={sm(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
-          <button className={sm(S_BTN_DANGER)} onClick={() => setShowIssue(true)}>
+          <button className={`press ${sm(S_BTN_DANGER)}`} onClick={() => setShowIssue(true)}>
             Issue Warrant
           </button>
         </div>
@@ -164,7 +168,7 @@ export default function WarrantControl() {
                 )}
 
                 {selWarrant.status === 'ACTIVE' && (
-                  <button className={`${S_BTN_SUCCESS} w-full justify-center`} onClick={() => serveWarrant(selWarrant.id)}>
+                  <button className={`press ${S_BTN_SUCCESS} w-full justify-center`} onClick={() => serveWarrant(selWarrant.id)}>
                     Mark as Served
                   </button>
                 )}
@@ -176,7 +180,7 @@ export default function WarrantControl() {
 
       {/* Issue Warrant Modal */}
       {showIssue && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && setShowIssue(false)}>
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && setShowIssue(false)}>
           <div className={S_MODAL}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Issue New Warrant</div>
@@ -211,7 +215,7 @@ export default function WarrantControl() {
             </div>
             <div className={S_MODAL_FOOTER}>
               <button className={S_BTN_SECONDARY} onClick={() => setShowIssue(false)}>Cancel</button>
-              <button className={S_BTN_DANGER} onClick={issueWarrant} disabled={!form.civilianId || !form.charge}>
+              <button className={`press ${S_BTN_DANGER}`} onClick={issueWarrant} disabled={!form.civilianId || !form.charge}>
                 Issue Warrant
               </button>
             </div>

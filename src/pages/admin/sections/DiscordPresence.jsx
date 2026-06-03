@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonField, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
@@ -37,6 +38,7 @@ function ToggleRow({ label, desc, on, onToggle }) {
 
 export default function DiscordPresence() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({
     buttons: [{ label: '', url: '' }, { label: '', url: '' }],
     ...state.discordPresence,
@@ -57,6 +59,7 @@ export default function DiscordPresence() {
 
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'discordPresence', value: { ...draft } } });
+    toast.success('Rich presence saved.');
     setSaved(true);
   };
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonField, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
@@ -37,6 +38,7 @@ function ToggleRow({ label, desc, on, onToggle }) {
 
 export default function Restrictions() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({ ...state.accountRestrictions });
   const [saved, setSaved] = useState(false);
 
@@ -49,6 +51,7 @@ export default function Restrictions() {
       minAccountAgeDays: Number(draft.minAccountAgeDays) || 0,
       autoBanThreshold: Number(draft.autoBanThreshold) || 0,
     } } });
+    toast.success('Restrictions saved.');
     setSaved(true);
   };
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, EmptyState, ADMIN, SON_INPUT,
 } from '../AdminKit';
@@ -8,12 +9,14 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 export default function Servers() {
   const { state, dispatch } = useCAD();
   const { adminServers } = state;
+  const toast = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   const add = () => {
     if (!name.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'adminServers', item: { name: name.trim(), description: description.trim() } } });
+    toast.success('Server added.');
     setName(''); setDescription('');
   };
 
@@ -48,7 +51,7 @@ export default function Servers() {
               <SonCell color={ADMIN.textDim}>{s.description}</SonCell>
               <SonCell align="center">
                 <SonIconBtn icon={MdDelete} danger title="Delete"
-                  onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminServers', id: s.id } })} />
+                  onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminServers', id: s.id } }); toast.success('Server deleted.'); }} />
               </SonCell>
             </SonRow>
           ))}

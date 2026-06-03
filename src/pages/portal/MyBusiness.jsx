@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import { MdBusiness, MdEdit } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_SECONDARY, S_BTN_SUCCESS, BADGE, sm } from '../../constants/styles';
@@ -10,6 +11,7 @@ const BLANK = { name: '', type: '', owner: '', ein: '', phone: '', address: '' }
 
 export default function MyBusiness() {
   const { dispatch } = useCAD();
+  const toast = useToast();
   const { activeBiz: myBiz } = useActiveBusiness();
 
   const [editing, setEditing] = useState(false);
@@ -30,6 +32,7 @@ export default function MyBusiness() {
   };
   const save = () => {
     dispatch({ type: 'UPDATE_BUSINESS', payload: { id: myBiz.id, ...form } });
+    toast.success('Business details saved.', { title: 'Business Updated' });
     setEditing(false);
   };
 
@@ -79,7 +82,7 @@ export default function MyBusiness() {
             </div>
             <div className="flex justify-end gap-2.5 mt-5">
               <button className={sm(S_BTN_SECONDARY)} onClick={() => setEditing(false)}>Cancel</button>
-              <button className={sm(S_BTN_SUCCESS)} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
+              <button className={`${sm(S_BTN_SUCCESS)} press`} disabled={!form.name.trim()} onClick={save}>Save Changes</button>
             </div>
           </>
         ) : (

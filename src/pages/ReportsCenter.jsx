@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
@@ -36,6 +37,7 @@ const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
 
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { reports, reportTemplates, currentUser, officers, calls = [], myCallId, communityConfig, departments } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -141,12 +143,14 @@ export default function ReportsCenter() {
       },
     });
     try { localStorage.removeItem(DRAFT_KEY(selectedTemplate.id)); } catch { /* ignore */ }
+    toast.success(`${selectedTemplate.name} filed as ${caseNum}.`, { title: 'Report Submitted' });
     closeForm();
     setReportTab('MINE');
   };
 
   const reviewReport = (id, status) => {
     dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id, status } });
+    toast.success(`Report marked ${status}.`, { title: 'Report Updated' });
   };
 
   const showForm   = selectedTemplate !== null;

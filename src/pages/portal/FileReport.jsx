@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import {
   MdReportProblem, MdCheckCircle, MdPerson, MdEventNote,
   MdPlace, MdDescription, MdCategory,
@@ -28,6 +29,7 @@ const EMPTY_FORM = {
 
 export default function FileReport() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
 
   const [form, setForm] = useState({ ...EMPTY_FORM, filerId: myChars[0] ? String(myChars[0].id) : '' });
@@ -65,6 +67,7 @@ export default function FileReport() {
       },
     });
     setSubmitted({ caseNumber, reportType: form.reportType, filedBy, location: form.location, incidentDate: form.incidentDate });
+    toast.success(`Case ${caseNumber} filed.`, { title: 'Report Submitted' });
   };
 
   const fileAnother = () => {
@@ -108,7 +111,7 @@ export default function FileReport() {
             <Field label="Location" value={submitted.location} />
           </div>
           <div>
-            <button className={S_BTN_PRIMARY} onClick={fileAnother}>File Another Report</button>
+            <button className={`${S_BTN_PRIMARY} press`} onClick={fileAnother}>File Another Report</button>
           </div>
         </PortalCard>
       ) : myChars.length === 0 ? (
@@ -157,7 +160,7 @@ export default function FileReport() {
               </div>
             </div>
             <div className="mt-5 flex justify-end">
-              <button type="submit" className={S_BTN_PRIMARY} disabled={!canSubmit}>
+              <button type="submit" className={`${S_BTN_PRIMARY} press`} disabled={!canSubmit}>
                 Submit Report
               </button>
             </div>

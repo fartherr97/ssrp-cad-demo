@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,6 +9,7 @@ import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdDelete, MdAdd } from 'react-i
 export default function StatusCodes() {
   const { state, dispatch } = useCAD();
   const { unitStatusCodes } = state;
+  const toast = useToast();
   const [code, setCode] = useState('');
   const [label, setLabel] = useState('');
   const [color, setColor] = useState('#22ff66');
@@ -15,6 +17,7 @@ export default function StatusCodes() {
   const add = () => {
     if (!code.trim() || !label.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'unitStatusCodes', item: { code: code.trim(), label: label.trim(), color } } });
+    toast.success('Status code added.');
     setCode(''); setLabel(''); setColor('#22ff66');
   };
 
@@ -45,7 +48,7 @@ export default function StatusCodes() {
                   <SonIconBtn icon={MdKeyboardArrowDown} title="Move down"
                     onClick={() => dispatch({ type: 'ADMIN_REORDER', payload: { key: 'unitStatusCodes', id: s.id, dir: 1 } })} />
                   <SonIconBtn icon={MdDelete} danger title="Delete"
-                    onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'unitStatusCodes', id: s.id } })} />
+                    onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'unitStatusCodes', id: s.id } }); toast.success('Status code deleted.'); }} />
                 </div>
               </SonCell>
               <SonCell>

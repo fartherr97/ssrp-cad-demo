@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, SonSearch, SON_INPUT, SON_LABEL, SonBadge, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -78,19 +79,21 @@ export default function Departments() {
   const { state, dispatch } = useCAD();
   const { departments } = state;
   const groups = state.persistentGroups || [];
+  const toast = useToast();
   const [groupName, setGroupName] = useState('');
   const [query, setQuery] = useState('');
 
   const addGroup = () => {
     if (!groupName.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'persistentGroups', item: { name: groupName.trim() } } });
+    toast.success('Group added.');
     setGroupName('');
   };
 
   const filtered = departments.filter(d => !query || d.name.toLowerCase().includes(query.toLowerCase()) || d.short.toLowerCase().includes(query.toLowerCase()));
 
-  const saveDept = (updated) => dispatch({ type: 'UPDATE_DEPARTMENT', payload: updated });
-  const deleteDept = (id) => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'departments', id } });
+  const saveDept = (updated) => { dispatch({ type: 'UPDATE_DEPARTMENT', payload: updated }); toast.success('Department saved.'); };
+  const deleteDept = (id) => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'departments', id } }); toast.success('Agency deleted.'); };
 
   return (
     <>
@@ -103,7 +106,7 @@ export default function Departments() {
                 <div key={g.id} className="flex items-center gap-2 px-3 py-1.5 rounded-[7px]"
                   style={{ background: ADMIN.panel2, border: `1px solid ${ADMIN.border}` }}>
                   <span className="text-[13px]" style={{ color: ADMIN.text }}>{g.name}</span>
-                  <SonIconBtn icon={MdDelete} danger onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'persistentGroups', id: g.id } })} />
+                  <SonIconBtn icon={MdDelete} danger onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'persistentGroups', id: g.id } }); toast.success('Group removed.'); }} />
                 </div>
               ))}
             </div>
@@ -131,7 +134,7 @@ export default function Departments() {
           </div>
         )}
         <div className="mt-4">
-          <SonButton variant="red" onClick={() => dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '' } })}>
+          <SonButton variant="red" onClick={() => { dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '' } }); toast.success('Agency added.'); }}>
             <MdAdd size={16} /> Add Agency
           </SonButton>
         </div>

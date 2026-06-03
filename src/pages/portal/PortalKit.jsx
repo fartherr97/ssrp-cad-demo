@@ -87,7 +87,7 @@ export function PortalCard({ children, accent, style = {}, onClick, hover, class
   return (
     <div
       onClick={onClick}
-      className={`bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm ${hover ? 'portal-card-hover cursor-pointer' : ''} ${className}`}
+      className={`bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm ${hover ? 'portal-card-hover lift cursor-pointer' : ''} ${className}`}
       style={{
         ...(hex ? { borderColor: `${hex}44`, borderLeft: `3px solid ${hex}` } : {}),
         ...style,

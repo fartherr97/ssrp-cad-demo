@@ -163,9 +163,9 @@ function MobileDrawer({ open, onClose, groups, isActive, onNavigate, onHome, onL
 
   return createPortal(
     <div className="fixed inset-0 z-[3000] flex flex-col">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm anim-overlay-in" onClick={onClose} />
 
-      <div className="relative z-10 flex flex-col w-full bg-app-panel border-b border-border-base shadow-2xl max-h-[85vh] overflow-hidden">
+      <div className="relative z-10 flex flex-col w-full bg-app-panel border-b border-border-base shadow-2xl max-h-[85vh] overflow-hidden anim-drawer-in">
         <div className="flex items-center gap-3 px-4 h-14 border-b border-border-base shrink-0">
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
             className="w-8 h-8 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />

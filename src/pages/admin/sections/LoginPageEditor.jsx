@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonField, SonIconBtn, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
@@ -24,6 +25,7 @@ function Toggle({ on, onClick }) {
 
 export default function LoginPageEditor() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({ ...state.loginPageConfig });
   const [saved, setSaved] = useState(false);
   const [newDomain, setNewDomain] = useState('');
@@ -31,6 +33,7 @@ export default function LoginPageEditor() {
   const set = (k, v) => { setDraft(d => ({ ...d, [k]: v })); setSaved(false); };
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: { ...draft } } });
+    toast.success('Login page saved.');
     setSaved(true);
   };
 
@@ -40,12 +43,14 @@ export default function LoginPageEditor() {
     const updated = { ...draft, customDomains: [...(draft.customDomains || []), d] };
     setDraft(updated);
     dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: updated } });
+    toast.success('Domain added.');
     setNewDomain('');
   };
   const removeDomain = (domain) => {
     const updated = { ...draft, customDomains: (draft.customDomains || []).filter(x => x !== domain) };
     setDraft(updated);
     dispatch({ type: 'ADMIN_SET', payload: { key: 'loginPageConfig', value: updated } });
+    toast.success('Domain removed.');
   };
 
   const bgPreview = draft.backgroundStyle === 'Solid Dark'

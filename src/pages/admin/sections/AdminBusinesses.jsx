@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack } from 'react-icons/md';
 
@@ -61,6 +62,7 @@ export default function AdminBusinesses() {
   const { state, dispatch } = useCAD();
   const { businesses, officers } = state;
   const { isMobile } = useResponsive();
+  const toast = useToast();
 
   const [selected,      setSelected]      = useState(null);
   const [form,          setForm]          = useState(BLANK_BIZ);
@@ -97,15 +99,18 @@ export default function AdminBusinesses() {
     if (!form.name.trim()) return;
     if (isNew) {
       dispatch({ type: 'ADD_BUSINESS', payload: { ...form } });
+      toast.success('Business created.', { title: form.name.trim() });
       setIsNew(false);
       setSelected(null);
     } else {
       dispatch({ type: 'UPDATE_BUSINESS', payload: { id: selected, ...form } });
+      toast.success('Changes saved.');
     }
   };
 
   const handleDelete = (id) => {
     dispatch({ type: 'DELETE_BUSINESS', payload: id });
+    toast.success('Business deleted.');
     setDeleteConfirm(null);
     setSelected(null);
     setIsNew(false);
@@ -114,12 +119,14 @@ export default function AdminBusinesses() {
   const handleAddEmployee = () => {
     if (!empForm.name.trim() || !selected) return;
     dispatch({ type: 'ADD_EMPLOYEE', payload: { businessId: selected, employee: { ...empForm } } });
+    toast.success('Employee added.');
     setEmpForm(BLANK_EMP);
     setAddingEmp(false);
   };
 
   const handleRemoveEmployee = (bizId, empId) => {
     dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: bizId, employeeId: empId } });
+    toast.success('Employee removed.');
   };
 
   /* On mobile: show list OR form, never both side by side */
@@ -292,7 +299,7 @@ export default function AdminBusinesses() {
                         Cancel
                       </button>
                       <button onClick={handleAddEmployee} type="button"
-                        className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
+                        className="press px-3 py-1.5 rounded-lg text-[11px] font-bold"
                         style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.12)', border: '1px solid rgba(58,136,232,0.28)', color: '#3a88e8' }}>
                         Add
                       </button>
@@ -315,6 +322,7 @@ export default function AdminBusinesses() {
                         </div>
                       </div>
                       <button onClick={() => handleRemoveEmployee(selectedBiz.id, emp.id)} type="button"
+                        className="press-sm"
                         style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}>
                         <MdDelete size={15} className="text-slate-700 hover:text-red-400" />
                       </button>
@@ -331,7 +339,7 @@ export default function AdminBusinesses() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[11px] text-red-400">Confirm delete?</span>
                     <button onClick={() => handleDelete(selected)} type="button"
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
+                      className="press px-3 py-1.5 rounded-lg text-[11px] font-bold"
                       style={{ cursor: 'pointer', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.28)', color: '#ef4444' }}>
                       Yes, Delete
                     </button>
@@ -343,14 +351,14 @@ export default function AdminBusinesses() {
                   </div>
                 ) : (
                   <button onClick={() => setDeleteConfirm(selected)} type="button"
-                    className="px-4 py-2 rounded-xl text-[12px] font-bold"
+                    className="press px-4 py-2 rounded-xl text-[12px] font-bold"
                     style={{ cursor: 'pointer', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.16)', color: '#ef4444' }}>
                     Delete
                   </button>
                 )
               )}
               <button onClick={handleSave} type="button"
-                className="flex-1 py-2 rounded-xl text-[12px] font-bold"
+                className="press flex-1 py-2 rounded-xl text-[12px] font-bold"
                 style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}>
                 {isNew ? 'Create Business' : 'Save Changes'}
               </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT,
   SonTable, SonRow, SonCell, SonBadge, SonIconBtn, EmptyState,
@@ -63,9 +64,9 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+    <div className="anim-overlay-in fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="flex flex-col bg-app-panel border border-border-base rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh]">
+      <div className="anim-modal-in flex flex-col bg-app-panel border border-border-base rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh]">
 
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-border-base shrink-0">
@@ -181,6 +182,7 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
 
 export default function LicensePoints() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const stored = state.licensePointsConfig;
   const penalCode = state.penalCode || [];
   const [cfg, setCfg] = useState(() => blank(stored));
@@ -188,7 +190,7 @@ export default function LicensePoints() {
   const [showImport, setShowImport] = useState(false);
 
   const dirty = JSON.stringify(cfg) !== JSON.stringify(stored);
-  const save = () => dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } });
+  const save = () => { dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } }); toast.success('License points config saved.'); };
 
   const setField = (k, v) => setCfg(p => ({ ...p, [k]: v }));
   const setSched = (id, patch) => setCfg(p => ({ ...p, schedule: p.schedule.map(s => s.id === id ? { ...s, ...patch } : s) }));
@@ -207,6 +209,7 @@ export default function LicensePoints() {
     const v = stored.schedule.find(s => s.id === vId);
     if (!v) return;
     dispatch({ type: 'ADD_LICENSE_POINTS', payload: { civilianId: civ.id, points: v.points, reason: v.label } });
+    toast.success(`+${v.points} points applied.`);
   };
 
   const statusColor = (s) => s === 'SUSPENDED' ? '#f87171' : s === 'ACTIVE' ? '#22c55e' : ADMIN.textMute;
@@ -329,9 +332,9 @@ export default function LicensePoints() {
                         {stored.schedule.map(v => <option key={v.id} value={v.id}>{v.label} (+{v.points})</option>)}
                       </select>
                       <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
-                      <SonIconBtn icon={MdRestartAlt} title="Reset points" onClick={() => dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id })} />
+                      <SonIconBtn icon={MdRestartAlt} title="Reset points" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }} />
                       {c.dlStatus === 'SUSPENDED' && (
-                        <SonIconBtn icon={MdLockOpen} title="Lift suspension" onClick={() => dispatch({ type: 'LIFT_SUSPENSION', payload: c.id })} />
+                        <SonIconBtn icon={MdLockOpen} title="Lift suspension" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success('Suspension lifted.'); }} />
                       )}
                     </div>
                   </SonCell>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import { AdminPageTitle, AdminPanel, SonButton, ADMIN } from '../AdminKit';
 
 const CIVILIAN_FIELDS = [
@@ -16,6 +17,7 @@ const VEHICLE_FIELDS = [
 export default function Identifiers() {
   const { state, dispatch } = useCAD();
   const config = state.uniqueIdentifiers || { civilian: ['ssn', 'dlNumber'], vehicle: ['plate'] };
+  const toast = useToast();
 
   const [saved, setSaved] = useState(false);
 
@@ -23,9 +25,11 @@ export default function Identifiers() {
 
   const toggle = (group, key) => {
     const current = config[group] || [];
-    const next = current.includes(key) ? current.filter(k => k !== key) : [...current, key];
+    const willEnable = !current.includes(key);
+    const next = willEnable ? [...current, key] : current.filter(k => k !== key);
     const newConfig = { ...config, [group]: next };
     dispatch({ type: 'ADMIN_SET', payload: { key: 'uniqueIdentifiers', value: newConfig } });
+    toast.success(`Unique identifier ${willEnable ? 'enabled' : 'disabled'}.`);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

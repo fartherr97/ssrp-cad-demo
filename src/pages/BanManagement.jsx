@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -11,6 +12,7 @@ const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded-lg px-
 
 export default function BanManagement() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { bannedUsers, currentUser } = state;
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('ALL');
@@ -23,11 +25,15 @@ export default function BanManagement() {
   const issueBan = () => {
     if (!form.name || !form.discordId || !form.reason) return;
     dispatch({ type: 'BAN_USER', payload: { ...form } });
+    toast.success(`${form.name} banned`, { title: 'Ban issued' });
     setForm({ name:'',discordId:'',reason:'',duration:'Permanent' });
     setShowForm(false);
   };
 
-  const unban = (id) => dispatch({ type: 'UNBAN_USER', payload: id });
+  const unban = (id) => {
+    dispatch({ type: 'UNBAN_USER', payload: id });
+    toast.success('Ban lifted');
+  };
 
   const statusBadge = { Active: BADGE.red, Expired: BADGE.gray, Lifted: BADGE.green };
 
@@ -51,7 +57,7 @@ export default function BanManagement() {
             <button key={f} className={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
-          <button className={sm(S_BTN_DANGER)} onClick={() => setShowForm(true)}>
+          <button className={`press ${sm(S_BTN_DANGER)}`} onClick={() => setShowForm(true)}>
             Issue Ban
           </button>
         </div>
@@ -84,7 +90,7 @@ export default function BanManagement() {
             </div>
             <div className="flex gap-1.5 justify-end">
               <button className={sm(S_BTN_GHOST)} onClick={() => setShowForm(false)}>Cancel</button>
-              <button className={sm(S_BTN_DANGER)} onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
+              <button className={`press ${sm(S_BTN_DANGER)}`} onClick={issueBan} disabled={!form.name||!form.discordId||!form.reason}>
                 Confirm Ban
               </button>
             </div>
@@ -125,7 +131,7 @@ export default function BanManagement() {
                       <td className={`${S_TABLE_TD} text-[11px] text-slate-500 max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap`}>{b.reason}</td>
                       <td className={S_TABLE_TD}>
                         {b.status === 'Active' && (
-                          <button className={xs(S_BTN_WARNING)} onClick={() => unban(b.id)}>Lift Ban</button>
+                          <button className={`press-sm ${xs(S_BTN_WARNING)}`} onClick={() => unban(b.id)}>Lift Ban</button>
                         )}
                       </td>
                     </tr>

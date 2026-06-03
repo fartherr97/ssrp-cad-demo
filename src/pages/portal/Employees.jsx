@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import { MdGroup, MdAdd, MdDelete, MdBusiness } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
@@ -12,6 +13,7 @@ const BLANK = { name: '', role: 'Employee', phone: '', since: '' };
 
 export default function Employees() {
   const { dispatch } = useCAD();
+  const toast = useToast();
   const { activeBiz: myBiz } = useActiveBusiness();
 
   const [adding, setAdding] = useState(false);
@@ -24,8 +26,14 @@ export default function Employees() {
   const addEmployee = () => {
     if (!canSubmit) return;
     dispatch({ type: 'ADD_EMPLOYEE', payload: { businessId: myBiz.id, employee: { ...form } } });
+    toast.success(`${form.name} added to the roster.`, { title: 'Employee Added' });
     setForm(BLANK);
     setAdding(false);
+  };
+
+  const removeEmployee = (emp) => {
+    dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } });
+    toast.success(`${emp.name} removed from the roster.`, { title: 'Employee Removed' });
   };
 
   return (
@@ -71,7 +79,7 @@ export default function Employees() {
           </div>
           <div className="flex justify-end gap-2.5 mt-[18px]">
             <button className={sm(S_BTN_SECONDARY)} onClick={() => { setForm(BLANK); setAdding(false); }}>Cancel</button>
-            <button className={sm(S_BTN_SUCCESS)} disabled={!canSubmit} onClick={addEmployee}>Add Employee</button>
+            <button className={`${sm(S_BTN_SUCCESS)} press`} disabled={!canSubmit} onClick={addEmployee}>Add Employee</button>
           </div>
         </PortalCard>
       )}
@@ -96,8 +104,8 @@ export default function Employees() {
                   </span>
                 </div>
                 <button
-                  className={`${sm(S_BTN_DANGER)} flex items-center gap-1`}
-                  onClick={() => dispatch({ type: 'REMOVE_EMPLOYEE', payload: { businessId: myBiz.id, employeeId: emp.id } })}
+                  className={`${sm(S_BTN_DANGER)} press-sm flex items-center gap-1`}
+                  onClick={() => removeEmployee(emp)}
                 >
                   <MdDelete size={16} /> Remove
                 </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonField, SonIconBtn, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
@@ -56,6 +57,7 @@ const US_TIMEZONES = [
 
 export default function CommunityInfo() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({ ...state.communityConfig });
   const [saved, setSaved] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -68,6 +70,7 @@ export default function CommunityInfo() {
 
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'communityConfig', value: { ...draft } } });
+    toast.success('Community info saved.');
     setSaved(true);
   };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL,
@@ -52,6 +53,7 @@ export default function IncidentDetail() {
   const { state, dispatch } = useCAD();
   const { calls, officers, dispatchLog, currentUser } = state;
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [radioMsg, setRadioMsg] = useState('');
 
@@ -63,27 +65,33 @@ export default function IncidentDetail() {
   const assignUnit = (unitId) => {
     if (!call) return;
     dispatch({ type:'ASSIGN_UNIT', payload:{ callId:call.id, unitId } });
+    toast.success(`${unitId} assigned to ${call.id}`);
   };
   const detachUnit = (unitId) => {
     if (!call) return;
     dispatch({ type:'DETACH_UNIT', payload:{ callId:call.id, unitId } });
+    toast.info(`${unitId} detached`);
   };
   const updateStatus = (status) => {
     if (!call) return;
     dispatch({ type:'UPDATE_CALL', payload:{ id:call.id, status } });
+    toast.info(`Call status → ${status}`);
   };
   const closeCall = () => {
     if (!call) return;
     dispatch({ type:'CLOSE_CALL', payload:call.id });
+    toast.success(`Call ${call.id} closed`);
     navigate('/cad');
   };
   const sendRadio = () => {
     if (!radioMsg.trim()) return;
     dispatch({ type:'DISPATCH_RADIO', payload:radioMsg.trim() });
+    toast.info('Radio broadcast sent');
     setRadioMsg('');
   };
   const setUnitStatus = (unitId, status) => {
     dispatch({ type:'SET_UNIT_STATUS', payload:{ unitId, status } });
+    toast.info(`${unitId} → ${CAD_STATUS_LABEL[status] || status}`);
   };
 
   if (!call) {
@@ -132,7 +140,7 @@ export default function IncidentDetail() {
 
         {isDispatch && (
           <button
-            className={`${sm(S_BTN_DANGER)} shrink-0`}
+            className={`press ${sm(S_BTN_DANGER)} shrink-0`}
             onClick={closeCall}
           >
             CLOSE CALL
@@ -180,7 +188,7 @@ export default function IncidentDetail() {
                       {isDispatch && (
                         <button
                           onClick={() => detachUnit(uid)}
-                          className="bg-transparent border-none text-red-400 hover:text-red-300 cursor-pointer text-base px-1 leading-none"
+                          className="press-sm bg-transparent border-none text-red-400 hover:text-red-300 cursor-pointer text-base px-1 leading-none"
                           title="Detach unit"
                         >×</button>
                       )}
@@ -203,7 +211,7 @@ export default function IncidentDetail() {
                       key={o.id}
                       onClick={() => assignUnit(o.unitId)}
                       title={`${o.name} · ${o.deptShort} · ${o.status}`}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold cursor-pointer bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition-colors"
+                      className="press-sm px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold cursor-pointer bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition-colors"
                     >
                       {o.unitId}
                     </button>
@@ -221,7 +229,7 @@ export default function IncidentDetail() {
                   <button
                     key={s}
                     onClick={() => updateStatus(s)}
-                    className={`px-3.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer border transition-all ${
+                    className={`press-sm px-3.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer border transition-all ${
                       call.status === s
                         ? 'bg-brand/15 text-brand-bright border-brand/40'
                         : 'bg-white/[0.03] text-slate-400 border-border-base hover:bg-white/[0.07] hover:text-slate-200'
@@ -253,7 +261,7 @@ export default function IncidentDetail() {
                             <button
                               key={s}
                               onClick={() => setUnitStatus(uid, s)}
-                              className={`px-2 py-1 rounded-md text-[9px] font-mono font-bold cursor-pointer border transition-all ${
+                              className={`press-sm px-2 py-1 rounded-md text-[9px] font-mono font-bold cursor-pointer border transition-all ${
                                 on
                                   ? 'bg-brand/15 text-brand-bright border-brand/40'
                                   : 'bg-white/[0.03] text-slate-500 border-border-base hover:bg-white/[0.07] hover:text-slate-300'
@@ -288,7 +296,7 @@ export default function IncidentDetail() {
                 <button
                   onClick={sendRadio}
                   disabled={!radioMsg.trim()}
-                  className={`${sm(S_BTN_PRIMARY)} shrink-0`}
+                  className={`press ${sm(S_BTN_PRIMARY)} shrink-0`}
                 >
                   TX
                 </button>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { STATUS_COLORS } from '../constants/statusColors';
 import { DeptTag } from '../constants/deptLogos';
 import {
@@ -211,7 +212,7 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
       )}
       <div className="flex gap-1.5 mt-0.5">
         <button onClick={onDispatch}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
+          className="press flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
           style={{ background: 'rgba(58,136,232,0.22)', border: '1px solid rgba(58,136,232,0.38)', color: '#93c5fd' }}>
           <MdSend size={11} /> Dispatch
         </button>
@@ -228,6 +229,7 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
 /* ─── Create call from 911 ─── */
 function Dispatch911Modal({ call, onClose }) {
   const { dispatch } = useCAD();
+  const toast = useToast();
   const [form, setForm] = useState({
     nature: '',
     location: call.location || '',
@@ -240,11 +242,12 @@ function Dispatch911Modal({ call, onClose }) {
   const submit = () => {
     if (!form.nature || !form.location) return;
     dispatch({ type: 'CREATE_CALL', payload: { ...form, status: 'PENDING' } });
+    toast.success(`${form.nature} dispatched`, { title: 'Incident created' });
     dispatch({ type: 'REMOVE_INCOMING_911', payload: call.id });
     onClose();
   };
   return (
-    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={`${S_MODAL} max-w-[600px]`}>
         <div className={S_MODAL_HEADER}>
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
@@ -308,7 +311,7 @@ function Dispatch911Modal({ call, onClose }) {
         </div>
         <div className={S_MODAL_FOOTER}>
           <button className={S_BTN_SECONDARY} onClick={onClose}>Cancel</button>
-          <button className={S_BTN_PRIMARY} onClick={submit} disabled={!form.nature || !form.location}>
+          <button className={`press ${S_BTN_PRIMARY}`} onClick={submit} disabled={!form.nature || !form.location}>
             Create Incident
           </button>
         </div>
@@ -320,6 +323,7 @@ function Dispatch911Modal({ call, onClose }) {
 /* ─── Simulate an incoming 911 ─── */
 function Sim911Modal({ onClose }) {
   const { dispatch } = useCAD();
+  const toast = useToast();
   const [form, setForm] = useState({ message: '', location: '', caller: '', callbackNumber: '', priority: 2 });
   const submit = () => {
     if (!form.message) return;
@@ -332,10 +336,11 @@ function Sim911Modal({ onClose }) {
       receivedAt: Date.now(),
       priority: Number(form.priority),
     }});
+    toast.info('Incoming 911 call queued');
     onClose();
   };
   return (
-    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={`${S_MODAL} max-w-[480px]`}>
         <div className={S_MODAL_HEADER}>
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
@@ -374,7 +379,7 @@ function Sim911Modal({ onClose }) {
         </div>
         <div className={S_MODAL_FOOTER}>
           <button className={S_BTN_SECONDARY} onClick={onClose}>Cancel</button>
-          <button className={S_BTN_PRIMARY} onClick={submit} disabled={!form.message}>Add to Queue</button>
+          <button className={`press ${S_BTN_PRIMARY}`} onClick={submit} disabled={!form.message}>Add to Queue</button>
         </div>
       </div>
     </div>
@@ -383,6 +388,7 @@ function Sim911Modal({ onClose }) {
 
 export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [],
     unitStatusCodes = [], tenCodes = [] } = state;
   // Status menu/badges are driven by admin-configured unit status codes.
@@ -414,7 +420,15 @@ export default function DispatchCenter() {
 
   const me = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
-  const setStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
+  const statusLabel = (code) => unitStatusCodes.find(s => s.code === code)?.label || CAD_STATUS_LABEL[code] || code;
+  const setStatus = (s) => {
+    dispatch({ type: 'SET_STATUS', payload: s });
+    toast.info(`Status set to ${statusLabel(s)}`);
+  };
+  const setUnitStatus = (unitId, s) => {
+    dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } });
+    toast.info(`${unitId} → ${statusLabel(s)}`);
+  };
 
   const activeCalls = calls.filter(c => c.status !== 'CLOSED' && c.status !== 'CANCELLED');
   const filteredCalls = activeCalls.filter(c =>
@@ -431,6 +445,7 @@ export default function DispatchCenter() {
   const createCall = () => {
     if (!newCall.nature || !newCall.location) return;
     dispatch({ type:'CREATE_CALL', payload:{ ...newCall, status:'PENDING' } });
+    toast.success(`${newCall.nature} created`, { title: 'Incident created' });
     setNewCall({ nature:'', location:'', city:'Tampa', county:'Hillsborough', priority:1, category:'police', description:'', reportingParty:'' });
     closeCreate();
   };
@@ -541,11 +556,14 @@ export default function DispatchCenter() {
                   );
                 })}
               </div>
-              <button onClick={() => dispatch({
-                type: 'PANIC',
-                payload: { officerId: me?.id, unit: me?.unitId || currentUser?.badge || 'UNIT', name: me?.name || currentUser?.name, location: me?.location || 'LOCATION UNKNOWN' },
-              })}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
+              <button onClick={() => {
+                dispatch({
+                  type: 'PANIC',
+                  payload: { officerId: me?.id, unit: me?.unitId || currentUser?.badge || 'UNIT', name: me?.name || currentUser?.name, location: me?.location || 'LOCATION UNKNOWN' },
+                });
+                toast.error('Panic alert broadcast', { title: 'Officer in distress' });
+              }}
+                className="press w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
                 <MdSos size={16} /> Panic Alert
               </button>
             </div>
@@ -649,7 +667,7 @@ export default function DispatchCenter() {
                           style={{ color: statusColor(o.status) }}>{o.unitId}</td>
                         <td className="px-4 py-2.5">
                           {isDispatcher
-                            ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
+                            ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={setUnitStatus} />
                             : <StatusBadge status={o.status} />}
                         </td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>
@@ -678,7 +696,7 @@ export default function DispatchCenter() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
                         {isDispatcher
-                          ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
+                          ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={setUnitStatus} />
                           : <StatusBadge status={o.status} />}
                         {o.callId && <span className="font-mono text-[11px] font-semibold text-amber-300">{o.callId}</span>}
                       </div>
@@ -744,7 +762,7 @@ export default function DispatchCenter() {
 
       {/* Create Call Modal */}
       {showCreateForm && (
-        <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && closeCreate()}>
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && closeCreate()}>
           <div className={`${S_MODAL} max-w-[640px]`}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Create New Incident</div>
@@ -801,7 +819,7 @@ export default function DispatchCenter() {
             </div>
             <div className={S_MODAL_FOOTER}>
               <button className={S_BTN_SECONDARY} onClick={closeCreate}>Cancel</button>
-              <button className={S_BTN_PRIMARY} onClick={createCall} disabled={!newCall.nature || !newCall.location}>
+              <button className={`press ${S_BTN_PRIMARY}`} onClick={createCall} disabled={!newCall.nature || !newCall.location}>
                 Create Incident
               </button>
             </div>

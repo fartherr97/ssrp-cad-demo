@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,6 +9,7 @@ import { MdAdd, MdDelete, MdPlayArrow, MdCloudUpload } from 'react-icons/md';
 export default function NotificationTones() {
   const { state, dispatch } = useCAD();
   const { notificationTones } = state;
+  const toast = useToast();
   const [name, setName] = useState('');
   const [event, setEvent] = useState('');
   const [url, setUrl] = useState('');
@@ -15,6 +17,7 @@ export default function NotificationTones() {
   const add = () => {
     if (!name.trim() || !event.trim() || !url.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'notificationTones', item: { name: name.trim(), event: event.trim(), url: url.trim(), enabled: true } } });
+    toast.success('Tone added.');
     setName(''); setEvent(''); setUrl('');
   };
 
@@ -107,7 +110,7 @@ export default function NotificationTones() {
                 icon={MdDelete}
                 danger
                 title="Delete"
-                onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'notificationTones', id: tone.id } })}
+                onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'notificationTones', id: tone.id } }); toast.success('Tone deleted.'); }}
               />
             </div>
           ))}

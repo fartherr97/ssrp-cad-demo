@@ -6,6 +6,7 @@ import {
   MdPerson, MdWarningAmber,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
 import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
@@ -34,6 +35,7 @@ function StatusPill({ status }) {
 ══════════════════════════════════ */
 function RecordEditor({ entry, officer, template, currentUser, allOfficers, communityConfig, departments, onBack, onSave }) {
   const { dispatch: cadDispatch } = useCAD();
+  const toast = useToast();
   const hasSReview = !!template?.sections?.some(s => s.id === 'sReview');
 
   const [editData, setEditData] = useState(() => {
@@ -87,6 +89,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         supervisorBadge: me?.badge || currentUser?.badge || '—',
       },
     });
+    toast.success(`${entry.caseNumber || entry.type} returned to officer.`, { title: 'Report Returned' });
     onBack();
   };
 
@@ -138,11 +141,11 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             <MdDownload size={13} /> {pdfLoading ? '…' : 'PDF'}
           </button>
           <button type="button" onClick={() => setReturning(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25">
+            className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25">
             <MdReply size={13} /> Return to Officer
           </button>
           <button type="button" onClick={handleSave}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0">
+            className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11.5px] font-bold cursor-pointer transition-all border-0 shrink-0">
             <MdSave size={13} /> Save Changes
           </button>
         </div>
@@ -278,7 +281,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                     <button
                       type="button"
                       onClick={signAndApprove}
-                      className="w-full h-full min-h-[44px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] uppercase tracking-[0.5px] cursor-pointer transition-colors border-0">
+                      className="press w-full h-full min-h-[44px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] uppercase tracking-[0.5px] cursor-pointer transition-colors border-0">
                       Supervisor Signature
                     </button>
                   )}
@@ -339,10 +342,10 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
 
       {/* ── Return to Officer modal — works on all screen sizes ── */}
       {returning && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
           style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)' }}
           onClick={e => e.target === e.currentTarget && setReturning(false)}>
-          <div className="w-full sm:max-w-[480px] rounded-t-2xl sm:rounded-xl p-5 flex flex-col gap-4"
+          <div className="w-full sm:max-w-[480px] rounded-t-2xl sm:rounded-xl p-5 flex flex-col gap-4 anim-modal-in"
             style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.25)' }}>
             <div className="flex items-center gap-2">
               <MdReply size={18} className="text-amber-400 shrink-0" />
@@ -386,7 +389,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 Cancel
               </button>
               <button type="button" onClick={handleReturn} disabled={!commentDraft.trim()}
-                className="flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40"
+                className="press flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40"
                 style={{ background: 'rgba(251,146,60,0.20)', border: '1px solid rgba(251,146,60,0.45)', color: '#fb923c' }}>
                 <MdReply size={13} style={{ display: 'inline', marginRight: 5 }} />Send Return
               </button>
@@ -793,6 +796,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
 ══════════════════════════════════ */
 export default function Supervisor() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const {
     reports, records, officers, currentUser,
     reportTemplates = [], recordTemplates = [], communityConfig, departments = [],
@@ -872,6 +876,11 @@ export default function Supervisor() {
     }
     // Update the open entry to reflect saved state
     setOpenEntry(prev => ({ ...prev, formData, status, ...(supervisorSignature ? { supervisorSignature } : {}) }));
+    if (status === 'Approved') {
+      toast.success('Report approved.', { title: 'Report Approved' });
+    } else {
+      toast.success('Changes saved.', { title: 'Report Updated' });
+    }
   };
 
   /* ── If a record is open, show full editor ── */

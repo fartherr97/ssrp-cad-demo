@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import ReportForm from '../components/ReportForm';
@@ -96,6 +97,7 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
 
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { currentUser, officers, departments, reports, calls, reportTemplates = [] } = state;
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myDept = departments.find(d => d.id === myOfficer?.dept);
@@ -131,8 +133,10 @@ export default function OfficerProfile() {
   };
   const saveName = () => {
     const trimmed = nameDraft.trim();
-    if (trimmed && trimmed !== myOfficer.name)
+    if (trimmed && trimmed !== myOfficer.name) {
       dispatch({ type: 'PATCH_OFFICER', payload: { name: trimmed } });
+      toast.success('Display name updated.', { title: 'Profile Saved' });
+    }
     setEditingName(false);
   };
   const cancelName = () => setEditingName(false);
@@ -143,6 +147,7 @@ export default function OfficerProfile() {
     const dataUrl = await resizeToDataUrl(file);
     dispatch({ type: 'PATCH_OFFICER', payload: { avatarUrl: dataUrl } });
     e.target.value = '';
+    toast.success('Profile photo updated.', { title: 'Profile Saved' });
   };
 
   if (!myOfficer) return (
@@ -339,6 +344,7 @@ export default function OfficerProfile() {
               onBack={() => setEditingReturned(null)}
               onResubmit={(formData) => {
                 dispatch({ type: 'RESUBMIT_REPORT', payload: { id: editingReturned.id, formData } });
+                toast.success('Report resubmitted for review.', { title: 'Resubmitted' });
                 setEditingReturned(null);
               }}
             />
@@ -417,7 +423,7 @@ export default function OfficerProfile() {
       {/* PDF Report Viewer Modal */}
       {viewReport && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex flex-col"
+          className="fixed inset-0 z-[9999] flex flex-col anim-overlay-in"
           style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(4px)' }}
         >
           {/* Modal header bar */}
@@ -484,6 +490,7 @@ export default function OfficerProfile() {
 
 function IdentifiersTab({ officer, accentColor }) {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { departments, unitStatusCodes } = state;
   const identifiers = officer.identifiers || [];
   const [editing, setEditing] = useState(null); // null | 'new' | id
@@ -522,6 +529,7 @@ function IdentifiersTab({ officer, accentColor }) {
       dept: Number(draft.dept),
       deptShort: deptObj?.short || officer.deptShort || '',
     }});
+    toast.success(`Identifier "${draft.label.trim()}" saved.`, { title: 'Identifier Saved' });
     setEditing(null);
   };
 
@@ -554,14 +562,14 @@ function IdentifiersTab({ officer, accentColor }) {
             </div>
             <div className="flex gap-1.5 shrink-0">
               {!isActive && (
-                <button className={S_BTN_PRIMARY + ' !px-3 !py-1.5 !text-xs'} onClick={() => dispatch({ type: 'LOAD_IDENTIFIER', payload: ident.id })}>
+                <button className={S_BTN_PRIMARY + ' press !px-3 !py-1.5 !text-xs'} onClick={() => { dispatch({ type: 'LOAD_IDENTIFIER', payload: ident.id }); toast.success(`Now on duty as ${ident.unitId}.`, { title: ident.label }); }}>
                   <MdCheckCircle size={13} style={{ display: 'inline', marginRight: 4 }} />Activate
                 </button>
               )}
-              <button className={S_BTN_SECONDARY + ' !px-3 !py-1.5 !text-xs'} onClick={() => openEdit(ident)}>
+              <button className={S_BTN_SECONDARY + ' press !px-3 !py-1.5 !text-xs'} onClick={() => openEdit(ident)}>
                 <MdEdit size={13} style={{ display: 'inline', marginRight: 4 }} />Edit
               </button>
-              <button className={S_BTN_DANGER + ' !px-2 !py-1.5 !text-xs'} onClick={() => dispatch({ type: 'DELETE_IDENTIFIER', payload: ident.id })}>
+              <button className={S_BTN_DANGER + ' press !px-2 !py-1.5 !text-xs'} onClick={() => { dispatch({ type: 'DELETE_IDENTIFIER', payload: ident.id }); toast.success(`Identifier "${ident.label}" removed.`, { title: 'Identifier Deleted' }); }}>
                 <MdDelete size={13} />
               </button>
             </div>

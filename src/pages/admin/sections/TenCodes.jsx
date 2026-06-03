@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,12 +9,14 @@ import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdDelete, MdAdd, MdFileUpload, 
 export default function TenCodes() {
   const { state, dispatch } = useCAD();
   const { tenCodes } = state;
+  const toast = useToast();
   const [code, setCode] = useState('');
   const [label, setLabel] = useState('');
 
   const add = () => {
     if (!code.trim() || !label.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'tenCodes', item: { code: code.trim(), label: label.trim() } } });
+    toast.success('10-code added.');
     setCode(''); setLabel('');
   };
 
@@ -52,7 +55,7 @@ export default function TenCodes() {
                   <SonIconBtn icon={MdKeyboardArrowDown} title="Move down"
                     onClick={() => dispatch({ type: 'ADMIN_REORDER', payload: { key: 'tenCodes', id: t.id, dir: 1 } })} />
                   <SonIconBtn icon={MdDelete} danger title="Delete"
-                    onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'tenCodes', id: t.id } })} />
+                    onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'tenCodes', id: t.id } }); toast.success('10-code deleted.'); }} />
                 </div>
               </SonCell>
               <SonCell>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
@@ -24,6 +25,7 @@ const DRAFT_KEY = (tplId) => `ssrp_record_draft_${tplId}`;
 
 export default function RecordsCenter() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { recordTemplates, currentUser, officers, communityConfig, departments } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -95,6 +97,7 @@ export default function RecordsCenter() {
       },
     });
     try { localStorage.removeItem(DRAFT_KEY(selectedTemplate.id)); } catch { /* ignore */ }
+    toast.success(`${selectedTemplate.name} created as ${recNum}.`, { title: 'Record Created' });
     closeForm();
   };
 
@@ -321,9 +324,10 @@ export default function RecordsCenter() {
               </span>
               {isAdmin && selRecord.status === 'Active' && (
                 <div className="ml-auto flex gap-1.5">
-                  <button className={xs(S_BTN_SECONDARY)} onClick={() =>
-                    dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: selRecord.id, status: 'Revoked' } })
-                  }>
+                  <button className={xs(S_BTN_SECONDARY)} onClick={() => {
+                    dispatch({ type: 'UPDATE_RECORD_STATUS', payload: { id: selRecord.id, status: 'Revoked' } });
+                    toast.warning(`${selRecord.recordNumber} revoked.`, { title: 'Record Revoked' });
+                  }}>
                     Revoke
                   </button>
                 </div>

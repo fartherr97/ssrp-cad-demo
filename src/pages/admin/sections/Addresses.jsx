@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonSearch, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,6 +9,7 @@ import { MdAdd, MdDelete, MdUploadFile, MdDownload, MdHelpOutline } from 'react-
 export default function Addresses() {
   const { state, dispatch } = useCAD();
   const { adminAddresses } = state;
+  const toast = useToast();
   const [query, setQuery] = useState('');
   const [name, setName] = useState('');
   const [street, setStreet] = useState('');
@@ -17,6 +19,7 @@ export default function Addresses() {
   const add = () => {
     if (!name.trim() || !street.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'adminAddresses', item: { name: name.trim(), street: street.trim(), area: area.trim(), postal: postal.trim() } } });
+    toast.success('Address added.');
     setName(''); setStreet(''); setArea(''); setPostal('');
   };
 
@@ -81,7 +84,7 @@ export default function Addresses() {
               <SonCell mono color={ADMIN.textMute}>{a.postal}</SonCell>
               <SonCell align="center">
                 <SonIconBtn icon={MdDelete} danger title="Delete"
-                  onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminAddresses', id: a.id } })} />
+                  onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminAddresses', id: a.id } }); toast.success('Address deleted.'); }} />
               </SonCell>
             </SonRow>
           ))}

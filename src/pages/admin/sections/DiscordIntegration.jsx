@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import { AdminPageTitle, AdminPanel, SonButton, ADMIN } from '../AdminKit';
 import {
   MdExpandMore, MdExpandLess, MdSave, MdAdd, MdDelete,
@@ -181,8 +182,8 @@ function AddCustomModal({ onAdd, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-app-card border border-border-strong rounded-2xl w-full max-w-[440px] shadow-2xl shadow-black/60">
+    <div className="anim-overlay-in fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="anim-modal-in bg-app-card border border-border-strong rounded-2xl w-full max-w-[440px] shadow-2xl shadow-black/60">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-faint">
           <div className="text-[14px] font-bold text-white">Add Custom Webhook</div>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-200 cursor-pointer">✕</button>
@@ -206,7 +207,7 @@ function AddCustomModal({ onAdd, onClose }) {
         </div>
         <div className="flex gap-2 px-5 pb-5">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-lg bg-white/[0.04] border border-white/10 text-slate-300 text-[12.5px] font-semibold cursor-pointer hover:bg-white/[0.08] transition-all">Cancel</button>
-          <button onClick={submit} disabled={!label.trim()} className="flex-1 py-2.5 rounded-lg bg-brand hover:bg-brand-bright text-white text-[12.5px] font-bold cursor-pointer transition-all disabled:opacity-40">Add Webhook</button>
+          <button onClick={submit} disabled={!label.trim()} className="press flex-1 py-2.5 rounded-lg bg-brand hover:bg-brand-bright text-white text-[12.5px] font-bold cursor-pointer transition-all disabled:opacity-40">Add Webhook</button>
         </div>
       </div>
     </div>
@@ -215,12 +216,14 @@ function AddCustomModal({ onAdd, onClose }) {
 
 export default function DiscordIntegration() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [hooks, setHooks] = useState(() => buildConfig(state.discordWebhooks));
   const [saved, setSaved] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
 
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'discordWebhooks', value: hooks } });
+    toast.success('Webhooks saved.');
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -11,6 +12,7 @@ import {
 
 export default function PenalCodeEditor() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { penalCode, currentUser } = state;
 
   const [filter, setFilter] = useState('');
@@ -46,11 +48,13 @@ export default function PenalCodeEditor() {
     });
     setEditing(null);
     setSelected(editing);
+    toast.success(`${form.code} ${form.name} updated.`, { title: 'Charge Saved' });
   };
 
   const addCharge = () => {
     if (!form.code || !form.name) return;
     dispatch({ type: 'ADD_CHARGE', payload: { ...form, fine: Number(form.fine), points: Number(form.points) } });
+    toast.success(`${form.code} ${form.name} added to the penal code.`, { title: 'Charge Added' });
     setForm({ category: '', code: '', name: '', type: 'Misdemeanor', fine: '', jailTime: '', points: 0 });
     setShowAdd(false);
   };
@@ -175,7 +179,7 @@ export default function PenalCodeEditor() {
                 {isAdmin && (
                   <div className="flex gap-1">
                     <button className={sm(S_BTN_SECONDARY)} onClick={() => startEdit(selCharge)}>Edit</button>
-                    <button className={sm(S_BTN_DANGER)} onClick={() => { dispatch({type:'DELETE_CHARGE',payload:selCharge.id}); setSelected(null); }}>Delete</button>
+                    <button className={sm(S_BTN_DANGER)} onClick={() => { dispatch({type:'DELETE_CHARGE',payload:selCharge.id}); toast.success(`${selCharge.code} ${selCharge.name} removed.`, { title: 'Charge Deleted' }); setSelected(null); }}>Delete</button>
                   </div>
                 )}
               </div>

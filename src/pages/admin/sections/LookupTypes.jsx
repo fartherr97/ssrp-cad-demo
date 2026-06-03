@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
 import { MdAdd, MdClose, MdDelete } from 'react-icons/md';
 
-function LookupCard({ type, dispatch }) {
+function LookupCard({ type, dispatch, toast }) {
   const [val, setVal] = useState('');
 
   const addValue = () => {
     const v = val.trim();
     if (!v || type.values.includes(v)) { setVal(''); return; }
     dispatch({ type: 'ADMIN_UPDATE', payload: { key: 'lookupTypes', item: { id: type.id, values: [...type.values, v] } } });
+    toast.success('Value added.');
     setVal('');
   };
   const removeValue = idx => {
     dispatch({ type: 'ADMIN_UPDATE', payload: { key: 'lookupTypes', item: { id: type.id, values: type.values.filter((_, i) => i !== idx) } } });
+    toast.success('Value removed.');
   };
 
   return (
@@ -25,7 +28,7 @@ function LookupCard({ type, dispatch }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: ADMIN.text }}>{type.category}</div>
         <SonIconBtn icon={MdDelete} danger title="Delete lookup type"
-          onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'lookupTypes', id: type.id } })} />
+          onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'lookupTypes', id: type.id } }); toast.success('Lookup type deleted.'); }} />
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12, minHeight: 8 }}>
@@ -55,12 +58,14 @@ function LookupCard({ type, dispatch }) {
 export default function LookupTypes() {
   const { state, dispatch } = useCAD();
   const { lookupTypes } = state;
+  const toast = useToast();
   const [category, setCategory] = useState('');
 
   const addType = () => {
     const c = category.trim();
     if (!c) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'lookupTypes', item: { category: c, values: [] } } });
+    toast.success('Lookup type added.');
     setCategory('');
   };
 
@@ -79,7 +84,7 @@ export default function LookupTypes() {
       {lookupTypes.length === 0 ? (
         <EmptyState>No lookup types configured.</EmptyState>
       ) : (
-        lookupTypes.map(t => <LookupCard key={t.id} type={t} dispatch={dispatch} />)
+        lookupTypes.map(t => <LookupCard key={t.id} type={t} dispatch={dispatch} toast={toast} />)
       )}
     </AdminPanel>
   );

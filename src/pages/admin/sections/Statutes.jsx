@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonSearch, SonBadge,
   SON_INPUT, EmptyState, ADMIN,
@@ -19,6 +20,7 @@ const blank = { category: '', code: '', name: '', type: 'Misdemeanor', fine: '',
 export default function Statutes() {
   const { state, dispatch } = useCAD();
   const { penalCode = [] } = state;
+  const toast = useToast();
   const [query, setQuery] = useState('');
   const [form, setForm] = useState(null);   // null | { ...charge }  (id present = editing)
 
@@ -43,8 +45,8 @@ export default function Statutes() {
       points: Number(form.points) || 0,
       jailTime: form.jailTime?.trim() || 'None',
     };
-    if (form.id) dispatch({ type: 'UPDATE_CHARGE', payload });
-    else dispatch({ type: 'ADD_CHARGE', payload });
+    if (form.id) { dispatch({ type: 'UPDATE_CHARGE', payload }); toast.success('Statute updated.'); }
+    else { dispatch({ type: 'ADD_CHARGE', payload }); toast.success('Statute added.'); }
     setForm(null);
   };
 
@@ -97,7 +99,7 @@ export default function Statutes() {
                   <SonIconBtn icon={MdEdit} title="Edit"
                     onClick={() => setForm({ ...s, fine: String(s.fine ?? ''), points: String(s.points ?? 0) })} />
                   <SonIconBtn icon={MdDelete} danger title="Delete"
-                    onClick={() => dispatch({ type: 'DELETE_CHARGE', payload: s.id })} />
+                    onClick={() => { dispatch({ type: 'DELETE_CHARGE', payload: s.id }); toast.success('Statute deleted.'); }} />
                 </div>
               </SonCell>
               <SonCell mono color={ADMIN.red} bold>{s.code}</SonCell>

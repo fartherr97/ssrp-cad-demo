@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -8,12 +9,14 @@ import { MdAdd, MdDelete } from 'react-icons/md';
 export default function QuickLinks() {
   const { state, dispatch } = useCAD();
   const { quickLinks } = state;
+  const toast = useToast();
   const [label, setLabel] = useState('');
   const [url, setUrl] = useState('');
 
   const add = () => {
     if (!label.trim() || !url.trim()) return;
     dispatch({ type: 'ADMIN_ADD', payload: { key: 'quickLinks', item: { label: label.trim(), url: url.trim() } } });
+    toast.success('Quick link added.');
     setLabel(''); setUrl('');
   };
 
@@ -41,7 +44,7 @@ export default function QuickLinks() {
               <SonCell mono color={ADMIN.blue}>{q.url}</SonCell>
               <SonCell align="center">
                 <SonIconBtn icon={MdDelete} danger title="Delete"
-                  onClick={() => dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'quickLinks', id: q.id } })} />
+                  onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'quickLinks', id: q.id } }); toast.success('Quick link deleted.'); }} />
               </SonCell>
             </SonRow>
           ))}

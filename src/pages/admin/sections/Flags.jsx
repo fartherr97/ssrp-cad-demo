@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT, SON_LABEL,
   SonTable, SonRow, SonCell, SonBadge, SonIconBtn, EmptyState,
@@ -31,6 +32,7 @@ const blank = { name: '', color: '#ef4444', description: '' };
 export default function Flags() {
   const { state, dispatch } = useCAD();
   const { customFlags = [], civilians = [] } = state;
+  const toast = useToast();
 
   const [editing, setEditing] = useState(null); // flagId being edited, or 'new'
   const [draft, setDraft] = useState(blank);
@@ -43,8 +45,10 @@ export default function Flags() {
     if (!draft.name.trim()) return;
     if (editing === 'new') {
       dispatch({ type: 'ADD_FLAG_DEF', payload: draft });
+      toast.success('Flag created.');
     } else {
       dispatch({ type: 'UPDATE_FLAG_DEF', payload: { id: editing, ...draft } });
+      toast.success('Flag updated.');
     }
     cancel();
   };
@@ -52,6 +56,7 @@ export default function Flags() {
   const del = (id) => {
     if (!window.confirm('Delete this flag? It will be removed from all civilians.')) return;
     dispatch({ type: 'DELETE_FLAG_DEF', payload: id });
+    toast.success('Flag deleted.');
   };
 
   // Count civilians using each flag

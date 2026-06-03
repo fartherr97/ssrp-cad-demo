@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, AdminPageTitle, SonButton, SonIconBtn, SonField, SON_INPUT, SON_LABEL, ADMIN,
 } from '../AdminKit';
@@ -41,24 +42,27 @@ function ChipSection({ title, field, values, onAdd, onRemove }) {
 
 export default function Geographical() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({ ...state.geoSettings });
 
   const stored = state.geoSettings;
   const codesDirty = ['emergencyCode', 'penalCodeName', 'tenCodeName', 'currencyDelimiter']
     .some(k => draft[k] !== stored[k]);
 
-  const saveCodes = () => dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: draft } });
+  const saveCodes = () => { dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: draft } }); toast.success('CAD settings saved.'); };
 
   // Chip add/remove — explicit user action, dispatch immediately
   const addVal = (field, v) => {
     const next = { ...draft, [field]: [...(draft[field] || []), v] };
     setDraft(next);
     dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
+    toast.success('Entry added.');
   };
   const removeVal = (field, idx) => {
     const next = { ...draft, [field]: draft[field].filter((_, i) => i !== idx) };
     setDraft(next);
     dispatch({ type: 'ADMIN_SET', payload: { key: 'geoSettings', value: next } });
+    toast.success('Entry removed.');
   };
 
   const setCode = (field, value) => setDraft(p => ({ ...p, [field]: value }));

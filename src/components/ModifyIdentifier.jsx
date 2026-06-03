@@ -5,9 +5,9 @@ import IdentifierEditor from './IdentifierEditor';
 export default function ModifyIdentifier({ onClose }) {
   return createPortal(
     <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm anim-overlay-in" onClick={onClose} />
       <div
-        className="relative w-full max-w-[420px] rounded-2xl border border-border-base shadow-2xl shadow-black/60 overflow-hidden"
+        className="relative w-full max-w-[420px] rounded-2xl border border-border-base shadow-2xl shadow-black/60 overflow-hidden anim-modal-in"
         style={{ background: 'var(--app-card, #161b22)' }}
       >
         {/* Header */}

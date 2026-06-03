@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import { AdminPanel, SonButton, ADMIN } from '../AdminKit';
 import { MdSave, MdCheckCircle, MdAllInclusive } from 'react-icons/md';
 
 export default function Limits() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const [draft, setDraft] = useState({ ...state.limitsConfig });
   const [saved, setSaved] = useState(false);
 
@@ -12,6 +14,7 @@ export default function Limits() {
 
   const save = () => {
     dispatch({ type: 'ADMIN_SET', payload: { key: 'limitsConfig', value: { ...draft } } });
+    toast.success('Limits saved.');
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

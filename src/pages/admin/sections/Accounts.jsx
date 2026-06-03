@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
+import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonSearch, SonBadge, SonButton, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -10,6 +11,7 @@ const PER_PAGE = 6;
 export default function Accounts() {
   const { state, dispatch } = useCAD();
   const { adminAccounts } = state;
+  const toast = useToast();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(0);
@@ -24,6 +26,7 @@ export default function Accounts() {
   const cycleStatus = (a) => {
     const next = a.status === 'ACTIVE' ? 'SUSPENDED' : a.status === 'SUSPENDED' ? 'BANNED' : 'ACTIVE';
     dispatch({ type: 'ADMIN_UPDATE', payload: { key: 'adminAccounts', item: { id: a.id, status: next } } });
+    toast.success(`${a.username} set to ${next}.`);
   };
 
   return (

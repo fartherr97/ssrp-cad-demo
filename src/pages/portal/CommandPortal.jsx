@@ -85,7 +85,7 @@ function DateRangeBar({ dateFrom, setDateFrom, dateTo, setDateTo }) {
         return (
           <button key={p.label} type="button"
             onClick={() => { setDateFrom(p.from()); setDateTo(p.to()); }}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border cursor-pointer transition-all ${
+            className={`press-sm px-2.5 py-1 rounded-lg text-[11px] font-semibold border cursor-pointer transition-all ${
               active
                 ? 'bg-violet-400/20 border-violet-400/50 text-violet-300'
                 : 'bg-transparent border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
@@ -112,10 +112,10 @@ function ReportModal({ report, officer, allTypes, onClose }) {
   const color = typeColor(report.type, allTypes);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-[520px] rounded-2xl flex flex-col overflow-hidden"
+      <div className="w-full max-w-[520px] rounded-2xl flex flex-col overflow-hidden anim-modal-in"
         style={{ background: '#0c1929', border: `1px solid ${color}44`, borderTop: `3px solid ${color}` }}>
         <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
           <MdDescription size={18} style={{ color, flexShrink: 0 }} />
@@ -793,7 +793,7 @@ export default function CommandPortal() {
           const active = activeTab === tab;
           return (
             <button key={tab} type="button" onClick={() => setActiveTab(tab)}
-              className={`px-3.5 py-1.5 rounded-lg text-[12px] font-semibold cursor-pointer transition-all border ${
+              className={`press-sm px-3.5 py-1.5 rounded-lg text-[12px] font-semibold cursor-pointer transition-all border ${
                 active
                   ? 'bg-violet-400/20 border-violet-400/50 text-violet-300'
                   : 'bg-transparent border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'

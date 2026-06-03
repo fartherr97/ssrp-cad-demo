@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
@@ -30,6 +31,7 @@ const FORM_FIELDS = [
 
 export default function MyCharacters() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
 
   const [showForm, setShowForm] = useState(false);
@@ -65,8 +67,10 @@ export default function MyCharacters() {
     e.preventDefault();
     if (editingId != null) {
       dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: editingId, ...form } });
+      toast.success(`${form.firstName} ${form.lastName} updated.`, { title: 'Character Saved' });
     } else {
       dispatch({ type: 'ADD_CIVILIAN', payload: { ...form, ownedByPlayer: true } });
+      toast.success(`${form.firstName} ${form.lastName} registered.`, { title: 'Character Registered' });
     }
     closeForm();
   };
@@ -80,7 +84,7 @@ export default function MyCharacters() {
         accent="brand"
         action={
           !showForm && (
-            <button className={S_BTN_PRIMARY} onClick={openNew}>
+            <button className={`${S_BTN_PRIMARY} press`} onClick={openNew}>
               <MdAdd size={18} /> Register Character
             </button>
           )
@@ -122,7 +126,7 @@ export default function MyCharacters() {
               </div>
             </div>
             <div className="flex gap-2.5 mt-[18px]">
-              <button type="submit" className={S_BTN_PRIMARY}>
+              <button type="submit" className={`${S_BTN_PRIMARY} press`}>
                 {editingId != null ? 'Save Changes' : 'Register Character'}
               </button>
             </div>
@@ -138,7 +142,7 @@ export default function MyCharacters() {
             <div className="text-sm text-slate-400 mt-1.5">
               Register your first character to get started.
             </div>
-            <button className={`${S_BTN_PRIMARY} mt-[18px]`} onClick={openNew}>
+            <button className={`${S_BTN_PRIMARY} press mt-[18px]`} onClick={openNew}>
               <MdAdd size={18} /> Register Character
             </button>
           </div>
@@ -159,7 +163,7 @@ export default function MyCharacters() {
                     </span>
                   </div>
                 </div>
-                <button className={sm(S_BTN_SECONDARY)} onClick={() => openEdit(c)}>
+                <button className={`${sm(S_BTN_SECONDARY)} press-sm`} onClick={() => openEdit(c)}>
                   <MdEdit size={15} /> Edit
                 </button>
               </div>

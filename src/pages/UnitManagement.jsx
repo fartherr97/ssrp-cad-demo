@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { MdArrowBack } from 'react-icons/md';
 import {
@@ -22,7 +23,12 @@ function StatusBadge({ status }) {
 
 export default function UnitManagement() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { officers, departments, calls, currentUser } = state;
+  const setUnitStatus = (unitId, status) => {
+    dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status } });
+    toast.info(`${unitId} → ${status}`);
+  };
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selected, setSelected] = useState(null);
@@ -120,7 +126,7 @@ export default function UnitManagement() {
                       <td className={S_TABLE_TD} onClick={e => e.stopPropagation()}>
                         <select className={`${S_SELECT} !w-20 !text-[9px] !px-1 !py-px`}
                           value={o.status}
-                          onChange={e => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: o.unitId, status: e.target.value } })}>
+                          onChange={e => setUnitStatus(o.unitId, e.target.value)}>
                           <option>AVAILABLE</option>
                           <option>BUSY</option>
                           <option>ENRT</option>
@@ -204,8 +210,8 @@ export default function UnitManagement() {
                     <div className="flex flex-wrap gap-1">
                       {['AVAILABLE','BUSY','ENRT','ARRVD','UNAVAILABLE','OFFDUTY'].map(s => (
                         <button key={s}
-                          className={xs(selOfficer.status === s ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
-                          onClick={() => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: selOfficer.unitId, status: s } })}>
+                          className={`press-sm ${xs(selOfficer.status === s ? S_BTN_PRIMARY : S_BTN_SECONDARY)}`}
+                          onClick={() => setUnitStatus(selOfficer.unitId, s)}>
                           {s}
                         </button>
                       ))}

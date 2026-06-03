@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
+import { useToast } from '../contexts/ToastContext';
 import {
   MdPhone, MdLocationOn, MdClose, MdAdd, MdRadio,
   MdSend, MdGroup, MdDelete, MdPerson, MdHeadsetMic,
@@ -97,10 +98,10 @@ function ElapsedTimer({ receivedAt, now }) {
 
 function Modal({ title, icon: Icon, iconColor = '#3a88e8', onClose, children, footer }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.72)' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="flex flex-col w-full max-w-md rounded-2xl overflow-hidden"
+      <div className="flex flex-col w-full max-w-md rounded-2xl overflow-hidden anim-modal-in"
         style={{ background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.10)', maxHeight: '90vh' }}>
         <div className="flex items-center justify-between px-5 py-3.5 shrink-0"
           style={{ background: '#080f18', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
@@ -190,7 +191,7 @@ function IncomingCard({ call, now, onDispatch }) {
         </div>
       )}
       <button onClick={() => onDispatch(call)} type="button"
-        className="flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold"
+        className="press flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold"
         style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.13)', borderTop: '1px solid rgba(58,136,232,0.20)', color: '#3a88e8', border: 'none' }}>
         <MdSend size={12} /> DISPATCH
       </button>
@@ -253,7 +254,7 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
                 </div>
               ))}
               <button onClick={() => onAddUnit(call)} type="button"
-                className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px]"
+                className="press-sm flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px]"
                 style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.10)', border: '1px solid rgba(58,136,232,0.22)', color: '#3a88e8' }}>
                 <MdAdd size={11} /> Add Unit
               </button>
@@ -262,7 +263,7 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
           <div className="flex items-center justify-end px-3.5 py-2"
             style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <button onClick={() => onClose(call.id)} type="button"
-              className="text-[11px] font-bold px-3 py-1.5 rounded-lg"
+              className="press-sm text-[11px] font-bold px-3 py-1.5 rounded-lg"
               style={{ cursor: 'pointer', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.20)', color: '#ef4444' }}>
               Close Call
             </button>
@@ -368,7 +369,7 @@ function GroupCard({ group, officers, onDelete, onRename, onAddUnit, onRemoveUni
           </div>
         ))}
         <button onClick={() => onAddUnit(group)} type="button"
-          className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10.5px]"
+          className="press-sm flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10.5px]"
           style={{ cursor: 'pointer', background: `${group.color}12`, border: `1px solid ${group.color}28`, color: group.color }}>
           <MdAdd size={11} /> Add
         </button>
@@ -435,7 +436,7 @@ function DispatchModal({ call, officers, onConfirm, onClose }) {
             Cancel
           </button>
           <button onClick={handleSubmit} disabled={!canSubmit} type="button"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold"
+            className="press flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold"
             style={{ cursor: canSubmit ? 'pointer' : 'default', background: canSubmit ? 'rgba(58,136,232,0.18)' : 'rgba(58,136,232,0.05)', border: `1px solid ${canSubmit ? 'rgba(58,136,232,0.38)' : 'rgba(58,136,232,0.08)'}`, color: canSubmit ? '#3a88e8' : '#1e3a50' }}>
             <MdSend size={13} /> Dispatch Call
           </button>
@@ -510,7 +511,7 @@ function Sim911Modal({ onConfirm, onClose }) {
             Cancel
           </button>
           <button onClick={() => canSubmit && onConfirm({ caller, callbackNumber: callback, message, location, priority })} type="button"
-            className="flex-1 py-2 rounded-xl text-[12px] font-bold"
+            className="press flex-1 py-2 rounded-xl text-[12px] font-bold"
             style={{ cursor: canSubmit ? 'pointer' : 'default', background: canSubmit ? 'rgba(239,68,68,0.14)' : 'rgba(239,68,68,0.04)', border: `1px solid ${canSubmit ? 'rgba(239,68,68,0.32)' : 'rgba(239,68,68,0.09)'}`, color: canSubmit ? '#ef4444' : '#3a1a1a' }}>
             Receive Call
           </button>
@@ -559,7 +560,7 @@ function AddUnitToCallModal({ call, officers, onConfirm, onClose }) {
             Cancel
           </button>
           <button onClick={() => sel && onConfirm(call.id, sel)} disabled={!sel} type="button"
-            className="flex-1 py-2 rounded-xl text-[12px] font-bold"
+            className="press flex-1 py-2 rounded-xl text-[12px] font-bold"
             style={{ cursor: sel ? 'pointer' : 'default', background: sel ? 'rgba(58,136,232,0.15)' : 'rgba(58,136,232,0.04)', border: `1px solid ${sel ? 'rgba(58,136,232,0.30)' : 'rgba(58,136,232,0.08)'}`, color: sel ? '#3a88e8' : '#1a2d40' }}>
             Assign
           </button>
@@ -584,7 +585,7 @@ function AddUnitToGroupModal({ group, officers, onConfirm, onClose }) {
             Cancel
           </button>
           <button onClick={() => sel && onConfirm(sel)} disabled={!sel} type="button"
-            className="flex-1 py-2 rounded-xl text-[12px] font-bold"
+            className="press flex-1 py-2 rounded-xl text-[12px] font-bold"
             style={{ cursor: sel ? 'pointer' : 'default', background: sel ? 'rgba(58,136,232,0.15)' : 'rgba(58,136,232,0.04)', border: `1px solid ${sel ? 'rgba(58,136,232,0.30)' : 'rgba(58,136,232,0.08)'}`, color: sel ? '#3a88e8' : '#1a2d40' }}>
             Add to Group
           </button>
@@ -609,7 +610,7 @@ function NewGroupModal({ onConfirm, onClose }) {
             Cancel
           </button>
           <button onClick={() => name.trim() && onConfirm({ name: name.trim(), color })} type="button"
-            className="flex-1 py-2 rounded-xl text-[12px] font-bold"
+            className="press flex-1 py-2 rounded-xl text-[12px] font-bold"
             style={{ cursor: name.trim() ? 'pointer' : 'default', background: name.trim() ? 'rgba(58,136,232,0.15)' : 'rgba(58,136,232,0.04)', border: `1px solid ${name.trim() ? 'rgba(58,136,232,0.30)' : 'rgba(58,136,232,0.08)'}`, color: name.trim() ? '#3a88e8' : '#1a2d40' }}>
             Create Group
           </button>
@@ -664,6 +665,7 @@ export default function DispatchPortal() {
   const { state, dispatch } = useCAD();
   const { isMobile } = useResponsive();
   const now = useNow();
+  const toast = useToast();
 
   const [unitTab,           setUnitTab]           = useState('UNITS');
   const [dispatchTarget,    setDispatchTarget]    = useState(null);
@@ -680,6 +682,7 @@ export default function DispatchPortal() {
 
   const handleDispatch = ({ nature, location, priority, units, description, reportingParty }) => {
     dispatch({ type: 'CREATE_CALL', payload: { nature, location, priority, units, category: 'police', description, reportingParty, city: '', county: '', status: units.length ? 'ACTIVE' : 'PENDING', timestamp: new Date().toISOString().slice(0,16).replace('T',' ') } });
+    toast.success(units.length ? `${nature} dispatched — ${units.length} unit${units.length > 1 ? 's' : ''}` : `${nature} created`, { title: 'Call dispatched' });
     dispatch({ type: 'REMOVE_INCOMING_911', payload: dispatchTarget.id });
     units.forEach(uid => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: uid, status: 'ENRT' } }));
     setDispatchTarget(null);
@@ -687,11 +690,13 @@ export default function DispatchPortal() {
 
   const handleSim911 = ({ caller, callbackNumber, message, location, priority }) => {
     dispatch({ type: 'ADD_INCOMING_911', payload: { id: `inc_${Date.now()}`, caller, callbackNumber, message, location, priority, receivedAt: Date.now() } });
+    toast.info('Incoming 911 call received');
     setShowSim911(false);
   };
 
   const handleAddUnitToCall = (callId, unitId) => {
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId, unitId } });
+    toast.success('Unit assigned to call');
     setAddUnitCallTarget(null);
   };
 
@@ -701,10 +706,12 @@ export default function DispatchPortal() {
 
   const handleCloseCall = callId => {
     dispatch({ type: 'CLOSE_CALL', payload: callId });
+    toast.success(`Call #${callId} closed`);
   };
 
   const handleCreateGroup = ({ name, color }) => {
     dispatch({ type: 'ADD_UNIT_GROUP', payload: { id: `grp_${Date.now()}`, name, color, units: [] } });
+    toast.success(`Group "${name}" created`);
     setShowNewGroup(false);
   };
 
@@ -714,6 +721,7 @@ export default function DispatchPortal() {
 
   const handleDeleteGroup = id => {
     dispatch({ type: 'DELETE_UNIT_GROUP', payload: id });
+    toast.info('Group deleted');
   };
 
   const handleAddUnitToGroup = unitId => {
@@ -729,6 +737,7 @@ export default function DispatchPortal() {
 
   const handleStatusChange = (unitId, status) => {
     dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status } });
+    toast.info(`${unitId} → ${(ST_CFG[status] || {}).label || status}`);
   };
 
   return (
@@ -747,7 +756,7 @@ export default function DispatchPortal() {
           )}
         </div>
         <button onClick={() => setShowSim911(true)} type="button"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold"
+          className="press flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold"
           style={{ cursor: 'pointer', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.22)', color: '#ef4444' }}>
           <MdPhone size={12} /> Simulate 911
         </button>
@@ -814,7 +823,7 @@ export default function DispatchPortal() {
           {unitTab === 'GROUPS' && (
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
               <button onClick={() => setShowNewGroup(true)} type="button"
-                className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-bold"
+                className="press flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-bold"
                 style={{ cursor: 'pointer', background: 'rgba(58,136,232,0.07)', border: '1px dashed rgba(58,136,232,0.22)', color: '#3a88e8' }}>
                 <MdAdd size={14} /> New Group
               </button>
