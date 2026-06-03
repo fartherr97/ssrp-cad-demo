@@ -450,7 +450,12 @@ function ByDeptTab({ reports, officers, departments }) {
         const pct = deptOfficers.length > 0
           ? Math.round((officersWithReports / deptOfficers.length) * 100)
           : 0;
-        const barColor = pct >= 80 ? '#2fd968' : pct >= 50 ? '#f5a93b' : '#ff5454';
+        const barColor    = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f97316' : '#ef4444';
+        const barGradient = pct >= 80
+          ? 'linear-gradient(90deg, #16a34a, #22c55e)'
+          : pct >= 50
+            ? 'linear-gradient(90deg, #c2410c, #ea580c, #f97316)'
+            : 'linear-gradient(90deg, #991b1b, #ef4444)';
 
         return (
           <PortalCard key={dept.id} accent={accent}>
@@ -488,7 +493,7 @@ function ByDeptTab({ reports, officers, departments }) {
                 <span className="text-[11px] font-bold font-mono" style={{ color: barColor }}>{pct}%</span>
               </div>
               <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
+                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barGradient }} />
               </div>
               <div className="text-[9.5px] text-slate-600 mt-1">{officersWithReports} of {deptOfficers.length} officers have filed at least 1 report</div>
             </div>
@@ -675,31 +680,34 @@ export default function CommandPortal() {
   const openReport = (r) => setModalReport(r);
   const closeModal = () => setModalReport(null);
 
-  /* ── Subtitle scope label ── */
-  const scopeLabel = scopeDept
-    ? `Viewing: ${scopeDept.short}`
-    : 'Viewing: All Departments';
-
-  const deptPicker = isAdmin && (
-    <select
-      className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer"
-      value={adminDeptId ?? ''}
-      onChange={e => setAdminDeptId(e.target.value ? Number(e.target.value) : null)}
-    >
-      <option value="">All Departments</option>
-      {leoDepts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-    </select>
-  );
-
   return (
     <PortalPage>
       <PortalHeader
         icon={MdShield}
         title="Command Portal"
-        subtitle={`Officer compliance, report oversight, and force tracking. · ${scopeLabel}`}
+        subtitle="Officer compliance, report oversight, and force tracking."
         accent="violet"
-        action={deptPicker}
       />
+
+      {/* Scope bar */}
+      <div className="flex flex-wrap items-center gap-2 mb-5">
+        <span
+          className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider border shrink-0"
+          style={{ background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.3)', color: '#c4b5fd' }}
+        >
+          {scopeDept ? `Viewing: ${scopeDept.short}` : 'All Departments'}
+        </span>
+        {isAdmin && (
+          <select
+            className="bg-app-input border border-border-base rounded-lg px-3 py-1.5 text-[12px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer"
+            value={adminDeptId ?? ''}
+            onChange={e => setAdminDeptId(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">All Departments</option>
+            {leoDepts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+        )}
+      </div>
 
       {/* Tab bar */}
       <div className="flex flex-wrap gap-1.5 mb-6">
