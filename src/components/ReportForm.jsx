@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -753,11 +753,87 @@ function downscaleImage(file) {
   });
 }
 
+/* ── Full-screen image viewer (lightbox) ── */
+function PhotoLightbox({ photos, index, onClose, onNavigate }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowLeft') onNavigate(-1);
+      else if (e.key === 'ArrowRight') onNavigate(1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose, onNavigate]);
+
+  const multi = photos.length > 1;
+
+  return createPortal(
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10"
+      style={{ background: 'rgba(3,7,12,0.92)', backdropFilter: 'blur(4px)' }}
+    >
+      {/* Close */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer z-10"
+        style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0' }}
+        title="Close (Esc)"
+      >
+        <MdClose size={22} />
+      </button>
+
+      {/* Prev / Next */}
+      {multi && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate(-1); }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center border-none cursor-pointer z-10"
+            style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0' }}
+            title="Previous (←)"
+          >
+            <MdChevronLeft size={28} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate(1); }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center border-none cursor-pointer z-10"
+            style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0' }}
+            title="Next (→)"
+          >
+            <MdChevronRight size={28} />
+          </button>
+        </>
+      )}
+
+      {/* Image — object-contain so nothing is cropped */}
+      <img
+        src={photos[index]}
+        alt={`Photo ${index + 1}`}
+        onClick={(e) => e.stopPropagation()}
+        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+      />
+
+      {/* Counter */}
+      <div
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full text-[12px] font-semibold text-slate-200"
+        style={{ background: 'rgba(255,255,255,0.08)' }}
+      >
+        Photo {index + 1} of {photos.length}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ── Multi-photo gallery field (up to `f.max` photos, default 8) ── */
 function PhotoGalleryField({ f, value, onChange, readOnly }) {
   const max = Math.min(f.max || 8, 8);
   const photos = Array.isArray(value) ? value : [];
   const fileRefs = useRef([]);
+  const [viewerIdx, setViewerIdx] = useState(null);
 
   const handleFile = async (idx, e) => {
     const file = e.target.files?.[0];
@@ -795,12 +871,21 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
         {slots.map((src, idx) => (
           <div key={idx}>
             {src ? (
-              <div className="relative rounded-lg overflow-hidden border border-border-base" style={{ aspectRatio: '4/3' }}>
+              <div
+                onClick={() => setViewerIdx(idx)}
+                className="group relative rounded-lg overflow-hidden border border-border-base cursor-zoom-in"
+                style={{ aspectRatio: '4/3' }}
+                title="Click to view full size"
+              >
                 <img src={src} alt={`Photo ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                {/* Hover hint that the photo opens full size */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0,0,0,0.35)' }}>
+                  <MdZoomIn size={22} className="text-white/90" />
+                </div>
                 {!readOnly && (
                   <button
                     type="button"
-                    onClick={() => removePhoto(idx)}
+                    onClick={(e) => { e.stopPropagation(); removePhoto(idx); }}
                     className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center border-none cursor-pointer z-10"
                     style={{ background: 'rgba(0,0,0,0.65)', color: '#f87171' }}
                     title="Remove photo"
@@ -837,6 +922,15 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
           <div className="sm:col-span-2 lg:col-span-4 text-[12px] text-slate-600 italic py-3">No photos attached.</div>
         )}
       </div>
+
+      {viewerIdx != null && photos[viewerIdx] && (
+        <PhotoLightbox
+          photos={photos}
+          index={viewerIdx}
+          onClose={() => setViewerIdx(null)}
+          onNavigate={(dir) => setViewerIdx(i => (i + dir + photos.length) % photos.length)}
+        />
+      )}
     </div>
   );
 }
