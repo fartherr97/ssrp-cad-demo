@@ -294,7 +294,6 @@ export default function ActionBar() {
     ['/portal/business',    'business'],
     ['/portal/my-business', 'business'],
     ['/portal/employees',   'business'],
-    ['/portal/incidents',   'business'],
     ['/fire',               'fire'],
   ];
   const pathPortalId = (PATH_PORTAL_MAP.find(([p]) => location.pathname.startsWith(p)) || [])[1];

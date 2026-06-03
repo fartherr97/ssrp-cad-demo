@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import {
-  MdStore, MdGroup, MdAssignment, MdReceiptLong,
+  MdStore, MdGroup, MdReceiptLong,
   MdCheckCircle, MdBusiness, MdMenuBook,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
-import { BADGE } from '../../constants/styles';
 import AccessDenied from './AccessDenied';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
@@ -13,7 +12,6 @@ const ACCENT = 'brand';
 const QUICK_ACTIONS = [
   { to: '/portal/my-business', icon: MdBusiness,    title: 'My Business',  desc: 'View & edit your business profile' },
   { to: '/portal/employees',   icon: MdGroup,       title: 'Employees',    desc: 'Manage your staff roster' },
-  { to: '/portal/incidents',   icon: MdAssignment,  title: 'Incidents',    desc: 'Review filed business incidents' },
   { to: '/portal/laws',        icon: MdMenuBook,    title: 'State Laws',   desc: 'Browse the penal code reference' },
 ];
 
@@ -22,11 +20,6 @@ export default function BusinessHome() {
   const { activeBiz: myBiz } = useActiveBusiness();
 
   if (!myBiz) return <AccessDenied portalName="the Business Center" />;
-
-  const openIncidents = myBiz.incidents.filter(i => i.status === 'Open').length;
-  const recentIncidents = [...myBiz.incidents]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 3);
 
   return (
     <PortalPage>
@@ -40,7 +33,6 @@ export default function BusinessHome() {
 
       <div className="flex gap-3.5 flex-wrap mb-7">
         <StatCard label="Employees" value={myBiz.employees.length} accent={ACCENT} icon={MdGroup} hint="On the roster" />
-        <StatCard label="Open Incidents" value={openIncidents} accent={openIncidents > 0 ? 'red' : ACCENT} icon={MdAssignment} hint={openIncidents > 0 ? 'Require attention' : 'All clear'} />
         <StatCard label="License" value={myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdReceiptLong} hint={`Expires ${myBiz.licenseExpiry}`} />
         <StatCard label="Business Status" value={myBiz.status} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdCheckCircle} hint="Operating status" />
       </div>
@@ -60,26 +52,6 @@ export default function BusinessHome() {
         ))}
       </div>
 
-      <SectionTitle accent={ACCENT}>Recent Incidents</SectionTitle>
-      <PortalCard accent={ACCENT}>
-        {recentIncidents.length === 0 ? (
-          <div className="text-center p-6 text-slate-500 text-sm">
-            No incidents on record.
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            {recentIncidents.map((inc, idx) => (
-              <div key={inc.id} className={`flex items-center gap-3 py-3 ${idx !== 0 ? 'border-t border-border-faint' : ''}`}>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-slate-100">{inc.type}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{inc.date}</div>
-                </div>
-                <span className={inc.status === 'Open' ? BADGE.orange : BADGE.gray}>{inc.status}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </PortalCard>
     </PortalPage>
   );
 }

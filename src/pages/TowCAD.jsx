@@ -696,6 +696,16 @@ export default function TowCAD() {
   );
 
   const activeCalls   = useMemo(() => calls.filter(c => c.status !== 'CLOSED'), [calls]);
+  // Road Hazard / MVA calls that still have no tow job linked to them. Once a
+  // job is linked (e.g. by dispatching the matching FDOT request), the call
+  // drops off this list — and the alert banner clears when none remain.
+  const unhandledRoadCalls = useMemo(
+    () => activeCalls.filter(c =>
+      (c.nature.includes('Road Hazard') || c.nature.includes('MVA')) &&
+      !towJobs.some(j => j.callId === c.id)
+    ),
+    [activeCalls, towJobs]
+  );
   const visibleUnits  = useMemo(() =>
     towUnits.filter(u => visibleCompanyIds.length === 0 || visibleCompanyIds.includes(u.companyId)),
     [towUnits, visibleCompanyIds]
@@ -941,13 +951,16 @@ export default function TowCAD() {
         )}
       </div>
 
-      {/* FDOT road incident alert */}
-      {towCompanies.some(b => b.isFDOT) &&
-        activeCalls.some(c => c.nature.includes('Road Hazard') || c.nature.includes('MVA')) && (
+      {/* FDOT road incident alert — only while road calls still lack a linked
+          tow job; clears once every one has been handled. */}
+      {towCompanies.some(b => b.isFDOT) && unhandledRoadCalls.length > 0 && (
         <div className="flex items-start gap-3 mb-5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
           <MdWarning size={18} className="text-amber-400 shrink-0 mt-0.5" />
           <div className="text-[12.5px] text-amber-300 leading-relaxed">
-            <span className="font-bold">Active road incidents detected.</span> Road Hazard or MVA calls are in the dispatch queue * consider linking new tow jobs to those calls for coordinated response.
+            <span className="font-bold">
+              {unhandledRoadCalls.length} active road incident{unhandledRoadCalls.length > 1 ? 's' : ''} awaiting a tow job.
+            </span>{' '}
+            Road Hazard or MVA calls in the dispatch queue have no tow job linked yet — link one to coordinate response.
           </div>
         </div>
       )}

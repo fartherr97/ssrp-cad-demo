@@ -644,10 +644,6 @@ export const BUSINESSES = [
       { id: 2, name: "Amanda Chen",    discordId: "309182746", roles: ["Dispatcher"],             phone: "555-0334", since: "2025-01-15" },
       { id: 3, name: "Luis Romero",    discordId: "",          roles: ["Driver"],                 phone: "555-0911", since: "2025-06-20" },
     ],
-    incidents: [
-      { id: 1, date: "2026-05-22", type: "Theft Report",     summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
-      { id: 2, date: "2026-04-10", type: "Alarm Activation", summary: "Silent alarm tripped 03:14, units responded, false alarm.", status: "Closed" },
-    ],
   },
   {
     id: 2, name: "FDOT Tow Operations", type: "Government / Towing",
@@ -663,7 +659,6 @@ export const BUSINESSES = [
       { id: 1, name: "Ray Calhoun",    discordId: "100200305", roles: ["Inspector", "Supervisor"], phone: "813-975-6200", since: "2022-01-01" },
       { id: 2, name: "Jordan Maxwell", discordId: "205947291", roles: ["Supervisor", "Dispatcher"], phone: "555-0192",    since: "2024-06-01" },
     ],
-    incidents: [],
   },
 ];
 

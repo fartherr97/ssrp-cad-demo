@@ -587,7 +587,7 @@ function reducer(state, action) {
 
     /* ─── Business portal ─── */
     case 'ADD_BUSINESS': {
-      const b = { ...action.payload, id: state.nextId, employees: [], incidents: [], status: 'ACTIVE' };
+      const b = { ...action.payload, id: state.nextId, employees: [], status: 'ACTIVE' };
       const audit = addAuditEntry(state, `Created business: ${b.name}`, 'Admin');
       return { ...state, businesses: [...state.businesses, b], nextId: state.nextId + 1, ...audit };
     }

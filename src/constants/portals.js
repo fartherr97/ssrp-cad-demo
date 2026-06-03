@@ -84,7 +84,6 @@ export const PORTALS = {
       { Icon: MdStore,         label: 'My Business', route: '/portal/my-business'    },
       { Icon: MdGroup,         label: 'Employees',   route: '/portal/employees'      },
       { Icon: MdDirectionsCar, label: 'Fleet',       route: '/portal/business-fleet' },
-      { Icon: MdAssignment,    label: 'Incidents',   route: '/portal/incidents'      },
       { Icon: MdLocalShipping, label: 'Tow CAD',     route: '/tow-cad'               },
       { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'           },
     ],
