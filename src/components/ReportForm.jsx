@@ -12,7 +12,7 @@ import { FlagRow } from './CivilianFlags';
 
 // Static span classes so Tailwind JIT picks them up.
 const SPAN = {
-  1: 'lg:col-span-1',
+  1: 'sm:col-span-1 lg:col-span-1',
   2: 'sm:col-span-2 lg:col-span-2',
   3: 'sm:col-span-2 lg:col-span-3',
   4: 'sm:col-span-2 lg:col-span-4',
