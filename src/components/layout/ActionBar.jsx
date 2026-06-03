@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import { useMountTransition } from '../ui/Modal';
 import { STATUS_COLORS } from '../../constants/statusColors';
 import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
@@ -125,6 +126,7 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
 
 /* ─── User chip with dropdown (status, panic, profile, portal, sign-out) ─── */
 function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, navigate, isActive }) {
+  const toast = useToast();
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const [hoveredStatus, setHoveredStatus] = useState(null);
@@ -166,16 +168,19 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
       { x: 1140,  y:  2660, z:  45, area: 'Route 68'       },
     ];
     const c = mockCoords[Math.floor(Math.random() * mockCoords.length)];
+    const unit = me?.unitId || currentUser?.badge || 'UNIT';
+    const location = me?.location || c.area;
     dispatch({
       type: 'PANIC',
       payload: {
         officerId: me?.id,
-        unit: me?.unitId || currentUser?.badge || 'UNIT',
+        unit,
         name: me?.name || currentUser?.name,
-        location: me?.location || c.area,
+        location,
         x: c.x, y: c.y, z: c.z,
       },
     });
+    toast.error(`${unit} — ${location}`, { title: 'PANIC — Officer in Distress' });
     setOpen(false);
   };
 

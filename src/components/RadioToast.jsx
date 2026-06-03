@@ -13,8 +13,9 @@ export default function RadioToast() {
   const isSender = currentUser?.portal === 'dispatch';
   // Panic alerts broadcast to everyone (incl. dispatch); normal radio traffic
   // still hides for the dispatcher who sent it.
+  // Panic alerts are handled by the top ToastContext notification; skip here.
   const visible = lastRadio && lastRadio.id !== dismissedId && currentUser &&
-    (lastRadio.panic || !isSender);
+    !lastRadio.panic && !isSender;
   const toast = visible ? lastRadio : null;
 
   useEffect(() => {

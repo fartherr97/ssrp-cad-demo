@@ -560,11 +560,13 @@ export default function DispatchCenter() {
                   { x: 1140,  y:  2660, z:  45, area: 'Route 68'       },
                 ];
                 const c = mockCoords[Math.floor(Math.random() * mockCoords.length)];
+                const unit = me?.unitId || currentUser?.badge || 'UNIT';
+                const location = me?.location || c.area;
                 dispatch({
                   type: 'PANIC',
-                  payload: { officerId: me?.id, unit: me?.unitId || currentUser?.badge || 'UNIT', name: me?.name || currentUser?.name, location: me?.location || c.area, x: c.x, y: c.y, z: c.z },
+                  payload: { officerId: me?.id, unit, name: me?.name || currentUser?.name, location, x: c.x, y: c.y, z: c.z },
                 });
-                toast.error('Panic alert broadcast', { title: 'Officer in distress' });
+                toast.error(`${unit} — ${location}`, { title: 'PANIC — Officer in Distress' });
               }}
                 className="press w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
                 <MdSos size={16} /> Panic Alert
