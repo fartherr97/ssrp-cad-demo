@@ -31,7 +31,7 @@ const GROUPS = [
       { icon: MdInventory2,         label: 'Custom Records', route: '/admin/custom-records' },
       { icon: MdShield,             label: 'Departments',    route: '/admin/departments' },
       { icon: MdFormatListNumbered, label: '10-Codes',       route: '/admin/ten-codes' },
-      { icon: MdGavel,              label: 'Statutes',       route: '/admin/statutes' },
+      { icon: MdGavel,              label: 'Penal Code',     route: '/admin/statutes' },
       { icon: MdRemoveModerator,    label: 'Auto Suspend',   route: '/admin/license-points' },
       { icon: MdFlag,               label: 'Flags',          route: '/admin/flags' },
     ],

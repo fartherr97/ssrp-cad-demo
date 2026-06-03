@@ -25,42 +25,10 @@ export const TEN_CODES = [
   { id: 22, code: '10-97',  label: 'Arrived on Scene' },
 ];
 
-export const CHARGE_TYPES = [
-  { id: 1, name: 'Infraction' },
-  { id: 2, name: 'Warning' },
-  { id: 3, name: 'First Degree Misdemeanor' },
-  { id: 4, name: 'Second Degree Misdemeanor' },
-  { id: 5, name: 'First Degree Felony' },
-  { id: 6, name: 'Second Degree Felony' },
-  { id: 7, name: 'Third Degree Felony' },
-];
-
-export const BOND_TYPES = [
-  { id: 1, name: 'Citation Release' },
-  { id: 2, name: 'Recognizance Release' },
-  { id: 3, name: 'Cash Bail' },
-  { id: 4, name: 'Surety Bond' },
-  { id: 5, name: 'Property Bond' },
-  { id: 6, name: 'No Bail' },
-];
-
-export const STATUTES = [
-  { id: 1, code: '784.011', title: 'Assault',                       chargeType: 'First Degree Misdemeanor', bondType: 'Cash Bail',    amount: 2500,  jailTime: '60 Days' },
-  { id: 2, code: '784.021', title: 'Aggravated Assault',            chargeType: 'Third Degree Felony',      bondType: 'Surety Bond',  amount: 5000,  jailTime: '5 Years' },
-  { id: 3, code: '784.03',  title: 'Battery',                       chargeType: 'First Degree Misdemeanor', bondType: 'Cash Bail',    amount: 2500,  jailTime: '1 Year' },
-  { id: 4, code: '782.04',  title: 'Murder',                        chargeType: 'First Degree Felony',      bondType: 'No Bail',      amount: 0,     jailTime: 'Life' },
-  { id: 5, code: '812.014', title: 'Theft (Grand)',                 chargeType: 'Third Degree Felony',      bondType: 'Surety Bond',  amount: 5000,  jailTime: '5 Years' },
-  { id: 6, code: '812.014', title: 'Theft (Petit)',                 chargeType: 'Second Degree Misdemeanor',bondType: 'Citation Release', amount: 500, jailTime: '60 Days' },
-  { id: 7, code: '316.193', title: 'DUI',                           chargeType: 'First Degree Misdemeanor', bondType: 'Cash Bail',    amount: 1000,  jailTime: '6 Months' },
-  { id: 8, code: '316.192', title: 'Reckless Driving',              chargeType: 'Second Degree Misdemeanor',bondType: 'Citation Release', amount: 500, jailTime: '90 Days' },
-  { id: 9, code: '322.34',  title: 'Driving While License Suspended',chargeType: 'Second Degree Misdemeanor',bondType: 'Recognizance Release', amount: 1000, jailTime: '60 Days' },
-  { id: 10,code: '893.13',  title: 'Possession of a Controlled Substance', chargeType: 'Third Degree Felony', bondType: 'Surety Bond', amount: 5000, jailTime: '5 Years' },
-  { id: 11,code: '790.01',  title: 'Carrying a Concealed Weapon',    chargeType: 'First Degree Misdemeanor', bondType: 'Cash Bail',    amount: 2500,  jailTime: '1 Year' },
-  { id: 12,code: '843.01',  title: 'Resisting Officer with Violence',chargeType: 'Third Degree Felony',      bondType: 'Surety Bond',  amount: 5000,  jailTime: '5 Years' },
-  { id: 13,code: '316.072', title: 'Fleeing or Eluding',            chargeType: 'Third Degree Felony',      bondType: 'No Bail',      amount: 10000, jailTime: '5 Years' },
-  { id: 14,code: '806.13',  title: 'Criminal Mischief',             chargeType: 'First Degree Misdemeanor', bondType: 'Citation Release', amount: 1000, jailTime: '1 Year' },
-  { id: 15,code: '810.02',  title: 'Burglary',                      chargeType: 'Second Degree Felony',     bondType: 'Surety Bond',  amount: 15000, jailTime: '15 Years' },
-];
+/* Charge types, bond types and statutes now live in the unified `penalCode`
+   slice (mockData.PENAL_CODE), edited via the admin Penal Code / Statutes
+   section. That single source feeds report charges, the citizen Laws page
+   and the license-points engine. */
 
 export const UNIT_STATUS_CODES = [
   { id: 1, code: 'AVAILABLE',   label: 'Available',    color: '#22ff66' },
