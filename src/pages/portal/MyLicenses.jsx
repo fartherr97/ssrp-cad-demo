@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import {
-  MdBadge, MdDriveEta, MdGppGood, MdPerson, MdLock,
+  MdBadge, MdDriveEta, MdPerson, MdLock,
   MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
 } from 'react-icons/md';
 import {
   PortalPage, PortalHeader, PortalCard, Field,
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
-import { statusBadge } from '../../constants/styles';
 import ReportForm from '../../components/ReportForm';
 
 const DL_CLASSES = [
@@ -19,24 +18,6 @@ const DL_CLASSES = [
   { value: 'Class M',     label: 'Class M',         desc: 'Motorcycle or moped only' },
   { value: 'Class E / M', label: 'Class E + M',     desc: 'Standard license with motorcycle endorsement' },
 ];
-
-function WeaponPermitBlock({ civ }) {
-  return (
-    <div className="flex-1 min-w-[240px] bg-app-card/70 border border-border-base rounded-xl p-4 backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-2.5 mb-3.5">
-        <div className="flex items-center gap-2">
-          <MdGppGood size={20} color="#3d82f0" />
-          <span className="text-sm font-bold text-slate-100">Weapon Permit</span>
-        </div>
-        <span className={statusBadge(civ.weaponPermit)}>{civ.weaponPermit || 'NONE'}</span>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <Field label="Status" value={civ.weaponPermit} />
-        <Field label="Expires" value={civ.weaponPermitExpiry || (civ.weaponPermit === 'NONE' ? '—' : '')} />
-      </div>
-    </div>
-  );
-}
 
 const DL_STATUSES = [
   { value: 'ACTIVE',    label: 'Active',    color: '#4ade80' },
@@ -463,8 +444,6 @@ export default function MyLicenses() {
                     )}
                   </div>
 
-                  {/* Weapon Permit (unchanged) */}
-                  <WeaponPermitBlock civ={c} />
                 </div>
               </PortalCard>
             );

@@ -592,9 +592,14 @@ function reducer(state, action) {
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1 };
     }
     case 'SET_DL_TEMPLATE': {
-      // Sets dlTemplate:true on one record template, clears all others. Pass null to clear.
       const { templateId } = action.payload;
       const recordTemplates = state.recordTemplates.map(t => ({ ...t, dlTemplate: t.id === templateId }));
+      return { ...state, recordTemplates };
+    }
+    case 'SET_TEMPLATE_FLAG': {
+      // Generic: sets flag to true on one template, false on all others. templateId:null clears all.
+      const { flag, templateId } = action.payload;
+      const recordTemplates = state.recordTemplates.map(t => ({ ...t, [flag]: t.id === templateId }));
       return { ...state, recordTemplates };
     }
     case 'UPDATE_REPORT': {

@@ -1,45 +1,125 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
-import { MdDirectionsCar, MdAdd, MdClose, MdPerson } from 'react-icons/md';
-import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
+import {
+  MdDirectionsCar, MdAdd, MdClose, MdPerson, MdLock, MdErrorOutline,
+} from 'react-icons/md';
+import {
+  PortalPage, PortalHeader, PortalCard, Field,
+  PORTAL_INPUT, PORTAL_LABEL,
+} from './PortalKit';
+import { BADGE } from '../../constants/styles';
+import ReportForm from '../../components/ReportForm';
 
-const EMPTY_FORM = { ownerId: '', plate: '', make: '', model: '', year: '', color: '', regExpiry: '' };
+const defaultExpiry = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().split('T')[0];
+};
+
+/* ── Confirmation modal (same pattern as MyLicenses) ── */
+function ConfirmModal({ onConfirm, onCancel }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="w-full sm:max-w-[440px] rounded-t-2xl sm:rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: '#0c1929', border: '1px solid rgba(251,146,60,0.3)' }}>
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+            <MdErrorOutline size={22} className="text-amber-400" />
+          </div>
+          <div>
+            <div className="text-[15px] font-bold text-white mb-1">Register this vehicle?</div>
+            <div className="text-[12.5px] text-slate-400 leading-relaxed">
+              Once submitted, <span className="text-white font-semibold">vehicle details cannot be edited</span>. Only server administrators can make changes after registration.
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <button type="button" onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
+            Go Back
+          </button>
+          <button type="button" onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-amber-500 hover:bg-amber-400 text-black transition-colors">
+            Yes, Register
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function MyVehicles() {
   const { state, dispatch } = useCAD();
   const { civilians, vehicles } = state;
 
-  const myChars = useMemo(() => civilians.filter(c => c.ownedByPlayer), [civilians]);
-  const myCharIds = useMemo(() => myChars.map(c => c.id), [myChars]);
-  const myVehicles = useMemo(() => vehicles.filter(v => myCharIds.includes(v.ownerId)), [vehicles, myCharIds]);
+  const vehicleTemplate = useMemo(
+    () => (state.recordTemplates || []).find(t => t.vehicleTemplate) || null,
+    [state.recordTemplates],
+  );
+
+  const myChars     = useMemo(() => civilians.filter(c => c.ownedByPlayer), [civilians]);
+  const myCharIds   = useMemo(() => myChars.map(c => c.id), [myChars]);
+  const myVehicles  = useMemo(() => vehicles.filter(v => myCharIds.includes(v.ownerId)), [vehicles, myCharIds]);
+
   const ownerName = (id) => {
     const c = civilians.find(x => x.id === id);
     return c ? `${c.firstName} ${c.lastName}` : 'Unknown';
   };
 
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const EMPTY_FORM = { ownerId: '', plate: '', make: '', model: '', year: '', color: '', regExpiry: defaultExpiry() };
+
+  const [showForm,        setShowForm]        = useState(false);
+  const [form,            setForm]            = useState(EMPTY_FORM);
+  const [templateData,    setTemplateData]    = useState({});
+  const [confirming,      setConfirming]      = useState(false);
+
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
   const openNew = () => {
     setForm({ ...EMPTY_FORM, ownerId: myChars[0] ? String(myChars[0].id) : '' });
+    setTemplateData({});
     setShowForm(true);
   };
-  const closeForm = () => { setShowForm(false); setForm(EMPTY_FORM); };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setForm(EMPTY_FORM);
+    setTemplateData({});
+    setConfirming(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setConfirming(true);
+  };
+
+  const handleConfirm = () => {
     const { ownerId, regExpiry, ...rest } = form;
     dispatch({
       type: 'ADD_VEHICLE',
       payload: { ...rest, regExpiry, regStatus: 'VALID', ownerId: Number(ownerId) },
     });
+    if (vehicleTemplate) {
+      dispatch({
+        type: 'ADD_RECORD',
+        payload: {
+          type: vehicleTemplate.name,
+          civilianId: Number(ownerId),
+          isVehicleReg: true,
+          status: 'Approved',
+          formData: { plate: form.plate, make: form.make, model: form.model, year: form.year, color: form.color, regExpiry, ...templateData },
+        },
+      });
+    }
     closeForm();
   };
 
   return (
     <PortalPage>
+      {confirming && <ConfirmModal onConfirm={handleConfirm} onCancel={() => setConfirming(false)} />}
+
       <PortalHeader
         icon={MdDirectionsCar}
         title="My Vehicles"
@@ -47,7 +127,9 @@ export default function MyVehicles() {
         accent="brand"
         action={
           !showForm && myChars.length > 0 && (
-            <button className={S_BTN_PRIMARY} onClick={openNew}>
+            <button
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0"
+              onClick={openNew}>
               <MdAdd size={18} /> Register Vehicle
             </button>
           )
@@ -58,11 +140,15 @@ export default function MyVehicles() {
         <PortalCard accent="brand" style={{ marginBottom: 22 }}>
           <div className="flex justify-between items-center mb-[18px]">
             <div className="text-[15px] font-extrabold text-slate-100">Register New Vehicle</div>
-            <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
+            <button
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors"
+              onClick={closeForm}>
               <MdClose size={16} /> Cancel
             </button>
           </div>
+
           <form onSubmit={handleSubmit}>
+            {/* Standard vehicle fields */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className={PORTAL_LABEL}>Registered Owner</label>
@@ -97,8 +183,30 @@ export default function MyVehicles() {
                 <input className={PORTAL_INPUT} type="date" value={form.regExpiry} onChange={e => setField('regExpiry', e.target.value)} />
               </div>
             </div>
-            <div className="mt-[18px]">
-              <button type="submit" className={S_BTN_PRIMARY}>Register Vehicle</button>
+
+            {/* Template-driven extra fields */}
+            {vehicleTemplate && (
+              <div className="mt-5 pt-5 border-t border-border-faint">
+                <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3 flex items-center gap-2">
+                  🚗 <span>{vehicleTemplate.name} — Additional Fields</span>
+                </div>
+                <ReportForm
+                  template={vehicleTemplate}
+                  data={templateData}
+                  onChange={(k, v) => setTemplateData(p => ({ ...p, [k]: v }))}
+                  onBulkChange={(obj) => setTemplateData(p => ({ ...p, ...obj }))}
+                />
+              </div>
+            )}
+
+            <div className="mt-[18px] flex gap-3 items-center">
+              <button type="submit"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0">
+                <MdDirectionsCar size={15} /> Register Vehicle
+              </button>
+              <span className="text-[10.5px] text-slate-600 flex items-center gap-1">
+                <MdLock size={11} /> Cannot be edited after submission
+              </span>
             </div>
           </form>
         </PortalCard>
@@ -115,7 +223,9 @@ export default function MyVehicles() {
                 : 'Register your first vehicle to get started.'}
             </div>
             {myChars.length > 0 && (
-              <button className={`${S_BTN_PRIMARY} mt-[18px]`} onClick={openNew}>
+              <button
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer bg-brand hover:bg-brand/80 text-white transition-colors border-0 mt-[18px]"
+                onClick={openNew}>
                 <MdAdd size={18} /> Register Vehicle
               </button>
             )}
@@ -142,9 +252,14 @@ export default function MyVehicles() {
                 <Field label="Color" value={v.color} />
                 <Field label="Reg. Expiry" value={v.regExpiry} />
               </div>
-              <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
-                <MdPerson size={15} color="#3d82f0" />
-                <span>Registered to <span className="text-slate-200 font-semibold">{ownerName(v.ownerId)}</span></span>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <MdPerson size={15} color="#3d82f0" />
+                  <span>Registered to <span className="text-slate-200 font-semibold">{ownerName(v.ownerId)}</span></span>
+                </div>
+                <span className="flex items-center gap-1 text-[10px] text-slate-600">
+                  <MdLock size={10} /> Filed
+                </span>
               </div>
             </PortalCard>
           ))}

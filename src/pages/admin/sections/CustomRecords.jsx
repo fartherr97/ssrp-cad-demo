@@ -635,21 +635,25 @@ function DLClassEditor({ draft, onChange }) {
   );
 }
 
-/* ── DL template meta bar (inside TemplateEditor) ── */
-function DLTemplateMetaBar({ draft, onChange, isReport }) {
-  const { dispatch } = useCAD();
-  const isActive = !!draft.dlTemplate;
+/* ── Record role toggles (DL / Vehicle Reg / Weapon Permit) ── */
+const RECORD_ROLES = [
+  { flag: 'dlTemplate',           emoji: '🪪', label: 'Driver License',      hint: 'Civilians use this to apply for their DL',          col: '#4ade80' },
+  { flag: 'vehicleTemplate',      emoji: '🚗', label: 'Vehicle Registration', hint: 'Adds extra fields to vehicle registration',          col: '#60a5fa' },
+  { flag: 'weaponPermitTemplate', emoji: '🔫', label: 'Weapon Permit',        hint: 'Reserved for future weapon-permit self-service',     col: '#c084fc' },
+];
 
-  const handleToggle = () => {
-    if (isActive) {
-      // Clear the flag on this template
-      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId: null } });
-      onChange({ dlTemplate: false });
+function RecordRoleToggles({ draft, onChange, isReport }) {
+  const { dispatch } = useCAD();
+
+  const toggle = (flag) => {
+    const next = !draft[flag];
+    const templateId = next ? draft.id : null;
+    if (flag === 'dlTemplate') {
+      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId } });
     } else {
-      // Set this template as the DL template (clears all others in the store)
-      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId: draft.id } });
-      onChange({ dlTemplate: true });
+      dispatch({ type: 'SET_TEMPLATE_FLAG', payload: { flag, templateId } });
     }
+    onChange({ [flag]: next });
   };
 
   return (
@@ -662,21 +666,21 @@ function DLTemplateMetaBar({ draft, onChange, isReport }) {
       </div>
       {!isReport && (
         <>
-          <div className="h-3.5 w-px ml-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          <button
-            type="button"
-            onClick={handleToggle}
-            title={isActive ? 'Remove Driver License template designation' : 'Use this template as the civilian Driver License form'}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-bold cursor-pointer transition-all border"
-            style={isActive
-              ? { background: 'rgba(74,222,128,0.12)', color: '#4ade80', borderColor: 'rgba(74,222,128,0.3)' }
-              : { background: 'rgba(255,255,255,0.04)', color: '#4b5563', borderColor: 'rgba(255,255,255,0.08)' }
-            }>
-            🪪 {isActive ? 'Driver License Template ✓' : 'Set as Driver License Template'}
-          </button>
-          {isActive && (
-            <span className="text-[9.5px] text-slate-600 italic">Civilians use this form to file their DL</span>
-          )}
+          <div className="h-3.5 w-px mx-0.5" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          {RECORD_ROLES.map(({ flag, emoji, label, hint, col }) => {
+            const active = !!draft[flag];
+            return (
+              <button key={flag} type="button" onClick={() => toggle(flag)}
+                title={active ? `Remove ${label} designation` : hint}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-bold cursor-pointer transition-all border"
+                style={active
+                  ? { background: `${col}1e`, color: col, borderColor: `${col}55` }
+                  : { background: 'rgba(255,255,255,0.04)', color: '#4b5563', borderColor: 'rgba(255,255,255,0.08)' }
+                }>
+                {emoji} {active ? `${label} ✓` : label}
+              </button>
+            );
+          })}
         </>
       )}
     </div>
@@ -767,8 +771,8 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Meta (form code + DL template toggle) */}
-      <DLTemplateMetaBar draft={draft} onChange={up} isReport={isReport} />
+      {/* Meta bar — form code + role toggles */}
+      <RecordRoleToggles draft={draft} onChange={up} isReport={isReport} />
 
       {/* Sections (scrollable body) */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
