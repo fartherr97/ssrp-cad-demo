@@ -557,7 +557,8 @@ export default function DispatchCenter() {
           {/* Active calls */}
           <SectionCard title="Active Calls" count={sortedCalls.length}
             action="View All" onAction={() => navigate('/board')}>
-            <div className="overflow-auto max-h-[min(46vh,520px)]">
+            {/* Desktop table */}
+            <div className="hidden lg:block overflow-auto max-h-[min(46vh,520px)]">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-app-bg/40">
@@ -593,12 +594,40 @@ export default function DispatchCenter() {
                 </tbody>
               </table>
             </div>
+            {/* Mobile cards */}
+            <div className="lg:hidden flex flex-col divide-y divide-border-faint max-h-[60vh] overflow-auto">
+              {sortedCalls.length === 0 ? (
+                <div className="p-8 text-center text-slate-600 text-[12px]">No active calls</div>
+              ) : sortedCalls.map(c => {
+                const priColor = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' }[c.priority] || '#94a3b8';
+                return (
+                  <div key={c.id} onClick={() => navigate('/cad/' + c.id)}
+                    className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                    style={{ borderLeft: `3px solid ${priColor}` }}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span className="text-[13px] font-bold text-white">{c.nature}</span>
+                        <PriBadge p={c.priority} />
+                        <CallStatus status={c.status} />
+                      </div>
+                      <div className="text-[11.5px] text-slate-400 truncate">{c.location}{c.city ? ` · ${c.city}` : ''}</div>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="font-mono text-[10.5px] text-slate-500">{c.id}</span>
+                        {c.createdAt && <span className="text-[10.5px]"><Elapsed createdAt={c.createdAt} /></span>}
+                        {c.units.length > 0 && <span className="text-[10.5px] font-mono text-emerald-400">{c.units.join(', ')}</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </SectionCard>
 
           {/* Field units */}
           {showUnits && (
             <SectionCard title="Field Units" count={onDutyOfficers.length}>
-              <div className="overflow-auto max-h-[min(40vh,460px)]">
+              {/* Desktop table */}
+              <div className="hidden lg:block overflow-auto max-h-[min(40vh,460px)]">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-app-bg/40">
@@ -633,6 +662,33 @@ export default function DispatchCenter() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              {/* Mobile cards */}
+              <div className="lg:hidden flex flex-col divide-y divide-border-faint max-h-[55vh] overflow-auto">
+                {filteredUnits.length === 0 ? (
+                  <div className="p-8 text-center text-slate-600 text-[12px]">No units on duty</div>
+                ) : filteredUnits.map(o => (
+                  <div key={o.id}
+                    onClick={() => o.callId && navigate('/cad/' + o.callId)}
+                    className={`flex items-center gap-3 px-4 py-3 ${o.callId ? 'cursor-pointer' : ''} hover:bg-white/[0.03] transition-colors`}>
+                    <div className="shrink-0 text-center min-w-[44px]">
+                      <div className="text-[14px] font-mono font-bold" style={{ color: statusColor(o.status) }}>{o.unitId}</div>
+                      <div className="mt-0.5"><DeptTag code={o.deptShort} /></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        {isDispatcher
+                          ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={(unitId, s) => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId, status: s } })} />
+                          : <StatusBadge status={o.status} />}
+                        {o.callId && <span className="font-mono text-[11px] font-semibold text-amber-300">{o.callId}</span>}
+                      </div>
+                      <div className="text-[12.5px] text-white truncate">
+                        {o.name}{o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}
+                      </div>
+                      {o.location && <div className="text-[11px] text-slate-500 truncate mt-0.5">{o.location}</div>}
+                    </div>
+                  </div>
+                ))}
               </div>
             </SectionCard>
           )}
