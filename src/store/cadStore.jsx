@@ -389,6 +389,12 @@ function reducer(state, action) {
       return { ...state, civilians };
     }
 
+    case 'UPDATE_MEDICAL_PROFILE': {
+      const { id, medicalProfile } = action.payload;
+      const civilians = state.civilians.map(c => c.id === id ? { ...c, medicalProfile } : c);
+      return { ...state, civilians };
+    }
+
     case 'ADD_VEHICLE': {
       const newVeh = { ...action.payload, id: state.nextId, flags: [], stolen: false };
       const civilians = state.civilians.map(c => c.id === action.payload.ownerId ? { ...c, vehicles: [...c.vehicles, state.nextId] } : c);

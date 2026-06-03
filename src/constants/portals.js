@@ -3,7 +3,7 @@ import {
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
-  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping, MdShield,
+  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping, MdShield, MdLocalHospital,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -70,6 +70,7 @@ export const PORTALS = {
       { Icon: MdPerson,        label: 'Characters',  route: '/portal/characters'  },
       { Icon: MdDirectionsCar, label: 'Vehicles',    route: '/portal/vehicles'    },
       { Icon: MdBadge,         label: 'Licenses',    route: '/portal/licenses'    },
+      { Icon: MdLocalHospital, label: 'Medical',     route: '/portal/medical'     },
       { Icon: MdReportProblem, label: 'File Report', route: '/portal/file-report' },
       { Icon: MdGavel,         label: 'Complaint',   route: '/portal/complaint'   },
       { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'        },

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import {
   MdHome, MdPerson, MdDirectionsCar, MdBadge, MdReportProblem,
-  MdWarning, MdMenuBook, MdChevronRight,
+  MdWarning, MdMenuBook, MdChevronRight, MdLocalHospital,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { BADGE } from '../../constants/styles';
@@ -31,11 +31,12 @@ export default function CivilianHome() {
   );
 
   const QUICK = [
-    { route: '/portal/characters',  icon: MdPerson,        title: 'My Characters', desc: 'Register and manage your identities.' },
-    { route: '/portal/vehicles',    icon: MdDirectionsCar, title: 'My Vehicles',   desc: 'Register vehicles and view registration.' },
-    { route: '/portal/licenses',    icon: MdBadge,         title: 'My Licenses',   desc: 'Driver licenses and weapon permits.' },
-    { route: '/portal/file-report', icon: MdReportProblem, title: 'File a Report', desc: 'Report theft, vandalism, and more.' },
-    { route: '/portal/laws',        icon: MdMenuBook,      title: 'State Laws',    desc: 'Browse the public penal code.' },
+    { route: '/portal/characters',  icon: MdPerson,        title: 'My Characters',   desc: 'Register and manage your identities.' },
+    { route: '/portal/vehicles',    icon: MdDirectionsCar, title: 'My Vehicles',     desc: 'Register vehicles and view registration.' },
+    { route: '/portal/licenses',    icon: MdBadge,         title: 'My Licenses',     desc: 'Driver licenses and weapon permits.' },
+    { route: '/portal/medical',     icon: MdLocalHospital, title: 'Medical Records', desc: 'Manage medical profiles, allergies, and emergency contacts.' },
+    { route: '/portal/file-report', icon: MdReportProblem, title: 'File a Report',   desc: 'Report theft, vandalism, and more.' },
+    { route: '/portal/laws',        icon: MdMenuBook,      title: 'State Laws',      desc: 'Browse the public penal code.' },
   ];
 
   return (

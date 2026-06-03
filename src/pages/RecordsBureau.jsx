@@ -7,6 +7,7 @@ import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore, MdExpandLess,
+  MdLocalHospital, MdShield,
 } from 'react-icons/md';
 
 function age(dob) {
@@ -210,7 +211,7 @@ export default function RecordsBureau() {
   const vehOwner    = selVeh ? civilians.find(c => c.id === selVeh.ownerId) : null;
   const vehWarrants = vehOwner ? warrants.filter(w => w.civilianId === vehOwner.id) : [];
 
-  const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES'];
+  const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES', 'MEDICAL'];
   const vehTabs    = ['RETURN', 'FLAGS'];
   const activeTabs = selCiv ? personTabs : selVeh ? vehTabs : ['RETURN'];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
@@ -675,6 +676,100 @@ export default function RecordsBureau() {
                       )}
                   </InfoCard>
                 )}
+
+                {tab === 'MEDICAL' && selCiv && (() => {
+                  const mp = selCiv.medicalProfile;
+                  const hasProfile = mp && (mp.bloodType || mp.conditions?.length || mp.allergies?.length || mp.safetyNotes);
+                  return (
+                    <div className="flex flex-col gap-4">
+                      {/* LEO notice banner */}
+                      <div className="flex items-start gap-3 rounded-xl px-4 py-3"
+                        style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)' }}>
+                        <MdShield size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                        <div className="text-[11px] text-amber-300/80 leading-relaxed">
+                          <span className="font-bold text-amber-300">LEO View</span> — showing safety-relevant information only.
+                          Medications, emergency contacts, and clinical notes are restricted to Fire &amp; EMS.
+                        </div>
+                      </div>
+
+                      {!hasProfile ? (
+                        <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                          <MdLocalHospital size={40} className="text-slate-700" />
+                          <div className="text-[13px] font-semibold text-slate-400">No medical profile on file</div>
+                          <div className="text-[11px] text-slate-600">Subject has not filed a medical profile.</div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Blood type + flags row */}
+                          <InfoCard title="Medical Identifiers">
+                            <div className="flex flex-wrap gap-2.5 items-center">
+                              {mp.bloodType && (
+                                <div className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl"
+                                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                  <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-red-400/70">Blood Type</span>
+                                  <span className="text-[22px] font-extrabold text-red-300 leading-none">{mp.bloodType}</span>
+                                </div>
+                              )}
+                              {mp.dnr && (
+                                <div className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl"
+                                  style={{ background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.35)' }}>
+                                  <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-red-400">DNR Status</span>
+                                  <span className="text-[14px] font-extrabold text-red-300">DO NOT RESUSCITATE</span>
+                                </div>
+                              )}
+                              {mp.organDonor && (
+                                <div className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl"
+                                  style={{ background: 'rgba(61,130,240,0.08)', border: '1px solid rgba(61,130,240,0.25)' }}>
+                                  <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-brand-bright/70">Donor</span>
+                                  <span className="text-[14px] font-extrabold text-brand-bright">Organ Donor</span>
+                                </div>
+                              )}
+                              {!mp.bloodType && !mp.dnr && !mp.organDonor && (
+                                <span className="text-[12px] text-slate-500">No identifiers on file</span>
+                              )}
+                            </div>
+                          </InfoCard>
+
+                          {/* Conditions */}
+                          <InfoCard title="Medical Conditions">
+                            {(!mp.conditions || mp.conditions.length === 0)
+                              ? <div className="text-[12px] text-slate-500">No conditions listed</div>
+                              : (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {mp.conditions.map((c, i) => (
+                                    <span key={i} className="px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-[11.5px] text-amber-200 font-medium">{c}</span>
+                                  ))}
+                                </div>
+                              )}
+                          </InfoCard>
+
+                          {/* Allergies */}
+                          <InfoCard title="Known Allergies">
+                            {(!mp.allergies || mp.allergies.length === 0)
+                              ? <div className="text-[12px] text-slate-500">No allergies listed</div>
+                              : (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {mp.allergies.map((a, i) => (
+                                    <span key={i} className="px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/25 text-[11.5px] text-red-200 font-medium">{a}</span>
+                                  ))}
+                                </div>
+                              )}
+                          </InfoCard>
+
+                          {/* Safety notes */}
+                          {mp.safetyNotes && (
+                            <InfoCard title="Officer Safety Notes">
+                              <div className="flex items-start gap-2.5">
+                                <MdWarningAmber size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                                <div className="text-[12.5px] text-amber-200/90 leading-relaxed">{mp.safetyNotes}</div>
+                              </div>
+                            </InfoCard>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </>
           )}
