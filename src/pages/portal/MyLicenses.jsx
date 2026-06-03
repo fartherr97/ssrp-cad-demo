@@ -11,9 +11,12 @@ import {
 import { statusBadge } from '../../constants/styles';
 
 const DL_CLASSES = [
-  { value: 'Class A', label: 'Class A', desc: 'Commercial vehicles over 26,000 lbs' },
-  { value: 'Class B', label: 'Class B', desc: 'Single vehicles over 26,000 lbs' },
-  { value: 'Class C', label: 'Class C', desc: 'Standard passenger vehicles' },
+  { value: 'Class E',     label: 'Class E',         desc: 'Standard license — non-commercial vehicles under 26,001 lbs (most common)' },
+  { value: 'Class A CDL', label: 'Class A CDL',     desc: 'Combination vehicles with a GCWR of 26,001+ lbs towing a unit over 10,000 lbs' },
+  { value: 'Class B CDL', label: 'Class B CDL',     desc: 'Heavy straight vehicles 26,001+ lbs, or buses designed for 24+ passengers' },
+  { value: 'Class C CDL', label: 'Class C CDL',     desc: 'Vehicles carrying hazardous materials or transporting 16–23 passengers' },
+  { value: 'Class M',     label: 'Class M',         desc: 'Motorcycle or moped only' },
+  { value: 'Class E / M', label: 'Class E + M',     desc: 'Standard license with motorcycle endorsement' },
 ];
 
 function WeaponPermitBlock({ civ }) {
@@ -83,7 +86,7 @@ function ConfirmModal({ onConfirm, onCancel }) {
 
 /* ── DL Application / Renewal form ── */
 function DLForm({ civ, isRenewal, onSubmit, onCancel }) {
-  const [dlClass,   setDlClass]   = useState(civ.dlClass    || 'Class C');
+  const [dlClass,   setDlClass]   = useState(civ.dlClass    || 'Class E');
   const [dlStatus,  setDlStatus]  = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
   const [dlExpiry,  setDlExpiry]  = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
   const [confirming, setConfirming] = useState(false);
