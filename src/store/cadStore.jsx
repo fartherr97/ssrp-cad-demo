@@ -337,6 +337,43 @@ function reducer(state, action) {
       const civilians = state.civilians.map(c => c.id === action.payload.id ? { ...c, ...action.payload } : c);
       return { ...state, civilians };
     }
+    case 'ISSUE_DRIVER_LICENSE': {
+      const { civilianId, dlClass } = action.payload;
+      const civ = state.civilians.find(c => c.id === civilianId);
+      if (!civ) return state;
+      const prefix = (civ.lastName?.[0] || 'X').toUpperCase();
+      const dlNumber = prefix + Math.floor(Math.random() * 9000000 + 1000000);
+      const today = new Date();
+      const expiry = new Date(today);
+      expiry.setFullYear(expiry.getFullYear() + 1);
+      const civilians = state.civilians.map(c => c.id === civilianId ? {
+        ...c,
+        dlNumber,
+        dlClass,
+        dlStatus: 'ACTIVE',
+        dlIssuedAt: today.toISOString().split('T')[0],
+        dlExpiry: expiry.toISOString().split('T')[0],
+        licensePoints: 0,
+      } : c);
+      return { ...state, civilians };
+    }
+    case 'RENEW_DRIVER_LICENSE': {
+      const { civilianId, dlClass } = action.payload;
+      const civ = state.civilians.find(c => c.id === civilianId);
+      if (!civ) return state;
+      const today = new Date();
+      const expiry = new Date(today);
+      expiry.setFullYear(expiry.getFullYear() + 1);
+      const civilians = state.civilians.map(c => c.id === civilianId ? {
+        ...c,
+        dlClass,
+        dlStatus: 'ACTIVE',
+        dlIssuedAt: today.toISOString().split('T')[0],
+        dlExpiry: expiry.toISOString().split('T')[0],
+        licensePoints: 0,
+      } : c);
+      return { ...state, civilians };
+    }
     case 'DELETE_CIVILIAN': {
       const civilians = state.civilians.filter(c => c.id !== action.payload);
       return { ...state, civilians };
