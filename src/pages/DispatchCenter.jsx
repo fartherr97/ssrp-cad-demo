@@ -154,12 +154,11 @@ function QuickAction({ Icon, label, onClick }) {
   );
 }
 
-function Stat({ label, value, sub, color = '#ffffff' }) {
+function Stat({ label, value, color = '#ffffff' }) {
   return (
     <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-app-card/70 border border-border-base">
       <span className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500">{label}</span>
       <span className="text-[26px] font-extrabold leading-none tabular-nums" style={{ color }}>{value}</span>
-      {sub && <span className="text-[10px] text-slate-500">{sub}</span>}
     </div>
   );
 }
@@ -544,7 +543,7 @@ export default function DispatchCenter() {
                   const c = s.color;
                   return (
                     <button key={s.code} onClick={() => setStatus(s.code)}
-                      className={`flex items-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? '' : 'border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
+                      className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? '' : 'border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
                       style={on ? { background: `${c}22`, borderColor: `${c}55`, color: c } : undefined}>
                       <s.Icon size={14} style={on ? { color: c } : undefined} /> {s.label}
                     </button>
