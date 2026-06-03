@@ -49,7 +49,6 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
           className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors shrink-0">
           <MdArrowBack size={14} /> Back
         </button>
-        <MdReply size={14} className="text-amber-400 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="text-[13px] font-bold text-white truncate leading-tight">{report.type}</div>
           <div className="text-[10px] font-mono text-slate-500 truncate mt-0.5">{report.caseNumber}</div>
