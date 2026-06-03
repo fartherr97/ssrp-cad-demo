@@ -30,6 +30,7 @@ const FIELD_TYPES = [
   { type: 'charges',         label: 'Charges'       },
   { type: 'mugshot',         label: 'Mugshot'       },
   { type: 'image',           label: 'Image'         },
+  { type: 'photos',          label: 'Photo Gallery' },
 ];
 
 const TYPE_COLOR = {
@@ -37,7 +38,7 @@ const TYPE_COLOR = {
   date: '#fb923c', datetime: '#fb923c',
   dropdown: '#34d399', checkbox: '#34d399',
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
-  charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee',
+  charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee', photos: '#22d3ee',
 };
 
 /* ── Premade sections matching template structure ── */
