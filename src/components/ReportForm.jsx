@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -718,6 +718,92 @@ function ImageField({ f, value, onChange, readOnly }) {
   );
 }
 
+/* ── Multi-photo gallery field (up to `f.max` photos, default 8) ── */
+function PhotoGalleryField({ f, value, onChange, readOnly }) {
+  const max = Math.min(f.max || 8, 8);
+  const photos = Array.isArray(value) ? value : [];
+  const fileRefs = useRef([]);
+
+  const handleFile = (idx, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const updated = [...photos];
+      updated[idx] = ev.target.result;
+      onChange(f.id, updated.filter(Boolean));
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const removePhoto = (idx) => {
+    const updated = [...photos];
+    updated.splice(idx, 1);
+    onChange(f.id, updated);
+  };
+
+  const slots = readOnly ? photos : [...photos, ...(photos.length < max ? [null] : [])].slice(0, max);
+
+  return (
+    <div className="sm:col-span-2 lg:col-span-4 flex flex-col min-w-0">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-2">
+        <MdAddPhotoAlternate size={12} />
+        {f.label || 'Photos'}
+        <span className="normal-case font-normal text-slate-600">({photos.length}/{max})</span>
+        {f.required && <span className="text-red-400"> *</span>}
+      </label>
+      <div className="grid grid-cols-4 gap-2">
+        {slots.map((src, idx) => (
+          <div key={idx}>
+            {src ? (
+              <div className="relative rounded-lg overflow-hidden border border-border-base" style={{ aspectRatio: '4/3' }}>
+                <img src={src} alt={`Photo ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center border-none cursor-pointer z-10"
+                    style={{ background: 'rgba(0,0,0,0.65)', color: '#f87171' }}
+                    title="Remove photo"
+                  >
+                    <MdClose size={12} />
+                  </button>
+                )}
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold text-white/70 leading-none px-1 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                  {idx + 1}
+                </span>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileRefs.current[idx]?.click()}
+                className="rounded-lg border border-dashed border-border-base flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors hover:border-blue-500/50 hover:bg-blue-500/5"
+                style={{ aspectRatio: '4/3', background: '#0a1018' }}
+              >
+                <MdAddPhotoAlternate size={20} style={{ color: '#2d3f52' }} />
+                <span className="text-[10px] font-semibold" style={{ color: '#3d5470' }}>Add Photo</span>
+              </div>
+            )}
+            {!readOnly && !src && (
+              <input
+                ref={el => fileRefs.current[idx] = el}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => handleFile(photos.length, e)}
+              />
+            )}
+          </div>
+        ))}
+        {readOnly && photos.length === 0 && (
+          <div className="sm:col-span-2 lg:col-span-4 text-[12px] text-slate-600 italic py-3">No photos attached.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const { state } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
@@ -736,6 +822,11 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   // Image — generic landscape image upload
   if (f.type === 'image') {
     return <ImageField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
+  }
+
+  // Photos — multi-photo gallery (up to 8)
+  if (f.type === 'photos') {
+    return <PhotoGalleryField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
   // Charges — full-width multi-select from penal code

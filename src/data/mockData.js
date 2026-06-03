@@ -558,6 +558,128 @@ export const REPORT_TEMPLATES = [
       },
     ],
   },
+  {
+    id: 7, name: "Accident Report",
+    agency: "FLORIDA HIGHWAY PATROL",
+    formCode: "FHP-ACC-001",
+    signatureSlots: ["Primary Officer / Badge #", "Supervisor Signature / Badge #", "Date"],
+    sections: [
+      {
+        id: "s1", title: "Accident Information", style: "blue",
+        fields: [
+          { id: "f1",  label: "Date / Time of Accident", type: "datetime",     span: 2, required: true },
+          { id: "f2",  label: "Location",                type: "text",         span: 3, required: true },
+          { id: "f3",  label: "Officer Badge #",         type: "badge_lookup", span: 1, required: true, mono: true },
+          { id: "f4",  label: "Accident Type",           type: "dropdown",     span: 2, required: true, options: ["Rear-End","Head-On","Side-Impact","Sideswipe","Single Vehicle","Multi-Vehicle","Pedestrian","Cyclist","Hit and Run","Other"] },
+          { id: "f5",  label: "Weather Conditions",      type: "dropdown",     span: 1, options: ["Clear","Cloudy","Rain","Heavy Rain","Fog","Windy","Other"] },
+          { id: "f6",  label: "Road Conditions",         type: "dropdown",     span: 1, options: ["Dry","Wet","Slick","Under Construction","Debris","Other"] },
+          { id: "f7",  label: "Posted Speed Limit",      type: "number",       span: 1 },
+          { id: "f8",  label: "Traffic Control Present", type: "dropdown",     span: 1, options: ["None","Traffic Light","Stop Sign","Yield Sign","Officer Directing","Other"] },
+          { id: "f9",  label: "Hit and Run",             type: "checkbox",     span: 1 },
+          { id: "f10", label: "School Zone",             type: "checkbox",     span: 1 },
+          { id: "f11", label: "Construction Zone",       type: "checkbox",     span: 1 },
+          { id: "f12", label: "DUI Suspected",           type: "checkbox",     span: 1 },
+        ],
+      },
+      {
+        id: "sV1", title: "Vehicle 1 — Primary", style: "dark", lookup: "vehicle",
+        fields: [
+          { id: "v1_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
+          { id: "v1_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
+          { id: "v1_make",   label: "Make",           type: "text",     span: 1 },
+          { id: "v1_model",  label: "Model",          type: "text",     span: 1 },
+          { id: "v1_color",  label: "Color",          type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
+          { id: "v1_year",   label: "Year",           type: "number",   span: 1 },
+          { id: "v1_damage", label: "Damage Description", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "sD1", title: "Driver 1 — Primary", style: "dark", lookup: "civilian",
+        fields: [
+          { id: "d1_first", label: "First Name",      type: "text",     span: 2, required: true },
+          { id: "d1_last",  label: "Last Name",       type: "text",     span: 2 },
+          { id: "d1_dob",   label: "Date of Birth",   type: "date",     span: 1 },
+          { id: "d1_sex",   label: "Sex",             type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
+          { id: "d1_dl",    label: "Driver's License",type: "text",     span: 2, mono: true },
+          { id: "d1_res",   label: "Address",         type: "text",     span: 3 },
+          { id: "d1_phone", label: "Phone",           type: "text",     span: 1 },
+          { id: "d1_ins",   label: "Insurance Carrier",type: "text",    span: 2 },
+          { id: "d1_pol",   label: "Policy Number",   type: "text",     span: 2, mono: true },
+          { id: "d1_fault", label: "At Fault",        type: "checkbox", span: 1 },
+          { id: "d1_inj",   label: "Injured",         type: "checkbox", span: 1 },
+          { id: "d1_cited", label: "Citation Issued", type: "checkbox", span: 1 },
+          { id: "d1_arrested", label: "Arrested",     type: "checkbox", span: 1 },
+        ],
+      },
+      {
+        id: "sV2", title: "Vehicle 2 — Secondary", style: "dark", lookup: "vehicle",
+        fields: [
+          { id: "v2_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
+          { id: "v2_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
+          { id: "v2_make",   label: "Make",           type: "text",     span: 1 },
+          { id: "v2_model",  label: "Model",          type: "text",     span: 1 },
+          { id: "v2_color",  label: "Color",          type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
+          { id: "v2_year",   label: "Year",           type: "number",   span: 1 },
+          { id: "v2_damage", label: "Damage Description", type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "sD2", title: "Driver 2 — Secondary", style: "dark", lookup: "civilian",
+        fields: [
+          { id: "d2_first", label: "First Name",      type: "text",     span: 2 },
+          { id: "d2_last",  label: "Last Name",       type: "text",     span: 2 },
+          { id: "d2_dob",   label: "Date of Birth",   type: "date",     span: 1 },
+          { id: "d2_sex",   label: "Sex",             type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
+          { id: "d2_dl",    label: "Driver's License",type: "text",     span: 2, mono: true },
+          { id: "d2_res",   label: "Address",         type: "text",     span: 3 },
+          { id: "d2_phone", label: "Phone",           type: "text",     span: 1 },
+          { id: "d2_ins",   label: "Insurance Carrier",type: "text",    span: 2 },
+          { id: "d2_pol",   label: "Policy Number",   type: "text",     span: 2, mono: true },
+          { id: "d2_fault", label: "At Fault",        type: "checkbox", span: 1 },
+          { id: "d2_inj",   label: "Injured",         type: "checkbox", span: 1 },
+          { id: "d2_cited", label: "Citation Issued", type: "checkbox", span: 1 },
+          { id: "d2_arrested", label: "Arrested",     type: "checkbox", span: 1 },
+        ],
+      },
+      {
+        id: "sInj", title: "Injuries / EMS", style: "gray",
+        fields: [
+          { id: "inj_count",  label: "Total Injured",  type: "number",   span: 1 },
+          { id: "inj_fatal",  label: "Fatalities",     type: "number",   span: 1 },
+          { id: "inj_ems",    label: "EMS Dispatched", type: "checkbox", span: 1 },
+          { id: "inj_hosp",   label: "Hospitalisation Required", type: "checkbox", span: 1 },
+          { id: "inj_notes",  label: "Injury Notes",   type: "textarea", span: 4, minRows: 2 },
+        ],
+      },
+      {
+        id: "sCharges", title: "Charges / Citations", style: "gray",
+        fields: [
+          { id: "charges", label: "Charges", type: "charges", span: 4 },
+        ],
+      },
+      {
+        id: "sPhotos", title: "Scene Photographs", style: "gray",
+        fields: [
+          { id: "scene_photos", label: "Scene Photographs", type: "photos", max: 8, span: 4 },
+        ],
+      },
+      {
+        id: "sNarr", title: "Narrative", style: "gray",
+        fields: [
+          { id: "narrative", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
+        ],
+      },
+      {
+        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
+        fields: [
+          { id: "rv_status", label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
+          { id: "rv_obs",    label: "Observing Officer",    type: "text",     span: 2 },
+          { id: "rv_date",   label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
+          { id: "rv_sig",    label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
+        ],
+      },
+    ],
+  },
 ];
 
 export const BANNED_USERS = [

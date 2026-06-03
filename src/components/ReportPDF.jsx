@@ -212,10 +212,11 @@ function ReportPDF({ template, data = {}, meta = {} }) {
 
         {/* Sections — wrap freely so long content flows to the next page naturally */}
         {sections.map(sec => {
-          const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea');
+          const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea' && f.type !== 'photos' && f.type !== 'image' && f.type !== 'mugshot');
           const textareaFields = sec.fields.filter(f => f.type === 'textarea');
           const checkboxFields = sec.fields.filter(f => f.type === 'checkbox');
           const chargeFields   = sec.fields.filter(f => f.type === 'charges');
+          const photoFields    = sec.fields.filter(f => f.type === 'photos');
 
           return (
             <View key={sec.id} style={styles.section}>
@@ -269,6 +270,27 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                   <Text style={styles.fieldValueNarr}>{data[f.id] || '—'}</Text>
                 </View>
               ))}
+              {/* Photo galleries — 4-up grid, each image aspect 4:3 */}
+              {photoFields.map(f => {
+                const imgs = Array.isArray(data[f.id]) ? data[f.id].filter(Boolean) : [];
+                return (
+                  <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 6 }}>
+                    <Text style={styles.fieldLabel}>{f.label || 'Scene Photographs'} ({imgs.length})</Text>
+                    {imgs.length === 0 ? (
+                      <Text style={{ fontSize: 9, color: gray, fontStyle: 'italic', marginTop: 2 }}>No photos attached.</Text>
+                    ) : (
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                        {imgs.map((src, i) => (
+                          <View key={i} style={{ width: '23%' }}>
+                            <Image src={src} style={{ width: '100%', aspectRatio: 1.33, borderRadius: 2, border: `0.5px solid ${lgray}` }} />
+                            <Text style={{ fontSize: 6.5, color: gray, textAlign: 'center', marginTop: 1 }}>Photo {i + 1}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
             </View>
           );
         })}

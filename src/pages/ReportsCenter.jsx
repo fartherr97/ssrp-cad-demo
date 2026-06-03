@@ -8,7 +8,7 @@ import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
   MdArrowBack, MdDownload, MdDeleteOutline, MdSend,
-  MdInventory2, MdPhone, MdShield,
+  MdInventory2, MdPhone, MdShield, MdCarCrash,
 } from 'react-icons/md';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER,
@@ -22,6 +22,7 @@ const TEMPLATE_ICONS = {
   'Incident Report':   MdReport,
   'Field Interview':   MdRecordVoiceOver,
   'Supplement Report': MdNote,
+  'Accident Report':   MdCarCrash,
 };
 
 const BUILTIN_NAMES = Object.keys(TEMPLATE_ICONS);
