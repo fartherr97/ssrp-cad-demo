@@ -158,7 +158,8 @@ export default function OfficerProfile() {
 
 
   const initials = myOfficer.name.split(' ').map(n => n[0]).join('').slice(0, 2);
-  const accentColor = myDept?.color || '#3b82f6';
+  // Profile accent stays TPD Blue regardless of the officer's department.
+  const accentColor = '#1a6bbf';
 
   return (
     <div className="flex-1 overflow-auto p-4 lg:p-5 box-border">
