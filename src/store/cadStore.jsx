@@ -37,6 +37,7 @@ const initialState = {
   messages: MESSAGES,
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
+  towJobs: [],
   departments: DEPARTMENTS,
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
@@ -698,6 +699,20 @@ function reducer(state, action) {
     case 'ADD_TOW': {
       const newTow = { ...action.payload, id: state.nextId, releaseStatus: 'Hold' };
       return { ...state, towLogs: [...state.towLogs, newTow], nextId: state.nextId + 1 };
+    }
+
+    case 'ADD_TOW_JOB': {
+      const job = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+      const log = addDispatchLog(state, `Tow job #${state.nextId} created — ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
+      return { ...state, towJobs: [job, ...state.towJobs], nextId: state.nextId + 1, ...log };
+    }
+    case 'UPDATE_TOW_JOB': {
+      const towJobs = state.towJobs.map(j => j.id === action.payload.id ? { ...j, ...action.payload } : j);
+      return { ...state, towJobs };
+    }
+    case 'CANCEL_TOW_JOB': {
+      const towJobs = state.towJobs.map(j => j.id === action.payload ? { ...j, status: 'CANCELLED' } : j);
+      return { ...state, towJobs };
     }
 
     case 'ADD_CUSTOM_RECORD_TYPE': {

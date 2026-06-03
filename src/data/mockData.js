@@ -597,6 +597,7 @@ export const BUSINESSES = [
     id: 1, name: "Bayshore Auto & Towing", type: "Automotive / Towing",
     owner: "Jordan Maxwell", ownerDiscordId: "205947291", ein: "FL-88-2210445", phone: "555-0710",
     address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
+    isTowCompany: true,
     license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
     employees: [
       { id: 1, name: "Michael Torres", discordId: "419283746", role: "Manager",    phone: "555-0192", since: "2024-02-01" },
@@ -607,6 +608,18 @@ export const BUSINESSES = [
       { id: 1, date: "2026-05-22", type: "Theft Report",     summary: "Catalytic converter stolen from lot overnight.", status: "Open" },
       { id: 2, date: "2026-04-10", type: "Alarm Activation", summary: "Silent alarm tripped 03:14, units responded, false alarm.", status: "Closed" },
     ],
+  },
+  {
+    id: 2, name: "FDOT Tow Operations", type: "Government / Towing",
+    owner: "State of Florida – FDOT District 7", ownerDiscordId: "100200305", ein: "FL-GOV-FDOT-TOW-7", phone: "800-511-0000",
+    address: "FDOT District 7 HQ, 11201 N Malcolm McKinley Dr, Tampa", status: "ACTIVE",
+    isTowCompany: true, isFDOT: true,
+    license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: false,
+    employees: [
+      { id: 1, name: "Ray Calhoun",   discordId: "100200305", role: "Inspector",  phone: "813-975-6200", since: "2022-01-01" },
+      { id: 2, name: "James Reeves",  discordId: "205947291", role: "Supervisor", phone: "555-0192",    since: "2024-06-01" },
+    ],
+    incidents: [],
   },
 ];
 

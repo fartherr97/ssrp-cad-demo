@@ -3,7 +3,7 @@ import {
   MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
-  MdSupervisorAccount, MdHeadsetMic,
+  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -17,6 +17,7 @@ export const PORTALS = {
       { Icon: MdPhoneAndroid, label: 'MDT',      route: '/mdt'      },
       { Icon: MdGavel,              label: 'Warrants',   route: '/warrants'          },
       { Icon: MdMap,                label: 'Map',        route: '/map'               },
+      { Icon: MdLocalShipping,      label: 'Tow CAD',    route: '/tow-cad'           },
       { Icon: MdSupervisorAccount,  label: 'Supervisor', route: '/portal/supervisor' },
     ],
   },
@@ -24,9 +25,10 @@ export const PORTALS = {
   dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
-      { Icon: MdDashboard,  label: 'Board',   route: '/cad'    },
-      { Icon: MdMap,        label: 'Map',     route: '/map'    },
-      { Icon: MdSearch,     label: 'Search',  route: '/search' },
+      { Icon: MdDashboard,     label: 'Board',   route: '/cad'     },
+      { Icon: MdMap,           label: 'Map',     route: '/map'     },
+      { Icon: MdSearch,        label: 'Search',  route: '/search'  },
+      { Icon: MdLocalShipping, label: 'Tow CAD', route: '/tow-cad' },
     ],
   },
 
@@ -75,11 +77,12 @@ export const PORTALS = {
   business: { id: 'business', label: 'Business Services', subtitle: 'Business Center', color: '#44aacc', landing: '/portal/business',
     showStatus: false, showCalls: false, showNewCall: false,
     nav: [
-      { Icon: MdHome,       label: 'Home',        route: '/portal/business'    },
-      { Icon: MdStore,      label: 'My Business', route: '/portal/my-business' },
-      { Icon: MdGroup,      label: 'Employees',   route: '/portal/employees'   },
-      { Icon: MdAssignment, label: 'Incidents',   route: '/portal/incidents'   },
-      { Icon: MdMenuBook,   label: 'Laws',        route: '/portal/laws'        },
+      { Icon: MdHome,          label: 'Home',        route: '/portal/business'    },
+      { Icon: MdStore,         label: 'My Business', route: '/portal/my-business' },
+      { Icon: MdGroup,         label: 'Employees',   route: '/portal/employees'   },
+      { Icon: MdAssignment,    label: 'Incidents',   route: '/portal/incidents'   },
+      { Icon: MdLocalShipping, label: 'Tow CAD',     route: '/tow-cad'            },
+      { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'        },
     ],
   },
 };

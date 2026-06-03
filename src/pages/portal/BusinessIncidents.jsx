@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdAssignment, MdBusiness, MdInfo } from 'react-icons/md';
-import { useCAD } from '../../store/cadStore';
 import { PortalPage, PortalHeader, StatCard, PortalCard } from './PortalKit';
 import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
+import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
 const ACCENT = 'brand';
 
 export default function BusinessIncidents() {
-  const { state } = useCAD();
   const navigate = useNavigate();
-  const myBiz = state.businesses.find(b => b.ownedByPlayer);
+  const { activeBiz: myBiz } = useActiveBusiness();
 
   const [filter, setFilter] = useState('ALL');
 
@@ -42,6 +41,7 @@ export default function BusinessIncidents() {
 
   return (
     <PortalPage>
+      <BusinessSwitcher />
       <PortalHeader
         icon={MdAssignment}
         title="Business Incidents"

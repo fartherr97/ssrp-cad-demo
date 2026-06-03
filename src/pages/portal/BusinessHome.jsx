@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { useCAD } from '../../store/cadStore';
 import {
   MdStore, MdGroup, MdAssignment, MdReceiptLong,
   MdCheckCircle, MdBusiness, MdMenuBook,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
-import { S_BTN_PRIMARY, BADGE } from '../../constants/styles';
+import { BADGE } from '../../constants/styles';
 import AccessDenied from './AccessDenied';
+import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
 const ACCENT = 'brand';
 
@@ -18,14 +18,8 @@ const QUICK_ACTIONS = [
 ];
 
 export default function BusinessHome() {
-  const { state } = useCAD();
-  const { currentUser } = state;
   const navigate = useNavigate();
-  const myBiz = state.businesses.find(b =>
-    b.ownedByPlayer ||
-    (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
-    (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
-  );
+  const { activeBiz: myBiz } = useActiveBusiness();
 
   if (!myBiz) return <AccessDenied portalName="the Business Center" />;
 
@@ -36,6 +30,7 @@ export default function BusinessHome() {
 
   return (
     <PortalPage>
+      <BusinessSwitcher />
       <PortalHeader
         icon={MdStore}
         title={myBiz.name}

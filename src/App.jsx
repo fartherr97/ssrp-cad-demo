@@ -33,6 +33,8 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessIncidents from './pages/portal/BusinessIncidents';
+import TowCAD from './pages/TowCAD';
+import { BusinessProvider } from './contexts/BusinessContext';
 // Admin (Sonoran-style customization suite)
 import AdminShell from './pages/admin/AdminShell';
 import CustomizationHub from './pages/admin/sections/CustomizationHub';
@@ -193,6 +195,9 @@ function CADApp() {
         <Route path="/portal/employees"   element={<Employees />} />
         <Route path="/portal/incidents"   element={<BusinessIncidents />} />
 
+        {/* ── Tow CAD ── */}
+        <Route path="/tow-cad"            element={<TowCAD />} />
+
         <Route path="*" element={<PortalFallback />} />
       </Route>
     </Routes>
@@ -203,7 +208,9 @@ export default function App() {
   return (
     <CADProvider>
       <BrowserRouter>
-        <CADApp />
+        <BusinessProvider>
+          <CADApp />
+        </BusinessProvider>
       </BrowserRouter>
     </CADProvider>
   );

@@ -4,26 +4,23 @@ import { MdBusiness, MdEdit } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_SECONDARY, S_BTN_SUCCESS, BADGE, sm } from '../../constants/styles';
 import AccessDenied from './AccessDenied';
+import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
 const BLANK = { name: '', type: '', owner: '', ein: '', phone: '', address: '' };
 
 export default function MyBusiness() {
-  const { state, dispatch } = useCAD();
-  const { currentUser } = state;
-  const myBiz = state.businesses.find(b =>
-    b.ownedByPlayer ||
-    (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
-    (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
-  );
+  const { dispatch } = useCAD();
+  const { activeBiz: myBiz } = useActiveBusiness();
 
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState(myBiz
-    ? { name: myBiz.name, type: myBiz.type, owner: myBiz.owner, ein: myBiz.ein, phone: myBiz.phone, address: myBiz.address }
-    : { ...BLANK, owner: currentUser?.name || '' });
+  const [form, setForm] = useState(
+    myBiz
+      ? { name: myBiz.name, type: myBiz.type, owner: myBiz.owner, ein: myBiz.ein, phone: myBiz.phone, address: myBiz.address }
+      : BLANK
+  );
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  /* ─── No access ─── */
   if (!myBiz) return <AccessDenied portalName="the Business Center" />;
 
   /* ─── Profile + inline edit ─── */
@@ -38,6 +35,7 @@ export default function MyBusiness() {
 
   return (
     <PortalPage>
+      <BusinessSwitcher />
       <PortalHeader
         icon={MdBusiness}
         title="My Business"

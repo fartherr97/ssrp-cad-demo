@@ -1,24 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { MdGroup, MdAdd, MdDelete, MdBusiness } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
 import AccessDenied from './AccessDenied';
+import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
 const ACCENT = 'brand';
 const ROLES = ['Manager', 'Employee', 'Driver', 'Security', 'Dispatcher'];
 const BLANK = { name: '', role: 'Employee', phone: '', since: '' };
 
 export default function Employees() {
-  const { state, dispatch } = useCAD();
-  const { currentUser } = state;
-  const navigate = useNavigate();
-  const myBiz = state.businesses.find(b =>
-    b.ownedByPlayer ||
-    (currentUser?.discordId && b.ownerDiscordId === currentUser.discordId) ||
-    (currentUser?.discordId && b.employees?.some(e => e.discordId === currentUser.discordId))
-  );
+  const { dispatch } = useCAD();
+  const { activeBiz: myBiz } = useActiveBusiness();
 
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(BLANK);
@@ -36,6 +30,7 @@ export default function Employees() {
 
   return (
     <PortalPage>
+      <BusinessSwitcher />
       <PortalHeader
         icon={MdGroup}
         title="Employees"
