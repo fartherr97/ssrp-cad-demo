@@ -19,6 +19,7 @@ const FIELD_TYPES = [
   { type: 'text',            label: 'Text'          },
   { type: 'number',          label: 'Number'        },
   { type: 'textarea',        label: 'Text Area'     },
+  { type: 'signature',       label: 'Signature'     },
   { type: 'date',            label: 'Date'          },
   { type: 'datetime',        label: 'Date & Time'   },
   { type: 'dropdown',        label: 'Select'        },

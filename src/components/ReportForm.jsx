@@ -778,7 +778,9 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
 
   // Signature fields get a one-click "Sign Off" that stamps the signer's
   // active identifier (badge | rank | name) — same format as filed reports.
-  const isSignatureField = (f.type === 'text' || f.type === 'signature') && /signature/i.test(f.label || '');
+  // An explicit `signature` builder field always qualifies; a plain text
+  // field qualifies when its label reads like a signature (back-compat).
+  const isSignatureField = f.type === 'signature' || (f.type === 'text' && /signature/i.test(f.label || ''));
   const signer = state.officers.find(o => o.id === state.currentUser?.id) || state.currentUser;
   const buildSignature = () => {
     if (!signer) return '';
