@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -776,6 +776,16 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const isNarr = f.type === 'textarea';
   const cls = isNarr ? FULL : (SPAN[span] || SPAN[1]);
 
+  // Signature fields get a one-click "Sign Off" that stamps the signer's
+  // active identifier (badge | rank | name) — same format as filed reports.
+  const isSignatureField = (f.type === 'text' || f.type === 'signature') && /signature/i.test(f.label || '');
+  const signer = state.officers.find(o => o.id === state.currentUser?.id) || state.currentUser;
+  const buildSignature = () => {
+    if (!signer) return '';
+    const rank = (signer.rank || signer.role || 'OFFICER').toString().toUpperCase();
+    return [signer.badge, rank, signer.name?.toUpperCase()].filter(Boolean).join(' | ');
+  };
+
   return (
     <div className={`flex flex-col min-w-0 ${cls}`}>
       <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
@@ -811,6 +821,13 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
           style={f.type === 'datetime' || f.type === 'date' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}
           placeholder={f.placeholder || ''}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
+      )}
+
+      {isSignatureField && !effectiveReadOnly && (
+        <button type="button" onClick={() => onChange(f.id, buildSignature())} disabled={!signer}
+          className="btn-glossy mt-2 self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-bold cursor-pointer bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 hover:bg-emerald-500/25 hover:border-emerald-400/55 hover:text-emerald-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+          <MdDriveFileRenameOutline size={16} className="shrink-0" /> Sign Off On Report
+        </button>
       )}
     </div>
   );

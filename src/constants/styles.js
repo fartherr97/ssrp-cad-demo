@@ -5,7 +5,7 @@
 
 // ─── Buttons ───────────────────────────────────────────────
 
-const _BTN_BASE = 'inline-flex items-center justify-center gap-2 select-none cursor-pointer font-semibold rounded-lg border transition-all duration-150 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100';
+const _BTN_BASE = 'btn-glossy inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer font-semibold rounded-lg border transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed';
 
 export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-600 hover:bg-blue-500 text-white border-blue-400/30 shadow-sm shadow-blue-950/40`;
 export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border-white/10`;
