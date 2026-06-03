@@ -199,13 +199,14 @@ export default function ReportsCenter() {
 
         {/* ── Top bar: title + section tabs + autosave ── */}
         <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
-          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 px-4 pt-2.5 pb-1.5">
+          <div className="flex items-center gap-x-3 px-4 pt-2.5 pb-1.5">
             <MdDescription size={18} className="text-brand-bright shrink-0" />
-            <span className="text-[13px] font-bold text-white uppercase tracking-[0.4px]">Report Writing</span>
-            <span className="text-[11px] text-slate-500">{tpl.name}</span>
-            <span className="ml-auto flex items-center gap-1.5 text-[10.5px] font-semibold text-slate-400">
+            <span className="text-[13px] font-bold text-white uppercase tracking-[0.4px] shrink-0">Report Writing</span>
+            <span className="text-[11px] text-slate-500 truncate min-w-0">{tpl.name}</span>
+            <span className="ml-auto flex items-center gap-1.5 text-[10.5px] font-semibold text-slate-400 shrink-0">
               <span className={`w-1.5 h-1.5 rounded-full ${savedAt ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
-              AUTOSAVE: ON{savedAt && <span className="text-slate-600 font-normal"> · {savedAt.toLocaleTimeString()}</span>}
+              <span className="hidden sm:inline">AUTOSAVE: ON</span>
+              {savedAt && <span className="hidden sm:inline text-slate-600 font-normal"> · {savedAt.toLocaleTimeString()}</span>}
             </span>
           </div>
           <div className="flex items-center gap-0.5 px-3 overflow-x-auto n-tabs-wrap">
@@ -225,8 +226,8 @@ export default function ReportsCenter() {
         {/* ── Body: 3 columns ── */}
         <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)_300px] overflow-auto xl:overflow-hidden">
 
-          {/* LEFT: case details */}
-          <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
+          {/* LEFT: case details — desktop only */}
+          <aside className="hidden xl:flex flex-col xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
             <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
             <div className="px-4">
               <Detail label="Incident #" value={draftMeta.caseNumber} />
@@ -239,21 +240,21 @@ export default function ReportsCenter() {
           </aside>
 
           {/* CENTER: report information + paper document */}
-          <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
-            <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
+          <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
+            <div className="hidden sm:grid sm:grid-cols-4 shrink-0 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
-            <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
+            <div className="xl:flex-1 xl:overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}
                 onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} />
             </div>
           </main>
 
-          {/* RIGHT: related records */}
-          <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
+          {/* RIGHT: related records — desktop only */}
+          <aside className="hidden xl:flex flex-col xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
             <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Related Records</div>
             <div className="p-3 flex flex-col gap-3">
               <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
@@ -292,13 +293,13 @@ export default function ReportsCenter() {
 
         {/* ── Bottom action bar ── */}
         <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base p-3 md:px-4 md:py-2.5">
-          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center">
-            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
-            <button className={`${S_BTN_SECONDARY} w-full md:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+            <button className={`${S_BTN_SECONDARY} w-full sm:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
+            <button className={`${S_BTN_SECONDARY} hidden sm:flex sm:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
               <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
-            <button className={`${S_BTN_DANGER} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-            <button className={`${S_BTN_PRIMARY} col-span-2 w-full md:col-span-1 md:w-auto md:ml-auto`} onClick={submitReport}><MdSend size={15} /> Submit Report</button>
+            <button className={`${S_BTN_DANGER} hidden sm:flex sm:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
+            <button className={`${S_BTN_PRIMARY} w-full sm:w-auto sm:ml-auto`} onClick={submitReport}><MdSend size={15} /> Submit Report</button>
           </div>
         </div>
       </div>

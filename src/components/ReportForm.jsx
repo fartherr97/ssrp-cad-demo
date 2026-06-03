@@ -784,7 +784,7 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
               </span>
             )}
           </div>
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3.5 overflow-hidden">
+          <div className="p-4 sm:p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-4 sm:gap-y-3.5 overflow-hidden">
             {sec.lookup && !readOnly && (
               <SectionInlineSearch sec={sec} data={data} onBulk={bulkFill} />
             )}
