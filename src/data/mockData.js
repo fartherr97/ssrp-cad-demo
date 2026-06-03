@@ -99,10 +99,28 @@ export const PENAL_CODE = [
 ];
 
 export const REPORTS = [
-  { id: 1, type: "Traffic Stop",   caseNumber: "TPD-2026-1042", officerBadge: "TPD-819", date: "2026-06-01", status: "Pending Review", callId: "26-1042", civilianId: null, summary: "Traffic stop on Elm St. Driver showed signs of impairment. Field sobriety conducted." },
-  { id: 2, type: "Arrest Report",  caseNumber: "TPD-2026-0401", officerBadge: "TPD-831", date: "2026-04-01", status: "Approved",        callId: "26-0401", civilianId: 3,    summary: "Arrest of Darnell Washington on narcotics charges following foot pursuit." },
-  { id: 3, type: "Use of Force",   caseNumber: "TPD-2026-0401-UOF", officerBadge: "TPD-831", date: "2026-04-01", status: "Pending Review",  callId: "26-0401", civilianId: 3, summary: "Use of force during arrest. Subject resisted, officer used takedown technique." },
-  { id: 4, type: "Incident Report",caseNumber: "TPD-2026-0503", officerBadge: "TPD-807", date: "2026-05-03", status: "Approved",        callId: "26-1038", civilianId: null, summary: "MVA at Oak & 5th. No injuries. Both drivers exchanged information." },
+  // ── TPD ──
+  { id: 1,  type: "Traffic Stop",   caseNumber: "TPD-2026-1042",     officerBadge: "TPD-819", date: "2026-06-01", status: "Pending Review",  callId: "26-1042", civilianId: null, summary: "Traffic stop on Elm St. Driver showed signs of impairment. Field sobriety conducted." },
+  { id: 2,  type: "Arrest Report",  caseNumber: "TPD-2026-0401",     officerBadge: "TPD-831", date: "2026-04-01", status: "Approved",         callId: "26-0401", civilianId: 3,    summary: "Arrest of Darnell Washington on narcotics charges following foot pursuit." },
+  { id: 3,  type: "Use of Force",   caseNumber: "TPD-2026-0401-UOF", officerBadge: "TPD-831", date: "2026-04-01", status: "Pending Review",   callId: "26-0401", civilianId: 3,    summary: "Use of force during arrest. Subject resisted, officer used takedown technique." },
+  { id: 4,  type: "Incident Report",caseNumber: "TPD-2026-0503",     officerBadge: "TPD-807", date: "2026-05-03", status: "Approved",         callId: "26-1038", civilianId: null, summary: "MVA at Oak & 5th. No injuries. Both drivers exchanged information." },
+  { id: 5,  type: "Traffic Stop",   caseNumber: "TPD-2026-0518",     officerBadge: "TPD-807", date: "2026-05-18", status: "Approved",         callId: null,      civilianId: null, summary: "Speed enforcement on Dale Mabry Hwy. Citation issued for 18 over." },
+  { id: 6,  type: "Traffic Stop",   caseNumber: "TPD-2026-0524",     officerBadge: "TPD-831", date: "2026-05-24", status: "Approved",         callId: null,      civilianId: null, summary: "Stop on Kennedy Blvd for expired registration. Warning issued." },
+  { id: 7,  type: "Arrest Report",  caseNumber: "TPD-2026-0527",     officerBadge: "TPD-819", date: "2026-05-27", status: "Approved",         callId: null,      civilianId: null, summary: "DUI arrest on Bayshore. Subject blew 0.11 BAC. Vehicle towed." },
+  { id: 8,  type: "Use of Force",   caseNumber: "TPD-2026-0527-UOF", officerBadge: "TPD-819", date: "2026-05-27", status: "Pending Changes",  callId: null,      civilianId: null, summary: "Verbal commands and soft restraint used during DUI arrest. Subject attempted to flee." },
+  { id: 9,  type: "Incident Report",caseNumber: "TPD-2026-0601",     officerBadge: "TPD-839", date: "2026-06-01", status: "Pending Review",   callId: null,      civilianId: null, summary: "Commercial burglary reported at 4302 W Boy Scout Blvd. Victim statement taken." },
+  { id: 10, type: "Arrest Report",  caseNumber: "TPD-2026-0602",     officerBadge: "TPD-839", date: "2026-06-02", status: "Approved",         callId: null,      civilianId: null, summary: "Warrant service at subject's residence. Arrested without incident." },
+  // ── HCSO ──
+  { id: 11, type: "Traffic Stop",   caseNumber: "HCSO-2026-0315",    officerBadge: "HCSO-422",date: "2026-03-15", status: "Approved",         callId: null,      civilianId: null, summary: "Traffic stop on US-301. Warning issued for expired registration." },
+  { id: 12, type: "Arrest Report",  caseNumber: "HCSO-2026-0402",    officerBadge: "HCSO-422",date: "2026-04-02", status: "Approved",         callId: null,      civilianId: null, summary: "DUI arrest following traffic stop. Subject blew 0.14 BAC." },
+  { id: 13, type: "Use of Force",   caseNumber: "HCSO-2026-0402-UOF",officerBadge: "HCSO-422",date: "2026-04-02", status: "Approved",         callId: null,      civilianId: null, summary: "Minor force used during DUI arrest. Subject became combative." },
+  { id: 14, type: "Incident Report",caseNumber: "HCSO-2026-0519",    officerBadge: "HCSO-422",date: "2026-05-19", status: "Approved",         callId: null,      civilianId: null, summary: "Disturbance at County Line Rd. Peace restored, no arrests." },
+  { id: 15, type: "Traffic Stop",   caseNumber: "HCSO-2026-0528",    officerBadge: "HCSO-318",date: "2026-05-28", status: "Pending Review",   callId: null,      civilianId: null, summary: "Speeding stop on Bruce B Downs. Citation issued." },
+  // ── FHP ──
+  { id: 16, type: "Traffic Stop",   caseNumber: "FHP-2026-0410",     officerBadge: "FHP-209", date: "2026-04-10", status: "Approved",         callId: null,      civilianId: null, summary: "Commercial vehicle weight inspection on I-275. Citation for overweight load." },
+  { id: 17, type: "Incident Report",caseNumber: "FHP-2026-0501",     officerBadge: "FHP-209", date: "2026-05-01", status: "Approved",         callId: null,      civilianId: null, summary: "Multi-vehicle crash on I-75. No fatalities. Lane closure coordinated with FDOT." },
+  { id: 18, type: "Traffic Stop",   caseNumber: "FHP-2026-0530",     officerBadge: "FHP-214", date: "2026-05-30", status: "Approved",         callId: null,      civilianId: null, summary: "Speed enforcement I-4. Two citations issued, one arrest for suspended DL." },
+  { id: 19, type: "Arrest Report",  caseNumber: "FHP-2026-0530-ARR", officerBadge: "FHP-214", date: "2026-05-30", status: "Pending Review",   callId: null,      civilianId: null, summary: "Arrest for driving on suspended license following I-4 traffic stop." },
 ];
 
 export const REPORT_TEMPLATES = [

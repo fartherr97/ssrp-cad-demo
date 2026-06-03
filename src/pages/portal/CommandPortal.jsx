@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   MdShield, MdSearch, MdPerson, MdWarningAmber,
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
+  MdFilterList,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -10,11 +11,20 @@ import {
 } from './PortalKit';
 import AccessDenied from './AccessDenied';
 
-/* Ranks that are considered command-level */
 const COMMAND_RANKS = [
   'Sergeant', 'Lieutenant', 'Captain',
   'Deputy Chief', 'Chief', 'Commander', 'Battalion Chief',
 ];
+
+/* Cycles through these for per-type color coding */
+const TYPE_COLORS = ['#9090cc', '#44aacc', '#3aaa44', '#c09010', '#e04020', '#3a88e8', '#aa44cc', '#cc8844'];
+function typeColor(type, allTypes) {
+  const idx = allTypes.indexOf(type);
+  return TYPE_COLORS[Math.max(0, idx) % TYPE_COLORS.length];
+}
+
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function daysAgoStr(n) { return new Date(Date.now() - n * 86400000).toISOString().slice(0, 10); }
 
 /* ── Status pill ── */
 const STATUS_META = {
@@ -23,12 +33,22 @@ const STATUS_META = {
   'Approved':        'bg-green-500/15 text-green-400 border-green-500/30',
   'Rejected':        'bg-red-500/15 text-red-400 border-red-500/30',
 };
-
 function StatusPill({ status }) {
   const cls = STATUS_META[status] || 'bg-slate-500/15 text-slate-400 border-slate-500/30';
   return (
     <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.3px] rounded-full border ${cls}`}>
       {status}
+    </span>
+  );
+}
+
+/* ── Report type pill (color-coded per type) ── */
+function TypePill({ type, allTypes }) {
+  const color = typeColor(type, allTypes);
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border shrink-0"
+      style={{ background: `${color}18`, borderColor: `${color}44`, color }}>
+      {type}
     </span>
   );
 }
@@ -47,46 +67,66 @@ function CompBadge({ label, color }) {
   );
 }
 
+/* ── Date range preset bar ── */
+const DATE_PRESETS = [
+  { label: 'Today',   from: () => todayStr(),     to: () => todayStr()     },
+  { label: '7 Days',  from: () => daysAgoStr(7),  to: () => todayStr()     },
+  { label: '30 Days', from: () => daysAgoStr(30), to: () => todayStr()     },
+  { label: '90 Days', from: () => daysAgoStr(90), to: () => todayStr()     },
+  { label: 'All',     from: () => '',             to: () => ''             },
+];
+
+function DateRangeBar({ dateFrom, setDateFrom, dateTo, setDateTo }) {
+  const activePreset = DATE_PRESETS.find(p => dateFrom === p.from() && dateTo === p.to());
+  return (
+    <div className="flex flex-wrap gap-2 items-center">
+      {DATE_PRESETS.map(p => {
+        const active = activePreset?.label === p.label;
+        return (
+          <button key={p.label} type="button"
+            onClick={() => { setDateFrom(p.from()); setDateTo(p.to()); }}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border cursor-pointer transition-all ${
+              active
+                ? 'bg-violet-400/20 border-violet-400/50 text-violet-300'
+                : 'bg-transparent border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+            }`}
+          >{p.label}</button>
+        );
+      })}
+      <div className="flex items-center gap-1.5">
+        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+        <span className="text-[11px] text-slate-600">→</span>
+        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════
-   REPORT DETAIL MODAL (read-only)
+   REPORT DETAIL MODAL
 ══════════════════════════════════ */
-function ReportModal({ report, officer, onClose }) {
+function ReportModal({ report, officer, allTypes, onClose }) {
   if (!report) return null;
-  const isUof = report.type === 'Use of Force';
-  const borderColor = isUof ? 'rgba(251,146,60,0.4)' : 'rgba(61,130,240,0.4)';
-  const accentColor = isUof ? '#fb923c' : '#3d82f0';
+  const color = typeColor(report.type, allTypes);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div
-        className="w-full max-w-[520px] rounded-2xl flex flex-col overflow-hidden"
-        style={{ background: '#0c1929', border: `1px solid ${borderColor}`, borderTop: `3px solid ${accentColor}` }}
-      >
-        {/* Header */}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-[520px] rounded-2xl flex flex-col overflow-hidden"
+        style={{ background: '#0c1929', border: `1px solid ${color}44`, borderTop: `3px solid ${color}` }}>
         <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
-          <MdDescription size={18} style={{ color: accentColor, flexShrink: 0 }} />
+          <MdDescription size={18} style={{ color, flexShrink: 0 }} />
           <span className="flex-1 text-[14px] font-bold text-white truncate">{report.type}</span>
-          {isUof && (
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0"
-              style={{ background: 'rgba(251,146,60,0.15)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.3)' }}>
-              Use of Force
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
+          <TypePill type={report.type} allTypes={allTypes} />
+          <button type="button" onClick={onClose}
             className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-            style={{ background: 'none', border: 'none' }}
-          >
+            style={{ background: 'none', border: 'none' }}>
             <MdClose size={16} />
           </button>
         </div>
-
-        {/* Body */}
         <div className="p-5 grid grid-cols-2 gap-4">
           <Field label="Type" value={report.type} />
           <Field label="Case Number" value={report.caseNumber || '—'} mono />
@@ -96,9 +136,7 @@ function ReportModal({ report, officer, onClose }) {
             <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-cad-muted">Status</span>
             <StatusPill status={report.status} />
           </div>
-          {officer && (
-            <Field label="Officer Name" value={officer.name} />
-          )}
+          {officer && <Field label="Officer Name" value={officer.name} />}
           {report.summary && (
             <div className="col-span-2 flex flex-col gap-1">
               <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-cad-muted">Summary</span>
@@ -106,15 +144,10 @@ function ReportModal({ report, officer, onClose }) {
             </div>
           )}
         </div>
-
-        {/* Footer */}
         <div className="px-5 pb-5">
-          <button
-            type="button"
-            onClick={onClose}
+          <button type="button" onClick={onClose}
             className="w-full py-2.5 rounded-xl text-[12px] font-bold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-          >
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
             Close
           </button>
         </div>
@@ -126,47 +159,48 @@ function ReportModal({ report, officer, onClose }) {
 /* ══════════════════════════════════
    TAB 1: OVERVIEW
 ══════════════════════════════════ */
-function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
-  const now = Date.now();
+function OverviewTab({ reports, officers, departments, reportTypes, onOpenReport }) {
+  const now   = Date.now();
   const ms30d = 30 * 24 * 60 * 60 * 1000;
 
   const leoDeptIds = useMemo(
     () => new Set(departments.filter(d => d.type === 'LEO').map(d => d.id)),
     [departments]
   );
-
   const leoOfficers = useMemo(
     () => officers.filter(o => leoDeptIds.has(o.dept)),
     [officers, leoDeptIds]
   );
-
   const deptById = useMemo(() => {
     const m = {};
     departments.forEach(d => { m[d.id] = d; });
     return m;
   }, [departments]);
 
-  const pendingReview = reports.filter(r => r.status === 'Pending Review');
-  const approved      = reports.filter(r => r.status === 'Approved');
-  const uofReports    = reports.filter(r => r.type === 'Use of Force');
+  const pendingReview = reports.filter(r => r.status === 'Pending Review').length;
+  const approved      = reports.filter(r => r.status === 'Approved').length;
 
-  /* Compliance alerts: LEO officers with zero reports in last 30 days */
+  const typeCounts = useMemo(() => {
+    const m = {};
+    reportTypes.forEach(t => { m[t] = reports.filter(r => r.type === t).length; });
+    return m;
+  }, [reports, reportTypes]);
+
   const noRecentReport = useMemo(() => {
     return leoOfficers.filter(o => {
-      const recent = reports.filter(r => {
-        if (r.officerBadge !== o.badge) return false;
-        if (!r.date) return false;
-        return (now - new Date(r.date).getTime()) <= ms30d;
-      });
+      const recent = reports.filter(r =>
+        r.officerBadge === o.badge &&
+        r.date &&
+        (now - new Date(r.date).getTime()) <= ms30d
+      );
       return recent.length === 0;
     });
   }, [leoOfficers, reports, now, ms30d]);
 
-  /* Recent submissions: last 5 by date */
   const recentReports = useMemo(() => {
     return [...reports]
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-      .slice(0, 5);
+      .slice(0, 6);
   }, [reports]);
 
   const officerByBadge = useMemo(() => {
@@ -177,15 +211,44 @@ function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Stat cards */}
+      {/* Summary stat cards */}
       <div className="flex flex-wrap gap-3">
         <StatCard label="Total Reports" value={reports.length} accent="violet" icon={MdDescription} />
-        <StatCard label="Pending Review" value={pendingReview.length} accent="amber" icon={MdWarningAmber} />
-        <StatCard label="Approved" value={approved.length} accent="green" icon={MdCheckCircle} />
-        <StatCard label="UOFs Filed" value={uofReports.length} accent="red" icon={MdShield} />
+        <StatCard label="Pending Review" value={pendingReview} accent="amber" icon={MdWarningAmber} />
+        <StatCard label="Approved" value={approved} accent="green" icon={MdCheckCircle} />
       </div>
 
-      {/* Compliance Alerts */}
+      {/* Reports by type */}
+      {reportTypes.length > 0 && (
+        <PortalCard>
+          <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400 mb-3 flex items-center gap-2">
+            <MdFilterList size={14} />
+            Reports by Type
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {reportTypes.map(t => {
+              const color = typeColor(t, reportTypes);
+              const count = typeCounts[t] || 0;
+              const pct   = reports.length > 0 ? Math.round((count / reports.length) * 100) : 0;
+              return (
+                <div key={t} className="rounded-lg px-3 py-2.5 flex flex-col gap-1.5"
+                  style={{ background: `${color}0e`, border: `1px solid ${color}28` }}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-semibold truncate" style={{ color }}>{t}</span>
+                    <span className="text-[20px] font-extrabold font-mono shrink-0 leading-none" style={{ color }}>{count}</span>
+                  </div>
+                  <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                  </div>
+                  <span className="text-[9.5px] text-slate-600">{pct}% of total</span>
+                </div>
+              );
+            })}
+          </div>
+        </PortalCard>
+      )}
+
+      {/* Compliance alerts */}
       <PortalCard accent="amber">
         <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-amber-400 mb-3 flex items-center gap-2">
           <MdWarningAmber size={14} />
@@ -201,8 +264,7 @@ function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
             {noRecentReport.map(o => (
               <div key={o.id}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}
-              >
+                style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}>
                 <MdPerson size={15} className="text-amber-400 shrink-0" />
                 <span className="text-[13px] font-semibold text-white flex-1">{o.name}</span>
                 <span className="font-mono text-[11px] text-slate-400">{o.badge}</span>
@@ -213,7 +275,7 @@ function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
         )}
       </PortalCard>
 
-      {/* Recent Submissions */}
+      {/* Recent submissions */}
       <PortalCard>
         <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400 mb-3">
           Recent Submissions
@@ -225,16 +287,13 @@ function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
             {recentReports.map((r, idx) => {
               const off = officerByBadge[r.officerBadge];
               return (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => onOpenReport(r)}
-                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-white/[0.05] ${idx !== 0 ? 'border-t border-border-faint' : ''}`}
-                >
-                  <MdDescription size={14} className="text-sky-400 shrink-0" />
-                  <span className="text-[13px] text-slate-200 flex-1 truncate">{r.type}</span>
+                <button key={r.id} type="button" onClick={() => onOpenReport(r)}
+                  className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-white/[0.05] ${idx !== 0 ? 'border-t border-border-faint' : ''}`}>
+                  <TypePill type={r.type} allTypes={reportTypes} />
                   <span className="font-mono text-[11px] text-slate-400 shrink-0">{r.officerBadge}</span>
-                  <span className="text-[11px] text-slate-500 shrink-0">{r.date}</span>
+                  {off && <span className="text-[12px] text-slate-300 flex-1 truncate">{off.name}</span>}
+                  {!off && <span className="flex-1" />}
+                  <span className="text-[11px] text-slate-500 shrink-0 hidden sm:block">{r.date}</span>
                   <StatusPill status={r.status} />
                   <MdChevronRight size={14} className="text-slate-600 shrink-0" />
                 </button>
@@ -250,37 +309,31 @@ function OverviewTab({ reports, officers, departments, calls, onOpenReport }) {
 /* ══════════════════════════════════
    TAB 2: BY OFFICER
 ══════════════════════════════════ */
-function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
-  const [search, setSearch]   = useState('');
+function ByOfficerTab({ reports, officers, departments, reportTypes }) {
+  const [search,     setSearch]     = useState('');
   const [deptFilter, setDeptFilter] = useState('All');
-  const [timePeriod, setTimePeriod] = useState('All Time');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [dateFrom,   setDateFrom]   = useState('');
+  const [dateTo,     setDateTo]     = useState('');
   const { isMobile } = useResponsive();
 
-  const leoDepts = useMemo(
-    () => departments.filter(d => d.type === 'LEO'),
-    [departments]
-  );
+  const leoDepts   = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
   const leoDeptIds = useMemo(() => new Set(leoDepts.map(d => d.id)), [leoDepts]);
-
   const leoOfficers = useMemo(
     () => officers.filter(o => leoDeptIds.has(o.dept)),
     [officers, leoDeptIds]
   );
 
-  const now = Date.now();
-  const timeMs = useMemo(() => {
-    if (timePeriod === 'This Month') {
-      const d = new Date(); d.setDate(1); d.setHours(0,0,0,0);
-      return d.getTime();
-    }
-    if (timePeriod === 'Last 7 Days') return now - 7 * 24 * 60 * 60 * 1000;
-    return 0;
-  }, [timePeriod, now]);
-
   const filteredReports = useMemo(() => {
-    if (timeMs === 0) return reports;
-    return reports.filter(r => r.date && new Date(r.date).getTime() >= timeMs);
-  }, [reports, timeMs]);
+    return reports.filter(r => {
+      if (typeFilter !== 'All' && r.type !== typeFilter) return false;
+      if (dateFrom && r.date < dateFrom) return false;
+      if (dateTo   && r.date > dateTo)   return false;
+      return true;
+    });
+  }, [reports, typeFilter, dateFrom, dateTo]);
+
+  const visibleTypes = typeFilter === 'All' ? reportTypes : [typeFilter];
 
   const officerRows = useMemo(() => {
     return leoOfficers
@@ -292,63 +345,55 @@ function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
       })
       .map(o => {
         const myReports = filteredReports.filter(r => r.officerBadge === o.badge);
-        const uofCount  = myReports.filter(r => r.type === 'Use of Force').length;
-        const sortedDates = myReports
-          .map(r => r.date)
-          .filter(Boolean)
-          .sort((a, b) => b.localeCompare(a));
-        const lastSub = sortedDates[0] || null;
-        const hasAnyCalls = calls.some(c => Array.isArray(c.units) && c.units.includes(o.unitId));
+        const perType   = {};
+        reportTypes.forEach(t => { perType[t] = myReports.filter(r => r.type === t).length; });
+        const lastSub = [...myReports]
+          .map(r => r.date).filter(Boolean)
+          .sort((a, b) => b.localeCompare(a))[0] || null;
         let compStatus, compColor;
         if (myReports.length === 0) {
           compStatus = 'No Reports'; compColor = 'red';
-        } else if (uofCount === 0 && hasAnyCalls) {
-          compStatus = 'No UOF'; compColor = 'amber';
         } else {
-          compStatus = 'Compliant'; compColor = 'green';
+          const pending = myReports.filter(r =>
+            r.status === 'Pending Review' || r.status === 'Pending Changes'
+          ).length;
+          compStatus = pending > 0 ? 'Pending' : 'Compliant';
+          compColor  = pending > 0 ? 'amber'   : 'green';
         }
-        return { officer: o, reportCount: myReports.length, uofCount, lastSub, compStatus, compColor };
-      });
-  }, [leoOfficers, filteredReports, calls, search, deptFilter]);
+        return { officer: o, total: myReports.length, perType, lastSub, compStatus, compColor };
+      })
+      .sort((a, b) => b.total - a.total);
+  }, [leoOfficers, filteredReports, reportTypes, search, deptFilter]);
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Filter bar */}
+      {/* Row 1: search, dept, type filters */}
       <div className="flex flex-wrap gap-2 items-center">
         <div className="flex items-center gap-2 flex-1 min-w-[180px] bg-app-input border border-border-base rounded-lg px-3 py-2">
           <MdSearch size={14} className="text-slate-500 shrink-0" />
-          <input
-            className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-            placeholder="Name or badge…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+          <input className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
+            placeholder="Name or badge…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <select
-          className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
-          value={deptFilter}
-          onChange={e => setDeptFilter(e.target.value)}
-        >
+        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+          value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
           <option value="All">All Depts</option>
           {leoDepts.map(d => <option key={d.id} value={d.short}>{d.short}</option>)}
         </select>
-        <select
-          className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
-          value={timePeriod}
-          onChange={e => setTimePeriod(e.target.value)}
-        >
-          <option>All Time</option>
-          <option>This Month</option>
-          <option>Last 7 Days</option>
+        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+          value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+          <option value="All">All Types</option>
+          {reportTypes.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
+      {/* Row 2: date range */}
+      <DateRangeBar dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo} />
+
       {isMobile ? (
-        /* Mobile cards */
         <div className="flex flex-col gap-3">
-          {officerRows.map(({ officer: o, reportCount, uofCount, lastSub, compStatus, compColor }) => (
+          {officerRows.map(({ officer: o, total, perType, lastSub, compStatus, compColor }) => (
             <PortalCard key={o.id}>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-violet-400/10 border border-violet-400/30 flex items-center justify-center shrink-0">
                   <MdShield size={16} className="text-violet-400" />
                 </div>
@@ -358,19 +403,23 @@ function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
                 </div>
                 <CompBadge label={compStatus} color={compColor} />
               </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-app-bg/60 rounded-lg py-2">
-                  <div className="text-[18px] font-extrabold font-mono text-slate-200">{reportCount}</div>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Reports</div>
-                </div>
-                <div className="bg-app-bg/60 rounded-lg py-2">
-                  <div className="text-[18px] font-extrabold font-mono text-red-400">{uofCount}</div>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">UOFs</div>
-                </div>
-                <div className="bg-app-bg/60 rounded-lg py-2">
-                  <div className="text-[12px] font-mono text-slate-400">{lastSub || '—'}</div>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Last Sub</div>
-                </div>
+              <div className="grid grid-cols-2 gap-1.5 mb-2">
+                {visibleTypes.map(t => {
+                  const color = typeColor(t, reportTypes);
+                  const cnt   = perType[t] || 0;
+                  return (
+                    <div key={t} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg gap-2"
+                      style={{ background: `${color}0d`, border: `1px solid ${color}20` }}>
+                      <span className="text-[10px] font-semibold truncate" style={{ color, opacity: 0.9 }}>{t}</span>
+                      <span className="text-[13px] font-extrabold font-mono shrink-0"
+                        style={{ color: cnt > 0 ? color : '#475569' }}>{cnt}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between mt-1 text-[10.5px] text-slate-500">
+                <span>Total: <span className="font-mono text-slate-300">{total}</span></span>
+                <span>Last: <span className="font-mono text-slate-300">{lastSub || '—'}</span></span>
               </div>
             </PortalCard>
           ))}
@@ -379,21 +428,25 @@ function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
           )}
         </div>
       ) : (
-        /* Desktop table */
         <div className="bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  {['Officer', 'Badge', 'Dept', 'Reports', 'UOFs', 'Last Submission', 'Status'].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-bg/60 border-b border-border-base whitespace-nowrap">
-                      {h}
-                    </th>
+                  {['Officer', 'Badge', 'Dept'].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-bg/60 border-b border-border-base whitespace-nowrap">{h}</th>
+                  ))}
+                  {visibleTypes.map(t => (
+                    <th key={t} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] bg-app-bg/60 border-b border-border-base whitespace-nowrap"
+                      style={{ color: typeColor(t, reportTypes) }}>{t}</th>
+                  ))}
+                  {['Total', 'Last Sub', 'Status'].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-bg/60 border-b border-border-base whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {officerRows.map(({ officer: o, reportCount, uofCount, lastSub, compStatus, compColor }, idx) => (
+                {officerRows.map(({ officer: o, total, perType, lastSub, compStatus, compColor }, idx) => (
                   <tr key={o.id} className={idx % 2 === 0 ? '' : 'bg-white/[0.02]'}>
                     <td className="px-4 py-3 border-b border-border-faint">
                       <div className="flex items-center gap-2">
@@ -403,15 +456,25 @@ function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
                     </td>
                     <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-300 whitespace-nowrap">{o.badge}</td>
                     <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-400 whitespace-nowrap">{o.deptShort}</td>
-                    <td className="px-4 py-3 border-b border-border-faint text-[13px] font-bold font-mono text-slate-200">{reportCount}</td>
-                    <td className="px-4 py-3 border-b border-border-faint text-[13px] font-bold font-mono text-red-400">{uofCount}</td>
+                    {visibleTypes.map(t => {
+                      const color = typeColor(t, reportTypes);
+                      const cnt   = perType[t] || 0;
+                      return (
+                        <td key={t} className="px-4 py-3 border-b border-border-faint">
+                          <span className="text-[13px] font-bold font-mono"
+                            style={{ color: cnt > 0 ? color : '#475569' }}>{cnt}</span>
+                        </td>
+                      );
+                    })}
+                    <td className="px-4 py-3 border-b border-border-faint text-[13px] font-bold font-mono text-slate-200">{total}</td>
                     <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-400 whitespace-nowrap">{lastSub || '—'}</td>
                     <td className="px-4 py-3 border-b border-border-faint"><CompBadge label={compStatus} color={compColor} /></td>
                   </tr>
                 ))}
                 {officerRows.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-12 text-center text-slate-500 text-[13px]">
+                    <td colSpan={3 + visibleTypes.length + 3}
+                      className="px-4 py-12 text-center text-slate-500 text-[13px]">
                       No officers match your filters.
                     </td>
                   </tr>
@@ -430,7 +493,7 @@ function ByOfficerTab({ reports, officers, departments, calls, onOpenReport }) {
 ══════════════════════════════════ */
 const CARD_ACCENTS = ['violet', 'brand', 'cyan', 'green', 'amber'];
 
-function ByDeptTab({ reports, officers, departments }) {
+function ByDeptTab({ reports, officers, departments, reportTypes }) {
   const leoDepts = useMemo(
     () => departments.filter(d => d.type === 'LEO'),
     [departments]
@@ -439,16 +502,15 @@ function ByDeptTab({ reports, officers, departments }) {
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
       {leoDepts.map((dept, idx) => {
-        const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length];
-        const deptOfficers = officers.filter(o => o.dept === dept.id);
-        const deptReports  = reports.filter(r => deptOfficers.some(o => o.badge === r.officerBadge));
-        const deptUofs     = deptReports.filter(r => r.type === 'Use of Force');
-        const avgReports   = deptOfficers.length > 0
+        const accent          = CARD_ACCENTS[idx % CARD_ACCENTS.length];
+        const deptOfficers    = officers.filter(o => o.dept === dept.id);
+        const deptReports     = reports.filter(r => deptOfficers.some(o => o.badge === r.officerBadge));
+        const avgReports      = deptOfficers.length > 0
           ? (deptReports.length / deptOfficers.length).toFixed(1)
           : '0.0';
-        const officersWithReports = deptOfficers.filter(o => deptReports.some(r => r.officerBadge === o.badge)).length;
-        const pct = deptOfficers.length > 0
-          ? Math.round((officersWithReports / deptOfficers.length) * 100)
+        const officersWithRep = deptOfficers.filter(o => deptReports.some(r => r.officerBadge === o.badge)).length;
+        const pct             = deptOfficers.length > 0
+          ? Math.round((officersWithRep / deptOfficers.length) * 100)
           : 0;
         const barColor    = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f97316' : '#ef4444';
         const barGradient = pct >= 80
@@ -471,13 +533,13 @@ function ByDeptTab({ reports, officers, departments }) {
               </div>
             </div>
 
-            {/* Stats grid */}
+            {/* Top stats */}
             <div className="grid grid-cols-2 gap-2 mb-4">
               {[
-                { label: 'Officers',            value: deptOfficers.length, color: '#94a3b8' },
-                { label: 'Reports Filed',        value: deptReports.length,  color: '#9090cc' },
-                { label: 'UOFs Filed',           value: deptUofs.length,     color: '#ff5454' },
-                { label: 'Avg Reports/Officer',  value: avgReports,          color: '#44aacc' },
+                { label: 'Officers',       value: deptOfficers.length, color: '#94a3b8' },
+                { label: 'Total Reports',  value: deptReports.length,  color: '#9090cc' },
+                { label: 'Avg / Officer',  value: avgReports,          color: '#44aacc' },
+                { label: 'Compliance',     value: `${pct}%`,           color: barColor  },
               ].map(s => (
                 <div key={s.label} className="bg-app-bg/60 rounded-lg px-3 py-2.5 text-center">
                   <div className="text-[20px] font-extrabold font-mono leading-none" style={{ color: s.color }}>{s.value}</div>
@@ -495,120 +557,132 @@ function ByDeptTab({ reports, officers, departments }) {
               <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                 <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barGradient }} />
               </div>
-              <div className="text-[9.5px] text-slate-600 mt-1">{officersWithReports} of {deptOfficers.length} officers have filed at least 1 report</div>
+              <div className="text-[9.5px] text-slate-600 mt-1">
+                {officersWithRep} of {deptOfficers.length} officers filed at least 1 report
+              </div>
             </div>
+
+            {/* Per-type breakdown */}
+            {reportTypes.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-border-faint">
+                <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-2">By Type</div>
+                <div className="grid grid-cols-2 gap-1">
+                  {reportTypes.map(t => {
+                    const color = typeColor(t, reportTypes);
+                    const cnt   = deptReports.filter(r => r.type === t).length;
+                    return (
+                      <div key={t} className="flex items-center justify-between px-2 py-1 rounded"
+                        style={{ background: `${color}0d` }}>
+                        <span className="text-[10px] truncate" style={{ color, opacity: 0.85 }}>{t}</span>
+                        <span className="text-[11px] font-bold font-mono shrink-0 ml-1.5"
+                          style={{ color: cnt > 0 ? color : '#475569' }}>{cnt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </PortalCard>
         );
       })}
       {leoDepts.length === 0 && (
-        <div className="col-span-3 text-[13px] text-slate-500 py-10 text-center">No LEO departments configured.</div>
+        <div className="col-span-3 text-[13px] text-slate-500 py-10 text-center">
+          No LEO departments configured.
+        </div>
       )}
     </div>
   );
 }
 
 /* ══════════════════════════════════
-   TAB 4: UOF TRACKER
+   TAB 4: REPORT TRACKER
 ══════════════════════════════════ */
-function UofTrackerTab({ reports, officers, calls, onOpenReport }) {
+const ALL_STATUSES = ['Pending Review', 'Pending Changes', 'Approved', 'Rejected'];
+
+function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
+  const [typeFilter,    setTypeFilter]    = useState('All');
+  const [statusFilter,  setStatusFilter]  = useState('All');
+  const [officerSearch, setOfficerSearch] = useState('');
+  const [dateFrom,      setDateFrom]      = useState('');
+  const [dateTo,        setDateTo]        = useState('');
+
   const officerByBadge = useMemo(() => {
     const m = {};
     officers.forEach(o => { m[o.badge] = o; });
     return m;
   }, [officers]);
 
-  const submittedUofs = useMemo(() => {
-    return [...reports.filter(r => r.type === 'Use of Force')]
+  const filtered = useMemo(() => {
+    return [...reports]
+      .filter(r => {
+        if (typeFilter   !== 'All' && r.type   !== typeFilter)   return false;
+        if (statusFilter !== 'All' && r.status !== statusFilter) return false;
+        if (dateFrom && r.date < dateFrom) return false;
+        if (dateTo   && r.date > dateTo)   return false;
+        if (officerSearch) {
+          const q   = officerSearch.toLowerCase();
+          const off = officerByBadge[r.officerBadge];
+          if (!r.officerBadge?.toLowerCase().includes(q) && !off?.name?.toLowerCase().includes(q))
+            return false;
+        }
+        return true;
+      })
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  }, [reports]);
-
-  const outstandingOfficers = useMemo(() => {
-    return officers.filter(o => {
-      const assignedToCalls = calls.some(c => Array.isArray(c.units) && c.units.includes(o.unitId));
-      if (!assignedToCalls) return false;
-      const uofFiled = reports.some(r => r.officerBadge === o.badge && r.type === 'Use of Force');
-      return !uofFiled;
-    });
-  }, [officers, calls, reports]);
+  }, [reports, typeFilter, statusFilter, dateFrom, dateTo, officerSearch, officerByBadge]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-violet-400 mb-1">
-        Use of Force Report Compliance
+    <div className="flex flex-col gap-4">
+      {/* Filter row 1 */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex items-center gap-2 flex-1 min-w-[180px] bg-app-input border border-border-base rounded-lg px-3 py-2">
+          <MdSearch size={14} className="text-slate-500 shrink-0" />
+          <input className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
+            placeholder="Officer name or badge…"
+            value={officerSearch}
+            onChange={e => setOfficerSearch(e.target.value)} />
+        </div>
+        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+          value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+          <option value="All">All Types</option>
+          {reportTypes.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+          value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <option value="All">All Statuses</option>
+          {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
       </div>
 
-      {/* Section A: Submitted UOFs */}
-      <PortalCard>
-        <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-400 mb-3 flex items-center gap-2">
-          <MdDescription size={14} className="text-red-400" />
-          Submitted UOF Reports
-          <span className="ml-auto text-slate-600 font-mono normal-case text-[10px]">{submittedUofs.length} record{submittedUofs.length !== 1 ? 's' : ''}</span>
-        </div>
+      {/* Date range row */}
+      <DateRangeBar dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo} />
 
-        {submittedUofs.length === 0 ? (
-          <div className="text-[12px] text-slate-600 py-4 text-center">No UOF reports on file.</div>
+      {/* Result count */}
+      <div className="text-[11px] text-slate-500">
+        {filtered.length} report{filtered.length !== 1 ? 's' : ''} match filters
+      </div>
+
+      {/* Report list */}
+      <PortalCard>
+        {filtered.length === 0 ? (
+          <div className="text-[13px] text-slate-600 py-6 text-center">No reports match your filters.</div>
         ) : (
           <div className="flex flex-col">
-            {submittedUofs.map((r, idx) => {
+            {filtered.map((r, idx) => {
               const off = officerByBadge[r.officerBadge];
               return (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => onOpenReport(r)}
-                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-white/[0.05] ${idx !== 0 ? 'border-t border-border-faint' : ''}`}
-                >
-                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(255,84,84,0.12)', border: '1px solid rgba(255,84,84,0.25)' }}>
-                    <MdShield size={13} className="text-red-400" />
-                  </div>
-                  <span className="font-mono text-[11.5px] text-slate-300 shrink-0">{r.officerBadge}</span>
+                <button key={r.id} type="button" onClick={() => onOpenReport(r)}
+                  className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-white/[0.05] ${idx !== 0 ? 'border-t border-border-faint' : ''}`}>
+                  <TypePill type={r.type} allTypes={reportTypes} />
+                  <span className="font-mono text-[11.5px] text-slate-400 shrink-0">{r.officerBadge}</span>
                   {off && <span className="text-[12.5px] text-slate-200 flex-1 truncate">{off.name}</span>}
                   {!off && <span className="flex-1" />}
-                  <span className="text-[11px] text-slate-500 shrink-0">{r.date}</span>
-                  <span className="font-mono text-[10.5px] text-slate-500 shrink-0 hidden sm:block">{r.caseNumber || '—'}</span>
+                  <span className="text-[11px] text-slate-500 shrink-0 hidden sm:block">{r.date}</span>
+                  <span className="font-mono text-[10.5px] text-slate-600 shrink-0 hidden md:block">{r.caseNumber || '—'}</span>
                   <StatusPill status={r.status} />
                   <MdChevronRight size={14} className="text-slate-600 shrink-0" />
                 </button>
               );
             })}
-          </div>
-        )}
-      </PortalCard>
-
-      {/* Divider */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 border-t border-border-base" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-600">Outstanding</span>
-        <div className="flex-1 border-t border-border-base" />
-      </div>
-
-      {/* Section B: Outstanding */}
-      <PortalCard accent="amber">
-        <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-amber-400 mb-3 flex items-center gap-2">
-          <MdWarningAmber size={14} />
-          Officers Without UOF — Assigned to Calls
-          <span className="ml-auto text-slate-600 font-mono normal-case text-[10px]">{outstandingOfficers.length} officer{outstandingOfficers.length !== 1 ? 's' : ''}</span>
-        </div>
-
-        {outstandingOfficers.length === 0 ? (
-          <div className="flex items-center gap-2 text-green-400">
-            <MdCheckCircle size={16} />
-            <span className="text-[13px] font-semibold">No outstanding UOF obligations detected.</span>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {outstandingOfficers.map(o => (
-              <div key={o.id}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}
-              >
-                <MdWarningAmber size={14} className="text-amber-400 shrink-0" />
-                <span className="text-[13px] font-semibold text-white flex-1">{o.name}</span>
-                <span className="font-mono text-[11px] text-slate-400">{o.badge}</span>
-                <span className="text-[10px] text-slate-500">{o.deptShort}</span>
-              </div>
-            ))}
           </div>
         )}
       </PortalCard>
@@ -619,17 +693,14 @@ function UofTrackerTab({ reports, officers, calls, onOpenReport }) {
 /* ══════════════════════════════════
    MAIN: COMMAND PORTAL
 ══════════════════════════════════ */
-const TABS = ['Overview', 'By Officer', 'By Department', 'UOF Tracker'];
+const TABS = ['Overview', 'By Officer', 'By Department', 'Report Tracker'];
 
 export default function CommandPortal() {
   const { state } = useCAD();
-  const {
-    reports = [], officers = [], departments = [], calls = [],
-    currentUser,
-  } = state;
+  const { reports = [], officers = [], departments = [], calls = [], currentUser } = state;
 
   /* ── Access control ── */
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin   = currentUser?.role === 'admin';
   const myOfficer = useMemo(
     () => officers.find(o => o.id === currentUser?.id),
     [officers, currentUser]
@@ -640,9 +711,7 @@ export default function CommandPortal() {
 
   /* ── Department scoping ── */
   const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
-
-  // Admins get a picker; everyone else is locked to their own dept
-  const [adminDeptId, setAdminDeptId] = useState(null); // null = all for admins
+  const [adminDeptId, setAdminDeptId] = useState(null);
 
   const scopeDeptId = isAdmin ? adminDeptId : (myOfficer?.dept ?? null);
   const scopeDept   = departments.find(d => d.id === scopeDeptId) ?? null;
@@ -667,6 +736,12 @@ export default function CommandPortal() {
     return departments.filter(d => d.id === scopeDeptId);
   }, [departments, scopeDeptId]);
 
+  /* Derive all unique report types from scoped data */
+  const reportTypes = useMemo(() => {
+    const types = new Set(scopedReports.map(r => r.type).filter(Boolean));
+    return [...types].sort();
+  }, [scopedReports]);
+
   /* ── UI state ── */
   const [activeTab,   setActiveTab]   = useState('Overview');
   const [modalReport, setModalReport] = useState(null);
@@ -676,9 +751,6 @@ export default function CommandPortal() {
     officers.forEach(o => { m[o.badge] = o; });
     return m;
   }, [officers]);
-
-  const openReport = (r) => setModalReport(r);
-  const closeModal = () => setModalReport(null);
 
   return (
     <PortalPage>
@@ -714,16 +786,12 @@ export default function CommandPortal() {
         {TABS.map(tab => {
           const active = activeTab === tab;
           return (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
+            <button key={tab} type="button" onClick={() => setActiveTab(tab)}
               className={`px-3.5 py-1.5 rounded-lg text-[12px] font-semibold cursor-pointer transition-all border ${
                 active
                   ? 'bg-violet-400/20 border-violet-400/50 text-violet-300'
                   : 'bg-transparent border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'
-              }`}
-            >
+              }`}>
               {tab}
             </button>
           );
@@ -736,8 +804,8 @@ export default function CommandPortal() {
           reports={scopedReports}
           officers={scopedOfficers}
           departments={scopedDepts}
-          calls={calls}
-          onOpenReport={openReport}
+          reportTypes={reportTypes}
+          onOpenReport={r => setModalReport(r)}
         />
       )}
       {activeTab === 'By Officer' && (
@@ -745,8 +813,7 @@ export default function CommandPortal() {
           reports={scopedReports}
           officers={scopedOfficers}
           departments={scopedDepts}
-          calls={calls}
-          onOpenReport={openReport}
+          reportTypes={reportTypes}
         />
       )}
       {activeTab === 'By Department' && (
@@ -754,23 +821,24 @@ export default function CommandPortal() {
           reports={scopedReports}
           officers={scopedOfficers}
           departments={scopedDepts}
+          reportTypes={reportTypes}
         />
       )}
-      {activeTab === 'UOF Tracker' && (
-        <UofTrackerTab
+      {activeTab === 'Report Tracker' && (
+        <ReportTrackerTab
           reports={scopedReports}
           officers={scopedOfficers}
-          calls={calls}
-          onOpenReport={openReport}
+          reportTypes={reportTypes}
+          onOpenReport={r => setModalReport(r)}
         />
       )}
 
-      {/* Report detail modal */}
       {modalReport && (
         <ReportModal
           report={modalReport}
           officer={officerByBadge[modalReport.officerBadge]}
-          onClose={closeModal}
+          allTypes={reportTypes}
+          onClose={() => setModalReport(null)}
         />
       )}
     </PortalPage>
