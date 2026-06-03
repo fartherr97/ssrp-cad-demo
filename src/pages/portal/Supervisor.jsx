@@ -3,6 +3,7 @@ import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
   MdSave, MdCheckCircle, MdShield, MdReply, MdComment,
+  MdPerson, MdWarningAmber,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import ReportForm from '../../components/ReportForm';
@@ -466,6 +467,312 @@ function MobileCard({ entry, officer, onClick }) {
 }
 
 /* ══════════════════════════════════
+   OFFICER PROFILE VIEW
+══════════════════════════════════ */
+function OfficerProfileView({ officer, submissions, departments }) {
+  const dept = departments.find(d => d.short === officer.deptShort);
+  const pending  = submissions.filter(r => r.status === 'Pending Review').length;
+  const approved = submissions.filter(r => r.status === 'Approved').length;
+  const SC = { AVAILABLE:'#4ade80', ENRT:'#a78bfa', BUSY:'#f87171', ARRVD:'#4ade80', UNAVAILABLE:'#e879f9', OFFDUTY:'#94a3b8' };
+  const sc = SC[officer.status] || '#94a3b8';
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="px-5 py-4 border-b border-border-faint flex items-center gap-4 shrink-0">
+        <div className="w-14 h-14 rounded-xl bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
+          <MdShield size={28} className="text-brand-bright" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[18px] font-extrabold text-white tracking-[-0.2px]">{officer.name}</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">
+            Badge <span className="font-mono text-brand-bright">#{officer.badge}</span>
+            {officer.rank && <span className="ml-2 text-slate-500">· {officer.rank}</span>}
+          </div>
+        </div>
+        <span className="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase"
+          style={{ background: `${sc}22`, color: sc, border: `1px solid ${sc}44` }}>
+          {officer.status || 'OFFDUTY'}
+        </span>
+      </div>
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
+          {[
+            { label: 'Department', value: dept?.name || officer.deptShort || '—' },
+            { label: 'Unit ID',    value: officer.unitId || '—', mono: true },
+            { label: 'Location',   value: officer.location || '—' },
+            { label: 'Call',       value: officer.callId || 'None', mono: !!officer.callId },
+          ].map(({ label, value, mono }) => (
+            <div key={label} className="bg-app-card/60 border border-border-faint rounded-lg px-3 py-2.5">
+              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">{label}</div>
+              <div className={`text-[12.5px] text-slate-200 truncate ${mono ? 'font-mono' : ''}`}>{value}</div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-5">
+          {[{ label:'Total', value: submissions.length, c:'#94a3b8' }, { label:'Pending', value: pending, c:'#fb923c' }, { label:'Approved', value: approved, c:'#4ade80' }].map(s => (
+            <div key={s.label} className="bg-app-card/60 border border-border-faint rounded-lg px-3 py-3 text-center">
+              <div className="text-[22px] font-extrabold font-mono leading-none" style={{ color: s.c }}>{s.value}</div>
+              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600 mt-1">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-2">Recent Submissions</div>
+        {submissions.length === 0
+          ? <div className="text-[12px] text-slate-600 py-3 text-center">No submissions on file</div>
+          : submissions.slice(0, 10).map(r => (
+            <div key={`${r.kind}-${r.id}`} className="flex items-center gap-3 py-2 border-b border-border-faint last:border-0">
+              {r.kind === 'report'
+                ? <MdDescription size={13} className="text-sky-400 shrink-0" />
+                : <MdFolder size={13} className="text-violet-400 shrink-0" />}
+              <div className="flex-1 min-w-0">
+                <div className="text-[12px] text-slate-200 truncate">{r.type}</div>
+                <div className="text-[10px] text-slate-600 font-mono">{r.caseNumber || r.recordNumber} · {r.date}</div>
+              </div>
+              <StatusPill status={r.status} />
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
+   CIVILIAN PROFILE VIEW
+══════════════════════════════════ */
+function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold }) {
+  const pts = civilian.licensePoints || 0;
+  const pct = ptThreshold > 0 ? pts / ptThreshold : 0;
+  const ptC = pts === 0 ? '#4ade80' : pct >= 1 ? '#f87171' : pct >= 0.7 ? '#fb923c' : pct >= 0.4 ? '#facc15' : '#4ade80';
+  const ageYrs = (dob) => { if (!dob) return ''; const d = new Date(dob); return isNaN(d) ? '' : Math.abs(new Date(Date.now()-d.getTime()).getUTCFullYear()-1970); };
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="px-5 py-4 border-b border-border-faint flex items-center gap-4 shrink-0">
+        <div className="w-14 h-14 rounded-xl bg-slate-500/15 border border-slate-500/30 flex items-center justify-center shrink-0 overflow-hidden">
+          {civilian.photoUrl ? <img src={civilian.photoUrl} alt="" className="w-full h-full object-cover" /> : <MdPerson size={28} className="text-slate-500" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[18px] font-extrabold text-white">{civilian.firstName} {civilian.lastName}</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">DOB {civilian.dob} ({ageYrs(civilian.dob)}) · {civilian.gender}</div>
+        </div>
+        {activeWarrants.length > 0 && (
+          <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/25 shrink-0">
+            <MdWarningAmber size={12} /> {activeWarrants.length} WARRANT{activeWarrants.length > 1 ? 'S' : ''}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+        {/* DL info */}
+        <div className="bg-app-card/60 border border-border-faint rounded-xl p-4 flex flex-col gap-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500">Driver's License</div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px] mb-0.5">DL Number</div>
+              <div className="text-[12.5px] font-mono text-slate-200">{civilian.dlNumber || '—'}</div>
+            </div>
+            <div>
+              <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px] mb-0.5">Status</div>
+              <div className={`text-[13px] font-bold ${civilian.dlStatus === 'SUSPENDED' ? 'text-red-400' : 'text-green-400'}`}>
+                {civilian.dlStatus || 'ACTIVE'}
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px] mb-1.5">Accumulated Points</div>
+            <div className="flex items-center gap-3">
+              <span className="text-[22px] font-extrabold font-mono leading-none" style={{ color: ptC }}>{pts}</span>
+              <div className="flex-1">
+                <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden mb-1">
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(pct*100,100)}%`, background: ptC }} />
+                </div>
+                <div className="text-[9.5px] text-slate-600">{pts} / {ptThreshold} pts to suspension</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Personal */}
+        <div className="bg-app-card/60 border border-border-faint rounded-xl p-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3">Personal Info</div>
+          <div className="grid grid-cols-2 gap-y-2.5 gap-x-4">
+            {[['SSN', civilian.ssn, true],['Occupation', civilian.occupation],['Height', civilian.height],['Weight', civilian.weight],['Hair', civilian.hair],['Eyes', civilian.eyes]]
+              .filter(([,v]) => v).map(([l, v, mono]) => (
+                <div key={l}>
+                  <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px]">{l}</div>
+                  <div className={`text-[12px] text-slate-300 ${mono ? 'font-mono' : ''}`}>{v}</div>
+                </div>
+              ))}
+          </div>
+          {civilian.flags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border-faint">
+              {civilian.flags.map(f => (
+                <span key={f} className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase bg-red-500/15 text-red-400 border border-red-500/25">{f}</span>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* Active warrants */}
+        {activeWarrants.length > 0 && (
+          <div className="bg-red-500/[0.05] border border-red-500/20 rounded-xl p-4">
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <MdWarningAmber size={13} className="text-red-400" />
+              <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-red-400">Active Warrants</div>
+            </div>
+            {activeWarrants.map(w => (
+              <div key={w.id} className="py-2 border-b border-red-500/10 last:border-0">
+                <div className="text-[12px] font-semibold text-slate-200">{w.charge}</div>
+                <div className="text-[10.5px] text-slate-500 mt-0.5">{w.type} · {w.issuedDate || w.date || ''}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Criminal history */}
+        <div className="bg-app-card/60 border border-border-faint rounded-xl p-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Criminal History ({civHistory.length})</div>
+          {civHistory.length === 0
+            ? <div className="text-[12px] text-slate-600">No criminal history on file</div>
+            : civHistory.slice(0, 6).map(h => (
+              <div key={h.id} className="flex items-start justify-between gap-2 py-2 border-b border-border-faint last:border-0">
+                <div className="min-w-0">
+                  <div className="text-[12px] text-slate-200 truncate">{h.charges?.join(', ')}</div>
+                  <div className="text-[10px] text-slate-600 font-mono mt-0.5">{h.caseNumber} · {h.date}</div>
+                </div>
+                {h.disposition && <span className="shrink-0 text-[9.5px] px-1.5 py-0.5 rounded border text-slate-400 border-border-faint whitespace-nowrap">{h.disposition}</span>}
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
+   PERSONNEL LOOKUP
+══════════════════════════════════ */
+function PersonnelLookup({ officers, civilians, warrants, criminalHistory, reports, records, licensePointsConfig, departments }) {
+  const [type, setType]           = useState('officers');
+  const [query, setQuery]         = useState('');
+  const [results, setResults]     = useState([]);
+  const [searched, setSearched]   = useState(false);
+  const [selected, setSelected]   = useState(null);
+
+  const ptThreshold = licensePointsConfig?.threshold || 12;
+
+  const doSearch = () => {
+    const q = query.trim().toLowerCase();
+    if (!q) return;
+    if (type === 'officers') {
+      setResults(officers.filter(o => o.name?.toLowerCase().includes(q) || o.badge?.toLowerCase().includes(q)));
+    } else {
+      setResults(civilians.filter(c =>
+        `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
+        c.dlNumber?.toLowerCase().includes(q) || c.ssn?.includes(q)
+      ));
+    }
+    setSearched(true);
+    setSelected(null);
+  };
+
+  const selOfficer  = type === 'officers'  && selected ? officers.find(o => o.id === selected)  : null;
+  const selCivilian = type === 'civilians' && selected ? civilians.find(c => c.id === selected)  : null;
+
+  const officerSubmissions = selOfficer ? [
+    ...reports.filter(r => r.officerBadge === selOfficer.badge).map(r => ({ ...r, kind: 'report' })),
+    ...records.filter(r => r.officerBadge === selOfficer.badge).map(r => ({ ...r, kind: 'record' })),
+  ].sort((a, b) => (b.date || '').localeCompare(a.date || '')) : [];
+
+  const civWarrants     = selCivilian ? warrants.filter(w => w.civilianId === selCivilian.id) : [];
+  const civHistory      = selCivilian ? criminalHistory.filter(h => h.civilianId === selCivilian.id) : [];
+  const activeWarrants  = civWarrants.filter(w => w.status === 'ACTIVE');
+
+  return (
+    <div className="grid gap-4 grid-cols-1 lg:grid-cols-[320px_1fr]">
+      {/* ── Left: search + results ── */}
+      <div className="bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm flex flex-col">
+        {/* Type toggle */}
+        <div className="flex gap-1 p-2 border-b border-border-faint shrink-0">
+          {[['officers', MdShield, 'Officers'], ['civilians', MdPerson, 'Civilians']].map(([v, Icon, l]) => (
+            <button key={v} type="button"
+              onClick={() => { setType(v); setResults([]); setSearched(false); setSelected(null); setQuery(''); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${type === v ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}>
+              <Icon size={14} /> {l}
+            </button>
+          ))}
+        </div>
+        {/* Search input */}
+        <div className="p-3 border-b border-border-faint shrink-0">
+          <div className="flex gap-2">
+            <input
+              className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-all"
+              placeholder={type === 'officers' ? 'Name or badge #…' : 'Name, DL # or SSN…'}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && doSearch()}
+            />
+            <button type="button" onClick={doSearch}
+              className="shrink-0 flex items-center justify-center px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white cursor-pointer transition-colors">
+              <MdSearch size={17} />
+            </button>
+          </div>
+        </div>
+        {/* Results list */}
+        <div className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
+          {!searched ? (
+            <div className="p-4 text-[11px] text-slate-600 leading-relaxed">
+              Search for {type === 'officers' ? 'an officer by name or badge #' : 'a civilian by name, DL #, or SSN'}
+            </div>
+          ) : results.length === 0 ? (
+            <div className="p-6 text-center text-slate-600 text-[12px]">No {type} found</div>
+          ) : (
+            <div className="flex flex-col gap-1 p-2">
+              {results.map(r => {
+                const on = selected === r.id;
+                const base = `text-left px-3 py-2.5 rounded-lg cursor-pointer border transition-all w-full ${on ? 'bg-brand/15 border-brand/40' : 'bg-white/[0.02] border-border-faint hover:bg-white/[0.05] hover:border-border-base'}`;
+                if (type === 'officers') {
+                  const subs = reports.filter(rp => rp.officerBadge === r.badge).length + records.filter(rc => rc.officerBadge === r.badge).length;
+                  return (
+                    <button key={r.id} type="button" className={base} onClick={() => setSelected(r.id)}>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-mono text-[11px] font-bold text-brand-bright">#{r.badge}</span>
+                        <span className="text-[12.5px] font-bold text-white truncate">{r.name}</span>
+                      </div>
+                      <div className="text-[10.5px] text-slate-500">{r.rank} · {r.deptShort || '—'} · {subs} submissions</div>
+                    </button>
+                  );
+                }
+                const pts = r.licensePoints || 0;
+                return (
+                  <button key={r.id} type="button" className={base} onClick={() => setSelected(r.id)}>
+                    <div className="text-[12.5px] font-bold text-white">{r.firstName} {r.lastName}</div>
+                    <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {r.dob} · DL {r.dlNumber || '—'}</div>
+                    <div className="flex gap-1 mt-1.5 flex-wrap items-center">
+                      {r.dlStatus === 'SUSPENDED' && <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-orange-500/15 text-orange-400 border border-orange-500/25">DL SUSP</span>}
+                      {r.flags?.map(f => <span key={f} className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-red-500/15 text-red-400 border border-red-500/25">{f}</span>)}
+                      {pts > 0 && <span className="text-[9.5px] text-slate-500 font-mono">{pts} pts</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Right: profile detail ── */}
+      <div className="bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm" style={{ minHeight: 320 }}>
+        {!selected ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 py-16 text-slate-600">
+            <MdSearch size={44} className="opacity-20" />
+            <div className="text-[12px] text-slate-500">Select a person to view their profile</div>
+          </div>
+        ) : selOfficer ? (
+          <OfficerProfileView officer={selOfficer} submissions={officerSubmissions} departments={departments} />
+        ) : selCivilian ? (
+          <CivilianProfileView civilian={selCivilian} activeWarrants={activeWarrants} civHistory={civHistory} ptThreshold={ptThreshold} />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
    MAIN
 ══════════════════════════════════ */
 export default function Supervisor() {
@@ -473,8 +780,10 @@ export default function Supervisor() {
   const {
     reports, records, officers, currentUser,
     reportTemplates = [], recordTemplates = [], communityConfig, departments = [],
+    civilians = [], warrants = [], criminalHistory = [], licensePointsConfig = {},
   } = state;
 
+  const [portalMode, setPortalMode]     = useState('submissions');
   const [deptFilter, setDeptFilter]     = useState('All');
   const [typeFilter, setTypeFilter]     = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -580,16 +889,53 @@ export default function Supervisor() {
         </div>
         <div className="min-w-0">
           <h1 className="text-[15px] font-bold text-white leading-none">Supervisor Portal</h1>
-          <p className="text-[11px] text-slate-500 mt-0.5">Click any row to open the full editable record</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            {portalMode === 'submissions' ? 'Click any row to open the full editable record' : 'Search officers and civilians by name, badge, DL #, or SSN'}
+          </p>
         </div>
-        <div className="ml-auto shrink-0 text-[11.5px] text-slate-500 font-mono">
-          <span className="text-sky-400 font-bold">{reportCount}</span>R&nbsp;·&nbsp;
-          <span className="text-violet-400 font-bold">{recordCount}</span>Rec&nbsp;·&nbsp;
-          <span className="text-white font-bold">{filtered.length}</span>
-        </div>
+        {portalMode === 'submissions' && (
+          <div className="ml-auto shrink-0 text-[11.5px] text-slate-500 font-mono">
+            <span className="text-sky-400 font-bold">{reportCount}</span>R&nbsp;·&nbsp;
+            <span className="text-violet-400 font-bold">{recordCount}</span>Rec&nbsp;·&nbsp;
+            <span className="text-white font-bold">{filtered.length}</span>
+          </div>
+        )}
       </div>
 
-      {/* ── Filter bar ── */}
+      {/* Mode tabs */}
+      <div className="flex gap-1.5 mb-4">
+        {[
+          { id: 'submissions', icon: MdOutlineRateReview, label: 'Submissions' },
+          { id: 'personnel',   icon: MdPerson,            label: 'Personnel Lookup' },
+        ].map(({ id, icon: Icon, label }) => (
+          <button key={id} type="button"
+            onClick={() => setPortalMode(id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer transition-all border
+              ${portalMode === id
+                ? 'bg-brand/15 border-brand/40 text-brand-bright'
+                : 'bg-app-panel/60 border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'
+              }`}>
+            <Icon size={14} /> {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Personnel Lookup ── */}
+      {portalMode === 'personnel' && (
+        <PersonnelLookup
+          officers={officers}
+          civilians={civilians}
+          warrants={warrants}
+          criminalHistory={criminalHistory}
+          reports={reports}
+          records={records}
+          licensePointsConfig={licensePointsConfig}
+          departments={departments}
+        />
+      )}
+
+      {/* ── Submissions mode ── */}
+      {portalMode === 'submissions' && <>
       <div className="bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm mb-4">
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-faint">
           <MdFilterList size={14} className="text-slate-400 shrink-0" />
@@ -662,7 +1008,6 @@ export default function Supervisor() {
         </div>
       </div>
 
-      {/* ── Submissions ── */}
       <div className="bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-faint">
           <MdOutlineRateReview size={15} className="text-slate-400" />
@@ -718,6 +1063,7 @@ export default function Supervisor() {
           </>
         )}
       </div>
+      </>}
     </div>
   );
 }
