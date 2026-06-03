@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
+import RequestFDOTModal from '../components/RequestFDOTModal';
+import { MdEngineering } from 'react-icons/md';
 import {
   cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL,
   S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_PRIMARY, sm,
@@ -48,16 +50,28 @@ const ST_COLOR = {
 
 const PRI_COLORS = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' };
 
+const FDOT_REQ_META = {
+  PENDING:      { label: 'FDOT Requested — Pending',  color: '#f59e0b' },
+  ACKNOWLEDGED: { label: 'FDOT Acknowledged',         color: '#06b6d4' },
+  DISPATCHED:   { label: 'FDOT Unit Dispatched',      color: '#22c55e' },
+  COMPLETED:    { label: 'FDOT Assist Completed',     color: '#6b7280' },
+  DECLINED:     { label: 'FDOT Declined Request',     color: '#ef4444' },
+};
+
 export default function IncidentDetail() {
   const { callId } = useParams();
   const { state, dispatch } = useCAD();
-  const { calls, officers, dispatchLog, currentUser } = state;
+  const { calls, officers, dispatchLog, currentUser, fdotRequests = [] } = state;
   const navigate = useNavigate();
   const toast = useToast();
 
   const [radioMsg, setRadioMsg] = useState('');
+  const [showFdot, setShowFdot] = useState(false);
 
   const call = calls.find(c => c.id === callId);
+  const me = officers.find(o => o.id === currentUser?.id);
+  // Most recent FDOT request tied to this call (any status).
+  const fdotReq = fdotRequests.find(r => r.callId === callId);
   const isDispatch = currentUser?.portal === 'dispatch' || currentUser?.portal === 'admin' || currentUser?.role === 'dispatch' || currentUser?.role === 'admin';
   const onDutyOfficers = officers.filter(o => o.status !== 'OFFDUTY');
   const availableUnits = onDutyOfficers.filter(o => (o.status === 'AVAILABLE' || o.status === 'ENRT') && !call?.units.includes(o.unitId));
@@ -138,6 +152,15 @@ export default function IncidentDetail() {
           {call.createdAt && <Elapsed createdAt={call.createdAt} />}
         </div>
 
+        <button
+          onClick={() => setShowFdot(true)}
+          disabled={!!fdotReq && !['DECLINED', 'COMPLETED'].includes(fdotReq.status)}
+          title={fdotReq && !['DECLINED', 'COMPLETED'].includes(fdotReq.status) ? 'FDOT already requested for this call' : 'Request FDOT assistance'}
+          className="press shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer bg-amber-500/15 border border-amber-500/35 text-amber-400 hover:bg-amber-500/25 transition-colors disabled:opacity-45 disabled:cursor-default"
+        >
+          <MdEngineering size={15} /> REQUEST FDOT
+        </button>
+
         {isDispatch && (
           <button
             className={`press ${sm(S_BTN_DANGER)} shrink-0`}
@@ -147,6 +170,32 @@ export default function IncidentDetail() {
           </button>
         )}
       </div>
+
+      {/* ── FDOT request status banner ── */}
+      {fdotReq && (() => {
+        const m = FDOT_REQ_META[fdotReq.status] || FDOT_REQ_META.PENDING;
+        return (
+          <div className="shrink-0 flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: `${m.color}14`, border: `1px solid ${m.color}40`, borderLeft: `3px solid ${m.color}` }}>
+            <MdEngineering size={18} style={{ color: m.color }} className="shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[12.5px] font-bold" style={{ color: m.color }}>{m.label}</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/[0.06] text-slate-400">P{fdotReq.priority}</span>
+                <span className="text-[11px] text-slate-500">{fdotReq.assistType}</span>
+              </div>
+              <div className="text-[11.5px] text-slate-400 mt-0.5 leading-relaxed">{fdotReq.description}</div>
+              <div className="text-[10.5px] text-slate-600 mt-0.5">
+                Requested by {fdotReq.requestedBy}{fdotReq.requestedByUnit ? ` (${fdotReq.requestedByUnit})` : ''}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {showFdot && (
+        <RequestFDOTModal call={call} officer={me} onClose={() => setShowFdot(false)} />
+      )}
 
       {/* ── Body: 3-column layout ── */}
       <div className="flex-1 grid overflow-auto lg:overflow-hidden gap-4 lg:gap-5 min-h-0 grid-cols-1 lg:grid-cols-3">

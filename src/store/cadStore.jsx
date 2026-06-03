@@ -39,6 +39,17 @@ const initialState = {
   towLogs: TOW_LOGS,
   towJobs: [],
   towUnits: [],
+  // LEO → FDOT assistance requests (seed one tied to the active MVA call)
+  fdotRequests: [
+    {
+      id: 'FDOT-2601', assistType: 'Vehicle Recovery',
+      location: 'I-4 EB / MLK Blvd', postal: '347', priority: 1,
+      description: '3-vehicle collision, one vehicle overturned blocking the inside lane. Need recovery + lane closure for clearance.',
+      callId: '26-1046', callNature: 'MVA w/ Injuries',
+      requestedBy: 'Amanda Torres', requestedByBadge: 'FHP-214', requestedByUnit: 'FHP-214',
+      status: 'PENDING', createdAt: Date.now() - 8 * 60000,
+    },
+  ],
   departments: DEPARTMENTS,
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
@@ -730,6 +741,35 @@ function reducer(state, action) {
       const towUnits = state.towUnits.filter(u => u.id !== action.payload);
       const log = unit ? addDispatchLog(state, `Tow unit offline: ${unit.operatorName} (${unit.truckName})`, 'unit') : {};
       return { ...state, towUnits, ...log };
+    }
+
+    case 'ADD_FDOT_REQUEST': {
+      // payload: { assistType, location, postal, priority, description, callId,
+      //            callNature, requestedBy, requestedByBadge, requestedByUnit }
+      const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+      const log = addDispatchLog(
+        state,
+        `FDOT assistance requested — ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        'alert'
+      );
+      return { ...state, fdotRequests: [req, ...state.fdotRequests], nextId: state.nextId + 1, ...log };
+    }
+    case 'UPDATE_FDOT_REQUEST': {
+      const prev = state.fdotRequests.find(r => r.id === action.payload.id);
+      const fdotRequests = state.fdotRequests.map(r => r.id === action.payload.id ? { ...r, ...action.payload } : r);
+      let log = {};
+      if (prev && action.payload.status && action.payload.status !== prev.status) {
+        const verb = {
+          ACKNOWLEDGED: 'acknowledged', DISPATCHED: 'dispatched a unit for',
+          DECLINED: 'declined', COMPLETED: 'completed',
+        }[action.payload.status] || 'updated';
+        log = addDispatchLog(
+          state,
+          `FDOT ${verb} assistance request${prev.callId ? ` for Call ${prev.callId}` : ''} (${prev.assistType || 'Assist'} @ ${prev.location})`,
+          action.payload.status === 'DECLINED' ? 'alert' : 'unit'
+        );
+      }
+      return { ...state, fdotRequests, ...log };
     }
 
     case 'ADD_CUSTOM_RECORD_TYPE': {

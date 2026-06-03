@@ -6,7 +6,7 @@ import {
   MdLocalShipping, MdAdd, MdClose, MdFilterList, MdLink,
   MdCancel, MdDirectionsCar, MdLocationOn,
   MdWarning, MdArrowForward, MdBusiness, MdPerson,
-  MdLogin, MdLogout,
+  MdLogin, MdLogout, MdEngineering, MdCheckCircle, MdThumbDownAlt,
 } from 'react-icons/md';
 
 const STATUSES = [
@@ -362,9 +362,10 @@ const EMPTY_FORM = {
   notes: '', callId: '', companyId: '', unitId: '',
 };
 
-function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
-  const [form, setForm] = useState({ ...EMPTY_FORM, companyId: companies[0]?.id || '' });
+function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel }) {
+  const [form, setForm] = useState({ ...EMPTY_FORM, companyId: companies[0]?.id || '', ...(initial || {}) });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const fromRequest = !!initial;
 
   const INPUT = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-cad-text placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
   const LABEL = 'block text-[11px] font-bold tracking-[0.5px] uppercase text-cad-muted mb-1.5';
@@ -378,6 +379,11 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
     c.status !== 'CLOSED' &&
     ['Road Hazard', 'MVA', 'Traffic Stop', 'Accident'].some(k => c.nature.includes(k))
   );
+  // Make sure a prefilled linked call is selectable even if it isn't a road call.
+  const linkedExtra = form.callId && !roadCalls.some(c => c.id === form.callId)
+    ? calls.filter(c => c.id === form.callId)
+    : [];
+  const callOptions = [...linkedExtra, ...roadCalls];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -392,7 +398,9 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
   return (
     <div className="bg-app-panel/80 border border-orange-500/30 rounded-xl p-4 sm:p-5 mb-5">
       <div className="flex justify-between items-center mb-4">
-        <div className="text-[15px] font-extrabold text-slate-100">New Tow Job</div>
+        <div className="text-[15px] font-extrabold text-slate-100">
+          {fromRequest ? 'Dispatch — FDOT Assist' : 'New Tow Job'}
+        </div>
         <button onClick={onCancel}
           className="press-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
           <MdClose size={15} /> Cancel
@@ -471,7 +479,7 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
             <label className={LABEL}>Link to LE Call</label>
             <select className={INPUT} value={form.callId} onChange={e => set('callId', e.target.value)}>
               <option value="">— None —</option>
-              {roadCalls.map(c => (
+              {callOptions.map(c => (
                 <option key={c.id} value={c.id}>{c.id} * {c.nature} @ {c.location}</option>
               ))}
             </select>
@@ -492,10 +500,82 @@ function NewJobForm({ companies, calls, towUnits, onSubmit, onCancel }) {
   );
 }
 
+/* ── FDOT assistance request card (FDOT inbound queue) ── */
+const FDOT_REQ_META = {
+  PENDING:      { label: 'Pending',      color: '#f59e0b' },
+  ACKNOWLEDGED: { label: 'Acknowledged', color: '#06b6d4' },
+};
+
+function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
+  const m = FDOT_REQ_META[req.status] || FDOT_REQ_META.PENDING;
+  const linkedCall = req.callId ? calls.find(c => c.id === req.callId) : null;
+
+  return (
+    <div className="bg-app-panel/80 border rounded-xl p-4 flex flex-col gap-3"
+      style={{ borderColor: `${m.color}55`, borderLeft: `3px solid ${m.color}` }}>
+      <div className="flex justify-between items-start gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+            style={{ color: m.color, borderColor: `${m.color}55`, background: `${m.color}14` }}>
+            {m.label}
+          </span>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${PRIORITY_BADGE[req.priority]}`}>
+            P{req.priority}
+          </span>
+          <span className="text-[11px] text-slate-500 font-mono">#{req.id}</span>
+        </div>
+        <span className="text-[10px] text-slate-500">{elapsed(req.createdAt)}</span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <MdEngineering size={16} className="text-amber-400 shrink-0" />
+        <span className="text-[14px] font-extrabold text-slate-100">{req.assistType}</span>
+      </div>
+
+      <div className="flex items-start gap-2">
+        <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
+        <div className="min-w-0">
+          <span className="text-xs text-slate-300 leading-relaxed">{req.location}</span>
+          {req.postal && <span className="text-[11px] text-slate-500 font-mono ml-2">({req.postal})</span>}
+        </div>
+      </div>
+
+      <div className="text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
+
+      <div className="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap">
+        <MdPerson size={13} className="shrink-0" />
+        <span>{req.requestedBy}{req.requestedByUnit ? ` · ${req.requestedByUnit}` : ''}</span>
+        {linkedCall && (
+          <span className="inline-flex items-center gap-1 ml-auto text-amber-400/80">
+            <MdLink size={12} /> Call {linkedCall.id}
+          </span>
+        )}
+      </div>
+
+      <div className="flex gap-2 flex-wrap pt-1">
+        {req.status === 'PENDING' && (
+          <button onClick={() => onAcknowledge(req)}
+            className="press-sm inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors">
+            <MdCheckCircle size={14} /> Acknowledge
+          </button>
+        )}
+        <button onClick={() => onDispatch(req)}
+          className="press flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border-0 bg-orange-500 hover:bg-orange-400 text-black transition-colors">
+          <MdArrowForward size={14} /> Dispatch Unit
+        </button>
+        <button onClick={() => onDecline(req)}
+          className="press-sm inline-flex items-center gap-1 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors">
+          <MdThumbDownAlt size={14} /> Decline
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ── Main page ── */
 export default function TowCAD() {
   const { state, dispatch } = useCAD();
-  const { towJobs, towUnits = [], calls, businesses, currentUser } = state;
+  const { towJobs, towUnits = [], calls, businesses, currentUser, fdotRequests = [] } = state;
   const bizCtx = useActiveBusiness();
   const toast = useToast();
 
@@ -509,10 +589,20 @@ export default function TowCAD() {
 
   const visibleCompanyIds = useMemo(() => visibleCompanies.map(b => b.id), [visibleCompanies]);
 
+  // FDOT inbound requests are only surfaced to the FDOT tow company's own view.
+  const fdotCompany = useMemo(() => visibleCompanies.find(b => b.isFDOT), [visibleCompanies]);
+  const isFdotView  = isBusinessPortal && !!fdotCompany;
+  const inboundRequests = useMemo(
+    () => fdotRequests.filter(r => r.status === 'PENDING' || r.status === 'ACKNOWLEDGED'),
+    [fdotRequests]
+  );
+
   const [showForm,      setShowForm]    = useState(false);
   const [showSignOn,    setShowSignOn]  = useState(false);
   const [statusFilter,  setStatus]      = useState('ALL');
   const [companyFilter, setCompany]     = useState('ALL');
+  const [formInitial,   setFormInitial] = useState(null);
+  const [pendingReqId,  setPendingReqId] = useState(null);
 
   const myUnit = useMemo(() =>
     towUnits.find(u =>
@@ -562,13 +652,49 @@ export default function TowCAD() {
     });
     toast.success(`Tow job created for ${form.plate || 'vehicle'}`, { title: 'Job created' });
     if (form.unitId) dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: form.unitId, status: 'ON_CALL' } });
+    // If this job fulfils an FDOT request, mark that request dispatched.
+    if (pendingReqId) {
+      dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: pendingReqId, status: 'DISPATCHED' } });
+      setPendingReqId(null);
+    }
+    setFormInitial(null);
     setShowForm(false);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setFormInitial(null);
+    setPendingReqId(null);
   };
 
   const handleSignOn = (data) => {
     dispatch({ type: 'ADD_TOW_UNIT', payload: data });
     toast.success(`Signed on — ${data.truckName}`, { title: 'On duty' });
     setShowSignOn(false);
+  };
+
+  /* ── FDOT request actions ── */
+  const acknowledgeRequest = (req) => {
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
+    toast.info(`Acknowledged — ${req.assistType}`, { title: 'FDOT' });
+  };
+  const declineRequest = (req) => {
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
+    toast.warning(`Declined — ${req.assistType}`, { title: 'FDOT' });
+  };
+  const dispatchFromRequest = (req) => {
+    setFormInitial({
+      location:     req.location,
+      pickupPostal: req.postal || '',
+      towType:      'FDOT Clearance',
+      priority:     req.priority || 2,
+      zone:         'Roaming',
+      notes:        `[FDOT Assist] ${req.assistType} — ${req.description}`,
+      callId:       req.callId || '',
+      companyId:    fdotCompany?.id || '',
+    });
+    setPendingReqId(req.id);
+    setShowForm(true);
   };
 
   return (
@@ -609,6 +735,23 @@ export default function TowCAD() {
         </div>
       </div>
 
+      {/* FDOT inbound assistance requests — FDOT company view only */}
+      {isFdotView && inboundRequests.length > 0 && (
+        <div className="mb-6">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
+            <MdEngineering size={14} /> Incoming LE Assistance Requests ({inboundRequests.length})
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 12 }}>
+            {inboundRequests.map(req => (
+              <FDOTRequestCard key={req.id} req={req} calls={calls}
+                onAcknowledge={acknowledgeRequest}
+                onDispatch={dispatchFromRequest}
+                onDecline={declineRequest} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Active units panel */}
       {visibleUnits.length > 0 && (
         <div className="mb-6">
@@ -645,8 +788,9 @@ export default function TowCAD() {
           companies={visibleCompanies.length > 0 ? visibleCompanies : towCompanies}
           calls={activeCalls}
           towUnits={visibleUnits}
+          initial={formInitial}
           onSubmit={handleCreate}
-          onCancel={() => setShowForm(false)}
+          onCancel={closeForm}
         />
       )}
 
