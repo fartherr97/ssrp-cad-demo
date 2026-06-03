@@ -137,7 +137,7 @@ function ToastCard({ toast, onDismiss }) {
     <div
       role="status"
       onClick={() => onDismiss(toast.id)}
-      className={`group pointer-events-auto relative flex items-center gap-3.5 w-[calc(100vw-2rem)] max-w-[400px] px-5 py-4 rounded-2xl cursor-pointer overflow-hidden backdrop-blur-xl
+      className={`group pointer-events-auto relative flex items-center gap-3.5 w-[calc(100vw-2rem)] max-w-[400px] px-5 pt-4 pb-[22px] rounded-2xl cursor-pointer overflow-hidden backdrop-blur-xl
         ${toast.leaving ? 'toast-pop-out' : 'toast-pop-in'}`}
       style={{
         background: `linear-gradient(135deg, ${color}1c 0%, rgba(10,16,26,0.94) 60%)`,
@@ -170,7 +170,7 @@ function ToastCard({ toast, onDismiss }) {
       {/* progress bar for timed toasts — inset + rounded to match the card */}
       {!loading && toast.duration > 0 && !toast.leaving && (
         <span
-          className="absolute left-4 right-4 bottom-2 h-[3px] rounded-full origin-left"
+          className="absolute left-4 right-4 bottom-[7px] h-[3px] rounded-full origin-left"
           style={{
             background: color,
             opacity: 0.5,
