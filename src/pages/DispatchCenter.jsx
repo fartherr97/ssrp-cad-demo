@@ -114,29 +114,32 @@ function TenCodeReference({ codes }) {
     ? codes.filter(c => c.code.toLowerCase().includes(q.toLowerCase()) || c.label.toLowerCase().includes(q.toLowerCase()))
     : codes;
   return (
-    <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
+    <div className="flex flex-col p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
       <button onClick={() => setOpen(v => !v)}
         className="flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0 text-left">
         <MdRadio size={13} className="text-brand-bright" />
         <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">10-Codes</div>
         <span className="px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[10px] font-bold leading-none">{codes.length}</span>
-        <MdAdd size={14} className={`text-slate-500 transition-transform ${open ? 'rotate-45' : ''}`} />
+        <MdAdd size={14} className={`text-slate-500 transition-transform duration-300 ${open ? 'rotate-45' : ''}`} />
       </button>
-      {open && (
-        <>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search codes…"
-            className="w-full bg-app-input border border-border-base focus:border-brand/50 rounded-lg px-2.5 py-1.5 text-[11.5px] text-white placeholder:text-slate-600 outline-none" />
-          <div className="flex flex-col gap-0.5 max-h-[260px] overflow-y-auto -mx-1 px-1">
-            {filtered.map(c => (
-              <div key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.04]">
-                <span className="font-mono font-bold text-[11px] text-brand-bright shrink-0 w-12">{c.code}</span>
-                <span className="text-[11.5px] text-slate-300 truncate">{c.label}</span>
-              </div>
-            ))}
-            {filtered.length === 0 && <div className="text-center text-slate-600 text-[11px] py-2">No codes match</div>}
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <div className="flex flex-col gap-2 pt-2">
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search codes…"
+              tabIndex={open ? 0 : -1}
+              className="w-full bg-app-input border border-border-base focus:border-brand/50 rounded-lg px-2.5 py-1.5 text-[11.5px] text-white placeholder:text-slate-600 outline-none" />
+            <div className="flex flex-col gap-0.5 max-h-[260px] overflow-y-auto -mx-1 px-1">
+              {filtered.map(c => (
+                <div key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.04]">
+                  <span className="font-mono font-bold text-[11px] text-brand-bright shrink-0 w-12">{c.code}</span>
+                  <span className="text-[11.5px] text-slate-300 truncate">{c.label}</span>
+                </div>
+              ))}
+              {filtered.length === 0 && <div className="text-center text-slate-600 text-[11px] py-2">No codes match</div>}
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
