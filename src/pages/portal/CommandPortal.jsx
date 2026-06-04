@@ -888,7 +888,7 @@ function dutySecondsFor(o, sub, now) {
 
 const SUBDIV_ACCENTS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#f472b6', '#60a5fa', '#fb923c', '#4ade80'];
 
-function SubdivisionHoursTab({ officers }) {
+function SubdivisionHoursTab({ officers, departments = [] }) {
   const [, setTick]       = useState(0);
   const [search, setSearch]       = useState('');
   const [subdivFilter, setSubdivFilter] = useState('All');
@@ -899,9 +899,29 @@ function SubdivisionHoursTab({ officers }) {
   }, []);
   const now = Date.now();
 
+  // Subdivisions defined in the admin portal for the departments in view.
+  // These register in the tracker the moment they're entered, showing 0h
+  // until an officer actually logs duty time under them. Patrol is never
+  // tracked. Scoped to departments that have officers in the current view so
+  // the tracker stays relevant to whatever the Command scope is set to.
+  const definedSubs = useMemo(() => {
+    const deptIds = new Set(officers.map(o => o.dept));
+    const set = new Set();
+    departments.forEach(d => {
+      if (!deptIds.has(d.id)) return;
+      (d.subdivisions || []).forEach(s => {
+        const name = (s || '').trim();
+        if (name && name !== 'Patrol') set.add(name);
+      });
+    });
+    return [...set];
+  }, [departments, officers]);
+
   // Build per-subdivision rows from every officer's banked + live duty time.
   const allRows = useMemo(() => {
     const map = {};
+    // Seed admin-defined subdivisions first so they appear even at 0 hours.
+    definedSubs.forEach(sub => { map[sub] = { sub, total: 0, officers: [], liveCount: 0 }; });
     officers.forEach(o => {
       const subs = new Set([
         ...Object.keys(o.dutyBySubdiv || {}),
@@ -920,7 +940,7 @@ function SubdivisionHoursTab({ officers }) {
     return Object.values(map)
       .map(r => ({ ...r, officers: r.officers.sort((a, b) => b.seconds - a.seconds) }))
       .sort((a, b) => b.total - a.total);
-  }, [officers, now]);
+  }, [officers, now, definedSubs]);
 
   const subdivNames = useMemo(() => ['All', ...allRows.map(r => r.sub)], [allRows]);
 
@@ -948,7 +968,7 @@ function SubdivisionHoursTab({ officers }) {
       {/* Summary cards */}
       <div className="flex flex-wrap gap-3">
         <StatCard label="Tracked Hours" value={fmtDuty(grandTotal)} accent="violet" icon={MdAccessTime} hint="All specialised subdivisions" />
-        <StatCard label="Subdivisions" value={allRows.length} accent="cyan" icon={MdShield} hint="With logged time" />
+        <StatCard label="Subdivisions" value={allRows.length} accent="cyan" icon={MdShield} hint="Registered + active" />
         <StatCard label="Clocked In Now" value={liveOfficers} accent="green" icon={MdDirectionsRun} hint="Accruing live" />
       </div>
 
@@ -1013,7 +1033,9 @@ function SubdivisionHoursTab({ officers }) {
                 </div>
 
                 <div className="flex flex-col">
-                  {r.officers.map(({ officer: o, seconds, live }, i) => (
+                  {r.officers.length === 0 ? (
+                    <div className="text-[11.5px] text-slate-600 py-1.5">Registered, no duty hours logged yet.</div>
+                  ) : r.officers.map(({ officer: o, seconds, live }, i) => (
                     <div key={o.id} className={`flex items-center gap-2.5 py-1.5 ${i > 0 ? 'border-t border-border-faint' : ''}`}>
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: live ? '#4ade80' : '#475569' }} />
                       <span className="text-[12px] text-slate-200 truncate flex-1">{o.name}</span>
@@ -1336,7 +1358,7 @@ export default function CommandPortal() {
         />
       )}
       {activeTab === 'Subdivision Hours' && (
-        <SubdivisionHoursTab officers={scopedOfficers} />
+        <SubdivisionHoursTab officers={scopedOfficers} departments={scopedDepts} />
       )}
       {activeTab === 'Report Tracker' && (
         <ReportTrackerTab

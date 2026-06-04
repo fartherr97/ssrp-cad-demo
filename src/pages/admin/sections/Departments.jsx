@@ -20,7 +20,7 @@ function DeptCard({ d, onSave, onDelete }) {
     <div className="rounded-lg p-4" style={{ background: ADMIN.bg, border: `1px solid ${dirty ? ADMIN.borderHi : ADMIN.border}` }}>
       <div className="flex items-center gap-2 mb-3">
         <SonBadge color={ADMIN.blue}>Agency</SonBadge>
-        <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} depts</SonBadge>
+        <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} subdivisions</SonBadge>
         <div className="ml-auto flex gap-1.5">
           <SonButton variant="red" onClick={() => onSave(draft)} disabled={!dirty} style={{ padding: '4px 10px', fontSize: 12 }}>
             <MdSave size={14} /> {dirty ? 'Save' : 'Saved'}
@@ -50,9 +50,12 @@ function DeptCard({ d, onSave, onDelete }) {
               </Select>
             </div>
             <div className="col-span-2">
-              <label style={SON_LABEL}>Sub-departments (comma separated)</label>
+              <label style={SON_LABEL}>Subdivisions (comma separated)</label>
               <input style={SON_INPUT} value={(draft.subdivisions || []).join(', ')}
                 onChange={e => set({ subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
+              <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 4 }}>
+                Subdivisions become selectable for this department's units and register in the Command Portal's Subdivision Hours tracker.
+              </div>
             </div>
             <div className="col-span-2">
               <label style={SON_LABEL}>Department Logo URL</label>
@@ -124,7 +127,7 @@ export default function Departments() {
 
       <AdminPanel
         title="Department Editor"
-        subtitle="Manage agencies, departments, and sub-departments."
+        subtitle="Manage agencies, departments, and subdivisions."
         right={<SonSearch value={query} onChange={setQuery} placeholder="Search agencies…" />}
       >
         {filtered.length === 0 ? <EmptyState>No agencies match.</EmptyState> : (
