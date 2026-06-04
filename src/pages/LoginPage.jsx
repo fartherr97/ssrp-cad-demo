@@ -4,7 +4,15 @@ import { useCAD } from '../store/cadStore';
 import { OFFICERS } from '../data/mockData';
 import { PORTALS } from '../constants/portals';
 import { MdAdminPanelSettings, MdLocalPolice, MdPeopleAlt, MdStorefront, MdLocalFireDepartment, MdHeadsetMic } from 'react-icons/md';
+import { FaDiscord, FaTiktok, FaXTwitter } from 'react-icons/fa6';
 import SiteFooter from '../components/SiteFooter';
+
+/* Community social links * open the real SSRP pages in a new tab. */
+const SOCIALS = [
+  { label: 'Discord', href: 'https://discord.gg/sunshinestaterp',        Icon: FaDiscord,   color: '#5865F2' },
+  { label: 'TikTok',  href: 'https://www.tiktok.com/@sunshinestaterp',   Icon: FaTiktok,    color: '#ff3b5c' },
+  { label: 'X',       href: 'https://twitter.com/SunshineStateRP',       Icon: FaXTwitter,  color: '#e8e8e8' },
+];
 
 const ROLE_ICONS = {
   admin:    MdAdminPanelSettings,
@@ -153,7 +161,7 @@ export default function LoginPage() {
             <button
               onClick={handleConnect}
               disabled={connectLoading}
-              className="flex items-center gap-2 px-3 sm:px-[18px] py-2 text-[12px] sm:text-[13px] font-bold bg-[#5865F2] text-white border-none rounded-md cursor-pointer transition-opacity disabled:opacity-70"
+              className="flex items-center gap-2 px-3 sm:px-[18px] py-2 text-[12px] sm:text-[13px] font-bold bg-[#5865F2] text-white border-none rounded-md cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5865F2]/50 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               <DiscordSVG />
               <span className="hidden sm:inline">{connectLoading ? 'Connecting...' : 'Connect'}</span>
@@ -221,11 +229,18 @@ export default function LoginPage() {
                 color: '#ffffff', border: 'none', borderRadius: 10, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
                 boxShadow: '0 4px 28px rgba(88,101,242,0.45)',
-                transition: 'opacity 0.15s',
+                transition: 'transform 0.18s ease, box-shadow 0.18s ease, opacity 0.15s ease',
                 marginBottom: 16,
               }}
-              onMouseEnter={e => { if (!connectLoading) e.currentTarget.style.opacity = '0.9'; }}
-              onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+              onMouseEnter={e => {
+                if (connectLoading) return;
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 12px 38px rgba(88,101,242,0.6)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = '0 4px 28px rgba(88,101,242,0.45)';
+              }}
             >
               <DiscordSVG />
               {connectLoading ? 'Connecting to Discord...' : 'Connect Discord'}
@@ -308,6 +323,46 @@ export default function LoginPage() {
               </div>
             </div>
           )}
+
+          {/* ── Community socials ── */}
+          <div style={{ marginTop: 34, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '1.4px', textTransform: 'uppercase',
+              color: 'rgba(120,160,200,0.4)',
+            }}>
+              Connect With Us
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              {SOCIALS.map(s => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  title={s.label}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: 30, height: 30, color: 'rgba(150,180,215,0.5)',
+                    textDecoration: 'none',
+                    transition: 'transform 0.18s ease, color 0.18s ease, filter 0.18s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = s.color;
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.filter = `drop-shadow(0 6px 12px ${s.color}66)`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = 'rgba(150,180,215,0.5)';
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.filter = 'none';
+                  }}
+                >
+                  <s.Icon size={22} />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
 
