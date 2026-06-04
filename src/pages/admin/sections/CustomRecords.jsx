@@ -32,6 +32,8 @@ const FIELD_TYPES = [
   { type: 'image',           label: 'Image'         },
   { type: 'photos',          label: 'Photo Gallery' },
   { type: 'supplemental',    label: 'Supplemental'  },
+  { type: 'linked_records',  label: 'Linked Records'},
+  { type: 'unit_lookup',     label: 'Unit Lookup'   },
 ];
 
 const TYPE_COLOR = {
@@ -40,7 +42,7 @@ const TYPE_COLOR = {
   dropdown: '#34d399', checkbox: '#34d399',
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
   charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee', photos: '#22d3ee',
-  supplemental: '#fbbf24',
+  supplemental: '#fbbf24', linked_records: '#2dd4bf', unit_lookup: '#3a88e8',
 };
 
 /* ── Premade sections matching template structure ── */
@@ -225,7 +227,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         </div>
         <div className="flex gap-0.5">
           <IconBtn icon={MdStar}        onClick={() => tog('required')}       active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
-          <IconBtn icon={MdTag}         onClick={() => onUpdate({ ...field, autoNumber: !field.autoNumber, mono: !field.autoNumber ? true : field.mono, label: !field.autoNumber ? 'Record Number' : field.label })} active={!!field.autoNumber} activeColor="#34d399" title="Auto Number * auto-fills the next sequential record/report number (0001+), titled 'Record Number'" size={12} />
+          <IconBtn icon={MdTag}         onClick={() => onUpdate({ ...field, autoNumber: !field.autoNumber, mono: !field.autoNumber ? true : field.mono, label: !field.autoNumber ? 'Record Number' : field.label })} active={!!field.autoNumber} activeColor="#34d399" title="Auto Number · auto-fills the next sequential record/report number (0001+), titled 'Record Number'" size={12} />
           <IconBtn icon={MdCode}        onClick={() => tog('mono')}           active={!!field.mono}           activeColor="#22d3ee" title="Monospace (IDs / plates / case #)" size={12} />
           <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}       active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
           <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')} active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
@@ -332,7 +334,7 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   const up = (patch) => onUpdate({ ...section, ...patch });
 
   const addField = (type) => {
-    const span = type === 'charges' || type === 'textarea' || type === 'supplemental' ? 4 : type === 'checkbox' ? 1 : 2;
+    const span = ['charges','textarea','supplemental','linked_records','unit_lookup'].includes(type) ? 4 : type === 'checkbox' ? 1 : 2;
     up({ fields: [...(section.fields || []), { id: uid(), label: '', type, span }] });
     setShowAddField(false);
   };
@@ -644,7 +646,7 @@ function DLClassEditor({ draft, onChange }) {
             License Classes
           </span>
           <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal ml-1">
-            * defines the class options civilians see when applying
+            · defines the class options civilians see when applying
           </span>
         </div>
         <button type="button" onClick={add}
@@ -658,7 +660,7 @@ function DLClassEditor({ draft, onChange }) {
       <div className="p-3 flex flex-col gap-2">
         {classes.length === 0 && (
           <div className="text-[11px] text-slate-600 py-2 text-center italic">
-            No classes defined * civilians will see the default Florida classes.
+            No classes defined · civilians will see the default Florida classes.
           </div>
         )}
         {classes.map((cls, idx) => (
@@ -729,7 +731,7 @@ function RecordRoleToggles({ draft, onChange, isReport }) {
       <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Report Number</div>
       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
         style={{ background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)' }}
-        title="Report numbers are auto-assigned sequentially when a report is filed * starting at 0001.">
+        title="Report numbers are auto-assigned sequentially when a report is filed · starting at 0001.">
         <span className="text-[12px] font-bold tabular-nums" style={{ color: '#3d82f0', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
           #{nextReportNumber}
         </span>
@@ -829,7 +831,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
             <input
               className="flex-1 text-[10.5px] bg-transparent border-b border-transparent focus:border-white/20 outline-none transition-colors"
               style={{ color: '#93a4bd', paddingBottom: 1, fontFamily: 'var(--font-ui)' }}
-              placeholder="Issuing Agency (document header) * e.g. Tampa Police Department"
+              placeholder="Issuing Agency (document header) · e.g. Tampa Police Department"
               value={draft.agency || ''}
               onChange={e => up({ agency: e.target.value })}
             />
@@ -879,7 +881,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         {(draft.sections || []).length === 0 && (
           <div className="py-10 text-center" style={{ color: '#2d3f52' }}>
             <MdDescription size={34} style={{ opacity: 0.18, margin: '0 auto 8px' }} />
-            <div className="text-[12px]">No sections yet * add a custom or premade section below</div>
+            <div className="text-[12px]">No sections yet · add a custom or premade section below</div>
           </div>
         )}
 

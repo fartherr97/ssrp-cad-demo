@@ -718,7 +718,7 @@ export default function WarrantControl() {
 
   const handleIssue = (payload) => {
     dispatch({ type: 'ADD_WARRANT', payload });
-    toast.success(`Warrant issued * ${payload.civilianName}`, { title: 'Warrant active' });
+    toast.success(`Warrant issued · ${payload.civilianName}`, { title: 'Warrant active' });
     setCreating(false);
     setFilter('ACTIVE');
   };

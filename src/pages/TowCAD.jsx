@@ -30,9 +30,9 @@ const TOW_TYPES = [
 const ZONES = ['City', 'County', 'Roaming'];
 
 const PRIORITIES = [
-  { val: 1, label: 'P1 * Emergency', color: '#ef4444' },
-  { val: 2, label: 'P2 * Urgent',    color: '#f59e0b' },
-  { val: 3, label: 'P3 * Routine',   color: '#6b7280' },
+  { val: 1, label: 'P1 · Emergency', color: '#ef4444' },
+  { val: 2, label: 'P2 · Urgent',    color: '#f59e0b' },
+  { val: 3, label: 'P3 · Routine',   color: '#6b7280' },
 ];
 
 const PRIORITY_BADGE = {
@@ -103,7 +103,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
         style={{ background: '#0c1929', border: '1px solid rgba(249,115,22,0.3)' }}>
         <div className="flex items-center justify-between">
           <div className="text-[16px] font-extrabold text-white flex items-center gap-2">
-            <MdLogin size={20} className="text-orange-400" /> Sign On * Tow Unit
+            <MdLogin size={20} className="text-orange-400" /> Sign On · Tow Unit
           </div>
           <button onClick={onCancel} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
             <MdClose size={20} className="text-slate-500 hover:text-slate-300" />
@@ -399,7 +399,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
     <div className="bg-app-panel/80 border border-orange-500/30 rounded-xl p-4 sm:p-5 mb-5">
       <div className="flex justify-between items-center mb-4">
         <div className="text-[15px] font-extrabold text-slate-100">
-          {fromRequest ? 'Dispatch * FDOT Assist' : 'New Tow Job'}
+          {fromRequest ? 'Dispatch · FDOT Assist' : 'New Tow Job'}
         </div>
         <button onClick={onCancel}
           className="press-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
@@ -762,7 +762,7 @@ export default function TowCAD() {
 
   const handleSignOn = (data) => {
     dispatch({ type: 'ADD_TOW_UNIT', payload: data });
-    toast.success(`Signed on * ${data.truckName}`, { title: 'On duty' });
+    toast.success(`Signed on · ${data.truckName}`, { title: 'On duty' });
     setShowSignOn(false);
   };
 
@@ -777,7 +777,7 @@ export default function TowCAD() {
   };
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
-    toast.info(`Acknowledged * ${req.assistType}`, { title: 'FDOT' });
+    toast.info(`Acknowledged · ${req.assistType}`, { title: 'FDOT' });
     dispatch({
       type: 'DISPATCH_RADIO',
       payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.` },
@@ -785,7 +785,7 @@ export default function TowCAD() {
   };
   const declineRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
-    toast.warning(`Declined * ${req.assistType}`, { title: 'FDOT' });
+    toast.warning(`Declined · ${req.assistType}`, { title: 'FDOT' });
   };
   const dispatchFromRequest = (req) => setDispatchingReq(req);
 
@@ -799,7 +799,7 @@ export default function TowCAD() {
         towType:     'FDOT Clearance',
         priority:    req.priority || 2,
         zone:        'Roaming',
-        notes:       `[FDOT Assist] ${req.assistType} * ${req.description}`,
+        notes:       `[FDOT Assist] ${req.assistType} · ${req.description}`,
         callId:      req.callId || '',
         companyId:   fdotCompany?.id,
         companyName: fdotCompany?.name || 'FDOT',

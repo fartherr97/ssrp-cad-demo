@@ -964,7 +964,7 @@ export default function RecordsBureau() {
                         style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)' }}>
                         <MdShield size={16} className="text-amber-400 shrink-0 mt-0.5" />
                         <div className="text-[11px] text-amber-300/80 leading-relaxed">
-                          <span className="font-bold text-amber-300">LEO View</span> * showing safety-relevant information only.
+                          <span className="font-bold text-amber-300">LEO View</span> · showing safety-relevant information only.
                           Medications, emergency contacts, and clinical notes are restricted to Fire &amp; EMS.
                         </div>
                       </div>

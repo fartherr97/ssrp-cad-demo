@@ -67,7 +67,7 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
       {/* Supervisor comments banner */}
       {(report.supervisorComments || []).length > 0 && (
         <div className="px-4 py-3 border-b border-border-faint flex flex-col gap-2" style={{ background: 'rgba(251,146,60,0.04)' }}>
-          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-amber-500">Supervisor Notes * Please Address Before Resubmitting</div>
+          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-amber-500">Supervisor Notes · Please Address Before Resubmitting</div>
           {(report.supervisorComments || []).map(c => (
             <div key={c.id} className="rounded-lg px-3 py-2.5 text-[12px] text-slate-300 leading-relaxed"
               style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}>
@@ -357,7 +357,7 @@ export default function OfficerProfile() {
             <div className="flex flex-col gap-3">
               {returnedReports.length === 0 ? (
                 <div className="bg-app-panel/80 border border-border-base rounded-xl p-10 text-center text-slate-600 text-[13px]">
-                  No returned reports * you&apos;re all clear.
+                  No returned reports · you&apos;re all clear.
                 </div>
               ) : returnedReports.map(r => {
                 const latestComment = (r.supervisorComments || []).slice(-1)[0];

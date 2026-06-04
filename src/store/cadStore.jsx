@@ -796,7 +796,9 @@ function reducer(state, action) {
 
     case 'ADD_RECORD': {
       const recordNumber = String(state.reportSeq).padStart(4, '0');
-      const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString() };
+      const fd = action.payload.formData || {};
+      const civId = action.payload.civilianId || fd._civilianId || undefined;
+      const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString(), ...(civId !== undefined ? { civilianId: civId } : {}) };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
     }
     case 'SET_DL_TEMPLATE': {

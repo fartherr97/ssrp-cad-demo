@@ -13,7 +13,7 @@ import ReportForm from '../../components/ReportForm';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const DL_CLASSES = [
-  { value: 'Class E',     label: 'Class E',         desc: 'Standard license * non-commercial vehicles under 26,001 lbs (most common)' },
+  { value: 'Class E',     label: 'Class E',         desc: 'Standard license · non-commercial vehicles under 26,001 lbs (most common)' },
   { value: 'Class A CDL', label: 'Class A CDL',     desc: 'Combination vehicles with a GCWR of 26,001+ lbs towing a unit over 10,000 lbs' },
   { value: 'Class B CDL', label: 'Class B CDL',     desc: 'Heavy straight vehicles 26,001+ lbs, or buses designed for 24+ passengers' },
   { value: 'Class C CDL', label: 'Class C CDL',     desc: 'Vehicles carrying hazardous materials or transporting 16–23 passengers' },
@@ -339,7 +339,7 @@ export default function MyLicenses() {
     dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
     storeDLRecord(civilianId, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
-    toast.success(`License renewed * valid through ${dlExpiry}.`, { title: 'License Renewed' });
+    toast.success(`License renewed · valid through ${dlExpiry}.`, { title: 'License Renewed' });
   };
 
   return (
@@ -384,7 +384,7 @@ export default function MyLicenses() {
                   {/* Driver License column */}
                   <div className="flex-1 min-w-[240px]">
                     {(c.dlStatus === 'SUSPENDED' || c.dlStatus === 'REVOKED') && mode !== 'applying' && mode !== 'renewing' ? (
-                      /* Suspended / Revoked * block all paths regardless of whether dlNumber exists */
+                      /* Suspended / Revoked · block all paths regardless of whether dlNumber exists */
                       (() => {
                         const isRev = c.dlStatus === 'REVOKED';
                         const bg = isRev ? 'rgba(232,121,249,0.05)' : 'rgba(248,113,113,0.05)';

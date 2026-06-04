@@ -68,6 +68,7 @@ function buildAutofill(kind, rec, fields, civilians) {
     const L = (f.label || '').toLowerCase();
     if (kind === 'civilian') {
       if (has(L, 'business')) continue;
+      out._civilianId = rec.id;
       // Split first / last name fields get individual values
       if (L === 'first name' || L === 'first') out[f.id] = rec.firstName;
       else if (L === 'last name' || L === 'last') out[f.id] = rec.lastName;
@@ -524,7 +525,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
           <MdGavel size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
           <input
             className={`${S_INPUT} pl-9 pr-3`}
-            placeholder="Search penal code * name, code, or category…"
+            placeholder="Search penal code · name, code, or category…"
             value={query}
             onChange={e => { setQuery(e.target.value); place(); setOpen(true); }}
             onFocus={() => { place(); setOpen(true); }}
@@ -995,7 +996,7 @@ function SupplementField({ f, entries, editable, onAppend }) {
         <div className="mt-2.5 rounded-lg border border-border-base bg-app-card/50 p-2.5">
           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Add Supplement</div>
           <textarea className={S_TEXTAREA} rows={3}
-            placeholder="Describe the follow-up * additional evidence, new statements, corrections, etc."
+            placeholder="Describe the follow-up · additional evidence, new statements, corrections, etc."
             value={draft} onChange={e => setDraft(e.target.value)} />
           <div className="flex items-center gap-2 mt-2">
             <span className="text-[10px] font-mono text-slate-500">Filing as: {authorLine}</span>
@@ -1103,7 +1104,7 @@ function LinkedRecordsField({ f, value, onChange, readOnly }) {
   const renderSuggestion = (r) => (
     <div className="min-w-0">
       <div className="text-[13px] font-semibold text-white truncate">#{r.number} <span className="text-slate-400 font-normal">{r.type}</span></div>
-      <div className="text-[11px] text-slate-500 truncate">{r.kind}{r.dept ? ` * ${r.dept}` : ''}</div>
+      <div className="text-[11px] text-slate-500 truncate">{r.kind}{r.dept ? ` · ${r.dept}` : ''}</div>
     </div>
   );
   const manualToChip = (q) => ({ key: `man-${Date.now()}`, number: q.trim(), type: 'Linked Record', kind: 'Manual', label: `#${q.trim()}` });
@@ -1126,13 +1127,13 @@ function UnitLookupField({ f, value, onChange, readOnly }) {
       .slice(0, 8)
       .map(o => ({
         key: `off-${o.id}`, name: o.name, badge: o.badge, rank: o.rank || o.role || 'Officer', unitId: o.unitId || o.badge,
-        label: `${o.unitId || o.badge} * ${o.name}`,
+        label: `${o.unitId || o.badge} · ${o.name}`,
       }));
   };
   const renderSuggestion = (r) => (
     <div className="min-w-0">
       <div className="text-[13px] font-semibold text-white truncate">{r.unitId} — {r.name}</div>
-      <div className="text-[11px] text-slate-500 truncate">{r.rank}{r.badge ? ` * Badge #${r.badge}` : ''}</div>
+      <div className="text-[11px] text-slate-500 truncate">{r.rank}{r.badge ? ` · Badge #${r.badge}` : ''}</div>
     </div>
   );
   return (

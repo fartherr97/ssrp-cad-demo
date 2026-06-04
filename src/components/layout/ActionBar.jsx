@@ -184,7 +184,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
         x: c.x, y: c.y, z: c.z,
       },
     });
-    toast.error(`${unit} * ${location}`, { title: 'PANIC * Officer in Distress' });
+    toast.error(`${unit} · ${location}`, { title: 'PANIC · Officer in Distress' });
     setOpen(false);
   };
 
@@ -253,7 +253,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
               </div>
               <button onClick={triggerPanic}
                 className="w-full flex items-center justify-center gap-2 px-2.5 py-2 mb-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
-                <MdSos size={16} /> PANIC * Officer in Distress
+                <MdSos size={16} /> PANIC · Officer in Distress
               </button>
               <div className="h-px bg-border-faint my-1 mx-1" />
             </>

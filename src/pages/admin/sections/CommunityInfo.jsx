@@ -46,13 +46,13 @@ function CopyBtn({ text }) {
 }
 
 const US_TIMEZONES = [
-  { value: 'America/New_York',    label: 'Eastern (EST/EDT) * America/New_York'    },
-  { value: 'America/Chicago',     label: 'Central (CST/CDT) * America/Chicago'     },
-  { value: 'America/Denver',      label: 'Mountain (MST/MDT) * America/Denver'     },
-  { value: 'America/Los_Angeles', label: 'Pacific (PST/PDT) * America/Los_Angeles' },
-  { value: 'America/Phoenix',     label: 'Mountain No DST (MST) * America/Phoenix' },
-  { value: 'Pacific/Honolulu',    label: 'Hawaii (HST) * Pacific/Honolulu'         },
-  { value: 'America/Anchorage',   label: 'Alaska (AKST/AKDT) * America/Anchorage' },
+  { value: 'America/New_York',    label: 'Eastern (EST/EDT) · America/New_York'    },
+  { value: 'America/Chicago',     label: 'Central (CST/CDT) · America/Chicago'     },
+  { value: 'America/Denver',      label: 'Mountain (MST/MDT) · America/Denver'     },
+  { value: 'America/Los_Angeles', label: 'Pacific (PST/PDT) · America/Los_Angeles' },
+  { value: 'America/Phoenix',     label: 'Mountain No DST (MST) · America/Phoenix' },
+  { value: 'Pacific/Honolulu',    label: 'Hawaii (HST) · Pacific/Honolulu'         },
+  { value: 'America/Anchorage',   label: 'Alaska (AKST/AKDT) · America/Anchorage' },
 ];
 
 export default function CommunityInfo() {
@@ -124,7 +124,7 @@ export default function CommunityInfo() {
             />
             {logoError && draft.logoUrl && (
               <div style={{ marginTop: 4, fontSize: 11, color: ADMIN.amber }}>
-                Could not load image * check the URL.
+                Could not load image · check the URL.
               </div>
             )}
           </div>

@@ -257,14 +257,14 @@ export default function LicensePoints() {
           <MdBolt size={15} className="text-brand-bright shrink-0" />
           {cfg.enabled
             ? <span>At <b className="text-cad-text">{cfg.threshold}</b> points a driver is auto-suspended for <b className="text-cad-text">{cfg.suspensionDays}</b> days{cfg.resetAfterSuspend ? ', then points reset to 0' : ''}.</span>
-            : <span>Auto-suspension is currently <b className="text-red-400">disabled</b> * points still accumulate but no suspension triggers.</span>}
+            : <span>Auto-suspension is currently <b className="text-red-400">disabled</b> · points still accumulate but no suspension triggers.</span>}
         </div>
       </AdminPanel>
 
       {/* ── Points schedule ── */}
       <AdminPanel
         title="Points Schedule"
-        subtitle="Point value applied per violation type. Import charges directly from the penal code * edit points there if changes are needed."
+        subtitle="Point value applied per violation type. Import charges directly from the penal code · edit points there if changes are needed."
         right={
           <SonButton size="sm" onClick={() => setShowImport(true)}><MdGavel size={14} /> Import from Penal Code</SonButton>
         }
@@ -294,7 +294,7 @@ export default function LicensePoints() {
           ))}
         </SonTable>
         {cfg.schedule.length === 0 && <EmptyState>No violations configured. Use "Import from Penal Code" to add charges.</EmptyState>}
-        {dirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes * click "Save Changes" to apply.</div>}
+        {dirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes · click "Save Changes" to apply.</div>}
       </AdminPanel>
 
       {/* ── Drivers ── */}

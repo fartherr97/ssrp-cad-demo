@@ -172,7 +172,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
   const ss = statusBadgeStyle(meta.status || 'Draft');
 
   return (
-    <Document title={`${template?.name || 'Report'} * ${meta.caseNumber || 'DRAFT'}`}
+    <Document title={`${template?.name || 'Report'} · ${meta.caseNumber || 'DRAFT'}`}
       author="Sunshine State RP CAD" creator="SSRP CAD System">
       <Page size="LETTER" style={styles.page}>
 

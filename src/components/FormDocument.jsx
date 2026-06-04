@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
+import { useCAD } from '../store/cadStore';
 import {
   S_RECORD_RETURN, S_RECORD_RETURN_HEADER, S_RECORD_RETURN_ALERT, S_RECORD_RETURN_ALERT_WARN,
   S_RECORD_RETURN_BODY, S_RECORD_RETURN_SECTION, S_RECORD_RETURN_LINE,
@@ -345,7 +346,7 @@ export function UseOfForceDoc({ data = {}, editable, onChange, meta = {} }) {
         caseNo={meta.caseNumber}
         status={meta.status}
       />
-      {meta.status === 'Pending Review' && <FormAlert text="PENDING SUPERVISOR REVIEW * DO NOT DISTRIBUTE" level="orange" />}
+      {meta.status === 'Pending Review' && <FormAlert text="PENDING SUPERVISOR REVIEW · DO NOT DISTRIBUTE" level="orange" />}
       <FormSection title="Incident Information" blue />
       <FormRow>
         <FormCell label="Date / Time" value={fv('f1')} onChange={set('f1')} type="datetime" editable={editable} colSpan={2} />
@@ -766,6 +767,7 @@ function ReturnFooter() {
 }
 
 export function RecordReturn({ type, subject, data }) {
+  const { state } = useCAD();
   const line = (key, val) => (val !== undefined && val !== null && val !== '') ? (
     <div style={S_RECORD_RETURN_LINE} key={key}>
       <span style={S_RECORD_RETURN_KEY}>{key}: </span>
@@ -779,14 +781,18 @@ export function RecordReturn({ type, subject, data }) {
     const flags = data.flags || [];
     const hasWarrant = flags.includes('WARRANT');
     const dlSusp = data.dlStatus === 'SUSPENDED';
+    const allRecords = state?.records || [];
+    const civRecords = allRecords.filter(r => r.civilianId === data.id);
+    const huntingLic = civRecords.find(r => r.type === 'Hunting License');
+    const fishingLic = civRecords.find(r => r.type === 'Fishing License');
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="PERSON" title={`DR * Name: ${data.firstName} ${data.lastName}`} />
+        <ReturnHeader type="PERSON" title={`DR · Name: ${data.firstName} ${data.lastName}`} />
         {hasWarrant && (
-          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE * DO NOT APPROACH WITHOUT BACKUP ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT ON FILE · DO NOT APPROACH WITHOUT BACKUP ***</div>
         )}
         {dlSusp && (
-          <div style={S_RECORD_RETURN_ALERT_WARN}>*** DRIVER LICENSE SUSPENDED * NO VALID DL ***</div>
+          <div style={S_RECORD_RETURN_ALERT_WARN}>*** DRIVER LICENSE SUSPENDED · NO VALID DL ***</div>
         )}
         <div style={S_RECORD_RETURN_BODY}>
           <div style={S_RECORD_RETURN_SECTION}>
@@ -824,6 +830,42 @@ export function RecordReturn({ type, subject, data }) {
           {line('DL Expiry', data.dlExpiry)}
           {line('Weapon Permit', data.weaponPermit)}
 
+          {huntingLic && (
+            <>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Hunting License<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
+              {line('Record #', huntingLic.recordNumber)}
+              {line('Status', huntingLic.status)}
+              {line('Issued', huntingLic.date)}
+              {line('License #', huntingLic.formData?.hl_licno || huntingLic.formData?.licenseNumber || '')}
+              {line('Expiry', huntingLic.formData?.hl_exp || huntingLic.formData?.expiryDate || '')}
+            </>
+          )}
+
+          {fishingLic && (
+            <>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Fishing License<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
+              {line('Record #', fishingLic.recordNumber)}
+              {line('Status', fishingLic.status)}
+              {line('Issued', fishingLic.date)}
+              {line('License #', fishingLic.formData?.fl_licno || fishingLic.formData?.licenseNumber || '')}
+              {line('Expiry', fishingLic.formData?.fl_exp || fishingLic.formData?.expiryDate || '')}
+            </>
+          )}
+
+          {!huntingLic && !fishingLic && (
+            <>
+              <div style={S_RECORD_RETURN_SECTION}>
+                <span style={{color:'#4f7bb0'}}>*** </span>Hunting / Fishing Licenses<span style={{color:'#4f7bb0'}}> ***</span>
+              </div>
+              {line('Hunting License', 'NO RECORD ON FILE')}
+              {line('Fishing License', 'NO RECORD ON FILE')}
+            </>
+          )}
+
           {flags.length > 0 && (
             <>
               <div style={S_RECORD_RETURN_SECTION}>
@@ -844,9 +886,9 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'VEHICLE' && data) {
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="VEHICLE" title={`VR * Plate: ${data.plate}`} />
+        <ReturnHeader type="VEHICLE" title={`VR · Plate: ${data.plate}`} />
         {data.stolen && (
-          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE * CAUTION ADVISED * CONTACT LOCAL LE IMMEDIATELY ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE * CAUTION ADVISED · CONTACT LOCAL LE IMMEDIATELY ***</div>
         )}
         {subject && subject.flags?.includes('WARRANT') && (
           <div style={S_RECORD_RETURN_ALERT_WARN}>*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>
@@ -870,7 +912,7 @@ export function RecordReturn({ type, subject, data }) {
           {line('Color', data.color)}
           {line('Registration', data.regStatus)}
           {line('Reg Expiry', data.regExpiry)}
-          {line('Stolen', data.stolen ? 'YES * REPORTED STOLEN' : 'No')}
+          {line('Stolen', data.stolen ? 'YES · REPORTED STOLEN' : 'No')}
 
           {subject && (
             <>
@@ -908,9 +950,9 @@ export function RecordReturn({ type, subject, data }) {
   if (type === 'WARRANT' && data) {
     return (
       <div className={S_RECORD_RETURN}>
-        <ReturnHeader type="WARRANT" title={`WR * Subject: ${data.civilianName}`} />
+        <ReturnHeader type="WARRANT" title={`WR · Subject: ${data.civilianName}`} />
         {data.status === 'ACTIVE' && (
-          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT * SUBJECT MAY BE APPREHENDED ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** ACTIVE WARRANT · SUBJECT MAY BE APPREHENDED ***</div>
         )}
         <div style={S_RECORD_RETURN_BODY}>
           <div style={S_RECORD_RETURN_SECTION}>

@@ -31,6 +31,7 @@ import MyLicenses from './pages/portal/MyLicenses';
 import FileReport from './pages/portal/FileReport';
 import MyReports from './pages/portal/MyReports';
 import FileComplaint from './pages/portal/FileComplaint';
+import LEORecords from './pages/portal/LEORecords';
 import CitizenLaws from './pages/portal/CitizenLaws';
 import MedicalRecords from './pages/portal/MedicalRecords';
 import BusinessHome from './pages/portal/BusinessHome';
@@ -199,6 +200,7 @@ function CADApp() {
         <Route path="/portal/licenses"    element={<MyLicenses />} />
         <Route path="/portal/file-report" element={<FileReport />} />
         <Route path="/portal/my-reports"  element={<MyReports />} />
+        <Route path="/portal/leo-records" element={<LEORecords />} />
         <Route path="/portal/complaint"   element={<FileComplaint />} />
         <Route path="/portal/laws"        element={<CitizenLaws />} />
         <Route path="/portal/medical"     element={<MedicalRecords />} />

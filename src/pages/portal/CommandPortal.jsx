@@ -261,12 +261,12 @@ function OverviewTab({ reports, officers, departments, reportTypes, onOpenReport
       <PortalCard accent="amber">
         <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-amber-400 mb-3 flex items-center gap-2">
           <MdWarningAmber size={14} />
-          Compliance Alerts * No Reports (Last 30 Days)
+          Compliance Alerts · No Reports (Last 30 Days)
         </div>
         {noRecentReport.length === 0 ? (
           <div className="flex items-center gap-2 text-green-400">
             <MdCheckCircle size={16} />
-            <span className="text-[13px] font-semibold">All clear * all LEO officers have submitted within 30 days.</span>
+            <span className="text-[13px] font-semibold">All clear · all LEO officers have submitted within 30 days.</span>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -819,7 +819,7 @@ function ResponseTimesTab({ callLogs }) {
       {/* Breakdown rows */}
       <PortalCard accent="violet">
         <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
-          {deptFilter === 'All' ? 'By Department' : `${deptFilter} * By Priority`}
+          {deptFilter === 'All' ? 'By Department' : `${deptFilter} · By Priority`}
         </div>
         {filtered.length === 0 ? (
           <div className="text-center py-8 text-slate-500 text-[13px]">No closed calls in this period.</div>
