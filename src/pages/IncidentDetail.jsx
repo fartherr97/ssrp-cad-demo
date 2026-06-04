@@ -5,7 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import RequestFDOTModal from '../components/RequestFDOTModal';
 import RequestHCFRModal from '../components/RequestHCFRModal';
-import { MdEngineering, MdLocalFireDepartment } from 'react-icons/md';
+import { MdEngineering, MdLocalFireDepartment, MdWarning, MdCheck, MdClose } from 'react-icons/md';
 import {
   cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL,
   S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_PRIMARY, sm,
@@ -66,9 +66,10 @@ export default function IncidentDetail() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [radioMsg, setRadioMsg] = useState('');
-  const [showFdot, setShowFdot]   = useState(false);
-  const [showHcfr, setShowHcfr]   = useState(false);
+  const [radioMsg, setRadioMsg]     = useState('');
+  const [showFdot, setShowFdot]     = useState(false);
+  const [showHcfr, setShowHcfr]     = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
 
   const call = calls.find(c => c.id === callId);
   const me = officers.find(o => o.id === currentUser?.id);
@@ -97,7 +98,7 @@ export default function IncidentDetail() {
   const closeCall = () => {
     if (!call) return;
     dispatch({ type:'CLOSE_CALL', payload:call.id });
-    toast.success(`Call ${call.id} closed`);
+    toast.success(`Call ${call.id} has been closed and all attached units cleared.`, { title: 'Call Closed' });
     navigate('/cad');
   };
   const sendRadio = () => {
@@ -174,12 +175,30 @@ export default function IncidentDetail() {
         </button>
 
         {isDispatch && (
-          <button
-            className={`press ${sm(S_BTN_DANGER)} shrink-0`}
-            onClick={closeCall}
-          >
-            CLOSE CALL
-          </button>
+          confirmClose ? (
+            <div className="flex items-center gap-2 shrink-0 px-3 py-1.5 rounded-xl"
+              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)' }}>
+              <MdWarning size={14} className="text-red-400 shrink-0" />
+              <span className="text-[11px] font-bold text-red-300">Close & clear all units?</span>
+              <button className="press flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer"
+                style={{ background: 'rgba(239,68,68,0.25)', border: '1px solid rgba(239,68,68,0.45)', color: '#fca5a5' }}
+                onClick={closeCall}>
+                <MdCheck size={12} /> Confirm
+              </button>
+              <button className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold cursor-pointer"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: '#64748b' }}
+                onClick={() => setConfirmClose(false)}>
+                <MdClose size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              className={`press ${sm(S_BTN_DANGER)} shrink-0`}
+              onClick={() => setConfirmClose(true)}
+            >
+              CLOSE CALL
+            </button>
+          )
         )}
       </div>
 
