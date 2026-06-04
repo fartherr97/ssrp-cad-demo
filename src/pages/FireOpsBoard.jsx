@@ -15,8 +15,9 @@ import {
 import {
   MdLocalHospital, MdSearch, MdWarningAmber, MdPerson, MdShield,
   MdLocalFireDepartment, MdCheckCircle, MdThumbDownAlt, MdArrowForward,
-  MdLocationOn, MdLink, MdClose, MdPhone,
+  MdLocationOn, MdLink, MdClose, MdPhone, MdMyLocation,
 } from 'react-icons/md';
+import MyStatusContent from '../components/MyStatusContent';
 
 function PriBadge({ p }) {
   const badgeMap = { 1: BADGE.p1, 2: BADGE.p2, 3: BADGE.p3, 4: BADGE.p4 };
@@ -353,10 +354,11 @@ export default function FireOpsBoard() {
   const toast = useToast();
   const { calls, officers, currentUser, hcfrRequests = [], incoming911HCFR = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
-  const [rosterTab, setRosterTab] = useState('APPARATUS');
-  const [dispatchingReq, setDispatchingReq] = useState(null);
-
   const me = officers.find(o => o.id === currentUser?.id);
+  // HCFR field members land on their own status / self-dispatch tab.
+  const isHCFR = me?.deptShort === 'HCFR';
+  const [rosterTab, setRosterTab] = useState(isHCFR ? 'MYSTATUS' : 'APPARATUS');
+  const [dispatchingReq, setDispatchingReq] = useState(null);
 
   const fireCalls = calls.filter(c => c.category === 'fire' && c.status !== 'CLOSED');
   const fireUnits = officers.filter(o => o.deptShort === 'HCFR' && o.status !== 'OFFDUTY');
@@ -632,6 +634,7 @@ export default function FireOpsBoard() {
         <div className={S_PANEL}>
           <div className="flex border-b border-border-faint shrink-0">
             {[
+              ...(isHCFR ? [{ id: 'MYSTATUS', label: 'My Status', icon: MdMyLocation }] : []),
               { id: 'APPARATUS', label: 'Apparatus' },
               { id: 'MEDICAL',   label: 'Medical Lookup', icon: MdLocalHospital },
             ].map(t => (
@@ -645,6 +648,10 @@ export default function FireOpsBoard() {
               </button>
             ))}
           </div>
+
+          {rosterTab === 'MYSTATUS' && isHCFR && (
+            <MyStatusContent me={me} calls={calls} dispatch={dispatch} toast={toast} />
+          )}
 
           {rosterTab === 'APPARATUS' && (
             <div className={S_PANEL_BODY}>
