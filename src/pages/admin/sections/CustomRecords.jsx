@@ -31,6 +31,7 @@ const FIELD_TYPES = [
   { type: 'mugshot',         label: 'Mugshot'       },
   { type: 'image',           label: 'Image'         },
   { type: 'photos',          label: 'Photo Gallery' },
+  { type: 'supplemental',    label: 'Supplemental'  },
 ];
 
 const TYPE_COLOR = {
@@ -39,10 +40,29 @@ const TYPE_COLOR = {
   dropdown: '#34d399', checkbox: '#34d399',
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
   charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee', photos: '#22d3ee',
+  supplemental: '#fbbf24',
 };
 
 /* ── Premade sections matching template structure ── */
 const PREMADE_SECTIONS = [
+  { key: 'agency', label: 'AGENCY INFORMATION', make: () => ({
+    id: sid(), title: 'Agency Information', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
+      { id: uid(), label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
+      { id: uid(), label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
+      { id: uid(), label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+      { id: uid(), label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
+      { id: uid(), label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
+      { id: uid(), label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
+    ],
+  })},
+  { key: 'supplemental', label: 'SUPPLEMENTALS', make: () => ({
+    id: sid(), title: 'Supplemental Reports', style: 'gray',
+    fields: [
+      { id: uid(), label: 'Supplemental Reports', type: 'supplemental', span: 4 },
+    ],
+  })},
   { key: 'flags', label: 'FLAGS', make: () => ({
     id: sid(), title: 'Flags', style: 'gray',
     fields: [
@@ -302,7 +322,7 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   const up = (patch) => onUpdate({ ...section, ...patch });
 
   const addField = (type) => {
-    const span = type === 'charges' || type === 'textarea' ? 4 : type === 'checkbox' ? 1 : 2;
+    const span = type === 'charges' || type === 'textarea' || type === 'supplemental' ? 4 : type === 'checkbox' ? 1 : 2;
     up({ fields: [...(section.fields || []), { id: uid(), label: '', type, span }] });
     setShowAddField(false);
   };

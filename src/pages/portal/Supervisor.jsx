@@ -351,6 +351,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 data={editData}
                 onChange={(k, v) => setEditData(p => ({ ...p, [k]: v }))}
                 onBulkChange={(obj) => setEditData(p => ({ ...p, ...obj }))}
+                canSupplement
               />
             ) : (
               <div className="text-slate-500 text-sm italic">

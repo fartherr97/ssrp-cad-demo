@@ -644,9 +644,10 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
         </FormRow>
       )}
       {sections.map(section => {
-        const inlineFields  = section.fields.filter(f => f.type !== 'checkbox' && f.type !== 'textarea');
+        const inlineFields  = section.fields.filter(f => f.type !== 'checkbox' && f.type !== 'textarea' && f.type !== 'supplemental');
         const checkboxFields = section.fields.filter(f => f.type === 'checkbox');
         const narrativeFields = section.fields.filter(f => f.type === 'textarea');
+        const supplementalFields = section.fields.filter(f => f.type === 'supplemental');
         const rows = packRows(inlineFields);
         return (
           <React.Fragment key={section.id}>
@@ -691,6 +692,31 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
                 minRows={field.minRows || 4}
               />
             ))}
+            {supplementalFields.map(field => {
+              const entries = Array.isArray(fv(field.id)) ? fv(field.id) : [];
+              return (
+                <div key={field.id} style={{ borderBottom: '1px solid #ccc', padding: '5px 7px' }}>
+                  <div style={{ fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#666', marginBottom: 4, fontWeight: 700 }}>
+                    {(field.label || 'Supplemental Reports').toUpperCase()}
+                  </div>
+                  {entries.length === 0 ? (
+                    <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#bbb' }}>No supplements filed.</div>
+                  ) : entries.map((s, i) => (
+                    <div key={s.id || i} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: i < entries.length - 1 ? '1px dashed #ddd' : 'none' }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, color: '#444', marginBottom: 2 }}>
+                        SUPPLEMENT #{i + 1} — {s.date}
+                      </div>
+                      <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#000', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                        {s.text}
+                      </div>
+                      <div style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: '#666', marginTop: 2 }}>
+                        — {s.authorLine || s.author || s.badge}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
           </React.Fragment>
         );
       })}

@@ -51,8 +51,24 @@ export default function RecordsCenter() {
     }
     // Auto-numbered fields always reflect the next shared record number.
     const recNum = String(reportSeq).padStart(4, '0');
+    const deptObj = departments?.find(d => d.short === me?.deptShort);
+    const af = (kind) => {
+      switch (kind) {
+        case 'agencyName':  return deptObj?.name || me?.deptShort || communityConfig?.name || '';
+        case 'department':  return me?.deptShort || '';
+        case 'subdivision': return me?.subdivision || '';
+        case 'unitNumber':  return me?.unitId || me?.badge || '';
+        case 'unitName':    return me?.name || currentUser?.name || '';
+        case 'date':        return new Date().toISOString().slice(0, 10);
+        default:            return '';
+      }
+    };
     (tpl.sections || []).forEach(s => (s.fields || []).forEach(f => {
       if (f.autoNumber) restored[f.id] = recNum;
+      else if (f.autoFill) {
+        if (f.autoFill === 'date') { if (!restored[f.id]) restored[f.id] = af('date'); }
+        else restored[f.id] = af(f.autoFill);
+      }
     }));
     setFormValues(restored);
     setSavedAt(null);
@@ -210,7 +226,7 @@ export default function RecordsCenter() {
             </div>
             <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}
-                onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} />
+                onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} canSupplement />
             </div>
           </main>
 
@@ -349,7 +365,8 @@ export default function RecordsCenter() {
             <div className="flex-1 overflow-auto p-4 lg:p-6 bg-app-bg/30">
               {(() => {
                 const t = (recordTemplates || []).find(t => t.name === selRecord.type);
-                if (t && selRecord.formData) return <ReportForm template={t} data={selRecord.formData} readOnly />;
+                if (t && selRecord.formData) return <ReportForm template={t} data={selRecord.formData} readOnly canSupplement
+                  onSupplement={(fid, arr) => dispatch({ type: 'UPDATE_RECORD', payload: { id: selRecord.id, formData: { ...selRecord.formData, [fid]: arr } } })} />;
                 return (
                   <div className="max-w-[1100px] mx-auto bg-app-card/70 border border-border-base rounded-xl p-4 text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed">
                     {selRecord.summary || 'No details on file.'}

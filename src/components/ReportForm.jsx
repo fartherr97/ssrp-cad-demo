@@ -947,12 +947,98 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
   );
 }
 
-function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
+/* ── Supplemental log — append-only follow-ups any LEO can add after filing ─
+   Existing entries are immutable (stamped with author + timestamp); the only
+   action is adding a new entry. This is what lets officers who can't edit a
+   filed report still attach additional findings after the fact. */
+function SupplementField({ f, entries, editable, onAppend }) {
+  const { state } = useCAD();
+  const [draft, setDraft] = useState('');
+  const signer = state.officers.find(o => o.id === state.currentUser?.id) || state.currentUser;
+  const authorLine = signer
+    ? [signer.badge, (signer.rank || signer.role || 'OFFICER').toString().toUpperCase(), signer.name?.toUpperCase()].filter(Boolean).join(' | ')
+    : 'OFFICER';
+
+  const list = Array.isArray(entries) ? entries : [];
+
+  const add = () => {
+    const text = draft.trim();
+    if (!text) return;
+    const entry = {
+      id: `sup_${Date.now()}`,
+      author: signer?.name || '',
+      badge: signer?.badge || '',
+      authorLine,
+      date: new Date().toLocaleString(),
+      text,
+    };
+    onAppend([...list, entry]);
+    setDraft('');
+  };
+
+  return (
+    <div className="flex flex-col sm:col-span-2 lg:col-span-4">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+        <MdDriveFileRenameOutline size={12} />
+        {f.label || 'Supplemental Reports'}
+        <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[8px] font-bold tracking-[0.4px] normal-case">SUPPLEMENT</span>
+        {list.length > 0 && <span className="ml-auto text-[10px] font-mono text-slate-500">{list.length} on file</span>}
+      </label>
+
+      <div className="flex flex-col gap-2">
+        {list.length === 0 && (
+          <div className="px-3.5 py-2.5 rounded-lg border border-border-base bg-app-input text-[12px] text-slate-600 italic">
+            No supplements filed.
+          </div>
+        )}
+        {list.map((s, i) => (
+          <div key={s.id || i} className="rounded-lg border border-amber-500/20 bg-amber-500/[0.04] overflow-hidden">
+            <div className="flex items-center gap-2 px-3 py-1.5 border-b border-amber-500/15 bg-amber-500/[0.06]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.4px] text-amber-300/90">Supplement #{i + 1}</span>
+              <span className="text-[10px] font-mono text-slate-400 ml-auto">{s.date}</span>
+            </div>
+            <div className="px-3 py-2">
+              <div className="text-[12.5px] text-slate-200 whitespace-pre-wrap leading-relaxed">{s.text}</div>
+              <div className="text-[10px] font-mono text-slate-500 mt-1.5">— {s.authorLine || s.author || s.badge}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editable && (
+        <div className="mt-2.5 rounded-lg border border-border-base bg-app-card/50 p-2.5">
+          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Add Supplement</div>
+          <textarea className={S_TEXTAREA} rows={3}
+            placeholder="Describe the follow-up — additional evidence, new statements, corrections, etc."
+            value={draft} onChange={e => setDraft(e.target.value)} />
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[10px] font-mono text-slate-500">Filing as: {authorLine}</span>
+            <button type="button" onClick={add} disabled={!draft.trim()}
+              className="btn-glossy ml-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-bold cursor-pointer bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400/55 hover:text-amber-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <MdAdd size={16} className="shrink-0" /> Add Supplement
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement }) {
   const { state } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
   const isSupOnly = !!f.supervisorOnly;
   // Honor the builder's field-level read-only flag in addition to supervisor gating.
   const effectiveReadOnly = readOnly || !!f.readOnly || (isSupOnly && !isSupervisor);
+
+  // Supplemental log — stays addable even when the rest of the form is locked,
+  // as long as the parent granted supplement rights (LEO views). New entries
+  // persist via onSupplement when read-only, or the normal onChange at creation.
+  if (f.type === 'supplemental') {
+    const supEditable = canSupplement && (!readOnly || !!onSupplement);
+    const persist = (arr) => (onSupplement ? onSupplement(f.id, arr) : onChange(f.id, arr));
+    return <SupplementField f={f} entries={value} editable={supEditable} onAppend={persist} />;
+  }
 
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
@@ -1083,7 +1169,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   );
 }
 
-export default function ReportForm({ template, data = {}, onChange, onBulkChange, readOnly = false }) {
+export default function ReportForm({ template, data = {}, onChange, onBulkChange, readOnly = false, onSupplement, canSupplement = false }) {
   const { state } = useCAD();
   const { currentUser, officers, departments, communityConfig } = state;
   const me = officers?.find(o => o.id === currentUser?.id);
@@ -1137,7 +1223,8 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
             )}
             {sec.fields.map(f => (
               <Field key={f.id} f={f} value={data[f.id]} data={data}
-                onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly} />
+                onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly}
+                onSupplement={onSupplement} canSupplement={canSupplement} />
             ))}
           </div>
         </section>
