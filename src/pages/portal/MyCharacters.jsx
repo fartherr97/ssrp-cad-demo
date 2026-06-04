@@ -47,19 +47,23 @@ const _ETH  = ['White / Caucasian', 'Black / African American', 'Hispanic / Lati
 const _HAIR = ['Black', 'Brown', 'Dark Brown', 'Blonde', 'Light Brown', 'Auburn',
                'Red', 'Gray', 'Salt & Pepper', 'Bald'];
 const _EYES = ['Brown', 'Dark Brown', 'Hazel', 'Green', 'Blue', 'Gray'];
+// GTA V / FiveM — Los Santos & Blaine County street names
 const _STREETS = [
-  '1234 N Dale Mabry Hwy', '567 W Kennedy Blvd', '891 S Howard Ave',
-  '2345 E Hillsborough Ave', '678 N Armenia Ave', '234 W Waters Ave',
-  '1567 Bayshore Blvd', '890 N Nebraska Ave', '3456 W Gandy Blvd',
-  '789 N MacDill Ave', '4521 E Busch Blvd', '1123 S Florida Ave',
-  '3302 W Columbus Dr', '2211 E Fletcher Ave', '5540 N 56th St',
-  '4120 W Spruce St', '7810 N Himes Ave', '9001 N 30th St',
+  'Vinewood Blvd', 'Spanish Ave', 'Alta St', 'Power St', 'Strawberry Ave',
+  'Carcer Way', 'Decker St', 'Forum Dr', 'Hawick Ave', 'Jamestown St',
+  'Macdonald St', 'Magellan Ave', 'Mirror Park Blvd', 'San Andreas Ave',
+  'Vespucci Blvd', 'West Eclipse Blvd', 'Boulevard Del Perro', 'Cougar Ave',
+  'Davis Ave', 'El Rancho Blvd', 'Elgin Ave', 'Greenwich Pkwy', 'Little Bighorn Ave',
+  'Marathon Ave', 'Portola Dr', 'Rockford Dr', 'Senora Way', 'Vinewood Park Dr',
+  'Paleto Blvd', 'Joshua Rd', 'Route 68', 'Niland Ave', 'Marina Dr',
 ];
-const _CITIES = [
-  ['Tampa', '33602'], ['Tampa', '33603'], ['Tampa', '33605'], ['Tampa', '33609'],
-  ['Tampa', '33611'], ['Tampa', '33612'], ['Tampa', '33614'], ['Tampa', '33617'],
-  ['Brandon', '33510'], ['Brandon', '33511'], ['Riverview', '33578'],
-  ['Temple Terrace', '33617'], ['Lutz', '33549'], ['Seffner', '33584'],
+// Los Santos neighborhoods + Blaine County towns
+const _AREAS = [
+  'Vinewood', 'Downtown Vinewood', 'Vinewood Hills', 'Vespucci', 'Vespucci Beach',
+  'Del Perro', 'Rockford Hills', 'Mirror Park', 'Strawberry', 'Davis',
+  'Chamberlain Hills', 'Rancho', 'La Mesa', 'Little Seoul', 'Pillbox Hill',
+  'Burton', 'Morningwood', 'Richman', 'El Burro Heights', 'Sandy Shores',
+  'Paleto Bay', 'Grapeseed', 'Harmony',
 ];
 
 const _pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -81,11 +85,9 @@ function generateCharacter() {
   const height = `${ftBase}'${inBase}"`;
   const weight = gender === 'Male' ? `${_int(145, 225)} lbs` : `${_int(105, 165)} lbs`;
 
-  const [city, zip] = _pick(_CITIES);
-  const address     = `${_pick(_STREETS)}, ${city}, FL ${zip}`;
+  const address = `${_int(100, 9999)} ${_pick(_STREETS)}, ${_pick(_AREAS)}, Los Santos`;
 
-  const area  = Math.random() < 0.7 ? '813' : '727';
-  const phone = `(${area}) ${_int(200, 999)}-${String(_int(1000, 9999)).padStart(4, '0')}`;
+  const phone = `(${_pick(['213', '310', '323', '424'])}) 555-${String(_int(0, 9999)).padStart(4, '0')}`;
 
   return { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
            height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone };
