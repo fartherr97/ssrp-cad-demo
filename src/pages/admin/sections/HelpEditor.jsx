@@ -7,13 +7,16 @@ import {
   MdPerson, MdStore, MdSupervisorAccount, MdShield,
   MdAdd, MdDelete, MdDragIndicator, MdSave, MdUndo,
   MdExpandMore, MdExpandLess, MdHelpOutline,
+  MdLocalPolice, MdLocalFireDepartment,
 } from 'react-icons/md';
 
 const PORTAL_TABS = [
-  { id: 'civilian',   label: 'Civilian',   icon: MdPerson            },
-  { id: 'business',   label: 'Business',   icon: MdStore             },
-  { id: 'supervisor', label: 'Supervisor', icon: MdSupervisorAccount },
-  { id: 'command',    label: 'Command',    icon: MdShield            },
+  { id: 'civilian',   label: 'Civilian',        icon: MdPerson              },
+  { id: 'business',   label: 'Business',        icon: MdStore               },
+  { id: 'leo',        label: 'Law Enforcement', icon: MdLocalPolice         },
+  { id: 'fire',       label: 'Fire / EMS',      icon: MdLocalFireDepartment },
+  { id: 'supervisor', label: 'Supervisor',      icon: MdSupervisorAccount   },
+  { id: 'command',    label: 'Command',         icon: MdShield              },
 ];
 
 const ICON_OPTIONS = Object.keys(HELP_ICON_MAP).filter(k => k !== 'MdStoreMini');
