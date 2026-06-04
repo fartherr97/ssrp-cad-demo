@@ -83,6 +83,7 @@ import ToneBoard from './pages/admin/sections/ToneBoard';
 import AdminBusinesses from './pages/admin/sections/AdminBusinesses';
 import CallTypes from './pages/admin/sections/CallTypes';
 import RoleMapping from './pages/admin/sections/RoleMapping';
+import AdminTiers from './pages/admin/sections/AdminTiers';
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -193,6 +194,7 @@ function CADApp() {
           <Route path="tone-board"         element={<ToneBoard />} />
           <Route path="help-center"        element={<HelpEditor />} />
           <Route path="role-mapping"       element={<RoleMapping />} />
+          <Route path="admin-tiers"        element={<AdminTiers />} />
         </Route>
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />

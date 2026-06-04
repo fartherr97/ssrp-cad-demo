@@ -87,7 +87,7 @@ function IdPill({ id }) {
 }
 
 /* ── Add / Edit Modal ───────────────────────────────────────────────── */
-function MappingModal({ draft, setDraft, departments, onSave, onClose, isNew }) {
+function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClose, isNew }) {
   const set = (patch) => setDraft(p => ({ ...p, ...patch }));
   const missingLabel = !draft.label.trim();
   const missingPortal = !draft.cadPortal;
@@ -140,7 +140,8 @@ function MappingModal({ draft, setDraft, departments, onSave, onClose, isNew }) 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label style={SON_LABEL}>CAD Portal <span style={{ color: '#ef4444' }}>*</span></label>
-              <Select style={SON_INPUT} value={draft.cadPortal} onChange={e => set({ cadPortal: e.target.value })}>
+              <Select style={SON_INPUT} value={draft.cadPortal}
+                onChange={e => set({ cadPortal: e.target.value, adminTierId: null })}>
                 {Object.entries(PORTAL_META).map(([k, v]) => (
                   <option key={k} value={k}>{v.label}</option>
                 ))}
@@ -165,6 +166,23 @@ function MappingModal({ draft, setDraft, departments, onSave, onClose, isNew }) 
               )}
             </div>
           </div>
+
+          {/* Admin Tier — only shown when portal = admin */}
+          {draft.cadPortal === 'admin' && (
+            <div className="rounded-lg p-3" style={{ background: '#22c55e0a', border: '1px solid #22c55e30' }}>
+              <label style={{ ...SON_LABEL, color: '#22c55e' }}>Management Tier</label>
+              <Select style={SON_INPUT} value={draft.adminTierId ?? ''}
+                onChange={e => set({ adminTierId: e.target.value ? Number(e.target.value) : null })}>
+                <option value="">No tier assigned (full access)</option>
+                {[...adminTiers].sort((a, b) => b.level - a.level).map(t => (
+                  <option key={t.id} value={t.id}>{t.name} (Level {t.level})</option>
+                ))}
+              </Select>
+              <div style={{ fontSize: 11, color: '#22c55e80', marginTop: 4 }}>
+                Determines which admin portal sections this person can access. Configure tiers in Users → Mgmt. Roles.
+              </div>
+            </div>
+          )}
 
           {/* Department + rank */}
           <div className="grid grid-cols-2 gap-3">
@@ -299,6 +317,7 @@ export default function RoleMapping() {
   const toast = useToast();
   const mappings = state.discordRoleMappings || [];
   const departments = state.departments || [];
+  const adminTiers = state.adminTiers || [];
 
   const [modal, setModal] = useState(null); // null | { draft, isNew, origId }
 
@@ -331,15 +350,13 @@ export default function RoleMapping() {
 
   return (
     <>
-      <AdminPageTitle
-        title="Discord Role Mapping"
-        subtitle="Map Discord server roles to CAD portals and permission levels. Steve's backend reads this table during OAuth login to assign each user their portal access."
-        right={
-          <SonButton variant="red" onClick={openAdd} style={{ gap: 6 }}>
-            <MdAdd size={16} /> Add Mapping
-          </SonButton>
-        }
-      />
+      <AdminPageTitle right={
+        <SonButton variant="red" onClick={openAdd} style={{ gap: 6 }}>
+          <MdAdd size={16} /> Add Mapping
+        </SonButton>
+      }>
+        Discord Role Mapping
+      </AdminPageTitle>
 
       {/* How it works */}
       <AdminPanel>
@@ -401,6 +418,7 @@ export default function RoleMapping() {
                 <tbody>
                   {sorted.map(m => {
                     const dept = departments.find(d => d.id === m.deptId);
+                    const tier = m.adminTierId ? adminTiers.find(t => t.id === m.adminTierId) : null;
                     return (
                       <tr key={m.id} className="group"
                         style={{ borderBottom: `1px solid ${ADMIN.border}` }}>
@@ -435,6 +453,14 @@ export default function RoleMapping() {
                             <MdArrowForward size={12} style={{ color: '#334155', flexShrink: 0 }} />
                             <RoleBadge role={m.cadRole} />
                           </div>
+                          {tier && (
+                            <div className="mt-1">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold"
+                                style={{ background: `${tier.color}18`, color: tier.color, border: `1px solid ${tier.color}40` }}>
+                                {tier.name}
+                              </span>
+                            </div>
+                          )}
                         </td>
 
                         {/* Dept / rank */}
@@ -516,6 +542,7 @@ export default function RoleMapping() {
           draft={modal.draft}
           setDraft={(updater) => setModal(m => ({ ...m, draft: typeof updater === 'function' ? updater(m.draft) : updater }))}
           departments={departments}
+          adminTiers={adminTiers}
           onSave={saveMapping}
           onClose={closeModal}
           isNew={modal.isNew}
