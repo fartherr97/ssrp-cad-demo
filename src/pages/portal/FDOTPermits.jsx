@@ -4,6 +4,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import {
   MdVerifiedUser, MdAdd, MdBlock, MdClose, MdArrowBack, MdCheck,
+  MdPerson, MdSearch,
 } from 'react-icons/md';
 import { useActiveBusiness } from '../../contexts/BusinessContext';
 import AccessDenied from './AccessDenied';
@@ -61,6 +62,51 @@ function FSelect({ label, value, onChange, options, span2 }) {
   );
 }
 
+/* Holder field with civilian auto-lookup. Pick an existing character from the
+   dropdown, or just keep typing any name / company manually. */
+function HolderLookup({ value, onChange, civilians }) {
+  const [open, setOpen] = useState(false);
+  const q = (value || '').trim().toLowerCase();
+  const matches = q.length >= 1
+    ? civilians.filter(c => `${c.firstName} ${c.lastName}`.toLowerCase().includes(q)).slice(0, 6)
+    : [];
+  const exact = civilians.some(c => `${c.firstName} ${c.lastName}`.toLowerCase() === q);
+  const showList = open && matches.length > 0 && !exact;
+  return (
+    <div className="col-span-1 sm:col-span-2 relative">
+      <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Holder Name / Company</div>
+      <div className="relative">
+        <MdSearch size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
+        <input
+          value={value}
+          onChange={e => { onChange(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          placeholder="Search a civilian, or type any name / company"
+          className="w-full text-[12.5px] text-white rounded-lg pl-8 pr-3 py-2 outline-none"
+          style={{ background: '#111e2d', border: '1px solid rgba(255,255,255,0.10)' }}
+        />
+      </div>
+      {showList && (
+        <div className="absolute z-30 left-0 right-0 mt-1 rounded-lg overflow-hidden max-h-52 overflow-y-auto"
+          style={{ background: '#0c1828', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 10px 28px rgba(0,0,0,0.55)' }}>
+          {matches.map(c => (
+            <button key={c.id} type="button"
+              onMouseDown={e => { e.preventDefault(); onChange(`${c.firstName} ${c.lastName}`); setOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left cursor-pointer hover:bg-white/[0.05]"
+              style={{ background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <MdPerson size={13} className="text-slate-500 shrink-0" />
+              <span className="text-[12px] text-slate-200 flex-1 truncate">{c.firstName} {c.lastName}</span>
+              {c.dob && <span className="text-[10px] font-mono text-slate-500 shrink-0">DOB {c.dob}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="text-[10px] text-slate-500 mt-1">Pick a registered civilian, or type any name / company manually.</p>
+    </div>
+  );
+}
+
 function DetailRow({ label, value, mono }) {
   return (
     <div>
@@ -79,7 +125,7 @@ export default function FDOTPermits() {
   const { activeBiz } = useActiveBusiness();
   const { isMobile } = useResponsive();
   const permits = state.permits || [];
-  const { currentUser } = state;
+  const { currentUser, civilians = [] } = state;
 
   const [selected,       setSelected]       = useState(null);
   const [isNew,          setIsNew]          = useState(false);
@@ -222,7 +268,7 @@ export default function FDOTPermits() {
                   <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-3">Permit Details</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <FSelect label="Permit Type" value={form.type} onChange={sf('type')} options={PERMIT_TYPES} span2 />
-                    <FInput label="Holder Name / Company" value={form.holderName} onChange={sf('holderName')} placeholder="Full name or company name" span2 />
+                    <HolderLookup value={form.holderName} onChange={sf('holderName')} civilians={civilians} />
                     <FInput label="Location / Road" value={form.location} onChange={sf('location')} placeholder="e.g. I-4 EB / MLK Blvd" />
                     <FInput label="Postal Code" value={form.postal} onChange={sf('postal')} placeholder="347" />
                     <FInput label="Issue Date" value={form.issuedAt} onChange={sf('issuedAt')} type="date" />
