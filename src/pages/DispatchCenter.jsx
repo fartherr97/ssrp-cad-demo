@@ -724,7 +724,7 @@ export default function DispatchCenter() {
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 whitespace-nowrap">{c.city}</td>
                         <td className="px-4 py-2.5"><PriBadge p={c.priority} /></td>
                         <td className="px-4 py-2.5"><CallStatus status={c.status} /></td>
-                        <td className="px-4 py-2.5 text-[12px]">{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">*</span>}</td>
+                        <td className="px-4 py-2.5 text-[12px]">{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">—</span>}</td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono whitespace-nowrap ${c.units.length > 0 ? 'text-emerald-400' : 'text-slate-600'}`}>
                           {c.units.length > 0 ? c.units.join(', ') : '—'}
                         </td>

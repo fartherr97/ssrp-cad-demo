@@ -119,7 +119,7 @@ export default function UnitManagement() {
                     <td className={S_TABLE_TD}>
                       {o.callId
                         ? <span className={`${S_DATA} text-[10px]`}>{o.callId}</span>
-                        : <span className="text-cad-muted text-[10px]">*</span>
+                        : <span className="text-cad-muted text-[10px]">—</span>
                       }
                     </td>
                     {isAdmin && (

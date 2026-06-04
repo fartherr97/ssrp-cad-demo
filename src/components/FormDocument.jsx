@@ -124,7 +124,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         ) : type === 'dropdown' ? (
           <select style={{ ...inputStyle, cursor: 'pointer', appearance: 'auto' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
-            <option value="">*</option>
+            <option value="">—</option>
             {options.map(o => <option key={o}>{o}</option>)}
           </select>
         ) : (type === 'date' || type === 'datetime') ? (
@@ -145,7 +145,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         )
       ) : (
-        <span style={valueStyle}>{value || <span style={{ color: '#bbb' }}>*</span>}</span>
+        <span style={valueStyle}>{value || <span style={{ color: '#bbb' }}>—</span>}</span>
       )}
     </div>
   );

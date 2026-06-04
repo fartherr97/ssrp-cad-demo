@@ -1268,7 +1268,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
       ) : effectiveReadOnly ? (
         <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg border text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}
           ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
-          {value || <span className="text-slate-600">*</span>}
+          {value || <span className="text-slate-600">—</span>}
         </div>
       ) : lookupKind ? (
         <LookupField f={f} kind={lookupKind} value={value} data={data} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
