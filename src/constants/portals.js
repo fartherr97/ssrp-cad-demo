@@ -4,6 +4,7 @@ import {
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
   MdHome, MdPerson, MdStore, MdGroup, MdFolder, MdAssignment,
   MdSupervisorAccount, MdLocalShipping, MdShield, MdLocalHospital,
+  MdHelpOutline,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -18,28 +19,31 @@ export const PORTALS = {
       { Icon: MdMap,                label: 'Map',        route: '/map'               },
       { Icon: MdShield,             label: 'Command',    route: '/portal/command'    },
       { Icon: MdSupervisorAccount,  label: 'Supervisor', route: '/portal/supervisor' },
+      { Icon: MdHelpOutline,        label: 'Help',       route: '/portal/help'       },
     ],
   },
 
   dispatch: { id: 'dispatch', label: 'Dispatch', subtitle: 'Dispatch Center', color: '#3aaa44', landing: '/cad',
     showStatus: true, showCalls: true, showNewCall: true,
     nav: [
-      { Icon: MdDashboard,     label: 'Board',   route: '/cad'     },
-      { Icon: MdMap,           label: 'Map',     route: '/map'     },
-      { Icon: MdSearch,        label: 'Search',  route: '/search'  },
-      { Icon: MdLocalShipping, label: 'Tow CAD', route: '/tow-cad' },
+      { Icon: MdDashboard,     label: 'Board',   route: '/cad'         },
+      { Icon: MdMap,           label: 'Map',     route: '/map'         },
+      { Icon: MdSearch,        label: 'Search',  route: '/search'      },
+      { Icon: MdLocalShipping, label: 'Tow CAD', route: '/tow-cad'     },
+      { Icon: MdHelpOutline,   label: 'Help',    route: '/portal/help' },
     ],
   },
 
   fire: { id: 'fire', label: 'Fire & EMS', subtitle: 'Fire & EMS', color: '#e04020', landing: '/fire',
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
-      { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'     },
-      { Icon: MdDashboard,           label: 'CAD',        route: '/cad'      },
-      { Icon: MdGroups,              label: 'Units',      route: '/units'    },
-      { Icon: MdMap,                 label: 'Map',        route: '/map'      },
-      { Icon: MdDescription,         label: 'Reports',   route: '/forms',   dropdown: 'reports' },
-      { Icon: MdFolder,              label: 'Records',   route: '/records', dropdown: 'records' },
+      { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'         },
+      { Icon: MdDashboard,           label: 'CAD',        route: '/cad'          },
+      { Icon: MdGroups,              label: 'Units',      route: '/units'        },
+      { Icon: MdMap,                 label: 'Map',        route: '/map'          },
+      { Icon: MdDescription,         label: 'Reports',    route: '/forms',       dropdown: 'reports' },
+      { Icon: MdFolder,              label: 'Records',    route: '/records',     dropdown: 'records' },
+      { Icon: MdHelpOutline,         label: 'Help',       route: '/portal/help' },
     ],
   },
 
@@ -57,6 +61,7 @@ export const PORTALS = {
       { Icon: MdPeopleAlt,         label: 'Civilians',  route: '/civilians'         },
       { Icon: MdSupervisorAccount, label: 'Supervisor', route: '/portal/supervisor' },
       { Icon: MdShield,            label: 'Command',    route: '/portal/command'    },
+      { Icon: MdHelpOutline,       label: 'Help',       route: '/portal/help'       },
     ],
   },
 
@@ -69,9 +74,10 @@ export const PORTALS = {
       { Icon: MdBadge,         label: 'Licenses',    route: '/portal/licenses'    },
       { Icon: MdLocalHospital, label: 'Medical',     route: '/portal/medical'     },
       { Icon: MdReportProblem, label: 'File Report', route: '/portal/file-report' },
-      { Icon: MdAssignment,   label: 'My Reports',  route: '/portal/my-reports'  },
+      { Icon: MdAssignment,    label: 'My Reports',  route: '/portal/my-reports'  },
       { Icon: MdGavel,         label: 'Complaint',   route: '/portal/complaint'   },
       { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'        },
+      { Icon: MdHelpOutline,   label: 'Help',        route: '/portal/help'        },
     ],
   },
 
@@ -84,6 +90,7 @@ export const PORTALS = {
       { Icon: MdDirectionsCar, label: 'Fleet',       route: '/portal/business-fleet' },
       { Icon: MdLocalShipping, label: 'Tow CAD',     route: '/tow-cad'               },
       { Icon: MdMenuBook,      label: 'Laws',        route: '/portal/laws'           },
+      { Icon: MdHelpOutline,   label: 'Help',        route: '/portal/help'           },
     ],
   },
 };

@@ -37,6 +37,7 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessFleet from './pages/portal/BusinessFleet';
+import HelpCenter from './pages/portal/HelpCenter';
 import TowCAD from './pages/TowCAD';
 import { BusinessProvider } from './contexts/BusinessContext';
 import { CivilianProvider } from './contexts/CivilianContext';
@@ -70,6 +71,7 @@ import QuickLinks from './pages/admin/sections/QuickLinks';
 import NotificationTones from './pages/admin/sections/NotificationTones';
 import Restrictions from './pages/admin/sections/Restrictions';
 import DiscordPresence from './pages/admin/sections/DiscordPresence';
+import HelpEditor from './pages/admin/sections/HelpEditor';
 import Servers from './pages/admin/sections/Servers';
 import Addresses from './pages/admin/sections/Addresses';
 import LookupTypes from './pages/admin/sections/LookupTypes';
@@ -183,6 +185,7 @@ function CADApp() {
           <Route path="addresses"          element={<Addresses />} />
           <Route path="lookup-types"       element={<LookupTypes />} />
           <Route path="tone-board"         element={<ToneBoard />} />
+          <Route path="help-center"        element={<HelpEditor />} />
         </Route>
         <Route path="/penal"         element={<PenalCodeEditor />} />
         <Route path="/bans"          element={<BanManagement />} />
@@ -210,6 +213,7 @@ function CADApp() {
         <Route path="/portal/my-business"     element={<MyBusiness />} />
         <Route path="/portal/employees"       element={<Employees />} />
         <Route path="/portal/business-fleet"  element={<BusinessFleet />} />
+        <Route path="/portal/help"             element={<HelpCenter />} />
 
         {/* ── Tow CAD ── */}
         <Route path="/tow-cad"            element={<TowCAD />} />

@@ -5,6 +5,7 @@ import {
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
   BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS
 } from '../data/mockData';
+import { DEFAULT_HELP_CONTENT } from '../data/helpDefaults';
 import {
   TEN_CODES, UNIT_STATUS_CODES,
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
@@ -134,6 +135,7 @@ const initialState = {
   lookupTypes: LOOKUP_TYPES,
   adminAddresses: ADMIN_ADDRESSES,
   communityConfig: COMMUNITY_CONFIG,
+  helpContent: DEFAULT_HELP_CONTENT,
   geoSettings: GEO_SETTINGS,
   loginPageConfig: LOGIN_PAGE_CONFIG,
   accountRestrictions: ACCOUNT_RESTRICTIONS,
@@ -829,6 +831,9 @@ function reducer(state, action) {
       const departments = state.departments.map(d => d.id === action.payload.id ? action.payload : d);
       return { ...state, departments };
     }
+
+    case 'SET_HELP_CONTENT':
+      return { ...state, helpContent: { ...state.helpContent, ...action.payload } };
 
     case 'BAN_USER': {
       const ban = { ...action.payload, id: state.nextId, status: 'Active', date: new Date().toLocaleDateString(), issuedBy: state.currentUser?.name };
