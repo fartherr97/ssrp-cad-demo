@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
-import { RecordReturn, ReportDocument } from '../components/FormDocument';
+import { RecordReturn } from '../components/FormDocument';
+import ReportForm from '../components/ReportForm';
+import { downloadReportPDF } from '../components/ReportPDF';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
@@ -129,7 +131,7 @@ const SEARCH_TYPES = [
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, licensePointsConfig = {}, businesses = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
@@ -142,6 +144,7 @@ export default function RecordsBureau() {
   const [selected, setSelected]     = useState(null); // for PERSON/VEHICLE/WARRANT: id; for CASES: "report:id" | "record:id"
   const [tab, setTab]               = useState('SUMMARY');
   const [searched, setSearched]     = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   // CASES-specific filters (live — no need to press search)
   const [caseKind, setCaseKind]     = useState('ALL');   // ALL | REPORTS | RECORDS
@@ -402,63 +405,82 @@ export default function RecordsBureau() {
             </div>
           ) : selCase ? (
             /* ── CASE DETAIL ── */
-            <>
-              {/* Compact header */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-border-faint shrink-0">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${selCaseKind === 'report' ? 'bg-blue-500/15' : 'bg-emerald-500/15'}`}>
-                  {selCaseKind === 'report'
-                    ? <MdDescription size={18} className="text-blue-400" />
-                    : <MdFolder size={18} className="text-emerald-400" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-extrabold text-white leading-tight truncate">{selCase.type}</div>
-                  <div className="text-[10px] font-mono text-brand-bright">
-                    {selCaseKind === 'report' ? selCase.caseNumber : selCase.recordNumber}
-                    {selCase.date ? <span className="text-slate-500 ml-2">{selCase.date}</span> : null}
+            (() => {
+              const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
+              const tpl = templates.find(t => t.name === selCase.type);
+              const data = {
+                ...(selCase.formData || {}),
+                ...(selCase.summary && !selCase.formData?.f10 ? { f10: selCase.summary } : {}),
+              };
+              const caseOfficer = officers.find(o => o.badge === selCase.officerBadge);
+              const caseDept = departments.find(d => d.short === caseOfficer?.deptShort);
+              const exportPDF = async () => {
+                if (!tpl) return;
+                setPdfLoading(true);
+                try {
+                  await downloadReportPDF(tpl, data, {
+                    caseNumber: selCase.caseNumber || selCase.recordNumber,
+                    status: selCase.status,
+                    officer: selCase.officerBadge,
+                    dateTime: selCase.date,
+                    agency: caseDept?.name || caseOfficer?.deptShort || communityConfig?.name,
+                    department: data._issuingDept || caseDept?.name || caseOfficer?.deptShort,
+                    logoUrl: caseDept?.logoUrl || communityConfig?.logoUrl,
+                  });
+                } finally { setPdfLoading(false); }
+              };
+              return (
+                <>
+                  {/* Compact header */}
+                  <div className="flex items-center gap-3 px-5 py-3 border-b border-border-faint shrink-0">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${selCaseKind === 'report' ? 'bg-blue-500/15' : 'bg-emerald-500/15'}`}>
+                      {selCaseKind === 'report'
+                        ? <MdDescription size={18} className="text-blue-400" />
+                        : <MdFolder size={18} className="text-emerald-400" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[15px] font-extrabold text-white leading-tight truncate">{selCase.type}</div>
+                      <div className="text-[10px] font-mono text-brand-bright">
+                        {selCaseKind === 'report' ? selCase.caseNumber : selCase.recordNumber}
+                        {selCase.date ? <span className="text-slate-500 ml-2">{selCase.date}</span> : null}
+                      </div>
+                    </div>
+                    {tpl && (
+                      <button
+                        onClick={exportPDF}
+                        disabled={pdfLoading}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-50 transition-colors shrink-0"
+                        style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}
+                        title="Download as PDF"
+                      >
+                        <MdDescription size={13} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
+                      </button>
+                    )}
+                    <StatusChip status={selCase.status} />
                   </div>
-                </div>
-                <StatusChip status={selCase.status} />
-              </div>
 
-              {/* Form document body — paper-constrained */}
-              <div className="flex-1 overflow-y-auto bg-[#36363a] p-6">
-                {(() => {
-                  const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
-                  const tpl = templates.find(t => t.name === selCase.type);
-                  const data = {
-                    ...(selCase.formData || {}),
-                    ...(selCase.summary && !selCase.formData?.f10 ? { f10: selCase.summary } : {}),
-                  };
-                  return (
-                    <div style={{
-                      background: '#ffffff',
-                      color: '#000',
-                      fontFamily: "'Arial','Helvetica',sans-serif",
-                      fontSize: 11,
-                      width: '100%',
-                      maxWidth: 816,
-                      minHeight: 1056,
-                      margin: '0 auto',
-                      border: '1px solid #888',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-                    }}>
-                      <ReportDocument
-                        type={selCase.type}
+                  {/* Read-only document body — matches the profile/report viewer */}
+                  <div className="flex-1 overflow-y-auto bg-app-bg/30 p-4 lg:p-6">
+                    {tpl ? (
+                      <ReportForm
                         template={tpl}
                         data={data}
-                        editable={false}
-                        meta={{
-                          caseNumber: selCase.caseNumber || selCase.recordNumber,
-                          status: selCase.status,
-                          officer: selCase.officerBadge,
-                          dateTime: selCase.date,
+                        readOnly
+                        canSupplement
+                        onSupplement={(fid, arr) => {
+                          const action = selCaseKind === 'report' ? 'UPDATE_REPORT' : 'UPDATE_RECORD';
+                          dispatch({ type: action, payload: { id: selCase.id, formData: { ...(selCase.formData || {}), [fid]: arr } } });
                         }}
                       />
-                    </div>
-                  );
-                })()}
-              </div>
-            </>
+                    ) : (
+                      <div className="max-w-[1100px] mx-auto bg-app-card/70 border border-border-base rounded-xl p-4 text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed">
+                        {selCase.summary || 'No details on file.'}
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()
           ) : (
             <>
               {/* Header */}

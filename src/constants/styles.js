@@ -12,7 +12,7 @@ const _BTN_BASE = 'btn-glossy inline-flex items-center justify-center gap-2 whit
 export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-transparent`;
 // Emphasized call-to-action — solid blue, white text, larger + glowing so the
 // primary submit action on long forms can't be missed at the bottom of the page.
-export const S_BTN_SUBMIT    = `${_BTN_BASE} px-6 py-2.5 text-[15px] font-bold bg-blue-600 hover:bg-blue-500 text-white border-blue-400/50 shadow-lg shadow-blue-600/30`;
+export const S_BTN_SUBMIT    = `${_BTN_BASE} px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white border-blue-400/50 shadow-lg shadow-blue-600/30`;
 export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.08] hover:bg-white/[0.14] text-slate-200 border-transparent`;
 export const S_BTN_SUCCESS   = `${_BTN_BASE} px-4 py-2 text-sm bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border-transparent`;
 export const S_BTN_DANGER    = `${_BTN_BASE} px-4 py-2 text-sm bg-red-500/20 hover:bg-red-500/30 text-red-200 border-transparent`;

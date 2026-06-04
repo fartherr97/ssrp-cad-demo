@@ -279,7 +279,7 @@ export default function ReportsCenter() {
                     <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
                   </button>
                   <button className={`${S_BTN_DANGER} hidden sm:flex sm:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-                  <button className={`${S_BTN_SUBMIT} w-full sm:w-auto sm:ml-auto`} onClick={submitReport}><MdSend size={17} /> Submit Report</button>
+                  <button className={`${S_BTN_SUBMIT} w-full sm:w-auto sm:ml-auto`} onClick={submitReport}><MdSend size={15} /> Submit Report</button>
                 </div>
               </div>
             </div>
