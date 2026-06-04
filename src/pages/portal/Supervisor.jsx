@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../../components/ui/Select';
 import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
@@ -350,13 +351,13 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                 {/* Status selector */}
                 <div className="min-w-0 bg-app-bg/60 border border-border-base rounded-lg px-2.5 py-2">
                   <div className="text-[8px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1">Status</div>
-                  <select
+                  <Select
                     value={status}
                     onChange={e => setStatus(e.target.value)}
                     className="w-full bg-transparent text-[11.5px] font-bold text-slate-200 outline-none cursor-pointer border-0 px-1 py-0.5 -mx-1 rounded"
                   >
                     {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </Select>
                 </div>
 
                 {/* Date */}
@@ -1057,33 +1058,33 @@ export default function Supervisor() {
                 className="text-slate-600 hover:text-slate-300 cursor-pointer text-[11px] font-bold shrink-0">✕</button>
             )}
           </div>
-          <select
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
             value={deptFilter}
             onChange={e => setDeptFilter(e.target.value)}
           >
             <option value="All">All Depts</option>
             {deptOptions.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
+          </Select>
         </div>
 
         <div className="grid grid-cols-2 gap-2 px-4 pt-2">
-          <select
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer w-full"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
           >
             <option value="All">All Types</option>
             {typeOptions.slice(1).map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <select
+          </Select>
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer w-full"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
           >
             <option value="All">All Statuses</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          </Select>
         </div>
 
         <div className="flex gap-1.5 px-4 py-3 overflow-x-auto">

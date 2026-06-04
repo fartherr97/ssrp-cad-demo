@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useActiveBusiness } from '../contexts/BusinessContext';
 import { useToast } from '../contexts/ToastContext';
@@ -113,10 +114,10 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
           {companies.length > 1 && (
             <div>
               <label className={LABEL}>Company</label>
-              <select className={INPUT} value={companyId}
+              <Select className={INPUT} value={companyId}
                 onChange={e => { setCompanyId(e.target.value); setTruckId(''); }}>
                 {companies.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
+              </Select>
             </div>
           )}
           <div>
@@ -124,10 +125,10 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
             {fleet.length === 0 ? (
               <div className="text-[12px] text-slate-500 italic px-1">No fleet configured for this company.</div>
             ) : (
-              <select className={INPUT} value={truckId} onChange={e => setTruckId(e.target.value)} required>
+              <Select className={INPUT} value={truckId} onChange={e => setTruckId(e.target.value)} required>
                 <option value="">* Select truck *</option>
                 {fleet.map(t => <option key={t.id} value={t.id}>{t.name} ({t.spawnCode})</option>)}
-              </select>
+              </Select>
             )}
           </div>
           <div>
@@ -411,9 +412,9 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
           {companies.length > 1 && (
             <div style={{ gridColumn: '1 / -1' }}>
               <label className={LABEL}>Tow Company</label>
-              <select className={INPUT} value={form.companyId} onChange={e => set('companyId', e.target.value)} required>
+              <Select className={INPUT} value={form.companyId} onChange={e => set('companyId', e.target.value)} required>
                 {companies.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
+              </Select>
             </div>
           )}
           <div>
@@ -450,39 +451,39 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
           </div>
           <div>
             <label className={LABEL}>Tow Type</label>
-            <select className={INPUT} value={form.towType} onChange={e => set('towType', e.target.value)}>
+            <Select className={INPUT} value={form.towType} onChange={e => set('towType', e.target.value)}>
               {TOW_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            </Select>
           </div>
           <div>
             <label className={LABEL}>Priority</label>
-            <select className={INPUT} value={form.priority} onChange={e => set('priority', e.target.value)}>
+            <Select className={INPUT} value={form.priority} onChange={e => set('priority', e.target.value)}>
               {PRIORITIES.map(p => <option key={p.val} value={p.val}>{p.label}</option>)}
-            </select>
+            </Select>
           </div>
           <div>
             <label className={LABEL}>Zone</label>
-            <select className={INPUT} value={form.zone} onChange={e => set('zone', e.target.value)}>
+            <Select className={INPUT} value={form.zone} onChange={e => set('zone', e.target.value)}>
               {ZONES.map(z => <option key={z} value={z}>{z}</option>)}
-            </select>
+            </Select>
           </div>
           <div>
             <label className={LABEL}>Assign Driver</label>
-            <select className={INPUT} value={form.unitId} onChange={e => set('unitId', e.target.value)}>
+            <Select className={INPUT} value={form.unitId} onChange={e => set('unitId', e.target.value)}>
               <option value="">* Unassigned *</option>
               {availableUnits.map(u => (
                 <option key={u.id} value={u.id}>{u.operatorName} ({u.truckName})</option>
               ))}
-            </select>
+            </Select>
           </div>
           <div>
             <label className={LABEL}>Link to LE Call</label>
-            <select className={INPUT} value={form.callId} onChange={e => set('callId', e.target.value)}>
+            <Select className={INPUT} value={form.callId} onChange={e => set('callId', e.target.value)}>
               <option value="">* None *</option>
               {callOptions.map(c => (
                 <option key={c.id} value={c.id}>{c.id} * {c.nature} @ {c.location}</option>
               ))}
-            </select>
+            </Select>
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
             <label className={LABEL}>Notes</label>
@@ -971,12 +972,12 @@ export default function TowCAD() {
           ))}
         </div>
         {towCompanies.length > 1 && !isBusinessPortal && (
-          <select
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-1.5 text-[11.5px] text-cad-text outline-none focus:border-brand/60 transition-all ml-auto"
             value={companyFilter} onChange={e => setCompany(e.target.value)}>
             <option value="ALL">All companies</option>
             {towCompanies.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
+          </Select>
         )}
       </div>
 

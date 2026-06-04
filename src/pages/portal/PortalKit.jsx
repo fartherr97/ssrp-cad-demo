@@ -1,3 +1,4 @@
+import Select from '../../components/ui/Select';
 /* Shared building blocks for the citizen-facing (Civilian / Business) portals. */
 
 const BRAND = '#3d82f0';
@@ -166,10 +167,10 @@ export function CivFormField({ field, value, onChange }) {
     <div>
       {labelEl}
       {type === 'select' ? (
-        <select className={PORTAL_INPUT} value={value || ''} onChange={e => onChange(e.target.value)} required={required}>
+        <Select className={PORTAL_INPUT} value={value || ''} onChange={e => onChange(e.target.value)} required={required}>
           <option value="">Select…</option>
           {options.map(o => <option key={o} value={o}>{o}</option>)}
-        </select>
+        </Select>
       ) : type === 'textarea' ? (
         <textarea className={`${PORTAL_INPUT} min-h-[80px] resize-y`} value={value || ''} onChange={e => onChange(e.target.value)} required={required} />
       ) : type === 'date' ? (

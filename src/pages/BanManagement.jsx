@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import {
@@ -74,14 +75,14 @@ export default function BanManagement() {
               <div className={S_FIELD}><label className={S_LABEL}>Username *</label><input className={S_INPUT} placeholder="Discord username" value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Discord ID *</label><input className={S_INPUT} placeholder="18-digit Discord ID" value={form.discordId} onChange={e => setForm(p=>({...p,discordId:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Duration</label>
-                <select className={S_SELECT} value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
+                <Select className={S_SELECT} value={form.duration} onChange={e => setForm(p=>({...p,duration:e.target.value}))}>
                   <option>Permanent</option>
                   <option>30 Days</option>
                   <option>14 Days</option>
                   <option>7 Days</option>
                   <option>3 Days</option>
                   <option>24 Hours</option>
-                </select>
+                </Select>
               </div>
             </div>
             <div className={`${S_FIELD} mb-2`}>

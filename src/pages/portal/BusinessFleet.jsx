@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -180,9 +181,9 @@ export default function BusinessFleet() {
               </div>
               <div>
                 <label className={PORTAL_LABEL}>Vehicle Type</label>
-                <select className={PORTAL_INPUT} value={form.type} onChange={e => setField('type', e.target.value)}>
+                <Select className={PORTAL_INPUT} value={form.type} onChange={e => setField('type', e.target.value)}>
                   {VEHICLE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className={PORTAL_LABEL}>Make *</label>

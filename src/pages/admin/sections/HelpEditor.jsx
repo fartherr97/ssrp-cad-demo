@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import { HELP_ICON_MAP, PORTAL_COLOR } from '../../portal/HelpCenter';
@@ -91,10 +92,10 @@ function SectionEditor({ sec, color, onChange, onDelete, onMoveUp, onMoveDown, i
             </div>
             <div>
               <label className={LBL}>Icon</label>
-              <select className={INP} value={sec.iconKey} onChange={e => setField('iconKey', e.target.value)}
+              <Select className={INP} value={sec.iconKey} onChange={e => setField('iconKey', e.target.value)}
                 style={{ transform: 'translateZ(0)' }}>
                 {ICON_OPTIONS.map(k => <option key={k} value={k}>{k.replace('Md', '')}</option>)}
-              </select>
+              </Select>
             </div>
           </div>
 

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonSearch, SonButton, EmptyState, ADMIN, SON_INPUT,
@@ -21,9 +22,9 @@ export default function Logs() {
       title="System Logs"
       subtitle={`${filtered.length} entries`}
       right={<>
-        <select style={{ ...SON_INPUT, width: 150 }} value={moduleFilter} onChange={e => setModuleFilter(e.target.value)}>
+        <Select style={{ ...SON_INPUT, width: 150 }} value={moduleFilter} onChange={e => setModuleFilter(e.target.value)}>
           {modules.map(m => <option key={m}>{m}</option>)}
-        </select>
+        </Select>
         <SonSearch value={query} onChange={setQuery} placeholder="Search logs…" />
       </>}
     >

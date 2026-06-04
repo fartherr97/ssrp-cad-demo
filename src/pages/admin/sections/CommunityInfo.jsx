@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -203,7 +204,7 @@ export default function CommunityInfo() {
 
         {/* Timezone select */}
         <SonField label="Timezone">
-          <select
+          <Select
             style={{ ...SON_INPUT, cursor: 'pointer', appearance: 'auto' }}
             value={draft.timezone || ''}
             onChange={e => set('timezone', e.target.value)}
@@ -212,7 +213,7 @@ export default function CommunityInfo() {
             {US_TIMEZONES.map(tz => (
               <option key={tz.value} value={tz.value}>{tz.label}</option>
             ))}
-          </select>
+          </Select>
         </SonField>
 
         {/* Default Language */}

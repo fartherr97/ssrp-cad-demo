@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import Select from '../../components/ui/Select';
 import {
   MdShield, MdSearch, MdPerson, MdWarningAmber,
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
@@ -383,16 +384,16 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
           <input className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
             placeholder="Name or badge…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+        <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
           value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
           <option value="All">All Depts</option>
           {leoDepts.map(d => <option key={d.id} value={d.short}>{d.short}</option>)}
-        </select>
-        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+        </Select>
+        <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
           value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="All">All Types</option>
           {reportTypes.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
+        </Select>
       </div>
 
       {/* Row 2: date range */}
@@ -650,16 +651,16 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
             value={officerSearch}
             onChange={e => setOfficerSearch(e.target.value)} />
         </div>
-        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+        <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
           value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="All">All Types</option>
           {reportTypes.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
+        </Select>
+        <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
           value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="All">All Statuses</option>
           {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
+        </Select>
       </div>
 
       {/* Date range row */}
@@ -964,10 +965,10 @@ function SubdivisionHoursTab({ officers }) {
               className="text-slate-500 hover:text-slate-300 cursor-pointer text-[11px] font-bold" style={{ background: 'none', border: 'none' }}>✕</button>
           )}
         </div>
-        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
+        <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
           value={subdivFilter} onChange={e => setSubdivFilter(e.target.value)}>
           {subdivNames.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
+        </Select>
       </div>
 
       {allRows.length === 0 ? (
@@ -1110,13 +1111,13 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
         {isAdmin ? (
           <div className="flex flex-col gap-1">
             <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Send To</label>
-            <select
+            <Select
               className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 outline-none focus:border-brand/60 transition-[border-color,box-shadow] cursor-pointer"
               value={targetDeptId}
               onChange={e => setTargetDeptId(e.target.value)}>
               <option value="">All Departments</option>
               {leoDepts.map(d => <option key={d.id} value={String(d.id)}>{d.name} ({d.short})</option>)}
-            </select>
+            </Select>
           </div>
         ) : (
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
@@ -1280,14 +1281,14 @@ export default function CommandPortal() {
           {scopeDept ? `Viewing: ${scopeDept.short}` : 'All Departments'}
         </span>
         {isAdmin && (
-          <select
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-1.5 text-[12px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer"
             value={adminDeptId ?? ''}
             onChange={e => setAdminDeptId(e.target.value ? Number(e.target.value) : null)}
           >
             <option value="">All Departments</option>
             {leoDepts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-          </select>
+          </Select>
         )}
       </div>
 

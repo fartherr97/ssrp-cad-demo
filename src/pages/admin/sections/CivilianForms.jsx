@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -128,10 +129,10 @@ function FieldListEditor({ fields, onChange, accent, note }) {
                     {f.type === 'age' ? 'Age (auto)' : (CIVILIAN_FIELD_TYPES.find(t => t.type === f.type)?.label || f.type)}
                   </span>
                 ) : (
-                  <select style={{ ...INPUT, width: 120 }} value={f.type}
+                  <Select style={{ ...INPUT, width: 120 }} value={f.type}
                     onChange={e => up(idx, { type: e.target.value })}>
                     {CIVILIAN_FIELD_TYPES.map(t => <option key={t.type} value={t.type} style={{ background: '#0d1827' }}>{t.label}</option>)}
-                  </select>
+                  </Select>
                 )}
                 <button type="button" onClick={() => up(idx, { required: !f.required })}
                   title="Required" disabled={isCore}

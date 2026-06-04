@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import {
@@ -66,15 +67,15 @@ export default function PenalCodeEditor() {
       {/* Header */}
       <div className="flex flex-wrap gap-2.5 items-center px-4 py-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0">
         <input className={`${S_INPUT} w-full sm:!w-[200px] text-[11px]`} placeholder="Search codes or names..." value={filter} onChange={e => setFilter(e.target.value)} />
-        <select className={`${S_SELECT} !w-[130px] text-[10px]`} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+        <Select className={`${S_SELECT} !w-[130px] text-[10px]`} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="ALL">All Types</option>
           <option value="Felony">Felony</option>
           <option value="Misdemeanor">Misdemeanor</option>
           <option value="Infraction">Infraction</option>
-        </select>
-        <select className={`${S_SELECT} !w-[200px] text-[10px]`} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
+        </Select>
+        <Select className={`${S_SELECT} !w-[200px] text-[10px]`} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
           {categories.map(c => <option key={c}>{c}</option>)}
-        </select>
+        </Select>
         <span className="text-[10px] text-cad-muted font-mono ml-1">
           {filtered.length} charges
         </span>
@@ -155,9 +156,9 @@ export default function PenalCodeEditor() {
                   <div className={S_FIELD}><label className={S_LABEL}>Offense Name</label><input className={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
                   <div className={S_FIELD}><label className={S_LABEL}>Category</label><input className={S_INPUT} value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
                   <div className={S_FIELD}><label className={S_LABEL}>Type</label>
-                    <select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}>
+                    <Select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}>
                       <option>Felony</option><option>Misdemeanor</option><option>Infraction</option>
-                    </select>
+                    </Select>
                   </div>
                   <div className={S_FIELD}><label className={S_LABEL}>Fine ($)</label><input className={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
                   <div className={S_FIELD}><label className={S_LABEL}>Jail Time</label><input className={S_INPUT} placeholder="e.g. 5 Years or None" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
@@ -225,7 +226,7 @@ export default function PenalCodeEditor() {
             <div className={S_MODAL_BODY}>
               <div className="grid grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>Code *</label><input className={S_INPUT} placeholder="e.g. 459 PC" value={form.code} onChange={e => setForm(p=>({...p,code:e.target.value}))} /></div>
-                <div className={S_FIELD}><label className={S_LABEL}>Type</label><select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}><option>Felony</option><option>Misdemeanor</option><option>Infraction</option></select></div>
+                <div className={S_FIELD}><label className={S_LABEL}>Type</label><Select className={S_SELECT} value={form.type} onChange={e => setForm(p=>({...p,type:e.target.value}))}><option>Felony</option><option>Misdemeanor</option><option>Infraction</option></Select></div>
               </div>
               <div className={S_FIELD}><label className={S_LABEL}>Offense Name *</label><input className={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Category</label><input className={S_INPUT} placeholder="e.g. Crimes Against Property" value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>

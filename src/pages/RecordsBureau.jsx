@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import { RecordReturn } from '../components/FormDocument';
@@ -9,7 +10,7 @@ import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
-  MdWarningAmber, MdFolder, MdDescription, MdExpandMore, MdExpandLess,
+  MdWarningAmber, MdFolder, MdDescription, MdExpandMore,
   MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
   MdVerifiedUser, MdLocationOn,
 } from 'react-icons/md';
@@ -81,31 +82,34 @@ function CollapsibleHistoryCard({ h }) {
               {h.disposition}
             </span>
           )}
-          <span className="text-slate-600" style={{ fontSize: 16 }}>
-            {open ? <MdExpandLess /> : <MdExpandMore />}
-          </span>
+          <MdExpandMore
+            className={`text-slate-600 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+            style={{ fontSize: 16 }}
+          />
         </div>
       </button>
 
-      {/* Expandable body */}
-      {open && (
-        <div className="px-4 pb-4 flex flex-col gap-2 border-t border-border-faint">
-          <div className="pt-2 flex flex-col gap-2">
-            <Row label="Agency"        value={h.agency} />
-            <Row label="Officer Badge" value={h.officerBadge} mono />
-            {h.sentence && <Row label="Sentence" value={h.sentence} />}
+      {/* Expandable body — grid-rows collapse keeps the reveal smooth */}
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <div className="px-4 pb-4 flex flex-col gap-2 border-t border-border-faint">
+            <div className="pt-2 flex flex-col gap-2">
+              <Row label="Agency"        value={h.agency} />
+              <Row label="Officer Badge" value={h.officerBadge} mono />
+              {h.sentence && <Row label="Sentence" value={h.sentence} />}
+            </div>
+            {h.charges?.length > 0 && (
+              <>
+                <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">Charges</div>
+                {h.charges.map((c, i) => (
+                  <div key={i} className="text-[12.5px] text-slate-200">• {c}</div>
+                ))}
+              </>
+            )}
+            {h.notes && <div className="mt-1 text-[12px] text-slate-400 italic">{h.notes}</div>}
           </div>
-          {h.charges?.length > 0 && (
-            <>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.5px] text-slate-600">Charges</div>
-              {h.charges.map((c, i) => (
-                <div key={i} className="text-[12.5px] text-slate-200">• {c}</div>
-              ))}
-            </>
-          )}
-          {h.notes && <div className="mt-1 text-[12px] text-slate-400 italic">{h.notes}</div>}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -294,20 +298,20 @@ export default function RecordsBureau() {
 
           {/* CASES: inline kind + status filters */}
           {searchType === 'CASES' && (
-            <div className="flex gap-1.5 px-2 pt-2 shrink-0 flex-wrap">
+            <div className="flex gap-1.5 px-2 pt-2 shrink-0 flex-wrap anim-dropdown-in">
               {[['ALL','All'],['REPORTS','Reports'],['RECORDS','Records']].map(([v,l]) => (
                 <button key={v}
                   className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all ${caseKind === v ? 'bg-brand/15 border-brand/40 text-brand-bright' : 'bg-transparent border-border-faint text-slate-500 hover:text-slate-300'}`}
                   onClick={() => updateCaseKind(v)}>{l}</button>
               ))}
-              <select
+              <Select
                 className="ml-auto bg-app-input border border-border-faint rounded-lg px-2 py-1 text-[10px] text-slate-400 outline-none cursor-pointer"
                 value={caseStatus}
                 onChange={e => updateCaseStatus(e.target.value)}
               >
                 <option value="ALL">All Statuses</option>
                 {allCaseStatuses.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              </Select>
             </div>
           )}
 

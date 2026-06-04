@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -41,12 +42,12 @@ function DeptCard({ d, onSave, onDelete }) {
           <div className="expand-section grid grid-cols-2 gap-[10px]">
             <div className="col-span-2">
               <label style={SON_LABEL}>Type</label>
-              <select style={SON_INPUT} value={draft.type || 'Law Enforcement'} onChange={e => set({ type: e.target.value })}>
+              <Select style={SON_INPUT} value={draft.type || 'Law Enforcement'} onChange={e => set({ type: e.target.value })}>
                 <option>Civilian</option>
                 <option>Law Enforcement</option>
                 <option>Fire &amp; EMS</option>
                 <option>Dispatch</option>
-              </select>
+              </Select>
             </div>
             <div className="col-span-2">
               <label style={SON_LABEL}>Sub-departments (comma separated)</label>

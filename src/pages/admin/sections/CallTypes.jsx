@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -61,13 +62,13 @@ export default function CallTypes() {
           onChange={e => setName(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && add()}
         />
-        <select
+        <Select
           style={{ ...SON_INPUT, width: 160 }}
           value={category}
           onChange={e => setCategory(e.target.value)}
         >
           {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </select>
+        </Select>
         <SonButton variant="red" onClick={add}><MdAdd size={16} /> Add</SonButton>
       </div>
 

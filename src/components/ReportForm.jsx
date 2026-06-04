@@ -4,6 +4,7 @@
    live data and auto-fill the rest of their section, Sonoran-style. */
 
 import { useState, useRef, useEffect } from 'react';
+import Select from './ui/Select';
 import { createPortal } from 'react-dom';
 import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight, MdLink, MdGroups } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
@@ -468,7 +469,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
               {readOnly ? (
                 <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '—'}</span>
               ) : (
-                <select
+                <Select
                   className="bg-transparent text-[12px] font-bold outline-none focus-visible:outline-none cursor-pointer shrink-0"
                   style={{ color: ts.color }}
                   value={c.type || ''}
@@ -477,7 +478,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
                   {['Felony', 'Misdemeanor', 'Infraction'].map(t => (
                     <option key={t} value={t} style={{ color: '#e2e8f0', background: '#1e2430' }}>{t}</option>
                   ))}
-                </select>
+                </Select>
               )}
               {!readOnly && (
                 <button type="button" onClick={() => removeCharge(c.id)}
@@ -495,13 +496,13 @@ function ChargesField({ f, value, onChange, readOnly }) {
               {cell('Bond Type', readOnly
                 ? <span className="text-[13px] text-slate-200">{c.bondType || '—'}</span>
                 : (
-                  <select
+                  <Select
                     className="w-full bg-transparent text-[13px] text-slate-100 outline-none focus-visible:outline-none cursor-pointer"
                     value={c.bondType || ''}
                     onChange={e => updateCharge(c.id, 'bondType', e.target.value)}
                   >
                     {BOND_TYPES.map(t => <option key={t} value={t} style={{ background: '#1e2430' }}>{t}</option>)}
-                  </select>
+                  </Select>
                 ))}
               {cell('Bond / Fine', (
                 <div className="flex items-baseline gap-1">
@@ -1273,10 +1274,10 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
           placeholder={f.placeholder || ''}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
-        <select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
+        <Select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
           <option value="">{f.placeholder || '—'}</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
-        </select>
+        </Select>
       ) : (
         <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''} ${isSupOnly ? 'border-red-500/40' : ''}`}
           style={f.type === 'datetime' || f.type === 'date' || f.type === 'time' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}

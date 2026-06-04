@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -167,9 +168,9 @@ export default function FileReport() {
             <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))' }}>
               <div>
                 <label className={PORTAL_LABEL}><MdCategory size={13} className="inline align-[-2px] mr-[5px]" />Report Type</label>
-                <select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
+                <Select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
                   {REPORT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>

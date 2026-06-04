@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
@@ -68,12 +69,12 @@ export default function UnitManagement() {
           ))}
         </div>
         <div className="flex flex-wrap gap-2 ml-auto">
-          <select className={`${S_SELECT} !w-[130px]`} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
+          <Select className={`${S_SELECT} !w-[130px]`} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
             {DEPTS.map(d => <option key={d}>{d}</option>)}
-          </select>
-          <select className={`${S_SELECT} !w-[150px]`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          </Select>
+          <Select className={`${S_SELECT} !w-[150px]`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             {STATUSES.map(s => <option key={s}>{s}</option>)}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -124,7 +125,7 @@ export default function UnitManagement() {
                     </td>
                     {isAdmin && (
                       <td className={S_TABLE_TD} onClick={e => e.stopPropagation()}>
-                        <select className={`${S_SELECT} !w-20 !text-[9px] !px-1 !py-px`}
+                        <Select className={`${S_SELECT} !w-20 !text-[9px] !px-1 !py-px`}
                           value={o.status}
                           onChange={e => setUnitStatus(o.unitId, e.target.value)}>
                           <option>AVAILABLE</option>
@@ -133,7 +134,7 @@ export default function UnitManagement() {
                           <option>ARRVD</option>
                           <option>UNAVAILABLE</option>
                           <option>OFFDUTY</option>
-                        </select>
+                        </Select>
                       </td>
                     )}
                   </tr>

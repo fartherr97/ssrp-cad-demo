@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import { FlagRow, FlagManager } from '../components/CivilianFlags';
@@ -278,8 +279,8 @@ export default function CivilianRegistry() {
                 <div className={S_FIELD}><label className={S_LABEL}>Last Name *</label><input className={S_INPUT} value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Date of Birth</label><div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}><input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.dob} onChange={e => setForm(p => ({...p, dob: e.target.value}))} style={{ colorScheme: 'dark' }} /></div></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Age</label><div className={`${S_INPUT} flex items-center justify-between`} style={{ opacity: 0.85 }}><span className={ageFromDob(form.dob) ? '' : 'text-slate-600'}>{ageFromDob(form.dob) || 'Auto from DOB'}</span><span className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Auto</span></div></div>
-                <div className={S_FIELD}><label className={S_LABEL}>Gender</label><select className={S_SELECT} value={form.gender} onChange={e => setForm(p => ({...p, gender: e.target.value}))}><option>Male</option><option>Female</option><option>Non-Binary</option></select></div>
-                <div className={S_FIELD}><label className={S_LABEL}>Ethnicity</label><select className={S_SELECT} value={form.ethnicity} onChange={e => setForm(p => ({...p, ethnicity: e.target.value}))}><option>White</option><option>Black</option><option>Hispanic</option><option>Asian</option><option>Other</option></select></div>
+                <div className={S_FIELD}><label className={S_LABEL}>Gender</label><Select className={S_SELECT} value={form.gender} onChange={e => setForm(p => ({...p, gender: e.target.value}))}><option>Male</option><option>Female</option><option>Non-Binary</option></Select></div>
+                <div className={S_FIELD}><label className={S_LABEL}>Ethnicity</label><Select className={S_SELECT} value={form.ethnicity} onChange={e => setForm(p => ({...p, ethnicity: e.target.value}))}><option>White</option><option>Black</option><option>Hispanic</option><option>Asian</option><option>Other</option></Select></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Hair Color</label><input className={S_INPUT} value={form.hair} onChange={e => setForm(p => ({...p, hair: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Eye Color</label><input className={S_INPUT} value={form.eyes} onChange={e => setForm(p => ({...p, eyes: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Height</label><input className={S_INPUT} value={form.height} onChange={e => setForm(p => ({...p, height: e.target.value}))} /></div>
@@ -289,7 +290,7 @@ export default function CivilianRegistry() {
               <div className={S_FIELD}><label className={S_LABEL}>Home Address</label><input className={S_INPUT} value={form.address} onChange={e => setForm(p => ({...p, address: e.target.value}))} /></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>DL Number</label><input className={S_INPUT} value={form.dlNumber} onChange={e => setForm(p => ({...p, dlNumber: e.target.value}))} /></div>
-                <div className={S_FIELD}><label className={S_LABEL}>DL Status</label><select className={S_SELECT} value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></select></div>
+                <div className={S_FIELD}><label className={S_LABEL}>DL Status</label><Select className={S_SELECT} value={form.dlStatus} onChange={e => setForm(p => ({...p, dlStatus: e.target.value}))}><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option><option value="REVOKED">REVOKED</option><option value="EXPIRED">EXPIRED</option></Select></div>
               </div>
             </div>
             {createError && (
@@ -320,7 +321,7 @@ export default function CivilianRegistry() {
                 <div className={S_FIELD}><label className={S_LABEL}>Make *</label><input className={S_INPUT} placeholder="Ford" value={vehForm.make} onChange={e => setVehForm(p => ({...p, make: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Model</label><input className={S_INPUT} placeholder="F-150" value={vehForm.model} onChange={e => setVehForm(p => ({...p, model: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Color</label><input className={S_INPUT} value={vehForm.color} onChange={e => setVehForm(p => ({...p, color: e.target.value}))} /></div>
-                <div className={S_FIELD}><label className={S_LABEL}>Reg. Status</label><select className={S_SELECT} value={vehForm.regStatus} onChange={e => setVehForm(p => ({...p, regStatus: e.target.value}))}><option value="VALID">VALID</option><option value="EXPIRED">EXPIRED</option><option value="SUSPENDED">SUSPENDED</option></select></div>
+                <div className={S_FIELD}><label className={S_LABEL}>Reg. Status</label><Select className={S_SELECT} value={vehForm.regStatus} onChange={e => setVehForm(p => ({...p, regStatus: e.target.value}))}><option value="VALID">VALID</option><option value="EXPIRED">EXPIRED</option><option value="SUSPENDED">SUSPENDED</option></Select></div>
               </div>
               <div className={S_FIELD}><label className={S_LABEL}>Reg. Expiry Date</label><div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}><input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={vehForm.regExpiry} onChange={e => setVehForm(p => ({...p, regExpiry: e.target.value}))} style={{ colorScheme: 'dark' }} /></div></div>
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -53,11 +54,11 @@ function FSelect({ label, value, onChange, options, span2 }) {
   return (
     <div className={span2 ? 'col-span-1 sm:col-span-2' : ''}>
       <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">{label}</div>
-      <select value={value} onChange={e => onChange(e.target.value)}
+      <Select value={value} onChange={e => onChange(e.target.value)}
         className="w-full text-[12.5px] text-white rounded-lg px-3 py-2 outline-none"
         style={{ background: '#111e2d', border: '1px solid rgba(255,255,255,0.10)' }}>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
+      </Select>
     </div>
   );
 }

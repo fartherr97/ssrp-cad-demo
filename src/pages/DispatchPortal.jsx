@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import { useToast } from '../contexts/ToastContext';
@@ -445,13 +446,13 @@ function DispatchModal({ call, officers, onConfirm, onClose }) {
       {/* Nature */}
       <div>
         <FieldLabel>Call Type / Nature</FieldLabel>
-        <select value={nature} onChange={e => setNature(e.target.value)}
+        <Select value={nature} onChange={e => setNature(e.target.value)}
           className="w-full text-[12.5px] text-white rounded-lg px-3 py-2 outline-none"
           style={{ background: '#111e2d', border: '1px solid rgba(255,255,255,0.10)' }}>
           <option value="">Select nature…</option>
           {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
           <option value="__custom__">Other (type in)</option>
-        </select>
+        </Select>
         {nature === '__custom__' && (
           <TextInput value={customNature} onChange={setCustomNature}
             placeholder="Enter call nature…" className="mt-2" />
