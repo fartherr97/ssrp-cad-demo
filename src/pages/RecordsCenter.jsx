@@ -60,13 +60,15 @@ export default function RecordsCenter() {
         case 'unitNumber':  return me?.unitId || me?.badge || '';
         case 'unitName':    return me?.name || currentUser?.name || '';
         case 'date':        return new Date().toISOString().slice(0, 10);
+        case 'time':        return new Date().toTimeString().slice(0, 5);
+        case 'county':      return 'Hillsborough County';
         default:            return '';
       }
     };
     (tpl.sections || []).forEach(s => (s.fields || []).forEach(f => {
       if (f.autoNumber) restored[f.id] = recNum;
       else if (f.autoFill) {
-        if (f.autoFill === 'date') { if (!restored[f.id]) restored[f.id] = af('date'); }
+        if (f.autoFill === 'date' || f.autoFill === 'time') { if (!restored[f.id]) restored[f.id] = af(f.autoFill); }
         else restored[f.id] = af(f.autoFill);
       }
     }));

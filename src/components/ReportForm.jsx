@@ -22,7 +22,7 @@ const SPAN = {
 const FULL = 'sm:col-span-2 lg:col-span-4';
 
 const inputType = (t) =>
-  t === 'datetime' ? 'datetime-local' : t === 'date' ? 'date' : t === 'number' ? 'number' : 'text';
+  t === 'datetime' ? 'datetime-local' : t === 'date' ? 'date' : t === 'time' ? 'time' : t === 'number' ? 'number' : 'text';
 
 const LOOKUP_KIND = {
   civilian_lookup: 'civilian',
@@ -423,18 +423,6 @@ function ChargesField({ f, value, onChange, readOnly }) {
 
   const typeStyle = (t) => CHARGE_TYPE_STYLE[t] || CHARGE_TYPE_STYLE.Infraction;
 
-  const InlineInput = ({ chId, field, val, placeholder, mono, type: iType = 'text' }) => (
-    <input
-      type={iType}
-      className="w-full bg-transparent text-[11.5px] text-slate-200 placeholder:text-slate-600 outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5"
-      value={val ?? ''}
-      placeholder={placeholder}
-      readOnly={readOnly}
-      onChange={e => updateCharge(chId, field, e.target.value)}
-      style={mono ? { fontFamily: 'monospace' } : undefined}
-    />
-  );
-
   return (
     <div className="flex flex-col gap-2">
       {/* Fine total bar */}
@@ -450,83 +438,81 @@ function ChargesField({ f, value, onChange, readOnly }) {
       {/* Charge cards */}
       {charges.map((c, idx) => {
         const ts = typeStyle(c.type);
+        // Plain function (not a nested component) so inputs keep focus while typing.
+        const txt = (field, { placeholder, mono, type: iType = 'text' } = {}) => (
+          <input
+            type={iType}
+            className={`w-full bg-transparent text-[13px] font-medium text-slate-100 placeholder:text-slate-600 outline-none ${mono ? 'font-mono' : ''}`}
+            value={c[field] ?? ''}
+            placeholder={placeholder}
+            readOnly={readOnly}
+            onChange={e => updateCharge(c.id, field, e.target.value)}
+          />
+        );
+        const cell = (label, node) => (
+          <div className="flex flex-col gap-1 rounded-lg bg-app-input/50 border border-border-faint px-3 py-2 min-w-0">
+            <span className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500">{label}</span>
+            <div className="min-w-0">{node}</div>
+          </div>
+        );
         return (
-          <div key={c.id} className="flex rounded-xl border overflow-hidden" style={{ borderColor: ts.border }}>
-            {/* Left sidebar — number + delete */}
-            <div className="flex flex-col items-center justify-between px-2.5 py-2.5 shrink-0 gap-2"
-              style={{ background: ts.bg, minWidth: 38 }}>
-              <span className="text-[10px] font-bold font-mono" style={{ color: ts.color }}>#{idx + 1}</span>
+          <div key={c.id} className="rounded-xl border overflow-hidden" style={{ borderColor: ts.border }}>
+            {/* Header — number · charge name · type · delete */}
+            <div className="flex items-center gap-3 px-3 py-2.5" style={{ background: ts.bg }}>
+              <span className="flex items-center justify-center w-6 h-6 rounded-md text-[11px] font-bold font-mono shrink-0"
+                style={{ background: 'rgba(0,0,0,0.25)', color: ts.color }}>{idx + 1}</span>
+              <input
+                className="flex-1 min-w-0 bg-transparent text-[14px] font-bold text-white placeholder:text-slate-500 outline-none"
+                value={c.name ?? ''}
+                placeholder="Charge name"
+                readOnly={readOnly}
+                onChange={e => updateCharge(c.id, 'name', e.target.value)}
+              />
+              {readOnly ? (
+                <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '—'}</span>
+              ) : (
+                <select
+                  className="bg-transparent text-[12px] font-bold outline-none cursor-pointer shrink-0"
+                  style={{ color: ts.color }}
+                  value={c.type || ''}
+                  onChange={e => updateCharge(c.id, 'type', e.target.value)}
+                >
+                  {['Felony', 'Misdemeanor', 'Infraction'].map(t => (
+                    <option key={t} value={t} style={{ color: '#e2e8f0', background: '#1e2430' }}>{t}</option>
+                  ))}
+                </select>
+              )}
               {!readOnly && (
                 <button type="button" onClick={() => removeCharge(c.id)}
-                  className="w-5 h-5 rounded flex items-center justify-center transition-colors hover:bg-red-500/20 border-none bg-transparent cursor-pointer shrink-0"
+                  className="w-7 h-7 rounded-md flex items-center justify-center transition-colors hover:bg-red-500/20 border-none bg-transparent cursor-pointer shrink-0"
                   title="Remove">
-                  <MdDelete size={12} className="text-slate-500 hover:text-red-400" />
+                  <MdDelete size={15} className="text-slate-400 hover:text-red-400" />
                 </button>
               )}
             </div>
 
-            {/* Field grid — 2 rows × 4 cols */}
-            <div className="flex-1 min-w-0 p-2.5 grid grid-cols-4 gap-x-4 gap-y-2.5"
-              style={{ background: 'rgba(255,255,255,0.015)' }}>
-              {/* Row 1: CHARGE (×2) | TYPE | COUNTS */}
-              <div className="col-span-2 flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Charge</span>
-                <InlineInput chId={c.id} field="name" val={c.name} placeholder="Charge name" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Charge Type</span>
-                {readOnly ? (
-                  <span className="text-[11.5px] font-semibold" style={{ color: ts.color }}>{c.type || '—'}</span>
-                ) : (
+            {/* Body — structured field cells */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3" style={{ background: 'rgba(255,255,255,0.015)' }}>
+              {cell('Code', txt('code', { placeholder: '§ Code', mono: true }))}
+              {cell('Counts', txt('counts', { placeholder: '1', type: 'number' }))}
+              {cell('Bond Type', readOnly
+                ? <span className="text-[13px] text-slate-200">{c.bondType || '—'}</span>
+                : (
                   <select
-                    className="w-full bg-transparent text-[11.5px] outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5 cursor-pointer"
-                    style={{ color: ts.color }}
-                    value={c.type || ''}
-                    onChange={e => updateCharge(c.id, 'type', e.target.value)}
-                  >
-                    {['Felony', 'Misdemeanor', 'Infraction'].map(t => (
-                      <option key={t} value={t} style={{ color: '#e2e8f0', background: '#1e2430' }}>{t}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Counts</span>
-                <InlineInput chId={c.id} field="counts" val={c.counts} placeholder="1" type="number" />
-              </div>
-
-              {/* Row 2: CODE | BOND TYPE | BOND / FINE | JAIL TIME */}
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Code</span>
-                <InlineInput chId={c.id} field="code" val={c.code} placeholder="§ Code" mono />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Bond Type</span>
-                {readOnly ? (
-                  <span className="text-[11.5px] text-slate-300">{c.bondType || '—'}</span>
-                ) : (
-                  <select
-                    className="w-full bg-transparent text-[11.5px] text-slate-300 outline-none border-b border-transparent focus:border-white/20 transition-colors pb-0.5 cursor-pointer"
+                    className="w-full bg-transparent text-[13px] text-slate-100 outline-none cursor-pointer"
                     value={c.bondType || ''}
                     onChange={e => updateCharge(c.id, 'bondType', e.target.value)}
                   >
-                    {BOND_TYPES.map(t => (
-                      <option key={t} value={t} style={{ background: '#1e2430' }}>{t}</option>
-                    ))}
+                    {BOND_TYPES.map(t => <option key={t} value={t} style={{ background: '#1e2430' }}>{t}</option>)}
                   </select>
-                )}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Bond / Fine</span>
-                <div className="flex items-baseline gap-0.5">
-                  <span className="text-[10px] text-slate-600 shrink-0">$</span>
-                  <InlineInput chId={c.id} field="bondAmount" val={c.bondAmount} placeholder="0.00" type="number" />
+                ))}
+              {cell('Bond / Fine', (
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[12px] text-slate-500 shrink-0">$</span>
+                  {txt('bondAmount', { placeholder: '0.00', type: 'number' })}
                 </div>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Jail Time</span>
-                <InlineInput chId={c.id} field="jailTime" val={c.jailTime} placeholder="None" />
-              </div>
+              ))}
+              {cell('Jail Time', txt('jailTime', { placeholder: 'None' }))}
             </div>
           </div>
         );
@@ -1154,7 +1140,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
         </select>
       ) : (
         <input type={inputType(f.type)} className={`${S_INPUT} ${f.mono ? 'font-mono' : ''} ${isSupOnly ? 'border-red-500/40' : ''}`}
-          style={f.type === 'datetime' || f.type === 'date' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}
+          style={f.type === 'datetime' || f.type === 'date' || f.type === 'time' ? { WebkitAppearance: 'none', appearance: 'none' } : undefined}
           placeholder={f.placeholder || ''}
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       )}

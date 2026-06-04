@@ -48,12 +48,23 @@ const PREMADE_SECTIONS = [
   { key: 'agency', label: 'AGENCY INFORMATION', make: () => ({
     id: sid(), title: 'Agency Information', style: 'gray',
     fields: [
+      { id: uid(), label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
+      { id: uid(), label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
       { id: uid(), label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
       { id: uid(), label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
       { id: uid(), label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
       { id: uid(), label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
       { id: uid(), label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-      { id: uid(), label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
+    ],
+  })},
+  { key: 'location', label: 'LOCATION OF OCCURRENCE', make: () => ({
+    id: sid(), title: 'Location of Occurrence', style: 'gray',
+    fields: [
+      { id: uid(), label: 'County',      type: 'text', span: 1, autoFill: 'county', readOnly: true },
+      { id: uid(), label: 'Street',      type: 'text', span: 2 },
+      { id: uid(), label: 'City Of',     type: 'text', span: 1 },
+      { id: uid(), label: 'State',       type: 'text', span: 1 },
+      { id: uid(), label: 'Postal Code', type: 'text', span: 1 },
     ],
   })},
   { key: 'supplemental', label: 'SUPPLEMENTALS', make: () => ({
