@@ -49,6 +49,11 @@ export default function RecordsCenter() {
       const deptName = departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || '';
       if (deptName) restored._issuingDept = deptName;
     }
+    // Auto-numbered fields always reflect the next shared record number.
+    const recNum = String(reportSeq).padStart(4, '0');
+    (tpl.sections || []).forEach(s => (s.fields || []).forEach(f => {
+      if (f.autoNumber) restored[f.id] = recNum;
+    }));
     setFormValues(restored);
     setSavedAt(null);
   };

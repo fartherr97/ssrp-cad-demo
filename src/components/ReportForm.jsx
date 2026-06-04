@@ -1010,6 +1010,13 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   const isNarr = f.type === 'textarea';
   const cls = isNarr ? FULL : (SPAN[span] || SPAN[1]);
 
+  // Auto-numbered fields (Warrant #, Notice #, Citation #, etc.) mirror the
+  // shared sequential record number — the same counter that stamps every
+  // report and record, zero-padded to 4 digits starting at 0001. They are
+  // never hand-typed: we show the assigned value read-only.
+  const isAutoNumber = !!f.autoNumber;
+  const autoValue = value || String(state.reportSeq || 1).padStart(4, '0');
+
   // Signature fields get a one-click "Sign Off" that stamps the signer's
   // active identifier (badge | rank | name) — same format as filed reports.
   // An explicit `signature` builder field always qualifies; a plain text
@@ -1025,7 +1032,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
   return (
     <div className={`flex flex-col min-w-0 ${cls}`}>
       <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
-        {f.label}{f.required && <span className="text-red-400"> *</span>}
+        {isAutoNumber ? 'Record Number' : f.label}{f.required && <span className="text-red-400"> *</span>}
         {isSupOnly && (
           <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold tracking-[0.4px] normal-case">
             {isSupervisor ? 'SUP ONLY' : 'RESTRICTED'}
@@ -1034,9 +1041,16 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
         {lookupKind && !effectiveReadOnly && (
           <span className="px-1.5 py-0.5 rounded bg-brand/15 text-brand-bright text-[8px] font-bold tracking-[0.4px] normal-case">LOOKUP</span>
         )}
+        {isAutoNumber && (
+          <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[8px] font-bold tracking-[0.4px] normal-case">AUTO #</span>
+        )}
       </label>
 
-      {effectiveReadOnly ? (
+      {isAutoNumber ? (
+        <div className="min-h-[40px] px-3.5 py-2.5 rounded-lg border bg-app-input border-border-base text-sm text-slate-200 font-mono flex items-center">
+          {autoValue}
+        </div>
+      ) : effectiveReadOnly ? (
         <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg border text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}
           ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
           {value || <span className="text-slate-600">—</span>}

@@ -80,6 +80,12 @@ export default function ReportsCenter() {
       }
     }
 
+    // Auto-numbered fields always reflect the next shared report number.
+    const caseNum = String(reportSeq).padStart(4, '0');
+    (tpl.sections || []).forEach(s => (s.fields || []).forEach(f => {
+      if (f.autoNumber) restored[f.id] = caseNum;
+    }));
+
     setFormValues(restored);
     setSavedAt(null);
   };

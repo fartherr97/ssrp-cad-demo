@@ -793,7 +793,7 @@ export const RECORD_TEMPLATES = [
       { id: 's1', title: 'License Holder', style: 'blue', fields: [
         { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
         { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f3', label: 'License Number',  type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f3', label: 'Record Number',   type: 'text',            span: 2, mono: true, autoNumber: true },
         { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
         { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
       ]},
@@ -811,7 +811,7 @@ export const RECORD_TEMPLATES = [
       { id: 's1', title: 'License Holder', style: 'blue', fields: [
         { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
         { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f3', label: 'License Number',  type: 'text',            span: 2, mono: true, required: true },
+        { id: 'f3', label: 'Record Number',   type: 'text',            span: 2, mono: true, autoNumber: true },
         { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
         { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
       ]},
@@ -829,7 +829,7 @@ export const RECORD_TEMPLATES = [
       { id: 's1', title: 'Subject Information', style: 'blue', fields: [
         { id: 'f1', label: 'Subject Name',    type: 'civilian_lookup', span: 3, required: true },
         { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f3', label: 'Notice Number',   type: 'text',            span: 2, mono: true },
+        { id: 'f3', label: 'Record Number',   type: 'text',            span: 2, mono: true, autoNumber: true },
         { id: 'f4', label: 'Issue Date',      type: 'date',            span: 2, required: true },
       ]},
       { id: 's2', title: 'Trespass Details', style: 'gray', fields: [
@@ -853,7 +853,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 's1', title: 'Warrant Information', style: 'blue', fields: [
         { id: 'f1', label: 'Subject Name',   type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'Warrant #',      type: 'text',            span: 1, mono: true },
+        { id: 'f2', label: 'Record Number',  type: 'text',            span: 1, mono: true, autoNumber: true },
         { id: 'f3', label: 'Warrant Type',   type: 'dropdown',        span: 2, required: true, options: ['Arrest Warrant','Bench Warrant','Search Warrant','Civil Warrant'] },
         { id: 'f4', label: 'Issue Date',     type: 'date',            span: 1, required: true },
         { id: 'f5', label: 'Issued By',      type: 'text',            span: 1, required: true },
@@ -872,7 +872,7 @@ export const RECORD_TEMPLATES = [
     formCode: 'FL-UFTC-001',
     sections: [
       { id: 's1', title: 'Citation Information', style: 'blue', fields: [
-        { id: 'f1', label: 'Citation #',      type: 'text',            span: 1, mono: true, required: true },
+        { id: 'f1', label: 'Record Number',   type: 'text',            span: 1, mono: true, autoNumber: true },
         { id: 'f2', label: 'Date / Time',     type: 'datetime',        span: 2, required: true },
         { id: 'f3', label: 'Officer Badge #', type: 'badge_lookup',    span: 1 },
       ]},
@@ -915,7 +915,7 @@ export const RECORD_TEMPLATES = [
       { id: 's1', title: 'Subject Information', style: 'blue', fields: [
         { id: 'f1', label: 'Full Name',      type: 'civilian_lookup', span: 3, required: true },
         { id: 'f2', label: 'DL Number',      type: 'text',            span: 1, mono: true, required: true },
-        { id: 'f3', label: 'Suspension #',   type: 'text',            span: 2, mono: true },
+        { id: 'f3', label: 'Record Number',  type: 'text',            span: 2, mono: true, autoNumber: true },
         { id: 'f4', label: 'Effective Date', type: 'date',            span: 1, required: true },
         { id: 'f5', label: 'End Date',       type: 'date',            span: 1 },
       ]},

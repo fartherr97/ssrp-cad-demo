@@ -660,15 +660,15 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
                 {row.map(field => (
                   <FormCell
                     key={field.id}
-                    label={field.label}
-                    value={fv(field.id)}
+                    label={field.autoNumber ? 'Record Number' : field.label}
+                    value={field.autoNumber ? (fv(field.id) || meta.caseNumber) : fv(field.id)}
                     onChange={set(field.id)}
                     type={field.type}
                     options={field.options || []}
-                    mono={field.mono}
+                    mono={field.mono || field.autoNumber}
                     colSpan={field.span || 1}
                     required={field.required}
-                    editable={editable}
+                    editable={editable && !field.autoNumber}
                   />
                 ))}
               </FormRow>

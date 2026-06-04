@@ -7,7 +7,7 @@ import {
   MdAdd, MdDelete, MdContentCopy, MdArrowUpward, MdArrowDownward,
   MdDescription, MdFolder, MdSearch, MdExpandMore, MdChevronRight,
   MdPerson, MdDirectionsCar, MdGavel, MdSave, MdLock,
-  MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar, MdCode,
+  MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar, MdCode, MdTag,
 } from 'react-icons/md';
 
 /* ── uid generators ── */
@@ -195,6 +195,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         </div>
         <div className="flex gap-0.5">
           <IconBtn icon={MdStar}        onClick={() => tog('required')}       active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
+          <IconBtn icon={MdTag}         onClick={() => onUpdate({ ...field, autoNumber: !field.autoNumber, mono: !field.autoNumber ? true : field.mono, label: !field.autoNumber ? 'Record Number' : field.label })} active={!!field.autoNumber} activeColor="#34d399" title="Auto Number — auto-fills the next sequential record/report number (0001+), titled 'Record Number'" size={12} />
           <IconBtn icon={MdCode}        onClick={() => tog('mono')}           active={!!field.mono}           activeColor="#22d3ee" title="Monospace (IDs / plates / case #)" size={12} />
           <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}       active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
           <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')} active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
