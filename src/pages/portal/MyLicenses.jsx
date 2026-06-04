@@ -6,20 +6,13 @@ import {
   MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
 } from 'react-icons/md';
 import {
-  PortalPage, PortalHeader, PortalCard, Field,
+  PortalPage, PortalHeader, PortalCard, Field, CivFormField,
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
-import ReportForm from '../../components/ReportForm';
+import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
-const DL_CLASSES = [
-  { value: 'Class E',     label: 'Class E',         desc: 'Standard license · non-commercial vehicles under 26,001 lbs (most common)' },
-  { value: 'Class A CDL', label: 'Class A CDL',     desc: 'Combination vehicles with a GCWR of 26,001+ lbs towing a unit over 10,000 lbs' },
-  { value: 'Class B CDL', label: 'Class B CDL',     desc: 'Heavy straight vehicles 26,001+ lbs, or buses designed for 24+ passengers' },
-  { value: 'Class C CDL', label: 'Class C CDL',     desc: 'Vehicles carrying hazardous materials or transporting 16–23 passengers' },
-  { value: 'Class M',     label: 'Class M',         desc: 'Motorcycle or moped only' },
-  { value: 'Class E / M', label: 'Class E + M',     desc: 'Standard license with motorcycle endorsement' },
-];
+const DL_CLASSES = CIVILIAN_FORMS_DEFAULT.driverLicense.classes;
 
 const DL_STATUSES = [
   { value: 'ACTIVE',    label: 'Active',    color: '#4ade80' },
@@ -69,13 +62,20 @@ function ConfirmModal({ onConfirm, onCancel }) {
 }
 
 /* ── DL Application / Renewal form ── */
-function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
-  const activeClasses = (dlTemplate?.dlClasses?.length > 0) ? dlTemplate.dlClasses : DL_CLASSES;
+function DLForm({ civ, isRenewal, onSubmit, onCancel, dlConfig }) {
+  const activeClasses = (dlConfig?.classes?.length > 0) ? dlConfig.classes : DL_CLASSES;
+  const activeEndorsements = dlConfig?.endorsements || [];
+  const extraFields = dlConfig?.fields || [];
   const [dlClass,          setDlClass]         = useState(civ.dlClass || activeClasses[0]?.value || 'Class E');
+  const [dlEndorsements,   setDlEndorsements]  = useState(civ.dlEndorsements || []);
   const [dlStatus,         setDlStatus]        = useState(isRenewal ? 'ACTIVE' : (civ.dlStatus || 'ACTIVE'));
   const [dlExpiry,         setDlExpiry]        = useState(isRenewal ? defaultExpiry() : (civ.dlExpiry || defaultExpiry()));
   const [templateFormData, setTemplateFormData] = useState({});
   const [confirming,       setConfirming]      = useState(false);
+
+  const toggleEndorsement = (val) => setDlEndorsements(cur =>
+    cur.includes(val) ? cur.filter(e => e !== val) : [...cur, val]
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -84,7 +84,7 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
 
   const handleConfirm = () => {
     setConfirming(false);
-    onSubmit({ dlClass, dlStatus, dlExpiry, templateFormData });
+    onSubmit({ dlClass, dlStatus, dlExpiry, dlEndorsements, templateFormData });
   };
 
   const statusMeta = DL_STATUSES.find(s => s.value === dlStatus);
@@ -147,6 +147,30 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
             </div>
           </div>
 
+          {/* Endorsements (optional checkbox add-ons) */}
+          {activeEndorsements.length > 0 && (
+            <div className="mb-5">
+              <label className={PORTAL_LABEL}>Endorsements <span className="text-slate-600 normal-case font-medium tracking-normal">· optional add-ons</span></label>
+              <div className="flex flex-col gap-2">
+                {activeEndorsements.map(end => {
+                  const on = dlEndorsements.includes(end.value);
+                  return (
+                    <label key={end.value}
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all
+                        ${on ? 'bg-brand/10 border-brand/50' : 'bg-app-bg/40 border-border-faint hover:border-border-base'}`}>
+                      <input type="checkbox" checked={on} onChange={() => toggleEndorsement(end.value)}
+                        className="mt-0.5 accent-blue-500 shrink-0" style={{ width: 15, height: 15 }} />
+                      <div>
+                        <div className="text-[13px] font-semibold text-slate-200">{end.label}</div>
+                        {end.desc && <div className="text-[11px] text-slate-500 mt-0.5">{end.desc}</div>}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Status + Expiry row */}
           <div className="grid grid-cols-2 gap-3 mb-5">
             <div>
@@ -170,18 +194,14 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
             </div>
           </div>
 
-          {/* Custom template fields */}
-          {dlTemplate && (
-            <div className="mb-5 border-t border-border-faint pt-5">
-              <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3 flex items-center gap-2">
-                🪪 <span>{dlTemplate.name} * Additional Fields</span>
-              </div>
-              <ReportForm
-                template={dlTemplate}
-                data={templateFormData}
-                onChange={(k, v) => setTemplateFormData(p => ({ ...p, [k]: v }))}
-                onBulkChange={(obj) => setTemplateFormData(p => ({ ...p, ...obj }))}
-              />
+          {/* Admin-configured extra fields */}
+          {extraFields.length > 0 && (
+            <div className="mb-5 border-t border-border-faint pt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {extraFields.map(f => (
+                <CivFormField key={f.key} field={f}
+                  value={templateFormData[f.key]}
+                  onChange={v => setTemplateFormData(p => ({ ...p, [f.key]: v }))} />
+              ))}
             </div>
           )}
 
@@ -259,6 +279,21 @@ function DLCard({ civ, onRenew }) {
         <Field label="Expires" value={civ.dlExpiry || '—'} />
       </div>
 
+      {/* Endorsements */}
+      {(civ.dlEndorsements?.length > 0) && (
+        <div className="mb-4">
+          <div className="text-[10px] font-bold tracking-[0.6px] uppercase text-cad-muted mb-1.5">Endorsements</div>
+          <div className="flex flex-wrap gap-1.5">
+            {civ.dlEndorsements.map(e => (
+              <span key={e} className="text-[11px] font-semibold px-2 py-0.5 rounded-full border"
+                style={{ color: '#4ade80', background: 'rgba(74,222,128,0.12)', borderColor: 'rgba(74,222,128,0.3)' }}>
+                {e}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Expiry warning */}
       {nearExpiry && (
         <div className="flex items-center gap-2 p-2.5 rounded-lg mb-3 text-[11px]"
@@ -309,35 +344,34 @@ export default function MyLicenses() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar } = useActiveCivilian();
-  const dlTemplate = useMemo(() => (state.recordTemplates || []).find(t => t.dlTemplate) || null, [state.recordTemplates]);
+  const dlConfig = state.civilianForms?.driverLicense || CIVILIAN_FORMS_DEFAULT.driverLicense;
 
   // Per-character UI state: null | 'applying' | 'renewing'
   const [formMode, setFormMode] = useState({});
 
-  const storeDLRecord = (civilianId, templateFormData) => {
-    if (!dlTemplate) return;
+  const storeDLRecord = (civilianId, dlClass, dlEndorsements, templateFormData) => {
     dispatch({
       type: 'ADD_RECORD',
       payload: {
-        type: dlTemplate.name,
+        type: 'Driver License',
         civilianId,
         isDL: true,
         status: 'Approved',
-        formData: templateFormData || {},
+        formData: { class: dlClass, endorsements: (dlEndorsements || []).join(', '), ...(templateFormData || {}) },
       },
     });
   };
 
-  const handleIssue = (civilianId, { dlClass, dlStatus, dlExpiry, templateFormData }) => {
-    dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
-    storeDLRecord(civilianId, templateFormData);
+  const handleIssue = (civilianId, { dlClass, dlStatus, dlExpiry, dlEndorsements, templateFormData }) => {
+    dispatch({ type: 'ISSUE_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry, dlEndorsements } });
+    storeDLRecord(civilianId, dlClass, dlEndorsements, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
     toast.success(`${dlClass} license issued.`, { title: 'License Issued' });
   };
 
-  const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry, templateFormData }) => {
-    dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry } });
-    storeDLRecord(civilianId, templateFormData);
+  const handleRenew = (civilianId, { dlClass, dlStatus, dlExpiry, dlEndorsements, templateFormData }) => {
+    dispatch({ type: 'RENEW_DRIVER_LICENSE', payload: { civilianId, dlClass, dlStatus, dlExpiry, dlEndorsements } });
+    storeDLRecord(civilianId, dlClass, dlEndorsements, templateFormData);
     setFormMode(p => ({ ...p, [civilianId]: null }));
     toast.success(`License renewed · valid through ${dlExpiry}.`, { title: 'License Renewed' });
   };
@@ -417,7 +451,7 @@ export default function MyLicenses() {
                         isRenewal={false}
                         onSubmit={(payload) => handleIssue(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
-                        dlTemplate={dlTemplate}
+                        dlConfig={dlConfig}
                       />
                     ) : mode === 'renewing' ? (
                       <DLForm
@@ -425,7 +459,7 @@ export default function MyLicenses() {
                         isRenewal={true}
                         onSubmit={(payload) => handleRenew(c.id, payload)}
                         onCancel={() => setFormMode(p => ({ ...p, [c.id]: null }))}
-                        dlTemplate={dlTemplate}
+                        dlConfig={dlConfig}
                       />
                     ) : hasDL ? (
                       <DLCard

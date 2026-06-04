@@ -6,6 +6,7 @@ import {
   BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS, FDOT_PERMITS
 } from '../data/mockData';
 import { DEFAULT_HELP_CONTENT } from '../data/helpDefaults';
+import { CIVILIAN_FORMS_DEFAULT } from '../data/civilianFormsDefaults';
 import {
   TEN_CODES, UNIT_STATUS_CODES,
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
@@ -81,6 +82,8 @@ const initialState = {
   records: [],
   reportTemplates: REPORT_TEMPLATES,
   recordTemplates: RECORD_TEMPLATES,
+  // Admin-configurable civilian-facing form schemas (DL, vehicle reg, character, medical)
+  civilianForms: CIVILIAN_FORMS_DEFAULT,
   bannedUsers: BANNED_USERS,
   auditLog: AUDIT_LOG,
   messages: MESSAGES,
@@ -487,7 +490,7 @@ function reducer(state, action) {
       return { ...state, civilians };
     }
     case 'ISSUE_DRIVER_LICENSE': {
-      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry } = action.payload;
+      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry, dlEndorsements = [] } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
       // Block if they already have a DL that's suspended or revoked
       if (!civ || (civ.dlNumber && (civ.dlStatus === 'SUSPENDED' || civ.dlStatus === 'REVOKED'))) return state;
@@ -503,6 +506,7 @@ function reducer(state, action) {
         dlNumber,
         dlClass,
         dlStatus,
+        dlEndorsements,
         dlIssuedAt: today,
         dlExpiry: dlExpiry || (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })(),
         licensePoints: 0,
@@ -510,7 +514,7 @@ function reducer(state, action) {
       return { ...state, civilians };
     }
     case 'RENEW_DRIVER_LICENSE': {
-      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry } = action.payload;
+      const { civilianId, dlClass, dlStatus = 'ACTIVE', dlExpiry, dlEndorsements = [] } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
       if (!civ || civ.dlStatus === 'SUSPENDED' || civ.dlStatus === 'REVOKED') return state;
       const today = new Date().toISOString().split('T')[0];
@@ -518,11 +522,17 @@ function reducer(state, action) {
         ...c,
         dlClass,
         dlStatus,
+        dlEndorsements,
         dlIssuedAt: today,
         dlExpiry: dlExpiry || (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })(),
         licensePoints: 0,
       } : c);
       return { ...state, civilians };
+    }
+    case 'UPDATE_CIVILIAN_FORMS': {
+      // payload: { form: 'driverLicense'|'vehicleRegistration'|'character'|'medical', config }
+      const { form, config } = action.payload;
+      return { ...state, civilianForms: { ...state.civilianForms, [form]: config } };
     }
     case 'DELETE_CIVILIAN': {
       const civilians = state.civilians.filter(c => c.id !== action.payload);

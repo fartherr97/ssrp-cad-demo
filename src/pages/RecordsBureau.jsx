@@ -836,6 +836,7 @@ export default function RecordsBureau() {
                         <Row label="Occupation"     value={selCiv.occupation || 'Unknown'} />
                         <Row label="Employer"       value={selCiv.employer || 'N/A'} />
                         <Row label="DL Class"       value={selCiv.dlClass} />
+                        <Row label="Endorsements"   value={(selCiv.dlEndorsements?.length > 0) ? selCiv.dlEndorsements.join(', ') : 'None'} />
                         <Row label="Weapon Permit"  value={selCiv.weaponPermit ? <span className={statusBadge(selCiv.weaponPermit)}>{selCiv.weaponPermit}</span> : 'None'} />
                         {selCiv.flags?.length > 0 && (
                           <div className="mt-1">

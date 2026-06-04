@@ -124,3 +124,45 @@ export function Field({ label, value, mono }) {
 export const PORTAL_INPUT = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-cad-text placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
 
 export const PORTAL_LABEL = 'block text-[11px] font-bold tracking-[0.5px] uppercase text-cad-muted mb-1.5';
+
+/* Renders a single admin-configured form field (text/textarea/number/date/select/checkbox).
+   Used by the civilian Licenses, Vehicles, Characters, and Medical pages so all four stay
+   in sync with whatever the admin defines in Admin ▸ Civilian Forms. */
+export function CivFormField({ field, value, onChange }) {
+  const { label, type, options = [], required } = field;
+  const labelEl = (
+    <label className={PORTAL_LABEL}>
+      {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+    </label>
+  );
+
+  if (type === 'checkbox') {
+    return (
+      <label className="flex items-center gap-2.5 cursor-pointer select-none py-1">
+        <input type="checkbox" checked={!!value} onChange={e => onChange(e.target.checked)}
+          className="accent-blue-500 cursor-pointer" style={{ width: 16, height: 16 }} />
+        <span className="text-[13px] text-slate-200">{label}</span>
+      </label>
+    );
+  }
+
+  return (
+    <div>
+      {labelEl}
+      {type === 'select' ? (
+        <select className={PORTAL_INPUT} value={value || ''} onChange={e => onChange(e.target.value)} required={required}>
+          <option value="">Select…</option>
+          {options.map(o => <option key={o} value={o}>{o}</option>)}
+        </select>
+      ) : type === 'textarea' ? (
+        <textarea className={`${PORTAL_INPUT} min-h-[80px] resize-y`} value={value || ''} onChange={e => onChange(e.target.value)} required={required} />
+      ) : type === 'date' ? (
+        <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
+          <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={value || ''} onChange={e => onChange(e.target.value)} required={required} style={{ colorScheme: 'dark' }} />
+        </div>
+      ) : (
+        <input className={PORTAL_INPUT} type={type === 'number' ? 'number' : 'text'} value={value || ''} onChange={e => onChange(e.target.value)} required={required} />
+      )}
+    </div>
+  );
+}

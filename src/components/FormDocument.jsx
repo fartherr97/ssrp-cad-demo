@@ -826,6 +826,7 @@ export function RecordReturn({ type, subject, data }) {
           </div>
           {line('DL Number', data.dlNumber)}
           {line('DL Class', data.dlClass)}
+          {line('Endorsements', (data.dlEndorsements?.length > 0) ? data.dlEndorsements.join(', ') : (data.dlNumber ? 'None' : ''))}
           {line('DL Status', data.dlStatus)}
           {line('DL Expiry', data.dlExpiry)}
           {line('Weapon Permit', data.weaponPermit)}
