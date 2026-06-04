@@ -464,6 +464,261 @@ export const REPORT_TEMPLATES = [
       ]},
     ],
   },
+
+  /* ── 6. Patient Care Report (PCR) — HCFR EMS ── */
+  {
+    id: 6, name: 'Patient Care Report',
+    agency: 'HILLSBOROUGH COUNTY FIRE RESCUE',
+    formCode: 'HCFR-PCR-001',
+    signatureSlots: ['Crew Member 1', 'Crew Member 2', 'Supervisor Authorization'],
+    sections: [
+      /* Run Header */
+      { id: 'sRun', title: 'Run / Incident Information', style: 'blue', fields: [
+        { id: 'run_inc',     label: 'Incident #',            type: 'text',     span: 2, mono: true, required: true, autoNumber: true },
+        { id: 'run_date',    label: 'Incident Date',         type: 'date',     span: 1, required: true, autoFill: 'date' },
+        { id: 'run_calltype',label: 'Call Type / Nature',    type: 'text',     span: 1, required: true },
+        { id: 'run_dispatch',label: 'Dispatch Time',         type: 'time',     span: 1 },
+        { id: 'run_enroute', label: 'En-Route Time',         type: 'time',     span: 1 },
+        { id: 'run_onscene', label: 'On-Scene Time',         type: 'time',     span: 1 },
+        { id: 'run_atpt',    label: 'At-Patient Time',       type: 'time',     span: 1 },
+        { id: 'run_transport',label: 'Transport Time',       type: 'time',     span: 1 },
+        { id: 'run_atdest',  label: 'At-Destination Time',   type: 'time',     span: 1 },
+        { id: 'run_avail',   label: 'Unit Available Time',   type: 'time',     span: 1 },
+        { id: 'run_total',   label: 'Total Call Time (min)', type: 'number',   span: 1 },
+      ]},
+
+      /* Unit & Crew */
+      { id: 'sCrew', title: 'Unit & Crew Information', style: 'gray', fields: [
+        { id: 'cr_unit',    label: 'Unit #',                 type: 'text',     span: 1, autoFill: 'unitNumber', readOnly: true },
+        { id: 'cr_station', label: 'Station',                type: 'text',     span: 1 },
+        { id: 'cr_role',    label: 'Response Role',          type: 'dropdown', span: 2, required: true, options: ['ALS — Primary','ALS — Assist','BLS — Primary','BLS — Assist','First Responder'] },
+        { id: 'cr_1name',   label: 'Crew Member 1 — Name',   type: 'text',     span: 2, required: true, autoFill: 'unitName', readOnly: true },
+        { id: 'cr_1cert',   label: 'Cert. Level',            type: 'dropdown', span: 1, required: true, options: ['EMR','EMT','AEMT','Paramedic'] },
+        { id: 'cr_1sig',    label: 'Crew 1 Signature',       type: 'signature',span: 1, required: true },
+        { id: 'cr_2name',   label: 'Crew Member 2 — Name',   type: 'text',     span: 2 },
+        { id: 'cr_2cert',   label: 'Cert. Level',            type: 'dropdown', span: 1, options: ['EMR','EMT','AEMT','Paramedic'] },
+        { id: 'cr_2sig',    label: 'Crew 2 Signature',       type: 'signature',span: 1 },
+      ]},
+
+      /* Patient Demographics */
+      _civ({ id: 'sPatient', title: 'Patient Demographics', p: 'pt', reqName: true, pre: [
+        { id: 'pt_ssn',    label: 'SSN (Last 4)',    type: 'text',     span: 1, mono: true },
+        { id: 'pt_ins',    label: 'Insurance Carrier', type: 'text',  span: 2 },
+        { id: 'pt_insid',  label: 'Insurance ID #',  type: 'text',     span: 1, mono: true },
+      ]}),
+
+      /* Scene Assessment */
+      { id: 'sScene', title: 'Scene / Incident Assessment', style: 'gray', fields: [
+        { id: 'sc_loc',     label: 'Incident Location',         type: 'text',     span: 4, required: true },
+        { id: 'sc_type',    label: 'Scene Type',                type: 'dropdown', span: 2, options: ['Residence','Street / Highway','Public Building','Workplace','School','Other'] },
+        { id: 'sc_pts',     label: '# of Patients',             type: 'number',   span: 1 },
+        { id: 'sc_mci',     label: 'MCI Activated',             type: 'dropdown', span: 1, options: ['No','Yes — Level 1','Yes — Level 2','Yes — Level 3'] },
+        { id: 'sc_found',   label: 'Patient Found Position',    type: 'dropdown', span: 2, options: ['Standing','Sitting','Lying — Supine','Lying — Prone','Lying — Left Lateral','Lying — Right Lateral','Fowlers','Semi-Fowlers','Other'] },
+        { id: 'sc_moi',     label: 'Mechanism / Nature of Illness', type: 'dropdown', span: 2, options: ['Medical Illness','Traumatic Injury — Blunt','Traumatic Injury — Penetrating','Burns','Allergic/Anaphylaxis','OB/Gynecological','Behavioral/Psychiatric','Toxic Ingestion / OD','Other'] },
+        { id: 'sc_hazmat',  label: 'HazMat Exposure',           type: 'dropdown', span: 2, options: ['No','Yes'] },
+        { id: 'sc_bystCPR', label: 'Bystander CPR Prior to EMS', type: 'dropdown', span: 2, options: ['N/A','Yes — Hands Only','Yes — Full CPR','No'] },
+      ]},
+
+      /* Chief Complaint & SAMPLE */
+      { id: 'sSAMPLE', title: 'Chief Complaint & SAMPLE History', style: 'gray', fields: [
+        { id: 'sam_cc',     label: 'Chief Complaint (in patient\'s words)', type: 'textarea', span: 4, required: true, minRows: 2 },
+        { id: 'sam_onset',  label: 'Onset / Duration',           type: 'text',     span: 2 },
+        { id: 'sam_provoke',label: 'Provocation / Palliation',   type: 'text',     span: 2 },
+        { id: 'sam_quality',label: 'Quality',                    type: 'text',     span: 2 },
+        { id: 'sam_radiate',label: 'Radiation',                  type: 'text',     span: 2 },
+        { id: 'sam_severity',label: 'Severity (Pain Scale 0–10)',type: 'number',   span: 2 },
+        { id: 'sam_time',   label: 'Time of Symptom Onset',      type: 'time',     span: 2 },
+        { id: 'sam_sx',     label: 'Signs & Symptoms',           type: 'textarea', span: 4, minRows: 2 },
+        { id: 'sam_allergy',label: 'Allergies (NKDA if none)',   type: 'text',     span: 4, required: true },
+        { id: 'sam_meds',   label: 'Current Medications',        type: 'textarea', span: 4, minRows: 2 },
+        { id: 'sam_pmhx',   label: 'Pertinent Past Medical History', type: 'textarea', span: 4, minRows: 2 },
+        { id: 'sam_loi',    label: 'Last Oral Intake (food/drink + time)', type: 'text', span: 2 },
+        { id: 'sam_events', label: 'Events Leading to This Call', type: 'textarea', span: 4, minRows: 2 },
+      ]},
+
+      /* Vital Signs — Set 1 */
+      { id: 'sVit1', title: 'Vital Signs — Set 1', style: 'gray', fields: [
+        { id: 'v1_time',   label: 'Time',               type: 'time',     span: 1, required: true },
+        { id: 'v1_bpS',    label: 'BP Systolic',        type: 'number',   span: 1 },
+        { id: 'v1_bpD',    label: 'BP Diastolic',       type: 'number',   span: 1 },
+        { id: 'v1_bp_pos', label: 'BP Position',        type: 'dropdown', span: 1, options: ['Sitting','Supine','Standing'] },
+        { id: 'v1_hr',     label: 'Pulse Rate (bpm)',   type: 'number',   span: 1 },
+        { id: 'v1_hrq',    label: 'Pulse Quality',      type: 'dropdown', span: 1, options: ['Regular','Irregular','Strong','Weak','Thready','Bounding'] },
+        { id: 'v1_rr',     label: 'Resp. Rate (rpm)',   type: 'number',   span: 1 },
+        { id: 'v1_rrq',    label: 'Resp. Quality',      type: 'dropdown', span: 1, options: ['Regular','Irregular','Labored','Shallow','Deep','Agonal'] },
+        { id: 'v1_spo2',   label: 'SpO₂ %',             type: 'number',   span: 1 },
+        { id: 'v1_o2',     label: 'O₂ Delivery',        type: 'dropdown', span: 1, options: ['RA (Room Air)','Nasal Cannula','Non-Rebreather','BVM','Ventilator','CPAP','None'] },
+        { id: 'v1_etco2',  label: 'EtCO₂ (mmHg)',       type: 'number',   span: 1 },
+        { id: 'v1_bg',     label: 'Blood Glucose (mg/dL)', type: 'number', span: 1 },
+        { id: 'v1_gcsE',   label: 'GCS — Eyes',         type: 'dropdown', span: 1, options: ['4 — Spontaneous','3 — To Voice','2 — To Pain','1 — None'] },
+        { id: 'v1_gcsV',   label: 'GCS — Verbal',       type: 'dropdown', span: 1, options: ['5 — Oriented','4 — Confused','3 — Inappropriate','2 — Incomprehensible','1 — None'] },
+        { id: 'v1_gcsM',   label: 'GCS — Motor',        type: 'dropdown', span: 1, options: ['6 — Obeys Commands','5 — Localizes Pain','4 — Withdraws','3 — Abnormal Flexion','2 — Extension','1 — None'] },
+        { id: 'v1_gcs',    label: 'GCS Total',          type: 'number',   span: 1 },
+        { id: 'v1_skin_c', label: 'Skin Color',         type: 'dropdown', span: 1, options: ['Normal','Pale','Flushed','Cyanotic','Jaundiced','Mottled'] },
+        { id: 'v1_skin_t', label: 'Skin Temperature',   type: 'dropdown', span: 1, options: ['Normal','Warm','Hot','Cool','Cold','Diaphoretic'] },
+        { id: 'v1_skin_m', label: 'Skin Moisture',      type: 'dropdown', span: 1, options: ['Dry','Moist','Diaphoretic','Clammy'] },
+        { id: 'v1_pupils', label: 'Pupils',             type: 'dropdown', span: 1, options: ['PERRL','Dilated','Constricted','Unequal','Sluggish','Non-Reactive'] },
+        { id: 'v1_temp',   label: 'Temp (°F)',          type: 'number',   span: 1 },
+        { id: 'v1_pain',   label: 'Pain Score (0–10)',  type: 'number',   span: 1 },
+        { id: 'v1_loa',    label: 'Level of Alertness', type: 'dropdown', span: 2, options: ['Alert & Oriented ×4','Alert & Oriented ×3','Alert & Oriented ×2','Alert & Oriented ×1','Confused','Unresponsive'] },
+      ]},
+
+      /* Vital Signs — Set 2 */
+      { id: 'sVit2', title: 'Vital Signs — Set 2 (if applicable)', style: 'gray', fields: [
+        { id: 'v2_time',   label: 'Time',               type: 'time',     span: 1 },
+        { id: 'v2_bpS',    label: 'BP Systolic',        type: 'number',   span: 1 },
+        { id: 'v2_bpD',    label: 'BP Diastolic',       type: 'number',   span: 1 },
+        { id: 'v2_hr',     label: 'Pulse Rate (bpm)',   type: 'number',   span: 1 },
+        { id: 'v2_hrq',    label: 'Pulse Quality',      type: 'dropdown', span: 1, options: ['Regular','Irregular','Strong','Weak','Thready','Bounding'] },
+        { id: 'v2_rr',     label: 'Resp. Rate (rpm)',   type: 'number',   span: 1 },
+        { id: 'v2_spo2',   label: 'SpO₂ %',             type: 'number',   span: 1 },
+        { id: 'v2_o2',     label: 'O₂ Delivery',        type: 'dropdown', span: 1, options: ['RA (Room Air)','Nasal Cannula','Non-Rebreather','BVM','Ventilator','CPAP','None'] },
+        { id: 'v2_etco2',  label: 'EtCO₂ (mmHg)',       type: 'number',   span: 1 },
+        { id: 'v2_bg',     label: 'Blood Glucose (mg/dL)', type: 'number', span: 1 },
+        { id: 'v2_gcs',    label: 'GCS Total',          type: 'number',   span: 1 },
+        { id: 'v2_loa',    label: 'Level of Alertness', type: 'dropdown', span: 1, options: ['Alert & Oriented ×4','Alert & Oriented ×3','Alert & Oriented ×2','Alert & Oriented ×1','Confused','Unresponsive'] },
+        { id: 'v2_pain',   label: 'Pain Score (0–10)',  type: 'number',   span: 1 },
+        { id: 'v2_skin',   label: 'Skin CTC',           type: 'text',     span: 3 },
+      ]},
+
+      /* Vital Signs — Set 3 */
+      { id: 'sVit3', title: 'Vital Signs — Set 3 (if applicable)', style: 'gray', fields: [
+        { id: 'v3_time',   label: 'Time',               type: 'time',     span: 1 },
+        { id: 'v3_bpS',    label: 'BP Systolic',        type: 'number',   span: 1 },
+        { id: 'v3_bpD',    label: 'BP Diastolic',       type: 'number',   span: 1 },
+        { id: 'v3_hr',     label: 'Pulse Rate (bpm)',   type: 'number',   span: 1 },
+        { id: 'v3_hrq',    label: 'Pulse Quality',      type: 'dropdown', span: 1, options: ['Regular','Irregular','Strong','Weak','Thready','Bounding'] },
+        { id: 'v3_rr',     label: 'Resp. Rate (rpm)',   type: 'number',   span: 1 },
+        { id: 'v3_spo2',   label: 'SpO₂ %',             type: 'number',   span: 1 },
+        { id: 'v3_o2',     label: 'O₂ Delivery',        type: 'dropdown', span: 1, options: ['RA (Room Air)','Nasal Cannula','Non-Rebreather','BVM','Ventilator','CPAP','None'] },
+        { id: 'v3_etco2',  label: 'EtCO₂ (mmHg)',       type: 'number',   span: 1 },
+        { id: 'v3_bg',     label: 'Blood Glucose (mg/dL)', type: 'number', span: 1 },
+        { id: 'v3_gcs',    label: 'GCS Total',          type: 'number',   span: 1 },
+        { id: 'v3_loa',    label: 'Level of Alertness', type: 'dropdown', span: 1, options: ['Alert & Oriented ×4','Alert & Oriented ×3','Alert & Oriented ×2','Alert & Oriented ×1','Confused','Unresponsive'] },
+        { id: 'v3_pain',   label: 'Pain Score (0–10)',  type: 'number',   span: 1 },
+        { id: 'v3_skin',   label: 'Skin CTC',           type: 'text',     span: 3 },
+      ]},
+
+      /* Physical Assessment */
+      { id: 'sPhys', title: 'Physical Assessment (Head-to-Toe)', style: 'gray', fields: [
+        { id: 'ph_head',   label: 'Head / Scalp / Face',       type: 'text',     span: 4 },
+        { id: 'ph_neck',   label: 'Neck / Trachea / JVD',      type: 'text',     span: 4 },
+        { id: 'ph_chest',  label: 'Chest / Breath Sounds',     type: 'text',     span: 4 },
+        { id: 'ph_abd',    label: 'Abdomen',                   type: 'text',     span: 4 },
+        { id: 'ph_pelvis', label: 'Pelvis / Genitalia',        type: 'text',     span: 4 },
+        { id: 'ph_back',   label: 'Back / Spine',              type: 'text',     span: 4 },
+        { id: 'ph_ue',     label: 'Upper Extremities',         type: 'text',     span: 4 },
+        { id: 'ph_le',     label: 'Lower Extremities',         type: 'text',     span: 4 },
+        { id: 'ph_neuro',  label: 'Neurological / Sensation',  type: 'text',     span: 4 },
+        { id: 'ph_notes',  label: 'Additional Assessment Notes', type: 'textarea', span: 4, minRows: 2 },
+      ]},
+
+      /* Airway Management */
+      { id: 'sAirway', title: 'Airway Management', style: 'gray', fields: [
+        { id: 'aw_patent',  label: 'Airway Status',            type: 'dropdown', span: 2, options: ['Patent — Self-Maintained','Patent — With Adjunct','Partially Obstructed','Obstructed — Managed'] },
+        { id: 'aw_adjunct', label: 'Airway Adjunct',           type: 'dropdown', span: 2, options: ['None','OPA','NPA','Supraglottic (i-gel / King)','Endotracheal Tube','Surgical Airway'] },
+        { id: 'aw_size',    label: 'Adjunct Size',             type: 'text',     span: 1 },
+        { id: 'aw_confirm', label: 'Placement Confirmed By',   type: 'dropdown', span: 2, options: ['N/A','EtCO₂','Chest Rise','Bilateral Breath Sounds','Colorimetric CO₂','Chest X-Ray'] },
+        { id: 'aw_sxn',     label: 'Suctioning Performed',     type: 'dropdown', span: 1, options: ['No','Yes — Oral','Yes — Endotracheal'] },
+        { id: 'aw_vent',    label: 'Ventilation Assistance',   type: 'dropdown', span: 2, options: ['None','Supplemental O₂ Only','BVM Assisted','Mechanical Ventilator','CPAP/BiPAP'] },
+        { id: 'aw_rate',    label: 'Ventilation Rate (rpm)',   type: 'number',   span: 1 },
+        { id: 'aw_tidal',   label: 'Tidal Volume (mL)',        type: 'number',   span: 1 },
+      ]},
+
+      /* Vascular Access */
+      { id: 'sIV', title: 'Vascular Access', style: 'gray', fields: [
+        { id: 'iv1_site',  label: 'IV Site #1',                type: 'dropdown', span: 2, options: ['None','Left AC','Right AC','Left Hand','Right Hand','Left FA','Right FA','Left EJ','Right EJ','IO — Left Tibia','IO — Right Tibia','IO — Humeral Head','Central Line — Other'] },
+        { id: 'iv1_ga',    label: 'Gauge',                     type: 'dropdown', span: 1, options: ['14g','16g','18g','20g','22g','24g','IO'] },
+        { id: 'iv1_att',   label: 'Attempts',                  type: 'number',   span: 1 },
+        { id: 'iv1_fluid', label: 'Fluid Type',                type: 'dropdown', span: 2, options: ['None','Normal Saline (0.9%)','Lactated Ringers','D5W','D50W','Blood Products','Saline Lock'] },
+        { id: 'iv1_vol',   label: 'Volume Infused (mL)',       type: 'number',   span: 1 },
+        { id: 'iv1_rate',  label: 'Drip Rate (mL/hr)',         type: 'number',   span: 1 },
+        { id: 'iv2_site',  label: 'IV Site #2',                type: 'dropdown', span: 2, options: ['None','Left AC','Right AC','Left Hand','Right Hand','Left FA','Right FA','Left EJ','Right EJ','IO — Left Tibia','IO — Right Tibia','IO — Humeral Head','Central Line — Other'] },
+        { id: 'iv2_ga',    label: 'Gauge',                     type: 'dropdown', span: 1, options: ['14g','16g','18g','20g','22g','24g','IO'] },
+        { id: 'iv2_fluid', label: 'Fluid Type',                type: 'dropdown', span: 2, options: ['None','Normal Saline (0.9%)','Lactated Ringers','D5W','D50W','Blood Products','Saline Lock'] },
+        { id: 'iv2_vol',   label: 'Volume Infused (mL)',       type: 'number',   span: 1 },
+        { id: 'iv2_att',   label: 'Attempts',                  type: 'number',   span: 1 },
+      ]},
+
+      /* Medications */
+      { id: 'sMeds', title: 'Medications Administered', style: 'gray', fields: [
+        { id: 'med1_name', label: 'Medication #1',             type: 'dropdown', span: 2, options: ['None','Adenosine','Albuterol','Amiodarone','Aspirin','Atropine','Calcium Chloride','Dextrose 50%','Diphenhydramine (Benadryl)','Dopamine','Epinephrine 1:1000','Epinephrine 1:10,000','Fentanyl','Glucagon','Ipratropium (Atrovent)','Ketamine','Lidocaine','Magnesium Sulfate','Methylprednisolone (Solu-Medrol)','Midazolam (Versed)','Morphine Sulfate','Naloxone (Narcan)','Nitroglycerin','Ondansetron (Zofran)','Oxygen','Sodium Bicarbonate','Thiamine','Other'] },
+        { id: 'med1_dose', label: 'Dose',                      type: 'text',     span: 1 },
+        { id: 'med1_route',label: 'Route',                     type: 'dropdown', span: 1, options: ['IV','IO','IM','SQ','SL','PO','IN','ETT','Topical','Inhalation','Other'] },
+        { id: 'med1_time', label: 'Time Given',                type: 'time',     span: 1 },
+        { id: 'med1_fx',   label: 'Effect / Response',         type: 'dropdown', span: 3, options: ['N/A','Improved','No Change','Worsened','Adverse Reaction'] },
+        { id: 'med2_name', label: 'Medication #2',             type: 'dropdown', span: 2, options: ['None','Adenosine','Albuterol','Amiodarone','Aspirin','Atropine','Calcium Chloride','Dextrose 50%','Diphenhydramine (Benadryl)','Dopamine','Epinephrine 1:1000','Epinephrine 1:10,000','Fentanyl','Glucagon','Ipratropium (Atrovent)','Ketamine','Lidocaine','Magnesium Sulfate','Methylprednisolone (Solu-Medrol)','Midazolam (Versed)','Morphine Sulfate','Naloxone (Narcan)','Nitroglycerin','Ondansetron (Zofran)','Oxygen','Sodium Bicarbonate','Thiamine','Other'] },
+        { id: 'med2_dose', label: 'Dose',                      type: 'text',     span: 1 },
+        { id: 'med2_route',label: 'Route',                     type: 'dropdown', span: 1, options: ['IV','IO','IM','SQ','SL','PO','IN','ETT','Topical','Inhalation','Other'] },
+        { id: 'med2_time', label: 'Time Given',                type: 'time',     span: 1 },
+        { id: 'med2_fx',   label: 'Effect / Response',         type: 'dropdown', span: 3, options: ['N/A','Improved','No Change','Worsened','Adverse Reaction'] },
+        { id: 'med3_name', label: 'Medication #3',             type: 'dropdown', span: 2, options: ['None','Adenosine','Albuterol','Amiodarone','Aspirin','Atropine','Calcium Chloride','Dextrose 50%','Diphenhydramine (Benadryl)','Dopamine','Epinephrine 1:1000','Epinephrine 1:10,000','Fentanyl','Glucagon','Ipratropium (Atrovent)','Ketamine','Lidocaine','Magnesium Sulfate','Methylprednisolone (Solu-Medrol)','Midazolam (Versed)','Morphine Sulfate','Naloxone (Narcan)','Nitroglycerin','Ondansetron (Zofran)','Oxygen','Sodium Bicarbonate','Thiamine','Other'] },
+        { id: 'med3_dose', label: 'Dose',                      type: 'text',     span: 1 },
+        { id: 'med3_route',label: 'Route',                     type: 'dropdown', span: 1, options: ['IV','IO','IM','SQ','SL','PO','IN','ETT','Topical','Inhalation','Other'] },
+        { id: 'med3_time', label: 'Time Given',                type: 'time',     span: 1 },
+        { id: 'med3_fx',   label: 'Effect / Response',         type: 'dropdown', span: 3, options: ['N/A','Improved','No Change','Worsened','Adverse Reaction'] },
+        { id: 'med_notes', label: 'Medication Notes / Protocol Used', type: 'textarea', span: 4, minRows: 2 },
+      ]},
+
+      /* Cardiac Monitoring */
+      { id: 'sCardiac', title: 'Cardiac Monitoring', style: 'gray', fields: [
+        { id: 'ec_applied',  label: 'Cardiac Monitor Applied',  type: 'dropdown', span: 2, options: ['No','Yes — 4-Lead','Yes — 12-Lead'] },
+        { id: 'ec_rhythm',   label: 'Initial Rhythm',           type: 'dropdown', span: 2, options: ['Not Monitored','Normal Sinus Rhythm','Sinus Tachycardia','Sinus Bradycardia','Atrial Fibrillation','Atrial Flutter','SVT','V-Tach','V-Fib','PEA','Asystole','Heart Block — 1°','Heart Block — 2° Mobitz I','Heart Block — 2° Mobitz II','Heart Block — 3°','LBBB','RBBB','STEMI','Other'] },
+        { id: 'ec_rhythm2',  label: 'Final Rhythm',             type: 'dropdown', span: 2, options: ['Not Monitored','Normal Sinus Rhythm','Sinus Tachycardia','Sinus Bradycardia','Atrial Fibrillation','Atrial Flutter','SVT','V-Tach','V-Fib','PEA','Asystole','Heart Block — 1°','Heart Block — 2° Mobitz I','Heart Block — 2° Mobitz II','Heart Block — 3°','LBBB','RBBB','STEMI','Other'] },
+        { id: 'ec_12lead',   label: '12-Lead Interpretation',   type: 'textarea', span: 4, minRows: 2 },
+        { id: 'ec_cpr',      label: 'CPR Performed',            type: 'dropdown', span: 2, options: ['No','Yes — Manual','Yes — Mechanical (LUCAS/AutoPulse)'] },
+        { id: 'ec_defib',    label: 'Defibrillation / Cardioversion', type: 'dropdown', span: 2, options: ['No','Defibrillation — AED','Defibrillation — Manual','Synchronized Cardioversion','Pacing — External'] },
+        { id: 'ec_shocks',   label: '# of Shocks Delivered',    type: 'number',   span: 1 },
+        { id: 'ec_joules',   label: 'Energy (Joules)',          type: 'number',   span: 1 },
+        { id: 'ec_rosc',     label: 'ROSC Achieved',            type: 'dropdown', span: 2, options: ['N/A','Yes','No'] },
+      ]},
+
+      /* Immobilization */
+      { id: 'sImmob', title: 'Immobilization & Splinting', style: 'gray', fields: [
+        { id: 'im_cspine',  label: 'Cervical Spine Precautions', type: 'dropdown', span: 2, options: ['No','Cervical Collar Applied','Full Spinal Restriction'] },
+        { id: 'im_board',   label: 'Long Backboard',             type: 'dropdown', span: 2, options: ['No','Yes'] },
+        { id: 'im_ked',     label: 'KED / Short Board',          type: 'dropdown', span: 2, options: ['No','Yes'] },
+        { id: 'im_traction',label: 'Traction Splint',            type: 'dropdown', span: 2, options: ['No','Yes — Left','Yes — Right'] },
+        { id: 'im_splint',  label: 'Extremity Splint(s)',        type: 'text',     span: 4 },
+        { id: 'im_pelvic',  label: 'Pelvic Binder',             type: 'dropdown', span: 2, options: ['No','Yes'] },
+        { id: 'im_other',   label: 'Other Interventions',        type: 'textarea', span: 4, minRows: 2 },
+      ]},
+
+      /* Transport */
+      { id: 'sTransport', title: 'Transport & Transfer of Care', style: 'blue', fields: [
+        { id: 'tr_dest',    label: 'Destination Facility',       type: 'dropdown', span: 2, required: true, options: ['Tampa General Hospital','St. Joseph\'s Hospital — Main','St. Joseph\'s Hospital — North','Brandon Regional Hospital','Moffitt Cancer Center — Main','AdventHealth Wesley Chapel','St. Joseph\'s Children\'s Hospital','Suncoast Behavioral Health Center','Other'] },
+        { id: 'tr_dest_oth',label: 'Destination (if Other)',     type: 'text',     span: 2 },
+        { id: 'tr_mode',    label: 'Transport Mode',             type: 'dropdown', span: 2, required: true, options: ['ALS Ground — Lights & Siren','ALS Ground — No Lights & Siren','BLS Ground — Lights & Siren','BLS Ground — No Lights & Siren','Air Transport — Medical Helicopter','No Transport — Patient Refused','No Transport — Patient DOA','No Transport — Transferred to Other EMS'] },
+        { id: 'tr_position',label: 'Patient Transport Position', type: 'dropdown', span: 2, options: ['Supine','Fowlers','Semi-Fowlers','Trendelenburg','Left Lateral','Right Lateral','Sitting'] },
+        { id: 'tr_refusal', label: 'Refusal / AMA',              type: 'dropdown', span: 2, options: ['N/A','Informed Refusal — Signed AMA','Capacity Questioned — MD Contacted','Involuntary — Baker Act'] },
+        { id: 'tr_condition',label: 'Condition on Arrival at ED', type: 'dropdown', span: 2, options: ['Improved','Stable','Unchanged','Deteriorated','Cardiac Arrest — Ongoing','DOA — No Resuscitation'] },
+        { id: 'tr_nurse',   label: 'Receiving RN / Physician',   type: 'text',     span: 2 },
+        { id: 'tr_xfer',    label: 'Transfer of Care Time',      type: 'time',     span: 1 },
+        { id: 'tr_verbal',  label: 'Verbal Report Given',        type: 'dropdown', span: 1, options: ['Yes','No'] },
+        { id: 'tr_notes',   label: 'Transport Notes',            type: 'textarea', span: 4, minRows: 2 },
+      ]},
+
+      /* Narrative */
+      { id: 'sNarrative', title: 'Narrative', style: 'gray', fields: [
+        { id: 'narrative',  label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 8 },
+      ]},
+
+      /* Linked Records */
+      { id: 'sLinked', title: 'Linked Records', style: 'gray', fields: [
+        { id: 'linked', label: 'Linked Records', type: 'linked_records', span: 4 },
+      ]},
+
+      /* Authorization */
+      { id: 'sAuth', title: 'Report Authorization', style: 'gray', fields: [
+        { id: 'au_status',  label: 'Report Status',              type: 'dropdown', span: 2, required: true, options: ['Draft','Pending Medical Director Review','Approved','Returned for Correction'] },
+        { id: 'au_meddir',  label: 'Medical Director Authorization', type: 'text', span: 2 },
+        { id: 'au_c1sig',   label: 'Crew 1 — Certification Signature', type: 'signature', span: 2, required: true },
+        { id: 'au_c2sig',   label: 'Crew 2 — Certification Signature', type: 'signature', span: 2 },
+        { id: 'au_date',    label: 'Date Completed',             type: 'date',     span: 2, required: true },
+        { id: 'au_notes',   label: 'Supervisor Notes',           type: 'textarea', span: 4, minRows: 2 },
+      ]},
+    ],
+  },
 ];
 
 export const BANNED_USERS = [

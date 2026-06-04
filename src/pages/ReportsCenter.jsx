@@ -8,7 +8,7 @@ import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
   MdArrowBack, MdDownload, MdDeleteOutline, MdSend,
-  MdInventory2, MdPhone, MdShield, MdCarCrash,
+  MdInventory2, MdPhone, MdShield, MdCarCrash, MdLocalHospital,
 } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
 import {
@@ -17,13 +17,14 @@ import {
 } from '../constants/styles';
 
 const TEMPLATE_ICONS = {
-  'Traffic Stop':      MdDirectionsCar,
-  'Use of Force':      MdGavel,
-  'Arrest Report':     MdPerson,
-  'Incident Report':   MdReport,
-  'Field Interview':   MdRecordVoiceOver,
-  'Supplement Report': MdNote,
-  'Accident Report':   MdCarCrash,
+  'Traffic Stop':       MdDirectionsCar,
+  'Use of Force':       MdGavel,
+  'Arrest Report':      MdPerson,
+  'Incident Report':    MdReport,
+  'Field Interview':    MdRecordVoiceOver,
+  'Supplement Report':  MdNote,
+  'Accident Report':    MdCarCrash,
+  'Patient Care Report': MdLocalHospital,
 };
 
 const BUILTIN_NAMES = Object.keys(TEMPLATE_ICONS);
