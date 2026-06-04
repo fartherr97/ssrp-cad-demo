@@ -7,7 +7,7 @@ import {
   MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
   MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
   MdHome, MdLogout, MdRemoveModerator,
-  MdMenu, MdClose, MdFlag,
+  MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
@@ -42,6 +42,7 @@ const GROUPS = [
     Icon: MdDns,
     items: [
       { icon: MdHistory,         label: 'Logs',            route: '/admin/logs' },
+      { icon: MdMessage,         label: 'Message Logs',    route: '/admin/message-logs' },
       { icon: MdVideogameAsset,  label: 'In-Game',         route: '/admin/in-game' },
       { icon: MdChat,            label: 'Discord',         route: '/admin/discord' },
       { icon: MdHourglassBottom, label: 'Limits',          route: '/admin/limits' },

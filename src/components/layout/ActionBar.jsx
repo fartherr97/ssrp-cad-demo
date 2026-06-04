@@ -10,7 +10,7 @@ import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
-  MdMenu, MdClose, MdCircle,
+  MdMenu, MdClose, MdCircle, MdInbox,
 } from 'react-icons/md';
 
 // Icons matched to standard status codes; custom admin codes fall back to a dot.
@@ -258,6 +258,10 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
           <button onClick={() => { navigate('/profile'); setOpen(false); }}
             className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06] ${isActive('/profile') ? 'text-brand-bright' : 'text-slate-300 hover:text-white'}`}>
             <MdPerson size={16} /> My Profile
+          </button>
+          <button onClick={() => { navigate('/messages'); setOpen(false); }}
+            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06] ${isActive('/messages') ? 'text-brand-bright' : 'text-slate-300 hover:text-white'}`}>
+            <MdInbox size={16} /> Messages
           </button>
           <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setOpen(false); }}
             className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-slate-300 hover:text-white cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06]">

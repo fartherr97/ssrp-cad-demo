@@ -36,6 +36,9 @@ const initialState = {
   bannedUsers: BANNED_USERS,
   auditLog: AUDIT_LOG,
   messages: MESSAGES,
+  directMessages: [],
+  messageLog: [],
+  lastBlast: null,
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
   towJobs: [],
@@ -846,6 +849,38 @@ function reducer(state, action) {
     case 'MARK_MESSAGE_READ': {
       const messages = state.messages.map(m => m.id === action.payload ? { ...m, read: true } : m);
       return { ...state, messages };
+    }
+
+    case 'MARK_DIRECT_MESSAGE_READ': {
+      const directMessages = state.directMessages.map(m => m.id === action.payload ? { ...m, read: true } : m);
+      return { ...state, directMessages };
+    }
+
+    case 'SEND_DIRECT_MESSAGE': {
+      const { fromName, fromBadge, fromId, toName, toId, subject, body } = action.payload;
+      const now = new Date();
+      const ts = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      const entry = { id: state.nextId, fromName, fromBadge, fromId, toName, toId, subject, body, timestamp: ts, read: false, type: 'direct' };
+      const logEntry = { id: state.nextId, from: fromName, fromBadge, to: toName, subject, body, timestamp: ts };
+      return {
+        ...state,
+        directMessages: [...state.directMessages, entry],
+        messageLog: [logEntry, ...state.messageLog],
+        nextId: state.nextId + 1,
+      };
+    }
+
+    case 'NOTIFICATION_BLAST': {
+      const { senderName, senderBadge, title, color, body } = action.payload;
+      const id = `blast-${Date.now()}`;
+      const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const logEntry = { id: state.nextId, from: `${senderName} (${senderBadge})`, subject: title, body, timestamp: ts, type: 'blast' };
+      return {
+        ...state,
+        messageLog: [logEntry, ...state.messageLog],
+        lastBlast: { id, senderName, senderBadge, title, color, body, time: ts },
+        nextId: state.nextId + 1,
+      };
     }
 
     default:

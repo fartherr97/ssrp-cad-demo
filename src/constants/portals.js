@@ -1,9 +1,9 @@
 import {
   MdDashboard, MdSearch, MdDescription, MdMap, MdGridView,
-  MdGroups, MdGavel, MdPeopleAlt, MdPhoneAndroid, MdMenuBook,
+  MdGroups, MdGavel, MdPeopleAlt, MdMenuBook,
   MdLocalFireDepartment, MdDirectionsCar, MdBadge, MdReportProblem,
-  MdHome, MdPerson, MdStore, MdGroup, MdAssignment, MdFolder,
-  MdSupervisorAccount, MdHeadsetMic, MdLocalShipping, MdShield, MdLocalHospital,
+  MdHome, MdPerson, MdStore, MdGroup, MdFolder,
+  MdSupervisorAccount, MdLocalShipping, MdShield, MdLocalHospital,
 } from 'react-icons/md';
 
 export const PORTALS = {
@@ -14,7 +14,6 @@ export const PORTALS = {
       { Icon: MdSearch,       label: 'Search',   route: '/search'   },
       { Icon: MdDescription,  label: 'Reports',  route: '/forms',   dropdown: 'reports' },
       { Icon: MdFolder,       label: 'Records',  route: '/records', dropdown: 'records' },
-      { Icon: MdPhoneAndroid, label: 'MDT',      route: '/mdt'      },
       { Icon: MdGavel,              label: 'Warrants',   route: '/warrants'          },
       { Icon: MdMap,                label: 'Map',        route: '/map'               },
       { Icon: MdLocalShipping,      label: 'Tow CAD',    route: '/tow-cad'           },
@@ -57,7 +56,6 @@ export const PORTALS = {
       { Icon: MdGroups,       label: 'Units',     route: '/units'     },
       { Icon: MdGavel,        label: 'Warrants',  route: '/warrants'  },
       { Icon: MdPeopleAlt,         label: 'Civilians',  route: '/civilians'         },
-      { Icon: MdPhoneAndroid,      label: 'MDT',        route: '/mdt'               },
       { Icon: MdSupervisorAccount, label: 'Supervisor', route: '/portal/supervisor' },
       { Icon: MdShield,            label: 'Command',    route: '/portal/command'    },
     ],
