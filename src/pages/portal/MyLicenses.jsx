@@ -351,7 +351,7 @@ export default function MyLicenses() {
         accent="brand"
       />
 
-      <div className="max-w-[1000px]">
+      <div className="max-w-[820px]">
       <CivilianSwitcher />
 
       {myChars.length === 0 ? (
