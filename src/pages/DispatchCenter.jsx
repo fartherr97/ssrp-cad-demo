@@ -423,7 +423,8 @@ export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { calls, officers, currentUser, selfDispatch, dispatchLog = [], incoming911 = [],
-    unitStatusCodes = [], tenCodes = [], callNatures = [] } = state;
+    unitStatusCodes = [], tenCodes = [], callNatures = [], reports = [] } = state;
+  const nonEmergencyCalls = reports.filter(r => r.officerBadge === 'CITIZEN' && r.status !== 'Resolved');
   // Status menu/badges are driven by admin-configured unit status codes.
   const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const statusColor = (code) => unitStatusCodes.find(s => s.code === code)?.color || STATUS_COLORS[code] || '#fff';
@@ -562,6 +563,54 @@ export default function DispatchCenter() {
                 <IncomingCallCard key={c.id} call={c}
                   onDispatch={() => setDispatchTarget(c)}
                   onDismiss={() => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id })} />
+              ))}
+            </div>
+          )}
+
+          {/* Non-Emergency Reports — dispatcher only */}
+          {isDispatcher && (
+            <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <MdDescription size={13} className="text-blue-400" />
+                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">Non-Emergency Reports</div>
+                {nonEmergencyCalls.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-400 text-[10px] font-bold leading-none">{nonEmergencyCalls.length}</span>
+                )}
+              </div>
+              {nonEmergencyCalls.length === 0 ? (
+                <div className="text-center text-slate-600 text-[11px] py-2">No pending reports</div>
+              ) : nonEmergencyCalls.map(r => (
+                <div key={r.id} className="bg-white/[0.02] border border-border-faint rounded-lg p-2.5">
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-bold text-slate-200 truncate">{r.formData?.reportType || r.type}</div>
+                      <div className="text-[10px] font-mono text-slate-500">{r.caseNumber}</div>
+                    </div>
+                    <span className={`shrink-0 text-[9.5px] font-bold px-1.5 py-0.5 rounded-md uppercase ${
+                      r.status === 'On Scene'     ? 'bg-orange-500/20 text-orange-400' :
+                      r.status === 'En Route'     ? 'bg-amber-500/20 text-amber-400'  :
+                      r.status === 'Under Review' ? 'bg-blue-500/20 text-blue-400'    :
+                                                    'bg-slate-500/20 text-slate-400'
+                    }`}>{r.status || 'Pending Review'}</span>
+                  </div>
+                  {r.formData?.location && (
+                    <div className="text-[11px] text-slate-400 mb-2 flex items-center gap-1">
+                      <MdLocationOn size={12} className="text-slate-500 shrink-0" />
+                      {r.formData.location}
+                    </div>
+                  )}
+                  <select
+                    className="w-full bg-app-input border border-border-faint rounded-md px-2 py-1 text-[11px] text-slate-200 outline-none cursor-pointer"
+                    value={r.status || 'Pending Review'}
+                    onChange={e => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: e.target.value } })}
+                  >
+                    <option value="Pending Review">Pending Review</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="En Route">En Route</option>
+                    <option value="On Scene">On Scene</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </div>
               ))}
             </div>
           )}
