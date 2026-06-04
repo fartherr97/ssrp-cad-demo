@@ -11,13 +11,13 @@ export const DEFAULT_HELP_CONTENT = {
       bullets: [
         { id: 'b1', text: 'Register multiple character identities to a single account.' },
         { id: 'b2', text: 'Generate with AI, one click fills a full character profile instantly with randomised demographics, address, and phone.' },
-        { id: 'b3', text: 'Switch your active character from any page using the banner at the top * vehicles, licenses, reports, and medical records all update automatically.' },
+        { id: 'b3', text: 'Switch your active character from any page using the banner at the top, vehicles, licenses, reports, and medical records all update automatically.' },
         { id: 'b4', text: 'Your active character persists when you close and reopen the portal.' },
       ],
     },
     {
       id: 'civ-2', iconKey: 'MdPhone', title: 'Call 911',
-      tip: 'For genuine in-game emergencies only * misuse may result in in-game consequences.',
+      tip: 'For genuine in-game emergencies only, misuse may result in in-game consequences.',
       bullets: [
         { id: 'b1', text: 'Tap Call 911 from the home page to open the emergency form.' },
         { id: 'b2', text: 'Fill in your emergency description, location, and optional callback number.' },
@@ -29,21 +29,21 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'civ-3', iconKey: 'MdDirectionsCar', title: 'My Vehicles', tip: '',
       bullets: [
         { id: 'b1', text: 'Register vehicles to your active character (plate, make, model, year, colour, registration expiry).' },
-        { id: 'b2', text: 'Vehicle details are locked after submission * double-check everything before confirming. Only admins can edit filed registrations.' },
+        { id: 'b2', text: 'Vehicle details are locked after submission, double-check everything before confirming. Only admins can edit filed registrations.' },
         { id: 'b3', text: 'Each registered vehicle is visible to law enforcement during a search.' },
       ],
     },
     {
       id: 'civ-4', iconKey: 'MdBadge', title: 'My Licenses', tip: '',
       bullets: [
-        { id: 'b1', text: 'Apply for a driver license * it is issued instantly once submitted.' },
+        { id: 'b1', text: 'Apply for a driver license, it is issued instantly once submitted.' },
         { id: 'b2', text: 'Renew a license approaching expiry from the same page.' },
-        { id: 'b3', text: 'If your license is Suspended or Revoked, you cannot apply or renew * contact an admin to appeal.' },
+        { id: 'b3', text: 'If your license is Suspended or Revoked, you cannot apply or renew, contact an admin to appeal.' },
       ],
     },
     {
       id: 'civ-5', iconKey: 'MdLocalHospital', title: 'Medical Records',
-      tip: 'Tiered visibility * not all responders see the same data.',
+      tip: 'Tiered visibility, not all responders see the same data.',
       bullets: [
         { id: 'b1', text: 'Set blood type, allergies, conditions, medications, and emergency contacts for your character.' },
         { id: 'b2', text: 'LEO safety notes are visible to law enforcement when they look up your character.' },
@@ -80,21 +80,21 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'biz-1', iconKey: 'MdStore', title: 'Business Dashboard', tip: '',
       bullets: [
-        { id: 'b1', text: 'Overview of your business * employee count, licence status, and current standing at a glance.' },
+        { id: 'b1', text: 'Overview of your business, employee count, licence status, and current standing at a glance.' },
         { id: 'b2', text: 'Quick-action cards navigate you to every section of the business portal.' },
       ],
     },
     {
       id: 'biz-2', iconKey: 'MdStoreMini', title: 'My Business', tip: '',
       bullets: [
-        { id: 'b1', text: 'View and edit your business profile * name, type, address, contact info, and owner details.' },
+        { id: 'b1', text: 'View and edit your business profile, name, type, address, contact info, and owner details.' },
         { id: 'b2', text: 'Business licence number is read-only and assigned by admins.' },
       ],
     },
     {
       id: 'biz-3', iconKey: 'MdGroup', title: 'Employees', tip: '',
       bullets: [
-        { id: 'b1', text: 'Manage your staff roster * add or remove employees by name and role.' },
+        { id: 'b1', text: 'Manage your staff roster, add or remove employees by name and role.' },
         { id: 'b2', text: 'Employee count is reflected on your business dashboard stat card.' },
       ],
     },
@@ -109,7 +109,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'biz-5', iconKey: 'MdLocalShipping', title: 'Tow CAD', tip: '',
       bullets: [
-        { id: 'b1', text: 'Access the Tow CAD board directly from the business portal * for tow company operators.' },
+        { id: 'b1', text: 'Access the Tow CAD board directly from the business portal, for tow company operators.' },
       ],
     },
     {
@@ -123,7 +123,7 @@ export const DEFAULT_HELP_CONTENT = {
   leo: [
     {
       id: 'leo-1', iconKey: 'MdDashboard', title: 'CAD & Dispatch Console',
-      tip: 'Your live operational picture * calls, units, and the radio feed.',
+      tip: 'Your live operational picture, calls, units, and the radio feed.',
       bullets: [
         { id: 'b1', text: 'View all active calls with priority, status, location, and live elapsed timers.' },
         { id: 'b2', text: 'Set your unit status (Available, En Route, On Scene, Busy, etc.) from the status bar.' },
@@ -133,10 +133,10 @@ export const DEFAULT_HELP_CONTENT = {
     },
     {
       id: 'leo-2', iconKey: 'MdSearch', title: 'Records Search',
-      tip: 'One search tool, multiple record types * supports exact and partial matches.',
+      tip: 'One search tool, multiple record types, supports exact and partial matches.',
       bullets: [
         { id: 'b1', text: 'Search People by name, DOB, SSN, or DL number to pull a full civilian profile.' },
-        { id: 'b2', text: 'Run a Vehicle by plate or make/model * includes commercial / business-owned vehicles.' },
+        { id: 'b2', text: 'Run a Vehicle by plate or make/model, includes commercial / business-owned vehicles.' },
         { id: 'b3', text: 'Look up Warrants by subject name or charge.' },
         { id: 'b4', text: 'Search Businesses by name, owner, or type to view license status, employees, and fleet.' },
         { id: 'b5', text: 'Verify FDOT Permits by holder, location, or permit number for roadwork authorization.' },
@@ -190,12 +190,12 @@ export const DEFAULT_HELP_CONTENT = {
       tip: 'HCFR\'s command picture for active incidents and apparatus.',
       bullets: [
         { id: 'b1', text: 'View active fire / EMS incidents with priority and live elapsed timers.' },
-        { id: 'b2', text: 'See the full apparatus roster * Engines, Ladders, Rescue/EMS, Hazmat, and Command * with live unit status.' },
+        { id: 'b2', text: 'See the full apparatus roster, Engines, Ladders, Rescue/EMS, Hazmat, and Command, with live unit status.' },
         { id: 'b3', text: 'Self-assign to an incident, or dispatch apparatus to a scene.' },
       ],
     },
     {
-      id: 'fire-2', iconKey: 'MdPhone', title: 'Incoming 911 * EMS / Fire',
+      id: 'fire-2', iconKey: 'MdPhone', title: 'Incoming 911, EMS / Fire',
       tip: 'Civilian 911 calls that request EMS or Fire are routed straight to your board.',
       bullets: [
         { id: 'b1', text: 'When a civilian selects EMS or Fire on their 911 call, it appears in the Incoming 911 section of the Fire board.' },
@@ -207,7 +207,7 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'fire-3', iconKey: 'MdShield', title: 'LE Assistance Requests', tip: '',
       bullets: [
         { id: 'b1', text: 'Law enforcement can request HCFR support directly from a call.' },
-        { id: 'b2', text: 'Incoming requests appear on the Fire board * acknowledge, dispatch a unit, or decline.' },
+        { id: 'b2', text: 'Incoming requests appear on the Fire board, acknowledge, dispatch a unit, or decline.' },
         { id: 'b3', text: 'Dispatching a unit notifies the requesting officer over radio.' },
       ],
     },
@@ -216,7 +216,7 @@ export const DEFAULT_HELP_CONTENT = {
       tip: 'EMS sees the medical data civilians mark for Fire / EMS.',
       bullets: [
         { id: 'b1', text: 'Blood type, conditions, and allergies set by a civilian are visible to Fire / EMS.' },
-        { id: 'b2', text: 'EMS / Fire notes are visible only to Fire & EMS personnel * not to law enforcement.' },
+        { id: 'b2', text: 'EMS / Fire notes are visible only to Fire & EMS personnel, not to law enforcement.' },
       ],
     },
     {
@@ -238,13 +238,13 @@ export const DEFAULT_HELP_CONTENT = {
   supervisor: [
     {
       id: 'sup-1', iconKey: 'MdOutlineRateReview', title: 'Submissions Review',
-      tip: 'Your primary workflow * review reports and records filed by officers in your department.',
+      tip: 'Your primary workflow, review reports and records filed by officers in your department.',
       bullets: [
         { id: 'b1', text: 'See all pending reports and records submitted for review, scoped to your department.' },
         { id: 'b2', text: 'Filter by department, record type, and status (Pending / Approved / Returned).' },
         { id: 'b3', text: 'Open any submission to read the full form, add a supervisor signature, and leave inline comments.' },
-        { id: 'b4', text: 'Approve * moves the submission to Approved status.' },
-        { id: 'b5', text: 'Return for Revision * flags it back to the filing officer with your comments.' },
+        { id: 'b4', text: 'Approve, moves the submission to Approved status.' },
+        { id: 'b5', text: 'Return for Revision, flags it back to the filing officer with your comments.' },
         { id: 'b6', text: 'Download any approved submission as a PDF.' },
       ],
     },
@@ -258,7 +258,7 @@ export const DEFAULT_HELP_CONTENT = {
     },
     {
       id: 'sup-3', iconKey: 'MdCampaign', title: 'Notification Blast',
-      tip: 'Blasts are department-scoped * you can only send to your own department.',
+      tip: 'Blasts are department-scoped, you can only send to your own department.',
       bullets: [
         { id: 'b1', text: 'Send an instant toast notification to all online personnel in your department.' },
         { id: 'b2', text: 'Choose a title, message body, and colour (Blue, Green, Amber, Red, Violet, Cyan).' },
@@ -271,7 +271,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'cmd-1', iconKey: 'MdBarChart', title: 'Overview', tip: '',
       bullets: [
-        { id: 'b1', text: 'Top-level stats across all departments * active calls, units on duty, pending submissions, open warrants.' },
+        { id: 'b1', text: 'Top-level stats across all departments, active calls, units on duty, pending submissions, open warrants.' },
         { id: 'b2', text: 'Filter by time range (Today / Last 7 Days / Last 30 Days).' },
         { id: 'b3', text: 'Charts for call volume, incident category breakdown, and unit status distribution.' },
       ],
@@ -279,14 +279,14 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'cmd-2', iconKey: 'MdPerson', title: 'By Officer', tip: '',
       bullets: [
-        { id: 'b1', text: 'Per-officer activity * total submissions, reports filed, records issued, and pending reviews.' },
+        { id: 'b1', text: 'Per-officer activity, total submissions, reports filed, records issued, and pending reviews.' },
         { id: 'b2', text: 'Sort and filter by department or activity level.' },
       ],
     },
     {
       id: 'cmd-3', iconKey: 'MdShield', title: 'By Department', tip: '',
       bullets: [
-        { id: 'b1', text: 'Department-level aggregate * active units, calls handled, and report completion rates.' },
+        { id: 'b1', text: 'Department-level aggregate, active units, calls handled, and report completion rates.' },
         { id: 'b2', text: 'Side-by-side comparison across TPD, HCSO, FHP, HCFR, and FDOT.' },
       ],
     },
@@ -300,7 +300,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'cmd-5', iconKey: 'MdAssignment', title: 'Report Tracker', tip: '',
       bullets: [
-        { id: 'b1', text: 'Full cross-department view of all submitted reports * status, type, filing officer, and date.' },
+        { id: 'b1', text: 'Full cross-department view of all submitted reports, status, type, filing officer, and date.' },
         { id: 'b2', text: 'Identify overdue or un-reviewed submissions quickly.' },
       ],
     },

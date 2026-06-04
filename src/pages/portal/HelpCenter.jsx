@@ -160,7 +160,7 @@ export default function HelpCenter() {
       <PortalHeader
         icon={MdHelpOutline}
         title="Help Center"
-        subtitle="Feature guides for your portal * pick a section below."
+        subtitle="Feature guides for your portal, pick a section below."
         accent="brand"
       />
 
