@@ -106,7 +106,7 @@ export default function Employees() {
             </div>
             <div>
               <label className={PORTAL_LABEL}>Since</label>
-              <input type="date" className={PORTAL_INPUT} value={form.since} onChange={setField('since')} />
+              <input type="date" className={PORTAL_INPUT} value={form.since} onChange={setField('since')} style={{ colorScheme: 'dark' }} />
             </div>
           </div>
           <div className="mt-4">

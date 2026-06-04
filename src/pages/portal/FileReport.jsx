@@ -142,7 +142,7 @@ export default function FileReport() {
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdEventNote size={13} className="inline align-[-2px] mr-[5px]" />Incident Date</label>
-                <input className={PORTAL_INPUT} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} required />
+                <input className={PORTAL_INPUT} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} style={{ colorScheme: 'dark' }} required />
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdPlace size={13} className="inline align-[-2px] mr-[5px]" />Location</label>

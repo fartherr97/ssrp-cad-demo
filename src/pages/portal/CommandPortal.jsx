@@ -97,10 +97,12 @@ function DateRangeBar({ dateFrom, setDateFrom, dateTo, setDateTo }) {
       })}
       <div className="flex items-center gap-1.5">
         <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]"
+          style={{ colorScheme: 'dark' }} />
         <span className="text-[11px] text-slate-600">→</span>
         <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]"
+          style={{ colorScheme: 'dark' }} />
       </div>
     </div>
   );
