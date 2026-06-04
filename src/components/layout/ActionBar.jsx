@@ -292,7 +292,12 @@ function NotificationBell({ notifications, dispatch }) {
   const place = () => {
     if (ref.current) {
       const r = ref.current.getBoundingClientRect();
-      setCoords({ left: Math.max(8, r.right - PANEL_W), top: r.bottom + 4 });
+      const mobile = window.innerWidth < 640;
+      if (mobile) {
+        setCoords({ left: 8, right: 8, top: r.bottom + 6, mobile: true });
+      } else {
+        setCoords({ left: Math.max(8, r.right - PANEL_W), top: r.bottom + 4, mobile: false });
+      }
     }
   };
   const doClose = () => setOpen(false);
@@ -330,7 +335,13 @@ function NotificationBell({ notifications, dispatch }) {
           onMouseEnter={() => clearTimeout(closeTimer.current)}
           onMouseLeave={scheduleClose}
           className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl flex flex-col overflow-hidden"
-          style={{ left: coords.left, top: coords.top, width: PANEL_W, maxHeight: 420, animation: 'dropdownFadeIn 0.13s ease-out' }}
+          style={{
+            left: coords.left,
+            top: coords.top,
+            ...(coords.mobile ? { right: coords.right } : { width: PANEL_W }),
+            maxHeight: 'min(420px, calc(100dvh - var(--actionbar-h, 64px) - 24px))',
+            animation: 'dropdownFadeIn 0.13s ease-out',
+          }}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border-faint shrink-0">
@@ -346,7 +357,7 @@ function NotificationBell({ notifications, dispatch }) {
             )}
           </div>
           {/* Body */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-10 px-4 text-slate-600">
                 <MdNotificationsNone size={28} className="opacity-40" />
@@ -354,8 +365,15 @@ function NotificationBell({ notifications, dispatch }) {
               </div>
             ) : (
               notifications.map(n => (
-                <div key={n.id} className={`flex gap-3 px-3.5 py-3 border-b border-border-faint/50 last:border-0 ${!n.read ? 'bg-white/[0.025]' : ''}`}>
-                  <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: n.color || '#3a88e8' }} />
+                <div
+                  key={n.id}
+                  className="flex gap-3 px-3 py-2.5 rounded-xl border transition-colors"
+                  style={{
+                    background: n.read ? 'rgba(255,255,255,0.02)' : `${n.color || '#3a88e8'}0f`,
+                    borderColor: n.read ? 'rgba(255,255,255,0.07)' : `${n.color || '#3a88e8'}35`,
+                  }}
+                >
+                  <div className="w-2 h-2 rounded-full mt-[5px] shrink-0" style={{ background: n.color || '#3a88e8' }} />
                   <div className="flex-1 min-w-0">
                     <div className="text-[12px] font-semibold text-white leading-tight">{n.title}</div>
                     <div className="text-[11px] text-slate-400 mt-0.5 leading-snug whitespace-pre-wrap line-clamp-3">{n.body}</div>
