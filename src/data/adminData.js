@@ -190,3 +190,122 @@ export const DISCORD_PRESENCE = {
 export const LIMITS_CONFIG = {
   maxCivilianCharacters: 0,
 };
+
+/* ── Discord → CAD Role Mappings ───────────────────────────────────────────
+   Each entry maps one Discord role (identified by its snowflake role ID, to
+   be filled in by the backend developer) to a CAD portal and permission level.
+   When a user authenticates via Discord OAuth, Steve's backend reads this
+   table, finds the highest-priority rule that matches one of their Discord
+   roles, and assigns them the corresponding cadPortal + cadRole.
+
+   Priority: higher number wins. If a user holds multiple Discord roles that
+   each match a rule, the rule with the greatest priority takes effect.
+
+   discordRoleId is left blank here — fill in the actual Discord snowflake IDs
+   from your server's role list before deploying. */
+export const DISCORD_ROLE_MAPPINGS_DEFAULT = [
+  {
+    id: 1,  label: 'Community Admin',
+    discordRoleName: 'Admin',        discordRoleId: '',
+    cadPortal: 'admin',    cadRole: 'admin',
+    deptId: null, autoRank: '',
+    priority: 100,
+    notes: 'Full access to all portals, CAD, and admin configuration.',
+  },
+  {
+    id: 2,  label: 'CAD Dispatcher',
+    discordRoleName: 'CAD Dispatcher', discordRoleId: '',
+    cadPortal: 'dispatch', cadRole: 'dispatcher',
+    deptId: null, autoRank: 'Dispatcher',
+    priority: 60,
+    notes: 'Access to the full dispatch console, CAD board, and unit management.',
+  },
+  {
+    id: 3,  label: 'HCFR Command',
+    discordRoleName: 'HCFR Command',   discordRoleId: '',
+    cadPortal: 'fire',     cadRole: 'command',
+    deptId: 3,    autoRank: 'Battalion Chief',
+    priority: 75,
+    notes: 'Fire chiefs and battalion chiefs — grants Command Portal analytics access.',
+  },
+  {
+    id: 4,  label: 'HCFR Supervisor',
+    discordRoleName: 'HCFR Supervisor', discordRoleId: '',
+    cadPortal: 'fire',     cadRole: 'supervisor',
+    deptId: 3,    autoRank: 'Lieutenant',
+    priority: 65,
+    notes: 'Lieutenants and Captains — can review and approve HCFR reports via Supervisor Portal.',
+  },
+  {
+    id: 5,  label: 'HCFR Personnel',
+    discordRoleName: 'HCFR Member',    discordRoleId: '',
+    cadPortal: 'fire',     cadRole: 'fire',
+    deptId: 3,    autoRank: 'Firefighter/EMT',
+    priority: 40,
+    notes: 'All active HCFR field personnel. Fire Board, apparatus, EMS calls.',
+  },
+  {
+    id: 6,  label: 'LEO Command',
+    discordRoleName: 'LEO Command',    discordRoleId: '',
+    cadPortal: 'leo',      cadRole: 'command',
+    deptId: null, autoRank: '',
+    priority: 75,
+    notes: 'Chiefs and command staff across all LEO agencies. Command Portal + Supervisor access.',
+  },
+  {
+    id: 7,  label: 'LEO Supervisor',
+    discordRoleName: 'LEO Supervisor', discordRoleId: '',
+    cadPortal: 'leo',      cadRole: 'supervisor',
+    deptId: null, autoRank: 'Sergeant',
+    priority: 65,
+    notes: 'Sergeants and above across all LEO agencies. Grants Supervisor Portal review access.',
+  },
+  {
+    id: 8,  label: 'TPD Officer',
+    discordRoleName: 'TPD Officer',    discordRoleId: '',
+    cadPortal: 'leo',      cadRole: 'officer',
+    deptId: 1,    autoRank: 'Officer',
+    priority: 40,
+    notes: 'Active Tampa Police Department officers.',
+  },
+  {
+    id: 9,  label: 'HCSO Deputy',
+    discordRoleName: 'HCSO Deputy',    discordRoleId: '',
+    cadPortal: 'leo',      cadRole: 'officer',
+    deptId: 2,    autoRank: 'Deputy',
+    priority: 40,
+    notes: 'Active Hillsborough County Sheriff Deputies.',
+  },
+  {
+    id: 10, label: 'FHP Trooper',
+    discordRoleName: 'FHP Trooper',    discordRoleId: '',
+    cadPortal: 'leo',      cadRole: 'officer',
+    deptId: 4,    autoRank: 'Trooper',
+    priority: 40,
+    notes: 'Active Florida Highway Patrol troopers.',
+  },
+  {
+    id: 11, label: 'FDOT Employee',
+    discordRoleName: 'FDOT',           discordRoleId: '',
+    cadPortal: 'dispatch', cadRole: 'dispatcher',
+    deptId: 5,    autoRank: 'Road Technician',
+    priority: 45,
+    notes: 'FDOT field staff — access to tow dispatch console and road ops tools.',
+  },
+  {
+    id: 12, label: 'Tow Operator',
+    discordRoleName: 'Tow Company',    discordRoleId: '',
+    cadPortal: 'civilian', cadRole: 'civilian',
+    deptId: null, autoRank: '',
+    priority: 20,
+    notes: 'Tow company employees — sign on via the Tow CAD (/tow-cad) after login.',
+  },
+  {
+    id: 13, label: 'Whitelisted Member',
+    discordRoleName: 'Whitelisted',    discordRoleId: '',
+    cadPortal: 'civilian', cadRole: 'civilian',
+    deptId: null, autoRank: '',
+    priority: 10,
+    notes: 'Default role granted after whitelist approval. Civilian portal access only.',
+  },
+];

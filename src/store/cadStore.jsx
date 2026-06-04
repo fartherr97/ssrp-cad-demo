@@ -12,7 +12,7 @@ import {
   ADMIN_ACCOUNTS, PERMISSION_KEYS, QUICK_LINKS, NOTIFICATION_TONES,
   ADMIN_SERVERS, LOOKUP_TYPES, ADMIN_ADDRESSES, COMMUNITY_CONFIG,
   GEO_SETTINGS, LOGIN_PAGE_CONFIG, ACCOUNT_RESTRICTIONS, DISCORD_PRESENCE,
-  LIMITS_CONFIG, CALL_NATURES_DEFAULT,
+  LIMITS_CONFIG, CALL_NATURES_DEFAULT, DISCORD_ROLE_MAPPINGS_DEFAULT,
 } from '../data/adminData';
 
 /* ── Subdivision duty-hour tracking ───────────────────────────────────────
@@ -150,6 +150,7 @@ const initialState = {
   accountRestrictions: ACCOUNT_RESTRICTIONS,
   discordPresence: DISCORD_PRESENCE,
   limitsConfig: LIMITS_CONFIG,
+  discordRoleMappings: DISCORD_ROLE_MAPPINGS_DEFAULT,
   inGameConfig: {
     apiKey: 'a3f9e2b1-7c84-4d56-b012-9e3a7f2c10d8',
     liveMapEnabled: true,

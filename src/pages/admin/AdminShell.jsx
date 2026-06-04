@@ -9,7 +9,7 @@ import {
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
-  MdHelpOutline, MdContactPage,
+  MdHelpOutline, MdContactPage, MdSwapHoriz,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -18,6 +18,7 @@ const GROUPS = [
     label: 'Users',
     Icon: MdManageAccounts,
     items: [
+      { icon: MdSwapHoriz,   label: 'Role Mapping',    route: '/admin/role-mapping' },
       { icon: MdPeople,      label: 'Accounts',        route: '/admin/accounts' },
       { icon: MdFingerprint, label: 'Identifiers',     route: '/admin/identifiers' },
       { icon: MdVpnKey,      label: 'Permission Keys', route: '/admin/permission-keys' },
