@@ -207,9 +207,10 @@ export default function RecordsCenter() {
 
           {/* CENTER: info strip + paper document */}
           <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
-            <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
-              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
+            <div className="hidden sm:grid sm:grid-cols-4 shrink-0 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Record Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
             <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
