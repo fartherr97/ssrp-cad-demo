@@ -350,7 +350,7 @@ export default function MyLicenses() {
       <PortalHeader
         icon={MdBadge}
         title="My Licenses"
-        subtitle="Manage driver licenses and weapon permits for your characters."
+        subtitle="Manage driver licenses for your characters."
         accent="brand"
       />
 

@@ -845,23 +845,7 @@ export const RECORD_TEMPLATES = [
       ]},
     ],
   },
-  {
-    id: 'r4', name: 'CCW Permit',
-    agency: 'FLORIDA DEPARTMENT OF AGRICULTURE AND CONSUMER SERVICES',
-    formCode: 'FDACS-CCW-001',
-    sections: [
-      { id: 's1', title: 'Permit Holder', style: 'blue', fields: [
-        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f3', label: 'Permit Number',   type: 'text',            span: 2, mono: true, required: true },
-        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
-        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
-      ]},
-      { id: 's2', title: 'Restrictions', style: 'gray', fields: [
-        { id: 'f6', label: 'Restrictions', type: 'textarea', span: 4, minRows: 2 },
-      ]},
-    ],
-  },
+
   {
     id: 'r5', name: 'Warrant',
     agency: 'SUNSHINE STATE CIRCUIT COURT',
