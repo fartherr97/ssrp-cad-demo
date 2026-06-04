@@ -10,7 +10,7 @@ export const DEFAULT_HELP_CONTENT = {
       tip: 'Everything in the portal scopes to whoever is active.',
       bullets: [
         { id: 'b1', text: 'Register multiple character identities to a single account.' },
-        { id: 'b2', text: 'Generate with AI * one click fills a full Los Santos character profile instantly with randomised demographics, address, and phone.' },
+        { id: 'b2', text: 'Generate with AI, one click fills a full character profile instantly with randomised demographics, address, and phone.' },
         { id: 'b3', text: 'Switch your active character from any page using the banner at the top * vehicles, licenses, reports, and medical records all update automatically.' },
         { id: 'b4', text: 'Your active character persists when you close and reopen the portal.' },
       ],
