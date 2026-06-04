@@ -203,6 +203,50 @@ export const LIMITS_CONFIG = {
 
    discordRoleId is left blank here — fill in the actual Discord snowflake IDs
    from your server's role list before deploying. */
+/* ── Management / Admin tier definitions ────────────────────────────────────
+   Each tier controls which admin portal sections a management-level user can
+   access and which destructive actions they can perform. Higher level = more
+   authority. When a user has adminTierId set, their nav is filtered to only
+   the sections their tier permits. No tierId = full access (backward compat). */
+
+const _ALL_ON = {
+  roleMapping: true, accounts: true, identifiers: true, permissionKeys: true, businesses: true,
+  customization: true, customRecords: true, civilianForms: true, helpCenter: true, departments: true,
+  callTypes: true, tenCodes: true, statutes: true, licensePoints: true, flags: true,
+  logs: true, messageLogs: true, inGame: true, discord: true, limits: true, wipeRecords: true,
+  canBanUsers: true, canUnbanUsers: true, canWipeData: true, canManageAdminTiers: true,
+};
+
+export const ADMIN_TIERS_DEFAULT = [
+  {
+    id: 1, name: 'Head Admin', level: 100, color: '#22c55e',
+    description: 'Unrestricted access to every section of the admin portal. Can manage all other admin tiers.',
+    permissions: { ..._ALL_ON },
+  },
+  {
+    id: 2, name: 'Senior Admin', level: 60, color: '#3a88e8',
+    description: 'Broad access to CAD configuration and user management. Cannot touch system config, role mappings, or data wipes.',
+    permissions: {
+      roleMapping: false, accounts: true, identifiers: true, permissionKeys: false, businesses: true,
+      customization: true, customRecords: true, civilianForms: true, helpCenter: true, departments: true,
+      callTypes: true, tenCodes: true, statutes: true, licensePoints: true, flags: true,
+      logs: true, messageLogs: true, inGame: false, discord: false, limits: false, wipeRecords: false,
+      canBanUsers: true, canUnbanUsers: true, canWipeData: false, canManageAdminTiers: false,
+    },
+  },
+  {
+    id: 3, name: 'Admin', level: 30, color: '#f59e0b',
+    description: 'Moderation-focused. Can ban users, review logs and flags, and manage business records. No configuration access.',
+    permissions: {
+      roleMapping: false, accounts: true, identifiers: false, permissionKeys: false, businesses: true,
+      customization: false, customRecords: false, civilianForms: false, helpCenter: false, departments: false,
+      callTypes: false, tenCodes: false, statutes: false, licensePoints: false, flags: true,
+      logs: true, messageLogs: true, inGame: false, discord: false, limits: false, wipeRecords: false,
+      canBanUsers: true, canUnbanUsers: false, canWipeData: false, canManageAdminTiers: false,
+    },
+  },
+];
+
 export const DISCORD_ROLE_MAPPINGS_DEFAULT = [
   {
     id: 1,  label: 'Community Admin',

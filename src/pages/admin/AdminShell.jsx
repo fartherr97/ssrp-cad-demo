@@ -9,51 +9,54 @@ import {
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
-  MdHelpOutline, MdContactPage, MdSwapHoriz,
+  MdHelpOutline, MdContactPage, MdSwapHoriz, MdAdminPanelSettings,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
+/* permKey maps each nav item to the adminTier permissions key that gates it.
+   Items with no permKey are visible to all admin-tier users. */
 const GROUPS = [
   {
     label: 'Users',
     Icon: MdManageAccounts,
     items: [
-      { icon: MdSwapHoriz,   label: 'Role Mapping',    route: '/admin/role-mapping' },
-      { icon: MdPeople,      label: 'Accounts',        route: '/admin/accounts' },
-      { icon: MdFingerprint, label: 'Identifiers',     route: '/admin/identifiers' },
-      { icon: MdVpnKey,      label: 'Permission Keys', route: '/admin/permission-keys' },
-      { icon: MdStore,       label: 'Businesses',      route: '/admin/businesses' },
+      { icon: MdSwapHoriz,          label: 'Role Mapping',     route: '/admin/role-mapping',    permKey: 'roleMapping'          },
+      { icon: MdAdminPanelSettings, label: 'Mgmt. Roles',      route: '/admin/admin-tiers',     permKey: 'canManageAdminTiers'  },
+      { icon: MdPeople,             label: 'Accounts',         route: '/admin/accounts',         permKey: 'accounts'             },
+      { icon: MdFingerprint,        label: 'Identifiers',      route: '/admin/identifiers',      permKey: 'identifiers'          },
+      { icon: MdVpnKey,             label: 'Permission Keys',  route: '/admin/permission-keys',  permKey: 'permissionKeys'       },
+      { icon: MdStore,              label: 'Businesses',       route: '/admin/businesses',       permKey: 'businesses'           },
     ],
   },
   {
     label: 'Configuration',
     Icon: MdTune,
     items: [
-      { icon: MdBrush,              label: 'Customization',  route: '/admin', exact: true },
-      { icon: MdInventory2,         label: 'Custom Records', route: '/admin/custom-records' },
-      { icon: MdContactPage,        label: 'Civilian Forms', route: '/admin/civilian-forms' },
-      { icon: MdHelpOutline,        label: 'Help Center',    route: '/admin/help-center' },
-      { icon: MdShield,             label: 'Departments',    route: '/admin/departments' },
-      { icon: MdLocalPhone,          label: 'Call Types',     route: '/admin/call-types' },
-      { icon: MdFormatListNumbered, label: '10-Codes',       route: '/admin/ten-codes' },
-      { icon: MdGavel,              label: 'Penal Code',     route: '/admin/statutes' },
-      { icon: MdRemoveModerator,    label: 'Auto Suspend',   route: '/admin/license-points' },
-      { icon: MdFlag,               label: 'Flags',          route: '/admin/flags' },
+      { icon: MdBrush,              label: 'Customization',  route: '/admin', exact: true,        permKey: 'customization'        },
+      { icon: MdInventory2,         label: 'Custom Records', route: '/admin/custom-records',      permKey: 'customRecords'        },
+      { icon: MdContactPage,        label: 'Civilian Forms', route: '/admin/civilian-forms',      permKey: 'civilianForms'        },
+      { icon: MdHelpOutline,        label: 'Help Center',    route: '/admin/help-center',         permKey: 'helpCenter'           },
+      { icon: MdShield,             label: 'Departments',    route: '/admin/departments',         permKey: 'departments'          },
+      { icon: MdLocalPhone,         label: 'Call Types',     route: '/admin/call-types',          permKey: 'callTypes'            },
+      { icon: MdFormatListNumbered, label: '10-Codes',       route: '/admin/ten-codes',           permKey: 'tenCodes'             },
+      { icon: MdGavel,              label: 'Penal Code',     route: '/admin/statutes',            permKey: 'statutes'             },
+      { icon: MdRemoveModerator,    label: 'Auto Suspend',   route: '/admin/license-points',      permKey: 'licensePoints'        },
+      { icon: MdFlag,               label: 'Flags',          route: '/admin/flags',               permKey: 'flags'                },
     ],
   },
   {
     label: 'System',
     Icon: MdDns,
     items: [
-      { icon: MdHistory,         label: 'Logs',            route: '/admin/logs' },
-      { icon: MdMessage,         label: 'Message Logs',    route: '/admin/message-logs' },
-      { icon: MdVideogameAsset,  label: 'In-Game',         route: '/admin/in-game' },
-      { icon: MdChat,            label: 'Discord',         route: '/admin/discord' },
-      { icon: MdHourglassBottom, label: 'Limits',          route: '/admin/limits' },
-      { icon: MdLayers,          label: 'Wipe Records',    route: '/admin/wipe' },
-      { icon: MdKey,             label: 'Community ID',    route: '/admin/community-id' },
-      { icon: MdLock,            label: 'Authenticate',    route: '/admin/authenticate' },
-      { icon: MdDelete,          label: 'Transfer/Delete', route: '/admin/transfer' },
+      { icon: MdHistory,         label: 'Logs',            route: '/admin/logs',            permKey: 'logs'           },
+      { icon: MdMessage,         label: 'Message Logs',    route: '/admin/message-logs',    permKey: 'messageLogs'    },
+      { icon: MdVideogameAsset,  label: 'In-Game',         route: '/admin/in-game',         permKey: 'inGame'         },
+      { icon: MdChat,            label: 'Discord',         route: '/admin/discord',         permKey: 'discord'        },
+      { icon: MdHourglassBottom, label: 'Limits',          route: '/admin/limits',          permKey: 'limits'         },
+      { icon: MdLayers,          label: 'Wipe Records',    route: '/admin/wipe',            permKey: 'wipeRecords'    },
+      { icon: MdKey,             label: 'Community ID',    route: '/admin/community-id'                               },
+      { icon: MdLock,            label: 'Authenticate',    route: '/admin/authenticate'                               },
+      { icon: MdDelete,          label: 'Transfer/Delete', route: '/admin/transfer'                                   },
     ],
   },
 ];
@@ -241,7 +244,27 @@ export default function AdminShell() {
 
   const community = state.communityConfig?.name || 'Sunshine State RP';
 
-  const allItems = GROUPS.flatMap(g => g.items);
+  // ── Tier-based nav filtering ──────────────────────────────────────────
+  // If the signed-in admin user has an adminTierId, filter nav items to only
+  // the sections their tier's permissions allow. No tierId = full access.
+  const tierPerms = (() => {
+    const tierId = state.currentUser?.adminTierId;
+    if (!tierId) return null; // full access — no filtering
+    const tier = (state.adminTiers || []).find(t => t.id === tierId);
+    return tier?.permissions || null;
+  })();
+
+  const canSeeItem = (item) => {
+    if (!tierPerms || !item.permKey) return true;
+    return !!tierPerms[item.permKey];
+  };
+
+  const visibleGroups = GROUPS.map(g => ({
+    ...g,
+    items: g.items.filter(canSeeItem),
+  })).filter(g => g.items.length > 0);
+
+  const allItems = visibleGroups.flatMap(g => g.items);
   const activeItem = allItems.find(item => isActive(item));
 
   return (
@@ -275,7 +298,7 @@ export default function AdminShell() {
 
         {/* Desktop: group dropdowns */}
         <nav className="hidden md:flex items-stretch gap-0.5 flex-1 min-w-0">
-          {GROUPS.map(group => (
+          {visibleGroups.map(group => (
             <GroupDropdown key={group.label} group={group} isActive={isActive} onNavigate={navigate} />
           ))}
         </nav>
@@ -311,7 +334,7 @@ export default function AdminShell() {
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        groups={GROUPS}
+        groups={visibleGroups}
         isActive={isActive}
         onNavigate={(route) => navigate(route)}
         onHome={() => dispatch({ type: 'EXIT_TO_HOME' })}
