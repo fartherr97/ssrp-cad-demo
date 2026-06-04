@@ -106,7 +106,9 @@ export default function Employees() {
             </div>
             <div>
               <label className={PORTAL_LABEL}>Since</label>
-              <input type="date" className={`${PORTAL_INPUT} h-[42px]`} value={form.since} onChange={setField('since')} style={{ colorScheme: 'dark' }} />
+              <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
+                <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.since} onChange={setField('since')} style={{ colorScheme: 'dark' }} />
+              </div>
             </div>
           </div>
           <div className="mt-4">
