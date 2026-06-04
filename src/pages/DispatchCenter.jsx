@@ -567,12 +567,12 @@ export default function DispatchCenter() {
             </div>
           )}
 
-          {/* Non-Emergency Reports — dispatcher only */}
-          {isDispatcher && (
+          {/* Non-Emergency Calls — LEO + dispatcher */}
+          {(isDispatcher || currentUser?.portal === 'leo') && (
             <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
               <div className="flex items-center gap-1.5 mb-0.5">
                 <MdDescription size={13} className="text-blue-400" />
-                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">Non-Emergency Reports</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 flex-1">Non-Emergency Calls</div>
                 {nonEmergencyCalls.length > 0 && (
                   <span className="px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-400 text-[10px] font-bold leading-none">{nonEmergencyCalls.length}</span>
                 )}
