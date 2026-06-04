@@ -638,6 +638,11 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
         caseNo={meta.caseNumber}
         status={meta.status}
       />
+      {template?.showDept !== false && (meta.department || data._issuingDept) && (
+        <FormRow style={{ minHeight: 32, borderBottom: '1px solid #bbb' }}>
+          <FormCell label="Issuing Department" value={data._issuingDept || meta.department} colSpan={4} editable={false} />
+        </FormRow>
+      )}
       {sections.map(section => {
         const inlineFields  = section.fields.filter(f => f.type !== 'checkbox' && f.type !== 'textarea');
         const checkboxFields = section.fields.filter(f => f.type === 'checkbox');

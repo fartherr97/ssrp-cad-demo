@@ -44,6 +44,10 @@ export default function RecordsCenter() {
       const saved = localStorage.getItem(DRAFT_KEY(tpl.id));
       if (saved) restored = JSON.parse(saved);
     } catch { /* ignore */ }
+    if (tpl.showDept !== false && !restored._issuingDept) {
+      const deptName = departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || '';
+      if (deptName) restored._issuingDept = deptName;
+    }
     setFormValues(restored);
     setSavedAt(null);
   };
@@ -129,12 +133,14 @@ export default function RecordsCenter() {
     const exportPDF = async () => {
       setPdfLoading(true);
       try {
+        const deptName = departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || 'SSRP';
         await downloadReportPDF(tpl, formValues, {
           caseNumber: draftMeta.caseNumber,
           status: 'Draft',
           dateTime: now.toLocaleString(),
           officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
-          agency: departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || 'SSRP',
+          agency: deptName,
+          department: formValues._issuingDept || deptName,
           logoUrl: departments?.find(d => d.short === me?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         });
       } finally { setPdfLoading(false); }

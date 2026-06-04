@@ -1069,6 +1069,12 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly }) {
 }
 
 export default function ReportForm({ template, data = {}, onChange, onBulkChange, readOnly = false }) {
+  const { state } = useCAD();
+  const { currentUser, officers, departments, communityConfig } = state;
+  const me = officers?.find(o => o.id === currentUser?.id);
+  const liveDeptName = departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || '';
+  const deptDisplay = data._issuingDept || (!readOnly ? liveDeptName : '');
+
   const sections = template?.sections || [];
   // Per-key change; fall back to bulk if a single onChange isn't supplied.
   const change = (k, v) => {
@@ -1089,6 +1095,15 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
   return (
     <div className="flex flex-col gap-5 max-w-[1100px] mx-auto w-full">
       <div data-doc-top />
+      {template?.showDept !== false && deptDisplay && (
+        <div className="rounded-xl border border-border-base bg-app-card/70 px-4 py-2.5 flex items-center gap-3">
+          <MdShield size={16} className="text-brand-bright shrink-0" />
+          <div>
+            <div className="text-[8.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Issuing Department</div>
+            <div className="text-[13px] font-bold text-white">{deptDisplay}</div>
+          </div>
+        </div>
+      )}
       {sections.map(sec => (
         <section key={sec.id} data-section={sec.title}
           className={`border rounded-xl backdrop-blur-sm scroll-mt-4 ${sec.supervisorOnly ? 'bg-red-500/[0.03] border-red-500/25' : 'bg-app-card/70 border-border-base'}`}>

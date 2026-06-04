@@ -794,13 +794,28 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
             value={draft.name || ''}
             onChange={e => up({ name: e.target.value })}
           />
-          <input
-            className="text-[10.5px] bg-transparent border-b border-transparent focus:border-white/20 outline-none w-full transition-colors mt-1.5"
-            style={{ color: '#93a4bd', paddingBottom: 1, fontFamily: 'var(--font-ui)' }}
-            placeholder="Issuing Agency (appears in the document header) — e.g. Tampa Police Department"
-            value={draft.agency || ''}
-            onChange={e => up({ agency: e.target.value })}
-          />
+          <div className="flex items-center gap-3 mt-1.5">
+            <input
+              className="flex-1 text-[10.5px] bg-transparent border-b border-transparent focus:border-white/20 outline-none transition-colors"
+              style={{ color: '#93a4bd', paddingBottom: 1, fontFamily: 'var(--font-ui)' }}
+              placeholder="Issuing Agency (document header) — e.g. Tampa Police Department"
+              value={draft.agency || ''}
+              onChange={e => up({ agency: e.target.value })}
+            />
+            <label className="flex items-center gap-1.5 shrink-0 cursor-pointer select-none"
+              title="Show the officer's department as a labeled box on every issued record">
+              <input
+                type="checkbox"
+                checked={draft.showDept !== false}
+                onChange={e => up({ showDept: e.target.checked })}
+                className="accent-blue-400 cursor-pointer"
+                style={{ width: 13, height: 13 }}
+              />
+              <span className="text-[9.5px] font-bold uppercase tracking-[0.4px]" style={{ color: '#4a7ba7' }}>
+                Show Department
+              </span>
+            </label>
+          </div>
         </div>
         <div className="flex gap-2 shrink-0">
           <button type="button" onClick={onClose}
