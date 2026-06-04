@@ -146,6 +146,15 @@ input:-webkit-autofill:focus {
 /* ─── Focus ─── */
 *:focus-visible { outline: 1px solid #1060a8; outline-offset: 0px; }
 
+/* ─── Kill the webkit/mobile tap-highlight flash that makes selects,
+       dropdowns and buttons flicker the instant they're clicked ─── */
+* { -webkit-tap-highlight-color: transparent; }
+select, option, input, textarea, button, a, label, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+/* Keep antialiasing stable on tap so option/select text doesn't re-smooth. */
+select:focus, select:active { -webkit-font-smoothing: antialiased; }
+
 /* ─── Button base (reset) ─── */
 button { font-family: var(--font-ui); cursor: pointer; border: none; background: none; }
 button:disabled { opacity: 0.38; cursor: not-allowed; }
