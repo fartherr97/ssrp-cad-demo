@@ -1,4 +1,4 @@
-import { MdOutlineGavel, MdOpenInNew, MdArrowForward } from 'react-icons/md';
+import { MdOutlineGavel, MdOpenInNew } from 'react-icons/md';
 
 export default function FileComplaint() {
   return (
@@ -32,10 +32,6 @@ export default function FileComplaint() {
         Go to Report Center
         <MdOpenInNew size={17} />
       </a>
-
-      <p className="text-[11px] text-slate-600 font-mono tracking-wide">
-        ssrp.us/reports <MdArrowForward size={11} className="inline align-[-1px]" /> Complaint Forms
-      </p>
     </div>
   );
 }

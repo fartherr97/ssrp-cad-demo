@@ -270,20 +270,20 @@ export default function ReportsCenter() {
             <div className="xl:flex-1 xl:overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}
                 onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} canSupplement />
+
+              {/* ── Action buttons: stacked directly below the document ── */}
+              <div className="max-w-[1100px] mx-auto w-full mt-5 pt-4 border-t border-border-faint">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+                  <button className={`${S_BTN_SECONDARY} w-full sm:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
+                  <button className={`${S_BTN_SECONDARY} hidden sm:flex sm:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
+                    <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
+                  </button>
+                  <button className={`${S_BTN_DANGER} hidden sm:flex sm:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
+                  <button className={`${S_BTN_SUBMIT} w-full sm:w-auto sm:ml-auto`} onClick={submitReport}><MdSend size={17} /> Submit Report</button>
+                </div>
+              </div>
             </div>
           </main>
-        </div>
-
-        {/* ── Bottom action bar ── */}
-        <div className="shrink-0 bg-app-toolbar/80 backdrop-blur-md border-t border-border-base p-3 md:px-4 md:py-2.5">
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-            <button className={`${S_BTN_SECONDARY} w-full sm:w-auto`} onClick={closeForm}><MdArrowBack size={15} /> Back</button>
-            <button className={`${S_BTN_SECONDARY} hidden sm:flex sm:w-auto`} onClick={exportPDF} disabled={pdfLoading}>
-              <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
-            </button>
-            <button className={`${S_BTN_DANGER} hidden sm:flex sm:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-            <button className={`${S_BTN_SUBMIT} w-full sm:w-auto sm:ml-auto`} onClick={submitReport}><MdSend size={17} /> Submit Report</button>
-          </div>
         </div>
       </div>
     );
