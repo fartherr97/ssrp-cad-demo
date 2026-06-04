@@ -56,8 +56,10 @@ const PORTAL_ICON = {
    the command page, civilians can't see LEO, etc. Hidden tabs are not rendered. */
 function accessibleTabs(currentUser, officers = []) {
   const portal = currentUser?.portal;
-  const isAdmin = currentUser?.role === 'admin' || portal === 'admin';
-  if (isAdmin) return ['civilian', 'business', 'leo', 'fire', 'supervisor', 'command'];
+  // Only the Admin portal previews every help page. An officer whose *account*
+  // role is 'admin' but who is signed into the LEO/Fire portal still only sees
+  // the help for that portal (plus leadership tiers below), never the others.
+  if (portal === 'admin') return ['civilian', 'business', 'leo', 'fire', 'supervisor', 'command'];
 
   const me = officers.find(o => o.id === currentUser?.id);
   const isLeadership = !!me && COMMAND_RANKS.includes(me.rank);
