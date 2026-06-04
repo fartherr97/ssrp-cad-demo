@@ -959,9 +959,9 @@ function reducer(state, action) {
     }
 
     case 'ADD_NOTIFICATION': {
-      const { title, body, color, time } = action.payload;
+      const { title, body, sender, color, time } = action.payload;
       const ts = time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const entry = { id: `notif-${Date.now()}-${state.nextId}`, title, body, color: color || '#3a88e8', time: ts, read: false };
+      const entry = { id: `notif-${Date.now()}-${state.nextId}`, title, body, sender: sender || null, color: color || '#3a88e8', time: ts, read: false };
       return { ...state, notifications: [entry, ...state.notifications], nextId: state.nextId + 1 };
     }
 
