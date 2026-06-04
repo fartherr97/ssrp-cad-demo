@@ -10,6 +10,7 @@ import {
 } from './PortalKit';
 import { BADGE } from '../../constants/styles';
 import ReportForm from '../../components/ReportForm';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const defaultExpiry = () => {
   const d = new Date();
@@ -55,15 +56,14 @@ export default function MyVehicles() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { civilians, vehicles } = state;
+  const { myChars, activeChar } = useActiveCivilian();
 
   const vehicleTemplate = useMemo(
     () => (state.recordTemplates || []).find(t => t.vehicleTemplate) || null,
     [state.recordTemplates],
   );
 
-  const myChars     = useMemo(() => civilians.filter(c => c.ownedByPlayer), [civilians]);
-  const myCharIds   = useMemo(() => myChars.map(c => c.id), [myChars]);
-  const myVehicles  = useMemo(() => vehicles.filter(v => myCharIds.includes(v.ownerId)), [vehicles, myCharIds]);
+  const myVehicles  = useMemo(() => vehicles.filter(v => v.ownerId === activeChar?.id), [vehicles, activeChar]);
 
   const ownerName = (id) => {
     const c = civilians.find(x => x.id === id);
@@ -80,7 +80,7 @@ export default function MyVehicles() {
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
   const openNew = () => {
-    setForm({ ...EMPTY_FORM, ownerId: myChars[0] ? String(myChars[0].id) : '' });
+    setForm({ ...EMPTY_FORM, ownerId: activeChar ? String(activeChar.id) : '' });
     setTemplateData({});
     setShowForm(true);
   };
@@ -126,7 +126,7 @@ export default function MyVehicles() {
       <PortalHeader
         icon={MdDirectionsCar}
         title="My Vehicles"
-        subtitle="Register vehicles to your characters and view their registration status."
+        subtitle="Register vehicles to your active character and view their registration status."
         accent="brand"
         action={
           !showForm && myChars.length > 0 && (
@@ -138,6 +138,8 @@ export default function MyVehicles() {
           )
         }
       />
+
+      <CivilianSwitcher />
 
       {showForm && (
         <PortalCard accent="brand" style={{ marginBottom: 22 }}>
@@ -155,11 +157,11 @@ export default function MyVehicles() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label className={PORTAL_LABEL}>Registered Owner</label>
-                <select className={PORTAL_INPUT} value={form.ownerId} onChange={e => setField('ownerId', e.target.value)} required>
-                  {myChars.map(c => (
-                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
-                  ))}
-                </select>
+                <div className={`${PORTAL_INPUT} flex items-center gap-2 !cursor-default`}>
+                  <MdPerson size={16} className="text-brand-bright shrink-0" />
+                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '—'}</span>
+                  <span className="text-[10px] text-slate-500 ml-auto">Active character</span>
+                </div>
               </div>
               <div>
                 <label className={PORTAL_LABEL}>License Plate</label>

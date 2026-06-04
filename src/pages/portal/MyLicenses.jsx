@@ -10,6 +10,7 @@ import {
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
 import ReportForm from '../../components/ReportForm';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const DL_CLASSES = [
   { value: 'Class E',     label: 'Class E',         desc: 'Standard license — non-commercial vehicles under 26,001 lbs (most common)' },
@@ -307,7 +308,7 @@ function DLCard({ civ, onRenew }) {
 export default function MyLicenses() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const myChars   = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const { myChars, activeChar } = useActiveCivilian();
   const dlTemplate = useMemo(() => (state.recordTemplates || []).find(t => t.dlTemplate) || null, [state.recordTemplates]);
 
   // Per-character UI state: null | 'applying' | 'renewing'
@@ -346,9 +347,11 @@ export default function MyLicenses() {
       <PortalHeader
         icon={MdBadge}
         title="My Licenses"
-        subtitle="Manage driver licenses and weapon permits for your characters."
+        subtitle="Manage driver licenses and weapon permits for your active character."
         accent="brand"
       />
+
+      <CivilianSwitcher />
 
       {myChars.length === 0 ? (
         <PortalCard accent="brand">
@@ -362,7 +365,7 @@ export default function MyLicenses() {
         </PortalCard>
       ) : (
         <div className="flex flex-col gap-5">
-          {myChars.map(c => {
+          {(activeChar ? [activeChar] : []).map(c => {
             const mode = formMode[c.id] || null;
             const hasDL = !!c.dlNumber;
 

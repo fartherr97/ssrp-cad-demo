@@ -5,6 +5,7 @@ import {
   MdDirectionsCar, MdLocationOn, MdCheckCircle, MdPhone,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard } from './PortalKit';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const REPORT_STATUS_MAP = {
   'Pending Review': { label: 'Awaiting review by law enforcement',          color: '#94a3b8', Icon: MdHourglassEmpty },
@@ -59,27 +60,24 @@ function ReportCard({ title, badge, st, body, meta }) {
 
 export default function MyReports() {
   const { state } = useCAD();
-
-  const myCharIds = useMemo(
-    () => state.civilians.filter(c => c.ownedByPlayer).map(c => c.id),
-    [state.civilians],
-  );
+  const { activeChar } = useActiveCivilian();
+  const activeId = activeChar?.id ?? null;
 
   const nonEmergency = useMemo(
     () => state.reports
-      .filter(r => r.officerBadge === 'CITIZEN' && myCharIds.includes(r.formData?.filerId))
+      .filter(r => r.officerBadge === 'CITIZEN' && r.formData?.filerId === activeId)
       .map(r => ({ _kind: 'report', _sortKey: r.id, ...r }))
       .reverse(),
-    [state.reports, myCharIds],
+    [state.reports, activeId],
   );
 
   const calls911 = useMemo(
     () => (state.civilian911Log || [])
-      .filter(c => myCharIds.includes(c.filerId))
+      .filter(c => c.filerId === activeId)
       .map(c => ({ _kind: '911', _sortKey: c.receivedAt, ...c }))
       .slice()
       .reverse(),
-    [state.civilian911Log, myCharIds],
+    [state.civilian911Log, activeId],
   );
 
   const allItems = useMemo(
@@ -94,9 +92,11 @@ export default function MyReports() {
       <PortalHeader
         icon={MdAssignment}
         title="My Reports"
-        subtitle="Track your filed reports and 911 calls."
+        subtitle="Track your active character's filed reports and 911 calls."
         accent="brand"
       />
+
+      <CivilianSwitcher />
 
       {empty ? (
         <PortalCard accent="brand" className="text-center px-6 py-[44px]">

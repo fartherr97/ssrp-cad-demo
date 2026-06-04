@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
-import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning } from 'react-icons/md';
+import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
+import { useActiveCivilian } from '../../contexts/CivilianContext';
 
 const DL_BADGE = {
   ACTIVE:    BADGE.green,
@@ -30,9 +31,9 @@ const FORM_FIELDS = [
 ];
 
 export default function MyCharacters() {
-  const { state, dispatch } = useCAD();
+  const { dispatch } = useCAD();
   const toast = useToast();
-  const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const { myChars, activeChar, setActiveCharId } = useActiveCivilian();
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -153,23 +154,35 @@ export default function MyCharacters() {
         </PortalCard>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: 14 }}>
-          {myChars.map(c => (
-            <PortalCard key={c.id} accent="brand">
+          {myChars.map(c => {
+            const isActive = c.id === activeChar?.id;
+            return (
+            <PortalCard key={c.id} accent="brand" className={isActive ? 'ring-2 ring-brand/60 border-brand/50' : ''}>
               <div className="flex justify-between items-start gap-2.5 mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
                     <MdPerson size={22} color="#3d82f0" />
                   </div>
                   <div>
-                    <div className="text-base font-extrabold text-slate-100">{c.firstName} {c.lastName}</div>
+                    <div className="text-base font-extrabold text-slate-100 flex items-center gap-2">
+                      {c.firstName} {c.lastName}
+                      {isActive && <span className="text-[9px] font-bold uppercase tracking-wider text-brand-bright bg-brand/15 border border-brand/30 rounded px-1.5 py-0.5">Active</span>}
+                    </div>
                     <span className={`${DL_BADGE[c.dlStatus] || BADGE.gray} mt-1`}>
                       DL {c.dlStatus || 'N/A'}
                     </span>
                   </div>
                 </div>
-                <button className={`${sm(S_BTN_SECONDARY)} press-sm`} onClick={() => openEdit(c)}>
-                  <MdEdit size={15} /> Edit
-                </button>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <button className={`${sm(S_BTN_SECONDARY)} press-sm`} onClick={() => openEdit(c)}>
+                    <MdEdit size={15} /> Edit
+                  </button>
+                  {!isActive && (
+                    <button className={`${sm(S_BTN_SECONDARY)} press-sm`} onClick={() => setActiveCharId(c.id)}>
+                      <MdCheckCircle size={15} /> Set Active
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -190,7 +203,8 @@ export default function MyCharacters() {
                 </div>
               )}
             </PortalCard>
-          ))}
+            );
+          })}
         </div>
       )}
     </PortalPage>

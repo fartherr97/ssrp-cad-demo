@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -7,6 +7,7 @@ import {
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY } from '../../constants/styles';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const ACCENT = 'brand';
 
@@ -30,12 +31,15 @@ const EMPTY_FORM = {
 export default function FileReport() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const { myChars, activeChar } = useActiveCivilian();
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, filerId: myChars[0] ? String(myChars[0].id) : '' });
+  const [form, setForm] = useState({ ...EMPTY_FORM, filerId: activeChar ? String(activeChar.id) : '' });
   const [submitted, setSubmitted] = useState(null);
 
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
+
+  // Keep the filer locked to whoever is the active character.
+  useEffect(() => { if (activeChar) setForm(f => ({ ...f, filerId: String(activeChar.id) })); }, [activeChar?.id]);
 
   const filerName = (id) => {
     const c = myChars.find(x => x.id === Number(id));
@@ -71,7 +75,7 @@ export default function FileReport() {
   };
 
   const fileAnother = () => {
-    setForm({ ...EMPTY_FORM, filerId: myChars[0] ? String(myChars[0].id) : '' });
+    setForm({ ...EMPTY_FORM, filerId: activeChar ? String(activeChar.id) : '' });
     setSubmitted(null);
   };
 
@@ -83,6 +87,8 @@ export default function FileReport() {
         subtitle="Submit a non-emergency report to law enforcement. For emergencies, always call 911."
         accent={ACCENT}
       />
+
+      {!submitted && <CivilianSwitcher />}
 
       {submitted ? (
         <PortalCard accent="green" className="text-center px-6 py-[44px]">
@@ -134,11 +140,11 @@ export default function FileReport() {
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>
-                <select className={PORTAL_INPUT} value={form.filerId} onChange={e => setField('filerId', e.target.value)} required>
-                  {myChars.map(c => (
-                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
-                  ))}
-                </select>
+                <div className={`${PORTAL_INPUT} flex items-center gap-2 !cursor-default`}>
+                  <MdPerson size={15} className="text-brand-bright shrink-0" />
+                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '—'}</span>
+                  <span className="text-[10px] text-slate-500 ml-auto">Active character</span>
+                </div>
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdEventNote size={13} className="inline align-[-2px] mr-[5px]" />Incident Date</label>

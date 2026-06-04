@@ -8,6 +8,7 @@ import {
   MdPhone, MdClose,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 import {
   BADGE, S_BTN_DANGER, S_BTN_SECONDARY, S_BTN_GHOST, sm,
   S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
@@ -28,22 +29,20 @@ export default function CivilianHome() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const navigate = useNavigate();
-  const { civilians, vehicles, warrants, currentUser } = state;
+  const { vehicles, warrants, currentUser } = state;
+  const { myChars, activeChar, setActiveCharId } = useActiveCivilian();
 
   const [show911, setShow911] = useState(false);
   const [form911, setForm911] = useState(BLANK_911);
   const set911 = k => e => setForm911(f => ({ ...f, [k]: e.target.value }));
 
-  const myChars = useMemo(() => civilians.filter(c => c.ownedByPlayer), [civilians]);
-  const myCharIds = useMemo(() => myChars.map(c => c.id), [myChars]);
-  const myVehicles = useMemo(() => vehicles.filter(v => myCharIds.includes(v.ownerId)), [vehicles, myCharIds]);
-  const validLicenses = useMemo(() => myChars.filter(c => c.dlStatus === 'ACTIVE').length, [myChars]);
+  const myVehicles = useMemo(() => vehicles.filter(v => v.ownerId === activeChar?.id), [vehicles, activeChar]);
   const myWarrants = useMemo(
-    () => warrants.filter(w => myCharIds.includes(w.civilianId) && w.status === 'ACTIVE'),
-    [warrants, myCharIds],
+    () => warrants.filter(w => w.civilianId === activeChar?.id && w.status === 'ACTIVE'),
+    [warrants, activeChar],
   );
 
-  const callerName = myChars[0] ? `${myChars[0].firstName} ${myChars[0].lastName}` : (currentUser?.name || 'Civilian');
+  const callerName = activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : (currentUser?.name || 'Civilian');
 
   const submit911 = () => {
     if (!form911.message.trim() || !form911.location.trim()) return;
@@ -51,7 +50,7 @@ export default function CivilianHome() {
       type: 'ADD_CIVILIAN_911',
       payload: {
         id: `inc_${Date.now()}`,
-        filerId: myChars[0]?.id ?? null,
+        filerId: activeChar?.id ?? null,
         caller: callerName,
         callbackNumber: form911.callbackNumber.trim() || null,
         message: form911.message.trim(),
@@ -82,6 +81,8 @@ export default function CivilianHome() {
         subtitle={`Welcome back, ${currentUser?.name || 'Citizen'} * manage your records and services here.`}
         accent={ACCENT}
       />
+
+      <CivilianSwitcher />
 
       {myWarrants.length > 0 && (
         <PortalCard accent="red" className="mb-5 flex items-center gap-4">
@@ -118,9 +119,9 @@ export default function CivilianHome() {
       </button>
 
       <div className="flex gap-3.5 flex-wrap mb-7">
-        <StatCard label="My Characters"  value={myChars.length}    accent={ACCENT}   icon={MdPerson} />
-        <StatCard label="My Vehicles"    value={myVehicles.length} accent={ACCENT}   icon={MdDirectionsCar} />
-        <StatCard label="Valid Licenses" value={validLicenses}     accent="green"    icon={MdBadge} />
+        <StatCard label="Characters"   value={myChars.length}    accent={ACCENT} icon={MdPerson} hint="Total on account" />
+        <StatCard label="Vehicles"     value={myVehicles.length} accent={ACCENT} icon={MdDirectionsCar} hint={activeChar ? `${activeChar.firstName}'s vehicles` : undefined} />
+        <StatCard label="License"      value={activeChar?.dlStatus || 'N/A'} accent={activeChar?.dlStatus === 'ACTIVE' ? 'green' : 'amber'} icon={MdBadge} />
         <StatCard
           label="Active Warrants"
           value={myWarrants.length}
@@ -157,22 +158,31 @@ export default function CivilianHome() {
           </div>
         </PortalCard>
       ) : (
-        <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
-          {myChars.map(c => (
-            <PortalCard key={c.id} accent={ACCENT} hover onClick={() => navigate('/portal/characters')}>
-              <div className="flex items-center justify-between gap-2.5">
-                <div className="flex items-center gap-3 min-w-0">
-                  <MdPerson size={22} className="text-brand-bright shrink-0" />
-                  <div className="min-w-0">
-                    <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
-                    <div className="text-[11px] text-slate-500">DOB {c.dob}</div>
+        <>
+          <div className="text-[12px] text-slate-500 mb-3">Select a character to make them active across the portal.</div>
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+            {myChars.map(c => {
+              const isActive = c.id === activeChar?.id;
+              return (
+                <PortalCard key={c.id} accent={ACCENT} hover onClick={() => setActiveCharId(c.id)}
+                  className={isActive ? 'ring-2 ring-brand/60 border-brand/50' : ''}>
+                  <div className="flex items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <MdPerson size={22} className={`shrink-0 ${isActive ? 'text-brand-bright' : 'text-slate-400'}`} />
+                      <div className="min-w-0">
+                        <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
+                        <div className="text-[11px] text-slate-500">DOB {c.dob}</div>
+                      </div>
+                    </div>
+                    {isActive
+                      ? <span className="text-[9px] font-bold uppercase tracking-wider text-brand-bright bg-brand/15 border border-brand/30 rounded px-1.5 py-0.5 shrink-0">Active</span>
+                      : <span className={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>}
                   </div>
-                </div>
-                <span className={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>
-              </div>
-            </PortalCard>
-          ))}
-        </div>
+                </PortalCard>
+              );
+            })}
+          </div>
+        </>
       )}
       {/* 911 Modal */}
       {show911 && (

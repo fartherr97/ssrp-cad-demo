@@ -39,6 +39,7 @@ import Employees from './pages/portal/Employees';
 import BusinessFleet from './pages/portal/BusinessFleet';
 import TowCAD from './pages/TowCAD';
 import { BusinessProvider } from './contexts/BusinessContext';
+import { CivilianProvider } from './contexts/CivilianContext';
 import { ToastProvider } from './contexts/ToastContext';
 // Admin (Sonoran-style customization suite)
 import AdminShell from './pages/admin/AdminShell';
@@ -225,7 +226,9 @@ export default function App() {
       <ToastProvider>
         <BrowserRouter>
           <BusinessProvider>
-            <CADApp />
+            <CivilianProvider>
+              <CADApp />
+            </CivilianProvider>
           </BusinessProvider>
         </BrowserRouter>
       </ToastProvider>

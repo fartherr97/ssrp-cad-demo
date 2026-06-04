@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -7,6 +7,7 @@ import {
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, sm } from '../../constants/styles';
+import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const BLOOD_TYPES = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown'];
 
@@ -363,10 +364,13 @@ function ProfileReadView({ profile }) {
 export default function MedicalRecords() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const myChars = useMemo(() => state.civilians.filter(c => c.ownedByPlayer), [state.civilians]);
+  const { myChars, activeChar } = useActiveCivilian();
 
   const [editingId, setEditingId] = useState(null);
-  const [expandedId, setExpandedId] = useState(myChars[0]?.id ?? null);
+  const [expandedId, setExpandedId] = useState(activeChar?.id ?? null);
+
+  // Keep the active character's card expanded when switching characters.
+  useEffect(() => { if (activeChar) setExpandedId(activeChar.id); }, [activeChar?.id]);
 
   const handleSave = (civId, profileData) => {
     dispatch({ type: 'UPDATE_MEDICAL_PROFILE', payload: { id: civId, medicalProfile: profileData } });
@@ -379,9 +383,11 @@ export default function MedicalRecords() {
       <PortalHeader
         icon={MdLocalHospital}
         title="Medical Records"
-        subtitle="Manage your characters' medical profiles — allergies, conditions, medications, and emergency contacts."
+        subtitle="Manage your active character's medical profile — allergies, conditions, medications, and emergency contacts."
         accent="brand"
       />
+
+      <CivilianSwitcher />
 
       {myChars.length === 0 ? (
         <PortalCard accent="brand">
@@ -404,7 +410,7 @@ export default function MedicalRecords() {
             </div>
           </div>
 
-          {myChars.map(c => {
+          {(activeChar ? [activeChar] : []).map(c => {
             const isExpanded = expandedId === c.id;
             const isEditing = editingId === c.id;
             const profile = c.medicalProfile;
