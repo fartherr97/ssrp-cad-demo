@@ -39,7 +39,7 @@ export default function ActivePanicsPanel({ className = '' }) {
           {activePanics.length}
         </span>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col max-h-[300px] overflow-y-auto">
         {activePanics.map((p, i) => (
           <div key={p.id} className={`flex items-center gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-red-500/15' : ''}`}>
             <span className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border border-red-500/40" style={{ background: 'rgba(239,68,68,0.2)' }}>

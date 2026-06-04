@@ -133,10 +133,10 @@ export function SonSearch({ value, onChange, placeholder = 'Search' }) {
 /* Table primitives */
 export function SonTable({ columns, children }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border-base">
+    <div className="overflow-auto max-h-[600px] rounded-xl border border-border-base">
       <table className="w-full border-collapse text-[13px]">
-        <thead>
-          <tr className="bg-app-bg/60 backdrop-blur-sm">
+        <thead className="sticky top-0 z-[1]">
+          <tr className="bg-app-panel backdrop-blur-sm">
             {columns.map((c, i) => (
               <th key={i} className="text-[10px] font-bold tracking-[0.7px] uppercase py-3 px-4 whitespace-nowrap text-slate-500 border-b border-border-base"
                 style={{ textAlign: c.align || 'left', width: c.width }}>{c.label}</th>

@@ -80,12 +80,12 @@ export default function MessageLogs() {
         ) : (
           <>
             {/* Desktop table */}
-            <div className="hidden sm:block overflow-x-auto -mx-4 -mb-4">
+            <div className="hidden sm:block overflow-auto max-h-[600px] -mx-4 -mb-4">
               <table className="w-full border-collapse">
-                <thead>
+                <thead className="sticky top-0 z-[1]">
                   <tr>
                     {['Time', 'Type', 'From', 'To / Title', 'Subject', 'Preview'].map(h => (
-                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-bg/60 border-b border-border-base whitespace-nowrap first:rounded-tl-xl last:rounded-tr-xl">
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 bg-app-panel border-b border-border-base whitespace-nowrap first:rounded-tl-xl last:rounded-tr-xl">
                         {h}
                       </th>
                     ))}
@@ -123,7 +123,7 @@ export default function MessageLogs() {
             </div>
 
             {/* Mobile cards */}
-            <div className="block sm:hidden flex flex-col gap-2">
+            <div className="block sm:hidden flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
               {filtered.map(m => (
                 <div key={m.id} className="bg-app-card/60 border border-border-faint rounded-xl p-3">
                   <div className="flex items-center gap-2 mb-2">
