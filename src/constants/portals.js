@@ -74,6 +74,7 @@ export const PORTALS = {
       { Icon: MdBadge,         label: 'Licenses',    route: '/portal/licenses'    },
       { Icon: MdLocalHospital, label: 'Medical',     route: '/portal/medical'     },
       { Icon: MdReportProblem, label: 'File Report', route: '/portal/file-report' },
+      { Icon: MdLocalShipping, label: 'Request Tow', route: '/portal/request-tow' },
       { Icon: MdAssignment,    label: 'My Reports',  route: '/portal/my-reports'  },
       { Icon: MdPolicy,        label: 'LE Records',  route: '/portal/leo-records' },
       { Icon: MdGavel,         label: 'Complaint',   route: '/portal/complaint'   },

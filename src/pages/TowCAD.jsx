@@ -604,6 +604,12 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${PRIORITY_BADGE[req.priority]}`}>
             P{req.priority}
           </span>
+          {req.source === 'CIVILIAN' && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border"
+              style={{ color: '#9090cc', borderColor: 'rgba(144,144,204,0.45)', background: 'rgba(144,144,204,0.14)' }}>
+              Civilian
+            </span>
+          )}
           <span className="text-[11px] text-slate-500 font-mono">#{req.id}</span>
         </div>
         <span className="text-[10px] text-slate-500">{elapsed(req.createdAt)}</span>
@@ -671,12 +677,25 @@ export default function TowCAD() {
 
   const visibleCompanyIds = useMemo(() => visibleCompanies.map(b => b.id), [visibleCompanies]);
 
-  // FDOT inbound requests are only surfaced to the FDOT tow company's own view.
+  // The tow company whose CAD is currently being viewed (business portal only).
+  const activeBizCompany = useMemo(
+    () => (isBusinessPortal && bizCtx?.activeBiz?.isTowCompany) ? bizCtx.activeBiz : null,
+    [isBusinessPortal, bizCtx],
+  );
+  const isTowCompanyView = !!activeBizCompany;
   const fdotCompany = useMemo(() => visibleCompanies.find(b => b.isFDOT), [visibleCompanies]);
-  const isFdotView  = isBusinessPortal && !!fdotCompany;
+  // Inbound assistance requests are routed: a request aimed at a specific company
+  // (targetCompanyId) is shown only to that company; an untargeted request — every
+  // LEO FDOT request, and any civilian request with no company chosen — falls to
+  // FDOT only. So a non-FDOT tow company never sees FDOT-bound requests.
   const inboundRequests = useMemo(
-    () => fdotRequests.filter(r => r.status === 'PENDING' || r.status === 'ACKNOWLEDGED'),
-    [fdotRequests]
+    () => fdotRequests.filter(r => {
+      if (r.status !== 'PENDING' && r.status !== 'ACKNOWLEDGED') return false;
+      if (!activeBizCompany) return false;
+      if (r.targetCompanyId) return r.targetCompanyId === activeBizCompany.id;
+      return !!activeBizCompany.isFDOT;
+    }),
+    [fdotRequests, activeBizCompany],
   );
 
   const [showForm,       setShowForm]       = useState(false);
@@ -701,6 +720,7 @@ export default function TowCAD() {
   // drops off this list * and the alert banner clears when none remain.
   const unhandledRoadCalls = useMemo(
     () => fdotRequests.filter(req =>
+      req.source !== 'CIVILIAN' && req.callId &&
       req.status !== 'DECLINED' &&
       !towJobs.some(j => j.callId === req.callId)
     ),
@@ -775,34 +795,40 @@ export default function TowCAD() {
     if (requester && !ids.includes(requester.id)) ids.push(requester.id);
     return ids;
   };
+  const handlerName = () => (activeBizCompany || fdotCompany)?.name || 'Tow';
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
-    toast.info(`Acknowledged · ${req.assistType}`, { title: 'FDOT' });
-    dispatch({
-      type: 'DISPATCH_RADIO',
-      payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.` },
-    });
+    toast.info(`Acknowledged · ${req.assistType}`, { title: handlerName() });
+    const to = recipientsFor(req);
+    if (to.length > 0) {
+      dispatch({
+        type: 'DISPATCH_RADIO',
+        payload: { from: currentUser?.id, to, text: `${handlerName()} has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.` },
+      });
+    }
   };
   const declineRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
-    toast.warning(`Declined · ${req.assistType}`, { title: 'FDOT' });
+    toast.warning(`Declined · ${req.assistType}`, { title: handlerName() });
   };
   const dispatchFromRequest = (req) => setDispatchingReq(req);
 
   const confirmQuickDispatch = (req, unitId) => {
     const unit = towUnits.find(u => u.id === unitId);
+    const handlingCompany = activeBizCompany || fdotCompany;
+    const isCiv = req.source === 'CIVILIAN';
     dispatch({
       type: 'ADD_TOW_JOB',
       payload: {
         location:    req.location,
         pickupPostal: req.postal || '',
-        towType:     'FDOT Clearance',
+        towType:     isCiv ? 'Civilian Request' : 'FDOT Clearance',
         priority:    req.priority || 2,
         zone:        'Roaming',
-        notes:       `[FDOT Assist] ${req.assistType} · ${req.description}`,
+        notes:       `[${isCiv ? 'Civilian Tow Request' : 'FDOT Assist'}] ${req.assistType} · ${req.description}`,
         callId:      req.callId || '',
-        companyId:   fdotCompany?.id,
-        companyName: fdotCompany?.name || 'FDOT',
+        companyId:   handlingCompany?.id,
+        companyName: handlingCompany?.name || 'FDOT',
         unitId,
         driverName:  unit?.operatorName || '',
         status:      'EN_ROUTE',
@@ -812,10 +838,13 @@ export default function TowCAD() {
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
     toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
-    dispatch({
-      type: 'DISPATCH_RADIO',
-      payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has dispatched ${unit?.truckName || 'a unit'} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
-    });
+    const to = recipientsFor(req);
+    if (to.length > 0) {
+      dispatch({
+        type: 'DISPATCH_RADIO',
+        payload: { from: currentUser?.id, to, text: `${handlingCompany?.name || 'FDOT'} has dispatched ${unit?.truckName || 'a unit'} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
+      });
+    }
     setDispatchingReq(null);
   };
 
@@ -867,11 +896,11 @@ export default function TowCAD() {
         </div>
       </div>
 
-      {/* FDOT inbound assistance requests * FDOT company view only */}
-      {isFdotView && inboundRequests.length > 0 && (
+      {/* Inbound assistance requests * each company only sees requests routed to it */}
+      {isTowCompanyView && inboundRequests.length > 0 && (
         <div className="mb-6">
           <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
-            <MdEngineering size={14} /> Incoming LE Assistance Requests ({inboundRequests.length})
+            <MdEngineering size={14} /> Incoming Assistance Requests ({inboundRequests.length})
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
             {inboundRequests.map(req => (
@@ -953,7 +982,7 @@ export default function TowCAD() {
 
       {/* FDOT road incident alert * only while road calls still lack a linked
           tow job; clears once every one has been handled. */}
-      {towCompanies.some(b => b.isFDOT) && unhandledRoadCalls.length > 0 && (
+      {activeBizCompany?.isFDOT && unhandledRoadCalls.length > 0 && (
         <div className="flex items-start gap-3 mb-5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
           <MdWarning size={18} className="text-amber-400 shrink-0 mt-0.5" />
           <div className="text-[12.5px] text-amber-300 leading-relaxed">

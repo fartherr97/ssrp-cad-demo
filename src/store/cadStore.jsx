@@ -957,9 +957,12 @@ function reducer(state, action) {
       // payload: { assistType, location, postal, priority, description, callId,
       //            callNature, requestedBy, requestedByBadge, requestedByUnit }
       const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+      const target = req.targetCompanyId ? state.businesses.find(b => b.id === req.targetCompanyId) : null;
+      const dest = target?.name || 'FDOT';
+      const who = req.source === 'CIVILIAN' ? `Civilian tow request (${req.requestedBy || 'unknown'})` : 'FDOT assistance requested';
       const log = addDispatchLog(
         state,
-        `FDOT assistance requested * ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        `${who} * ${req.assistType || 'Assist'} @ ${req.location}${req.source === 'CIVILIAN' ? ` → ${dest}` : ''}${req.callId ? ` (Call ${req.callId})` : ''}`,
         'alert'
       );
       return { ...state, fdotRequests: [req, ...state.fdotRequests], nextId: state.nextId + 1, ...log };
