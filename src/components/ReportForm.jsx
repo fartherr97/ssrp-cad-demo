@@ -1326,11 +1326,11 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
     <div className="flex flex-col gap-5 max-w-[1100px] mx-auto w-full">
       <div data-doc-top />
       {template?.showDept !== false && deptDisplay && (
-        <div className="rounded-xl border border-border-base bg-app-card/70 px-4 py-2.5 flex items-center gap-3">
-          <DeptBadge deptShort={me?.deptShort} size={22} fallbackClassName="text-brand-bright" />
-          <div>
-            <div className="text-[8.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Issuing Department</div>
-            <div className="text-[13px] font-bold text-white">{deptDisplay}</div>
+        <div className="rounded-xl border border-border-base bg-gradient-to-r from-brand/[0.12] via-app-card/70 to-app-card/70 px-5 sm:px-7 py-4 sm:py-5 flex items-center gap-4 sm:gap-5 shadow-lg shadow-black/20">
+          <DeptBadge deptShort={me?.deptShort} size={44} fallbackClassName="text-brand-bright" />
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[1.4px] text-brand-bright/80">Issuing Department</div>
+            <div className="text-[20px] sm:text-[26px] font-extrabold text-white tracking-[-0.3px] leading-tight truncate">{deptDisplay}</div>
           </div>
         </div>
       )}
