@@ -151,9 +151,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -243,9 +241,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -324,9 +320,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -429,9 +423,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -520,9 +512,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -600,9 +590,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -640,9 +628,7 @@ export const REPORT_TEMPLATES = [
         id: 'sAI', title: 'Agency Information', style: 'gray',
         fields: [
           { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
           { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
           { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
           { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -876,9 +862,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -902,9 +886,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -928,9 +910,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -961,9 +941,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -989,9 +967,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -1019,9 +995,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
@@ -1047,9 +1021,7 @@ export const RECORD_TEMPLATES = [
     sections: [
       { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
         { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_dp',  label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
         { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
         { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
         { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },

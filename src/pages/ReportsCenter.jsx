@@ -254,21 +254,8 @@ export default function ReportsCenter() {
           </div>
         </div>
 
-        {/* ── Body: 3 columns ── */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)_300px] overflow-auto xl:overflow-hidden">
-
-          {/* LEFT: case details — desktop only */}
-          <aside className="hidden xl:flex flex-col xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
-            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
-            <div className="px-4">
-              <Detail label="Incident #" value={draftMeta.caseNumber} />
-              <Detail label="Report Type" value={tpl.name} />
-              <Detail label="Date / Time" value={now.toLocaleString()} />
-              <Detail label="Primary Officer" value={`${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`} />
-              <Detail label="Agency" value={me?.deptShort || 'HCSO'} />
-              <Detail label="Status" value={<span className={BADGE.gray}>Draft</span>} />
-            </div>
-          </aside>
+        {/* ── Body ── */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 overflow-auto xl:overflow-hidden">
 
           {/* CENTER: report information + paper document */}
           <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
@@ -283,43 +270,6 @@ export default function ReportsCenter() {
                 onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} canSupplement />
             </div>
           </main>
-
-          {/* RIGHT: related records — desktop only */}
-          <aside className="hidden xl:flex flex-col xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
-            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Related Records</div>
-            <div className="p-3 flex flex-col gap-3">
-              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Author</div>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0"><DeptBadge deptShort={me?.deptShort} size={22} /></div>
-                  <div className="min-w-0">
-                    <div className="text-[12.5px] font-semibold text-white truncate">{me?.name || currentUser?.name}</div>
-                    <div className="text-[10.5px] text-slate-500">#{me?.badge || currentUser?.badge} · {me?.deptShort || 'HCSO'}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                <div className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2"><MdPhone size={13} /> Related Call</div>
-                {relatedCall ? (
-                  <div className="text-[12px]">
-                    <div className="font-mono font-bold text-white">{relatedCall.id}</div>
-                    <div className="text-slate-300 mt-0.5">{relatedCall.nature}</div>
-                    <div className="text-slate-500 mt-0.5">{relatedCall.location}, {relatedCall.city}</div>
-                  </div>
-                ) : <div className="text-[11.5px] text-slate-600">No call linked</div>}
-              </div>
-              {[
-                { icon: MdPerson, label: 'Subjects' },
-                { icon: MdDirectionsCar, label: 'Vehicles' },
-                { icon: MdInventory2, label: 'Evidence' },
-              ].map(c => (
-                <div key={c.label} className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-1.5"><c.icon size={13} /> {c.label}</div>
-                  <div className="text-[11.5px] text-slate-600">Link from Records search</div>
-                </div>
-              ))}
-            </div>
-          </aside>
         </div>
 
         {/* ── Bottom action bar ── */}

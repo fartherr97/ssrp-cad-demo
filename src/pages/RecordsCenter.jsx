@@ -202,20 +202,8 @@ export default function RecordsCenter() {
           </div>
         </div>
 
-        {/* ── Body: 3 columns ── */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)_300px] overflow-auto xl:overflow-hidden">
-
-          {/* LEFT: record details */}
-          <aside className="flex flex-col border-b xl:border-b-0 xl:border-r border-border-base bg-app-panel/60 xl:overflow-y-auto">
-            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Details</div>
-            <div className="px-4">
-              <Detail label="Record #" value={draftMeta.caseNumber} />
-              <Detail label="Record Type" value={tpl.name} />
-              <Detail label="Date / Time" value={now.toLocaleString()} />
-              <Detail label="Issuing Officer" value={`${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`} />
-              <Detail label="Status" value={<span className={BADGE.gray}>Draft</span>} />
-            </div>
-          </aside>
+        {/* ── Body ── */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 overflow-auto xl:overflow-hidden">
 
           {/* CENTER: info strip + paper document */}
           <main className="flex flex-col min-h-[70vh] xl:min-h-0 overflow-hidden">
@@ -229,33 +217,6 @@ export default function RecordsCenter() {
                 onBulkChange={(obj) => setFormValues(p => ({ ...p, ...obj }))} canSupplement />
             </div>
           </main>
-
-          {/* RIGHT: related */}
-          <aside className="flex flex-col border-t xl:border-t-0 xl:border-l border-border-base bg-app-panel/60 xl:overflow-y-auto">
-            <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Related Records</div>
-            <div className="p-3 flex flex-col gap-3">
-              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Issuing Officer</div>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0"><DeptBadge deptShort={me?.deptShort} size={22} /></div>
-                  <div className="min-w-0">
-                    <div className="text-[12.5px] font-semibold text-white truncate">{me?.name || currentUser?.name}</div>
-                    <div className="text-[10.5px] text-slate-500">#{me?.badge || currentUser?.badge} · {me?.deptShort || 'HCSO'}</div>
-                  </div>
-                </div>
-              </div>
-              {[
-                { icon: MdPerson, label: 'Subject' },
-                { icon: MdDirectionsCar, label: 'Vehicle' },
-                { icon: MdInventory2, label: 'Attachments' },
-              ].map(c => (
-                <div key={c.label} className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-1.5"><c.icon size={13} /> {c.label}</div>
-                  <div className="text-[11.5px] text-slate-600">Link from Records search</div>
-                </div>
-              ))}
-            </div>
-          </aside>
         </div>
 
         {/* ── Bottom action bar ── */}

@@ -49,8 +49,7 @@ const PREMADE_SECTIONS = [
     id: sid(), title: 'Agency Information', style: 'gray',
     fields: [
       { id: uid(), label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-      { id: uid(), label: 'Agency',      type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-      { id: uid(), label: 'Department',  type: 'text', span: 1, autoFill: 'department',  readOnly: true },
+      { id: uid(), label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
       { id: uid(), label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
       { id: uid(), label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
       { id: uid(), label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },

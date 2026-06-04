@@ -300,26 +300,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
 
       {/* ── Body: left sidebar + center form + right sidebar ──
            Mobile: outer div scrolls everything; xl: each col scrolls independently ── */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[240px_minmax(0,1fr)_260px] overflow-auto xl:overflow-hidden">
-
-        {/* LEFT: case meta — desktop only */}
-        <aside className="hidden xl:flex flex-col border-r border-border-base bg-app-panel/60 overflow-y-auto max-h-full">
-          <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Case Details</div>
-          <div className="px-4">
-            {[
-              { label: 'Case #',    value: entry.caseNumber || '—' },
-              { label: 'Type',      value: entry.type },
-              { label: 'Date',      value: entry.date },
-              { label: 'Officer',   value: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—') },
-              { label: 'Dept',      value: officer?.deptShort || '—' },
-            ].map(d => (
-              <div key={d.label} className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
-                <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{d.label}</span>
-                <span className="text-[12.5px] text-slate-200">{d.value}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
+      <div className="flex-1 min-h-0 grid grid-cols-1 overflow-auto xl:overflow-hidden">
 
         {/* CENTER: dark form (same as report writing) */}
         <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
@@ -426,54 +407,6 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </div>}
           </div>
         </main>
-
-        {/* RIGHT: officer / record info — desktop only */}
-        <aside className="hidden xl:flex flex-col border-l border-border-base bg-app-panel/60 overflow-y-auto max-h-full">
-          <div className="px-4 py-3 border-b border-border-faint shrink-0 text-[11px] font-bold uppercase tracking-[0.7px] text-slate-300">Record Info</div>
-          <div className="p-3 flex flex-col gap-3">
-            <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-              <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Submitted By</div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0">
-                  <DeptBadge deptShort={officer?.deptShort} size={22} />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[12.5px] font-semibold text-white truncate">{officer?.name || entry.officerBadge || '—'}</div>
-                  <div className="text-[10.5px] text-slate-500">#{officer?.badge || entry.officerBadge} · {officer?.deptShort || '—'}</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-              <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Signatures</div>
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${entry.officerSignature ? 'bg-amber-400' : 'bg-slate-600'}`} />
-                  <span className="text-[11px] text-slate-400">Officer</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${effectiveSupSig ? 'bg-green-400' : 'bg-slate-600'}`} />
-                  <span className="text-[11px] text-slate-400">Supervisor</span>
-                </div>
-              </div>
-            </div>
-            {(entry.supervisorComments || []).length > 0 && (
-              <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <MdComment size={12} className="text-slate-500" />
-                  <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Prior Notes</div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {(entry.supervisorComments || []).map(c => (
-                    <div key={c.id} className="rounded-lg p-2.5" style={{ background: 'rgba(251,146,60,0.06)', border: '1px solid rgba(251,146,60,0.18)' }}>
-                      <div className="text-[11px] text-slate-300 leading-snug">{c.text}</div>
-                      <div className="text-[9.5px] text-slate-600 mt-1.5 font-mono">{c.supervisorBadge} · {c.timestamp}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </aside>
       </div>
 
       {/* ── Return to Officer modal — works on all screen sizes ── */}
