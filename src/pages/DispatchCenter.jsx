@@ -242,18 +242,20 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
           {call.callbackNumber && <span className="ml-1 text-slate-600">· {call.callbackNumber}</span>}
         </div>
       )}
-      <div className="flex gap-1.5 mt-0.5">
-        <button onClick={onDispatch}
-          className="press flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
-          style={{ background: 'rgba(58,136,232,0.22)', border: '1px solid rgba(58,136,232,0.38)', color: '#93c5fd' }}>
-          <MdSend size={11} /> Dispatch
-        </button>
-        <button onClick={onDismiss}
-          className="px-2 py-1 rounded-md text-slate-500 hover:text-red-400 cursor-pointer transition-colors"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <MdClose size={13} />
-        </button>
-      </div>
+      {(onDispatch || onDismiss) && (
+        <div className="flex gap-1.5 mt-0.5">
+          <button onClick={onDispatch}
+            className="press flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
+            style={{ background: 'rgba(58,136,232,0.22)', border: '1px solid rgba(58,136,232,0.38)', color: '#93c5fd' }}>
+            <MdSend size={11} /> Dispatch
+          </button>
+          <button onClick={onDismiss}
+            className="px-2 py-1 rounded-md text-slate-500 hover:text-red-400 cursor-pointer transition-colors"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <MdClose size={13} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -542,8 +544,8 @@ export default function DispatchCenter() {
           {/* 10-code radio reference (admin-configured) */}
           <TenCodeReference codes={tenCodes} />
 
-          {/* Incoming 911 — dispatcher only */}
-          {isDispatcher && (
+          {/* Incoming 911 — dispatcher + LEO */}
+          {(isDispatcher || currentUser?.portal === 'leo') && (
             <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
               <div className="flex items-center gap-1.5 mb-0.5">
                 <MdPhone size={13} className="text-red-400" />
@@ -551,18 +553,20 @@ export default function DispatchCenter() {
                 {incoming911.length > 0 && (
                   <span className="px-1.5 py-0.5 rounded-md bg-red-500/20 text-red-400 text-[10px] font-bold leading-none">{incoming911.length}</span>
                 )}
-                <button onClick={() => setShowSim911(true)}
-                  className="ml-1 p-0.5 rounded-md text-slate-500 hover:text-slate-200 hover:bg-white/[0.07] cursor-pointer transition-colors"
-                  title="Simulate 911">
-                  <MdAdd size={14} />
-                </button>
+                {isDispatcher && (
+                  <button onClick={() => setShowSim911(true)}
+                    className="ml-1 p-0.5 rounded-md text-slate-500 hover:text-slate-200 hover:bg-white/[0.07] cursor-pointer transition-colors"
+                    title="Simulate 911">
+                    <MdAdd size={14} />
+                  </button>
+                )}
               </div>
               {incoming911.length === 0 ? (
                 <div className="text-center text-slate-600 text-[11px] py-2">No incoming calls</div>
               ) : [...incoming911].map(c => (
                 <IncomingCallCard key={c.id} call={c}
-                  onDispatch={() => setDispatchTarget(c)}
-                  onDismiss={() => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id })} />
+                  onDispatch={isDispatcher ? () => setDispatchTarget(c) : null}
+                  onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null} />
               ))}
             </div>
           )}

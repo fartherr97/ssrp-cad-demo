@@ -120,6 +120,7 @@ const initialState = {
   activeSessions: ACTIVE_SESSIONS,
   businesses: BUSINESSES,
   incoming911: INCOMING_911,
+  civilian911Log: [],
   unitGroups: UNIT_GROUPS,
   // ─── Admin customization config ───
   callNatures: CALL_NATURES_DEFAULT,
@@ -433,8 +434,31 @@ function reducer(state, action) {
 
     case 'ADD_INCOMING_911':
       return { ...state, incoming911: [action.payload, ...state.incoming911] };
-    case 'REMOVE_INCOMING_911':
-      return { ...state, incoming911: state.incoming911.filter(c => c.id !== action.payload) };
+    case 'ADD_CIVILIAN_911': {
+      const { filerId, ...incPayload } = action.payload;
+      const logEntry = {
+        id: action.payload.id,
+        filerId,
+        caller: action.payload.caller,
+        message: action.payload.message,
+        location: action.payload.location,
+        callbackNumber: action.payload.callbackNumber,
+        receivedAt: action.payload.receivedAt,
+        priority: action.payload.priority,
+        status: 'Pending Dispatch',
+      };
+      return {
+        ...state,
+        incoming911: [incPayload, ...state.incoming911],
+        civilian911Log: [logEntry, ...(state.civilian911Log || [])],
+      };
+    }
+    case 'REMOVE_INCOMING_911': {
+      const civilian911Log = (state.civilian911Log || []).map(e =>
+        e.id === action.payload ? { ...e, status: 'Dispatched' } : e
+      );
+      return { ...state, incoming911: state.incoming911.filter(c => c.id !== action.payload), civilian911Log };
+    }
     case 'ADD_UNIT_GROUP':
       return { ...state, unitGroups: [...state.unitGroups, action.payload] };
     case 'UPDATE_UNIT_GROUP':

@@ -48,9 +48,10 @@ export default function CivilianHome() {
   const submit911 = () => {
     if (!form911.message.trim() || !form911.location.trim()) return;
     dispatch({
-      type: 'ADD_INCOMING_911',
+      type: 'ADD_CIVILIAN_911',
       payload: {
         id: `inc_${Date.now()}`,
+        filerId: myChars[0]?.id ?? null,
         caller: callerName,
         callbackNumber: form911.callbackNumber.trim() || null,
         message: form911.message.trim(),
