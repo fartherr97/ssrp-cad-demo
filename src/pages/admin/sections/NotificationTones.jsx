@@ -1,121 +1,156 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { MdNotifications, MdSos, MdPlayArrow, MdCloudUpload, MdClose, MdCheckCircle } from 'react-icons/md';
 import { useCAD } from '../../../store/cadStore';
-import { useToast } from '../../../contexts/ToastContext';
-import {
-  AdminPanel, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
-} from '../AdminKit';
-import { MdAdd, MdDelete, MdPlayArrow, MdCloudUpload } from 'react-icons/md';
+import { AdminPanel, AdminPageTitle } from '../AdminKit';
 
-export default function NotificationTones() {
-  const { state, dispatch } = useCAD();
-  const { notificationTones } = state;
-  const toast = useToast();
-  const [name, setName] = useState('');
-  const [event, setEvent] = useState('');
-  const [url, setUrl] = useState('');
+function ToneSlot({ icon: Icon, accentColor, label, desc, url, name, onUpload, onClear }) {
+  const inputRef = useRef(null);
+  const [status, setStatus] = useState(null); // null | 'playing' | 'done'
 
-  const add = () => {
-    if (!name.trim() || !event.trim() || !url.trim()) return;
-    dispatch({ type: 'ADMIN_ADD', payload: { key: 'notificationTones', item: { name: name.trim(), event: event.trim(), url: url.trim(), enabled: true } } });
-    toast.success('Tone added.');
-    setName(''); setEvent(''); setUrl('');
-  };
-
-  const playTone = (tone) => {
+  const play = () => {
+    if (!url) return;
     try {
-      new Audio(tone.url).play();
-    } catch (_) { /* no-op in demo */ }
+      const audio = new Audio(url);
+      audio.play().then(() => {
+        setStatus('playing');
+        audio.onended = () => {
+          setStatus('done');
+          setTimeout(() => setStatus(null), 1800);
+        };
+      }).catch(() => {});
+    } catch (_) {}
   };
 
   return (
-    <AdminPanel
-      title="Notification Tones"
-      subtitle="Audio cues played for CAD/MDT events."
-    >
-      {/* Add form */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-        <input style={{ ...SON_INPUT, width: 200 }} placeholder="Name" value={name}
-          onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, width: 200 }} placeholder="Event" value={event}
-          onChange={e => setEvent(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, flex: 1, minWidth: 200 }} placeholder="tones/file.mp3" value={url}
-          onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <SonButton variant="red" onClick={add}><MdAdd size={16} /> Add</SonButton>
+    <div className="flex items-center gap-4 p-4 rounded-xl border"
+      style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.07)' }}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+        style={{ background: `${accentColor}1a`, border: `1px solid ${accentColor}40` }}>
+        <Icon size={22} style={{ color: accentColor }} />
       </div>
 
-      {/* Tone rows */}
-      {notificationTones.length === 0 ? (
-        <EmptyState>No notification tones configured.</EmptyState>
-      ) : (
-        <div>
-          {notificationTones.map((tone, i) => (
-            <div key={tone.id} style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-              background: i % 2 === 0 ? ADMIN.row : ADMIN.rowAlt,
-              borderRadius: 8, marginBottom: 4,
-            }}>
-              {/* Play button */}
-              <button
-                onClick={() => playTone(tone)}
-                title="Play tone"
-                style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
-                  color: '#f87171', cursor: 'pointer', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.28)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; }}
-              >
-                <MdPlayArrow size={18} />
-              </button>
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] font-bold text-white">{label}</div>
+        <div className="text-[11.5px] text-slate-500 mt-0.5">{desc}</div>
+        {url && (
+          <div className="mt-1.5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: accentColor }} />
+            <span className="text-[11px] text-slate-400 font-mono truncate">{name || 'Custom tone'}</span>
+          </div>
+        )}
+        {!url && (
+          <div className="text-[11px] text-slate-600 mt-1 italic">No tone uploaded</div>
+        )}
+      </div>
 
-              {/* Event name */}
-              <div style={{ minWidth: 120, fontWeight: 700, fontSize: 13, color: ADMIN.text }}>
-                {tone.name}
-              </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {url && (
+          <>
+            <button
+              onClick={play}
+              title="Test tone"
+              className="flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
+              style={{
+                background: status === 'playing' ? `${accentColor}28` : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${status === 'playing' ? accentColor + '55' : 'rgba(255,255,255,0.10)'}`,
+                color: status ? accentColor : '#94a3b8',
+              }}
+            >
+              {status === 'done' ? <MdCheckCircle size={16} /> : <MdPlayArrow size={16} />}
+            </button>
+            <button
+              onClick={onClear}
+              title="Remove tone"
+              className="flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all text-slate-600 hover:text-red-400"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <MdClose size={15} />
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => inputRef.current?.click()}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold cursor-pointer transition-all"
+          style={{
+            background: `${accentColor}16`,
+            border: `1px solid ${accentColor}38`,
+            color: accentColor,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${accentColor}28`; }}
+          onMouseLeave={e => { e.currentTarget.style.background = `${accentColor}16`; }}
+        >
+          <MdCloudUpload size={15} />
+          {url ? 'Replace' : 'Upload'}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="audio/*"
+          className="hidden"
+          onChange={e => {
+            const file = e.target.files?.[0];
+            if (file) onUpload(file);
+            e.target.value = '';
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
-              {/* Event label */}
-              <div style={{ minWidth: 100, fontSize: 12, color: ADMIN.textDim }}>
-                {tone.event}
-              </div>
+export default function NotificationTones() {
+  const { state, dispatch } = useCAD();
+  const { audioTones = {} } = state;
 
-              {/* URL / path - truncated */}
-              <div style={{
-                flex: 1, fontFamily: 'var(--font-mono)', fontSize: 12, color: ADMIN.textMute,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {tone.url}
-              </div>
+  const upload = (slot, file) => {
+    const url = URL.createObjectURL(file);
+    if (slot === 'toast') {
+      if (audioTones.toastUrl) URL.revokeObjectURL(audioTones.toastUrl);
+      dispatch({ type: 'SET_TONE', payload: { toastUrl: url, toastName: file.name } });
+    } else {
+      if (audioTones.panicUrl) URL.revokeObjectURL(audioTones.panicUrl);
+      dispatch({ type: 'SET_TONE', payload: { panicUrl: url, panicName: file.name } });
+    }
+  };
 
-              {/* Upload button */}
-              <button
-                title="Upload audio file"
-                style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
-                  color: ADMIN.textDim, cursor: 'pointer', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.10)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-              >
-                <MdCloudUpload size={16} />
-              </button>
+  const clear = (slot) => {
+    if (slot === 'toast') {
+      if (audioTones.toastUrl) URL.revokeObjectURL(audioTones.toastUrl);
+      dispatch({ type: 'SET_TONE', payload: { toastUrl: null, toastName: null } });
+    } else {
+      if (audioTones.panicUrl) URL.revokeObjectURL(audioTones.panicUrl);
+      dispatch({ type: 'SET_TONE', payload: { panicUrl: null, panicName: null } });
+    }
+  };
 
-              {/* Delete button */}
-              <SonIconBtn
-                icon={MdDelete}
-                danger
-                title="Delete"
-                onClick={() => { dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'notificationTones', id: tone.id } }); toast.success('Tone deleted.'); }}
-              />
-            </div>
-          ))}
+  return (
+    <div className="flex flex-col gap-5 p-4 lg:p-6 font-ui">
+      <AdminPageTitle>Notification Tones</AdminPageTitle>
+
+      <AdminPanel title="Audio Tones" subtitle="Upload audio cues that play when CAD events occur. MP3, WAV, and OGG are supported.">
+        <div className="flex flex-col gap-3">
+          <ToneSlot
+            icon={MdNotifications}
+            accentColor="#3b82f6"
+            label="Notification Tone"
+            desc="Plays for incoming notification blasts and dispatch radio broadcasts."
+            url={audioTones.toastUrl ?? null}
+            name={audioTones.toastName ?? null}
+            onUpload={file => upload('toast', file)}
+            onClear={() => clear('toast')}
+          />
+          <ToneSlot
+            icon={MdSos}
+            accentColor="#ef4444"
+            label="Panic Tone"
+            desc="Plays when any officer triggers a panic alarm — kept separate for immediate urgency."
+            url={audioTones.panicUrl ?? null}
+            name={audioTones.panicName ?? null}
+            onUpload={file => upload('panic', file)}
+            onClear={() => clear('panic')}
+          />
         </div>
-      )}
-    </AdminPanel>
+      </AdminPanel>
+    </div>
   );
 }

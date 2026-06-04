@@ -7,10 +7,15 @@ import GuidedTour from '../GuidedTour';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 
+function playAudio(url) {
+  if (!url) return;
+  try { new Audio(url).play().catch(() => {}); } catch (_) {}
+}
+
 function BlastToast() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { lastBlast, currentUser, officers } = state;
+  const { lastBlast, currentUser, officers, audioTones } = state;
   const seenId = useRef(lastBlast?.id ?? null);
 
   useEffect(() => {
@@ -30,7 +35,23 @@ function BlastToast() {
     const body = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
     toast.info(body, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
     dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
-  }, [lastBlast, currentUser, officers, toast, dispatch]);
+    playAudio(audioTones?.toastUrl);
+  }, [lastBlast, currentUser, officers, toast, dispatch, audioTones]);
+
+  return null;
+}
+
+function PanicTone() {
+  const { state } = useCAD();
+  const { lastRadio, audioTones } = state;
+  const seenId = useRef(lastRadio?.id ?? null);
+
+  useEffect(() => {
+    if (!lastRadio?.panic) return;
+    if (lastRadio.id === seenId.current) return;
+    seenId.current = lastRadio.id;
+    playAudio(audioTones?.panicUrl);
+  }, [lastRadio, audioTones]);
 
   return null;
 }
@@ -53,6 +74,7 @@ export default function AppShell({ children }) {
       <SiteFooter />
       <RadioToast />
       <BlastToast />
+      <PanicTone />
       {!inAdmin && <GuidedTour />}
     </div>
   );

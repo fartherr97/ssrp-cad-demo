@@ -87,6 +87,7 @@ const initialState = {
   messageLog: [],
   lastBlast: null,
   notifications: [],
+  audioTones: { toastUrl: null, toastName: null, panicUrl: null, panicName: null },
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
   towJobs: [],
@@ -974,6 +975,10 @@ function reducer(state, action) {
 
     case 'CLEAR_NOTIFICATIONS': {
       return { ...state, notifications: [] };
+    }
+
+    case 'SET_TONE': {
+      return { ...state, audioTones: { ...state.audioTones, ...action.payload } };
     }
 
     default:

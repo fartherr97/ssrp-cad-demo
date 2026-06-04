@@ -4,10 +4,15 @@ import { useToast } from '../contexts/ToastContext';
 
 /* Bridges store radio broadcasts (lastRadio) into the top toast notifications.
    Renders nothing itself — replaced the old bottom-right toast card. */
+function playAudio(url) {
+  if (!url) return;
+  try { new Audio(url).play().catch(() => {}); } catch (_) {}
+}
+
 export default function RadioToast() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { lastRadio, currentUser } = state;
+  const { lastRadio, currentUser, audioTones } = state;
 
   // Baseline to whatever radio already exists on mount so a stale broadcast
   // can't re-fire when switching portals/users — only genuinely new ones do.
@@ -33,7 +38,8 @@ export default function RadioToast() {
 
     toast.info(lastRadio.text, { title: 'Dispatch Radio', duration: 6000 });
     dispatch({ type: 'ADD_NOTIFICATION', payload: { title: 'Dispatch Radio', body: lastRadio.text, color: '#3a88e8' } });
-  }, [lastRadio, currentUser, toast, dispatch]);
+    playAudio(audioTones?.toastUrl);
+  }, [lastRadio, currentUser, toast, dispatch, audioTones]);
 
   return null;
 }
