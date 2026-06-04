@@ -195,7 +195,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 .n-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 
 /* Split layouts */
-.split-3       { display: grid; grid-template-columns: 260px 1fr 230px; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
+.split-3       { display: grid; grid-template-columns: 260px minmax(0, 1fr) 340px; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
 .split-2       { display: grid; grid-template-columns: 280px 1fr; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
 .split-2-right { display: grid; grid-template-columns: 1fr 280px; gap: 5px; flex: 1; overflow: hidden; min-height: 0; }
 

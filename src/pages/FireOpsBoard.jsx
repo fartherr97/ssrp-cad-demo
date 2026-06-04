@@ -607,18 +607,18 @@ export default function FireOpsBoard() {
                       {ap.icon} {ap.label} ({ap.units.length})
                     </div>
                     {ap.units.map(o => (
-                      <div key={o.id} className={S_UNIT_ROW}>
+                      <div key={o.id} className={`${S_UNIT_ROW} gap-2.5 py-2.5`}>
                         <div className={`w-2 h-2 rounded-full shrink-0 ${
                           o.status === 'AVAILABLE' ? 'bg-emerald-400' :
                           o.status === 'ENRT' ? 'bg-amber-400' :
                           o.status === 'ARRVD' ? 'bg-emerald-400' : 'bg-red-400'
                         }`} />
-                        <span className={`${S_DATA} min-w-[44px] text-[10px] text-orange-400`}>{o.unitId}</span>
+                        <span className={`${S_DATA} shrink-0 text-[10px] text-orange-400`}>{o.unitId}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11.5px] text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</div>
-                          <div className="text-[9.5px] text-slate-500 font-mono">{o.rank}</div>
+                          <div className="text-[12px] font-semibold text-slate-200 truncate">{o.name}</div>
+                          <div className="text-[9.5px] text-slate-500 font-mono truncate">{o.rank}</div>
                         </div>
-                        <span className={o.status === 'AVAILABLE' ? BADGE.available : o.status === 'ENRT' ? BADGE.enrt : o.status === 'ARRVD' ? BADGE.arrvd : BADGE.busy}>
+                        <span className={`${o.status === 'AVAILABLE' ? BADGE.available : o.status === 'ENRT' ? BADGE.enrt : o.status === 'ARRVD' ? BADGE.arrvd : BADGE.busy} shrink-0`}>
                           {o.status}
                         </span>
                       </div>
