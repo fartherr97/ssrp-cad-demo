@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { DeptBadge } from '../constants/deptLogos';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { FlagRow } from './CivilianFlags';
@@ -1097,7 +1098,7 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
       <div data-doc-top />
       {template?.showDept !== false && deptDisplay && (
         <div className="rounded-xl border border-border-base bg-app-card/70 px-4 py-2.5 flex items-center gap-3">
-          <MdShield size={16} className="text-brand-bright shrink-0" />
+          <DeptBadge deptShort={me?.deptShort} size={22} fallbackClassName="text-brand-bright" />
           <div>
             <div className="text-[8.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Issuing Department</div>
             <div className="text-[13px] font-bold text-white">{deptDisplay}</div>

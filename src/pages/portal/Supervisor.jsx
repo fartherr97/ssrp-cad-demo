@@ -7,6 +7,7 @@ import {
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
+import { DeptBadge } from '../../constants/deptLogos';
 
 /* ══════════════════════════════════
    NOTIFICATION BLAST
@@ -63,7 +64,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
         {/* Sender tag */}
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <MdShield size={14} className="text-slate-400 shrink-0" />
+          <DeptBadge deptShort={me?.deptShort} size={14} />
           <span className="text-[11.5px] text-slate-400">Sent as: </span>
           <span className="text-[11.5px] font-bold text-white">{senderName}</span>
           <span className="text-[10.5px] font-mono text-slate-500 ml-0.5">({senderBadge})</span>
@@ -433,7 +434,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
               <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Submitted By</div>
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0">
-                  <MdShield size={18} className="text-slate-400" />
+                  <DeptBadge deptShort={officer?.deptShort} size={22} />
                 </div>
                 <div className="min-w-0">
                   <div className="text-[12.5px] font-semibold text-white truncate">{officer?.name || entry.officerBadge || '—'}</div>
@@ -616,7 +617,7 @@ function OfficerProfileView({ officer, submissions, departments, onOpenEntry }) 
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-4 border-b border-border-faint flex items-center gap-4 shrink-0">
         <div className="w-14 h-14 rounded-xl bg-brand/15 border border-brand/30 flex items-center justify-center shrink-0">
-          <MdShield size={28} className="text-brand-bright" />
+          <DeptBadge deptShort={officer.deptShort} logoUrl={dept?.logoUrl} size={40} fallbackClassName="text-brand-bright" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[18px] font-extrabold text-white tracking-[-0.2px]">{officer.name}</div>

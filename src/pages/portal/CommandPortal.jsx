@@ -8,6 +8,7 @@ import {
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
+import { DeptBadge, deptLogo } from '../../constants/deptLogos';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
 } from './PortalKit';
@@ -403,7 +404,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
             <PortalCard key={o.id}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-violet-400/10 border border-violet-400/30 flex items-center justify-center shrink-0">
-                  <MdShield size={16} className="text-violet-400" />
+                  <DeptBadge deptShort={o.deptShort} size={20} fallbackClassName="text-violet-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-white truncate">{o.name}</div>
@@ -458,7 +459,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
                   <tr key={o.id} className={idx % 2 === 0 ? '' : 'bg-white/[0.02]'}>
                     <td className="px-4 py-3 border-b border-border-faint">
                       <div className="flex items-center gap-2">
-                        <MdShield size={13} className="text-violet-400 shrink-0" />
+                        <DeptBadge deptShort={o.deptShort} size={14} fallbackClassName="text-violet-400" />
                         <span className="text-[12.5px] text-slate-200">{o.name}</span>
                       </div>
                     </td>
@@ -533,7 +534,7 @@ function ByDeptTab({ reports, officers, departments, reportTypes }) {
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: `${dept.color}22`, border: `1px solid ${dept.color}55` }}>
-                <MdShield size={16} style={{ color: dept.color }} />
+                <DeptBadge deptShort={dept.short} logoUrl={dept.logoUrl} size={20} fallbackClassName="" style={{ color: dept.color }} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-bold text-white truncate">{dept.name}</div>
@@ -1099,7 +1100,7 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
         {/* Sender tag */}
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <MdShield size={14} className="text-slate-400 shrink-0" />
+          <DeptBadge deptShort={myOfficer?.deptShort} size={14} />
           <span className="text-[11.5px] text-slate-400">Sent as: </span>
           <span className="text-[11.5px] font-bold text-white">{senderName}</span>
           <span className="text-[10.5px] font-mono text-slate-500 ml-0.5">({senderBadge})</span>

@@ -8,6 +8,7 @@ import {
   MdDescription, MdArrowBack, MdDownload, MdDeleteOutline, MdCheckCircle,
   MdShield, MdPerson, MdInventory2, MdAssignment, MdDirectionsCar,
 } from 'react-icons/md';
+import { DeptBadge } from '../constants/deptLogos';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, xs,
 } from '../constants/styles';
@@ -215,7 +216,7 @@ export default function RecordsCenter() {
               <div className="bg-app-card/70 border border-border-base rounded-xl p-3">
                 <div className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2">Issuing Officer</div>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0"><MdShield size={18} className="text-slate-400" /></div>
+                  <div className="w-9 h-9 rounded-full bg-app-elevated border border-border-base flex items-center justify-center shrink-0"><DeptBadge deptShort={me?.deptShort} size={22} /></div>
                   <div className="min-w-0">
                     <div className="text-[12.5px] font-semibold text-white truncate">{me?.name || currentUser?.name}</div>
                     <div className="text-[10.5px] text-slate-500">#{me?.badge || currentUser?.badge} · {me?.deptShort || 'HCSO'}</div>
