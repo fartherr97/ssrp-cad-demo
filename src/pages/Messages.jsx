@@ -1,40 +1,64 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import {
   MdInbox, MdSend, MdSearch, MdClose, MdPerson, MdLock,
-  MdArrowBack, MdInfo,
+  MdArrowBack, MdInfo, MdGroup, MdReply,
 } from 'react-icons/md';
 import {
-  S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
-  S_INPUT, S_LABEL, S_FIELD, S_BTN_PRIMARY, S_BTN_SECONDARY,
+  S_PAGE, S_INPUT, S_LABEL, S_FIELD, S_BTN_PRIMARY, S_BTN_SECONDARY,
 } from '../constants/styles';
 
 const DISCLAIMER = 'Messages in this system are monitored for security and compliance purposes.';
 
-function ComposeModal({ onClose, currentUser, officers, onSend }) {
-  const [toId, setToId]       = useState('');
+/* ── Compose modal with multi-recipient support ── */
+function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
+  const [toIds,   setToIds]   = useState(new Set());
   const [subject, setSubject] = useState('');
-  const [body, setBody]       = useState('');
-  const [search, setSearch]   = useState('');
+  const [body,    setBody]    = useState('');
+  const [search,  setSearch]  = useState('');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return officers.filter(o =>
       o.id !== currentUser?.id &&
+      !toIds.has(o.id) &&
       (!q || o.name?.toLowerCase().includes(q) || o.badge?.toLowerCase().includes(q))
     );
-  }, [officers, currentUser, search]);
+  }, [officers, currentUser, search, toIds]);
 
-  const toOfficer = officers.find(o => o.id === Number(toId));
+  const selectedOfficers = officers.filter(o => toIds.has(o.id));
 
-  const handleSend = () => {
-    if (!toOfficer || !subject.trim() || !body.trim()) return;
-    onSend({
+  const addRecipient = (o) => { setToIds(p => new Set([...p, o.id])); setSearch(''); };
+  const removeRecipient = (id) => setToIds(p => { const n = new Set(p); n.delete(id); return n; });
+
+  const canSend = toIds.size > 0 && subject.trim() && body.trim();
+
+  const handleSendSeparately = () => {
+    if (!canSend) return;
+    selectedOfficers.forEach(o => {
+      onSend({
+        fromName: currentUser?.name || 'Unknown',
+        fromBadge: currentUser?.badge || '—',
+        fromId: currentUser?.id,
+        toName: o.name,
+        toId: o.id,
+        subject: subject.trim(),
+        body: body.trim(),
+      });
+    });
+    onClose();
+  };
+
+  const handleGroupSend = () => {
+    if (!canSend) return;
+    const allIds   = [currentUser?.id, ...selectedOfficers.map(o => o.id)];
+    const allNames = [currentUser?.name || 'Unknown', ...selectedOfficers.map(o => o.name)];
+    onGroupSend({
       fromName: currentUser?.name || 'Unknown',
       fromBadge: currentUser?.badge || '—',
       fromId: currentUser?.id,
-      toName: toOfficer.name,
-      toId: toOfficer.id,
+      participantIds: allIds,
+      participantNames: allNames,
       subject: subject.trim(),
       body: body.trim(),
     });
@@ -60,41 +84,48 @@ function ComposeModal({ onClose, currentUser, officers, onSend }) {
         </div>
 
         <div className="p-5 flex flex-col gap-4">
-          {/* To field */}
+          {/* Recipients */}
           <div className={S_FIELD}>
             <label className={S_LABEL}>To</label>
+
+            {/* Selected recipient chips */}
+            {selectedOfficers.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {selectedOfficers.map(o => (
+                  <div key={o.id} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11.5px] font-semibold"
+                    style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
+                    <MdPerson size={12} />
+                    {o.name}
+                    <button type="button" onClick={() => removeRecipient(o.id)}
+                      className="text-blue-400/60 hover:text-blue-300 cursor-pointer ml-0.5" style={{ background: 'none', border: 'none' }}>
+                      <MdClose size={11} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Search box */}
             <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2 mb-1">
               <MdSearch size={14} className="text-slate-500 shrink-0" />
               <input className="flex-1 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-                placeholder="Search by name or badge…"
+                placeholder={selectedOfficers.length > 0 ? 'Add another recipient…' : 'Search by name or badge…'}
                 value={search}
-                onChange={e => { setSearch(e.target.value); setToId(''); }} />
+                onChange={e => setSearch(e.target.value)} />
             </div>
-            {search && !toOfficer && (
+            {search && (
               <div className="bg-app-card border border-border-base rounded-xl overflow-hidden max-h-[150px] overflow-y-auto">
                 {filtered.length === 0 ? (
                   <div className="px-3 py-2 text-[11px] text-slate-600">No accounts found</div>
                 ) : filtered.map(o => (
                   <button key={o.id} type="button"
-                    onClick={() => { setToId(String(o.id)); setSearch(o.name); }}
+                    onClick={() => addRecipient(o)}
                     className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/[0.06] cursor-pointer text-left transition-colors">
                     <MdPerson size={14} className="text-slate-400 shrink-0" />
                     <span className="text-[12px] text-slate-200">{o.name}</span>
                     <span className="text-[10.5px] text-slate-500 font-mono ml-auto">{o.badge}</span>
                   </button>
                 ))}
-              </div>
-            )}
-            {toOfficer && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg mt-1"
-                style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)' }}>
-                <MdPerson size={13} className="text-brand-bright shrink-0" />
-                <span className="text-[12px] text-brand-bright font-semibold">{toOfficer.name}</span>
-                <span className="text-[10px] text-slate-500 font-mono ml-auto">{toOfficer.badge}</span>
-                <button type="button" onClick={() => { setToId(''); setSearch(''); }}
-                  className="text-slate-500 hover:text-slate-300 cursor-pointer ml-1" style={{ background: 'none', border: 'none' }}>
-                  <MdClose size={12} />
-                </button>
               </div>
             )}
           </div>
@@ -125,42 +156,157 @@ function ComposeModal({ onClose, currentUser, officers, onSend }) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex gap-2 flex-col xs:flex-row">
             <button type="button" onClick={onClose}
               className="flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>
               Cancel
             </button>
-            <button type="button" onClick={handleSend}
-              disabled={!toOfficer || !subject.trim() || !body.trim()}
+            {/* Send individually — available for 1+ recipients */}
+            <button type="button" onClick={handleSendSeparately}
+              disabled={!canSend}
               className="press flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
               style={{ background: 'rgba(59,130,246,0.2)', border: '1px solid rgba(59,130,246,0.45)', color: '#60a5fa' }}>
-              <MdSend size={13} /> Send Message
+              <MdSend size={13} />
+              {toIds.size > 1 ? 'Send to Each' : 'Send'}
             </button>
+            {/* Group chat — only available for 2+ recipients */}
+            {toIds.size >= 2 && (
+              <button type="button" onClick={handleGroupSend}
+                disabled={!canSend}
+                className="press flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
+                style={{ background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.4)', color: '#22d3ee' }}>
+                <MdGroup size={14} /> Group Chat
+              </button>
+            )}
           </div>
+
+          {toIds.size >= 2 && (
+            <div className="text-[10px] text-slate-500 text-center -mt-2">
+              <span className="text-cyan-400 font-semibold">Group Chat</span> creates a shared thread all recipients can reply to.
+              <span className="text-blue-400 font-semibold"> Send to Each</span> sends separate private messages.
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
+/* ── Group thread detail view ── */
+function GroupThreadView({ thread, currentUserId, currentUserName, onReply }) {
+  const [replyText, setReplyText] = useState('');
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [thread.messages.length]);
+
+  const handleSend = () => {
+    const text = replyText.trim();
+    if (!text) return;
+    onReply(thread.id, text);
+    setReplyText('');
+  };
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Thread header */}
+      <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint shrink-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.3px] rounded-full border bg-cyan-500/15 text-cyan-400 border-cyan-500/30">
+            GROUP THREAD
+          </span>
+        </div>
+        <div className="text-[15px] font-bold mb-1">{thread.subject}</div>
+        <div className="flex items-center gap-1 text-[10px] text-cad-dim flex-wrap">
+          <MdGroup size={11} />
+          {thread.participantNames.join(', ')}
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+        {thread.messages.map((msg, i) => {
+          const isMe = String(msg.fromId) === String(currentUserId);
+          return (
+            <div key={msg.id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
+                {!isMe && (
+                  <div className="text-[10px] font-semibold text-slate-400 px-1">{msg.fromName}</div>
+                )}
+                <div className={`px-3.5 py-2.5 rounded-2xl text-[12.5px] leading-[1.65] ${
+                  isMe
+                    ? 'rounded-br-sm bg-brand/25 border border-brand/35 text-white'
+                    : 'rounded-bl-sm bg-white/[0.06] border border-white/10 text-cad-text'
+                }`}>
+                  {msg.body}
+                </div>
+                <div className="text-[9px] text-slate-600 px-1">{msg.timestamp}</div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Reply bar */}
+      <div className="shrink-0 border-t border-border-base p-3 flex gap-2 items-end bg-app-toolbar/60">
+        <textarea
+          className="flex-1 bg-app-input border border-border-base rounded-xl px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-colors resize-none"
+          placeholder="Reply to group…"
+          rows={1}
+          value={replyText}
+          onChange={e => setReplyText(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          style={{ minHeight: 36, maxHeight: 100 }}
+        />
+        <button type="button" onClick={handleSend} disabled={!replyText.trim()}
+          className="flex items-center justify-center w-9 h-9 rounded-xl cursor-pointer disabled:opacity-40 transition-colors shrink-0"
+          style={{ background: 'rgba(59,130,246,0.25)', border: '1px solid rgba(59,130,246,0.4)' }}>
+          <MdSend size={15} className="text-brand-bright" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════
+   MAIN PAGE
+════════════════════════════════ */
 export default function Messages() {
   const { state, dispatch } = useCAD();
-  const { messages, directMessages, currentUser, officers } = state;
+  const { messages, directMessages, groupThreads = [], currentUser, officers } = state;
 
-  const [selectedId, setSelectedId] = useState(null);
-  const [selectedType, setSelectedType] = useState(null); // 'system' | 'direct'
-  const [composing, setComposing] = useState(false);
-  const [tab, setTab] = useState('inbox'); // 'inbox' | 'sent'
-  const [search, setSearch] = useState('');
+  const [selectedId,   setSelectedId]   = useState(null);
+  const [selectedType, setSelectedType] = useState(null); // 'system' | 'direct' | 'group'
+  const [composing,    setComposing]    = useState(false);
+  const [tab,          setTab]          = useState('inbox');
+  const [search,       setSearch]       = useState('');
 
-  // Inbox: system messages + direct messages addressed to current user
+  // Switching tabs always clears the open message
+  const switchTab = (newTab) => {
+    setTab(newTab);
+    setSelectedId(null);
+    setSelectedType(null);
+  };
+
+  // Inbox: system + direct-to-me + group threads I'm in
   const inbox = useMemo(() => {
     const sys = messages.map(m => ({ ...m, type: 'system' }));
     const dir = directMessages
-      .filter(m => m.toId === currentUser?.id)
+      .filter(m => String(m.toId) === String(currentUser?.id))
       .map(m => ({ ...m }));
-    return [...sys, ...dir]
+    const groups = groupThreads
+      .filter(t => t.participantIds.some(id => String(id) === String(currentUser?.id)))
+      .map(t => ({
+        ...t,
+        subject: t.subject,
+        timestamp: t.messages.at(-1)?.timestamp || t.createdAt,
+        read: (t.readBy || []).some(id => String(id) === String(currentUser?.id)),
+        from: t.messages.at(-1)?.fromName || '',
+      }));
+    return [...sys, ...dir, ...groups]
       .filter(m => {
         if (!search.trim()) return true;
         const q = search.trim().toLowerCase();
@@ -173,44 +319,56 @@ export default function Messages() {
         const tb = new Date(b.timestamp).getTime() || 0;
         return tb - ta;
       });
-  }, [messages, directMessages, currentUser, search]);
+  }, [messages, directMessages, groupThreads, currentUser, search]);
 
   const sent = useMemo(() => {
-    return directMessages
-      .filter(m => m.fromId === currentUser?.id)
+    const dir = directMessages
+      .filter(m => String(m.fromId) === String(currentUser?.id))
       .filter(m => {
         if (!search.trim()) return true;
         const q = search.trim().toLowerCase();
         return m.subject?.toLowerCase().includes(q) || m.toName?.toLowerCase().includes(q);
-      })
-      .sort((a, b) => b.id - a.id);
-  }, [directMessages, currentUser, search]);
+      });
+    const groups = groupThreads
+      .filter(t => String(t.createdBy) === String(currentUser?.id))
+      .map(t => ({ ...t, timestamp: t.createdAt }));
+    return [...dir, ...groups].sort((a, b) => b.id?.toString().localeCompare?.(a.id?.toString()) || 0);
+  }, [directMessages, groupThreads, currentUser, search]);
 
-  const list = tab === 'inbox' ? inbox : sent;
+  const list   = tab === 'inbox' ? inbox : sent;
   const unread = inbox.filter(m => !m.read).length;
 
   const selMsg = useMemo(() => {
     if (selectedId == null) return null;
     if (selectedType === 'system') return messages.find(m => m.id === selectedId);
+    if (selectedType === 'group')  return groupThreads.find(t => t.id === selectedId);
     return directMessages.find(m => m.id === selectedId);
-  }, [selectedId, selectedType, messages, directMessages]);
+  }, [selectedId, selectedType, messages, directMessages, groupThreads]);
 
   const selectMsg = (m) => {
+    const type = m.type === 'system' ? 'system' : m.type === 'group' ? 'group' : 'direct';
     setSelectedId(m.id);
-    setSelectedType(m.type === 'system' ? 'system' : 'direct');
+    setSelectedType(type);
     if (!m.read) {
-      if (m.type === 'system') dispatch({ type: 'MARK_MESSAGE_READ', payload: m.id });
+      if (type === 'system') dispatch({ type: 'MARK_MESSAGE_READ', payload: m.id });
+      else if (type === 'group') dispatch({ type: 'MARK_GROUP_THREAD_READ', payload: { threadId: m.id, userId: currentUser?.id } });
       else dispatch({ type: 'MARK_DIRECT_MESSAGE_READ', payload: m.id });
     }
   };
 
-  const handleSend = (payload) => {
-    dispatch({ type: 'SEND_DIRECT_MESSAGE', payload });
+  const handleSend = (payload) => dispatch({ type: 'SEND_DIRECT_MESSAGE', payload });
+  const handleGroupSend = (payload) => dispatch({ type: 'CREATE_GROUP_THREAD', payload });
+  const handleGroupReply = (threadId, body) => {
+    dispatch({ type: 'SEND_GROUP_REPLY', payload: {
+      threadId,
+      fromId: currentUser?.id,
+      fromName: currentUser?.name || currentUser?.username || 'Unknown',
+      body,
+    }});
   };
 
   const BADGE_BASE = 'px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.3px] rounded-full border';
-
-  const TAB_BASE = 'relative px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-[0.4px] cursor-pointer transition-colors shrink-0';
+  const TAB_BASE   = 'relative px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-[0.4px] cursor-pointer transition-colors shrink-0';
   const tabCls = (id) => tab === id
     ? `${TAB_BASE} text-brand-bright`
     : `${TAB_BASE} text-slate-500 hover:text-slate-300`;
@@ -221,7 +379,7 @@ export default function Messages() {
       {/* Toolbar */}
       <div className="flex items-center gap-0.5 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base shrink-0 px-3 pr-4">
         <div className="flex items-end gap-0.5 py-1">
-          <button className={tabCls('inbox')} onClick={() => setTab('inbox')}>
+          <button className={tabCls('inbox')} onClick={() => switchTab('inbox')}>
             Inbox
             {unread > 0 && (
               <span className="ml-1.5 text-[9px] bg-brand/20 text-brand-bright rounded-full px-1.5 py-0.5 font-mono">
@@ -230,7 +388,7 @@ export default function Messages() {
             )}
             {tab === 'inbox' && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
           </button>
-          <button className={tabCls('sent')} onClick={() => setTab('sent')}>
+          <button className={tabCls('sent')} onClick={() => switchTab('sent')}>
             Sent
             {tab === 'sent' && <span className="absolute -bottom-[1px] left-2 right-2 h-[3px] rounded-full bg-brand" />}
           </button>
@@ -243,7 +401,7 @@ export default function Messages() {
         </button>
       </div>
 
-      {/* Disclaimer banner */}
+      {/* Disclaimer */}
       <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/[0.06] border-b border-amber-500/20 shrink-0 text-[10.5px] text-amber-400/80">
         <MdInfo size={13} className="shrink-0" />
         {DISCLAIMER}
@@ -253,7 +411,6 @@ export default function Messages() {
 
         {/* Left: message list */}
         <div className={`mob-list-panel${selMsg ? ' mob-gone' : ''} flex flex-col w-full md:w-[280px] md:shrink-0 border-r border-border-base overflow-hidden`}>
-          {/* Search */}
           <div className="p-2 border-b border-border-faint shrink-0">
             <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-1.5">
               <MdSearch size={13} className="text-slate-500 shrink-0" />
@@ -275,8 +432,11 @@ export default function Messages() {
               </div>
             ) : list.map(m => {
               const isRead = m.read;
-              const isSel  = selectedId === m.id && selectedType === (m.type === 'system' ? 'system' : 'direct');
-              const sender = m.type === 'system' ? (m.from || 'System') : (tab === 'sent' ? `→ ${m.toName}` : m.fromName);
+              const isSel  = selectedId === m.id && selectedType === (m.type === 'system' ? 'system' : m.type === 'group' ? 'group' : 'direct');
+              const isGroup = m.type === 'group';
+              const sender  = m.type === 'system' ? (m.from || 'System')
+                : isGroup ? `${m.participantNames?.length || 0} participants`
+                : tab === 'sent' ? `→ ${m.toName}` : m.fromName;
               return (
                 <div key={`${m.type || 'direct'}-${m.id}`}
                   className={`mx-2 my-[3px] px-3 py-2.5 rounded-lg cursor-pointer border transition-colors ${
@@ -292,15 +452,20 @@ export default function Messages() {
                     {m.priority === 'HIGH' && (
                       <span className={`${BADGE_BASE} bg-red-500/20 text-red-400 border-red-500/30 text-[8px]`}>HIGH PRI</span>
                     )}
-                    {m.type !== 'system' && (
+                    {isGroup ? (
+                      <span className={`${BADGE_BASE} bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-[8px]`}>GROUP</span>
+                    ) : m.type !== 'system' ? (
                       <span className={`${BADGE_BASE} bg-violet-500/20 text-violet-400 border-violet-500/30 text-[8px]`}>DIRECT</span>
-                    )}
+                    ) : null}
                     <span className="text-[9px] text-cad-muted font-mono ml-auto">
                       {m.timestamp?.split(' ')[1] || ''}
                     </span>
                   </div>
                   <div className={`text-[11.5px] mb-px truncate ${isRead ? 'font-normal' : 'font-semibold'}`}>{m.subject}</div>
-                  <div className="text-[10px] text-cad-dim truncate">{sender}</div>
+                  <div className="text-[10px] text-cad-dim truncate flex items-center gap-1">
+                    {isGroup && <MdGroup size={10} className="shrink-0" />}
+                    {sender}
+                  </div>
                 </div>
               );
             })}
@@ -312,11 +477,19 @@ export default function Messages() {
           <button className="mob-back-btn" onClick={() => setSelectedId(null)}>
             <MdArrowBack size={14} /> Back to inbox
           </button>
+
           {!selMsg ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-cad-muted p-5">
               <MdInbox size={40} className="opacity-15" />
               <span className="text-[11px]">Select a message to read</span>
             </div>
+          ) : selMsg.type === 'group' ? (
+            <GroupThreadView
+              thread={selMsg}
+              currentUserId={currentUser?.id}
+              currentUserName={currentUser?.name}
+              onReply={handleGroupReply}
+            />
           ) : (
             <>
               <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint shrink-0">
@@ -349,6 +522,7 @@ export default function Messages() {
           currentUser={currentUser}
           officers={officers}
           onSend={handleSend}
+          onGroupSend={handleGroupSend}
         />
       )}
     </div>

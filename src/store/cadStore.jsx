@@ -84,6 +84,7 @@ const initialState = {
   auditLog: AUDIT_LOG,
   messages: MESSAGES,
   directMessages: [],
+  groupThreads: [],
   messageLog: [],
   lastBlast: null,
   notifications: [],
@@ -933,6 +934,56 @@ function reducer(state, action) {
     case 'MARK_DIRECT_MESSAGE_READ': {
       const directMessages = state.directMessages.map(m => m.id === action.payload ? { ...m, read: true } : m);
       return { ...state, directMessages };
+    }
+
+    case 'CREATE_GROUP_THREAD': {
+      const { fromName, fromBadge, fromId, participantIds, participantNames, subject, body } = action.payload;
+      const now = new Date();
+      const ts = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      const thread = {
+        id: `gt-${state.nextId}`,
+        type: 'group',
+        subject,
+        participantIds,
+        participantNames,
+        createdBy: fromId,
+        createdAt: ts,
+        messages: [{ id: `gm-${state.nextId}`, fromId, fromName, body, timestamp: ts }],
+        readBy: [fromId],
+      };
+      const logEntry = {
+        id: state.nextId + 1, type: 'group',
+        from: fromName, fromBadge,
+        to: participantNames.filter((_, i) => participantIds[i] !== fromId).join(', '),
+        subject, body, timestamp: ts,
+      };
+      return {
+        ...state,
+        groupThreads: [thread, ...(state.groupThreads || [])],
+        messageLog: [logEntry, ...state.messageLog],
+        nextId: state.nextId + 2,
+      };
+    }
+
+    case 'SEND_GROUP_REPLY': {
+      const { threadId, fromId, fromName, body } = action.payload;
+      const now = new Date();
+      const ts = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      const newMsg = { id: `gm-${state.nextId}`, fromId, fromName, body, timestamp: ts };
+      const groupThreads = (state.groupThreads || []).map(t => {
+        if (t.id !== threadId) return t;
+        return { ...t, messages: [...t.messages, newMsg], readBy: [fromId] };
+      });
+      return { ...state, groupThreads, nextId: state.nextId + 1 };
+    }
+
+    case 'MARK_GROUP_THREAD_READ': {
+      const { threadId, userId } = action.payload;
+      const groupThreads = (state.groupThreads || []).map(t => {
+        if (t.id !== threadId) return t;
+        return { ...t, readBy: [...new Set([...(t.readBy || []), userId])] };
+      });
+      return { ...state, groupThreads };
     }
 
     case 'SEND_DIRECT_MESSAGE': {

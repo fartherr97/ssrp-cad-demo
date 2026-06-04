@@ -6,6 +6,7 @@ import { AdminPanel, AdminPageTitle } from '../AdminKit';
 const TYPE_META = {
   direct: { label: 'Direct',    cls: 'bg-violet-500/15 text-violet-400 border-violet-500/30' },
   blast:  { label: 'Blast',     cls: 'bg-amber-500/15 text-amber-400 border-amber-500/30'   },
+  group:  { label: 'Group',     cls: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30'       },
 };
 
 function TypeBadge({ type }) {
@@ -60,6 +61,7 @@ export default function MessageLogs() {
           >
             <option value="All">All Types</option>
             <option value="direct">Direct Messages</option>
+            <option value="group">Group Threads</option>
             <option value="blast">Notification Blasts</option>
           </select>
         </div>
@@ -124,16 +126,16 @@ export default function MessageLogs() {
             <div className="block sm:hidden flex flex-col gap-2">
               {filtered.map(m => (
                 <div key={m.id} className="bg-app-card/60 border border-border-faint rounded-xl p-3">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 mb-2">
                     <TypeBadge type={m.type} />
                     <span className="font-mono text-[10px] text-slate-500 ml-auto">{m.timestamp}</span>
                   </div>
-                  <div className="text-[12.5px] font-semibold text-white mb-0.5">{m.subject}</div>
-                  <div className="text-[10.5px] text-slate-400">
-                    From: <span className="text-slate-300">{m.from}</span>
-                    {m.to && <> · To: <span className="text-slate-300">{m.to}</span></>}
+                  <div className="text-[13px] font-bold text-white mb-1">{m.subject}</div>
+                  {m.body && <div className="text-[11px] text-slate-400 leading-relaxed mb-2 line-clamp-2">{m.body}</div>}
+                  <div className="text-[10.5px] text-slate-500 border-t border-border-faint pt-1.5 mt-1">
+                    From: <span className="text-slate-300 font-medium">{m.from}</span>
+                    {m.to && <> → <span className="text-slate-300 font-medium">{m.to}</span></>}
                   </div>
-                  <div className="text-[10.5px] text-slate-500 mt-1 line-clamp-2">{m.body}</div>
                 </div>
               ))}
             </div>
