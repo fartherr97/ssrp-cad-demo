@@ -10,7 +10,7 @@ function playAudio(url) {
 }
 
 export default function RadioToast() {
-  const { state, dispatch } = useCAD();
+  const { state } = useCAD();
   const toast = useToast();
   const { lastRadio, currentUser, audioTones } = state;
 
@@ -37,9 +37,8 @@ export default function RadioToast() {
     if (targeted && !lastRadio.to.includes(currentUser.id)) return;
 
     toast.info(lastRadio.text, { title: 'Dispatch Radio', duration: 6000 });
-    dispatch({ type: 'ADD_NOTIFICATION', payload: { title: 'Dispatch Radio', body: lastRadio.text, color: '#3a88e8' } });
     playAudio(audioTones?.toastUrl);
-  }, [lastRadio, currentUser, toast, dispatch, audioTones]);
+  }, [lastRadio, currentUser, toast, audioTones]);
 
   return null;
 }

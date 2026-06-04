@@ -41,9 +41,12 @@ function normalize(input, extra = {}) {
   return { ...input, ...extra };
 }
 
-export function ToastProvider({ children }) {
+export function ToastProvider({ children, onPush: externalOnPush }) {
   const [toasts, setToasts] = useState([]);
   const timers = useRef({});
+  // Stable ref so push() doesn't need onPush in its dep array.
+  const onPushRef = useRef(externalOnPush);
+  useEffect(() => { onPushRef.current = externalOnPush; }, [externalOnPush]);
 
   useEffect(() => () => {
     Object.values(timers.current).forEach(clearTimeout);
@@ -77,6 +80,7 @@ export function ToastProvider({ children }) {
       ...opts,
     };
     if (t.variant === 'loading' && opts.duration === undefined) t.duration = 0;
+    onPushRef.current?.(t);
     setToasts(ts => {
       const next = [...ts, t];
       // Hard-cap the stack: when spammed, drop the oldest instantly (no exit
