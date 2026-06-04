@@ -126,9 +126,18 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
             <option value="">—</option>
             {options.map(o => <option key={o}>{o}</option>)}
           </select>
+        ) : (type === 'date' || type === 'datetime') ? (
+          <div style={{ position: 'relative', overflow: 'hidden', height: 22 }}>
+            <input
+              type={type === 'datetime' ? 'datetime-local' : 'date'}
+              style={{ ...inputStyle, position: 'absolute', inset: 0, width: '100%', height: '100%', colorScheme: 'light' }}
+              value={value || ''}
+              onChange={e => onChange && onChange(e.target.value)}
+            />
+          </div>
         ) : (
           <input
-            type={type === 'datetime' ? 'datetime-local' : type === 'date' ? 'date' : type === 'number' ? 'number' : 'text'}
+            type={type === 'number' ? 'number' : 'text'}
             style={inputStyle}
             value={value || ''}
             onChange={e => onChange && onChange(e.target.value)}

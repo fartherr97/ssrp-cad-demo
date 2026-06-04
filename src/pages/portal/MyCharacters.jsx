@@ -11,17 +11,6 @@ const DL_BADGE = {
   EXPIRED:   BADGE.orange,
 };
 
-function calcAge(dob) {
-  if (!dob) return null;
-  const today = new Date();
-  const birth = new Date(dob);
-  if (isNaN(birth)) return null;
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-  return age;
-}
-
 const EMPTY_FORM = {
   firstName: '', lastName: '', dob: '', gender: 'Male', ethnicity: '',
   height: '', weight: '', hair: '', eyes: '', address: '', phone: '',
@@ -122,14 +111,9 @@ export default function MyCharacters() {
                       {f.options.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : f.type === 'date' ? (
-                    <>
-                      <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
-                        <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form[f.key]} onChange={e => setField(f.key, e.target.value)} style={{ colorScheme: 'dark' }} />
-                      </div>
-                      {f.key === 'dob' && form.dob && calcAge(form.dob) !== null && (
-                        <div className="text-[11px] text-slate-500 mt-1">Age: <span className="text-brand-bright font-bold">{calcAge(form.dob)}</span></div>
-                      )}
-                    </>
+                    <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
+                      <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form[f.key]} onChange={e => setField(f.key, e.target.value)} style={{ colorScheme: 'dark' }} />
+                    </div>
                   ) : (
                     <input
                       className={PORTAL_INPUT}
@@ -189,7 +173,7 @@ export default function MyCharacters() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <Field label="Date of Birth" value={c.dob ? `${c.dob} · ${calcAge(c.dob)} yrs` : '—'} />
+                <Field label="Date of Birth" value={c.dob} />
                 <Field label="Gender" value={c.gender} />
                 <Field label="Address" value={c.address} />
                 <Field label="Phone" value={c.phone} mono />
