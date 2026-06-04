@@ -695,13 +695,39 @@ function reducer(state, action) {
 
     /* ─── Business portal ─── */
     case 'ADD_BUSINESS': {
-      const b = { ...action.payload, id: state.nextId, employees: [], status: 'ACTIVE' };
-      const audit = addAuditEntry(state, `Created business: ${b.name}`, 'Admin');
+      const yr = new Date().getFullYear();
+      const licenseNum = action.payload.license?.trim() || `BL-${yr}-${String(state.nextId).padStart(4, '0')}`;
+      const issuedAt = new Date().toISOString().split('T')[0];
+      const b = {
+        ...action.payload,
+        id: state.nextId,
+        employees: [],
+        status: 'ACTIVE',
+        license: licenseNum,
+        licenseIssuedAt: issuedAt,
+        licenseStatus: 'ACTIVE',
+      };
+      const audit = addAuditEntry(state, `Created business: ${b.name} (License: ${licenseNum}, expires in 90 days)`, 'Admin');
       return { ...state, businesses: [...state.businesses, b], nextId: state.nextId + 1, ...audit };
     }
     case 'UPDATE_BUSINESS': {
       const businesses = state.businesses.map(b => b.id === action.payload.id ? { ...b, ...action.payload } : b);
       return { ...state, businesses };
+    }
+    case 'UPDATE_BUSINESS_LICENSE': {
+      const { id, action: licAction } = action.payload;
+      const businesses = state.businesses.map(b => {
+        if (b.id !== id) return b;
+        if (licAction === 'EXTEND') {
+          return { ...b, licenseIssuedAt: new Date().toISOString().split('T')[0], licenseStatus: 'ACTIVE' };
+        }
+        if (licAction === 'REVOKE') return { ...b, licenseStatus: 'REVOKED' };
+        if (licAction === 'REINSTATE') return { ...b, licenseIssuedAt: new Date().toISOString().split('T')[0], licenseStatus: 'ACTIVE' };
+        return b;
+      });
+      const target = state.businesses.find(b => b.id === id);
+      const audit = addAuditEntry(state, `Business license ${licAction.toLowerCase()}d: ${target?.name}`, 'Admin');
+      return { ...state, businesses, ...audit };
     }
     case 'ADD_EMPLOYEE': {
       const { businessId, employee } = action.payload;

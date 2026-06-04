@@ -9,8 +9,19 @@ import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore, MdExpandLess,
-  MdLocalHospital, MdShield,
+  MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
 } from 'react-icons/md';
+
+function bizDaysLeft(issuedAt) {
+  if (!issuedAt) return null;
+  const expiry = new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000;
+  return Math.ceil((expiry - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
+function bizExpiryStr(issuedAt) {
+  if (!issuedAt) return '—';
+  return new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+}
 
 function age(dob) {
   if (!dob) return '';
@@ -123,10 +134,11 @@ function StatusChip({ status }) {
 }
 
 const SEARCH_TYPES = [
-  { id: 'PERSON',  label: 'Person',            Icon: MdPerson },
-  { id: 'VEHICLE', label: 'Vehicle',            Icon: MdDirectionsCar },
-  { id: 'WARRANT', label: 'Warrant',            Icon: MdGavel },
-  { id: 'CASES',   label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300', hoverClass: 'hover:bg-amber-400/[0.08] hover:border-amber-400/25 hover:text-amber-300' },
+  { id: 'PERSON',   label: 'Person',            Icon: MdPerson },
+  { id: 'VEHICLE',  label: 'Vehicle',            Icon: MdDirectionsCar },
+  { id: 'WARRANT',  label: 'Warrant',            Icon: MdGavel },
+  { id: 'CASES',    label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300', hoverClass: 'hover:bg-amber-400/[0.08] hover:border-amber-400/25 hover:text-amber-300' },
+  { id: 'BUSINESS', label: 'Business',           Icon: MdStore, activeClass: 'bg-cyan-400/15 border-cyan-400/40 text-cyan-300', hoverClass: 'hover:bg-cyan-400/[0.08] hover:border-cyan-400/25 hover:text-cyan-300' },
 ];
 
 export default function RecordsBureau() {
@@ -154,6 +166,19 @@ export default function RecordsBureau() {
     if (searchType === 'CASES') {
       setSearched(true);
       runCaseSearch(query, caseKind, caseStatus);
+      return;
+    }
+    if (searchType === 'BUSINESS') {
+      setSearched(true);
+      const q = query.trim().toLowerCase();
+      setResults(q
+        ? businesses.filter(b =>
+            b.name?.toLowerCase().includes(q) ||
+            b.owner?.toLowerCase().includes(q) ||
+            b.type?.toLowerCase().includes(q) ||
+            b.ein?.toLowerCase().includes(q))
+        : [...businesses]);
+      setSelected(null);
       return;
     }
     if (!query.trim()) return;
@@ -195,10 +220,11 @@ export default function RecordsBureau() {
   const updateCaseStatus = (v) => { setCaseStatus(v); if (searched) runCaseSearch(query, caseKind, v); };
 
   // Selected item resolution
-  const selCiv     = selected && searchType === 'PERSON'  ? civilians.find(c => c.id === selected) : null;
-  const selVeh     = selected && searchType === 'VEHICLE' ? vehicles.find(v => v.id === selected) : null;
-  const selWarrant = selected && searchType === 'WARRANT' ? warrants.find(w => w.id === selected) : null;
-  const selCase    = selected && searchType === 'CASES'   ? (() => {
+  const selCiv     = selected && searchType === 'PERSON'   ? civilians.find(c => c.id === selected) : null;
+  const selVeh     = selected && searchType === 'VEHICLE'  ? vehicles.find(v => v.id === selected) : null;
+  const selWarrant = selected && searchType === 'WARRANT'  ? warrants.find(w => w.id === selected) : null;
+  const selBiz     = selected && searchType === 'BUSINESS' ? businesses.find(b => b.id === selected) : null;
+  const selCase    = selected && searchType === 'CASES'    ? (() => {
     const [kind, id] = selected.split(':');
     const numId = Number(id);
     return kind === 'report' ? reports.find(r => r.id === numId || r.id === id)
@@ -220,9 +246,10 @@ export default function RecordsBureau() {
 
   const allCaseStatuses = [...new Set([...reports, ...records].map(i => i.status).filter(Boolean))].sort();
 
-  const placeholder = searchType === 'CASES'   ? 'Case #, record #, or type…'
-    : searchType === 'PERSON'  ? 'Name, DOB, SSN or DL #'
-    : searchType === 'VEHICLE' ? 'Plate or make / model'
+  const placeholder = searchType === 'CASES'    ? 'Case #, record #, or type…'
+    : searchType === 'PERSON'   ? 'Name, DOB, SSN or DL #'
+    : searchType === 'VEHICLE'  ? 'Plate or make / model'
+    : searchType === 'BUSINESS' ? 'Business name, owner, or type…'
     : 'Subject name or charge';
 
   return (
@@ -303,6 +330,13 @@ export default function RecordsBureau() {
                     <div>• Report or record type</div>
                     <div>• Filter by status above</div>
                   </>
+                ) : searchType === 'BUSINESS' ? (
+                  <>
+                    <div>• Full or partial business name</div>
+                    <div>• Owner name</div>
+                    <div>• Business type</div>
+                    <div>• Leave blank for all businesses</div>
+                  </>
                 ) : (
                   <>
                     <div>• Full or partial name</div>
@@ -365,6 +399,26 @@ export default function RecordsBureau() {
                         {r.stolen && <span className={BADGE.red}>STOLEN</span>}
                         {r.regStatus !== 'VALID' && <span className={BADGE.orange}>REG {r.regStatus}</span>}
                         {bizOwner && <span className={BADGE.blue}>COMMERCIAL</span>}
+                      </div>
+                    </button>
+                  );
+                }
+                if (searchType === 'BUSINESS') {
+                  const days = bizDaysLeft(r.licenseIssuedAt);
+                  const licRevoked = r.licenseStatus === 'REVOKED';
+                  const licExpired = !licRevoked && (days === null || days <= 0);
+                  const licColor   = licRevoked || licExpired ? '#ef4444' : days !== null && days <= 14 ? '#f59e0b' : '#22c55e';
+                  const licLabel   = licRevoked ? 'REVOKED' : licExpired ? 'EXPIRED' : `${days ?? '?'}d`;
+                  return (
+                    <button key={r.id} className={base} onClick={() => setSelected(r.id)}>
+                      <div className="text-[12.5px] font-bold text-white truncate">{r.name}</div>
+                      <div className="text-[10.5px] text-slate-500 mt-0.5">{r.type}</div>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ color: licColor, background: `${licColor}18`, border: `1px solid ${licColor}30` }}>
+                          {licLabel}
+                        </span>
+                        <span className="text-[10px] text-slate-500">{r.employees?.length || 0} emp</span>
                       </div>
                     </button>
                   );
@@ -476,6 +530,109 @@ export default function RecordsBureau() {
                       <div className="max-w-[1100px] mx-auto bg-app-card/70 border border-border-base rounded-xl p-4 text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed">
                         {selCase.summary || 'No details on file.'}
                       </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()
+          ) : selBiz ? (
+            /* ── BUSINESS DETAIL ── */
+            (() => {
+              const days = bizDaysLeft(selBiz.licenseIssuedAt);
+              const licRevoked = selBiz.licenseStatus === 'REVOKED';
+              const licExpired = !licRevoked && (days === null || days <= 0);
+              const licWarn    = !licRevoked && !licExpired && days !== null && days <= 14;
+              const licColor   = licRevoked || licExpired ? '#ef4444' : licWarn ? '#f59e0b' : '#22c55e';
+              const licLabel   = licRevoked ? 'REVOKED' : licExpired ? 'EXPIRED' : 'ACTIVE';
+              const bizVehicles = vehicles.filter(v => v.businessOwnerId === selBiz.id);
+              return (
+                <>
+                  {/* Header */}
+                  <div className="flex items-center gap-3 px-5 py-4 border-b border-border-faint shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-cyan-500/15 border border-cyan-500/25">
+                      <MdStore size={20} className="text-cyan-400" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[18px] font-extrabold text-white tracking-[-0.2px] truncate">{selBiz.name}</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">{selBiz.type}</div>
+                    </div>
+                    <span className="text-[10.5px] font-bold px-2.5 py-1 rounded-lg shrink-0"
+                      style={{ color: licColor, background: `${licColor}18`, border: `1px solid ${licColor}30` }}>
+                      {licLabel}
+                    </span>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+                    {/* License card */}
+                    <InfoCard title="Business License">
+                      <Row label="License #"    value={selBiz.license} mono />
+                      <Row label="Status"       value={
+                        <span className="font-bold" style={{ color: licColor }}>{licLabel}</span>
+                      } />
+                      <Row label="Issued"       value={selBiz.licenseIssuedAt || '—'} mono />
+                      <Row label="Expires"      value={bizExpiryStr(selBiz.licenseIssuedAt)} mono />
+                      {!licRevoked && days !== null && (
+                        <div className="mt-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[11px] text-slate-500">Days Remaining</span>
+                            <span className="text-[12px] font-bold font-mono" style={{ color: licColor }}>
+                              {licExpired ? 'Expired' : `${days} day${days === 1 ? '' : 's'}`}
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+                            <div className="h-full rounded-full transition-all"
+                              style={{ width: `${Math.max(0, Math.min(100, (days / 90) * 100))}%`, background: licColor }} />
+                          </div>
+                        </div>
+                      )}
+                    </InfoCard>
+
+                    {/* Business info */}
+                    <InfoCard title="Business Information">
+                      <Row label="Owner"   value={selBiz.owner} />
+                      <Row label="EIN"     value={selBiz.ein} mono />
+                      <Row label="Phone"   value={selBiz.phone} mono />
+                      <Row label="Address" value={selBiz.address} />
+                      {selBiz.isTowCompany && <Row label="Type" value={<span className={BADGE.blue}>TOW COMPANY</span>} />}
+                      {selBiz.isFDOT      && <Row label="Agency" value={<span className={BADGE.gray}>FDOT</span>} />}
+                    </InfoCard>
+
+                    {/* Employees */}
+                    <InfoCard title={`Employees (${selBiz.employees?.length || 0})`}>
+                      {(!selBiz.employees || selBiz.employees.length === 0)
+                        ? <div className="text-[12px] text-slate-500">No employees on file.</div>
+                        : selBiz.employees.map(emp => (
+                          <div key={emp.id} className="flex items-center gap-2.5">
+                            <MdGroup size={13} className="text-slate-600 shrink-0 mt-0.5" />
+                            <div className="min-w-0 flex-1">
+                              <div className="text-[12.5px] font-semibold text-slate-200">{emp.name}</div>
+                              <div className="text-[10.5px] text-slate-500">
+                                {Array.isArray(emp.roles) ? emp.roles.join(', ') : emp.role}
+                                {emp.phone && <span className="font-mono ml-2">{emp.phone}</span>}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </InfoCard>
+
+                    {/* Fleet / registered vehicles */}
+                    {(selBiz.fleet?.length > 0 || bizVehicles.length > 0) && (
+                      <InfoCard title={`Registered Vehicles (${(selBiz.fleet?.length || 0) + bizVehicles.length})`}>
+                        {selBiz.fleet?.map(v => (
+                          <div key={v.id} className="flex items-center gap-2">
+                            <MdBusiness size={12} className="text-slate-600 shrink-0" />
+                            <span className="text-[12px] text-slate-200">{v.name}</span>
+                            <span className={`ml-auto ${BADGE.gray}`}>{v.type}</span>
+                          </div>
+                        ))}
+                        {bizVehicles.map(v => (
+                          <div key={v.id} className="flex items-center gap-2">
+                            <MdDirectionsCar size={12} className="text-slate-600 shrink-0" />
+                            <span className="text-[12px] text-slate-200">{v.year} {v.make} {v.model}</span>
+                            <span className="text-[11px] font-mono text-brand-bright ml-auto">{v.plate}</span>
+                          </div>
+                        ))}
+                      </InfoCard>
                     )}
                   </div>
                 </>

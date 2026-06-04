@@ -830,7 +830,7 @@ export const BUSINESSES = [
       { id: 2, name: 'T2 — Medium Duty', spawnCode: 'towtruck2', type: 'Medium Duty' },
       { id: 3, name: 'T3 — Flatbed',     spawnCode: 'flatbed',   type: 'Flatbed'     },
     ],
-    license: "BL-2026-0445", licenseExpiry: "2026-12-31", ownedByPlayer: true,
+    license: "BL-2026-0445", licenseExpiry: "2026-12-31", licenseIssuedAt: "2026-04-15", licenseStatus: "ACTIVE", ownedByPlayer: true,
     employees: [
       { id: 1, name: "Michael Torres", discordId: "419283746", roles: ["Manager", "Driver"],    phone: "555-0192", since: "2024-02-01" },
       { id: 2, name: "Amanda Chen",    discordId: "309182746", roles: ["Dispatcher"],             phone: "555-0334", since: "2025-01-15" },
@@ -846,7 +846,7 @@ export const BUSINESSES = [
       { id: 1, name: 'FDOT-T1 — Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
       { id: 2, name: 'FDOT-T2 — Medium Duty',   spawnCode: 'towtruck2', type: 'Medium Duty' },
     ],
-    license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", ownedByPlayer: true,
+    license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", licenseIssuedAt: "2026-04-15", licenseStatus: "ACTIVE", ownedByPlayer: true,
     employees: [
       { id: 1, name: "Ray Calhoun",    discordId: "100200305", roles: ["Inspector", "Supervisor"], phone: "813-975-6200", since: "2022-01-01" },
       { id: 2, name: "Jordan Maxwell", discordId: "205947291", roles: ["Supervisor", "Dispatcher"], phone: "555-0192",    since: "2024-06-01" },

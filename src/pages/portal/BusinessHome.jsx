@@ -7,6 +7,12 @@ import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './
 import AccessDenied from './AccessDenied';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 
+function licenseDaysLeft(issuedAt) {
+  if (!issuedAt) return null;
+  const expiry = new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000;
+  return Math.ceil((expiry - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
 const ACCENT = 'brand';
 
 const QUICK_ACTIONS = [
@@ -31,11 +37,26 @@ export default function BusinessHome() {
         accent={ACCENT}
       />
 
-      <div className="flex gap-3.5 flex-wrap mb-7">
-        <StatCard label="Employees" value={myBiz.employees.length} accent={ACCENT} icon={MdGroup} hint="On the roster" />
-        <StatCard label="License" value={myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdReceiptLong} hint={`Expires ${myBiz.licenseExpiry}`} />
-        <StatCard label="Business Status" value={myBiz.status} accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdCheckCircle} hint="Operating status" />
-      </div>
+      {(() => {
+        const days = licenseDaysLeft(myBiz.licenseIssuedAt);
+        const licRevoked  = myBiz.licenseStatus === 'REVOKED';
+        const licExpired  = !licRevoked && (days === null || days <= 0);
+        const licWarn     = !licRevoked && !licExpired && days !== null && days <= 14;
+        const licAccent   = licRevoked || licExpired ? 'red' : licWarn ? 'amber' : 'green';
+        const licVal      = licRevoked ? 'REVOKED' : licExpired ? 'EXPIRED' : days !== null ? `${days}d` : (myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE');
+        const licHint     = licRevoked ? 'License has been revoked'
+          : licExpired  ? 'License has expired — contact admin'
+          : licWarn     ? `Expires in ${days} day${days === 1 ? '' : 's'} — renew soon`
+          : days !== null ? `${days} days remaining`
+          : `Expires ${myBiz.licenseExpiry}`;
+        return (
+          <div className="flex gap-3.5 flex-wrap mb-7">
+            <StatCard label="Employees"       value={myBiz.employees.length} accent={ACCENT}   icon={MdGroup}       hint="On the roster" />
+            <StatCard label="License"         value={licVal}                 accent={licAccent} icon={MdReceiptLong} hint={licHint} />
+            <StatCard label="Business Status" value={myBiz.status}           accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdCheckCircle} hint="Operating status" />
+          </div>
+        );
+      })()}
 
       <SectionTitle accent={ACCENT}>Quick Actions</SectionTitle>
       <div className="grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))' }}>

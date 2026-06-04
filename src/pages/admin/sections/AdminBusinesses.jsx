@@ -2,7 +2,19 @@ import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack } from 'react-icons/md';
+import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack, MdVerified, MdBlock, MdRefresh, MdReceiptLong } from 'react-icons/md';
+
+function licenseDaysLeft(issuedAt) {
+  if (!issuedAt) return null;
+  const expiry = new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000;
+  return Math.ceil((expiry - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
+function licenseExpiryStr(issuedAt) {
+  if (!issuedAt) return '—';
+  const d = new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000);
+  return d.toISOString().split('T')[0];
+}
 
 const BUSINESS_TYPES = [
   'Automotive / Towing', 'Restaurant / Food Service', 'Retail / Shop',
@@ -329,6 +341,91 @@ export default function AdminBusinesses() {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* Business License */}
+            {!isNew && selectedBiz && (
+              <section>
+                <div className="flex items-center gap-2 mb-3">
+                  <MdReceiptLong size={13} style={{ color: '#3a88e8' }} />
+                  <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600">Business License</div>
+                </div>
+                {(() => {
+                  const days = licenseDaysLeft(selectedBiz.licenseIssuedAt);
+                  const licStatus = selectedBiz.licenseStatus || 'ACTIVE';
+                  const isRevoked  = licStatus === 'REVOKED';
+                  const isExpired  = !isRevoked && (days === null || days <= 0);
+                  const isWarn     = !isRevoked && !isExpired && days !== null && days <= 14;
+                  const statusColor = isRevoked || isExpired ? '#ef4444' : isWarn ? '#f59e0b' : '#22c55e';
+                  const statusLabel = isRevoked ? 'REVOKED' : isExpired ? 'EXPIRED' : 'ACTIVE';
+                  return (
+                    <div className="rounded-xl p-4 flex flex-col gap-3"
+                      style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${statusColor}28` }}>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div>
+                          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">License #</div>
+                          <div className="text-[12px] font-mono text-slate-200">{selectedBiz.license || '—'}</div>
+                        </div>
+                        <div>
+                          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Status</div>
+                          <span className="text-[10.5px] font-bold px-2 py-0.5 rounded"
+                            style={{ color: statusColor, background: `${statusColor}18`, border: `1px solid ${statusColor}30` }}>
+                            {statusLabel}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Issued</div>
+                          <div className="text-[12px] font-mono text-slate-300">{selectedBiz.licenseIssuedAt || '—'}</div>
+                        </div>
+                        <div>
+                          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Expires</div>
+                          <div className="text-[12px] font-mono text-slate-300">{licenseExpiryStr(selectedBiz.licenseIssuedAt)}</div>
+                        </div>
+                        {!isRevoked && days !== null && (
+                          <div className="col-span-2">
+                            <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1">Days Remaining</div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                                <div className="h-full rounded-full transition-all"
+                                  style={{ width: `${Math.max(0, Math.min(100, (days / 90) * 100))}%`, background: statusColor }} />
+                              </div>
+                              <span className="text-[12px] font-bold shrink-0" style={{ color: statusColor }}>
+                                {isExpired ? 'Expired' : `${days} day${days === 1 ? '' : 's'}`}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={() => { dispatch({ type: 'UPDATE_BUSINESS_LICENSE', payload: { id: selectedBiz.id, action: 'EXTEND' } }); toast.success('License extended 90 days.'); }}
+                          type="button"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer"
+                          style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.28)', color: '#22c55e' }}>
+                          <MdRefresh size={13} /> Extend 90 Days
+                        </button>
+                        {isRevoked ? (
+                          <button
+                            onClick={() => { dispatch({ type: 'UPDATE_BUSINESS_LICENSE', payload: { id: selectedBiz.id, action: 'REINSTATE' } }); toast.success('License reinstated.'); }}
+                            type="button"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer"
+                            style={{ background: 'rgba(58,136,232,0.10)', border: '1px solid rgba(58,136,232,0.28)', color: '#3a88e8' }}>
+                            <MdVerified size={13} /> Reinstate
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => { dispatch({ type: 'UPDATE_BUSINESS_LICENSE', payload: { id: selectedBiz.id, action: 'REVOKE' } }); toast.success('License revoked.'); }}
+                            type="button"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer"
+                            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', color: '#ef4444' }}>
+                            <MdBlock size={13} /> Revoke License
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </section>
             )}
 
