@@ -854,6 +854,49 @@ export const BUSINESSES = [
   },
 ];
 
+/* ─── FDOT Road-Use Permits ─── */
+export const FDOT_PERMITS = [
+  {
+    id: 1,
+    permitNumber: 'FDOT-P-2026-0001',
+    type: 'Roadwork / Construction',
+    holderName: 'Carlos Mendez',
+    location: 'I-4 EB / MLK Blvd',
+    postal: '347',
+    description: 'Storm drain repair and partial lane closure on inside lane. Contractor must maintain one through lane at all times.',
+    issuedAt: '2026-05-28',
+    expiresAt: '2026-06-28',
+    issuedBy: 'Ray Calhoun',
+    status: 'ACTIVE',
+  },
+  {
+    id: 2,
+    permitNumber: 'FDOT-P-2026-0002',
+    type: 'Utility Work',
+    holderName: 'Brandon Torres',
+    location: 'SR-60 WB / MacDill Ave',
+    postal: '312',
+    description: 'Emergency fiber optic cable repair. Full shoulder closure, no lane impact.',
+    issuedAt: '2026-06-02',
+    expiresAt: '2026-07-02',
+    issuedBy: 'Ray Calhoun',
+    status: 'ACTIVE',
+  },
+  {
+    id: 3,
+    permitNumber: 'FDOT-P-2026-0003',
+    type: 'Oversize Load Transit',
+    holderName: 'Apex Logistics LLC',
+    location: 'US-41 SB corridor',
+    postal: '501',
+    description: 'Oversize load escort — 14-foot wide transformer in transit. LEO escort required at all highway on-ramps.',
+    issuedAt: '2026-05-15',
+    expiresAt: '2026-05-16',
+    issuedBy: 'Jordan Maxwell',
+    status: 'EXPIRED',
+  },
+];
+
 export const RECORD_TEMPLATES = [
   {
     id: 'r1', name: 'Hunting License',

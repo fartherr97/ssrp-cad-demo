@@ -3,7 +3,7 @@ import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
-  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS
+  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS, FDOT_PERMITS
 } from '../data/mockData';
 import { DEFAULT_HELP_CONTENT } from '../data/helpDefaults';
 import {
@@ -120,6 +120,7 @@ const initialState = {
   whitelistApps: WHITELIST_APPS,
   activeSessions: ACTIVE_SESSIONS,
   businesses: BUSINESSES,
+  permits: FDOT_PERMITS,
   incoming911: INCOMING_911,
   civilian911Log: [],
   unitGroups: UNIT_GROUPS,
@@ -748,6 +749,22 @@ function reducer(state, action) {
       const audit = addAuditEntry(state, `Deleted business ID ${action.payload}`, 'Admin');
       return { ...state, businesses, ...audit };
     }
+
+    /* ─── FDOT Permits ─── */
+    case 'ADD_PERMIT': {
+      const seq = state.nextId;
+      const permitNumber = `FDOT-P-${new Date().getFullYear()}-${String(seq).padStart(4, '0')}`;
+      const permit = { ...action.payload, id: seq, permitNumber, status: 'ACTIVE' };
+      const audit = addAuditEntry(state, `Issued permit ${permitNumber} to ${permit.holderName}`, 'Permits');
+      return { ...state, permits: [permit, ...state.permits], nextId: seq + 1, ...audit };
+    }
+    case 'REVOKE_PERMIT': {
+      const permits = state.permits.map(p => p.id === action.payload ? { ...p, status: 'REVOKED' } : p);
+      const target = state.permits.find(p => p.id === action.payload);
+      const audit = addAuditEntry(state, `Revoked permit ${target?.permitNumber} (${target?.holderName})`, 'Permits');
+      return { ...state, permits, ...audit };
+    }
+
     case 'UPDATE_REPORT_STATUS': {
       const { id, status, supervisorSignature } = action.payload;
       const reports = state.reports.map(r =>

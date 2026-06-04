@@ -37,6 +37,7 @@ import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
 import BusinessFleet from './pages/portal/BusinessFleet';
+import FDOTPermits from './pages/portal/FDOTPermits';
 import HelpCenter from './pages/portal/HelpCenter';
 import TowCAD from './pages/TowCAD';
 import { BusinessProvider } from './contexts/BusinessContext';
@@ -213,6 +214,7 @@ function CADApp() {
         <Route path="/portal/my-business"     element={<MyBusiness />} />
         <Route path="/portal/employees"       element={<Employees />} />
         <Route path="/portal/business-fleet"  element={<BusinessFleet />} />
+        <Route path="/portal/permits"          element={<FDOTPermits />} />
         <Route path="/portal/help"             element={<HelpCenter />} />
 
         {/* ── Tow CAD ── */}

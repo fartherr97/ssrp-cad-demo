@@ -10,6 +10,7 @@ import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore, MdExpandLess,
   MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
+  MdVerifiedUser, MdLocationOn,
 } from 'react-icons/md';
 
 function bizDaysLeft(issuedAt) {
@@ -138,12 +139,13 @@ const SEARCH_TYPES = [
   { id: 'VEHICLE',  label: 'Vehicle',            Icon: MdDirectionsCar },
   { id: 'WARRANT',  label: 'Warrant',            Icon: MdGavel },
   { id: 'CASES',    label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300', hoverClass: 'hover:bg-amber-400/[0.08] hover:border-amber-400/25 hover:text-amber-300' },
-  { id: 'BUSINESS', label: 'Business',           Icon: MdStore, activeClass: 'bg-cyan-400/15 border-cyan-400/40 text-cyan-300', hoverClass: 'hover:bg-cyan-400/[0.08] hover:border-cyan-400/25 hover:text-cyan-300' },
+  { id: 'BUSINESS', label: 'Business',           Icon: MdStore,        activeClass: 'bg-cyan-400/15 border-cyan-400/40 text-cyan-300',   hoverClass: 'hover:bg-cyan-400/[0.08] hover:border-cyan-400/25 hover:text-cyan-300'   },
+  { id: 'PERMIT',   label: 'Permits',            Icon: MdVerifiedUser, activeClass: 'bg-green-400/15 border-green-400/40 text-green-300', hoverClass: 'hover:bg-green-400/[0.08] hover:border-green-400/25 hover:text-green-300' },
 ];
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
@@ -178,6 +180,19 @@ export default function RecordsBureau() {
             b.type?.toLowerCase().includes(q) ||
             b.ein?.toLowerCase().includes(q))
         : [...businesses]);
+      setSelected(null);
+      return;
+    }
+    if (searchType === 'PERMIT') {
+      setSearched(true);
+      const q = query.trim().toLowerCase();
+      setResults(q
+        ? permits.filter(p =>
+            p.holderName?.toLowerCase().includes(q) ||
+            p.location?.toLowerCase().includes(q) ||
+            p.permitNumber?.toLowerCase().includes(q) ||
+            p.type?.toLowerCase().includes(q))
+        : [...permits]);
       setSelected(null);
       return;
     }
@@ -224,6 +239,7 @@ export default function RecordsBureau() {
   const selVeh     = selected && searchType === 'VEHICLE'  ? vehicles.find(v => v.id === selected) : null;
   const selWarrant = selected && searchType === 'WARRANT'  ? warrants.find(w => w.id === selected) : null;
   const selBiz     = selected && searchType === 'BUSINESS' ? businesses.find(b => b.id === selected) : null;
+  const selPermit  = selected && searchType === 'PERMIT'   ? permits.find(p => p.id === selected)    : null;
   const selCase    = selected && searchType === 'CASES'    ? (() => {
     const [kind, id] = selected.split(':');
     const numId = Number(id);
@@ -250,6 +266,7 @@ export default function RecordsBureau() {
     : searchType === 'PERSON'   ? 'Name, DOB, SSN or DL #'
     : searchType === 'VEHICLE'  ? 'Plate or make / model'
     : searchType === 'BUSINESS' ? 'Business name, owner, or type…'
+    : searchType === 'PERMIT'   ? 'Holder name, location, or permit #…'
     : 'Subject name or charge';
 
   return (
@@ -337,6 +354,13 @@ export default function RecordsBureau() {
                     <div>• Business type</div>
                     <div>• Leave blank for all businesses</div>
                   </>
+                ) : searchType === 'PERMIT' ? (
+                  <>
+                    <div>• Holder name or company</div>
+                    <div>• Location / road name</div>
+                    <div>• Permit number (FDOT-P-…)</div>
+                    <div>• Leave blank to see all permits</div>
+                  </>
                 ) : (
                   <>
                     <div>• Full or partial name</div>
@@ -400,6 +424,23 @@ export default function RecordsBureau() {
                         {r.regStatus !== 'VALID' && <span className={BADGE.orange}>REG {r.regStatus}</span>}
                         {bizOwner && <span className={BADGE.blue}>COMMERCIAL</span>}
                       </div>
+                    </button>
+                  );
+                }
+                if (searchType === 'PERMIT') {
+                  const pSt = r.status === 'REVOKED' ? 'REVOKED'
+                    : r.expiresAt && new Date(r.expiresAt) < new Date() ? 'EXPIRED' : 'ACTIVE';
+                  const pColor = pSt === 'ACTIVE' ? '#22c55e' : pSt === 'EXPIRED' ? '#94a3b8' : '#ef4444';
+                  return (
+                    <button key={r.id} className={base} onClick={() => setSelected(r.id)}>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10.5px] font-mono font-bold" style={{ color: pColor }}>{r.permitNumber}</span>
+                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ color: pColor, background: `${pColor}18`, border: `1px solid ${pColor}30` }}>{pSt}</span>
+                      </div>
+                      <div className="text-[12.5px] font-bold text-white truncate">{r.holderName}</div>
+                      <div className="text-[10.5px] text-slate-500 mt-0.5 truncate">{r.location}</div>
+                      <div className="text-[10px] text-slate-600 mt-0.5">{r.type} · Exp {r.expiresAt}</div>
                     </button>
                   );
                 }
@@ -632,6 +673,53 @@ export default function RecordsBureau() {
                             <span className="text-[11px] font-mono text-brand-bright ml-auto">{v.plate}</span>
                           </div>
                         ))}
+                      </InfoCard>
+                    )}
+                  </div>
+                </>
+              );
+            })()
+          ) : selPermit ? (
+            /* ── PERMIT DETAIL ── */
+            (() => {
+              const pSt = selPermit.status === 'REVOKED' ? 'REVOKED'
+                : selPermit.expiresAt && new Date(selPermit.expiresAt) < new Date() ? 'EXPIRED' : 'ACTIVE';
+              const pColor = pSt === 'ACTIVE' ? '#22c55e' : pSt === 'EXPIRED' ? '#94a3b8' : '#ef4444';
+              return (
+                <>
+                  <div className="flex items-center gap-3 px-5 py-4 border-b border-border-faint shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${pColor}18`, border: `1px solid ${pColor}28` }}>
+                      <MdVerifiedUser size={20} style={{ color: pColor }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[18px] font-extrabold text-white tracking-[-0.2px] truncate">{selPermit.holderName}</div>
+                      <div className="text-[11px] font-mono mt-0.5" style={{ color: pColor }}>{selPermit.permitNumber}</div>
+                    </div>
+                    <span className="text-[10.5px] font-bold px-2.5 py-1 rounded-lg shrink-0"
+                      style={{ color: pColor, background: `${pColor}18`, border: `1px solid ${pColor}30` }}>{pSt}</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+                    <InfoCard title="Permit Information">
+                      <Row label="Permit #"   value={selPermit.permitNumber} mono />
+                      <Row label="Type"       value={selPermit.type} />
+                      <Row label="Holder"     value={selPermit.holderName} />
+                      <Row label="Issued By"  value={selPermit.issuedBy} />
+                      <Row label="Issue Date" value={selPermit.issuedAt} mono />
+                      <Row label="Expiry"     value={selPermit.expiresAt} mono />
+                      <Row label="Status"     value={<span className="font-bold" style={{ color: pColor }}>{pSt}</span>} />
+                    </InfoCard>
+                    <InfoCard title="Location">
+                      <div className="flex items-start gap-2">
+                        <MdLocationOn size={15} className="text-slate-500 mt-0.5 shrink-0" />
+                        <div>
+                          <div className="text-[13px] font-semibold text-slate-200">{selPermit.location}</div>
+                          {selPermit.postal && <div className="text-[11px] text-slate-500 font-mono mt-0.5">Postal {selPermit.postal}</div>}
+                        </div>
+                      </div>
+                    </InfoCard>
+                    {selPermit.description && (
+                      <InfoCard title="Description / Conditions">
+                        <div className="text-[12.5px] text-slate-300 leading-relaxed">{selPermit.description}</div>
                       </InfoCard>
                     )}
                   </div>
