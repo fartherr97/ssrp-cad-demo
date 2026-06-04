@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Select from '../components/ui/Select';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
@@ -165,39 +165,80 @@ function Stat({ label, value, color = '#ffffff' }) {
   );
 }
 
-/* Smoothly reveal/hide a block by animating its height (grid-rows 0fr↔1fr)
-   plus a fade. Mounts on show, stays mounted through the collapse, then
-   unmounts * so surrounding layout slides instead of snapping. */
+/* Smoothly reveal/hide a block by animating a measured pixel height plus a
+   fade. Mounts on show, stays mounted through the collapse, then unmounts * so
+   surrounding layout slides instead of snapping.
+
+   Why pixel height and not grid-template-rows (0fr↔1fr)?  Interpolating a
+   fractional grid track forces the browser to re-resolve the track size — and
+   therefore re-lay-out the whole child subtree — on every animation frame.
+   With a heavy child (the Field Units table + blurred panels) that drops
+   frames and feels laggy.  Animating an explicit height instead lays the child
+   out once and merely clips it, which the compositor handles cheaply.  Once the
+   reveal finishes we release to `height: auto` so it can grow/scroll freely. */
 function Reveal({ show, children, duration = 300 }) {
   const [mounted, setMounted] = useState(show);
-  const [open, setOpen]       = useState(show);
+  const [height, setHeight]   = useState(show ? 'auto' : 0);   // 'auto' | px number
+  const innerRef    = useRef(null);
+  const startedOpen = useRef(show);   // open on first paint? (skip initial anim)
+  const firstRun    = useRef(true);
 
+  // Mount immediately when showing; defer unmount until the collapse finishes.
   useEffect(() => {
-    if (show) {
-      setMounted(true);
-      // Paint the collapsed state first, then flip open so the transition runs.
-      const r = requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)));
-      return () => cancelAnimationFrame(r);
-    }
-    setOpen(false);
+    if (show) { setMounted(true); return undefined; }
     const t = setTimeout(() => setMounted(false), duration);
     return () => clearTimeout(t);
   }, [show, duration]);
 
+  // Drive the height transition once the element is in the DOM.
+  useLayoutEffect(() => {
+    if (!mounted) return undefined;
+    const inner = innerRef.current;
+    if (!inner) return undefined;
+
+    if (firstRun.current) {
+      firstRun.current = false;
+      // Rendered already-open on page load → it already starts at `auto`, so
+      // skip the animation entirely (no state write needed).
+      if (startedOpen.current) return undefined;
+    }
+
+    let raf1;
+    let raf2;
+    let timer;
+    if (show) {
+      // Closed → measured height (the collapsed 0px frame is already committed).
+      raf1 = requestAnimationFrame(() => {
+        setHeight(inner.offsetHeight);
+        timer = setTimeout(() => setHeight('auto'), duration + 20);
+      });
+    } else {
+      // Pin the current height, then collapse to 0 on the next frame so the
+      // height transition has a concrete start value to animate from.
+      raf1 = requestAnimationFrame(() => {
+        setHeight(inner.offsetHeight);
+        raf2 = requestAnimationFrame(() => setHeight(0));
+      });
+    }
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); clearTimeout(timer); };
+  }, [show, mounted, duration]);
+
   if (!mounted) return null;
 
+  const animating = height !== 'auto';
   return (
     <div
-      className={`grid ease-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       style={{
-        transitionProperty: 'grid-template-rows, opacity',
-        transitionDuration: `${duration}ms`,
-        // Isolate layout/paint so a heavy child (the Field Units table) can't
-        // thrash the rest of the page while its height animates.
+        height: animating ? `${height}px` : 'auto',
+        opacity: height === 0 ? 0 : 1,
+        overflow: 'hidden',
+        // Isolate layout/paint and hint the compositor only while animating.
         contain: 'layout paint',
+        willChange: animating ? 'height' : 'auto',
+        transition: `height ${duration}ms cubic-bezier(0.16,1,0.3,1), opacity ${Math.round(duration * 0.85)}ms ease`,
       }}
     >
-      <div className="overflow-hidden min-h-0">{children}</div>
+      <div ref={innerRef}>{children}</div>
     </div>
   );
 }
