@@ -155,27 +155,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right * connect */}
-        <div className="ml-auto flex items-center gap-3 sm:gap-5">
-          {!connected && (
-            <button
-              onClick={handleConnect}
-              disabled={connectLoading}
-              className="flex items-center gap-2 px-3 sm:px-[18px] py-2 text-[12px] sm:text-[13px] font-bold bg-[#5865F2] text-white border-none rounded-md cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5865F2]/50 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-            >
-              <DiscordSVG />
-              <span className="hidden sm:inline">{connectLoading ? 'Connecting...' : 'Connect'}</span>
-            </button>
-          )}
-          {connected && (
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: '#22ff66', animation: 'connectedGlow 2.4s ease-in-out infinite' }} />
-              <span className="text-[11px] sm:text-[12px] font-semibold text-[#22ff66]">
-                <span className="hidden sm:inline">Discord </span>Connected
-              </span>
-            </div>
-          )}
-        </div>
+        {/* Right (empty — connect flow handled by main button) */}
+        <div className="ml-auto" />
       </header>
 
       {/* ── MAIN CONTENT ── */}
