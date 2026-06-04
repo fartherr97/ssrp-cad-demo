@@ -51,6 +51,7 @@ import Accounts from './pages/admin/sections/Accounts';
 import Identifiers from './pages/admin/sections/Identifiers';
 import PermissionKeys from './pages/admin/sections/PermissionKeys';
 import CustomRecords from './pages/admin/sections/CustomRecords';
+import CivilianForms from './pages/admin/sections/CivilianForms';
 import Departments from './pages/admin/sections/Departments';
 import TenCodes from './pages/admin/sections/TenCodes';
 import Statutes from './pages/admin/sections/Statutes';
@@ -159,6 +160,7 @@ function CADApp() {
           <Route path="identifiers"        element={<Identifiers />} />
           <Route path="permission-keys"    element={<PermissionKeys />} />
           <Route path="custom-records"     element={<CustomRecords />} />
+          <Route path="civilian-forms"     element={<CivilianForms />} />
           <Route path="departments"        element={<Departments />} />
           <Route path="call-types"          element={<CallTypes />} />
           <Route path="ten-codes"          element={<TenCodes />} />

@@ -9,7 +9,7 @@ import {
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
-  MdHelpOutline,
+  MdHelpOutline, MdContactPage,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -30,6 +30,7 @@ const GROUPS = [
     items: [
       { icon: MdBrush,              label: 'Customization',  route: '/admin', exact: true },
       { icon: MdInventory2,         label: 'Custom Records', route: '/admin/custom-records' },
+      { icon: MdContactPage,        label: 'Civilian Forms', route: '/admin/civilian-forms' },
       { icon: MdHelpOutline,        label: 'Help Center',    route: '/admin/help-center' },
       { icon: MdShield,             label: 'Departments',    route: '/admin/departments' },
       { icon: MdLocalPhone,          label: 'Call Types',     route: '/admin/call-types' },
