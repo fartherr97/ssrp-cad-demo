@@ -44,7 +44,7 @@ export default function RecordsCenter() {
       const saved = localStorage.getItem(DRAFT_KEY(tpl.id));
       if (saved) restored = JSON.parse(saved);
     } catch { /* ignore */ }
-    if (tpl.showDept !== false && !restored._issuingDept) {
+    if (tpl.showDept !== false) {
       const deptName = departments?.find(d => d.short === me?.deptShort)?.name || me?.deptShort || communityConfig?.name || '';
       if (deptName) restored._issuingDept = deptName;
     }
