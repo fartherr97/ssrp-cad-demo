@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack, MdVerified, MdBlock, MdRefresh, MdReceiptLong } from 'react-icons/md';
+import { MdStore, MdAdd, MdDelete, MdPerson, MdClose, MdCheck, MdArrowBack, MdVerified, MdBlock, MdRefresh, MdReceiptLong, MdSearch } from 'react-icons/md';
 
 function licenseDaysLeft(issuedAt) {
   if (!issuedAt) return null;
@@ -82,6 +82,7 @@ export default function AdminBusinesses() {
   const [empForm,       setEmpForm]       = useState(BLANK_EMP);
   const [addingEmp,     setAddingEmp]     = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [ownerSearch,   setOwnerSearch]   = useState('');
 
   const sf = k => v => setForm(f => ({ ...f, [k]: v }));
   const se = k => v => setEmpForm(f => ({ ...f, [k]: v }));
@@ -97,6 +98,7 @@ export default function AdminBusinesses() {
     setIsNew(true);
     setAddingEmp(false);
     setDeleteConfirm(null);
+    setOwnerSearch('');
   };
 
   const openEdit = (biz) => {
@@ -105,6 +107,7 @@ export default function AdminBusinesses() {
     setIsNew(false);
     setAddingEmp(false);
     setDeleteConfirm(null);
+    setOwnerSearch('');
   };
 
   const handleSave = () => {
@@ -260,24 +263,43 @@ export default function AdminBusinesses() {
               <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-3">Owner Assignment</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <FInput label="Owner Name" value={form.owner} onChange={sf('owner')} placeholder="Full name" />
-                <FInput label="Owner Discord ID" value={form.ownerDiscordId} onChange={sf('ownerDiscordId')} placeholder="Discord snowflake" mono />
+                <FInput label="Owner Discord ID" value={form.ownerDiscordId} onChange={sf('ownerDiscordId')} placeholder="e.g. 216583122775736322" mono />
               </div>
               <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1.5">Quick-assign from accounts</div>
+              <div className="relative mb-2">
+                <MdSearch size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
+                <input
+                  value={ownerSearch}
+                  onChange={e => setOwnerSearch(e.target.value)}
+                  placeholder="Search by name or badge…"
+                  className="w-full rounded-lg text-[11.5px] outline-none"
+                  style={{ background: '#0d1a2c', border: '1px solid rgba(255,255,255,0.10)', padding: '6px 10px 6px 30px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
+                />
+              </div>
               <div className="flex flex-col gap-0 max-h-40 overflow-y-auto rounded-xl"
                 style={{ border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-                {officers.map(o => {
-                  const active = form.ownerDiscordId === o.discordId;
-                  return (
-                    <button key={o.id} type="button" onClick={() => setForm(f => ({ ...f, owner: o.name, ownerDiscordId: o.discordId || '' }))}
-                      className="flex items-center gap-2.5 px-3 py-2 text-left"
-                      style={{ cursor: 'pointer', background: active ? 'rgba(58,136,232,0.10)' : 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                      <MdPerson size={13} className="text-slate-600 shrink-0" />
-                      <span className="text-[11.5px] text-slate-200 flex-1">{o.name}</span>
-                      <span className="text-[10px] font-mono text-slate-500">{o.badge}</span>
-                      {active && <MdCheck size={13} style={{ color: '#3a88e8' }} />}
-                    </button>
-                  );
-                })}
+                {(() => {
+                  const q = ownerSearch.trim().toLowerCase();
+                  const filtered = q
+                    ? officers.filter(o => o.name?.toLowerCase().includes(q) || String(o.badge || '').toLowerCase().includes(q))
+                    : officers;
+                  if (filtered.length === 0) {
+                    return <div className="text-[11px] text-slate-600 italic px-3 py-3 text-center">No accounts match “{ownerSearch}”.</div>;
+                  }
+                  return filtered.map(o => {
+                    const active = form.ownerDiscordId === o.discordId;
+                    return (
+                      <button key={o.id} type="button" onClick={() => setForm(f => ({ ...f, owner: o.name, ownerDiscordId: o.discordId || '' }))}
+                        className="flex items-center gap-2.5 px-3 py-2 text-left"
+                        style={{ cursor: 'pointer', background: active ? 'rgba(58,136,232,0.10)' : 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <MdPerson size={13} className="text-slate-600 shrink-0" />
+                        <span className="text-[11.5px] text-slate-200 flex-1">{o.name}</span>
+                        <span className="text-[10px] font-mono text-slate-500">{o.badge}</span>
+                        {active && <MdCheck size={13} style={{ color: '#3a88e8' }} />}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             </section>
 
@@ -301,7 +323,7 @@ export default function AdminBusinesses() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <FInput label="Name"       value={empForm.name}      onChange={se('name')}      placeholder="Full name" />
                       <FSelect label="Role"      value={empForm.role}      onChange={se('role')}      options={EMP_ROLES} />
-                      <FInput label="Discord ID" value={empForm.discordId} onChange={se('discordId')} placeholder="Snowflake ID" mono />
+                      <FInput label="Discord ID" value={empForm.discordId} onChange={se('discordId')} placeholder="e.g. 216583122775736322" mono />
                       <FInput label="Phone"      value={empForm.phone}     onChange={se('phone')}     placeholder="555-0000" />
                     </div>
                     <div className="flex justify-end gap-2">
