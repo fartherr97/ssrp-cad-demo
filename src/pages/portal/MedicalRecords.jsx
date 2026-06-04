@@ -5,8 +5,9 @@ import {
   MdLocalHospital, MdPerson, MdEdit, MdSave, MdClose, MdAdd,
   MdExpandMore, MdExpandLess, MdShield, MdWarningAmber,
 } from 'react-icons/md';
-import { PortalPage, PortalHeader, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { PortalPage, PortalHeader, PortalCard, CivFormField, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, sm } from '../../constants/styles';
+import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const BLOOD_TYPES = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown'];
@@ -96,7 +97,7 @@ function CheckToggle({ checked, onChange, label, description, color = '#3d82f0' 
   );
 }
 
-function MedicalProfileEditor({ civilian, onSave, onCancel }) {
+function MedicalProfileEditor({ civilian, extraFields = [], onSave, onCancel }) {
   const profile = civilian.medicalProfile || EMPTY_PROFILE;
   const [form, setForm] = useState({
     bloodType:        profile.bloodType || '',
@@ -108,10 +109,12 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
     emergencyContact: { ...(profile.emergencyContact || { name: '', phone: '', relationship: '' }) },
     safetyNotes:      profile.safetyNotes || '',
     notes:            profile.notes || '',
+    custom:           { ...(profile.custom || {}) },
   });
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
   const setEC = (key, val) => setForm(f => ({ ...f, emergencyContact: { ...f.emergencyContact, [key]: val } }));
+  const setCustom = (key, val) => setForm(f => ({ ...f, custom: { ...f.custom, [key]: val } }));
 
   return (
     <form onSubmit={e => { e.preventDefault(); onSave(form); }} className="flex flex-col gap-6 p-1">
@@ -231,6 +234,20 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
           placeholder="e.g. DNR in effect. Prior CABG surgery 2021. Contact spouse before any procedure." />
       </div>
 
+      {/* Admin-configured extra fields */}
+      {extraFields.length > 0 && (
+        <div>
+          <SectionHeader>Additional Information</SectionHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {extraFields.map(f => (
+              <CivFormField key={f.key} field={f}
+                value={form.custom[f.key]}
+                onChange={v => setCustom(f.key, v)} />
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-2.5 pt-1">
         <button type="submit" className={`${S_BTN_PRIMARY} press`}>
           <MdSave size={16} /> Save Medical Profile
@@ -243,7 +260,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
   );
 }
 
-function ProfileReadView({ profile }) {
+function ProfileReadView({ profile, extraFields = [] }) {
   if (!profile) {
     return (
       <div className="text-[12px] text-slate-500 italic py-2">
@@ -357,6 +374,25 @@ function ProfileReadView({ profile }) {
           </div>
         )}
       </div>
+
+      {/* Admin-configured extra fields */}
+      {extraFields.some(f => profile.custom?.[f.key] !== undefined && profile.custom?.[f.key] !== '' && profile.custom?.[f.key] !== false) && (
+        <div className="sm:col-span-2">
+          <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-1.5">Additional Information</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+            {extraFields.map(f => {
+              const v = profile.custom?.[f.key];
+              if (v === undefined || v === '' || v === false) return null;
+              return (
+                <div key={f.key} className="flex justify-between gap-3 text-[12.5px]">
+                  <span className="text-slate-500">{f.label}</span>
+                  <span className="text-slate-200 font-medium text-right">{f.type === 'checkbox' ? 'Yes' : v}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -365,6 +401,7 @@ export default function MedicalRecords() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar } = useActiveCivilian();
+  const medicalFields = state.civilianForms?.medical?.fields || CIVILIAN_FORMS_DEFAULT.medical.fields;
 
   const [editingId, setEditingId] = useState(null);
   const [expandedId, setExpandedId] = useState(activeChar?.id ?? null);
@@ -456,11 +493,12 @@ export default function MedicalRecords() {
                     {isEditing ? (
                       <MedicalProfileEditor
                         civilian={c}
+                        extraFields={medicalFields}
                         onSave={(data) => handleSave(c.id, data)}
                         onCancel={() => setEditingId(null)}
                       />
                     ) : (
-                      <ProfileReadView profile={profile} />
+                      <ProfileReadView profile={profile} extraFields={medicalFields} />
                     )}
                   </div>
                 )}

@@ -5,11 +5,11 @@ import {
   MdDirectionsCar, MdAdd, MdClose, MdPerson, MdLock, MdErrorOutline,
 } from 'react-icons/md';
 import {
-  PortalPage, PortalHeader, PortalCard, Field,
+  PortalPage, PortalHeader, PortalCard, Field, CivFormField,
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
 import { BADGE } from '../../constants/styles';
-import ReportForm from '../../components/ReportForm';
+import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const defaultExpiry = () => {
@@ -58,10 +58,7 @@ export default function MyVehicles() {
   const { civilians, vehicles } = state;
   const { myChars, activeChar } = useActiveCivilian();
 
-  const vehicleTemplate = useMemo(
-    () => (state.recordTemplates || []).find(t => t.vehicleTemplate) || null,
-    [state.recordTemplates],
-  );
+  const extraFields = state.civilianForms?.vehicleRegistration?.fields || CIVILIAN_FORMS_DEFAULT.vehicleRegistration.fields;
 
   const myVehicles  = useMemo(() => vehicles.filter(v => v.ownerId === activeChar?.id), [vehicles, activeChar]);
 
@@ -103,18 +100,16 @@ export default function MyVehicles() {
       type: 'ADD_VEHICLE',
       payload: { ...rest, regExpiry, regStatus: 'VALID', ownerId: Number(ownerId) },
     });
-    if (vehicleTemplate) {
-      dispatch({
-        type: 'ADD_RECORD',
-        payload: {
-          type: vehicleTemplate.name,
-          civilianId: Number(ownerId),
-          isVehicleReg: true,
-          status: 'Approved',
-          formData: { plate: form.plate, make: form.make, model: form.model, year: form.year, color: form.color, regExpiry, ...templateData },
-        },
-      });
-    }
+    dispatch({
+      type: 'ADD_RECORD',
+      payload: {
+        type: 'Vehicle Registration',
+        civilianId: Number(ownerId),
+        isVehicleReg: true,
+        status: 'Approved',
+        formData: { plate: form.plate, make: form.make, model: form.model, year: form.year, color: form.color, regExpiry, ...templateData },
+      },
+    });
     toast.success(`${form.plate} registered.`, { title: 'Vehicle Registered' });
     closeForm();
   };
@@ -191,18 +186,19 @@ export default function MyVehicles() {
               </div>
             </div>
 
-            {/* Template-driven extra fields */}
-            {vehicleTemplate && (
+            {/* Admin-configured extra fields */}
+            {extraFields.length > 0 && (
               <div className="mt-5 pt-5 border-t border-border-faint">
                 <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3 flex items-center gap-2">
-                  🚗 <span>{vehicleTemplate.name} * Additional Fields</span>
+                  🚗 <span>Additional Information</span>
                 </div>
-                <ReportForm
-                  template={vehicleTemplate}
-                  data={templateData}
-                  onChange={(k, v) => setTemplateData(p => ({ ...p, [k]: v }))}
-                  onBulkChange={(obj) => setTemplateData(p => ({ ...p, ...obj }))}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {extraFields.map(f => (
+                    <CivFormField key={f.key} field={f}
+                      value={templateData[f.key]}
+                      onChange={v => setTemplateData(p => ({ ...p, [f.key]: v }))} />
+                  ))}
+                </div>
               </div>
             )}
 

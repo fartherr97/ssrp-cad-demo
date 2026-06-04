@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHigh } from 'react-icons/md';
-import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { PortalPage, PortalHeader, PortalCard, Field, CivFormField } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
+import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
 import { useActiveCivilian } from '../../contexts/CivilianContext';
 
 const DL_BADGE = {
@@ -12,23 +13,10 @@ const DL_BADGE = {
   EXPIRED:   BADGE.orange,
 };
 
-const EMPTY_FORM = {
-  firstName: '', lastName: '', dob: '', gender: 'Male', ethnicity: '',
-  height: '', weight: '', hair: '', eyes: '', address: '', phone: '',
-};
-
-const FORM_FIELDS = [
-  { key: 'firstName', label: 'First Name', type: 'text' },
-  { key: 'lastName',  label: 'Last Name',  type: 'text' },
-  { key: 'dob',       label: 'Date of Birth', type: 'date' },
-  { key: 'gender',    label: 'Gender', type: 'select', options: ['Male', 'Female', 'Other'] },
-  { key: 'ethnicity', label: 'Ethnicity', type: 'text' },
-  { key: 'height',    label: 'Height', type: 'text' },
-  { key: 'weight',    label: 'Weight', type: 'text' },
-  { key: 'hair',      label: 'Hair', type: 'text' },
-  { key: 'eyes',      label: 'Eyes', type: 'text' },
-  { key: 'phone',     label: 'Phone', type: 'text' },
-];
+// Build a blank form object from the configured field list.
+const blankForm = (fields) => Object.fromEntries(
+  fields.map(f => [f.key, f.type === 'checkbox' ? false : (f.type === 'select' ? (f.options?.[0] || '') : '')])
+);
 
 // ── AI character generation data pool ────────────────────────────────────────
 
@@ -69,7 +57,26 @@ const _AREAS = [
 const _pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const _int  = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
 
-function generateCharacter() {
+// Produces a value for a single configured field. Known character keys get
+// realistic data; unknown custom fields fall back to type-appropriate values.
+function _genForField(field, base) {
+  const { key, type, options } = field;
+  if (key in base) return base[key];        // known character attribute
+  switch (type) {
+    case 'select':   return options?.length ? _pick(options) : '';
+    case 'checkbox': return Math.random() < 0.5;
+    case 'number':   return String(_int(1, 100));
+    case 'date': {
+      const y = new Date().getFullYear() - _int(1, 40);
+      return `${y}-${String(_int(1, 12)).padStart(2, '0')}-${String(_int(1, 28)).padStart(2, '0')}`;
+    }
+    default:         return '';             // free-text custom fields left blank
+  }
+}
+
+// `fields` is the admin-configured character schema; the generator adapts to it
+// so newly added/removed fields are always reflected in "Generate with AI".
+function generateCharacter(fields) {
   const gender = Math.random() < 0.52 ? 'Male' : 'Female';
   const firstName = _pick(gender === 'Male' ? _FM : _FF);
   const lastName  = _pick(_LAST);
@@ -86,19 +93,24 @@ function generateCharacter() {
   const weight = gender === 'Male' ? `${_int(145, 225)} lbs` : `${_int(105, 165)} lbs`;
 
   const address = `${_int(100, 9999)} ${_pick(_STREETS)}, ${_pick(_AREAS)}, Los Santos`;
-
   const phone = `(${_pick(['213', '310', '323', '424'])}) 555-${String(_int(0, 9999)).padStart(4, '0')}`;
 
-  return { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
-           height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone };
+  const base = { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
+                 height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone };
+
+  // Map onto the configured fields so the output matches the live schema exactly.
+  return Object.fromEntries(fields.map(f => [f.key, _genForField(f, base)]));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function MyCharacters() {
-  const { dispatch } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar, setActiveCharId } = useActiveCivilian();
+
+  const characterFields = state.civilianForms?.character?.fields || CIVILIAN_FORMS_DEFAULT.character.fields;
+  const EMPTY_FORM = useMemo(() => blankForm(characterFields), [characterFields]);
 
   const [showForm,   setShowForm]   = useState(false);
   const [editingId,  setEditingId]  = useState(null);
@@ -114,12 +126,8 @@ export default function MyCharacters() {
   };
 
   const openEdit = (c) => {
-    setForm({
-      firstName: c.firstName || '', lastName: c.lastName || '', dob: c.dob || '',
-      gender: c.gender || 'Male', ethnicity: c.ethnicity || '', height: c.height || '',
-      weight: c.weight || '', hair: c.hair || '', eyes: c.eyes || '',
-      address: c.address || '', phone: c.phone || '',
-    });
+    // Seed each configured field from the character record (falling back to blank).
+    setForm(Object.fromEntries(characterFields.map(f => [f.key, c[f.key] ?? EMPTY_FORM[f.key]])));
     setEditingId(c.id);
     setShowForm(true);
   };
@@ -134,10 +142,11 @@ export default function MyCharacters() {
     if (generating) return;
     setGenerating(true);
     setTimeout(() => {
-      const profile = generateCharacter();
+      const profile = generateCharacter(characterFields);
       setForm(profile);
       setGenerating(false);
-      toast.success(`Generated ${profile.firstName} ${profile.lastName}.`, { title: 'AI Generation Complete' });
+      const name = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'character';
+      toast.success(`Generated ${name}.`, { title: 'AI Generation Complete' });
     }, 1400);
   };
 
@@ -206,31 +215,11 @@ export default function MyCharacters() {
           </div>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
-              {FORM_FIELDS.map(f => (
-                <div key={f.key}>
-                  <label className={PORTAL_LABEL}>{f.label}</label>
-                  {f.type === 'select' ? (
-                    <select className={PORTAL_INPUT} value={form[f.key]} onChange={e => setField(f.key, e.target.value)}>
-                      {f.options.map(o => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  ) : f.type === 'date' ? (
-                    <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
-                      <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form[f.key]} onChange={e => setField(f.key, e.target.value)} style={{ colorScheme: 'dark' }} />
-                    </div>
-                  ) : (
-                    <input
-                      className={PORTAL_INPUT}
-                      type={f.type}
-                      value={form[f.key]}
-                      onChange={e => setField(f.key, e.target.value)}
-                    />
-                  )}
+              {characterFields.map(f => (
+                <div key={f.key} style={f.full ? { gridColumn: '1 / -1' } : undefined}>
+                  <CivFormField field={f} value={form[f.key]} onChange={v => setField(f.key, v)} />
                 </div>
               ))}
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label className={PORTAL_LABEL}>Address</label>
-                <input className={PORTAL_INPUT} type="text" value={form.address} onChange={e => setField('address', e.target.value)} />
-              </div>
             </div>
             <div className="flex gap-2.5 mt-[18px]">
               <button type="submit" className={`${S_BTN_PRIMARY} press`}>
