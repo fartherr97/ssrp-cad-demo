@@ -3,10 +3,144 @@ import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
   MdSave, MdCheckCircle, MdShield, MdReply, MdComment,
-  MdPerson, MdWarningAmber,
+  MdPerson, MdWarningAmber, MdCampaign,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
+
+/* ══════════════════════════════════
+   NOTIFICATION BLAST
+══════════════════════════════════ */
+const BLAST_COLORS = [
+  { label: 'Blue',   value: '#3b82f6' },
+  { label: 'Green',  value: '#22c55e' },
+  { label: 'Amber',  value: '#f59e0b' },
+  { label: 'Red',    value: '#ef4444' },
+  { label: 'Violet', value: '#a78bfa' },
+  { label: 'Cyan',   value: '#22d3ee' },
+];
+
+function NotificationBlast({ currentUser, officers, departments }) {
+  const { dispatch } = useCAD();
+  const toast = useToast();
+  const [title, setTitle]   = useState('');
+  const [color, setColor]   = useState('#3b82f6');
+  const [body, setBody]     = useState('');
+  const [sent, setSent]     = useState(false);
+
+  const me = officers.find(o => o.id === currentUser?.id);
+  const senderName  = me?.name  || currentUser?.name  || 'Unknown';
+  const senderBadge = me?.badge || currentUser?.badge || '—';
+
+  // Supervisors are always scoped to their own department.
+  const myDeptId = me?.dept ?? null;
+  const myDept   = departments.find(d => d.id === myDeptId);
+  const targetLabel = myDept?.short || myDept?.name || 'Your Department';
+
+  const handleSend = () => {
+    if (!title.trim() || !body.trim()) return;
+    dispatch({ type: 'NOTIFICATION_BLAST', payload: { senderName, senderBadge, title: title.trim(), color, body: body.trim(), targetDeptId: myDeptId } });
+    toast.success(`Blast "${title.trim()}" sent to ${targetLabel}.`, { title: 'Blast Sent', color });
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+    setTitle('');
+    setBody('');
+  };
+
+  return (
+    <div className="max-w-[600px]">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+          <MdCampaign size={20} className="text-amber-400" />
+        </div>
+        <div>
+          <h2 className="text-[15px] font-bold text-white leading-none">Notification Blast</h2>
+          <p className="text-[11px] text-slate-500 mt-0.5">Sends a toast notification to all online LEO personnel immediately.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 bg-app-panel/80 border border-border-base rounded-2xl p-5 backdrop-blur-sm">
+        {/* Sender tag */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <MdShield size={14} className="text-slate-400 shrink-0" />
+          <span className="text-[11.5px] text-slate-400">Sent as: </span>
+          <span className="text-[11.5px] font-bold text-white">{senderName}</span>
+          <span className="text-[10.5px] font-mono text-slate-500 ml-0.5">({senderBadge})</span>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <span className="text-[11.5px] text-slate-400">Sending to: </span>
+          <span className="text-[11.5px] font-bold text-white">{targetLabel}</span>
+        </div>
+
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Notification Title</label>
+          <input
+            className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow]"
+            placeholder="e.g. Shift Briefing, BOLO Update, Code Change…"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </div>
+
+        {/* Color */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Accent Color</label>
+          <div className="flex gap-2 flex-wrap">
+            {BLAST_COLORS.map(c => (
+              <button key={c.value} type="button"
+                onClick={() => setColor(c.value)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border"
+                style={color === c.value
+                  ? { background: `${c.value}22`, borderColor: `${c.value}66`, color: c.value }
+                  : { borderColor: 'transparent', color: '#94a3b8', background: 'rgba(255,255,255,0.04)' }}>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: c.value }} />
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Message</label>
+          <textarea
+            className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow] resize-none"
+            placeholder="Write the notification message…"
+            rows={4}
+            value={body}
+            onChange={e => setBody(e.target.value)}
+          />
+        </div>
+
+        {/* Preview */}
+        {(title || body) && (
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Preview</label>
+            <div className="rounded-xl px-4 py-3 text-[12px]"
+              style={{ background: `${color}12`, border: `1px solid ${color}44`, borderLeft: `4px solid ${color}` }}>
+              <div className="font-bold mb-0.5" style={{ color }}>{title || 'Title'}</div>
+              <div className="text-slate-300 leading-snug whitespace-pre-wrap">{body || 'Message…'}</div>
+              <div className="text-slate-500 text-[10px] mt-1.5">— {senderName} ({senderBadge})</div>
+            </div>
+          </div>
+        )}
+
+        {/* Send button */}
+        <button type="button" onClick={handleSend}
+          disabled={!title.trim() || !body.trim() || sent}
+          className="press flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[13px] font-bold cursor-pointer transition-all disabled:opacity-40"
+          style={{ background: `${color}22`, border: `1px solid ${color}55`, color }}>
+          {sent
+            ? <><MdCheckCircle size={16} /> Blast Sent!</>
+            : <><MdCampaign size={16} /> Send to {targetLabel}</>}
+        </button>
+      </div>
+    </div>
+  );
+}
 import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
 import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
@@ -928,22 +1062,28 @@ export default function Supervisor() {
       </div>
 
       {/* Mode tabs */}
-      <div className="flex gap-1.5 mb-4">
+      <div className="flex gap-1.5 mb-4 flex-wrap">
         {[
           { id: 'submissions', icon: MdOutlineRateReview, label: 'Submissions' },
           { id: 'personnel',   icon: MdPerson,            label: 'Personnel Lookup' },
+          { id: 'blast',       icon: MdCampaign,          label: 'Notification Blast' },
         ].map(({ id, icon: Icon, label }) => (
           <button key={id} type="button"
             onClick={() => setPortalMode(id)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer transition-all border
               ${portalMode === id
-                ? 'bg-brand/15 border-brand/40 text-brand-bright'
+                ? (id === 'blast' ? 'bg-amber-500/15 border-amber-500/40 text-amber-400' : 'bg-brand/15 border-brand/40 text-brand-bright')
                 : 'bg-app-panel/60 border-border-base text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'
               }`}>
             <Icon size={14} /> {label}
           </button>
         ))}
       </div>
+
+      {/* ── Notification Blast ── */}
+      {portalMode === 'blast' && (
+        <NotificationBlast currentUser={currentUser} officers={officers} departments={departments} />
+      )}
 
       {/* ── Personnel Lookup ── */}
       {portalMode === 'personnel' && (

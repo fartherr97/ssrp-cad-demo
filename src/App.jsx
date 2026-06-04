@@ -19,7 +19,7 @@ import CivilianRegistry from './pages/CivilianRegistry';
 import PenalCodeEditor from './pages/PenalCodeEditor';
 import BanManagement from './pages/BanManagement';
 import LiveMap from './pages/LiveMap';
-import MDT from './pages/MDT';
+import Messages from './pages/Messages';
 import OfficerProfile from './pages/OfficerProfile';
 // Citizen portals
 import Supervisor from './pages/portal/Supervisor';
@@ -52,6 +52,7 @@ import Statutes from './pages/admin/sections/Statutes';
 import LicensePoints from './pages/admin/sections/LicensePoints';
 import Flags from './pages/admin/sections/Flags';
 import Logs from './pages/admin/sections/Logs';
+import MessageLogs from './pages/admin/sections/MessageLogs';
 import InGame from './pages/admin/sections/InGame';
 import DiscordIntegration from './pages/admin/sections/DiscordIntegration';
 import Limits from './pages/admin/sections/Limits';
@@ -145,7 +146,7 @@ function CADApp() {
         <Route path="/units"         element={<UnitManagement />} />
         <Route path="/warrants"      element={<WarrantControl />} />
         <Route path="/civilians"     element={<CivilianRegistry />} />
-        <Route path="/mdt"           element={<MDT />} />
+        <Route path="/messages"      element={<Messages />} />
         <Route path="/admin" element={<AdminShell />}>
           <Route index                     element={<CustomizationHub />} />
           <Route path="accounts"           element={<Accounts />} />
@@ -159,6 +160,7 @@ function CADApp() {
           <Route path="license-points"     element={<LicensePoints />} />
           <Route path="flags"              element={<Flags />} />
           <Route path="logs"               element={<Logs />} />
+          <Route path="message-logs"       element={<MessageLogs />} />
           <Route path="in-game"            element={<InGame />} />
           <Route path="discord"            element={<DiscordIntegration />} />
           <Route path="limits"             element={<Limits />} />
