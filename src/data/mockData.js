@@ -699,7 +699,7 @@ export const AUDIT_LOG = [
 ];
 
 export const MESSAGES = [
-  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "BOLO * Black Dodge Charger",    body: "BOLO for black Dodge Charger plate SUS-1109. Owner has active warrant. Do not approach without backup. Last seen northbound US-41.",           timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
+  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "WARRANT ALERT * Darnell Washington", body: "Active arrest warrant on file. Subject is a felony warrant — do not approach without backup. Last seen near 330 Magnolia Blvd.",     timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
   { id: 2, from: "Sgt. Reeves (TPD-831)", to: "All TPD Units", subject: "Briefing Update",           body: "All patrol units: increased gang activity in Riverside district. Exercise caution. Extra patrol ordered for evening shift.",                   timestamp: "2026-06-01 13:00", read: true,  priority: "NORMAL" },
   { id: 3, from: "Lt. Commander",     to: "Supervisors",    subject: "Use of Force Policy Update",   body: "New UOF reporting requirements effective Monday. All use of force incidents require supervisor review within 24 hours. See department portal.", timestamp: "2026-05-31 09:15", read: true,  priority: "NORMAL" },
 ];

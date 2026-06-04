@@ -102,8 +102,7 @@ export const QUICK_LINKS = [
 export const NOTIFICATION_TONES = [
   { id: 1, name: 'Dispatch Alert',   event: 'New Call Assigned',  url: 'tones/dispatch.mp3',  enabled: true },
   { id: 2, name: 'Panic Button',     event: 'Officer Panic',      url: 'tones/panic.mp3',     enabled: true },
-  { id: 3, name: 'BOLO Broadcast',   event: 'BOLO Issued',        url: 'tones/bolo.mp3',      enabled: true },
-  { id: 4, name: 'Structure Fire',   event: 'Fire Dispatch',      url: 'tones/fire.mp3',      enabled: false },
+  { id: 3, name: 'Structure Fire',   event: 'Fire Dispatch',      url: 'tones/fire.mp3',      enabled: false },
 ];
 
 export const ADMIN_SERVERS = [

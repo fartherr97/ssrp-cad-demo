@@ -31,13 +31,6 @@ const WEBHOOK_DEFAULTS = [
     events: { new: false, modified: false, removed: false },
   },
   {
-    id: 'bolo',
-    label: 'BOLO',
-    desc: 'Sent when a BOLO is issued or updated.',
-    url: '',
-    events: { new: false, modified: false, removed: false },
-  },
-  {
     id: 'warrant',
     label: 'Warrant',
     desc: 'Sent when a warrant is issued, served, or voided.',

@@ -1130,7 +1130,7 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
           <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Notification Title</label>
           <input
             className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow]"
-            placeholder="e.g. Shift Briefing, BOLO Update, Code Change…"
+            placeholder="e.g. Shift Briefing, Warrant Update, Code Change…"
             value={title}
             onChange={e => setTitle(e.target.value)}
           />
