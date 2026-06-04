@@ -3,9 +3,10 @@ import {
   MdShield, MdSearch, MdPerson, MdWarningAmber,
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
   MdFilterList, MdTimer, MdDirectionsRun, MdInfoOutline,
-  MdAccessTime, MdFiberManualRecord,
+  MdAccessTime, MdFiberManualRecord, MdCampaign,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
+import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
@@ -880,8 +881,10 @@ function dutySecondsFor(o, sub, now) {
 const SUBDIV_ACCENTS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#f472b6', '#60a5fa', '#fb923c', '#4ade80'];
 
 function SubdivisionHoursTab({ officers }) {
-  // Tick once a second so the running clocks count up live.
-  const [, setTick] = useState(0);
+  const [, setTick]       = useState(0);
+  const [search, setSearch]       = useState('');
+  const [subdivFilter, setSubdivFilter] = useState('All');
+
   useEffect(() => {
     const i = setInterval(() => setTick(t => t + 1), 1000);
     return () => clearInterval(i);
@@ -889,7 +892,7 @@ function SubdivisionHoursTab({ officers }) {
   const now = Date.now();
 
   // Build per-subdivision rows from every officer's banked + live duty time.
-  const rows = useMemo(() => {
+  const allRows = useMemo(() => {
     const map = {};
     officers.forEach(o => {
       const subs = new Set([
@@ -911,28 +914,70 @@ function SubdivisionHoursTab({ officers }) {
       .sort((a, b) => b.total - a.total);
   }, [officers, now]);
 
-  const grandTotal = rows.reduce((s, r) => s + r.total, 0);
-  const liveOfficers = rows.reduce((s, r) => s + r.liveCount, 0);
+  const subdivNames = useMemo(() => ['All', ...allRows.map(r => r.sub)], [allRows]);
+
+  // Apply subdivision + officer search filters.
+  const rows = useMemo(() => {
+    let r = allRows;
+    if (subdivFilter !== 'All') r = r.filter(row => row.sub === subdivFilter);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      r = r.map(row => ({
+        ...row,
+        officers: row.officers.filter(({ officer: o }) =>
+          o.name?.toLowerCase().includes(q) || o.badge?.toLowerCase().includes(q)
+        ),
+      })).filter(row => row.officers.length > 0);
+    }
+    return r;
+  }, [allRows, subdivFilter, search]);
+
+  const grandTotal = allRows.reduce((s, r) => s + r.total, 0);
+  const liveOfficers = allRows.reduce((s, r) => s + r.liveCount, 0);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {/* Summary cards */}
       <div className="flex flex-wrap gap-3">
         <StatCard label="Tracked Hours" value={fmtDuty(grandTotal)} accent="violet" icon={MdAccessTime} hint="All specialised subdivisions" />
-        <StatCard label="Subdivisions" value={rows.length} accent="cyan" icon={MdShield} hint="With logged time" />
+        <StatCard label="Subdivisions" value={allRows.length} accent="cyan" icon={MdShield} hint="With logged time" />
         <StatCard label="Clocked In Now" value={liveOfficers} accent="green" icon={MdDirectionsRun} hint="Accruing live" />
       </div>
 
-      {rows.length === 0 ? (
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex items-center gap-2 flex-1 min-w-[180px] bg-app-input border border-border-base rounded-lg px-3 py-2">
+          <MdSearch size={14} className="text-slate-500 shrink-0" />
+          <input className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
+            placeholder="Search officer name or badge…"
+            value={search}
+            onChange={e => setSearch(e.target.value)} />
+          {search && (
+            <button type="button" onClick={() => setSearch('')}
+              className="text-slate-500 hover:text-slate-300 cursor-pointer text-[11px] font-bold" style={{ background: 'none', border: 'none' }}>✕</button>
+          )}
+        </div>
+        <select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
+          value={subdivFilter} onChange={e => setSubdivFilter(e.target.value)}>
+          {subdivNames.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+
+      {allRows.length === 0 ? (
         <PortalCard>
           <div className="text-[13px] text-slate-500 py-6 text-center">
             No subdivision hours logged yet. Time accrues once an officer goes on duty under a subdivision other than Patrol.
           </div>
         </PortalCard>
+      ) : rows.length === 0 ? (
+        <PortalCard>
+          <div className="text-[13px] text-slate-500 py-6 text-center">No results match your filters.</div>
+        </PortalCard>
       ) : (
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-          {rows.map((r, idx) => {
-            const color = SUBDIV_ACCENTS[idx % SUBDIV_ACCENTS.length];
+          {rows.map((r) => {
+            const colorIdx = allRows.findIndex(x => x.sub === r.sub);
+            const color = SUBDIV_ACCENTS[colorIdx % SUBDIV_ACCENTS.length];
             const pct = grandTotal > 0 ? Math.round((r.total / grandTotal) * 100) : 0;
             return (
               <PortalCard key={r.sub}>
@@ -980,7 +1025,163 @@ function SubdivisionHoursTab({ officers }) {
         <MdInfoOutline size={14} className="shrink-0 mt-0.5" />
         Hours accrue for any status except Off Duty, only under specialised subdivisions (anything but Patrol). To prevent
         inactive farming, an officer who leaves the CAD idle for 15 minutes is automatically set Off Duty, and closing the
-        tab clocks them out. Persisting totals across sessions requires the production backend.
+        tab clocks them out.
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
+   NOTIFICATION BLAST (Command version)
+   — dept-scoped; admins choose dept or all, commanders locked to theirs
+══════════════════════════════════ */
+const BLAST_COLORS = [
+  { label: 'Blue',   value: '#3b82f6' },
+  { label: 'Green',  value: '#22c55e' },
+  { label: 'Amber',  value: '#f59e0b' },
+  { label: 'Red',    value: '#ef4444' },
+  { label: 'Violet', value: '#a78bfa' },
+  { label: 'Cyan',   value: '#22d3ee' },
+];
+
+function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) {
+  const { dispatch } = useCAD();
+  const toast = useToast();
+
+  const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
+
+  // Admins can choose which dept (or all); non-admin commanders are locked to their dept.
+  const [targetDeptId, setTargetDeptId] = useState(isAdmin ? '' : (myOfficer?.dept ?? ''));
+  const [title, setTitle]   = useState('');
+  const [color, setColor]   = useState('#3b82f6');
+  const [body, setBody]     = useState('');
+  const [sent, setSent]     = useState(false);
+
+  const senderName  = myOfficer?.name  || currentUser?.name  || 'Unknown';
+  const senderBadge = myOfficer?.badge || currentUser?.badge || '—';
+
+  const targetLabel = isAdmin
+    ? (targetDeptId ? (leoDepts.find(d => String(d.id) === String(targetDeptId))?.short || 'Dept') : 'All Departments')
+    : (leoDepts.find(d => d.id === myOfficer?.dept)?.short || 'Your Department');
+
+  const handleSend = () => {
+    if (!title.trim() || !body.trim()) return;
+    dispatch({
+      type: 'NOTIFICATION_BLAST',
+      payload: { senderName, senderBadge, title: title.trim(), color, body: body.trim(), targetDeptId: targetDeptId || null },
+    });
+    toast.success(`Blast "${title.trim()}" sent to ${targetLabel}.`, { title: 'Blast Sent', color });
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+    setTitle('');
+    setBody('');
+  };
+
+  return (
+    <div className="max-w-[600px]">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+          <MdCampaign size={20} className="text-amber-400" />
+        </div>
+        <div>
+          <h2 className="text-[15px] font-bold text-white leading-none">Notification Blast</h2>
+          <p className="text-[11px] text-slate-500 mt-0.5">Sends a toast notification to targeted personnel immediately.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 bg-app-panel/80 border border-border-base rounded-2xl p-5 backdrop-blur-sm">
+        {/* Sender tag */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <MdShield size={14} className="text-slate-400 shrink-0" />
+          <span className="text-[11.5px] text-slate-400">Sent as: </span>
+          <span className="text-[11.5px] font-bold text-white">{senderName}</span>
+          <span className="text-[10.5px] font-mono text-slate-500 ml-0.5">({senderBadge})</span>
+        </div>
+
+        {/* Target dept selector — only for admins */}
+        {isAdmin ? (
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Send To</label>
+            <select
+              className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 outline-none focus:border-brand/60 transition-[border-color,box-shadow] cursor-pointer"
+              value={targetDeptId}
+              onChange={e => setTargetDeptId(e.target.value)}>
+              <option value="">All Departments</option>
+              {leoDepts.map(d => <option key={d.id} value={String(d.id)}>{d.name} ({d.short})</option>)}
+            </select>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <span className="text-[11.5px] text-slate-400">Sending to: </span>
+            <span className="text-[11.5px] font-bold text-white">{targetLabel}</span>
+          </div>
+        )}
+
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Notification Title</label>
+          <input
+            className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow]"
+            placeholder="e.g. Shift Briefing, BOLO Update, Code Change…"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </div>
+
+        {/* Color */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Accent Color</label>
+          <div className="flex gap-2 flex-wrap">
+            {BLAST_COLORS.map(c => (
+              <button key={c.value} type="button"
+                onClick={() => setColor(c.value)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border"
+                style={color === c.value
+                  ? { background: `${c.value}22`, borderColor: `${c.value}66`, color: c.value }
+                  : { borderColor: 'transparent', color: '#94a3b8', background: 'rgba(255,255,255,0.04)' }}>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: c.value }} />
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Message</label>
+          <textarea
+            className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow] resize-none"
+            placeholder="Write the notification message…"
+            rows={4}
+            value={body}
+            onChange={e => setBody(e.target.value)}
+          />
+        </div>
+
+        {/* Preview */}
+        {(title || body) && (
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Preview</label>
+            <div className="rounded-xl px-4 py-3 text-[12px]"
+              style={{ background: `${color}12`, border: `1px solid ${color}44`, borderLeft: `4px solid ${color}` }}>
+              <div className="font-bold mb-0.5" style={{ color }}>{title || 'Title'}</div>
+              <div className="text-slate-300 leading-snug whitespace-pre-wrap">{body || 'Message…'}</div>
+              <div className="text-slate-500 text-[10px] mt-1.5">— {senderName} ({senderBadge})</div>
+            </div>
+          </div>
+        )}
+
+        {/* Send button */}
+        <button type="button" onClick={handleSend}
+          disabled={!title.trim() || !body.trim() || sent}
+          className="press flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[13px] font-bold cursor-pointer transition-all disabled:opacity-40"
+          style={{ background: `${color}22`, border: `1px solid ${color}55`, color }}>
+          {sent
+            ? <><MdCheckCircle size={16} /> Blast Sent!</>
+            : <><MdCampaign size={16} /> Send to {targetLabel}</>}
+        </button>
       </div>
     </div>
   );
@@ -989,7 +1190,7 @@ function SubdivisionHoursTab({ officers }) {
 /* ══════════════════════════════════
    MAIN: COMMAND PORTAL
 ══════════════════════════════════ */
-const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'Report Tracker', 'Response Times'];
+const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'Report Tracker', 'Response Times', 'Notification Blast'];
 
 export default function CommandPortal() {
   const { state } = useCAD();
@@ -1139,6 +1340,14 @@ export default function CommandPortal() {
       )}
       {activeTab === 'Response Times' && (
         <ResponseTimesTab callLogs={callLogs} />
+      )}
+      {activeTab === 'Notification Blast' && (
+        <NotificationBlastTab
+          currentUser={currentUser}
+          myOfficer={myOfficer}
+          isAdmin={isAdmin}
+          departments={departments}
+        />
       )}
 
       {modalReport && (
