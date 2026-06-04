@@ -563,11 +563,15 @@ export default function DispatchCenter() {
               </div>
               {incoming911.length === 0 ? (
                 <div className="text-center text-slate-600 text-[11px] py-2">No incoming calls</div>
-              ) : [...incoming911].map(c => (
-                <IncomingCallCard key={c.id} call={c}
-                  onDispatch={isDispatcher ? () => setDispatchTarget(c) : null}
-                  onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null} />
-              ))}
+              ) : (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[420px] pr-0.5">
+                  {[...incoming911].map(c => (
+                    <IncomingCallCard key={c.id} call={c}
+                      onDispatch={isDispatcher ? () => setDispatchTarget(c) : null}
+                      onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -583,7 +587,9 @@ export default function DispatchCenter() {
               </div>
               {nonEmergencyCalls.length === 0 ? (
                 <div className="text-center text-slate-600 text-[11px] py-2">No pending reports</div>
-              ) : nonEmergencyCalls.map(r => (
+              ) : (
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[460px] pr-0.5">
+              {nonEmergencyCalls.map(r => (
                 <div key={r.id} className="bg-white/[0.02] border border-border-faint rounded-lg p-2.5">
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <div className="min-w-0">
@@ -616,6 +622,8 @@ export default function DispatchCenter() {
                   </select>
                 </div>
               ))}
+              </div>
+              )}
             </div>
           )}
 
