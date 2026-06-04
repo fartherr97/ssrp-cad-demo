@@ -248,17 +248,21 @@ export default function AdminShell() {
       {/* ── Top nav bar ── */}
       <div className="flex items-stretch h-14 shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base gap-1 px-1">
 
-        {/* Brand */}
-        <div className="flex items-center gap-2.5 pl-3 pr-4 mr-1 shrink-0 border-r border-border-base select-none">
+        {/* Brand (click to return to portal-selection screen) */}
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'EXIT_TO_HOME' })}
+          title="Back to portal selection"
+          className="flex items-center gap-2.5 pl-3 pr-4 mr-1 shrink-0 border-r border-border-base select-none bg-transparent border-none cursor-pointer hover:opacity-90 transition-opacity">
           <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
             className="w-9 h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
-          <div className="leading-[1.15] whitespace-nowrap">
+          <div className="leading-[1.15] whitespace-nowrap text-left">
             <div className="text-[15px] font-extrabold text-white tracking-[-0.3px]">
               Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
             </div>
             <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">Administration</div>
           </div>
-        </div>
+        </button>
 
         {/* Mobile: active section name */}
         <div className="flex md:hidden flex-1 items-center min-w-0 px-2">

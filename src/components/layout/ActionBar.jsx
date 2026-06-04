@@ -468,17 +468,21 @@ export default function ActionBar() {
   return (
     <div className="cad-actionbar flex items-center gap-1 px-3 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base">
 
-      {/* ── Brand ── */}
-      <div className="flex items-center gap-2.5 pr-3 lg:pr-4 mr-1 lg:border-r border-border-base shrink-0 select-none">
+      {/* ── Brand (click to return to portal-selection screen) ── */}
+      <button
+        type="button"
+        onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
+        title="Back to portal selection"
+        className="flex items-center gap-2.5 pr-3 lg:pr-4 mr-1 lg:border-r border-border-base shrink-0 select-none cursor-pointer bg-transparent border-none rounded-lg hover:opacity-90 transition-opacity">
         <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP"
           className="w-8 h-8 lg:w-9 lg:h-9 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(61,130,240,0.35)]" />
-        <div className="leading-[1.15] whitespace-nowrap">
+        <div className="leading-[1.15] whitespace-nowrap text-left">
           <div className="text-[15px] lg:text-[16px] font-extrabold tracking-[-0.3px] text-white">
             Sunshine State <span style={{ color: '#f2800d' }}>RP</span>
           </div>
           <div className="text-[9px] font-bold tracking-[1.2px] uppercase text-slate-500">{portal.subtitle || portal.label}</div>
         </div>
-      </div>
+      </button>
 
       {/* ── Desktop portal nav ── */}
       <nav className="hidden lg:flex items-center gap-0.5 overflow-x-auto n-tabs-wrap">
@@ -525,8 +529,11 @@ export default function ActionBar() {
             className={`absolute left-0 right-0 bg-app-card border-b border-border-strong shadow-2xl shadow-black/60 flex flex-col ${drawer.show ? 'anim-drawer-in' : 'anim-drawer-out'}`}
             style={{ top: 'var(--actionbar-h)', height: 'calc(100dvh - var(--actionbar-h))' }}
           >
-            {/* Brand header */}
-            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint shrink-0">
+            {/* Brand header (click to return to portal-selection screen) */}
+            <button
+              type="button"
+              onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
+              className="flex items-center gap-2.5 px-5 py-4 border-b border-border-faint shrink-0 w-full text-left bg-transparent cursor-pointer hover:bg-white/[0.03] transition-colors">
               <img src="https://cdn.ssrp.us/images/ssrp.png" alt="SSRP" className="w-8 h-8 shrink-0 object-contain" />
               <div className="leading-[1.15]">
                 <div className="text-[15px] font-extrabold text-white">
@@ -534,7 +541,7 @@ export default function ActionBar() {
                 </div>
                 <div className="text-[9px] font-bold tracking-[1.1px] uppercase text-slate-500">Computer Aided Dispatch</div>
               </div>
-            </div>
+            </button>
 
             {/* Flat grouped list * scrolls independently, items stagger in */}
             <div className="flex-1 overflow-y-auto py-3">
