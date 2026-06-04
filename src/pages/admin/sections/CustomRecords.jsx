@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import ReportForm from '../../../components/ReportForm';
@@ -184,7 +185,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
 
       {/* Row 1: type selector + label */}
       <div className="flex items-center gap-1.5 px-2 pt-1.5 pb-1" style={{ background: '#0a1520' }}>
-        <select
+        <Select
           value={field.type}
           onChange={e => onUpdate({ ...field, type: e.target.value })}
           className="rounded-md text-[10.5px] font-bold border-none outline-none cursor-pointer shrink-0"
@@ -199,7 +200,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
               {ft.label}
             </option>
           ))}
-        </select>
+        </Select>
         <input
           className="flex-1 bg-transparent text-[12px] outline-none min-w-0 border-b border-transparent focus:border-white/20 transition-colors"
           style={{ color: '#dde6f1', fontFamily: 'var(--font-ui)' }}

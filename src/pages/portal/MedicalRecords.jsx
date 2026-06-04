@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -125,9 +126,9 @@ function MedicalProfileEditor({ civilian, extraFields = [], onSave, onCancel }) 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className={PORTAL_LABEL}>Blood Type</label>
-            <select className={PORTAL_INPUT} value={form.bloodType} onChange={e => set('bloodType', e.target.value)}>
+            <Select className={PORTAL_INPUT} value={form.bloodType} onChange={e => set('bloodType', e.target.value)}>
               {BLOOD_TYPES.map(bt => <option key={bt} value={bt}>{bt || 'Not specified'}</option>)}
-            </select>
+            </Select>
           </div>
           <div className="flex flex-col justify-end gap-3 sm:col-span-2">
             <CheckToggle

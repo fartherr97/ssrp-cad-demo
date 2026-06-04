@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from './ui/Select';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_LABEL, S_BTN_SUCCESS, S_BTN_SECONDARY } from '../constants/styles';
 import { MdSave } from 'react-icons/md';
@@ -63,11 +64,11 @@ export default function IdentifierEditor({ onClose }) {
 
       <div>
         <label className={S_LABEL}>Status</label>
-        <select className={S_SELECT} value={draft.status} onChange={e => set('status', e.target.value)}>
+        <Select className={S_SELECT} value={draft.status} onChange={e => set('status', e.target.value)}>
           {unitStatusCodes.map(s => (
             <option key={s.code} value={s.code}>{s.label}</option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -83,21 +84,21 @@ export default function IdentifierEditor({ onClose }) {
 
       <div>
         <label className={S_LABEL}>Agency</label>
-        <select className={S_SELECT} value={draft.dept} onChange={e => handleDeptChange(e.target.value)}>
+        <Select className={S_SELECT} value={draft.dept} onChange={e => handleDeptChange(e.target.value)}>
           <option value="">* Select Agency *</option>
           {departments.map(d => (
             <option key={d.id} value={d.id}>{d.name}</option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {subdivisions.length > 0 && (
         <div>
           <label className={S_LABEL}>Subdivision</label>
-          <select className={S_SELECT} value={draft.subdivision} onChange={e => set('subdivision', e.target.value)}>
+          <Select className={S_SELECT} value={draft.subdivision} onChange={e => set('subdivision', e.target.value)}>
             <option value="">* None *</option>
             {subdivisions.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          </Select>
         </div>
       )}
 

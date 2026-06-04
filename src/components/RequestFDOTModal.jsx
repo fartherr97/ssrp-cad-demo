@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from './ui/Select';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
@@ -94,9 +95,9 @@ export default function RequestFDOTModal({ call, officer, onClose }) {
         <form onSubmit={submit} className="flex flex-col gap-4 p-5 overflow-y-auto">
           <div>
             <label className={LABEL}>Assistance Needed</label>
-            <select className={INPUT} value={assistType} onChange={e => setAssistType(e.target.value)}>
+            <Select className={INPUT} value={assistType} onChange={e => setAssistType(e.target.value)}>
               {FDOT_ASSIST_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            </Select>
           </div>
 
           <div>
@@ -115,9 +116,9 @@ export default function RequestFDOTModal({ call, officer, onClose }) {
             </div>
             <div>
               <label className={LABEL}>Priority</label>
-              <select className={INPUT} value={priority} onChange={e => setPriority(e.target.value)}>
+              <Select className={INPUT} value={priority} onChange={e => setPriority(e.target.value)}>
                 {PRIORITIES.map(p => <option key={p.val} value={p.val}>{p.label}</option>)}
-              </select>
+              </Select>
             </div>
           </div>
 

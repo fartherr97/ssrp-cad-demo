@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { RecordReturn } from '../components/FormDocument';
 import ActivePanicsPanel from '../components/ActivePanicsPanel';
@@ -171,10 +172,10 @@ export default function MDT() {
               <div className="flex flex-wrap gap-1.5 items-end">
                 <div className={`${S_FIELD} flex-[0_0_120px] min-w-[120px]`}>
                   <label className={S_LABEL}>Query Type</label>
-                  <select className={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
+                  <Select className={S_SELECT} value={queryType} onChange={e => { setQueryType(e.target.value); setResults([]); setSearched(false); }}>
                     <option value="PERSON">Person</option>
                     <option value="VEHICLE">Vehicle</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className={`${S_FIELD} flex-1 min-w-[160px]`}>
                   <label className={S_LABEL}>{queryType === 'PERSON' ? 'Name or SSN' : 'Plate or Description'}</label>

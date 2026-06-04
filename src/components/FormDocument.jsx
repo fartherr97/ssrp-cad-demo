@@ -1,6 +1,7 @@
 /* PDF-style government form document components */
 
 import React, { useState } from 'react';
+import Select from './ui/Select';
 import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { ageFromDob } from '../utils/age';
@@ -124,10 +125,10 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
             onChange={e => onChange && onChange(e.target.value)}
           />
         ) : type === 'dropdown' ? (
-          <select style={{ ...inputStyle, cursor: 'pointer', appearance: 'auto' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
+          <Select style={{ ...inputStyle, cursor: 'pointer', appearance: 'auto' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
             <option value="">—</option>
             {options.map(o => <option key={o}>{o}</option>)}
-          </select>
+          </Select>
         ) : (type === 'date' || type === 'datetime') ? (
           <div style={{ position: 'relative', overflow: 'hidden', height: 22 }}>
             <input

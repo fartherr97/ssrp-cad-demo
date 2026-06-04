@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -177,7 +178,7 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlConfig }) {
           <div className="grid grid-cols-2 gap-3 mb-5">
             <div>
               <label className={PORTAL_LABEL}>Initial Status</label>
-              <select
+              <Select
                 value={dlStatus}
                 onChange={e => setDlStatus(e.target.value)}
                 className={PORTAL_INPUT}
@@ -186,7 +187,7 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlConfig }) {
                 {DL_STATUSES.map(s => (
                   <option key={s.value} value={s.value} style={{ color: s.color }}>{s.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <label className={PORTAL_LABEL}>Expiration Date</label>

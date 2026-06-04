@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../components/ui/Select';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
@@ -311,36 +312,36 @@ function Dispatch911Modal({ call, onClose }) {
           <div className="n-grid-2">
             <div className={S_FIELD}>
               <label className={S_LABEL}>Nature of Call *</label>
-              <select className={S_SELECT} value={form.nature} onChange={e => setForm(p => ({ ...p, nature: e.target.value }))}>
+              <Select className={S_SELECT} value={form.nature} onChange={e => setForm(p => ({ ...p, nature: e.target.value }))}>
                 <option value="">Select nature...</option>
                 {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
-              </select>
+              </Select>
             </div>
             <div className={S_FIELD}>
               <label className={S_LABEL}>Priority</label>
-              <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: Number(e.target.value) }))}>
+              <Select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: Number(e.target.value) }))}>
                 <option value={1}>P1 * Critical / Life Safety</option>
                 <option value={2}>P2 * High</option>
                 <option value={3}>P3 * Medium</option>
                 <option value={4}>P4 * Low / Routine</option>
-              </select>
+              </Select>
             </div>
           </div>
           <div className="n-grid-2">
             <div className={S_FIELD}>
               <label className={S_LABEL}>Category</label>
-              <select className={S_SELECT} value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
+              <Select className={S_SELECT} value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
                 <option value="police">Law Enforcement</option>
                 <option value="fire">Fire / EMS</option>
                 <option value="traffic">Traffic / FDOT</option>
                 <option value="other">Other</option>
-              </select>
+              </Select>
             </div>
             <div className={S_FIELD}>
               <label className={S_LABEL}>City</label>
-              <select className={S_SELECT} value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}>
+              <Select className={S_SELECT} value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}>
                 {['Tampa','Brandon','Plant City','Riverview','Ruskin','Gibsonton','Temple Terrace','Unincorporated'].map(c => <option key={c}>{c}</option>)}
-              </select>
+              </Select>
             </div>
           </div>
           <div className={S_FIELD}>
@@ -416,12 +417,12 @@ function Sim911Modal({ onClose }) {
           </div>
           <div className={S_FIELD}>
             <label className={S_LABEL}>Priority</label>
-            <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))}>
+            <Select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))}>
               <option value={1}>P1 * Critical</option>
               <option value={2}>P2 * High</option>
               <option value={3}>P3 * Medium</option>
               <option value={4}>P4 * Low</option>
-            </select>
+            </Select>
           </div>
         </div>
         <div className={S_MODAL_FOOTER}>
@@ -533,23 +534,23 @@ export default function DispatchCenter() {
             <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 px-1">Filters</div>
             <div className={S_FIELD}>
               <label className={S_LABEL}>Priority</label>
-              <select className={S_SELECT} value={priFilter} onChange={e => setPriFilter(e.target.value)}>
+              <Select className={S_SELECT} value={priFilter} onChange={e => setPriFilter(e.target.value)}>
                 <option value="ALL">All Priorities</option>
                 <option value="1">P1 * Critical</option>
                 <option value="2">P2 * High</option>
                 <option value="3">P3 * Medium</option>
                 <option value="4">P4 * Low</option>
-              </select>
+              </Select>
             </div>
             <div className={S_FIELD}>
               <label className={S_LABEL}>Status</label>
-              <select className={S_SELECT} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+              <Select className={S_SELECT} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="ALL">All Statuses</option>
                 <option value="PENDING">Pending</option>
                 <option value="ACTIVE">Active</option>
                 <option value="ENRT">En Route</option>
                 <option value="ONSCENE">On Scene</option>
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -621,7 +622,7 @@ export default function DispatchCenter() {
                       {r.formData.location}
                     </div>
                   )}
-                  <select
+                  <Select
                     className="w-full bg-app-input border border-border-faint rounded-md px-2 py-1 text-[11px] text-slate-200 outline-none cursor-pointer"
                     value={r.status || 'Pending Review'}
                     onChange={e => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: e.target.value } })}
@@ -631,7 +632,7 @@ export default function DispatchCenter() {
                     <option value="En Route">En Route</option>
                     <option value="On Scene">On Scene</option>
                     <option value="Resolved">Resolved</option>
-                  </select>
+                  </Select>
                 </div>
               ))}
               </div>
@@ -894,36 +895,36 @@ export default function DispatchCenter() {
               <div className="n-grid-2">
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Nature of Call *</label>
-                  <select className={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
+                  <Select className={S_SELECT} value={newCall.nature} onChange={e => setNewCall(p => ({ ...p, nature:e.target.value }))}>
                     <option value="">Select nature...</option>
                     {callNatures.map(n => <option key={n.id} value={n.name}>{n.name}</option>)}
-                  </select>
+                  </Select>
                 </div>
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Priority</label>
-                  <select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
+                  <Select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
                     <option value={1}>P1 * Critical / Life Safety</option>
                     <option value={2}>P2 * High</option>
                     <option value={3}>P3 * Medium</option>
                     <option value={4}>P4 * Low / Routine</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
               <div className="n-grid-2">
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Category</label>
-                  <select className={S_SELECT} value={newCall.category} onChange={e => setNewCall(p => ({ ...p, category:e.target.value }))}>
+                  <Select className={S_SELECT} value={newCall.category} onChange={e => setNewCall(p => ({ ...p, category:e.target.value }))}>
                     <option value="police">Law Enforcement</option>
                     <option value="fire">Fire / EMS</option>
                     <option value="traffic">Traffic / FDOT</option>
                     <option value="other">Other</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>City</label>
-                  <select className={S_SELECT} value={newCall.city} onChange={e => setNewCall(p => ({ ...p, city:e.target.value }))}>
+                  <Select className={S_SELECT} value={newCall.city} onChange={e => setNewCall(p => ({ ...p, city:e.target.value }))}>
                     {['Tampa','Brandon','Plant City','Riverview','Ruskin','Gibsonton','Temple Terrace','Unincorporated'].map(c => <option key={c}>{c}</option>)}
-                  </select>
+                  </Select>
                 </div>
               </div>
               <div className={S_FIELD}>

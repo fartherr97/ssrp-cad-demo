@@ -228,6 +228,11 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 /* Table scroll */
 .table-scroll { overflow: auto; flex: 1; }
 
+/* Smooth every table-row hover in one place. Many rows toggle their background
+   via inline JS handlers (trHoverOn/Off) which is otherwise instant/harsh —
+   this eases the colour change without touching per-page markup. */
+tbody tr { transition: background-color 0.13s ease, box-shadow 0.13s ease; }
+
 /* ════════════════════════════════════════
    ANIMATIONS * keyframe definitions
    Referenced by inline style={{ animation: '...' }}
@@ -238,7 +243,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 @keyframes slideInLeft  { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0);  opacity: 1; } }
 @keyframes slideUp      { from { transform: translateY(6px);   opacity: 0; } to { transform: translateY(0);  opacity: 1; } }
 @keyframes fadeIn       { from { opacity: 0; }                               to { opacity: 1; } }
-@keyframes dropdownFadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes dropdownFadeIn  { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes dropdownFadeOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-4px) scale(0.98); } }
 @keyframes modalPop     { from { transform: translateY(12px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes pageEnter    { from { transform: translateY(14px) scale(0.99); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes expandDown   { from { opacity: 0; transform: translateY(-6px); }  to { opacity: 1; transform: translateY(0); } }
@@ -268,6 +274,10 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
 @keyframes staggerIn    { from { opacity: 0; transform: translateY(8px); }               to { opacity: 1; transform: translateY(0); } }
 @keyframes spinnerSpin  { to { transform: rotate(360deg); } }
 @keyframes barGrow      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Dropdown / select / popover menu entrances + exits */
+.anim-dropdown-in  { animation: dropdownFadeIn  0.16s cubic-bezier(0.16,1,0.3,1) both; }
+.anim-dropdown-out { animation: dropdownFadeOut 0.12s ease-in forwards; }
 
 /* Convenience animation utility classes */
 .anim-slide-in { animation: slideInRight 0.15s ease-out; }
@@ -363,7 +373,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   .split-2-right { grid-template-columns: 1fr; }
   .n-grid-4      { grid-template-columns: 1fr 1fr; }
   .n-grid-3      { grid-template-columns: 1fr 1fr; }
-  input, select, textarea { font-size: 16px !important; }
+  input, select, textarea, [aria-haspopup="listbox"] { font-size: 16px !important; }
 }
 
 /* ── Mobile (≤ 768px) ── */
@@ -398,7 +408,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
   .n-grid-3 { grid-template-columns: 1fr; }
   .n-grid-2 { grid-template-columns: 1fr; }
 
-  input, select, textarea { font-size: 16px !important; }
+  input, select, textarea, [aria-haspopup="listbox"] { font-size: 16px !important; }
 }
 
 /* ── Small mobile (≤ 480px) ── */

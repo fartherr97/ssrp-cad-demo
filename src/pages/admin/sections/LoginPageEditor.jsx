@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -98,9 +99,9 @@ export default function LoginPageEditor() {
               </div>
             </SonField>
             <SonField label="Background Style">
-              <select style={SON_INPUT} value={draft.backgroundStyle} onChange={e => set('backgroundStyle', e.target.value)}>
+              <Select style={SON_INPUT} value={draft.backgroundStyle} onChange={e => set('backgroundStyle', e.target.value)}>
                 {BG_STYLES.map(s => <option key={s}>{s}</option>)}
-              </select>
+              </Select>
             </SonField>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>

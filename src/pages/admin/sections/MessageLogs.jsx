@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../../../components/ui/Select';
 import { MdMessage, MdSearch, MdShield, MdCampaign } from 'react-icons/md';
 import { useCAD } from '../../../store/cadStore';
 import { AdminPanel, AdminPageTitle } from '../AdminKit';
@@ -54,7 +55,7 @@ export default function MessageLogs() {
                 className="text-slate-600 hover:text-slate-300 cursor-pointer text-[11px] font-bold shrink-0" style={{ background: 'none', border: 'none' }}>✕</button>
             )}
           </div>
-          <select
+          <Select
             className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
@@ -63,7 +64,7 @@ export default function MessageLogs() {
             <option value="direct">Direct Messages</option>
             <option value="group">Group Threads</option>
             <option value="blast">Notification Blasts</option>
-          </select>
+          </Select>
         </div>
         <div className="mt-2 text-[11px] text-slate-500">
           {filtered.length} log entr{filtered.length !== 1 ? 'ies' : 'y'}

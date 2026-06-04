@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import Select from '../components/ui/Select';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
@@ -628,9 +629,9 @@ function IdentifiersTab({ officer, accentColor }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={S_LABEL}>Status</label>
-                <select className={S_INPUT} value={draft.status} onChange={e => setDraftField('status', e.target.value)}>
+                <Select className={S_INPUT} value={draft.status} onChange={e => setDraftField('status', e.target.value)}>
                   {unitStatusCodes.map(s => <option key={s.code} value={s.code}>{s.label}</option>)}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className={S_LABEL}>AOP</label>
@@ -639,21 +640,21 @@ function IdentifiersTab({ officer, accentColor }) {
             </div>
             <div>
               <label className={S_LABEL}>Agency</label>
-              <select className={S_INPUT} value={draft.dept} onChange={e => {
+              <Select className={S_INPUT} value={draft.dept} onChange={e => {
                 const dept = departments.find(d => d.id === Number(e.target.value));
                 setDraft(p => ({ ...p, dept: Number(e.target.value), subdivision: dept?.subdivisions?.[0] || '' }));
               }}>
                 <option value="">* Select Agency *</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
+              </Select>
             </div>
             {selectedDeptSubs.length > 0 && (
               <div>
                 <label className={S_LABEL}>Subdivision</label>
-                <select className={S_INPUT} value={draft.subdivision} onChange={e => setDraftField('subdivision', e.target.value)}>
+                <Select className={S_INPUT} value={draft.subdivision} onChange={e => setDraftField('subdivision', e.target.value)}>
                   <option value="">* None *</option>
                   {selectedDeptSubs.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+                </Select>
               </div>
             )}
             <div className="flex gap-2 pt-1">

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { MdPerson, MdSwapHoriz } from 'react-icons/md';
 import { BADGE } from '../constants/styles';
@@ -72,7 +73,7 @@ export function CivilianSwitcher() {
           Active Character
         </div>
         {multi ? (
-          <select
+          <Select
             className="w-full max-w-[280px] bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm font-semibold text-cad-text outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
             value={activeChar.id}
             onChange={e => setActiveCharId(Number(e.target.value))}
@@ -80,7 +81,7 @@ export function CivilianSwitcher() {
             {myChars.map(c => (
               <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
             ))}
-          </select>
+          </Select>
         ) : (
           // key forces re-mount → triggers char-name-swap animation on character change
           <div key={activeChar.id} className="char-name-swap text-[15px] font-bold text-slate-100 truncate">

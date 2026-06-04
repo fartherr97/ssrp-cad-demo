@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import {
@@ -121,7 +122,7 @@ function BInput({ value, onChange, placeholder, type = 'text' }) {
 
 function BSelect({ value, onChange, options }) {
   return (
-    <select
+    <Select
       value={value}
       onChange={e => onChange(e.target.value)}
       className="w-full bg-transparent text-[11.5px] text-slate-200 outline-none cursor-pointer"
@@ -131,7 +132,7 @@ function BSelect({ value, onChange, options }) {
           ? <option key={o} value={o} style={{ background: '#0b1424' }}>{o || '—'}</option>
           : <option key={o.value} value={o.value} style={{ background: '#0b1424' }}>{o.label}</option>
       )}
-    </select>
+    </Select>
   );
 }
 
@@ -214,7 +215,7 @@ function ChargeRow({ charge, idx, penalCode, onChange, onRemove, canRemove }) {
       </div>
       <div className="bg-app-panel/80 p-2.5 grid grid-cols-2 gap-1.5">
         <Box label="Charge" span={2}>
-          <select
+          <Select
             value={charge.charge}
             onChange={e => handleChargeSelect(e.target.value)}
             className="w-full bg-transparent text-[11.5px] text-slate-200 outline-none cursor-pointer"
@@ -223,7 +224,7 @@ function ChargeRow({ charge, idx, penalCode, onChange, onRemove, canRemove }) {
             {penalCode.map(p => (
               <option key={p.id} value={p.name} style={{ background: '#0b1424' }}>{p.code} – {p.name}</option>
             ))}
-          </select>
+          </Select>
         </Box>
         <Box label="Charge Type">
           <BInput value={charge.chargeType} onChange={v => set('chargeType', v)} placeholder="Felony, Misdemeanor…" />

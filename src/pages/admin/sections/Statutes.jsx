@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -73,9 +74,9 @@ export default function Statutes() {
             onChange={e => set('code', e.target.value)} />
           <input style={{ ...SON_INPUT, gridColumn: 'span 2' }} placeholder="Name / Title" value={form.name}
             onChange={e => set('name', e.target.value)} />
-          <select style={SON_INPUT} value={form.type} onChange={e => set('type', e.target.value)}>
+          <Select style={SON_INPUT} value={form.type} onChange={e => set('type', e.target.value)}>
             {TYPES.map(t => <option key={t}>{t}</option>)}
-          </select>
+          </Select>
           <input style={SON_INPUT} type="number" placeholder="Fine $" value={form.fine}
             onChange={e => set('fine', e.target.value)} />
           <input style={SON_INPUT} placeholder="Jail Time (e.g. 5 Years)" value={form.jailTime}

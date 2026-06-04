@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -91,7 +92,7 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
               onChange={e => setQuery(e.target.value)}
             />
           </div>
-          <select
+          <Select
             className="shrink-0 bg-app-input border border-border-base rounded-lg px-2 py-2 text-[12px] text-slate-200 outline-none cursor-pointer"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
@@ -100,7 +101,7 @@ function ImportModal({ penalCode, schedule, onImport, onClose }) {
             <option value="Felony">Felony</option>
             <option value="Misdemeanor">Misd.</option>
             <option value="Infraction">Infr.</option>
-          </select>
+          </Select>
         </div>
 
         {/* List */}
@@ -326,11 +327,11 @@ export default function LicensePoints() {
                   </SonCell>
                   <SonCell align="right">
                     <div className="inline-flex items-center gap-1.5 justify-end flex-wrap">
-                      <select style={{ ...SON_INPUT, padding: '6px 10px', width: 170 }}
+                      <Select style={{ ...SON_INPUT, padding: '6px 10px', width: 170 }}
                         value={selViolation[c.id] || stored.schedule[0]?.id || ''}
                         onChange={e => setSelViolation(p => ({ ...p, [c.id]: e.target.value }))}>
                         {stored.schedule.map(v => <option key={v.id} value={v.id}>{v.label} (+{v.points})</option>)}
-                      </select>
+                      </Select>
                       <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
                       <SonIconBtn icon={MdRestartAlt} title="Reset points" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }} />
                       {c.dlStatus === 'SUSPENDED' && (

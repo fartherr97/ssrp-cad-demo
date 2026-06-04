@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
@@ -164,12 +165,12 @@ export default function RequestTow() {
             {/* Company selector */}
             <div>
               <label className={PORTAL_LABEL}><MdBusiness size={12} className="inline mr-1 -mt-0.5" />Tow Company</label>
-              <select className={PORTAL_INPUT} value={form.companyId} onChange={set('companyId')}>
+              <Select className={PORTAL_INPUT} value={form.companyId} onChange={set('companyId')}>
                 <option value="">No preference</option>
                 {towCompanies.map(b => (
                   <option key={b.id} value={b.id}>{b.name}{b.isFDOT ? ' (FDOT)' : ''}</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Disclaimer */}
