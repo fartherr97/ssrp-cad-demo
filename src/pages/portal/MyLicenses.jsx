@@ -193,7 +193,7 @@ function IssueLicenseForm({ chars, onSubmit, onCancel, dlTemplate }) {
             <div>
               <label className={PORTAL_LABEL}>Expiration Date</label>
               <input type="date" required value={dlExpiry} onChange={e => setDlExpiry(e.target.value)}
-                className={PORTAL_INPUT} style={{ colorScheme: 'dark' }} />
+                className={`${PORTAL_INPUT} h-[42px]`} style={{ colorScheme: 'dark' }} />
             </div>
           </div>
 
@@ -277,7 +277,7 @@ function RenewForm({ civ, onSubmit, onCancel, dlTemplate }) {
           <div className="mb-5">
             <label className={PORTAL_LABEL}>New Expiration Date</label>
             <input type="date" required value={dlExpiry} onChange={e => setDlExpiry(e.target.value)}
-              className={PORTAL_INPUT} style={{ colorScheme: 'dark' }} />
+              className={`${PORTAL_INPUT} h-[42px]`} style={{ colorScheme: 'dark' }} />
           </div>
 
           {dlTemplate && (

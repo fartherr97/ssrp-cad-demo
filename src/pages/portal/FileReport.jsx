@@ -125,14 +125,14 @@ export default function FileReport() {
       ) : (
         <PortalCard accent={ACCENT}>
           <form onSubmit={handleSubmit}>
-            <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))' }}>
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="min-w-0">
                 <label className={PORTAL_LABEL}><MdCategory size={13} className="inline align-[-2px] mr-[5px]" />Report Type</label>
                 <select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
                   {REPORT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>
                 <select className={PORTAL_INPUT} value={form.filerId} onChange={e => setField('filerId', e.target.value)} required>
                   {myChars.map(c => (
@@ -140,11 +140,11 @@ export default function FileReport() {
                   ))}
                 </select>
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className={PORTAL_LABEL}><MdEventNote size={13} className="inline align-[-2px] mr-[5px]" />Incident Date</label>
-                <input className={PORTAL_INPUT} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} style={{ colorScheme: 'dark' }} required />
+                <input className={`${PORTAL_INPUT} h-[42px]`} type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} style={{ colorScheme: 'dark' }} required />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className={PORTAL_LABEL}><MdPlace size={13} className="inline align-[-2px] mr-[5px]" />Location</label>
                 <input className={PORTAL_INPUT} type="text" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="Street, City" required />
               </div>
