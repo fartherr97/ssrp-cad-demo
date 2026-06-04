@@ -38,11 +38,9 @@ export const PORTALS = {
     showStatus: true, showCalls: true, showNewCall: false,
     nav: [
       { Icon: MdLocalFireDepartment, label: 'Fire Board', route: '/fire'         },
-      { Icon: MdDashboard,           label: 'CAD',        route: '/cad'          },
       { Icon: MdGroups,              label: 'Units',      route: '/units'        },
       { Icon: MdMap,                 label: 'Map',        route: '/map'          },
       { Icon: MdDescription,         label: 'Reports',    route: '/forms',       dropdown: 'reports' },
-      { Icon: MdFolder,              label: 'Records',    route: '/records',     dropdown: 'records' },
       { Icon: MdHelpOutline,         label: 'Help',       route: '/portal/help' },
     ],
   },

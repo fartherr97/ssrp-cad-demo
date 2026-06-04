@@ -6,6 +6,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { useMountTransition } from '../ui/Modal';
 import { STATUS_COLORS } from '../../constants/statusColors';
 import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
+import { templatesForPortal } from '../../utils/templateScope';
 import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
@@ -440,12 +441,12 @@ export default function ActionBar() {
 
   const dropdownItems = (kind) => {
     if (kind === 'reports') {
-      return (reportTemplates || []).map(t => ({
+      return templatesForPortal(reportTemplates || [], portal.id).map(t => ({
         ...t, route: `/forms?open=${encodeURIComponent(t.name)}`,
       }));
     }
     if (kind === 'records') {
-      return (recordTemplates || []).map(t => ({
+      return templatesForPortal(recordTemplates || [], portal.id).map(t => ({
         ...t, route: `/records?open=${encodeURIComponent(t.name)}`,
       }));
     }

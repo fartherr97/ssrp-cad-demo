@@ -9,6 +9,7 @@ import {
   MdShield, MdPerson, MdInventory2, MdAssignment, MdDirectionsCar,
 } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
+import { templatesForPortal, templateInPortal } from '../utils/templateScope';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, S_BTN_SUBMIT, xs,
 } from '../constants/styles';
@@ -80,7 +81,7 @@ export default function RecordsCenter() {
     const openName = searchParams.get('open');
     if (!openName || !recordTemplates?.length) return;
     const tpl = recordTemplates.find(t => t.name === decodeURIComponent(openName));
-    if (tpl) openTemplate(tpl);
+    if (tpl && templateInPortal(tpl, currentUser?.portal)) openTemplate(tpl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, recordTemplates]);
 
@@ -237,7 +238,8 @@ export default function RecordsCenter() {
     );
   }
 
-  const sortedTemplates = [...(recordTemplates || [])].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTemplates = templatesForPortal(recordTemplates || [], currentUser?.portal)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="flex flex-col lg:flex-row h-full overflow-hidden font-ui">

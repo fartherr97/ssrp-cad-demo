@@ -11,6 +11,7 @@ import {
   MdInventory2, MdPhone, MdShield, MdCarCrash, MdLocalHospital,
 } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
+import { templatesForPortal, templateInPortal } from '../utils/templateScope';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER,
   S_BTN_SUCCESS, S_BTN_WARNING, S_BTN_SUBMIT, xs,
@@ -114,7 +115,8 @@ export default function ReportsCenter() {
     const openName = searchParams.get('open');
     if (!openName || !reportTemplates?.length) return;
     const tpl = reportTemplates.find(t => t.name === decodeURIComponent(openName));
-    if (tpl) openTemplate(tpl);
+    // Only open templates this portal is allowed to file (e.g. Fire can't open LEO reports).
+    if (tpl && templateInPortal(tpl, currentUser?.portal)) openTemplate(tpl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, reportTemplates]);
 
@@ -132,18 +134,29 @@ export default function ReportsCenter() {
 
   const isAdmin   = currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const me        = officers.find(o => o.id === currentUser?.id);
-  const myReports = reports.filter(r => r.officerBadge === me?.badge);
-  const pendingReports = reports.filter(r => r.status === 'Pending Review' || r.status === 'Pending Changes');
+
+  // Templates filed-able from this portal (Fire only sees EMS reports, etc.).
+  const visibleTemplates = templatesForPortal(reportTemplates, currentUser?.portal);
+  const visibleNames     = new Set(visibleTemplates.map(t => t.name));
+
+  // In a scoped portal (e.g. Fire), the filed-report queues only surface
+  // reports of types that portal can file — Fire never browses LEO reports.
+  const scopedReports = currentUser?.portal === 'fire'
+    ? reports.filter(r => visibleNames.has(r.type))
+    : reports;
+
+  const myReports = scopedReports.filter(r => r.officerBadge === me?.badge);
+  const pendingReports = scopedReports.filter(r => r.status === 'Pending Review' || r.status === 'Pending Changes');
 
   const displayedReports =
     reportTab === 'MINE'    ? myReports :
     reportTab === 'PENDING' ? pendingReports :
-    reports;
+    scopedReports;
 
   const selReport = selectedReport ? reports.find(r => r.id === selectedReport) : null;
 
-  const builtinTpls = reportTemplates.filter(t => BUILTIN_NAMES.includes(t.name));
-  const customTpls  = reportTemplates.filter(t => !BUILTIN_NAMES.includes(t.name));
+  const builtinTpls = visibleTemplates.filter(t => BUILTIN_NAMES.includes(t.name));
+  const customTpls  = visibleTemplates.filter(t => !BUILTIN_NAMES.includes(t.name));
 
   const handleFormChange = (key, val) => setFormValues(prev => ({ ...prev, [key]: val }));
 

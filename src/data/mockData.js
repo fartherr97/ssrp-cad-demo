@@ -470,6 +470,7 @@ export const REPORT_TEMPLATES = [
     id: 6, name: 'Patient Care Report',
     agency: 'HILLSBOROUGH COUNTY FIRE RESCUE',
     formCode: 'HCFR-PCR-001',
+    portals: ['fire'],
     signatureSlots: ['Crew Member 1', 'Crew Member 2', 'Supervisor Authorization'],
     sections: [
       /* Run Header */
