@@ -71,7 +71,7 @@ export default function LoginPage() {
 
   // Resolve a stable Discord account identity for this browser. In a real
   // deployment this comes from the Discord OAuth callback; here we persist a
-  // mock account so per-account flags (like the guided tour) survive refreshes.
+  // mock account so per-account flags survive refreshes.
   const getDiscordAccount = () => {
     const KEY = 'ssrp_discord_account';
     try {

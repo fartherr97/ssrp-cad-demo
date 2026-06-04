@@ -43,12 +43,11 @@ function Clock() {
 }
 
 /* Primary nav button * stacked icon + label */
-function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMouseEnter, onMouseLeave }) {
+function NavBtn({ Icon: IconComp, label, onClick, active, refCb, onMouseEnter, onMouseLeave }) {
   return (
     <button
       ref={refCb}
       onClick={onClick}
-      data-tour={dataTour}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       title={label}
@@ -68,7 +67,7 @@ function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMou
 let __navDropdownCloser = null;
 
 /* Dropdown nav button * hover to open a template picker */
-function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour }) {
+function DropdownNav({ Icon: IconComp, label, items, active, navigate }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const btnRef = useRef(null);
@@ -95,7 +94,7 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour 
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 25); };
 
   return (
-    <div className="relative" data-tour={dataTour} onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
+    <div className="relative" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <NavBtn Icon={IconComp} label={label} active={active || open} refCb={btnRef}
         onClick={() => (open ? setOpen(false) : openMenu())} />
       {open && createPortal(
@@ -190,7 +189,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
   };
 
   return (
-    <div className="relative" ref={ref} data-tour="account" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
+    <div className="relative" ref={ref} onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <button
         onClick={toggle}
         className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-75 hover:bg-white/[0.05] border border-transparent hover:border-border-base"
@@ -490,8 +489,7 @@ export default function ActionBar() {
         {navItems.map(item =>
           item.dropdown ? (
             <DropdownNav key={item.route} Icon={item.Icon} label={item.label}
-              items={dropdownItems(item.dropdown)} active={isActive(item.route)} navigate={go}
-              dataTour={item.dropdown === 'reports' ? 'reports' : undefined} />
+              items={dropdownItems(item.dropdown)} active={isActive(item.route)} navigate={go} />
           ) : (
             <NavBtn key={item.route} Icon={item.Icon} label={item.label}
               onClick={() => go(item.route)} active={isActive(item.route)} />

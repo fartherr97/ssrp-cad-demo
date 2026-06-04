@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react';
 import ActionBar from './ActionBar';
 import RadioToast from '../RadioToast';
 import SiteFooter from '../SiteFooter';
-import GuidedTour from '../GuidedTour';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -112,7 +111,6 @@ export default function AppShell({ children }) {
       <BlastToast />
       <MessageToast />
       <PanicTone />
-      {!inAdmin && <GuidedTour />}
     </div>
   );
 }

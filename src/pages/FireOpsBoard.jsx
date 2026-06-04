@@ -24,6 +24,13 @@ function PriBadge({ p }) {
   return <span className={badgeMap[p] || BADGE.gray}>P{p}</span>;
 }
 
+/* HCFR supervisor + command ranks. Only these (or dispatch/admin) may pull
+   apparatus off a scene from the Fire Board. */
+const HCFR_LEADER_RANKS = [
+  'Lieutenant', 'Captain',
+  'Battalion Chief', 'Division Chief', 'Assistant Chief', 'Deputy Chief', 'Fire Chief', 'Chief',
+];
+
 function elapsed(ts) {
   const mins = Math.floor((Date.now() - ts) / 60000);
   if (mins < 60) return `${mins}m ago`;
@@ -357,6 +364,10 @@ export default function FireOpsBoard() {
   const me = officers.find(o => o.id === currentUser?.id);
   // HCFR field members land on their own status / self-dispatch tab.
   const isHCFR = me?.deptShort === 'HCFR';
+  // Supervisors / command (or dispatch/admin) may pull units off a scene.
+  const canRemoveUnits =
+    (isHCFR && HCFR_LEADER_RANKS.includes(me?.rank)) ||
+    currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const [rosterTab, setRosterTab] = useState(isHCFR ? 'MYSTATUS' : 'APPARATUS');
   const [dispatchingReq, setDispatchingReq] = useState(null);
 
@@ -379,6 +390,12 @@ export default function FireOpsBoard() {
     if (!selectedCall || !me) return;
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall, unitId: me.unitId } });
     dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
+  };
+
+  const removeUnit = (callId, unitId) => {
+    dispatch({ type: 'DETACH_UNIT', payload: { callId, unitId } });
+    if (unitId === me?.unitId) dispatch({ type: 'SET_MY_CALL', payload: null });
+    toast.info(`${unitId} removed from ${callId}`, { title: 'Unit Cleared' });
   };
 
   // Officer ids to notify for a request: units attached to that scene's call,
@@ -591,7 +608,12 @@ export default function FireOpsBoard() {
                 </div>
 
                 <div className={S_CARD}>
-                  <div className={S_LABEL}>Assigned Apparatus ({selCall.units.length})</div>
+                  <div className="flex items-center gap-2">
+                    <div className={S_LABEL}>Assigned Apparatus ({selCall.units.length})</div>
+                    {canRemoveUnits && selCall.units.length > 0 && (
+                      <span className="ml-auto text-[9.5px] font-bold uppercase tracking-wide text-slate-500">Supervisor · tap ✕ to clear</span>
+                    )}
+                  </div>
                   {selCall.units.length === 0 ? (
                     <div className="text-[11.5px] text-slate-500">No apparatus on scene</div>
                   ) : (
@@ -599,9 +621,19 @@ export default function FireOpsBoard() {
                       {selCall.units.map(uid => {
                         const off = officers.find(o => o.unitId === uid);
                         return (
-                          <div key={uid} className="flex items-center gap-1.5 bg-app-elevated border border-border-base rounded-lg px-2.5 py-1.5">
+                          <div key={uid} className="flex items-center gap-1.5 bg-app-elevated border border-border-base rounded-lg pl-2.5 pr-1.5 py-1.5">
                             <span className="text-orange-400 text-[11px] font-mono font-bold">{uid}</span>
                             {off && <span className="text-[11px] text-slate-300">{off.name}</span>}
+                            {canRemoveUnits && (
+                              <button
+                                onClick={() => removeUnit(selCall.id, uid)}
+                                title={`Remove ${uid} from scene`}
+                                aria-label={`Remove ${uid} from scene`}
+                                className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-md text-slate-500 hover:text-red-300 hover:bg-red-500/15 cursor-pointer transition-colors"
+                                style={{ background: 'none', border: 'none' }}>
+                                <MdClose size={13} />
+                              </button>
+                            )}
                           </div>
                         );
                       })}
