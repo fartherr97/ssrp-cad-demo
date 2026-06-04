@@ -5,12 +5,12 @@ import { useToast } from '../contexts/ToastContext';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
-  MdDescription, MdArrowBack, MdDownload, MdDeleteOutline, MdCheckCircle,
+  MdDescription, MdArrowBack, MdDownload, MdDeleteOutline, MdSend,
   MdShield, MdPerson, MdInventory2, MdAssignment, MdDirectionsCar,
 } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
 import {
-  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, xs,
+  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, S_BTN_SUBMIT, xs,
 } from '../constants/styles';
 
 
@@ -230,7 +230,7 @@ export default function RecordsCenter() {
               <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
             <button className={`${S_BTN_DANGER} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-            <button className={`${S_BTN_PRIMARY} w-full md:w-auto md:ml-auto`} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
+            <button className={`${S_BTN_SUBMIT} w-full md:w-auto md:ml-auto`} onClick={submitRecord}><MdSend size={17} /> Submit Record</button>
           </div>
         </div>
       </div>

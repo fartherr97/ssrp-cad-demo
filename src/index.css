@@ -152,8 +152,11 @@ input:-webkit-autofill:focus {
 select, option, input, textarea, button, a, label, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
-/* Keep antialiasing stable on tap so option/select text doesn't re-smooth. */
-select:focus, select:active { -webkit-font-smoothing: antialiased; }
+/* Native <select> text can flicker on desktop Chrome when an ancestor uses
+   backdrop-filter (our blurred toolbars/panels): opening the native popup
+   re-rasterizes that layer and the value text strobes. Promoting the select to
+   its own compositing layer isolates it from those ancestor repaints. */
+select { transform: translateZ(0); }
 
 /* ─── Button base (reset) ─── */
 button { font-family: var(--font-ui); cursor: pointer; border: none; background: none; }
