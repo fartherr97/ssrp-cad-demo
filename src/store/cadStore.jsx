@@ -127,6 +127,10 @@ const initialState = {
   incoming911: INCOMING_911,
   incoming911HCFR: [],
   civilian911Log: [],
+  // Requests that could not be delivered because their receiver (business or
+  // routing-role department) no longer exists. Steve's backend should monitor
+  // this queue and alert ops staff. Items are never auto-discarded.
+  unroutedRequests: [],
   unitGroups: UNIT_GROUPS,
   // ─── Admin customization config ───
   callNatures: CALL_NATURES_DEFAULT,
@@ -226,6 +230,11 @@ const nowTime = () => {
 function addDispatchLog(state, text, kind = 'info') {
   const entry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, time: nowTime(), text, kind };
   return { dispatchLog: [entry, ...state.dispatchLog].slice(0, 250) };
+}
+
+function addSystemNotif(state, { title, body, color = '#f59e0b' }) {
+  const entry = { id: `notif-sys-${Date.now()}`, title, body, sender: 'System', color, time: nowTime(), read: false };
+  return { notifications: [entry, ...state.notifications] };
 }
 
 function addAuditEntry(state, action, module) {
@@ -957,6 +966,23 @@ function reducer(state, action) {
       // payload: { assistType, location, postal, priority, description, callId,
       //            callNature, requestedBy, requestedByBadge, requestedByUnit }
       const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+
+      // For civilian tow requests routed to a specific company, verify the
+      // receiver still exists. If it was deleted, park the request in the
+      // unrouted queue so it isn't silently lost.
+      if (req.source === 'CIVILIAN' && req.targetCompanyId) {
+        const receiverExists = state.businesses.some(b => b.id === req.targetCompanyId);
+        if (!receiverExists) {
+          const fallback = { ...req, status: 'UNROUTED', routingFailure: `Receiver company ID ${req.targetCompanyId} not found` };
+          const log = addDispatchLog(state, `[UNROUTED] Civilian tow request (${req.assistType || 'Assist'} @ ${req.location}) — receiver company no longer exists`, 'alert');
+          const notif = addSystemNotif(state, {
+            title: 'Tow Request Unrouted',
+            body: `Civilian tow (${req.assistType || 'Assist'} @ ${req.location}) could not be delivered — target company no longer exists. Check Unrouted Requests.`,
+          });
+          return { ...state, unroutedRequests: [fallback, ...(state.unroutedRequests || [])], nextId: state.nextId + 1, ...log, ...notif };
+        }
+      }
+
       const target = req.targetCompanyId ? state.businesses.find(b => b.id === req.targetCompanyId) : null;
       const dest = target?.name || 'FDOT';
       const who = req.source === 'CIVILIAN' ? `Civilian tow request (${req.requestedBy || 'unknown'})` : 'FDOT assistance requested';
@@ -987,6 +1013,21 @@ function reducer(state, action) {
 
     case 'ADD_HCFR_REQUEST': {
       const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+
+      // Verify at least one department with routingRole 'HCFR' still exists.
+      // If not, the Fire Ops Board has no agency configured to receive this
+      // request — park it in the unrouted queue.
+      const hcfrReceiverExists = state.departments.some(d => d.routingRole === 'HCFR');
+      if (!hcfrReceiverExists) {
+        const fallback = { ...req, status: 'UNROUTED', routingFailure: 'No department with routingRole HCFR found' };
+        const log = addDispatchLog(state, `[UNROUTED] HCFR assistance request (${req.assistType || 'Assist'} @ ${req.location}) — no HCFR agency configured`, 'alert');
+        const notif = addSystemNotif(state, {
+          title: 'HCFR Request Unrouted',
+          body: `HCFR assistance (${req.assistType || 'Assist'} @ ${req.location}) could not be delivered — no HCFR agency is configured. Check Unrouted Requests.`,
+        });
+        return { ...state, unroutedRequests: [fallback, ...(state.unroutedRequests || [])], nextId: state.nextId + 1, ...log, ...notif };
+      }
+
       const log = addDispatchLog(
         state,
         `HCFR assistance requested * ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
@@ -1010,6 +1051,25 @@ function reducer(state, action) {
         );
       }
       return { ...state, hcfrRequests, ...log };
+    }
+
+    case 'DISMISS_UNROUTED': {
+      return { ...state, unroutedRequests: (state.unroutedRequests || []).filter(r => r.id !== action.payload) };
+    }
+    case 'RESOLVE_UNROUTED': {
+      // Manually re-route an unrouted request to the right queue.
+      const { id: unreId, targetQueue } = action.payload;
+      const req = (state.unroutedRequests || []).find(r => r.id === unreId);
+      if (!req) return state;
+      const resolved = { ...req, status: 'PENDING', routingFailure: undefined, resolvedAt: Date.now() };
+      const unroutedRequests = (state.unroutedRequests || []).filter(r => r.id !== unreId);
+      if (targetQueue === 'fdot') {
+        return { ...state, unroutedRequests, fdotRequests: [resolved, ...state.fdotRequests] };
+      }
+      if (targetQueue === 'hcfr') {
+        return { ...state, unroutedRequests, hcfrRequests: [resolved, ...(state.hcfrRequests || [])] };
+      }
+      return { ...state, unroutedRequests };
     }
 
     case 'ADD_CUSTOM_RECORD_TYPE': {
