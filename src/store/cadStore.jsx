@@ -86,6 +86,7 @@ const initialState = {
   directMessages: [],
   messageLog: [],
   lastBlast: null,
+  notifications: [],
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
   towJobs: [],
@@ -944,16 +945,35 @@ function reducer(state, action) {
     }
 
     case 'NOTIFICATION_BLAST': {
-      const { senderName, senderBadge, title, color, body } = action.payload;
+      const { senderName, senderBadge, senderId, title, color, body, targetDeptId } = action.payload;
       const id = `blast-${Date.now()}`;
       const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const logEntry = { id: state.nextId, from: `${senderName} (${senderBadge})`, subject: title, body, timestamp: ts, type: 'blast' };
       return {
         ...state,
         messageLog: [logEntry, ...state.messageLog],
-        lastBlast: { id, senderName, senderBadge, title, color, body, time: ts },
+        lastBlast: { id, senderName, senderBadge, senderId: senderId ?? null, title, color, body, time: ts, targetDeptId: targetDeptId ?? null },
         nextId: state.nextId + 1,
       };
+    }
+
+    case 'ADD_NOTIFICATION': {
+      const { title, body, color, time } = action.payload;
+      const ts = time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const entry = { id: `notif-${Date.now()}-${state.nextId}`, title, body, color: color || '#3a88e8', time: ts, read: false };
+      return { ...state, notifications: [entry, ...state.notifications], nextId: state.nextId + 1 };
+    }
+
+    case 'MARK_NOTIFICATIONS_READ': {
+      return { ...state, notifications: state.notifications.map(n => ({ ...n, read: true })) };
+    }
+
+    case 'DISMISS_NOTIFICATION': {
+      return { ...state, notifications: state.notifications.filter(n => n.id !== action.payload) };
+    }
+
+    case 'CLEAR_NOTIFICATIONS': {
+      return { ...state, notifications: [] };
     }
 
     default:

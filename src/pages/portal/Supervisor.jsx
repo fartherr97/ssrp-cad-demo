@@ -39,7 +39,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
 
   const handleSend = () => {
     if (!title.trim() || !body.trim()) return;
-    dispatch({ type: 'NOTIFICATION_BLAST', payload: { senderName, senderBadge, title: title.trim(), color, body: body.trim(), targetDeptId: myDeptId } });
+    dispatch({ type: 'NOTIFICATION_BLAST', payload: { senderName, senderBadge, senderId: me?.id ?? currentUser?.id, title: title.trim(), color, body: body.trim(), targetDeptId: myDeptId } });
     toast.success(`Blast "${title.trim()}" sent to ${targetLabel}.`, { title: 'Blast Sent', color });
     setSent(true);
     setTimeout(() => setSent(false), 3000);

@@ -5,7 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 /* Bridges store radio broadcasts (lastRadio) into the top toast notifications.
    Renders nothing itself — replaced the old bottom-right toast card. */
 export default function RadioToast() {
-  const { state } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
   const { lastRadio, currentUser } = state;
 
@@ -32,7 +32,8 @@ export default function RadioToast() {
     if (targeted && !lastRadio.to.includes(currentUser.id)) return;
 
     toast.info(lastRadio.text, { title: 'Dispatch Radio', duration: 6000 });
-  }, [lastRadio, currentUser, toast]);
+    dispatch({ type: 'ADD_NOTIFICATION', payload: { title: 'Dispatch Radio', body: lastRadio.text, color: '#3a88e8' } });
+  }, [lastRadio, currentUser, toast, dispatch]);
 
   return null;
 }

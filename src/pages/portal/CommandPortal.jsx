@@ -1068,7 +1068,7 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
     if (!title.trim() || !body.trim()) return;
     dispatch({
       type: 'NOTIFICATION_BLAST',
-      payload: { senderName, senderBadge, title: title.trim(), color, body: body.trim(), targetDeptId: targetDeptId || null },
+      payload: { senderName, senderBadge, senderId: myOfficer?.id ?? currentUser?.id, title: title.trim(), color, body: body.trim(), targetDeptId: targetDeptId || null },
     });
     toast.success(`Blast "${title.trim()}" sent to ${targetLabel}.`, { title: 'Blast Sent', color });
     setSent(true);

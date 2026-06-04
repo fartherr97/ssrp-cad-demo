@@ -8,7 +8,7 @@ import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 
 function BlastToast() {
-  const { state } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
   const { lastBlast, currentUser, officers } = state;
   const seenId = useRef(lastBlast?.id ?? null);
@@ -18,6 +18,9 @@ function BlastToast() {
     if (lastBlast.id === seenId.current) return;
     seenId.current = lastBlast.id;
 
+    // Don't echo the blast back to whoever sent it.
+    if (lastBlast.senderId != null && String(lastBlast.senderId) === String(currentUser.id)) return;
+
     // Department-targeted blast: only fire if current user is in the target dept.
     if (lastBlast.targetDeptId) {
       const me = officers.find(o => o.id === currentUser.id);
@@ -26,7 +29,8 @@ function BlastToast() {
 
     const body = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
     toast.info(body, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
-  }, [lastBlast, currentUser, officers, toast]);
+    dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
+  }, [lastBlast, currentUser, officers, toast, dispatch]);
 
   return null;
 }

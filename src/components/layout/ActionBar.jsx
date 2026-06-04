@@ -10,7 +10,7 @@ import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
-  MdMenu, MdClose, MdCircle, MdInbox,
+  MdMenu, MdClose, MdCircle, MdInbox, MdNotifications, MdNotificationsNone,
 } from 'react-icons/md';
 
 // Icons matched to standard status codes; custom admin codes fall back to a dot.
@@ -278,9 +278,111 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
   );
 }
 
+/* ─── Notification Bell ─── */
+function NotificationBell({ notifications, dispatch }) {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ left: 0, top: 0 });
+  const ref = useRef(null);
+  const menuRef = useRef(null);
+  const closeTimer = useRef(null);
+  const PANEL_W = 320;
+
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  const place = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: Math.max(8, r.right - PANEL_W), top: r.bottom + 4 });
+    }
+  };
+  const doClose = () => setOpen(false);
+  const openPanel = () => {
+    clearTimeout(closeTimer.current);
+    if (__navDropdownCloser && __navDropdownCloser !== setOpen) __navDropdownCloser(false);
+    __navDropdownCloser = setOpen;
+    place();
+    setOpen(true);
+    dispatch({ type: 'MARK_NOTIFICATIONS_READ' });
+  };
+  const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
+  const toggle = () => (open ? doClose() : openPanel());
+
+  const unread = notifications.filter(n => !n.read).length;
+
+  return (
+    <div className="relative" ref={ref} onMouseEnter={() => { clearTimeout(closeTimer.current); }} onMouseLeave={scheduleClose}>
+      <button
+        onClick={toggle}
+        title="Notifications"
+        className="relative flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 cursor-pointer transition-colors"
+      >
+        {unread > 0 ? <MdNotifications size={20} /> : <MdNotificationsNone size={20} />}
+        {unread > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-brand text-white text-[9px] font-bold flex items-center justify-center leading-none">
+            {unread > 99 ? '99+' : unread}
+          </span>
+        )}
+      </button>
+
+      {open && createPortal(
+        <div
+          ref={menuRef}
+          onMouseEnter={() => clearTimeout(closeTimer.current)}
+          onMouseLeave={scheduleClose}
+          className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl flex flex-col overflow-hidden"
+          style={{ left: coords.left, top: coords.top, width: PANEL_W, maxHeight: 420, animation: 'dropdownFadeIn 0.13s ease-out' }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border-faint shrink-0">
+            <span className="text-[12px] font-bold text-white">Notifications</span>
+            {notifications.length > 0 && (
+              <button
+                onClick={() => dispatch({ type: 'CLEAR_NOTIFICATIONS' })}
+                className="text-[11px] text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
+                style={{ background: 'none', border: 'none' }}
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 px-4 text-slate-600">
+                <MdNotificationsNone size={28} className="opacity-40" />
+                <span className="text-[12px]">No notifications</span>
+              </div>
+            ) : (
+              notifications.map(n => (
+                <div key={n.id} className={`flex gap-3 px-3.5 py-3 border-b border-border-faint/50 last:border-0 ${!n.read ? 'bg-white/[0.025]' : ''}`}>
+                  <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: n.color || '#3a88e8' }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-semibold text-white leading-tight">{n.title}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5 leading-snug whitespace-pre-wrap line-clamp-3">{n.body}</div>
+                    <div className="text-[10px] text-slate-600 mt-1">{n.time}</div>
+                  </div>
+                  <button
+                    onClick={() => dispatch({ type: 'DISMISS_NOTIFICATION', payload: n.id })}
+                    title="Dismiss"
+                    className="shrink-0 text-slate-600 hover:text-slate-400 cursor-pointer mt-0.5 text-[11px] font-bold"
+                    style={{ background: 'none', border: 'none' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 export default function ActionBar() {
   const { state, dispatch } = useCAD();
-  const { currentUser, officers, reportTemplates, recordTemplates, unitStatusCodes = [], businesses = [] } = state;
+  const { currentUser, officers, reportTemplates, recordTemplates, unitStatusCodes = [], businesses = [], notifications = [] } = state;
   const statusOptions = unitStatusCodes.map(s => ({ ...s, Icon: STATUS_ICONS[s.code] || MdCircle }));
   const navigate = useNavigate();
   const location = useLocation();
@@ -371,6 +473,7 @@ export default function ActionBar() {
       <div className="ml-auto flex items-center shrink-0 pl-2">
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
+        <NotificationBell notifications={notifications} dispatch={dispatch} />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}
