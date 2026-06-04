@@ -10,6 +10,7 @@ import {
   PORTAL_INPUT, PORTAL_LABEL,
 } from './PortalKit';
 import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
+import { ageFromDob } from '../../utils/age';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const DL_CLASSES = CIVILIAN_FORMS_DEFAULT.driverLicense.classes;
@@ -114,8 +115,9 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlConfig }) {
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
             <Field label="Full Name" value={`${civ.firstName} ${civ.lastName}`} />
             <Field label="Date of Birth" value={civ.dob} />
-            <Field label="Address" value={civ.address} />
+            <Field label="Age" value={ageFromDob(civ.dob)} />
             <Field label="Gender" value={civ.gender} />
+            <Field label="Address" value={civ.address} />
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[10.5px] text-slate-600">
             <MdLock size={11} />

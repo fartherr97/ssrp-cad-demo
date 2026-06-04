@@ -122,11 +122,17 @@ function FieldListEditor({ fields, onChange, accent, note }) {
               <div className="flex items-center gap-2">
                 <input style={{ ...INPUT, flex: 1 }} value={f.label} placeholder="Field label"
                   onChange={e => up(idx, { label: e.target.value })} />
-                <select style={{ ...INPUT, width: 120 }} value={f.type}
-                  disabled={isCore}
-                  onChange={e => up(idx, { type: e.target.value })}>
-                  {CIVILIAN_FIELD_TYPES.map(t => <option key={t.type} value={t.type} style={{ background: '#0d1827' }}>{t.label}</option>)}
-                </select>
+                {isCore ? (
+                  <span className="inline-flex items-center justify-center text-[11px] font-bold rounded-lg shrink-0"
+                    style={{ width: 120, height: 33, background: 'rgba(59,130,246,0.10)', border: '1px solid rgba(59,130,246,0.25)', color: '#93c5fd' }}>
+                    {f.type === 'age' ? 'Age (auto)' : (CIVILIAN_FIELD_TYPES.find(t => t.type === f.type)?.label || f.type)}
+                  </span>
+                ) : (
+                  <select style={{ ...INPUT, width: 120 }} value={f.type}
+                    onChange={e => up(idx, { type: e.target.value })}>
+                    {CIVILIAN_FIELD_TYPES.map(t => <option key={t.type} value={t.type} style={{ background: '#0d1827' }}>{t.label}</option>)}
+                  </select>
+                )}
                 <button type="button" onClick={() => up(idx, { required: !f.required })}
                   title="Required" disabled={isCore}
                   className="w-7 h-7 rounded-lg inline-flex items-center justify-center cursor-pointer border shrink-0 disabled:opacity-40"

@@ -35,6 +35,7 @@ export const CIVILIAN_FORMS_DEFAULT = {
       { key: 'firstName', label: 'First Name',    type: 'text',   core: true, required: true },
       { key: 'lastName',  label: 'Last Name',     type: 'text',   core: true, required: true },
       { key: 'dob',       label: 'Date of Birth', type: 'date',   core: true },
+      { key: 'age',       label: 'Age',           type: 'age',    core: true },
       { key: 'gender',    label: 'Gender',        type: 'select', core: true, options: ['Male', 'Female', 'Other'] },
       { key: 'ethnicity', label: 'Ethnicity',     type: 'text' },
       { key: 'height',    label: 'Height',        type: 'text' },

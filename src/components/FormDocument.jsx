@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
+import { ageFromDob } from '../utils/age';
 import {
   S_RECORD_RETURN, S_RECORD_RETURN_HEADER, S_RECORD_RETURN_ALERT, S_RECORD_RETURN_ALERT_WARN,
   S_RECORD_RETURN_BODY, S_RECORD_RETURN_SECTION, S_RECORD_RETURN_LINE,
@@ -809,6 +810,7 @@ export function RecordReturn({ type, subject, data }) {
           {line('Gender', data.gender)}
           {line('Race', data.ethnicity)}
           {line('Date of Birth', data.dob)}
+          {line('Age', ageFromDob(data.dob))}
           {line('Height', data.height)}
           {line('Weight', data.weight)}
           {line('Hair Color', data.hair)}

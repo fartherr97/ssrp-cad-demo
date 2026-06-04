@@ -5,6 +5,7 @@ import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHi
 import { PortalPage, PortalHeader, PortalCard, Field, CivFormField } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
 import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
+import { ageFromDob } from '../../utils/age';
 import { useActiveCivilian } from '../../contexts/CivilianContext';
 
 const DL_BADGE = {
@@ -165,11 +166,14 @@ export default function MyCharacters() {
         if (conflict) { toast.error(`That ${field} is already in use.`, { title: 'Duplicate Value' }); return; }
       }
     }
+    // Age is derived from DOB on display — never persist it.
+    const payload = { ...form };
+    characterFields.filter(f => f.type === 'age').forEach(f => { delete payload[f.key]; });
     if (editingId != null) {
-      dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: editingId, ...form } });
+      dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: editingId, ...payload } });
       toast.success(`${form.firstName} ${form.lastName} updated.`, { title: 'Character Saved' });
     } else {
-      dispatch({ type: 'ADD_CIVILIAN', payload: { ...form, ownedByPlayer: true } });
+      dispatch({ type: 'ADD_CIVILIAN', payload: { ...payload, ownedByPlayer: true } });
       toast.success(`${form.firstName} ${form.lastName} registered.`, { title: 'Character Registered' });
     }
     closeForm();
@@ -228,11 +232,15 @@ export default function MyCharacters() {
           </div>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
-              {characterFields.map(f => (
-                <div key={f.key} style={f.full ? { gridColumn: '1 / -1' } : undefined}>
-                  <CivFormField field={f} value={form[f.key]} onChange={v => setField(f.key, v)} />
-                </div>
-              ))}
+              {characterFields.map(f => {
+                const isAge = f.type === 'age';
+                const val = isAge ? ageFromDob(form.dob) : form[f.key];
+                return (
+                  <div key={f.key} style={f.full ? { gridColumn: '1 / -1' } : undefined}>
+                    <CivFormField field={f} value={val} onChange={isAge ? () => {} : v => setField(f.key, v)} />
+                  </div>
+                );
+              })}
             </div>
             <div className="flex gap-2.5 mt-[18px]">
               <button type="submit" className={`${S_BTN_PRIMARY} press`}>
@@ -291,6 +299,7 @@ export default function MyCharacters() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Field label="Date of Birth" value={c.dob} />
+                <Field label="Age" value={ageFromDob(c.dob)} />
                 <Field label="Gender" value={c.gender} />
                 <Field label="Address" value={c.address} />
                 <Field label="Phone" value={c.phone} mono />

@@ -4,6 +4,7 @@ import { useResponsive } from '../hooks/useResponsive';
 import { RecordReturn } from '../components/FormDocument';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
+import { ageFromDob } from '../utils/age';
 import { BADGE, statusBadge } from '../constants/styles';
 import { FlagRow } from '../components/CivilianFlags';
 import {
@@ -24,12 +25,7 @@ function bizExpiryStr(issuedAt) {
   return new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 }
 
-function age(dob) {
-  if (!dob) return '';
-  const d = new Date(dob);
-  if (isNaN(d)) return '';
-  return Math.abs(new Date(Date.now() - d.getTime()).getUTCFullYear() - 1970);
-}
+const age = ageFromDob;
 
 function InfoCard({ title, children, className = '' }) {
   return (

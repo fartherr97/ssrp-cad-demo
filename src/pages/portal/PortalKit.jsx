@@ -146,6 +146,22 @@ export function CivFormField({ field, value, onChange }) {
     );
   }
 
+  // Auto-calculated from Date of Birth — read-only. The parent passes the
+  // computed age in as `value`.
+  if (type === 'age') {
+    return (
+      <div>
+        {labelEl}
+        <div className={`${PORTAL_INPUT} flex items-center justify-between !cursor-default`} style={{ opacity: 0.9 }}>
+          <span className={value === '' || value == null ? 'text-slate-600' : 'text-cad-text'}>
+            {value === '' || value == null ? 'Auto from DOB' : value}
+          </span>
+          <span className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Auto</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {labelEl}

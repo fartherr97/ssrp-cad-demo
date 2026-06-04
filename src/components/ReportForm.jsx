@@ -9,6 +9,7 @@ import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose,
 import { DeptBadge } from '../constants/deptLogos';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
+import { ageFromDob } from '../utils/age';
 import { FlagRow } from './CivilianFlags';
 import { useMountTransition } from './ui/Modal';
 
@@ -54,12 +55,7 @@ function searchData(kind, q, state) {
 }
 
 /* ── Map a picked record onto the section's fields by label ── */
-function calcAge(dob) {
-  if (!dob) return '';
-  const d = new Date(dob);
-  if (isNaN(d)) return '';
-  return String(Math.abs(new Date(Date.now() - d.getTime()).getUTCFullYear() - 1970));
-}
+const calcAge = ageFromDob;
 
 function buildAutofill(kind, rec, fields, civilians) {
   const out = {};

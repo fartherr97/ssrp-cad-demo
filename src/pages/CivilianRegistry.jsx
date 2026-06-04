@@ -11,6 +11,7 @@ import {
   trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
 import { MdArrowBack } from 'react-icons/md';
+import { ageFromDob } from '../utils/age';
 
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
@@ -162,7 +163,7 @@ export default function CivilianRegistry() {
                   <div>
                     <div className="text-[18px] font-extrabold text-white tracking-[-0.2px]">{selCiv.firstName} {selCiv.lastName}</div>
                     <div className="text-[11px] font-mono text-slate-500 mt-0.5">
-                      DOB: {selCiv.dob} · {selCiv.gender} · {selCiv.ethnicity}
+                      DOB: {selCiv.dob}{ageFromDob(selCiv.dob) ? ` (${ageFromDob(selCiv.dob)})` : ''} · {selCiv.gender} · {selCiv.ethnicity}
                     </div>
                     <div className="flex gap-1 mt-1.5 flex-wrap items-center">
                       {civWarrants.length > 0 && <span className={BADGE.red}>ACTIVE WARRANT</span>}
@@ -276,6 +277,7 @@ export default function CivilianRegistry() {
                 <div className={S_FIELD}><label className={S_LABEL}>First Name *</label><input className={S_INPUT} value={form.firstName} onChange={e => setForm(p => ({...p, firstName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Last Name *</label><input className={S_INPUT} value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Date of Birth</label><div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}><input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.dob} onChange={e => setForm(p => ({...p, dob: e.target.value}))} style={{ colorScheme: 'dark' }} /></div></div>
+                <div className={S_FIELD}><label className={S_LABEL}>Age</label><div className={`${S_INPUT} flex items-center justify-between`} style={{ opacity: 0.85 }}><span className={ageFromDob(form.dob) ? '' : 'text-slate-600'}>{ageFromDob(form.dob) || 'Auto from DOB'}</span><span className="text-[9px] font-bold uppercase tracking-[0.5px] text-slate-600">Auto</span></div></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Gender</label><select className={S_SELECT} value={form.gender} onChange={e => setForm(p => ({...p, gender: e.target.value}))}><option>Male</option><option>Female</option><option>Non-Binary</option></select></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Ethnicity</label><select className={S_SELECT} value={form.ethnicity} onChange={e => setForm(p => ({...p, ethnicity: e.target.value}))}><option>White</option><option>Black</option><option>Hispanic</option><option>Asian</option><option>Other</option></select></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Hair Color</label><input className={S_INPUT} value={form.hair} onChange={e => setForm(p => ({...p, hair: e.target.value}))} /></div>

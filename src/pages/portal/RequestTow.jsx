@@ -165,7 +165,7 @@ export default function RequestTow() {
             <div>
               <label className={PORTAL_LABEL}><MdBusiness size={12} className="inline mr-1 -mt-0.5" />Tow Company</label>
               <select className={PORTAL_INPUT} value={form.companyId} onChange={set('companyId')}>
-                <option value="">No preference — auto-route to {fdotCompany?.name || 'FDOT'}</option>
+                <option value="">No preference</option>
                 {towCompanies.map(b => (
                   <option key={b.id} value={b.id}>{b.name}{b.isFDOT ? ' (FDOT)' : ''}</option>
                 ))}
