@@ -70,24 +70,26 @@ export function PortalHeader({ icon: Icon, title, subtitle, accent = 'brand', ac
 
 export function StatCard({ label, value, accent = 'brand', icon: Icon, hint }) {
   const hex = resolveHex(accent);
+  const valStr = String(value ?? '');
+  const valSize = valStr.length <= 3 ? 'text-[30px]' : valStr.length <= 6 ? 'text-[20px]' : 'text-[15px]';
   return (
-    <div className="stat-card-enter animate-slide-up bg-app-card/70 border border-border-base rounded-xl px-4 py-4 sm:px-5 sm:py-[18px] flex-1 min-w-[130px] flex flex-col gap-1.5 relative overflow-hidden backdrop-blur-sm transition-[border-color,transform]">
+    <div className="portal-card-enter bg-app-card/70 border border-border-base rounded-xl px-4 py-4 sm:px-5 sm:py-[18px] flex-1 min-w-[130px] flex flex-col gap-1.5 relative overflow-hidden backdrop-blur-sm transition-[border-color,transform]">
       <div className="absolute top-[-10px] right-[-10px] opacity-10">
         {Icon && <Icon size={68} color={hex} />}
       </div>
       <div className="text-[11px] font-bold tracking-[0.8px] uppercase text-cad-muted">{label}</div>
-      <div className="text-[30px] font-extrabold leading-none" style={{ color: hex }}>{value}</div>
+      <div className={`${valSize} font-extrabold leading-none`} style={{ color: hex }}>{value}</div>
       {hint && <div className="text-[11px] text-cad-dim">{hint}</div>}
     </div>
   );
 }
 
-export function PortalCard({ children, accent, style = {}, onClick, hover, className = '' }) {
+export function PortalCard({ children, accent, style = {}, onClick, hover, className = '', noAnim = false }) {
   const hex = accent ? resolveHex(accent) : null;
   return (
     <div
       onClick={onClick}
-      className={`bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm ${hover ? 'portal-card-hover lift cursor-pointer' : ''} ${className}`}
+      className={`${noAnim ? '' : 'portal-card-enter'} bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm transition-[border-color,box-shadow,transform] ${hover ? 'portal-card-hover lift cursor-pointer' : ''} ${className}`}
       style={{
         ...(hex ? { borderColor: `${hex}44`, borderLeft: `3px solid ${hex}` } : {}),
         ...style,

@@ -170,7 +170,7 @@ export default function MyCharacters() {
       />
 
       {showForm && (
-        <PortalCard accent="brand" style={{ marginBottom: 22 }}>
+        <PortalCard accent="brand" noAnim style={{ marginBottom: 22 }} className="portal-form-enter">
           <div className="flex justify-between items-center mb-[18px]">
             <div className="text-[15px] font-extrabold text-slate-100">
               {editingId != null ? 'Edit Character' : 'Register New Character'}
@@ -255,7 +255,7 @@ export default function MyCharacters() {
           </div>
         </PortalCard>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: 14 }}>
+        <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: 14 }}>
           {myChars.map(c => {
             const isActive = c.id === activeChar?.id;
             return (

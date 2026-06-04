@@ -62,7 +62,7 @@ export function CivilianSwitcher() {
   const multi = myChars.length > 1;
 
   return (
-    <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl border border-border-base bg-app-card/60">
+    <div className="portal-card-enter flex items-center gap-3 mb-5 px-4 py-3 rounded-xl border border-border-base bg-app-card/60 transition-[border-color,box-shadow]">
       <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
         <MdPerson size={22} className="text-brand-bright" />
       </div>
@@ -82,13 +82,17 @@ export function CivilianSwitcher() {
             ))}
           </select>
         ) : (
-          <div className="text-[15px] font-bold text-slate-100 truncate">
+          // key forces re-mount → triggers char-name-swap animation on character change
+          <div key={activeChar.id} className="char-name-swap text-[15px] font-bold text-slate-100 truncate">
             {activeChar.firstName} {activeChar.lastName}
           </div>
         )}
       </div>
-      <span className={`${DL_BADGE[activeChar.dlStatus] || BADGE.gray} shrink-0`}>
-        DL {activeChar.dlStatus || 'N/A'}
+      {/* key forces badge to re-animate whenever active character changes */}
+      <span key={activeChar.id} className="char-name-swap shrink-0">
+        <span className={DL_BADGE[activeChar.dlStatus] || BADGE.gray}>
+          DL {activeChar.dlStatus || 'N/A'}
+        </span>
       </span>
     </div>
   );

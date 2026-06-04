@@ -438,13 +438,7 @@ export default function FireOpsBoard() {
 
       {/* Header stats */}
       <div className="flex flex-wrap gap-4 lg:gap-6 items-center px-4 py-3 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 shrink-0">
-        <div className="flex items-center gap-3">
-          <DeptTag code="HCFR" />
-          <div>
-            <div className="text-[13px] font-bold text-orange-400 tracking-[0.3px]">HCFR Operations</div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">HCFR Fire Rescue</div>
-          </div>
-        </div>
+        <DeptTag code="HCFR" />
         {[
           { label: 'Active', value: fireCalls.length, colorClass: 'text-orange-400' },
           { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },

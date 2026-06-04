@@ -132,7 +132,7 @@ export default function CivilianHome() {
       </div>
 
       <SectionTitle accent={ACCENT}>Quick Actions</SectionTitle>
-      <div className="grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))' }}>
+      <div className="stagger grid gap-3.5 mb-[30px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))' }}>
         {QUICK.map(q => (
           <PortalCard key={q.route} accent={ACCENT} hover onClick={() => navigate(q.route)}>
             <div className="flex items-center gap-3.5">
@@ -160,7 +160,7 @@ export default function CivilianHome() {
       ) : (
         <>
           <div className="text-[12px] text-slate-500 mb-3">Select a character to make them active across the portal.</div>
-          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+          <div className="stagger grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
             {myChars.map(c => {
               const isActive = c.id === activeChar?.id;
               return (
