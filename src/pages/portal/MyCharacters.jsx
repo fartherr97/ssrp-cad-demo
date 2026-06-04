@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
-import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle } from 'react-icons/md';
+import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHigh } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
 import { useActiveCivilian } from '../../contexts/CivilianContext';
@@ -30,14 +30,78 @@ const FORM_FIELDS = [
   { key: 'phone',     label: 'Phone', type: 'text' },
 ];
 
+// ── AI character generation data pool ────────────────────────────────────────
+
+const _FM = ['James', 'Michael', 'David', 'Robert', 'John', 'William', 'Carlos', 'Marcus',
+              'Anthony', 'Kevin', 'Tyler', 'Brandon', 'Derek', 'Jason', 'Nathan', 'Raymond',
+              'Darnell', 'Luis', 'Victor', 'Patrick'];
+const _FF = ['Sarah', 'Jessica', 'Amanda', 'Ashley', 'Brittany', 'Christina', 'Maria',
+              'Jasmine', 'Destiny', 'Kayla', 'Nicole', 'Amber', 'Stephanie', 'Vanessa',
+              'Alexis', 'Monique', 'Diana', 'Tiffany', 'Rachel', 'Brianna'];
+const _LAST = ['Johnson', 'Williams', 'Brown', 'Davis', 'Martinez', 'Garcia', 'Rodriguez',
+               'Wilson', 'Anderson', 'Taylor', 'Thomas', 'Hernandez', 'Moore', 'Jackson',
+               'White', 'Harris', 'Clark', 'Lewis', 'Robinson', 'Walker', 'Perez', 'Hall',
+               'Young', 'Allen', 'Sanchez', 'Wright', 'King', 'Scott', 'Green', 'Baker'];
+const _ETH  = ['White / Caucasian', 'Black / African American', 'Hispanic / Latino',
+               'Asian / Pacific Islander', 'Native American', 'Two or More Races'];
+const _HAIR = ['Black', 'Brown', 'Dark Brown', 'Blonde', 'Light Brown', 'Auburn',
+               'Red', 'Gray', 'Salt & Pepper', 'Bald'];
+const _EYES = ['Brown', 'Dark Brown', 'Hazel', 'Green', 'Blue', 'Gray'];
+const _STREETS = [
+  '1234 N Dale Mabry Hwy', '567 W Kennedy Blvd', '891 S Howard Ave',
+  '2345 E Hillsborough Ave', '678 N Armenia Ave', '234 W Waters Ave',
+  '1567 Bayshore Blvd', '890 N Nebraska Ave', '3456 W Gandy Blvd',
+  '789 N MacDill Ave', '4521 E Busch Blvd', '1123 S Florida Ave',
+  '3302 W Columbus Dr', '2211 E Fletcher Ave', '5540 N 56th St',
+  '4120 W Spruce St', '7810 N Himes Ave', '9001 N 30th St',
+];
+const _CITIES = [
+  ['Tampa', '33602'], ['Tampa', '33603'], ['Tampa', '33605'], ['Tampa', '33609'],
+  ['Tampa', '33611'], ['Tampa', '33612'], ['Tampa', '33614'], ['Tampa', '33617'],
+  ['Brandon', '33510'], ['Brandon', '33511'], ['Riverview', '33578'],
+  ['Temple Terrace', '33617'], ['Lutz', '33549'], ['Seffner', '33584'],
+];
+
+const _pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const _int  = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
+
+function generateCharacter() {
+  const gender = Math.random() < 0.52 ? 'Male' : 'Female';
+  const firstName = _pick(gender === 'Male' ? _FM : _FF);
+  const lastName  = _pick(_LAST);
+
+  const age     = _int(18, 65);
+  const dobYear = new Date().getFullYear() - age;
+  const dobMo   = String(_int(1, 12)).padStart(2, '0');
+  const dobDay  = String(_int(1, 28)).padStart(2, '0');
+  const dob     = `${dobYear}-${dobMo}-${dobDay}`;
+
+  const ftBase = gender === 'Male' ? _int(5, 6) : 5;
+  const inBase = gender === 'Male' ? _int(4, 11) : _int(1, 9);
+  const height = `${ftBase}'${inBase}"`;
+  const weight = gender === 'Male' ? `${_int(145, 225)} lbs` : `${_int(105, 165)} lbs`;
+
+  const [city, zip] = _pick(_CITIES);
+  const address     = `${_pick(_STREETS)}, ${city}, FL ${zip}`;
+
+  const area  = Math.random() < 0.7 ? '813' : '727';
+  const phone = `(${area}) ${_int(200, 999)}-${String(_int(1000, 9999)).padStart(4, '0')}`;
+
+  return { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
+           height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function MyCharacters() {
   const { dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar, setActiveCharId } = useActiveCivilian();
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [showForm,   setShowForm]   = useState(false);
+  const [editingId,  setEditingId]  = useState(null);
+  const [form,       setForm]       = useState(EMPTY_FORM);
+  const [generating, setGenerating] = useState(false);
 
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
@@ -62,6 +126,17 @@ export default function MyCharacters() {
     setShowForm(false);
     setEditingId(null);
     setForm(EMPTY_FORM);
+  };
+
+  const handleGenerateAI = () => {
+    if (generating) return;
+    setGenerating(true);
+    setTimeout(() => {
+      const profile = generateCharacter();
+      setForm(profile);
+      setGenerating(false);
+      toast.success(`Generated ${profile.firstName} ${profile.lastName}.`, { title: 'AI Generation Complete' });
+    }, 1400);
   };
 
   const handleSubmit = (e) => {
@@ -98,9 +173,34 @@ export default function MyCharacters() {
             <div className="text-[15px] font-extrabold text-slate-100">
               {editingId != null ? 'Edit Character' : 'Register New Character'}
             </div>
-            <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
-              <MdClose size={16} /> Cancel
-            </button>
+            <div className="flex items-center gap-2">
+              {editingId == null && (
+                <button
+                  type="button"
+                  onClick={handleGenerateAI}
+                  disabled={generating}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-bold border transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{
+                    background: generating
+                      ? 'linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%)'
+                      : 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                    borderColor: 'rgba(167,139,250,0.35)',
+                    color: '#e9d5ff',
+                    boxShadow: '0 2px 12px rgba(124,58,237,0.35)',
+                  }}
+                >
+                  <MdAutoFixHigh
+                    size={15}
+                    className={generating ? 'animate-spin' : ''}
+                    style={{ flexShrink: 0 }}
+                  />
+                  {generating ? 'Generating…' : 'Generate with AI'}
+                </button>
+              )}
+              <button className={sm(S_BTN_SECONDARY)} onClick={closeForm}>
+                <MdClose size={16} /> Cancel
+              </button>
+            </div>
           </div>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
