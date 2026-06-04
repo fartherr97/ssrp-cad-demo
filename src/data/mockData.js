@@ -140,614 +140,328 @@ export const REPORTS = [
   { id: 19, type: "Arrest Report",  caseNumber: "FHP-2026-0530-ARR", officerBadge: "FHP-214", date: "2026-05-30", status: "Pending Review",   callId: null,      civilianId: null, summary: "Arrest for driving on suspended license following I-4 traffic stop." },
 ];
 
+/* ─── Shared option sets & "premade" section builders ───────────────────────
+   These mirror the live Sonoran premade sections (Department Identification,
+   Agency Information, Flags, Civilian, Vehicle, Charges) so every report and
+   record reuses the same lookups, auto-fill and styling. */
+const _SEX   = ['Male','Female','Non-Binary','Unknown'];
+const _SKIN  = ['Light','Fair','Tan','Medium','Olive','Brown','Dark','Black','Other'];
+const _HAIR  = ['Black','Brown','Dark Brown','Blonde','Red','Auburn','Gray','White','Bald','Other'];
+const _EYE   = ['Brown','Blue','Green','Hazel','Gray','Black','Other'];
+const _VTYPE = ['Sedan','SUV','Truck','Van','Motorcycle','Coupe','Convertible','Hatchback','Bus','Other'];
+const _COLOR = ['Black','White','Silver','Gray','Red','Blue','Green','Yellow','Orange','Brown','Tan','Purple','Other'];
+const _YESNO = ['Yes','No'];
+const _DEPTS = ['Tampa Police Department',"Hillsborough County Sheriff's Office",'Florida Highway Patrol','Hillsborough County Fire Rescue','Florida Dept of Transportation'];
+const _CITIES = ['Tampa','St. Petersburg','Clearwater','Brandon','Riverview','Plant City','Temple Terrace','Unincorporated'];
+const _FORCE = ['N/A','Verbal Commands','Open Hand Strike','Soft Empty Hand Control','Hard Empty Hand Control','OC Spray','Taser','Baton / Impact Weapon','K9 Deployment','Firearm','Other'];
+
+const _agencyInfo = () => ({
+  id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
+    { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
+    { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
+    { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
+    { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
+    { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
+    { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
+    { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
+  ],
+});
+
+const _deptId = () => ({
+  id: 'sDept', title: 'Department Identification', style: 'gray', fields: [
+    { id: 'dept_sel', label: 'Department', type: 'dropdown', span: 4, required: true, options: _DEPTS },
+  ],
+});
+
+const _flags = (opts) => ({
+  id: 'sFlags', title: 'Flags', style: 'gray',
+  fields: (opts || ['Escape Risk','Armed','Dangerous','Felon']).map((o, i) => ({ id: `flag_${i}`, label: o, type: 'checkbox', span: 1 })),
+});
+
+const _civ = ({ id = 'sCiv', title = 'Civilian Information', p = 'ci', mugshot = false, reqName = true, pre = [] } = {}) => ({
+  id, title, style: 'dark', lookup: 'civilian', fields: [
+    ...(mugshot ? [{ id: `${p}_mug`, label: 'Mugshot', type: 'mugshot', span: 4 }] : []),
+    ...pre,
+    { id: `${p}_first`, label: 'First Name', type: 'text', span: 2, required: reqName },
+    { id: `${p}_last`,  label: 'Last Name',  type: 'text', span: 2, required: reqName },
+    { id: `${p}_mi`,    label: 'M.I.',       type: 'text', span: 1 },
+    { id: `${p}_dob`,   label: 'Date of Birth', type: 'date', span: 1 },
+    { id: `${p}_age`,   label: 'Age', type: 'number', span: 1 },
+    { id: `${p}_sex`,   label: 'Sex', type: 'dropdown', span: 1, options: _SEX },
+    { id: `${p}_aka`,   label: 'A.K.A. / Former Alias', type: 'text', span: 4 },
+    { id: `${p}_res`,   label: 'Residence', type: 'text', span: 2 },
+    { id: `${p}_zip`,   label: 'Zip Code', type: 'text', span: 1 },
+    { id: `${p}_occ`,   label: 'Occupation', type: 'text', span: 1 },
+    { id: `${p}_ht`,    label: 'Height', type: 'text', span: 1 },
+    { id: `${p}_wt`,    label: 'Weight', type: 'text', span: 1 },
+    { id: `${p}_skin`,  label: 'Skin Tone', type: 'dropdown', span: 1, options: _SKIN },
+    { id: `${p}_hair`,  label: 'Hair Color', type: 'dropdown', span: 1, options: _HAIR },
+    { id: `${p}_eye`,   label: 'Eye Color', type: 'dropdown', span: 1, options: _EYE },
+    { id: `${p}_ec`,    label: 'Emergency Contact', type: 'text', span: 1 },
+    { id: `${p}_rel`,   label: 'Relationship', type: 'text', span: 1 },
+    { id: `${p}_phone`, label: 'Contact Number', type: 'text', span: 1 },
+  ],
+});
+
+const _veh = ({ id = 'sVeh', title = 'Vehicle Information', p = 'vi', pre = [], post = [] } = {}) => ({
+  id, title, style: 'dark', lookup: 'vehicle', fields: [
+    ...pre,
+    { id: `${p}_type`,  label: 'Vehicle Type', type: 'dropdown', span: 2, options: _VTYPE },
+    { id: `${p}_plate`, label: 'License Plate', type: 'text', span: 2, mono: true },
+    { id: `${p}_make`,  label: 'Make', type: 'text', span: 1 },
+    { id: `${p}_model`, label: 'Model', type: 'text', span: 1 },
+    { id: `${p}_color`, label: 'Color', type: 'dropdown', span: 1, options: _COLOR },
+    { id: `${p}_year`,  label: 'Year', type: 'number', span: 1 },
+    ...post,
+  ],
+});
+
+const _charges = ({ id = 'sCharges', title = 'Charges', fid = 'charges', required = false } = {}) => ({
+  id, title, style: 'gray', fields: [{ id: fid, label: title, type: 'charges', span: 4, required }],
+});
+
+const _admin = () => ({
+  id: 'sAdmin', title: 'Administrative', style: 'gray', fields: [
+    { id: 'adm_obs',    label: 'Observing Unit',        type: 'text',     span: 2, required: true },
+    { id: 'adm_status', label: 'Status',                type: 'dropdown', span: 2, required: true, options: ['Active','Pending Review','Closed'] },
+    { id: 'adm_sup',    label: 'Supervisor Signature',  type: 'text',     span: 2, required: true },
+    { id: 'adm_date',   label: 'Date',                  type: 'date',     span: 2, required: true },
+  ],
+});
+
 export const REPORT_TEMPLATES = [
+  /* ── 1. Florida Traffic Crash Report ── */
   {
-    id: 1, name: "Traffic Stop",
-    agency: "TAMPA POLICE DEPARTMENT",
-    formCode: "TPD-TS-001",
-    signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature", "Date"],
+    id: 1, name: 'Florida Traffic Crash Report',
+    agency: 'FLORIDA HIGHWAY PATROL',
+    formCode: 'FHP-CRASH-001',
+    signatureSlots: ['Reporting Unit', 'Supervisor Signature', 'Date'],
     sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Incident Information", style: "blue",
-        fields: [
-          { id: "f1", label: "Date / Time",      type: "datetime",     span: 2, required: true },
-          { id: "f3", label: "Location of Stop", type: "text",         span: 3, required: true },
-          { id: "f2", label: "Officer Badge #",  type: "badge_lookup", span: 1, required: true, mono: true },
-        ],
-      },
-      {
-        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
-          { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
-          { id: "ci_mi",    label: "M.I.",                  type: "text",     span: 1 },
-          { id: "ci_dob",   label: "Date of Birth",         type: "date",     span: 1 },
-          { id: "ci_age",   label: "Age",                   type: "number",   span: 1 },
-          { id: "ci_sex",   label: "Sex",                   type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "ci_aka",   label: "A.K.A. / Former Alias", type: "text",     span: 4 },
-          { id: "ci_res",   label: "Residence",             type: "text",     span: 2 },
-          { id: "ci_zip",   label: "Zip Code",              type: "text",     span: 1 },
-          { id: "ci_occ",   label: "Occupation",            type: "text",     span: 1 },
-          { id: "ci_ht",    label: "Height",                type: "text",     span: 1 },
-          { id: "ci_wt",    label: "Weight",                type: "text",     span: 1 },
-          { id: "ci_skin",  label: "Skin Tone",             type: "dropdown", span: 1, options: ["Light","Fair","Tan","Medium","Olive","Brown","Dark","Black","Other"] },
-          { id: "ci_hair",  label: "Hair Color",            type: "dropdown", span: 1, options: ["Black","Brown","Dark Brown","Blonde","Red","Auburn","Gray","White","Bald","Other"] },
-          { id: "ci_eye",   label: "Eye Color",             type: "dropdown", span: 1, options: ["Brown","Blue","Green","Hazel","Gray","Black","Other"] },
-          { id: "ci_ec",    label: "Emergency Contact",     type: "text",     span: 1 },
-          { id: "ci_rel",   label: "Relationship",          type: "text",     span: 1 },
-          { id: "ci_phone", label: "Contact Number",        type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
-        fields: [
-          { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
-          { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
-          { id: "vi_make",  label: "Make",          type: "text",     span: 1 },
-          { id: "vi_model", label: "Model",         type: "text",     span: 1 },
-          { id: "vi_color", label: "Color",         type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
-          { id: "vi_year",  label: "Year",          type: "number",   span: 1 },
-        ],
-      },
-      {
-        id: "s2", title: "Stop Details", style: "gray",
-        fields: [
-          { id: "f6", label: "Reason for Stop",            type: "dropdown", span: 4, required: true, options: ["Speeding","Red Light Violation","Equipment Violation","Expired Registration","Erratic Driving","Other"] },
-          { id: "f9", label: "Outcome",                    type: "dropdown", span: 4, required: true, options: ["Warning","Citation","Arrest","No Action"] },
-          { id: "f7", label: "DL Checked",                 type: "checkbox", span: 2 },
-          { id: "f8", label: "Sobriety Test Administered", type: "checkbox", span: 2 },
-        ],
-      },
-      {
-        id: "s2b", title: "Charges / Violations", style: "gray",
-        fields: [
-          { id: "f11", label: "Charges", type: "charges", span: 4 },
-        ],
-      },
-      {
-        id: "s3", title: "Narrative", style: "gray",
-        fields: [
-          { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
+      _deptId(),
+      _agencyInfo(),
+      { id: 'sCID', title: 'Crash Identifiers', style: 'blue', fields: [
+        { id: 'cid_county',   label: 'County / City of Crash', type: 'dropdown', span: 2, required: true, options: _CITIES },
+        { id: 'cid_limits',   label: 'Check if in City Limits', type: 'checkbox', span: 1 },
+        { id: 'cid_notified', label: 'Notified By', type: 'dropdown', span: 1, required: true, options: ['Dispatch','Witness','Involved Party','Officer Observed','Other'] },
+      ]},
+      { id: 'sRoad', title: 'Roadway Information', style: 'gray', fields: [
+        { id: 'rd_street',   label: 'Crash Occured (Street Name)', type: 'text', span: 2, required: true },
+        { id: 'rd_postal',   label: 'Postal', type: 'text', span: 1 },
+        { id: 'rd_sysid',    label: 'Road System Identifer', type: 'dropdown', span: 1, required: true, options: ['Interstate','US Highway','State Road','County Road','Local Street','Private Road'] },
+        { id: 'rd_shoulder', label: 'Type of Shoulder', type: 'dropdown', span: 1, required: true, options: ['Paved','Unpaved','Curb & Gutter','None'] },
+        { id: 'rd_inter',    label: 'Type of Intersection', type: 'dropdown', span: 1, required: true, options: ['Not at Intersection','Four-Way','T-Intersection','Y-Intersection','Roundabout','Other'] },
+        { id: 'rd_aop',      label: 'AOP', type: 'dropdown', span: 1, required: true, options: ['On Roadway','Shoulder','Median','Off Roadway'] },
+      ]},
+      { id: 'sCrash', title: 'Crash Information', style: 'gray', fields: [
+        { id: 'cr_light',   label: 'Light Condition', type: 'dropdown', span: 1, required: true, options: ['Daylight','Dawn','Dusk','Dark - Lighted','Dark - Not Lighted'] },
+        { id: 'cr_weather', label: 'Weather Condition', type: 'dropdown', span: 1, required: true, options: ['Clear','Cloudy','Rain','Fog','Windy','Other'] },
+        { id: 'cr_surface', label: 'Roadway Surface Condition', type: 'dropdown', span: 1, required: true, options: ['Dry','Wet','Slick','Icy','Sand / Debris','Other'] },
+        { id: 'cr_wzrel',   label: 'Work Zone Related', type: 'dropdown', span: 1, required: true, options: _YESNO },
+        { id: 'cr_wzin',    label: 'Crash in Work Zone', type: 'dropdown', span: 1, required: true, options: _YESNO },
+        { id: 'cr_workers', label: 'Workers in Zone', type: 'dropdown', span: 1, required: true, options: _YESNO },
+        { id: 'cr_leo',     label: 'Law Enforcement in Zone', type: 'dropdown', span: 1, required: true, options: _YESNO },
+      ]},
+      { id: 'sWit', title: 'Witnesses', style: 'gray', fields: [
+        { id: 'w1_name', label: 'Name', type: 'text', span: 2 }, { id: 'w1_addr', label: 'Address (Street Name)', type: 'text', span: 1 }, { id: 'w1_postal', label: 'Postal', type: 'text', span: 1 },
+        { id: 'w2_name', label: 'Name', type: 'text', span: 2 }, { id: 'w2_addr', label: 'Address (Street Name)', type: 'text', span: 1 }, { id: 'w2_postal', label: 'Postal', type: 'text', span: 1 },
+        { id: 'w3_name', label: 'Name', type: 'text', span: 2 }, { id: 'w3_addr', label: 'Address (Street Name)', type: 'text', span: 1 }, { id: 'w3_postal', label: 'Postal', type: 'text', span: 1 },
+      ]},
+      _veh({ pre: [
+        { id: 'vi_cond',  label: 'Vehicle Condition', type: 'text', span: 4 },
+        { id: 'vi_cmv',   label: 'Check if Commercial Motor Vehicle', type: 'checkbox', span: 2 },
+        { id: 'vi_towed', label: 'Check if Vehicle was Towed from Scene', type: 'checkbox', span: 2 },
+      ]}),
+      _civ({ id: 'sDriver', title: 'Driver Information', p: 'dr', reqName: false, pre: [
+        { id: 'dr_action', label: 'Driver Actions at Time of Crash', type: 'dropdown', span: 4, options: ['No Improper Action','Failed to Yield','Followed Too Closely','Improper Lane Change','Distracted','DUI Suspected','Exceeding Speed Limit','Other'] },
+      ]}),
+      { id: 'sProp', title: 'Non-Vehicle Property Damage', style: 'gray', fields: [
+        { id: 'pd_desc', label: 'Property Damaged other than Vehicles', type: 'text', span: 4 },
+      ]},
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'narrative', label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 5 },
+      ]},
+      { id: 'sOther', title: 'Other Units', style: 'gray', fields: [
+        { id: 'ou_fire',   label: 'Fire Department Dispatched', type: 'dropdown', span: 1, options: _YESNO },
+        { id: 'ou_ems',    label: 'EMS Transport', type: 'dropdown', span: 1, options: _YESNO },
+        { id: 'ou_assist', label: 'Other Units That Assisted', type: 'unit_lookup', span: 4 },
+      ]},
+      { id: 'sPhotos', title: 'Photos', style: 'gray', fields: [
+        { id: 'photos', label: 'Photos', type: 'photos', max: 6, span: 4 },
+      ]},
+      { id: 'sLinked', title: 'Linked Records', style: 'gray', fields: [
+        { id: 'linked', label: 'Linked Records', type: 'linked_records', span: 4 },
+      ]},
+      _admin(),
     ],
   },
+
+  /* ── 2. General Police Report ── */
   {
-    id: 2, name: "Use of Force",
-    agency: "TAMPA POLICE DEPARTMENT",
-    formCode: "TPD-UOF-001",
-    signatureSlots: ["Officer Signature / Badge #", "Supervisor Signature / Badge #", "Review Date"],
+    id: 2, name: 'General Police Report',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-GPR-001',
+    signatureSlots: ['Observing Unit', 'Supervisor Signature', 'Date'],
     sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Incident Information", style: "blue",
-        fields: [
-          { id: "f1", label: "Date / Time",    type: "datetime",     span: 2, required: true },
-          { id: "f4", label: "Location",       type: "text",         span: 3, required: true },
-          { id: "f2", label: "Officer Badge #", type: "badge_lookup", span: 1, required: true, mono: true },
-        ],
-      },
-      {
-        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
-          { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
-          { id: "ci_mi",    label: "M.I.",                  type: "text",     span: 1 },
-          { id: "ci_dob",   label: "Date of Birth",         type: "date",     span: 1 },
-          { id: "ci_age",   label: "Age",                   type: "number",   span: 1 },
-          { id: "ci_sex",   label: "Sex",                   type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "ci_aka",   label: "A.K.A. / Former Alias", type: "text",     span: 4 },
-          { id: "ci_res",   label: "Residence",             type: "text",     span: 2 },
-          { id: "ci_zip",   label: "Zip Code",              type: "text",     span: 1 },
-          { id: "ci_occ",   label: "Occupation",            type: "text",     span: 1 },
-          { id: "ci_ht",    label: "Height",                type: "text",     span: 1 },
-          { id: "ci_wt",    label: "Weight",                type: "text",     span: 1 },
-          { id: "ci_skin",  label: "Skin Tone",             type: "dropdown", span: 1, options: ["Light","Fair","Tan","Medium","Olive","Brown","Dark","Black","Other"] },
-          { id: "ci_hair",  label: "Hair Color",            type: "dropdown", span: 1, options: ["Black","Brown","Dark Brown","Blonde","Red","Auburn","Gray","White","Bald","Other"] },
-          { id: "ci_eye",   label: "Eye Color",             type: "dropdown", span: 1, options: ["Brown","Blue","Green","Hazel","Gray","Black","Other"] },
-          { id: "ci_ec",    label: "Emergency Contact",     type: "text",     span: 1 },
-          { id: "ci_rel",   label: "Relationship",          type: "text",     span: 1 },
-          { id: "ci_phone", label: "Contact Number",        type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "s2", title: "Force Used", style: "gray",
-        fields: [
-          { id: "f5", label: "Type of Force",   type: "dropdown", span: 4, required: true, options: ["Verbal Commands","Soft Empty Hand","Hard Empty Hand","OC Spray","Taser","Impact Weapon","K9","Firearm"] },
-          { id: "f7", label: "Subject Injured", type: "checkbox", span: 1 },
-          { id: "f8", label: "Officer Injured", type: "checkbox", span: 1 },
-          { id: "f9", label: "EMS Called",      type: "checkbox", span: 1 },
-        ],
-      },
-      {
-        id: "s3", title: "Reason for Use of Force", style: "gray",
-        fields: [
-          { id: "f6", label: "Reason for Use of Force", type: "textarea", span: 4, required: true, minRows: 3 },
-        ],
-      },
-      {
-        id: "s4", title: "Full Narrative", style: "gray",
-        fields: [
-          { id: "f10", label: "Full Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
+      _deptId(),
+      _agencyInfo(),
+      _civ(),
+      _veh(),
+      _charges(),
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'narrative', label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 5 },
+      ]},
+      { id: 'sPhotos', title: 'Photos', style: 'gray', fields: [
+        { id: 'photos', label: 'Photos', type: 'photos', max: 8, span: 4 },
+      ]},
+      _admin(),
     ],
   },
+
+  /* ── 3. Use of Force Report ── */
   {
-    id: 3, name: "Arrest Report",
-    agency: "TAMPA POLICE DEPARTMENT",
-    formCode: "TPD-AR-001",
-    signatureSlots: ["Arresting Officer / Badge #", "Supervisor / Badge #", "Booking Officer / Date"],
+    id: 3, name: 'Use of Force Report',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-UOF-001',
+    signatureSlots: ['Officer Involved', 'Supervisor Signature', 'Date'],
     sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Arrest Information", style: "blue",
-        fields: [
-          { id: "f1", label: "Date / Time of Arrest",   type: "datetime",     span: 2, required: true },
-          { id: "f4", label: "Location of Arrest",      type: "text",         span: 3, required: true },
-          { id: "f2", label: "Arresting Officer Badge", type: "badge_lookup", span: 1, required: true, mono: true },
-        ],
-      },
-      {
-        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
-          { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
-          { id: "ci_mi",    label: "M.I.",                  type: "text",     span: 1 },
-          { id: "ci_dob",   label: "Date of Birth",         type: "date",     span: 1 },
-          { id: "ci_age",   label: "Age",                   type: "number",   span: 1 },
-          { id: "ci_sex",   label: "Sex",                   type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "ci_aka",   label: "A.K.A. / Former Alias", type: "text",     span: 4 },
-          { id: "ci_res",   label: "Residence",             type: "text",     span: 2 },
-          { id: "ci_zip",   label: "Zip Code",              type: "text",     span: 1 },
-          { id: "ci_occ",   label: "Occupation",            type: "text",     span: 1 },
-          { id: "ci_ht",    label: "Height",                type: "text",     span: 1 },
-          { id: "ci_wt",    label: "Weight",                type: "text",     span: 1 },
-          { id: "ci_skin",  label: "Skin Tone",             type: "dropdown", span: 1, options: ["Light","Fair","Tan","Medium","Olive","Brown","Dark","Black","Other"] },
-          { id: "ci_hair",  label: "Hair Color",            type: "dropdown", span: 1, options: ["Black","Brown","Dark Brown","Blonde","Red","Auburn","Gray","White","Bald","Other"] },
-          { id: "ci_eye",   label: "Eye Color",             type: "dropdown", span: 1, options: ["Brown","Blue","Green","Hazel","Gray","Black","Other"] },
-          { id: "ci_ec",    label: "Emergency Contact",     type: "text",     span: 1 },
-          { id: "ci_rel",   label: "Relationship",          type: "text",     span: 1 },
-          { id: "ci_phone", label: "Contact Number",        type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
-        fields: [
-          { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
-          { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
-          { id: "vi_make",  label: "Make",          type: "text",     span: 1 },
-          { id: "vi_model", label: "Model",         type: "text",     span: 1 },
-          { id: "vi_color", label: "Color",         type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
-          { id: "vi_year",  label: "Year",          type: "number",   span: 1 },
-        ],
-      },
-      {
-        id: "s3", title: "Charges", style: "gray",
-        fields: [
-          { id: "f5", label: "Charges", type: "charges", span: 4, required: true },
-        ],
-      },
-      {
-        id: "sAddl", title: "Additional Information", style: "gray",
-        fields: [
-          { id: "ad_weapons",  label: "Weapon(s)",            type: "text",     span: 2 },
-          { id: "ad_arrtype",  label: "Arrest Type",          type: "dropdown", span: 1, options: ["On-View","Warrant","Probable Cause","Probation/Parole Violation"] },
-          { id: "ad_proboff",  label: "Probationary Officer", type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "s5", title: "Arrest Narrative", style: "gray",
-        fields: [
-          { id: "f10", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
+      _deptId(),
+      _agencyInfo(),
+      { id: 'sInc', title: 'Incident Information', style: 'blue', fields: [
+        { id: 'uof_f1', label: 'Force Type (Primary)',   type: 'dropdown', span: 4, required: true, options: _FORCE },
+        { id: 'uof_f2', label: 'Force Type (Secondary)', type: 'dropdown', span: 4, options: _FORCE },
+        { id: 'uof_f3', label: 'Force Type (Tertiary)',  type: 'dropdown', span: 4, options: _FORCE },
+      ]},
+      { id: 'sEMS', title: 'EMS Involvement', style: 'gray', fields: [
+        { id: 'ems_inv',  label: 'Was EMS Involved?', type: 'dropdown', span: 2, options: _YESNO },
+        { id: 'ems_hosp', label: 'Was the Suspect Transported to the Hospital?', type: 'dropdown', span: 2, options: ['Yes','No','N/A'] },
+      ]},
+      { id: 'sAnimal', title: 'Animal Involvement', style: 'gray', fields: [
+        { id: 'ani_inv',  label: 'Were Animals Involved?', type: 'dropdown', span: 2, options: _YESNO },
+        { id: 'ani_live', label: 'Did the Animal Live?', type: 'dropdown', span: 2, options: ['Yes','No','N/A'] },
+      ]},
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'incident_report', label: 'Incident Report', type: 'textarea', span: 4, required: true, minRows: 5 },
+      ]},
+      { id: 'sUnits', title: 'Additional Units', style: 'gray', fields: [
+        { id: 'addl_units', label: 'Additional Units', type: 'unit_lookup', span: 4 },
+      ]},
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_officer', label: 'Officer Involved', type: 'text', span: 2, required: true },
+        { id: 'st_date',    label: 'Date of Occurrence', type: 'date', span: 2 },
+        { id: 'st_status',  label: 'Status', type: 'dropdown', span: 2, options: ['Active','Under Review','Justified','Not Justified','Closed'] },
+        { id: 'st_sup',     label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+      ]},
     ],
   },
+
+  /* ── 4. Commercial Vehicle Inspection Report ── */
   {
-    id: 4, name: "Incident Report",
-    agency: "HCSO LAW ENFORCEMENT",
-    formCode: "HCSO-IR-001",
-    signatureSlots: ["Reporting Officer / Badge #", "Supervisor Signature", "Date"],
+    id: 4, name: 'Commercial Vehicle Inspection Report',
+    agency: 'FLORIDA HIGHWAY PATROL',
+    formCode: 'FHP-CVI-001',
+    signatureSlots: ['Inspector Signature', 'Supervisor Signature', 'Date'],
     sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Incident Information", style: "blue",
-        fields: [
-          { id: "f1", label: "Date / Time",             type: "datetime",     span: 2, required: true },
-          { id: "f4", label: "Location",                type: "text",         span: 3, required: true },
-          { id: "f2", label: "Reporting Officer Badge", type: "badge_lookup", span: 1, required: true, mono: true },
-          { id: "f3", label: "Incident Type",           type: "dropdown",     span: 4, required: true, options: ["MVA","Property Damage","Theft","Vandalism","Disturbance","Other"] },
-        ],
-      },
-      {
-        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
-          { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
-          { id: "ci_mi",    label: "M.I.",                  type: "text",     span: 1 },
-          { id: "ci_dob",   label: "Date of Birth",         type: "date",     span: 1 },
-          { id: "ci_age",   label: "Age",                   type: "number",   span: 1 },
-          { id: "ci_sex",   label: "Sex",                   type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "ci_aka",   label: "A.K.A. / Former Alias", type: "text",     span: 4 },
-          { id: "ci_res",   label: "Residence",             type: "text",     span: 2 },
-          { id: "ci_zip",   label: "Zip Code",              type: "text",     span: 1 },
-          { id: "ci_occ",   label: "Occupation",            type: "text",     span: 1 },
-          { id: "ci_ht",    label: "Height",                type: "text",     span: 1 },
-          { id: "ci_wt",    label: "Weight",                type: "text",     span: 1 },
-          { id: "ci_skin",  label: "Skin Tone",             type: "dropdown", span: 1, options: ["Light","Fair","Tan","Medium","Olive","Brown","Dark","Black","Other"] },
-          { id: "ci_hair",  label: "Hair Color",            type: "dropdown", span: 1, options: ["Black","Brown","Dark Brown","Blonde","Red","Auburn","Gray","White","Bald","Other"] },
-          { id: "ci_eye",   label: "Eye Color",             type: "dropdown", span: 1, options: ["Brown","Blue","Green","Hazel","Gray","Black","Other"] },
-          { id: "ci_ec",    label: "Emergency Contact",     type: "text",     span: 1 },
-          { id: "ci_rel",   label: "Relationship",          type: "text",     span: 1 },
-          { id: "ci_phone", label: "Contact Number",        type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "sVeh", title: "Vehicle Information", style: "dark", lookup: "vehicle",
-        fields: [
-          { id: "vi_type",  label: "Vehicle Type",  type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
-          { id: "vi_plate", label: "License Plate", type: "text",     span: 2, mono: true },
-          { id: "vi_make",  label: "Make",          type: "text",     span: 1 },
-          { id: "vi_model", label: "Model",         type: "text",     span: 1 },
-          { id: "vi_color", label: "Color",         type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
-          { id: "vi_year",  label: "Year",          type: "number",   span: 1 },
-        ],
-      },
-      {
-        id: "s2", title: "Conditions", style: "gray",
-        fields: [
-          { id: "f6", label: "Injuries Reported", type: "checkbox", span: 2 },
-          { id: "f7", label: "Property Damage",   type: "checkbox", span: 2 },
-        ],
-      },
-      {
-        id: "s3", title: "Parties Involved", style: "gray",
-        fields: [
-          { id: "f5", label: "Parties Involved", type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "s4", title: "Narrative", style: "gray",
-        fields: [
-          { id: "f8", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
+      _deptId(),
+      _agencyInfo(),
+      { id: 'sInsp', title: 'Inspection Details', style: 'gray', fields: [
+        { id: 'in_usdot',   label: 'USDOT #', type: 'text', span: 2, mono: true, required: true },
+        { id: 'in_company', label: 'Company Name', type: 'text', span: 2, required: true },
+        { id: 'in_loc',     label: 'Inspection Location', type: 'text', span: 4, required: true },
+      ]},
+      { id: 'sCargo', title: 'Cargo Information', style: 'gray', fields: [
+        { id: 'cg_ostate',  label: 'Origin State', type: 'text', span: 2, required: true },
+        { id: 'cg_ocity',   label: 'Origin City', type: 'text', span: 2, required: true },
+        { id: 'cg_dstate',  label: 'Destination State', type: 'text', span: 2, required: true },
+        { id: 'cg_dcity',   label: 'Destination City', type: 'text', span: 2, required: true },
+        { id: 'cg_shipper', label: 'Shipper Name', type: 'text', span: 4 },
+        { id: 'cg_type',    label: 'Cargo Type', type: 'dropdown', span: 4, required: true, options: ['General Freight','Hazardous Materials','Refrigerated','Livestock','Oversized / Heavy','Passengers','Household Goods','Other'] },
+      ]},
+      { id: 'sLevel', title: 'Inspection Level', style: 'gray', fields: [
+        { id: 'lv_level', label: 'Pick Level of Inspection', type: 'dropdown', span: 4, required: true, options: ['Level One','Level Two','Level Three','Level Four','Level Five','Level Six'] },
+      ]},
+      { id: 'sVeh', title: 'Vehicle Information', style: 'dark', lookup: 'vehicle', fields: [
+        { id: 'vi_dmv',    label: 'DMV Status', type: 'text', span: 1 },
+        { id: 'vi_status', label: 'Status', type: 'dropdown', span: 1, options: ['Active','Suspended','Expired','Revoked'] },
+        { id: 'vi_exp',    label: 'Expiration', type: 'date', span: 1 },
+        { id: 'vi_gov',    label: 'Gov. Status', type: 'dropdown', span: 1, options: ['Compliant','Non-Compliant','Exempt'] },
+        { id: 'vi_plate',  label: 'License Plate', type: 'text', span: 2, mono: true },
+        { id: 'vi_gvwr',   label: 'GVWR', type: 'text', span: 1 },
+        { id: 'vi_type',   label: 'Vehicle Type', type: 'dropdown', span: 1, options: ['Tractor','Trailer','Straight Truck','Bus','Other'] },
+        { id: 'vi_make',   label: 'Make', type: 'text', span: 1 },
+        { id: 'vi_model',  label: 'Model', type: 'text', span: 1 },
+        { id: 'vi_color',  label: 'Color', type: 'dropdown', span: 1, options: _COLOR },
+        { id: 'vi_year',   label: 'Year', type: 'number', span: 1 },
+      ]},
+      { id: 'sVViol', title: 'Vehicle Violations', style: 'gray', fields: [
+        { id: 'vv_section', label: 'Violation Section', type: 'text', span: 2 },
+        { id: 'vv_unit',    label: 'Unit', type: 'dropdown', span: 1, options: ['Tractor','Trailer','Both','N/A'] },
+        { id: 'vv_oos',     label: 'OOS', type: 'dropdown', span: 1, options: _YESNO },
+        { id: 'vv_notes',   label: 'Notes', type: 'text', span: 4 },
+      ]},
+      _civ({ id: 'sDriver', title: 'Driver Information', p: 'dr', reqName: true }),
+      _civ({ id: 'sCoDriver', title: 'Co-Driver Information (If Applicable)', p: 'cd', reqName: false }),
+      { id: 'sDViol', title: 'Driver Violations', style: 'gray', fields: [
+        { id: 'dv_section', label: 'Violation Section', type: 'text', span: 2 },
+        { id: 'dv_unit',    label: 'Unit', type: 'dropdown', span: 1, options: ['Driver','Co-Driver','N/A'] },
+        { id: 'dv_oos',     label: 'OOS', type: 'dropdown', span: 1, options: _YESNO },
+        { id: 'dv_notes',   label: 'Notes', type: 'text', span: 4 },
+      ]},
+      { id: 'sState', title: 'State Fields', style: 'gray', fields: [
+        { id: 'sf_hire',     label: 'For Hire Carrier?', type: 'dropdown', span: 2, required: true, options: _YESNO },
+        { id: 'sf_reason',   label: 'Reason for Inspection', type: 'dropdown', span: 2, required: true, options: ['Random','Post-Crash','Complaint','Follow-Up','Targeted Enforcement'] },
+        { id: 'sf_fatal',    label: '# of Fatalities', type: 'number', span: 1, required: true },
+        { id: 'sf_injuries', label: '# of Injuries', type: 'number', span: 1, required: true },
+        { id: 'sf_coinsp',   label: 'Co-Inspector #', type: 'text', span: 2, required: true },
+      ]},
+      { id: 'sLinked', title: 'Linked Records', style: 'gray', fields: [
+        { id: 'linked', label: 'Linked Records', type: 'linked_records', span: 4 },
+      ]},
+      { id: 'sNotes', title: 'Inspector Notes', style: 'gray', fields: [
+        { id: 'insp_notes', label: 'Notes', type: 'textarea', span: 4, required: true, minRows: 4 },
+      ]},
+      { id: 'sAuth', title: 'Report Authorization', style: 'gray', fields: [
+        { id: 'au_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Pending','Closed'] },
+        { id: 'au_insp',   label: 'Inspector Signature', type: 'signature', span: 2, required: true },
+        { id: 'au_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'au_date',   label: 'Date', type: 'date', span: 2, required: true },
+      ]},
     ],
   },
+
+  /* ── 5. Arrest Report ── */
   {
-    id: 5, name: "Field Interview",
-    agency: "SSRP LAW ENFORCEMENT",
-    formCode: "HCSO-FI-001",
-    signatureSlots: ["Officer Signature / Badge #", "Date"],
+    id: 5, name: 'Arrest Report',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-AR-001',
+    signatureSlots: ['Observing Officer', 'Supervisor Signature', 'Date'],
     sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Contact Information", style: "blue",
-        fields: [
-          { id: "f1", label: "Date / Time",        type: "datetime",     span: 2, required: true },
-          { id: "f4", label: "Location",           type: "text",         span: 3, required: true },
-          { id: "f2", label: "Officer Badge #",    type: "badge_lookup", span: 1, required: true, mono: true },
-          { id: "f7", label: "Associates Present", type: "text",         span: 4 },
-        ],
-      },
-      {
-        id: "sCiv", title: "Civilian Information", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "ci_first", label: "First Name",            type: "text",     span: 2, required: true },
-          { id: "ci_last",  label: "Last Name",             type: "text",     span: 2 },
-          { id: "ci_mi",    label: "M.I.",                  type: "text",     span: 1 },
-          { id: "ci_dob",   label: "Date of Birth",         type: "date",     span: 1 },
-          { id: "ci_age",   label: "Age",                   type: "number",   span: 1 },
-          { id: "ci_sex",   label: "Sex",                   type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "ci_aka",   label: "A.K.A. / Former Alias", type: "text",     span: 4 },
-          { id: "ci_res",   label: "Residence",             type: "text",     span: 2 },
-          { id: "ci_zip",   label: "Zip Code",              type: "text",     span: 1 },
-          { id: "ci_occ",   label: "Occupation",            type: "text",     span: 1 },
-          { id: "ci_ht",    label: "Height",                type: "text",     span: 1 },
-          { id: "ci_wt",    label: "Weight",                type: "text",     span: 1 },
-          { id: "ci_skin",  label: "Skin Tone",             type: "dropdown", span: 1, options: ["Light","Fair","Tan","Medium","Olive","Brown","Dark","Black","Other"] },
-          { id: "ci_hair",  label: "Hair Color",            type: "dropdown", span: 1, options: ["Black","Brown","Dark Brown","Blonde","Red","Auburn","Gray","White","Bald","Other"] },
-          { id: "ci_eye",   label: "Eye Color",             type: "dropdown", span: 1, options: ["Brown","Blue","Green","Hazel","Gray","Black","Other"] },
-          { id: "ci_ec",    label: "Emergency Contact",     type: "text",     span: 1 },
-          { id: "ci_rel",   label: "Relationship",          type: "text",     span: 1 },
-          { id: "ci_phone", label: "Contact Number",        type: "text",     span: 1 },
-        ],
-      },
-      {
-        id: "s2", title: "Contact Details", style: "gray",
-        fields: [
-          { id: "f5", label: "Reason for Contact",  type: "textarea", span: 4, required: true, minRows: 2 },
-          { id: "f6", label: "Subject Description", type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "s3", title: "Outcome", style: "gray",
-        fields: [
-          { id: "f8", label: "Outcome", type: "dropdown", span: 4, required: true, options: ["No Action","Warned","Cited","Arrested","Referred"] },
-        ],
-      },
-      {
-        id: "s4", title: "Notes", style: "gray",
-        fields: [
-          { id: "f9", label: "Additional Notes", type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status",  label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",     label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",    label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",     label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: 6, name: "Supplement Report",
-    agency: "SSRP LAW ENFORCEMENT",
-    formCode: "HCSO-SUPP-001",
-    signatureSlots: ["Supplement Author / Badge #", "Supervisor Approval", "Date"],
-    sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Supplement Reference", style: "blue",
-        fields: [
-          { id: "f1", label: "Original Case Number",  type: "text",         span: 3, required: true, mono: true },
-          { id: "f2", label: "Date / Time",           type: "datetime",     span: 2 },
-          { id: "f3", label: "Author Badge #",        type: "badge_lookup", span: 1, mono: true },
-        ],
-      },
-      {
-        id: "s2", title: "Supplement Narrative", style: "gray",
-        fields: [
-          { id: "f4", label: "Supplement Narrative", type: "textarea", span: 4, required: true, minRows: 6 },
-        ],
-      },
-      {
-        id: "s3", title: "New Evidence / Information", style: "gray",
-        fields: [
-          { id: "f5", label: "New Evidence", type: "textarea", span: 4, minRows: 3 },
-        ],
-      },
-    ],
-  },
-  {
-    id: 7, name: "Accident Report",
-    agency: "FLORIDA HIGHWAY PATROL",
-    formCode: "FHP-ACC-001",
-    signatureSlots: ["Primary Officer / Badge #", "Supervisor Signature / Badge #", "Date"],
-    sections: [
-      {
-        id: 'sAI', title: 'Agency Information', style: 'gray',
-        fields: [
-          { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-          { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-          { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-          { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-          { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-          { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-          { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-        ],
-      },
-      {
-        id: "s1", title: "Accident Information", style: "blue",
-        fields: [
-          { id: "f1",  label: "Date / Time of Accident", type: "datetime",     span: 2, required: true },
-          { id: "f2",  label: "Location",                type: "text",         span: 3, required: true },
-          { id: "f3",  label: "Officer Badge #",         type: "badge_lookup", span: 1, required: true, mono: true },
-          { id: "f4",  label: "Accident Type",           type: "dropdown",     span: 2, required: true, options: ["Rear-End","Head-On","Side-Impact","Sideswipe","Single Vehicle","Multi-Vehicle","Pedestrian","Cyclist","Hit and Run","Other"] },
-          { id: "f5",  label: "Weather Conditions",      type: "dropdown",     span: 1, options: ["Clear","Cloudy","Rain","Heavy Rain","Fog","Windy","Other"] },
-          { id: "f6",  label: "Road Conditions",         type: "dropdown",     span: 1, options: ["Dry","Wet","Slick","Under Construction","Debris","Other"] },
-          { id: "f7",  label: "Posted Speed Limit",      type: "number",       span: 1 },
-          { id: "f8",  label: "Traffic Control Present", type: "dropdown",     span: 1, options: ["None","Traffic Light","Stop Sign","Yield Sign","Officer Directing","Other"] },
-          { id: "f9",  label: "Hit and Run",             type: "checkbox",     span: 1 },
-          { id: "f10", label: "School Zone",             type: "checkbox",     span: 1 },
-          { id: "f11", label: "Construction Zone",       type: "checkbox",     span: 1 },
-          { id: "f12", label: "DUI Suspected",           type: "checkbox",     span: 1 },
-        ],
-      },
-      {
-        id: "sV1", title: "Vehicle 1 * Primary", style: "dark", lookup: "vehicle",
-        fields: [
-          { id: "v1_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
-          { id: "v1_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
-          { id: "v1_make",   label: "Make",           type: "text",     span: 1 },
-          { id: "v1_model",  label: "Model",          type: "text",     span: 1 },
-          { id: "v1_color",  label: "Color",          type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
-          { id: "v1_year",   label: "Year",           type: "number",   span: 1 },
-          { id: "v1_damage", label: "Damage Description", type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "sD1", title: "Driver 1 * Primary", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "d1_first", label: "First Name",      type: "text",     span: 2, required: true },
-          { id: "d1_last",  label: "Last Name",       type: "text",     span: 2 },
-          { id: "d1_dob",   label: "Date of Birth",   type: "date",     span: 1 },
-          { id: "d1_sex",   label: "Sex",             type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "d1_dl",    label: "Driver's License",type: "text",     span: 2, mono: true },
-          { id: "d1_res",   label: "Address",         type: "text",     span: 3 },
-          { id: "d1_phone", label: "Phone",           type: "text",     span: 1 },
-          { id: "d1_ins",   label: "Insurance Carrier",type: "text",    span: 2 },
-          { id: "d1_pol",   label: "Policy Number",   type: "text",     span: 2, mono: true },
-          { id: "d1_fault", label: "At Fault",        type: "checkbox", span: 1 },
-          { id: "d1_inj",   label: "Injured",         type: "checkbox", span: 1 },
-          { id: "d1_cited", label: "Citation Issued", type: "checkbox", span: 1 },
-          { id: "d1_arrested", label: "Arrested",     type: "checkbox", span: 1 },
-        ],
-      },
-      {
-        id: "sV2", title: "Vehicle 2 * Secondary", style: "dark", lookup: "vehicle",
-        fields: [
-          { id: "v2_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
-          { id: "v2_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
-          { id: "v2_make",   label: "Make",           type: "text",     span: 1 },
-          { id: "v2_model",  label: "Model",          type: "text",     span: 1 },
-          { id: "v2_color",  label: "Color",          type: "dropdown", span: 1, options: ["Black","White","Silver","Gray","Red","Blue","Green","Yellow","Orange","Brown","Tan","Purple","Other"] },
-          { id: "v2_year",   label: "Year",           type: "number",   span: 1 },
-          { id: "v2_damage", label: "Damage Description", type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "sD2", title: "Driver 2 * Secondary", style: "dark", lookup: "civilian",
-        fields: [
-          { id: "d2_first", label: "First Name",      type: "text",     span: 2 },
-          { id: "d2_last",  label: "Last Name",       type: "text",     span: 2 },
-          { id: "d2_dob",   label: "Date of Birth",   type: "date",     span: 1 },
-          { id: "d2_sex",   label: "Sex",             type: "dropdown", span: 1, options: ["Male","Female","Non-Binary","Unknown"] },
-          { id: "d2_dl",    label: "Driver's License",type: "text",     span: 2, mono: true },
-          { id: "d2_res",   label: "Address",         type: "text",     span: 3 },
-          { id: "d2_phone", label: "Phone",           type: "text",     span: 1 },
-          { id: "d2_ins",   label: "Insurance Carrier",type: "text",    span: 2 },
-          { id: "d2_pol",   label: "Policy Number",   type: "text",     span: 2, mono: true },
-          { id: "d2_fault", label: "At Fault",        type: "checkbox", span: 1 },
-          { id: "d2_inj",   label: "Injured",         type: "checkbox", span: 1 },
-          { id: "d2_cited", label: "Citation Issued", type: "checkbox", span: 1 },
-          { id: "d2_arrested", label: "Arrested",     type: "checkbox", span: 1 },
-        ],
-      },
-      {
-        id: "sInj", title: "Injuries / EMS", style: "gray",
-        fields: [
-          { id: "inj_count",  label: "Total Injured",  type: "number",   span: 1 },
-          { id: "inj_fatal",  label: "Fatalities",     type: "number",   span: 1 },
-          { id: "inj_ems",    label: "EMS Dispatched", type: "checkbox", span: 1 },
-          { id: "inj_hosp",   label: "Hospitalisation Required", type: "checkbox", span: 1 },
-          { id: "inj_notes",  label: "Injury Notes",   type: "textarea", span: 4, minRows: 2 },
-        ],
-      },
-      {
-        id: "sCharges", title: "Charges / Citations", style: "gray",
-        fields: [
-          { id: "charges", label: "Charges", type: "charges", span: 4 },
-        ],
-      },
-      {
-        id: "sPhotos", title: "Scene Photographs", style: "gray",
-        fields: [
-          { id: "scene_photos", label: "Scene Photographs", type: "photos", max: 8, span: 4 },
-        ],
-      },
-      {
-        id: "sNarr", title: "Narrative", style: "gray",
-        fields: [
-          { id: "narrative", label: "Narrative", type: "textarea", span: 4, required: true, minRows: 5 },
-        ],
-      },
-      {
-        id: "sReview", title: "Report Review", style: "gray", supervisorOnly: true,
-        fields: [
-          { id: "rv_status", label: "Status",               type: "dropdown", span: 1, supervisorOnly: true, options: ["Pending Review","Approved","Rejected","Pending Changes"] },
-          { id: "rv_obs",    label: "Observing Officer",    type: "text",     span: 2 },
-          { id: "rv_date",   label: "Review Date",          type: "date",     span: 1, supervisorOnly: true },
-          { id: "rv_sig",    label: "Supervisor Signature", type: "text",     span: 4, supervisorOnly: true },
-        ],
-      },
+      _deptId(),
+      _flags(),
+      _agencyInfo(),
+      { id: 'sLoc', title: 'Location of Occurrence', style: 'blue', fields: [
+        { id: 'lo_county', label: 'County', type: 'text', span: 1 },
+        { id: 'lo_street', label: 'Street', type: 'text', span: 2, required: true },
+        { id: 'lo_city',   label: 'City Of', type: 'dropdown', span: 1, required: true, options: _CITIES },
+        { id: 'lo_state',  label: 'State', type: 'text', span: 1 },
+        { id: 'lo_postal', label: 'Postal Code', type: 'text', span: 1, required: true },
+      ]},
+      _civ({ mugshot: true }),
+      _veh(),
+      _charges({ required: true }),
+      { id: 'sInfo', title: 'Information Cont.', style: 'gray', fields: [
+        { id: 'ic_weapons', label: 'Weapon(s)', type: 'text', span: 2 },
+        { id: 'ic_arrtype', label: 'Arrest Type', type: 'dropdown', span: 1, options: ['On-View','Warrant','Probable Cause','Probation/Parole Violation'] },
+        { id: 'ic_prob',    label: 'Probationary Officer', type: 'text', span: 1 },
+      ]},
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'narrative', label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 5 },
+      ]},
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Booked','Released','Pending'] },
+        { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_date',   label: 'Date', type: 'date', span: 2 },
+      ]},
     ],
   },
 ];
@@ -898,91 +612,84 @@ export const FDOT_PERMITS = [
 ];
 
 export const RECORD_TEMPLATES = [
+  /* ── Hunting License ── */
   {
     id: 'r1', name: 'Hunting License',
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-HL-001',
     sections: [
-      { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
-        { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-        { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-        { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-        { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-        { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-      ]},
-      { id: 's1', title: 'License Holder', style: 'blue', fields: [
-        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
-        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
-      ]},
-      { id: 's2', title: 'License Details', style: 'gray', fields: [
-        { id: 'f6', label: 'License Type',     type: 'dropdown', span: 2, options: ['Resident Annual','Non-Resident Annual','Resident 5-Day','Youth'] },
-        { id: 'f7', label: 'Issuing Officer',  type: 'badge_lookup', span: 2 },
+      _deptId(),
+      _agencyInfo(),
+      _civ(),
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Expired','Revoked','Suspended'] },
+        { id: 'st_exp',    label: 'Expiration Date', type: 'date', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
       ]},
     ],
   },
+
+  /* ── Fishing License ── */
   {
     id: 'r2', name: 'Fishing License',
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-FL-001',
     sections: [
-      { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
-        { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-        { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-        { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-        { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-        { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-      ]},
-      { id: 's1', title: 'License Holder', style: 'blue', fields: [
-        { id: 'f1', label: 'Full Name',       type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 1, required: true },
-        { id: 'f5', label: 'Expiry Date',     type: 'date',            span: 1, required: true },
-      ]},
-      { id: 's2', title: 'License Details', style: 'gray', fields: [
-        { id: 'f6', label: 'License Type',    type: 'dropdown', span: 2, options: ['Freshwater','Saltwater','Combined','Youth'] },
-        { id: 'f7', label: 'Issuing Officer', type: 'badge_lookup', span: 2 },
-      ]},
-    ],
-  },
-  {
-    id: 'r3', name: 'Trespass Notice',
-    agency: 'SSRP LAW ENFORCEMENTg',
-    formCode: 'HCLE-TN-001',
-    sections: [
-      { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
-        { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-        { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-        { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-        { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-        { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-      ]},
-      { id: 's1', title: 'Subject Information', style: 'blue', fields: [
-        { id: 'f1', label: 'Subject Name',    type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'Date of Birth',   type: 'date',            span: 1, required: true },
-        { id: 'f4', label: 'Issue Date',      type: 'date',            span: 2, required: true },
-      ]},
-      { id: 's2', title: 'Trespass Details', style: 'gray', fields: [
-        { id: 'f5', label: 'Property Address',          type: 'text',     span: 4, required: true },
-        { id: 'f6', label: 'Property Owner / Business', type: 'text',     span: 2 },
-        { id: 'f7', label: 'Duration',                  type: 'dropdown', span: 2, options: ['1 Year','2 Years','5 Years','Permanent'] },
-      ]},
-      { id: 's3', title: 'Reason', style: 'gray', fields: [
-        { id: 'f8', label: 'Reason for Trespass', type: 'textarea', span: 4, required: true, minRows: 3 },
-      ]},
-      { id: 's4', title: 'Issuing Officer', style: 'gray', fields: [
-        { id: 'f9', label: 'Officer Badge #', type: 'badge_lookup', span: 2 },
+      _deptId(),
+      _agencyInfo(),
+      _civ(),
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Expired','Revoked','Suspended'] },
+        { id: 'st_exp',    label: 'Expiration Date', type: 'date', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
       ]},
     ],
   },
 
+  /* ── Trespass Notice ── */
+  {
+    id: 'r3', name: 'Trespass Notice',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-TN-001',
+    sections: [
+      _agencyInfo(),
+      { id: 'sImg', title: 'Image', style: 'gray', fields: [
+        { id: 'img_photo', label: 'Civilian Photo', type: 'image', span: 4 },
+      ]},
+      _civ(),
+      { id: 'sProp', title: 'Property Information', style: 'gray', fields: [
+        { id: 'pr_name',  label: 'Property Name', type: 'text', span: 2 },
+        { id: 'pr_addr',  label: 'Address', type: 'text', span: 2 },
+        { id: 'pr_type',  label: 'Property Type', type: 'dropdown', span: 2, options: ['Residential','Commercial','Retail','Industrial','Government','Other'] },
+        { id: 'pr_auth',  label: 'Authorized By (Owner/Agent): [Name]', type: 'text', span: 2 },
+        { id: 'pr_title', label: 'Title: [Owner / Manager / Security]', type: 'text', span: 2 },
+        { id: 'pr_phone', label: 'Contact Phone Number', type: 'text', span: 2 },
+      ]},
+      { id: 'sDur', title: 'Duration of Warning', style: 'gray', fields: [
+        { id: 'du_7',   label: '7 Day', type: 'checkbox', span: 1 },
+        { id: 'du_14',  label: '14 Day', type: 'checkbox', span: 1 },
+        { id: 'du_30',  label: '30 Day', type: 'checkbox', span: 1 },
+        { id: 'du_60',  label: '60 Day', type: 'checkbox', span: 1 },
+        { id: 'du_90',  label: '90 Day', type: 'checkbox', span: 1 },
+        { id: 'du_ind', label: 'Indefinite (Until Rescinded by Owner/Agent)', type: 'checkbox', span: 2 },
+        { id: 'du_exp', label: 'Expiration Date', type: 'date', span: 2, required: true },
+      ]},
+      { id: 'sNotice', title: 'Notice', style: 'gray', fields: [
+        { id: 'tn_notice', label: 'Notice', type: 'textarea', span: 4, minRows: 4, placeholder: 'NOTICE: YOU ARE HEREBY GIVEN A TRESPASS WARNING FOR THE ABOVE LISTED PROPERTY. YOU ARE ORDERED TO LEAVE THE PREMISES IMMEDIATELY AND ARE NOT PERMITTED TO RETURN TO THIS PROPERTY. THIS WARNING IS ISSUED PURSUANT TO FLORIDA STATUTE 810.09. IF YOU RETURN TO THIS PROPERTY AFTER BEING WARNED, YOU MAY BE ARRESTED FOR TRESPASS AFTER WARNING, A CRIMINAL OFFENSE UNDER FLORIDA LAW.' },
+      ]},
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'tn_narr', label: 'Narrative (Optional)', type: 'textarea', span: 4, minRows: 3 },
+      ]},
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_obs',  label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
+        { id: 'st_date', label: 'Date', type: 'date', span: 2 },
+      ]},
+    ],
+  },
+
+  /* ── Warrant (kept) ── */
   {
     id: 'r5', name: 'Warrant',
     agency: 'SUNSHINE STATE CIRCUIT COURT',
@@ -1011,33 +718,161 @@ export const RECORD_TEMPLATES = [
       ]},
     ],
   },
+
+  /* ── Florida Uniform Traffic Citation ── */
   {
-    id: 'r6', name: 'Florida Traffic Citation',
-    agency: 'SSRP LAW ENFORCEMENTg',
+    id: 'r6', name: 'Florida Uniform Traffic Citation',
+    agency: 'SSRP LAW ENFORCEMENT',
     formCode: 'FL-UFTC-001',
     sections: [
-      { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
-        { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-        { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-        { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-        { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-        { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
+      _flags(),
+      { id: 'sRec', title: 'Record Number', style: 'gray', fields: [
+        { id: 'rec_id', label: 'ID', type: 'text', span: 4, mono: true, autoNumber: true },
       ]},
-      { id: 's1', title: 'Citation Information', style: 'blue', fields: [
-        { id: 'f2', label: 'Date / Time',     type: 'datetime',        span: 2, required: true },
-        { id: 'f3', label: 'Officer Badge #', type: 'badge_lookup',    span: 1 },
+      { id: 'sUFTC', title: 'Florida Uniform Traffic Citation', style: 'blue', fields: [
+        { id: 'uf_county',  label: 'County Of', type: 'text', span: 2 },
+        { id: 'uf_fhp',     label: 'FHP', type: 'checkbox', span: 1 },
+        { id: 'uf_pd',      label: 'PD', type: 'checkbox', span: 1 },
+        { id: 'uf_so',      label: 'SO', type: 'checkbox', span: 1 },
+        { id: 'uf_other',   label: 'Other', type: 'checkbox', span: 1 },
+        { id: 'uf_city',    label: 'City Of', type: 'dropdown', span: 1, required: true, options: _CITIES },
+        { id: 'uf_agency',  label: 'Agency', type: 'dropdown', span: 1, required: true, options: _DEPTS },
+        { id: 'uf_summons', label: 'Summons #', type: 'text', span: 2, mono: true },
+        { id: 'uf_dow',     label: 'Day of Week', type: 'dropdown', span: 1, options: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] },
+        { id: 'uf_month',   label: 'Month', type: 'dropdown', span: 1, options: ['January','February','March','April','May','June','July','August','September','October','November','December'] },
+        { id: 'uf_day',     label: 'Day', type: 'text', span: 1 },
+        { id: 'uf_year',    label: 'Year', type: 'text', span: 1 },
+        { id: 'uf_time',    label: 'Time', type: 'time', span: 1 },
+        { id: 'uf_am',      label: 'A.M.', type: 'checkbox', span: 1 },
+        { id: 'uf_pm',      label: 'P.M.', type: 'checkbox', span: 1 },
       ]},
-      { id: 's2', title: 'Driver Information', style: 'gray', fields: [
-        { id: 'f4', label: 'Driver Name',       type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f5', label: 'DL Number',         type: 'text',            span: 1, mono: true },
-        { id: 'f6', label: 'Vehicle Plate',     type: 'text',            span: 2, mono: true, required: true },
-        { id: 'f7', label: 'Location / Street', type: 'text',            span: 2, required: true },
+      _civ(),
+      _veh(),
+      { id: 'sReg', title: 'Registration Information', style: 'gray', fields: [
+        { id: 'rg_dmv',    label: 'DMV Status', type: 'text', span: 1 },
+        { id: 'rg_status', label: 'Status', type: 'dropdown', span: 1, options: ['Active','Suspended','Expired','Revoked'] },
+        { id: 'rg_exp',    label: 'Expiration', type: 'date', span: 1 },
+        { id: 'rg_street', label: 'Upon a Public Street or Highway, or Other Location, Namely', type: 'text', span: 3, required: true },
+        { id: 'rg_postal', label: 'Upon Postal', type: 'text', span: 1, required: true },
       ]},
-      { id: 's3', title: 'Violation', style: 'gray', fields: [
-        { id: 'f8', label: 'Violation / Statute', type: 'text', span: 3, required: true },
-        { id: 'f9', label: 'Fine Amount ($)',      type: 'text', span: 1, mono: true },
+      { id: 'sOffence', title: 'Did Unlawfully Commit the Following Offence (Check Only One Offence Each Citation)', style: 'gray', fields: [
+        { id: 'off_0',  label: 'Careless Driving', type: 'checkbox', span: 1 },
+        { id: 'off_1',  label: 'Child Restraint', type: 'checkbox', span: 1 },
+        { id: 'off_2',  label: 'Expired Driver License', type: 'checkbox', span: 1 },
+        { id: 'off_3',  label: 'Violation of Traffic Control Device', type: 'checkbox', span: 1 },
+        { id: 'off_4',  label: 'Safety Belt Violation', type: 'checkbox', span: 1 },
+        { id: 'off_5',  label: 'Expired DL More Than 6 Months', type: 'checkbox', span: 1 },
+        { id: 'off_6',  label: 'Failure to Stop at a Traffic Signal', type: 'checkbox', span: 1 },
+        { id: 'off_7',  label: 'Improper or Unsafe Equipment', type: 'checkbox', span: 1 },
+        { id: 'off_8',  label: 'No Valid Driver License', type: 'checkbox', span: 1 },
+        { id: 'off_9',  label: 'Improper Lane Change or Course', type: 'checkbox', span: 1 },
+        { id: 'off_10', label: 'Expired Tag 6 Months or Less', type: 'checkbox', span: 1 },
+        { id: 'off_11', label: 'Driving While Suspended or Revoked', type: 'checkbox', span: 1 },
+        { id: 'off_12', label: 'No Proof of Insurance', type: 'checkbox', span: 1 },
+        { id: 'off_13', label: 'Expired Tag More Than 6 Months', type: 'checkbox', span: 1 },
+        { id: 'off_14', label: 'Violation of Right-of-Way', type: 'checkbox', span: 1 },
+        { id: 'off_15', label: 'Improper Passing', type: 'checkbox', span: 1 },
+        { id: 'off_16', label: 'Unlawful Speed', type: 'checkbox', span: 1 },
+      ]},
+      { id: 'sSpeed', title: 'Speed', style: 'gray', fields: [
+        { id: 'sp_mph1',    label: 'MPH', type: 'text', span: 1 },
+        { id: 'sp_limit',   label: 'Speed Limit', type: 'text', span: 1 },
+        { id: 'sp_mph2',    label: 'MPH', type: 'text', span: 1 },
+        { id: 'sp_interstate', label: 'Interstate', type: 'checkbox', span: 1 },
+        { id: 'sp_school',  label: 'School Zone', type: 'checkbox', span: 1 },
+        { id: 'sp_workers', label: 'Construction Workers Present', type: 'checkbox', span: 1 },
+        { id: 'sp_device',  label: 'Speed Measurement Device', type: 'text', span: 2 },
+        { id: 'sp_devtype', label: 'Device Type', type: 'dropdown', span: 2, options: ['Radar','Lidar','Pace','VASCAR','Aircraft'] },
+      ]},
+      _charges({ id: 'sOtherCharges', title: 'Other Charges', fid: 'other_charges' }),
+      { id: 'sComments', title: 'Other Violations or Comments', style: 'gray', fields: [
+        { id: 'uf_comments', label: 'Other Violations or Comments Pertaining to Offense', type: 'textarea', span: 4, minRows: 3 },
+      ]},
+      { id: 'sAppearance', title: 'Court Appearance', style: 'gray', fields: [
+        { id: 'ap_criminal',   label: 'Criminal Violation Court Appearance Required', type: 'checkbox', span: 2 },
+        { id: 'ap_infraction', label: 'Infraction Which Does Not Require Appearance in Court', type: 'checkbox', span: 2 },
+      ]},
+      { id: 'sSign', title: 'Signatures', style: 'gray', fields: [
+        { id: 'sg_status',  label: 'Status', type: 'dropdown', span: 1, options: ['Active','Paid','Court Pending','Dismissed'] },
+        { id: 'sg_officer', label: 'Officer Signature', type: 'signature', span: 3, required: true },
+        { id: 'sg_sup',     label: 'Supervisor Signature', type: 'text', span: 4, required: true },
+      ]},
+    ],
+  },
+
+  /* ── General Citation ── */
+  {
+    id: 'r7', name: 'General Citation',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-GC-001',
+    sections: [
+      _deptId(),
+      _flags(),
+      _agencyInfo(),
+      _civ(),
+      _veh(),
+      { id: 'sCourt', title: 'Court Date', style: 'gray', fields: [
+        { id: 'court_date', label: 'Court Date', type: 'date', span: 4, required: true },
+      ]},
+      _charges(),
+      { id: 'sNarr', title: 'Narrative', style: 'gray', fields: [
+        { id: 'narrative', label: 'Narrative', type: 'textarea', span: 4, required: true, minRows: 4 },
+      ]},
+      { id: 'sStatus', title: 'Status', style: 'gray', fields: [
+        { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Paid','Court Pending','Dismissed'] },
+        { id: 'st_date',   label: 'Date', type: 'date', span: 2 },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_obs',    label: "Observing Unit's Signature", type: 'signature', span: 2, required: true },
+      ]},
+    ],
+  },
+
+  /* ── Written Warning ── */
+  {
+    id: 'r8', name: 'Written Warning',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-WW-001',
+    sections: [
+      _deptId(),
+      _agencyInfo(),
+      _civ(),
+      { id: 'sSpeed', title: 'Speed Information', style: 'gray', fields: [
+        { id: 'sp_speed', label: 'Vehicle Speed', type: 'text', span: 1 },
+        { id: 'sp_limit', label: 'Speed Limit', type: 'text', span: 1 },
+        { id: 'sp_pace',  label: 'Pace Type', type: 'dropdown', span: 2, options: ['Radar','Lidar','Pace','VASCAR','Visual Estimate'] },
+        { id: 'sp_cdate', label: 'Court Date', type: 'date', span: 1 },
+        { id: 'sp_ctime', label: 'Court Time', type: 'time', span: 1 },
+        { id: 'sp_fine',  label: 'Fine', type: 'text', span: 1, mono: true },
+      ]},
+      _veh(),
+      { id: 'sViol', title: 'Violation / Charge', style: 'gray', fields: [
+        { id: 'ww_text', label: 'Warning Citation', type: 'textarea', span: 4, minRows: 4 },
+      ]},
+    ],
+  },
+
+  /* ── Confidential Informant Record ── */
+  {
+    id: 'r9', name: 'Confidential Informant Record',
+    agency: 'SSRP LAW ENFORCEMENT',
+    formCode: 'LE-CI-001',
+    sections: [
+      _flags(['Armed','Dangerous','Gang Affiliated','Escape Risk']),
+      { id: 'sImg', title: 'Image', style: 'gray', fields: [
+        { id: 'img_photo', label: 'Civilian Photo', type: 'image', span: 4 },
+      ]},
+      _civ(),
+      { id: 'sReg', title: 'Registration Information', style: 'gray', fields: [
+        { id: 'rg_dmv',    label: 'DMV Status', type: 'text', span: 1, required: true },
+        { id: 'rg_status', label: 'Status', type: 'dropdown', span: 1, options: ['Active','Suspended','Expired','Revoked'] },
+        { id: 'rg_exp',    label: 'Expiration', type: 'date', span: 1 },
+        { id: 'rg_gov',    label: 'Gov. Status', type: 'text', span: 1, required: true },
+      ]},
+      _veh(),
+      { id: 'sCI', title: 'Confidential Informant', style: 'gray', fields: [
+        { id: 'cinf_status',  label: 'Confidential Informant Status', type: 'dropdown', span: 1, required: true, options: ['Active','Inactive','Burned','Deactivated'] },
+        { id: 'cinf_exp',     label: 'Expiration Date', type: 'date', span: 1, required: true },
+        { id: 'cinf_contact', label: 'Law Enforcement Contact', type: 'text', span: 2, required: true },
       ]},
     ],
   },

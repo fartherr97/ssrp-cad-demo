@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight, MdLink, MdGroups } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
@@ -1010,6 +1010,138 @@ function SupplementField({ f, entries, editable, onAppend }) {
   );
 }
 
+/* ── Generic "search + attach chips" field (linked records & unit lookup) ──
+   Type to search live data, click a suggestion to attach it as a chip. The
+   stored value is an array of chip objects ({ key, label, ...meta }). */
+function ChipSearchField({ f, accent, placeholder, readOnly, value, onUpdate,
+  Icon, search, renderSuggestion, allowManual, manualToChip, manualLabel, emptyHint }) {
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const items = Array.isArray(value) ? value : [];
+  const results = open && q.trim() ? search(q.trim()).filter(r => !items.some(i => i.key === r.key)) : [];
+
+  const add = (chip) => {
+    if (!chip) return;
+    if (items.some(i => i.key === chip.key)) { setQ(''); setOpen(false); return; }
+    onUpdate([...items, chip]);
+    setQ(''); setOpen(false);
+  };
+  const remove = (key) => onUpdate(items.filter(i => i.key !== key));
+
+  return (
+    <div className="flex flex-col sm:col-span-2 lg:col-span-4">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+        <Icon size={12} />{f.label}{f.required && <span className="text-red-400"> *</span>}
+      </label>
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {items.map(chip => (
+            <span key={chip.key} className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg text-[12px] font-semibold"
+              style={{ background: `${accent}1a`, border: `1px solid ${accent}40`, color: accent }}>
+              {chip.label}
+              {!readOnly && (
+                <button type="button" onClick={() => remove(chip.key)}
+                  className="flex items-center justify-center w-4 h-4 rounded hover:bg-white/10 cursor-pointer" style={{ background: 'none', border: 'none', color: 'inherit' }}>
+                  <MdClose size={12} />
+                </button>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+      {!readOnly && (
+        <div className="relative">
+          <div className="flex gap-2">
+            <input value={q} onChange={e => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
+              onBlur={() => setTimeout(() => setOpen(false), 150)} placeholder={placeholder} className={`${S_INPUT} flex-1`} />
+            {allowManual && (
+              <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => add(manualToChip(q))}
+                disabled={!q.trim()} className="px-3.5 rounded-lg text-[12px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-default shrink-0"
+                style={{ background: `${accent}1a`, border: `1px solid ${accent}40`, color: accent }}>
+                {manualLabel || 'Add'}
+              </button>
+            )}
+          </div>
+          {open && results.length > 0 && (
+            <div className="absolute z-[60] left-0 right-0 mt-1 bg-app-card border border-border-strong rounded-xl shadow-2xl shadow-black/60 p-1 max-h-[260px] overflow-y-auto">
+              {results.map(r => (
+                <button key={r.key} type="button" onMouseDown={e => e.preventDefault()} onClick={() => add(r)}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/[0.06] cursor-pointer" style={{ background: 'none', border: 'none' }}>
+                  {renderSuggestion(r)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {readOnly && items.length === 0 && <span className="text-[12px] text-slate-600 italic">{emptyHint || 'None'}</span>}
+    </div>
+  );
+}
+
+/* Linked Records * type a report/record number, auto-suggest matches by number
+   or type (with the issuing kind/department), then attach. Free text allowed. */
+function LinkedRecordsField({ f, value, onChange, readOnly }) {
+  const { state } = useCAD();
+  const pool = [
+    ...(state.reports || []).map(r => ({
+      key: `rep-${r.id}`, number: r.reportNumber || r.caseNumber || String(r.id),
+      type: r.type || 'Report', kind: 'Report', dept: r.agency || '',
+    })),
+    ...(state.records || []).map(r => ({
+      key: `rec-${r.id}`, number: r.recordNumber || r.caseNumber || String(r.id),
+      type: r.recordType || r.type || r.name || 'Record', kind: 'Record', dept: r.agency || '',
+    })),
+  ];
+  const search = (q) => {
+    const s = q.toLowerCase();
+    return pool
+      .filter(p => String(p.number).toLowerCase().includes(s) || String(p.type).toLowerCase().includes(s))
+      .slice(0, 8)
+      .map(p => ({ ...p, label: `#${p.number} ${p.type}` }));
+  };
+  const renderSuggestion = (r) => (
+    <div className="min-w-0">
+      <div className="text-[13px] font-semibold text-white truncate">#{r.number} <span className="text-slate-400 font-normal">{r.type}</span></div>
+      <div className="text-[11px] text-slate-500 truncate">{r.kind}{r.dept ? ` * ${r.dept}` : ''}</div>
+    </div>
+  );
+  const manualToChip = (q) => ({ key: `man-${Date.now()}`, number: q.trim(), type: 'Linked Record', kind: 'Manual', label: `#${q.trim()}` });
+  return (
+    <ChipSearchField f={f} accent="#2dd4bf" Icon={MdLink} readOnly={readOnly} value={value}
+      onUpdate={(arr) => onChange(f.id, arr)} search={search} renderSuggestion={renderSuggestion}
+      placeholder="Paste record link or type a report / record number..."
+      allowManual manualToChip={manualToChip} manualLabel="Link" emptyHint="No linked records" />
+  );
+}
+
+/* Unit lookup * type a callsign or name, auto-suggest an officer, then attach
+   to the on-scene list. */
+function UnitLookupField({ f, value, onChange, readOnly }) {
+  const { state } = useCAD();
+  const search = (q) => {
+    const s = q.toLowerCase();
+    return (state.officers || [])
+      .filter(o => o.name?.toLowerCase().includes(s) || String(o.badge || '').toLowerCase().includes(s) || o.unitId?.toLowerCase().includes(s))
+      .slice(0, 8)
+      .map(o => ({
+        key: `off-${o.id}`, name: o.name, badge: o.badge, rank: o.rank || o.role || 'Officer', unitId: o.unitId || o.badge,
+        label: `${o.unitId || o.badge} * ${o.name}`,
+      }));
+  };
+  const renderSuggestion = (r) => (
+    <div className="min-w-0">
+      <div className="text-[13px] font-semibold text-white truncate">{r.unitId} — {r.name}</div>
+      <div className="text-[11px] text-slate-500 truncate">{r.rank}{r.badge ? ` * Badge #${r.badge}` : ''}</div>
+    </div>
+  );
+  return (
+    <ChipSearchField f={f} accent="#3a88e8" Icon={MdGroups} readOnly={readOnly} value={value}
+      onUpdate={(arr) => onChange(f.id, arr)} search={search} renderSuggestion={renderSuggestion}
+      placeholder="Type a unit number, rank, or name..." emptyHint="No additional units" />
+  );
+}
+
 function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement }) {
   const { state } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
@@ -1077,6 +1209,16 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
         {isSupOnly && <span className="ml-auto px-1 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold">{isSupervisor ? 'SUP' : '🔒'}</span>}
       </label>
     );
+  }
+
+  // Linked Records * attach related reports/records by number (Sonoran-style)
+  if (f.type === 'linked_records') {
+    return <LinkedRecordsField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
+  }
+
+  // Unit lookup * attach on-scene officers by callsign / name
+  if (f.type === 'unit_lookup') {
+    return <UnitLookupField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
   const isNarr = f.type === 'textarea';
