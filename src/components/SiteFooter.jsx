@@ -11,7 +11,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="ml-auto text-[10.5px] font-medium text-slate-600 hidden md:block">
-          CAD v2.4.1
+          CAD v1.0
         </div>
       </div>
     </footer>
