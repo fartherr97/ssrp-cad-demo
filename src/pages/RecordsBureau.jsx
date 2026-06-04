@@ -129,14 +129,12 @@ const SEARCH_TYPES = [
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers, licensePointsConfig = {}, businesses = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, licensePointsConfig = {}, businesses = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
-  const SUP_RANKS = ['Sergeant', 'Staff Sergeant', 'Lieutenant', 'Captain', 'Major', 'Commander', 'Colonel', 'Chief', 'Corporal'];
-  const myOfficer = officers.find(o => o.id === currentUser?.id);
-  const canManageLicenses = currentUser?.portal === 'admin' || currentUser?.portal === 'dispatch'
-    || (myOfficer && SUP_RANKS.some(r => myOfficer.rank?.includes(r)));
+  // License suspension/reinstatement is a leadership action — admin/command portal only.
+  const canManageLicenses = currentUser?.portal === 'admin';
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');

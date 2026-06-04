@@ -1026,33 +1026,6 @@ export const RECORD_TEMPLATES = [
       ]},
     ],
   },
-  {
-    id: 'r8', name: 'License Suspension',
-    agency: 'FLORIDA DEPARTMENT OF HIGHWAY SAFETY AND MOTOR VEHICLES',
-    formCode: 'DHSMV-LS-001',
-    sections: [
-      { id: 'sAI', title: 'Agency Information', style: 'gray', fields: [
-        { id: 'ai_dt',  label: 'Date',        type: 'date', span: 1, autoFill: 'date' },
-        { id: 'ai_tm',  label: 'Time',        type: 'time', span: 1, autoFill: 'time' },
-        { id: 'ai_rn',  label: 'Record #',    type: 'text', span: 1, mono: true, autoNumber: true },
-        { id: 'ai_ag',  label: 'Department',  type: 'text', span: 1, autoFill: 'agencyName', readOnly: true },
-        { id: 'ai_sd',  label: 'Subdivision', type: 'text', span: 1, autoFill: 'subdivision', readOnly: true },
-        { id: 'ai_un',  label: 'Unit #',      type: 'text', span: 1, autoFill: 'unitNumber',  readOnly: true },
-        { id: 'ai_unm', label: 'Unit Name',   type: 'text', span: 2, autoFill: 'unitName',    readOnly: true },
-      ]},
-      { id: 's1', title: 'Subject Information', style: 'blue', fields: [
-        { id: 'f1', label: 'Full Name',      type: 'civilian_lookup', span: 3, required: true },
-        { id: 'f2', label: 'DL Number',      type: 'text',            span: 1, mono: true, required: true },
-        { id: 'f4', label: 'Effective Date', type: 'date',            span: 1, required: true },
-        { id: 'f5', label: 'End Date',       type: 'date',            span: 1 },
-      ]},
-      { id: 's2', title: 'Suspension Details', style: 'gray', fields: [
-        { id: 'f6', label: 'Suspension Type',   type: 'dropdown', span: 2, required: true, options: ['DUI','Habitual Offender','Failure to Pay Fines','Medical','Other'] },
-        { id: 'f7', label: 'Issuing Authority', type: 'text',     span: 2 },
-        { id: 'f8', label: 'Notes',             type: 'textarea', span: 4, minRows: 2 },
-      ]},
-    ],
-  },
 ];
 
 export const INCOMING_911 = [
