@@ -16,7 +16,6 @@ export const PORTALS = {
       { Icon: MdFolder,       label: 'Records',  route: '/records', dropdown: 'records' },
       { Icon: MdGavel,              label: 'Warrants',   route: '/warrants'          },
       { Icon: MdMap,                label: 'Map',        route: '/map'               },
-      { Icon: MdLocalShipping,      label: 'Tow CAD',    route: '/tow-cad'           },
       { Icon: MdShield,             label: 'Command',    route: '/portal/command'    },
       { Icon: MdSupervisorAccount,  label: 'Supervisor', route: '/portal/supervisor' },
     ],
