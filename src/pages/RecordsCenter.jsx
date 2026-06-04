@@ -6,7 +6,7 @@ import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
 import {
   MdDescription, MdArrowBack, MdDownload, MdDeleteOutline, MdCheckCircle,
-  MdShield, MdPerson, MdInventory2,
+  MdShield, MdPerson, MdInventory2, MdAssignment, MdDirectionsCar,
 } from 'react-icons/md';
 import {
   BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER, xs,

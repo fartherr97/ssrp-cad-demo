@@ -455,8 +455,12 @@ function reducer(state, action) {
       const civ = state.civilians.find(c => c.id === civilianId);
       // Block if they already have a DL that's suspended or revoked
       if (!civ || (civ.dlNumber && (civ.dlStatus === 'SUSPENDED' || civ.dlStatus === 'REVOKED'))) return state;
-      const prefix = (civ.lastName?.[0] || 'X').toUpperCase();
-      const dlNumber = prefix + Math.floor(Math.random() * 9000000 + 1000000);
+      const lastInitial = (civ.lastName?.[0] || 'X').toUpperCase();
+      const randomDigits = Math.floor(Math.random() * 9000000 + 1000000);
+      const adminPrefix = state.uniqueIdentifiers?.dlPrefix?.trim();
+      const dlNumber = adminPrefix
+        ? `${adminPrefix}-${lastInitial}${randomDigits}`
+        : `${lastInitial}${randomDigits}`;
       const today = new Date().toISOString().split('T')[0];
       const civilians = state.civilians.map(c => c.id === civilianId ? {
         ...c,

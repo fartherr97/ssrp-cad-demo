@@ -20,6 +20,7 @@ export default function Identifiers() {
   const toast = useToast();
 
   const [saved, setSaved] = useState(false);
+  const [dlPrefix, setDlPrefix] = useState(config.dlPrefix || '');
 
   const isOn = (group, key) => (config[group] || []).includes(key);
 
@@ -30,6 +31,16 @@ export default function Identifiers() {
     const newConfig = { ...config, [group]: next };
     dispatch({ type: 'ADMIN_SET', payload: { key: 'uniqueIdentifiers', value: newConfig } });
     toast.success(`Unique identifier ${willEnable ? 'enabled' : 'disabled'}.`);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const saveDlPrefix = () => {
+    const trimmed = dlPrefix.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    setDlPrefix(trimmed);
+    const newConfig = { ...config, dlPrefix: trimmed || null };
+    dispatch({ type: 'ADMIN_SET', payload: { key: 'uniqueIdentifiers', value: newConfig } });
+    toast.success('DL number format saved.');
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -109,6 +120,41 @@ export default function Identifiers() {
               </div>
             );
           })}
+        </div>
+      </AdminPanel>
+
+      <AdminPanel
+        title="DL Number Format"
+        subtitle="Configure a prefix for auto-generated driver's license numbers. Leave blank to use the default format (last-name initial + 7 digits)."
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: ADMIN.textMute, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                Prefix (max 6 characters, A–Z / 0–9)
+              </div>
+              <input
+                type="text"
+                value={dlPrefix}
+                onChange={e => setDlPrefix(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
+                placeholder="e.g. FL or HCFD"
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  background: ADMIN.row, border: `1px solid ${ADMIN.border}`,
+                  borderRadius: 8, padding: '8px 12px',
+                  fontSize: 13, color: ADMIN.text,
+                  outline: 'none', fontFamily: 'monospace',
+                }}
+              />
+            </div>
+            <SonButton onClick={saveDlPrefix} style={{ marginBottom: 0 }}>Save</SonButton>
+          </div>
+          <div style={{ fontSize: 11, color: ADMIN.textMute, background: ADMIN.panel2, border: `1px solid ${ADMIN.border}`, borderRadius: 8, padding: '8px 12px' }}>
+            Preview:{' '}
+            <span style={{ fontFamily: 'monospace', color: ADMIN.text, fontWeight: 600 }}>
+              {dlPrefix ? `${dlPrefix}-A1234567` : 'A1234567'}
+            </span>
+          </div>
         </div>
       </AdminPanel>
     </div>
