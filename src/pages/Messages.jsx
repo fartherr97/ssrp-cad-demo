@@ -232,9 +232,6 @@ function GroupThreadView({ thread, currentUserId, currentUserName, onReply }) {
           return (
             <div key={msg.id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
-                {!isMe && (
-                  <div className="text-[10px] font-semibold text-slate-400 px-1">{msg.fromName}</div>
-                )}
                 <div className={`px-3.5 py-2.5 rounded-2xl text-[12.5px] leading-[1.65] ${
                   isMe
                     ? 'rounded-br-sm bg-brand/25 border border-brand/35 text-white'
@@ -242,7 +239,10 @@ function GroupThreadView({ thread, currentUserId, currentUserName, onReply }) {
                 }`}>
                   {msg.body}
                 </div>
-                <div className="text-[9px] text-slate-600 px-1">{msg.timestamp}</div>
+                <div className={`text-[9px] px-1 flex items-center gap-1.5 ${isMe ? 'flex-row-reverse' : ''}`}>
+                  <span className="font-semibold text-slate-400">{isMe ? 'You' : msg.fromName}</span>
+                  <span className="text-slate-600">{msg.timestamp}</span>
+                </div>
               </div>
             </div>
           );
