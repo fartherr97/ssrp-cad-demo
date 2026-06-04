@@ -96,11 +96,17 @@ function DateRangeBar({ dateFrom, setDateFrom, dateTo, setDateTo }) {
         );
       })}
       <div className="flex items-center gap-1.5">
-        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+        <div className="relative overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-violet-400/50 transition-all w-[130px]" style={{ height: 32 }}>
+          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+            className="absolute inset-0 w-full h-full bg-transparent px-2.5 text-[11.5px] text-slate-300 outline-none cursor-pointer"
+            style={{ colorScheme: 'dark' }} />
+        </div>
         <span className="text-[11px] text-slate-600">→</span>
-        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-          className="bg-app-input border border-border-base rounded-lg px-2.5 py-1 text-[11.5px] text-slate-300 outline-none focus:border-violet-400/50 transition-all cursor-pointer w-[130px]" />
+        <div className="relative overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-violet-400/50 transition-all w-[130px]" style={{ height: 32 }}>
+          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+            className="absolute inset-0 w-full h-full bg-transparent px-2.5 text-[11.5px] text-slate-300 outline-none cursor-pointer"
+            style={{ colorScheme: 'dark' }} />
+        </div>
       </div>
     </div>
   );
