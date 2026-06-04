@@ -376,16 +376,19 @@ function NotificationBell({ notifications, dispatch }) {
                   <div className="w-2 h-2 rounded-full mt-[5px] shrink-0" style={{ background: n.color || '#3a88e8' }} />
                   <div className="flex-1 min-w-0">
                     <div className="text-[12px] font-semibold text-white leading-tight">{n.title}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5 leading-snug whitespace-pre-wrap line-clamp-3">{n.body}</div>
+                    <div className="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-3">{n.body}</div>
+                    {n.sender && (
+                      <div className="text-[11px] text-slate-500 mt-1 font-medium">— {n.sender}</div>
+                    )}
                     <div className="text-[10px] text-slate-600 mt-1">{n.time}</div>
                   </div>
                   <button
                     onClick={() => dispatch({ type: 'DISMISS_NOTIFICATION', payload: n.id })}
                     title="Dismiss"
-                    className="shrink-0 text-slate-600 hover:text-slate-400 cursor-pointer mt-0.5 text-[11px] font-bold"
+                    className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.08] cursor-pointer transition-colors"
                     style={{ background: 'none', border: 'none' }}
                   >
-                    ✕
+                    <MdClose size={15} />
                   </button>
                 </div>
               ))

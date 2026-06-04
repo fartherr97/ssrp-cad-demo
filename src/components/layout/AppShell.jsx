@@ -23,11 +23,18 @@ function BlastToast() {
     if (lastBlast.id === seenId.current) return;
     seenId.current = lastBlast.id;
 
-    const body = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
+    const toastBody = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
+    const notifPayload = {
+      title: lastBlast.title || 'Notification',
+      body: lastBlast.body,
+      sender: `${lastBlast.senderName} (${lastBlast.senderBadge})`,
+      color: lastBlast.color,
+      time: lastBlast.time,
+    };
 
     // Sender: skip the popup but still record in their inbox.
     if (lastBlast.senderId != null && String(lastBlast.senderId) === String(currentUser.id)) {
-      dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
+      dispatch({ type: 'ADD_NOTIFICATION', payload: notifPayload });
       return;
     }
 
@@ -37,8 +44,8 @@ function BlastToast() {
       if (!me || String(me.dept) !== String(lastBlast.targetDeptId)) return;
     }
 
-    toast.info(body, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
-    dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
+    toast.info(toastBody, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
+    dispatch({ type: 'ADD_NOTIFICATION', payload: notifPayload });
     playAudio(audioTones?.toastUrl);
   }, [lastBlast, currentUser, officers, toast, dispatch, audioTones]);
 
