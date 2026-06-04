@@ -1,10 +1,10 @@
 export const DEPARTMENTS = [
-  { id: 1, name: "Tampa Police Department", short: "TPD", abbreviation: "TPD", color: "#1a6bbf", type: "LEO", badgePrefix: "TPD", radioChannel: "TPD-1", subdivisions: ["Patrol","K9","Traffic","SWAT","Detectives"] },
-  { id: 2, name: "Hillsborough County Sheriff's Office", short: "HCSO", abbreviation: "HCSO", color: "#2e7d32", type: "LEO", badgePrefix: "HCSO", radioChannel: "SO-1", subdivisions: ["Patrol","Marine","Air Support","Civil"] },
-  { id: 3, name: "Hillsborough County Fire Rescue", short: "HCFR", abbreviation: "HCFR", color: "#c62828", type: "Fire", badgePrefix: "HCFR", radioChannel: "FIRE-1", subdivisions: ["Engine","Ladder","Rescue","Hazmat"] },
-  { id: 4, name: "Florida Highway Patrol", short: "FHP", abbreviation: "FHP", color: "#c8a860", type: "LEO", badgePrefix: "FHP", radioChannel: "FHP-1", subdivisions: ["Patrol","Commercial Vehicle","Air"] },
-  { id: 5, name: "Florida Dept of Transportation", short: "FDOT", abbreviation: "FDOT", color: "#e07820", type: "Civilian", badgePrefix: "FDOT", radioChannel: "FDOT-1", subdivisions: ["Road Operations","Inspections","Signals"] },
-  { id: 6, name: "Civilian Operations", short: "CIV-OPS", abbreviation: "CIV", color: "#7878aa", type: "Civilian", badgePrefix: "CIV", radioChannel: "CIV-1", subdivisions: ["ECC","Admin","Support"] },
+  { id: 1, name: "Tampa Police Department", short: "TPD", abbreviation: "TPD", color: "#1a6bbf", type: "LEO", badgePrefix: "TPD", radioChannel: "TPD-1", subdivisions: ["Patrol","K9","Traffic","SWAT","Detectives"], routingRole: 'LEO' },
+  { id: 2, name: "Hillsborough County Sheriff's Office", short: "HCSO", abbreviation: "HCSO", color: "#2e7d32", type: "LEO", badgePrefix: "HCSO", radioChannel: "SO-1", subdivisions: ["Patrol","Marine","Air Support","Civil"], routingRole: 'LEO' },
+  { id: 3, name: "Hillsborough County Fire Rescue", short: "HCFR", abbreviation: "HCFR", color: "#c62828", type: "Fire", badgePrefix: "HCFR", radioChannel: "FIRE-1", subdivisions: ["Engine","Ladder","Rescue","Hazmat"], routingRole: 'HCFR' },
+  { id: 4, name: "Florida Highway Patrol", short: "FHP", abbreviation: "FHP", color: "#c8a860", type: "LEO", badgePrefix: "FHP", radioChannel: "FHP-1", subdivisions: ["Patrol","Commercial Vehicle","Air"], routingRole: 'LEO' },
+  { id: 5, name: "Florida Dept of Transportation", short: "FDOT", abbreviation: "FDOT", color: "#e07820", type: "Civilian", badgePrefix: "FDOT", radioChannel: "FDOT-1", subdivisions: ["Road Operations","Inspections","Signals"], routingRole: 'FDOT' },
+  { id: 6, name: "Civilian Operations", short: "CIV-OPS", abbreviation: "CIV", color: "#7878aa", type: "Civilian", badgePrefix: "CIV", radioChannel: "CIV-1", subdivisions: ["ECC","Admin","Support"], routingRole: null },
 ];
 
 export const RANKS = {

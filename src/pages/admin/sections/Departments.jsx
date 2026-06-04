@@ -5,27 +5,89 @@ import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, SonSearch, SON_INPUT, SON_LABEL, SonBadge, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete, MdExpandMore, MdChevronRight, MdSave } from 'react-icons/md';
+import { MdAdd, MdDelete, MdExpandMore, MdChevronRight, MdSave, MdWarning } from 'react-icons/md';
 
-function DeptCard({ d, onSave, onDelete }) {
+const ROUTING_ROLES = [
+  { value: '',       label: 'None'                       },
+  { value: 'LEO',    label: 'LEO — Law Enforcement'      },
+  { value: 'HCFR',   label: 'HCFR — Fire / EMS'          },
+  { value: 'FDOT',   label: 'FDOT — Transport / Tow'     },
+  { value: 'DISPATCH', label: 'Dispatch'                 },
+];
+
+const ROLE_COLOR = {
+  LEO:      '#3a88e8',
+  HCFR:     '#e04020',
+  FDOT:     '#e07820',
+  DISPATCH: '#a855f7',
+};
+
+function DeleteGuard({ dept, officerCount, onConfirm, onCancel }) {
+  const role = dept.routingRole;
+  return (
+    <div className="rounded-lg p-3 mt-2" style={{ background: '#3a1a1a', border: '1px solid #e0402060' }}>
+      <div className="flex items-start gap-2 mb-3">
+        <MdWarning size={16} style={{ color: '#f59e0b', flexShrink: 0, marginTop: 1 }} />
+        <div className="text-[12px] leading-relaxed" style={{ color: '#f1a07a' }}>
+          <strong>Delete "{dept.name}"?</strong>
+          <ul className="mt-1.5 ml-2 list-disc list-inside space-y-0.5" style={{ color: '#e2c08a' }}>
+            {officerCount > 0 && (
+              <li>{officerCount} officer{officerCount !== 1 ? 's' : ''} will lose their department reference.</li>
+            )}
+            {role && (
+              <li>
+                Routing role <strong style={{ color: ROLE_COLOR[role] || '#f59e0b' }}>{role}</strong> will be lost —
+                requests routed to this agency may become undelivered.
+              </li>
+            )}
+          </ul>
+          <div className="mt-2" style={{ color: '#94a3b8' }}>This cannot be undone. Steve's backend may need to be updated.</div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <SonButton variant="red" onClick={onConfirm} style={{ padding: '4px 12px', fontSize: 12 }}>
+          <MdDelete size={13} /> Force Delete
+        </SonButton>
+        <SonButton onClick={onCancel} style={{ padding: '4px 12px', fontSize: 12 }}>Cancel</SonButton>
+      </div>
+    </div>
+  );
+}
+
+function DeptCard({ d, onSave, onDelete, officers = [] }) {
   const [draft, setDraft] = useState({ ...d });
   const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  useEffect(() => { setDraft({ ...d }); }, [d.id]);
+  useEffect(() => { setDraft({ ...d }); setConfirmDelete(false); }, [d.id]);
 
   const set = (patch) => setDraft(p => ({ ...p, ...patch }));
   const dirty = JSON.stringify(draft) !== JSON.stringify(d);
+
+  const attachedCount = officers.filter(o => o.dept === d.id).length;
+  const needsGuard = attachedCount > 0 || !!d.routingRole;
+
+  const handleDeleteClick = () => {
+    if (needsGuard) {
+      setConfirmDelete(true);
+    } else {
+      onDelete();
+    }
+  };
 
   return (
     <div className="rounded-lg p-4" style={{ background: ADMIN.bg, border: `1px solid ${dirty ? ADMIN.borderHi : ADMIN.border}` }}>
       <div className="flex items-center gap-2 mb-3">
         <SonBadge color={ADMIN.blue}>Agency</SonBadge>
         <SonBadge color={d.color || ADMIN.green}>{d.subdivisions?.length || 0} subdivisions</SonBadge>
+        {d.routingRole && (
+          <SonBadge color={ROLE_COLOR[d.routingRole] || ADMIN.textMute}>{d.routingRole}</SonBadge>
+        )}
         <div className="ml-auto flex gap-1.5">
           <SonButton variant="red" onClick={() => onSave(draft)} disabled={!dirty} style={{ padding: '4px 10px', fontSize: 12 }}>
             <MdSave size={14} /> {dirty ? 'Save' : 'Saved'}
           </SonButton>
-          <SonIconBtn icon={MdDelete} danger title="Delete agency" onClick={onDelete} />
+          <SonIconBtn icon={MdDelete} danger title="Delete agency" onClick={handleDeleteClick} />
           <SonIconBtn icon={open ? MdExpandMore : MdChevronRight} title="Expand" onClick={() => setOpen(v => !v)} />
         </div>
       </div>
@@ -40,7 +102,7 @@ function DeptCard({ d, onSave, onDelete }) {
         </div>
         {open && (
           <div className="expand-section grid grid-cols-2 gap-[10px]">
-            <div className="col-span-2">
+            <div>
               <label style={SON_LABEL}>Type</label>
               <Select style={SON_INPUT} value={draft.type || 'Law Enforcement'} onChange={e => set({ type: e.target.value })}>
                 <option>Civilian</option>
@@ -48,6 +110,19 @@ function DeptCard({ d, onSave, onDelete }) {
                 <option>Fire &amp; EMS</option>
                 <option>Dispatch</option>
               </Select>
+            </div>
+            <div>
+              <label style={SON_LABEL}>Routing Role</label>
+              <Select
+                style={SON_INPUT}
+                value={draft.routingRole || ''}
+                onChange={e => set({ routingRole: e.target.value || null })}
+              >
+                {ROUTING_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              </Select>
+            </div>
+            <div className="col-span-2" style={{ fontSize: 11, color: ADMIN.textMute, marginTop: -4 }}>
+              Routing role pins this agency to a specific request feed (HCFR → Fire Board, FDOT → Tow dispatch). Agencies with a role cannot be deleted without a warning.
             </div>
             <div className="col-span-2">
               <label style={SON_LABEL}>Subdivisions (comma separated)</label>
@@ -74,6 +149,14 @@ function DeptCard({ d, onSave, onDelete }) {
         {dirty && (
           <div className="text-[11px] text-amber-400">Unsaved changes * click Save to apply.</div>
         )}
+        {confirmDelete && (
+          <DeleteGuard
+            dept={d}
+            officerCount={attachedCount}
+            onConfirm={() => { setConfirmDelete(false); onDelete(); }}
+            onCancel={() => setConfirmDelete(false)}
+          />
+        )}
       </div>
     </div>
   );
@@ -81,7 +164,7 @@ function DeptCard({ d, onSave, onDelete }) {
 
 export default function Departments() {
   const { state, dispatch } = useCAD();
-  const { departments } = state;
+  const { departments, officers = [] } = state;
   const groups = state.persistentGroups || [];
   const toast = useToast();
   const [groupName, setGroupName] = useState('');
@@ -133,12 +216,12 @@ export default function Departments() {
         {filtered.length === 0 ? <EmptyState>No agencies match.</EmptyState> : (
           <div className="grid gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))' }}>
             {filtered.map(d => (
-              <DeptCard key={d.id} d={d} onSave={saveDept} onDelete={() => deleteDept(d.id)} />
+              <DeptCard key={d.id} d={d} onSave={saveDept} onDelete={() => deleteDept(d.id)} officers={officers} />
             ))}
           </div>
         )}
         <div className="mt-4">
-          <SonButton variant="red" onClick={() => { dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '' } }); toast.success('Agency added.'); }}>
+          <SonButton variant="red" onClick={() => { dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '', routingRole: null } }); toast.success('Agency added.'); }}>
             <MdAdd size={16} /> Add Agency
           </SonButton>
         </div>
