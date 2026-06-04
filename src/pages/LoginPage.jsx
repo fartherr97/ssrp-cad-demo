@@ -206,8 +206,7 @@ export default function LoginPage() {
             fontSize: 13, color: 'rgba(180,200,230,0.5)', textAlign: 'center',
             lineHeight: 1.6, marginBottom: 32, maxWidth: 360,
           }}>
-            Unified platform for Emergency Services, Civilian Operations,
-            and Command * TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.
+            Unified Platform for Emergency Services and Civilian Operations
           </div>
 
           {/* ── BEFORE CONNECT: show big Discord button ── */}
