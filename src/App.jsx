@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { CADProvider, useCAD } from './store/cadStore';
 import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
@@ -217,38 +217,16 @@ function CADApp() {
   );
 }
 
-const VARIANT_COLORS = { success: '#2fd96b', error: '#ff5d5d', info: '#3d9bf0', warning: '#f5a93b' };
-const VARIANT_LABELS = { success: 'Success', error: 'Error', info: 'Notice', warning: 'Warning' };
-
-function AppWithToasts() {
-  const { dispatch } = useCAD();
-  const handlePush = useCallback((t) => {
-    if (t.variant === 'loading') return;
-    dispatch({
-      type: 'ADD_NOTIFICATION',
-      payload: {
-        title: t.title || VARIANT_LABELS[t.variant] || 'Notice',
-        body: t.message || '',
-        color: t.color || VARIANT_COLORS[t.variant] || '#3d9bf0',
-      },
-    });
-  }, [dispatch]);
-
-  return (
-    <ToastProvider onPush={handlePush}>
-      <BrowserRouter>
-        <BusinessProvider>
-          <CADApp />
-        </BusinessProvider>
-      </BrowserRouter>
-    </ToastProvider>
-  );
-}
-
 export default function App() {
   return (
     <CADProvider>
-      <AppWithToasts />
+      <ToastProvider>
+        <BrowserRouter>
+          <BusinessProvider>
+            <CADApp />
+          </BusinessProvider>
+        </BrowserRouter>
+      </ToastProvider>
     </CADProvider>
   );
 }

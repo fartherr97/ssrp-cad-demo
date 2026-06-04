@@ -37,10 +37,35 @@ function BlastToast() {
       if (!me || String(me.dept) !== String(lastBlast.targetDeptId)) return;
     }
 
-    // toast.info triggers onPush in ToastProvider which adds to inbox automatically.
     toast.info(body, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
+    dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
     playAudio(audioTones?.toastUrl);
   }, [lastBlast, currentUser, officers, toast, dispatch, audioTones]);
+
+  return null;
+}
+
+function MessageToast() {
+  const { state, dispatch } = useCAD();
+  const toast = useToast();
+  const { directMessages, currentUser } = state;
+  const seenIds = useRef(new Set(directMessages.map(m => m.id)));
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const unseen = directMessages.filter(
+      m => String(m.toId) === String(currentUser.id) && !seenIds.current.has(m.id)
+    );
+    unseen.forEach(m => {
+      seenIds.current.add(m.id);
+      toast.info(`${m.subject}`, { title: `Message from ${m.fromName}`, color: '#a78bfa', duration: 6000 });
+      dispatch({ type: 'ADD_NOTIFICATION', payload: {
+        title: `Message from ${m.fromName}`,
+        body: m.subject,
+        color: '#a78bfa',
+      }});
+    });
+  }, [directMessages, currentUser, toast, dispatch]);
 
   return null;
 }
@@ -78,6 +103,7 @@ export default function AppShell({ children }) {
       <SiteFooter />
       <RadioToast />
       <BlastToast />
+      <MessageToast />
       <PanicTone />
       {!inAdmin && <GuidedTour />}
     </div>
