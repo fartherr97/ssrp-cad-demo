@@ -5,7 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import ReportForm from '../components/ReportForm';
-import { ReportDocument } from '../components/FormDocument';
+import { downloadReportPDF } from '../components/ReportPDF';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_DANGER, S_INPUT, S_LABEL } from '../constants/styles';
@@ -121,8 +121,12 @@ export default function OfficerProfile() {
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
   const [viewReport, setViewReport] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [editingReturned, setEditingReturned] = useState(null);
   const { isMobile } = useResponsive();
+  // Keep the open report in sync with the store so freshly-added supplements
+  // appear immediately (viewReport only holds the id-bearing snapshot).
+  const liveReport = viewReport ? (reports.find(r => r.id === viewReport.id) || viewReport) : null;
   const fileRef = useRef();
   const nameInputRef = useRef();
 
@@ -433,9 +437,42 @@ export default function OfficerProfile() {
               <MdDescription size={16} className="text-blue-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[14px] font-extrabold text-white leading-tight truncate">{viewReport.type}</div>
-              <div className="text-[10px] font-mono text-brand-bright">{viewReport.caseNumber}</div>
+              <div className="text-[14px] font-extrabold text-white leading-tight truncate">{liveReport.type}</div>
+              <div className="text-[10px] font-mono text-brand-bright">{liveReport.caseNumber}</div>
             </div>
+            {(() => {
+              const tpl = reportTemplates.find(t => t.name === liveReport.type);
+              if (!tpl) return null;
+              const data = {
+                ...(liveReport.formData || {}),
+                ...(liveReport.summary && !liveReport.formData?.f10 ? { f10: liveReport.summary } : {}),
+              };
+              const exportPDF = async () => {
+                setPdfLoading(true);
+                try {
+                  await downloadReportPDF(tpl, data, {
+                    caseNumber: liveReport.caseNumber,
+                    status: liveReport.status,
+                    officer: liveReport.officerBadge,
+                    dateTime: liveReport.date,
+                    agency: myDept?.name || myOfficer?.deptShort,
+                    department: data._issuingDept || myDept?.name || myOfficer?.deptShort,
+                    logoUrl: myDept?.logoUrl,
+                  });
+                } finally { setPdfLoading(false); }
+              };
+              return (
+                <button
+                  onClick={exportPDF}
+                  disabled={pdfLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer disabled:opacity-50 transition-colors shrink-0"
+                  style={{ background: 'rgba(58,136,232,0.14)', border: '1px solid rgba(58,136,232,0.30)', color: '#3a88e8' }}
+                  title="Download as PDF"
+                >
+                  <MdDescription size={13} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
+                </button>
+              );
+            })()}
             <button
               onClick={() => setViewReport(null)}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all duration-75"
@@ -445,40 +482,29 @@ export default function OfficerProfile() {
             </button>
           </div>
 
-          {/* Paper document */}
-          <div className="flex-1 overflow-y-auto bg-[#36363a] p-6">
+          {/* Filled-out report — locked read-only; supplements can still be added */}
+          <div className="flex-1 overflow-y-auto bg-app-bg/40 p-4 lg:p-6">
             {(() => {
-              const tpl = reportTemplates.find(t => t.name === viewReport.type);
+              const tpl = reportTemplates.find(t => t.name === liveReport.type);
               const data = {
-                ...(viewReport.formData || {}),
-                ...(viewReport.summary && !viewReport.formData?.f10 ? { f10: viewReport.summary } : {}),
+                ...(liveReport.formData || {}),
+                ...(liveReport.summary && !liveReport.formData?.f10 ? { f10: liveReport.summary } : {}),
               };
+              if (!tpl) {
+                return (
+                  <div className="max-w-[1100px] mx-auto bg-app-card/70 border border-border-base rounded-xl p-4 text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed">
+                    {liveReport.summary || 'No details on file.'}
+                  </div>
+                );
+              }
               return (
-                <div style={{
-                  background: '#ffffff',
-                  color: '#000',
-                  fontFamily: "'Arial','Helvetica',sans-serif",
-                  fontSize: 11,
-                  width: '100%',
-                  maxWidth: 816,
-                  minHeight: 1056,
-                  margin: '0 auto',
-                  border: '1px solid #888',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-                }}>
-                  <ReportDocument
-                    type={viewReport.type}
-                    template={tpl}
-                    data={data}
-                    editable={false}
-                    meta={{
-                      caseNumber: viewReport.caseNumber,
-                      status: viewReport.status,
-                      officer: viewReport.officerBadge,
-                      dateTime: viewReport.date,
-                    }}
-                  />
-                </div>
+                <ReportForm
+                  template={tpl}
+                  data={data}
+                  readOnly
+                  canSupplement
+                  onSupplement={(fid, arr) => dispatch({ type: 'UPDATE_REPORT', payload: { id: liveReport.id, formData: { ...(liveReport.formData || {}), [fid]: arr } } })}
+                />
               );
             })()}
           </div>

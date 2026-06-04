@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
-import { MdPerson, MdSwapHoriz, MdExpandMore } from 'react-icons/md';
+import { MdPerson, MdSwapHoriz } from 'react-icons/md';
 import { BADGE } from '../constants/styles';
 
 const CivilianContext = createContext(null);
@@ -66,33 +66,28 @@ export function CivilianSwitcher() {
       <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
         <MdPerson size={22} className="text-brand-bright" />
       </div>
-      <div className="min-w-0">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+      <div className="min-w-0 flex-1">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5 mb-1">
           {multi ? <MdSwapHoriz size={13} className="text-brand-bright" /> : null}
           Active Character
         </div>
         {multi ? (
-          <div className="relative inline-flex items-center">
-            <select
-              className="appearance-none bg-transparent border-none outline-none cursor-pointer text-[16px] font-extrabold text-slate-100 pr-6"
-              value={activeChar.id}
-              onChange={e => setActiveCharId(Number(e.target.value))}
-            >
-              {myChars.map(c => (
-                <option key={c.id} value={c.id} className="bg-app-input text-cad-text">
-                  {c.firstName} {c.lastName}
-                </option>
-              ))}
-            </select>
-            <MdExpandMore size={18} className="text-brand-bright absolute right-0 pointer-events-none" />
-          </div>
+          <select
+            className="w-full max-w-[280px] bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm font-semibold text-cad-text outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
+            value={activeChar.id}
+            onChange={e => setActiveCharId(Number(e.target.value))}
+          >
+            {myChars.map(c => (
+              <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
+            ))}
+          </select>
         ) : (
-          <div className="text-[16px] font-extrabold text-slate-100 truncate">
+          <div className="text-[15px] font-bold text-slate-100 truncate">
             {activeChar.firstName} {activeChar.lastName}
           </div>
         )}
       </div>
-      <span className={`${DL_BADGE[activeChar.dlStatus] || BADGE.gray} ml-auto shrink-0`}>
+      <span className={`${DL_BADGE[activeChar.dlStatus] || BADGE.gray} shrink-0`}>
         DL {activeChar.dlStatus || 'N/A'}
       </span>
     </div>

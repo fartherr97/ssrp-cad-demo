@@ -212,11 +212,12 @@ function ReportPDF({ template, data = {}, meta = {} }) {
 
         {/* Sections — wrap freely so long content flows to the next page naturally */}
         {sections.map(sec => {
-          const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea' && f.type !== 'photos' && f.type !== 'image' && f.type !== 'mugshot');
+          const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea' && f.type !== 'photos' && f.type !== 'image' && f.type !== 'mugshot' && f.type !== 'supplemental');
           const textareaFields = sec.fields.filter(f => f.type === 'textarea');
           const checkboxFields = sec.fields.filter(f => f.type === 'checkbox');
           const chargeFields   = sec.fields.filter(f => f.type === 'charges');
           const photoFields    = sec.fields.filter(f => f.type === 'photos');
+          const supplementalFields = sec.fields.filter(f => f.type === 'supplemental');
 
           return (
             <View key={sec.id} style={styles.section}>
@@ -270,6 +271,24 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                   <Text style={styles.fieldValueNarr}>{data[f.id] || '—'}</Text>
                 </View>
               ))}
+              {/* Supplemental log — append-only follow-ups */}
+              {supplementalFields.map(f => {
+                const entries = Array.isArray(data[f.id]) ? data[f.id] : [];
+                return (
+                  <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
+                    <Text style={styles.fieldLabel}>{f.label || 'Supplemental Reports'}</Text>
+                    {entries.length === 0 ? (
+                      <Text style={styles.noCharges}>No supplements filed.</Text>
+                    ) : entries.map((s, i) => (
+                      <View key={s.id || i} wrap={false} style={{ marginTop: 3, paddingTop: 3, borderTop: i ? `0.5px solid ${lgray}` : undefined }}>
+                        <Text style={{ fontSize: 7, color: gray }}>SUPPLEMENT #{i + 1} — {s.date}</Text>
+                        <Text style={styles.fieldValueNarr}>{s.text}</Text>
+                        <Text style={{ fontSize: 7, color: gray }}>— {s.authorLine || s.author || s.badge}</Text>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })}
               {/* Photo galleries — 4-up grid, each image aspect 4:3 */}
               {photoFields.map(f => {
                 const imgs = Array.isArray(data[f.id]) ? data[f.id].filter(Boolean) : [];

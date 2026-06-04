@@ -351,6 +351,7 @@ export default function MyLicenses() {
         accent="brand"
       />
 
+      <div className="max-w-[1000px]">
       <CivilianSwitcher />
 
       {myChars.length === 0 ? (
@@ -453,6 +454,7 @@ export default function MyLicenses() {
           })}
         </div>
       )}
+      </div>
     </PortalPage>
   );
 }
