@@ -13,7 +13,7 @@ function playAudio(url) {
 }
 
 function BlastToast() {
-  const { state } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
   const { lastBlast, currentUser, officers, audioTones } = state;
   const seenId = useRef(lastBlast?.id ?? null);
@@ -23,8 +23,13 @@ function BlastToast() {
     if (lastBlast.id === seenId.current) return;
     seenId.current = lastBlast.id;
 
-    // Don't echo the blast back to whoever sent it.
-    if (lastBlast.senderId != null && String(lastBlast.senderId) === String(currentUser.id)) return;
+    const body = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
+
+    // Sender: skip the popup but still record in their inbox.
+    if (lastBlast.senderId != null && String(lastBlast.senderId) === String(currentUser.id)) {
+      dispatch({ type: 'ADD_NOTIFICATION', payload: { title: lastBlast.title || 'Notification', body, color: lastBlast.color, time: lastBlast.time } });
+      return;
+    }
 
     // Department-targeted blast: only fire if current user is in the target dept.
     if (lastBlast.targetDeptId) {
@@ -32,10 +37,10 @@ function BlastToast() {
       if (!me || String(me.dept) !== String(lastBlast.targetDeptId)) return;
     }
 
-    const body = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
+    // toast.info triggers onPush in ToastProvider which adds to inbox automatically.
     toast.info(body, { title: lastBlast.title || 'Notification', color: lastBlast.color, duration: 9000 });
     playAudio(audioTones?.toastUrl);
-  }, [lastBlast, currentUser, officers, toast, audioTones]);
+  }, [lastBlast, currentUser, officers, toast, dispatch, audioTones]);
 
   return null;
 }
