@@ -55,7 +55,7 @@ export default function Limits() {
           </span>
         </label>
 
-        {/* Slider — only shown when not unlimited */}
+        {/* Slider * only shown when not unlimited */}
         {!isUnlimited && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>

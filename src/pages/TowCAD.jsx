@@ -30,9 +30,9 @@ const TOW_TYPES = [
 const ZONES = ['City', 'County', 'Roaming'];
 
 const PRIORITIES = [
-  { val: 1, label: 'P1 — Emergency', color: '#ef4444' },
-  { val: 2, label: 'P2 — Urgent',    color: '#f59e0b' },
-  { val: 3, label: 'P3 — Routine',   color: '#6b7280' },
+  { val: 1, label: 'P1 * Emergency', color: '#ef4444' },
+  { val: 2, label: 'P2 * Urgent',    color: '#f59e0b' },
+  { val: 3, label: 'P3 * Routine',   color: '#6b7280' },
 ];
 
 const PRIORITY_BADGE = {
@@ -103,7 +103,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
         style={{ background: '#0c1929', border: '1px solid rgba(249,115,22,0.3)' }}>
         <div className="flex items-center justify-between">
           <div className="text-[16px] font-extrabold text-white flex items-center gap-2">
-            <MdLogin size={20} className="text-orange-400" /> Sign On — Tow Unit
+            <MdLogin size={20} className="text-orange-400" /> Sign On * Tow Unit
           </div>
           <button onClick={onCancel} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
             <MdClose size={20} className="text-slate-500 hover:text-slate-300" />
@@ -125,7 +125,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
               <div className="text-[12px] text-slate-500 italic px-1">No fleet configured for this company.</div>
             ) : (
               <select className={INPUT} value={truckId} onChange={e => setTruckId(e.target.value)} required>
-                <option value="">— Select truck —</option>
+                <option value="">* Select truck *</option>
                 {fleet.map(t => <option key={t.id} value={t.id}>{t.name} ({t.spawnCode})</option>)}
               </select>
             )}
@@ -262,7 +262,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
       <div>
         <div className="flex items-center gap-2">
           <MdDirectionsCar size={15} className="text-slate-500 shrink-0" />
-          <span className="text-[15px] font-extrabold text-slate-100 font-mono tracking-[1px]">{job.plate || '—'}</span>
+          <span className="text-[15px] font-extrabold text-slate-100 font-mono tracking-[1px]">{job.plate || '*'}</span>
           {job.color && <span className="text-sm text-slate-400">{job.color}</span>}
         </div>
         {(job.make || job.model) && (
@@ -275,7 +275,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
           <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
-          <span className="text-xs text-slate-300 leading-relaxed">{job.location || '—'}</span>
+          <span className="text-xs text-slate-300 leading-relaxed">{job.location || '*'}</span>
         </div>
         {job.pickupPostal && (
           <div className="text-[11px] text-slate-500 ml-[22px]">
@@ -317,7 +317,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/25">
           <MdLink size={14} className="text-amber-400 shrink-0" />
           <div className="min-w-0">
-            <div className="text-[11px] font-bold text-amber-300">Linked — Call {linkedCall.id}</div>
+            <div className="text-[11px] font-bold text-amber-300">Linked * Call {linkedCall.id}</div>
             <div className="text-[10.5px] text-amber-400/80 truncate">
               {linkedCall.nature} * {linkedCall.location}
             </div>
@@ -399,7 +399,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
     <div className="bg-app-panel/80 border border-orange-500/30 rounded-xl p-4 sm:p-5 mb-5">
       <div className="flex justify-between items-center mb-4">
         <div className="text-[15px] font-extrabold text-slate-100">
-          {fromRequest ? 'Dispatch — FDOT Assist' : 'New Tow Job'}
+          {fromRequest ? 'Dispatch * FDOT Assist' : 'New Tow Job'}
         </div>
         <button onClick={onCancel}
           className="press-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
@@ -469,7 +469,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
           <div>
             <label className={LABEL}>Assign Driver</label>
             <select className={INPUT} value={form.unitId} onChange={e => set('unitId', e.target.value)}>
-              <option value="">— Unassigned —</option>
+              <option value="">* Unassigned *</option>
               {availableUnits.map(u => (
                 <option key={u.id} value={u.id}>{u.operatorName} ({u.truckName})</option>
               ))}
@@ -478,7 +478,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
           <div>
             <label className={LABEL}>Link to LE Call</label>
             <select className={INPUT} value={form.callId} onChange={e => set('callId', e.target.value)}>
-              <option value="">— None —</option>
+              <option value="">* None *</option>
               {callOptions.map(c => (
                 <option key={c.id} value={c.id}>{c.id} * {c.nature} @ {c.location}</option>
               ))}
@@ -500,7 +500,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
   );
 }
 
-/* ── Quick Dispatch Modal — pick a unit, send it en route ── */
+/* ── Quick Dispatch Modal * pick a unit, send it en route ── */
 function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCancel }) {
   const [selectedUnitId, setSelectedUnitId] = useState(
     availableUnits.length === 1 ? availableUnits[0].id : null
@@ -698,7 +698,7 @@ export default function TowCAD() {
   const activeCalls   = useMemo(() => calls.filter(c => c.status !== 'CLOSED'), [calls]);
   // Road Hazard / MVA calls that still have no tow job linked to them. Once a
   // job is linked (e.g. by dispatching the matching FDOT request), the call
-  // drops off this list — and the alert banner clears when none remain.
+  // drops off this list * and the alert banner clears when none remain.
   const unhandledRoadCalls = useMemo(
     () => fdotRequests.filter(req =>
       req.status !== 'DECLINED' &&
@@ -762,7 +762,7 @@ export default function TowCAD() {
 
   const handleSignOn = (data) => {
     dispatch({ type: 'ADD_TOW_UNIT', payload: data });
-    toast.success(`Signed on — ${data.truckName}`, { title: 'On duty' });
+    toast.success(`Signed on * ${data.truckName}`, { title: 'On duty' });
     setShowSignOn(false);
   };
 
@@ -777,7 +777,7 @@ export default function TowCAD() {
   };
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
-    toast.info(`Acknowledged — ${req.assistType}`, { title: 'FDOT' });
+    toast.info(`Acknowledged * ${req.assistType}`, { title: 'FDOT' });
     dispatch({
       type: 'DISPATCH_RADIO',
       payload: { from: currentUser?.id, to: recipientsFor(req), text: `FDOT has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is en route.` },
@@ -785,7 +785,7 @@ export default function TowCAD() {
   };
   const declineRequest = (req) => {
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
-    toast.warning(`Declined — ${req.assistType}`, { title: 'FDOT' });
+    toast.warning(`Declined * ${req.assistType}`, { title: 'FDOT' });
   };
   const dispatchFromRequest = (req) => setDispatchingReq(req);
 
@@ -799,7 +799,7 @@ export default function TowCAD() {
         towType:     'FDOT Clearance',
         priority:    req.priority || 2,
         zone:        'Roaming',
-        notes:       `[FDOT Assist] ${req.assistType} — ${req.description}`,
+        notes:       `[FDOT Assist] ${req.assistType} * ${req.description}`,
         callId:      req.callId || '',
         companyId:   fdotCompany?.id,
         companyName: fdotCompany?.name || 'FDOT',
@@ -867,7 +867,7 @@ export default function TowCAD() {
         </div>
       </div>
 
-      {/* FDOT inbound assistance requests — FDOT company view only */}
+      {/* FDOT inbound assistance requests * FDOT company view only */}
       {isFdotView && inboundRequests.length > 0 && (
         <div className="mb-6">
           <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
@@ -951,7 +951,7 @@ export default function TowCAD() {
         )}
       </div>
 
-      {/* FDOT road incident alert — only while road calls still lack a linked
+      {/* FDOT road incident alert * only while road calls still lack a linked
           tow job; clears once every one has been handled. */}
       {towCompanies.some(b => b.isFDOT) && unhandledRoadCalls.length > 0 && (
         <div className="flex items-start gap-3 mb-5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
@@ -960,7 +960,7 @@ export default function TowCAD() {
             <span className="font-bold">
               {unhandledRoadCalls.length} active road incident{unhandledRoadCalls.length > 1 ? 's' : ''} awaiting a tow job.
             </span>{' '}
-            Road Hazard or MVA calls in the dispatch queue have no tow job linked yet — link one to coordinate response.
+            Road Hazard or MVA calls in the dispatch queue have no tow job linked yet * link one to coordinate response.
           </div>
         </div>
       )}

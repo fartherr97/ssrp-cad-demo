@@ -187,7 +187,7 @@ function ToastCard({ toast, onDismiss }) {
 
       <MdClose size={16} className="shrink-0 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* progress bar for timed toasts — inset + rounded to match the card */}
+      {/* progress bar for timed toasts * inset + rounded to match the card */}
       {!loading && toast.duration > 0 && !toast.leaving && (
         <span
           className="absolute left-4 right-4 bottom-[7px] h-[3px] rounded-full origin-left"
@@ -202,7 +202,7 @@ function ToastCard({ toast, onDismiss }) {
   );
 }
 
-/* ── Centered viewport (portaled to body) — same on desktop and mobile ── */
+/* ── Centered viewport (portaled to body) * same on desktop and mobile ── */
 function ToastViewport({ toasts, onDismiss }) {
   if (typeof document === 'undefined') return null;
   return createPortal(

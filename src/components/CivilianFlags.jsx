@@ -37,7 +37,7 @@ export function FlagRow({ flags = [], size = 'sm' }) {
   );
 }
 
-/* Inline flag manager — shows current flags + add button with dropdown */
+/* Inline flag manager * shows current flags + add button with dropdown */
 export function FlagManager({ civilianId, flags = [] }) {
   const { state, dispatch } = useCAD();
   const defs = state.customFlags || [];

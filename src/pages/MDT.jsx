@@ -72,7 +72,7 @@ export default function MDT() {
         ))}
       </div>
 
-      {/* Active panics — always visible across MDT tabs while unresolved */}
+      {/* Active panics * always visible across MDT tabs while unresolved */}
       <ActivePanicsPanel className="shrink-0 m-2" />
 
       <div className="flex-1 overflow-hidden flex">

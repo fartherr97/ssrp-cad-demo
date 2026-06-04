@@ -108,7 +108,7 @@ export default function MessageLogs() {
                         {m.fromBadge && <div className="text-[10px] font-mono text-slate-500 pl-5">{m.fromBadge}</div>}
                       </td>
                       <td className="px-4 py-3 border-b border-border-faint text-[12px] text-slate-300 whitespace-nowrap">
-                        {m.type === 'blast' ? <span className="text-amber-400 font-semibold">{m.subject}</span> : (m.to || '—')}
+                        {m.type === 'blast' ? <span className="text-amber-400 font-semibold">{m.subject}</span> : (m.to || '*')}
                       </td>
                       <td className="px-4 py-3 border-b border-border-faint text-[12px] text-slate-200 max-w-[160px] truncate">
                         {m.subject}

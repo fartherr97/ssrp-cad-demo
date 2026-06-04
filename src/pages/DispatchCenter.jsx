@@ -166,7 +166,7 @@ function Stat({ label, value, color = '#ffffff' }) {
 
 /* Smoothly reveal/hide a block by animating its height (grid-rows 0fr↔1fr)
    plus a fade. Mounts on show, stays mounted through the collapse, then
-   unmounts — so surrounding layout slides instead of snapping. */
+   unmounts * so surrounding layout slides instead of snapping. */
 function Reveal({ show, children, duration = 300 }) {
   const [mounted, setMounted] = useState(show);
   const [open, setOpen]       = useState(show);
@@ -319,10 +319,10 @@ function Dispatch911Modal({ call, onClose }) {
             <div className={S_FIELD}>
               <label className={S_LABEL}>Priority</label>
               <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: Number(e.target.value) }))}>
-                <option value={1}>P1 — Critical / Life Safety</option>
-                <option value={2}>P2 — High</option>
-                <option value={3}>P3 — Medium</option>
-                <option value={4}>P4 — Low / Routine</option>
+                <option value={1}>P1 * Critical / Life Safety</option>
+                <option value={2}>P2 * High</option>
+                <option value={3}>P3 * Medium</option>
+                <option value={4}>P4 * Low / Routine</option>
               </select>
             </div>
           </div>
@@ -417,10 +417,10 @@ function Sim911Modal({ onClose }) {
           <div className={S_FIELD}>
             <label className={S_LABEL}>Priority</label>
             <select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))}>
-              <option value={1}>P1 — Critical</option>
-              <option value={2}>P2 — High</option>
-              <option value={3}>P3 — Medium</option>
-              <option value={4}>P4 — Low</option>
+              <option value={1}>P1 * Critical</option>
+              <option value={2}>P2 * High</option>
+              <option value={3}>P3 * Medium</option>
+              <option value={4}>P4 * Low</option>
             </select>
           </div>
         </div>
@@ -535,10 +535,10 @@ export default function DispatchCenter() {
               <label className={S_LABEL}>Priority</label>
               <select className={S_SELECT} value={priFilter} onChange={e => setPriFilter(e.target.value)}>
                 <option value="ALL">All Priorities</option>
-                <option value="1">P1 — Critical</option>
-                <option value="2">P2 — High</option>
-                <option value="3">P3 — Medium</option>
-                <option value="4">P4 — Low</option>
+                <option value="1">P1 * Critical</option>
+                <option value="2">P2 * High</option>
+                <option value="3">P3 * Medium</option>
+                <option value="4">P4 * Low</option>
               </select>
             </div>
             <div className={S_FIELD}>
@@ -556,7 +556,7 @@ export default function DispatchCenter() {
           {/* 10-code radio reference (admin-configured) */}
           <TenCodeReference codes={tenCodes} />
 
-          {/* Incoming 911 — dispatcher + LEO */}
+          {/* Incoming 911 * dispatcher + LEO */}
           {(isDispatcher || currentUser?.portal === 'leo') && (
             <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -587,7 +587,7 @@ export default function DispatchCenter() {
             </div>
           )}
 
-          {/* Non-Emergency Calls — LEO + dispatcher */}
+          {/* Non-Emergency Calls * LEO + dispatcher */}
           {(isDispatcher || currentUser?.portal === 'leo') && (
             <div className="flex flex-col gap-2 p-3.5 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm">
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -680,7 +680,7 @@ export default function DispatchCenter() {
                   type: 'PANIC',
                   payload: { officerId: me?.id, unit, name: me?.name || currentUser?.name, location, x: c.x, y: c.y, z: c.z },
                 });
-                toast.error(`${unit} — ${location}`, { title: 'PANIC — Officer in Distress' });
+                toast.error(`${unit} * ${location}`, { title: 'PANIC * Officer in Distress' });
               }}
                 className="press w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
                 <MdSos size={16} /> Panic Alert
@@ -691,7 +691,7 @@ export default function DispatchCenter() {
 
         {/* ─────────── CENTER ─────────── */}
         <div className="flex flex-col gap-4 lg:gap-5 min-w-0 order-1 xl:order-none">
-          {/* Active panics — persists after the toast clears */}
+          {/* Active panics * persists after the toast clears */}
           <ActivePanicsPanel />
 
           {/* Active calls */}
@@ -724,9 +724,9 @@ export default function DispatchCenter() {
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 whitespace-nowrap">{c.city}</td>
                         <td className="px-4 py-2.5"><PriBadge p={c.priority} /></td>
                         <td className="px-4 py-2.5"><CallStatus status={c.status} /></td>
-                        <td className="px-4 py-2.5 text-[12px]">{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">—</span>}</td>
+                        <td className="px-4 py-2.5 text-[12px]">{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">*</span>}</td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono whitespace-nowrap ${c.units.length > 0 ? 'text-emerald-400' : 'text-slate-600'}`}>
-                          {c.units.length > 0 ? c.units.join(', ') : '—'}
+                          {c.units.length > 0 ? c.units.join(', ') : '*'}
                         </td>
                       </tr>
                     );
@@ -792,7 +792,7 @@ export default function DispatchCenter() {
                             ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={setUnitStatus} />
                             : <StatusBadge status={o.status} />}
                         </td>
-                        <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>
+                        <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '*'}</td>
                         <td className="px-4 py-2.5 text-[12.5px] whitespace-nowrap"><DeptTag code={o.deptShort} /></td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 max-w-[200px] truncate">{o.location}</td>
                         <td className="px-4 py-2.5 text-[12.5px] text-white whitespace-nowrap">
@@ -902,10 +902,10 @@ export default function DispatchCenter() {
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Priority</label>
                   <select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
-                    <option value={1}>P1 — Critical / Life Safety</option>
-                    <option value={2}>P2 — High</option>
-                    <option value={3}>P3 — Medium</option>
-                    <option value={4}>P4 — Low / Routine</option>
+                    <option value={1}>P1 * Critical / Life Safety</option>
+                    <option value={2}>P2 * High</option>
+                    <option value={3}>P3 * Medium</option>
+                    <option value={4}>P4 * Low / Routine</option>
                   </select>
                 </div>
               </div>

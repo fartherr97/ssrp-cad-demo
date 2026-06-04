@@ -154,7 +154,7 @@ export default function ReportsCenter() {
 
   const submitReport = () => {
     if (!selectedTemplate) return;
-    // Sequential report number — the store stamps the authoritative value; we
+    // Sequential report number * the store stamps the authoritative value; we
     // mirror it here for the confirmation toast.
     const caseNum = String(reportSeq).padStart(4, '0');
     dispatch({
@@ -223,7 +223,7 @@ export default function ReportsCenter() {
     const Detail = ({ label, value }) => (
       <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
         <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{label}</span>
-        <span className="text-[12.5px] text-slate-200">{value || '—'}</span>
+        <span className="text-[12.5px] text-slate-200">{value || '*'}</span>
       </div>
     );
 
@@ -265,7 +265,7 @@ export default function ReportsCenter() {
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
-              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '*'}</div></div>
             </div>
             <div className="xl:flex-1 xl:overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}

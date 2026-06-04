@@ -11,7 +11,7 @@ function licenseDaysLeft(issuedAt) {
 }
 
 function licenseExpiryStr(issuedAt) {
-  if (!issuedAt) return '—';
+  if (!issuedAt) return '*';
   const d = new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000);
   return d.toISOString().split('T')[0];
 }
@@ -281,7 +281,7 @@ export default function AdminBusinesses() {
               </div>
             </section>
 
-            {/* Employees — only for saved businesses */}
+            {/* Employees * only for saved businesses */}
             {!isNew && selectedBiz && (
               <section>
                 <div className="flex items-center justify-between mb-3">
@@ -365,7 +365,7 @@ export default function AdminBusinesses() {
                       <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                         <div>
                           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">License #</div>
-                          <div className="text-[12px] font-mono text-slate-200">{selectedBiz.license || '—'}</div>
+                          <div className="text-[12px] font-mono text-slate-200">{selectedBiz.license || '*'}</div>
                         </div>
                         <div>
                           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Status</div>
@@ -376,7 +376,7 @@ export default function AdminBusinesses() {
                         </div>
                         <div>
                           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Issued</div>
-                          <div className="text-[12px] font-mono text-slate-300">{selectedBiz.licenseIssuedAt || '—'}</div>
+                          <div className="text-[12px] font-mono text-slate-300">{selectedBiz.licenseIssuedAt || '*'}</div>
                         </div>
                         <div>
                           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Expires</div>

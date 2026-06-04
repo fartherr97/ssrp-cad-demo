@@ -244,7 +244,7 @@ function LookupField({ f, kind, value, data, sectionFields, onChange, onBulk }) 
     return (state.civilians || []).find(c => `${c.firstName} ${c.lastName}`.toLowerCase() === val) || null;
   })();
 
-  // Build results — vehicle lookup is scoped to the section's civilian when one
+  // Build results * vehicle lookup is scoped to the section's civilian when one
   // is selected (their registered vehicles first), but still allows any plate.
   let results = [];
   let ownerIds = new Set();
@@ -457,7 +457,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
         );
         return (
           <div key={c.id} className="rounded-xl border overflow-hidden" style={{ borderColor: ts.border }}>
-            {/* Header — number · charge name · type · delete */}
+            {/* Header * number · charge name · type · delete */}
             <div className="flex items-center gap-3 px-3 py-2.5" style={{ background: ts.bg }}>
               <span className="flex items-center justify-center w-6 h-6 rounded-md text-[11px] font-bold font-mono shrink-0"
                 style={{ background: 'rgba(0,0,0,0.25)', color: ts.color }}>{idx + 1}</span>
@@ -469,7 +469,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
                 onChange={e => updateCharge(c.id, 'name', e.target.value)}
               />
               {readOnly ? (
-                <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '—'}</span>
+                <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '*'}</span>
               ) : (
                 <select
                   className="bg-transparent text-[12px] font-bold outline-none focus-visible:outline-none cursor-pointer shrink-0"
@@ -491,12 +491,12 @@ function ChargesField({ f, value, onChange, readOnly }) {
               )}
             </div>
 
-            {/* Body — structured field cells */}
+            {/* Body * structured field cells */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3" style={{ background: 'rgba(255,255,255,0.015)' }}>
               {cell('Code', txt('code', { placeholder: '§ Code', mono: true }))}
               {cell('Counts', txt('counts', { placeholder: '1', type: 'number' }))}
               {cell('Bond Type', readOnly
-                ? <span className="text-[13px] text-slate-200">{c.bondType || '—'}</span>
+                ? <span className="text-[13px] text-slate-200">{c.bondType || '*'}</span>
                 : (
                   <select
                     className="w-full bg-transparent text-[13px] text-slate-100 outline-none focus-visible:outline-none cursor-pointer"
@@ -524,7 +524,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
           <MdGavel size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-bright pointer-events-none" />
           <input
             className={`${S_INPUT} pl-9 pr-3`}
-            placeholder="Search penal code — name, code, or category…"
+            placeholder="Search penal code * name, code, or category…"
             value={query}
             onChange={e => { setQuery(e.target.value); place(); setOpen(true); }}
             onFocus={() => { place(); setOpen(true); }}
@@ -707,7 +707,7 @@ function ImageField({ f, value, onChange, readOnly }) {
 }
 
 /* Downscale an image file in the browser before we store it. Officers can drop
-   in a huge phone/4K capture and it just works — we resize to fit within
+   in a huge phone/4K capture and it just works * we resize to fit within
    MAX_EDGE px and re-encode as JPEG, so what we keep is a few hundred KB rather
    than the multi-MB original. Keeps memory + draft auto-save well under limits. */
 const PHOTO_MAX_EDGE = 1920;   // longest side, px
@@ -731,7 +731,7 @@ function downscaleImage(file) {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        // PNGs with transparency would go black on JPEG — but report photos are
+        // PNGs with transparency would go black on JPEG * but report photos are
         // opaque captures, so JPEG is the right call for size.
         resolve(canvas.toDataURL('image/jpeg', PHOTO_QUALITY));
       };
@@ -806,7 +806,7 @@ function PhotoLightbox({ open, photos, index, onClose, onNavigate }) {
         </>
       )}
 
-      {/* Image — object-contain so nothing is cropped */}
+      {/* Image * object-contain so nothing is cropped */}
       <img
         key={idx}
         src={photos[idx]}
@@ -933,7 +933,7 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
   );
 }
 
-/* ── Supplemental log — append-only follow-ups any LEO can add after filing ─
+/* ── Supplemental log * append-only follow-ups any LEO can add after filing ─
    Existing entries are immutable (stamped with author + timestamp); the only
    action is adding a new entry. This is what lets officers who can't edit a
    filed report still attach additional findings after the fact. */
@@ -985,7 +985,7 @@ function SupplementField({ f, entries, editable, onAppend }) {
             </div>
             <div className="px-3 py-2">
               <div className="text-[12.5px] text-slate-200 whitespace-pre-wrap leading-relaxed">{s.text}</div>
-              <div className="text-[10px] font-mono text-slate-500 mt-1.5">— {s.authorLine || s.author || s.badge}</div>
+              <div className="text-[10px] font-mono text-slate-500 mt-1.5">* {s.authorLine || s.author || s.badge}</div>
             </div>
           </div>
         ))}
@@ -995,7 +995,7 @@ function SupplementField({ f, entries, editable, onAppend }) {
         <div className="mt-2.5 rounded-lg border border-border-base bg-app-card/50 p-2.5">
           <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">Add Supplement</div>
           <textarea className={S_TEXTAREA} rows={3}
-            placeholder="Describe the follow-up — additional evidence, new statements, corrections, etc."
+            placeholder="Describe the follow-up * additional evidence, new statements, corrections, etc."
             value={draft} onChange={e => setDraft(e.target.value)} />
           <div className="flex items-center gap-2 mt-2">
             <span className="text-[10px] font-mono text-slate-500">Filing as: {authorLine}</span>
@@ -1017,7 +1017,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
   // Honor the builder's field-level read-only flag in addition to supervisor gating.
   const effectiveReadOnly = readOnly || !!f.readOnly || (isSupOnly && !isSupervisor);
 
-  // Supplemental log — stays addable even when the rest of the form is locked,
+  // Supplemental log * stays addable even when the rest of the form is locked,
   // as long as the parent granted supplement rights (LEO views). New entries
   // persist via onSupplement when read-only, or the normal onChange at creation.
   if (f.type === 'supplemental') {
@@ -1029,22 +1029,22 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
   const span = Math.min(f.span || 1, 4);
   const lookupKind = LOOKUP_KIND[f.type];
 
-  // Mugshot — portrait image upload
+  // Mugshot * portrait image upload
   if (f.type === 'mugshot') {
     return <MugshotField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
-  // Image — generic landscape image upload
+  // Image * generic landscape image upload
   if (f.type === 'image') {
     return <ImageField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
-  // Photos — multi-photo gallery (up to 8)
+  // Photos * multi-photo gallery (up to 8)
   if (f.type === 'photos') {
     return <PhotoGalleryField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
-  // Charges — full-width multi-select from penal code
+  // Charges * full-width multi-select from penal code
   if (f.type === 'charges') {
     return (
       <div className={`flex flex-col sm:col-span-2 lg:col-span-4`}>
@@ -1065,7 +1065,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
     );
   }
 
-  // Checkbox — compact toggle row
+  // Checkbox * compact toggle row
   if (f.type === 'checkbox') {
     return (
       <label className={`${SPAN[span]} flex items-center gap-2.5 self-end px-3 py-2.5 rounded-lg border text-[12.5px] text-slate-200 ${effectiveReadOnly ? '' : 'cursor-pointer hover:border-border-strong'} transition-colors
@@ -1083,14 +1083,14 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
   const cls = isNarr ? FULL : (SPAN[span] || SPAN[1]);
 
   // Auto-numbered fields (Warrant #, Notice #, Citation #, etc.) mirror the
-  // shared sequential record number — the same counter that stamps every
+  // shared sequential record number * the same counter that stamps every
   // report and record, zero-padded to 4 digits starting at 0001. They are
   // never hand-typed: we show the assigned value read-only.
   const isAutoNumber = !!f.autoNumber;
   const autoValue = value || String(state.reportSeq || 1).padStart(4, '0');
 
   // Signature fields get a one-click "Sign Off" that stamps the signer's
-  // active identifier (badge | rank | name) — same format as filed reports.
+  // active identifier (badge | rank | name) * same format as filed reports.
   // An explicit `signature` builder field always qualifies; a plain text
   // field qualifies when its label reads like a signature (back-compat).
   const isSignatureField = f.type === 'signature' || (f.type === 'text' && /signature/i.test(f.label || ''));
@@ -1125,7 +1125,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
       ) : effectiveReadOnly ? (
         <div className={`min-h-[40px] px-3.5 py-2.5 rounded-lg border text-sm text-slate-200 ${f.mono ? 'font-mono' : ''} ${isNarr ? 'whitespace-pre-wrap leading-relaxed' : ''}
           ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
-          {value || <span className="text-slate-600">—</span>}
+          {value || <span className="text-slate-600">*</span>}
         </div>
       ) : lookupKind ? (
         <LookupField f={f} kind={lookupKind} value={value} data={data} sectionFields={sectionFields} onChange={onChange} onBulk={onBulk} />
@@ -1135,7 +1135,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
         <select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
-          <option value="">{f.placeholder || '—'}</option>
+          <option value="">{f.placeholder || '*'}</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (

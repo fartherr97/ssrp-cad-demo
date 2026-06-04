@@ -671,7 +671,7 @@ export default function DispatchPortal() {
 
   const handleDispatch = ({ nature, location, priority, units, description, reportingParty }) => {
     dispatch({ type: 'CREATE_CALL', payload: { nature, location, priority, units, category: 'police', description, reportingParty, city: '', county: '', status: units.length ? 'ACTIVE' : 'PENDING', timestamp: new Date().toISOString().slice(0,16).replace('T',' ') } });
-    toast.success(units.length ? `${nature} dispatched — ${units.length} unit${units.length > 1 ? 's' : ''}` : `${nature} created`, { title: 'Call dispatched' });
+    toast.success(units.length ? `${nature} dispatched * ${units.length} unit${units.length > 1 ? 's' : ''}` : `${nature} created`, { title: 'Call dispatched' });
     dispatch({ type: 'REMOVE_INCOMING_911', payload: dispatchTarget.id });
     units.forEach(uid => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: uid, status: 'ENRT' } }));
     setDispatchTarget(null);
@@ -755,7 +755,7 @@ export default function DispatchPortal() {
       <div className="flex-1 min-h-0 p-4 grid gap-4"
         style={{ gridTemplateColumns: isMobile ? '1fr' : '280px 1fr 260px' }}>
 
-        {/* Col 1 — Incoming 911 */}
+        {/* Col 1 * Incoming 911 */}
         <Column icon={MdPhone} iconColor="#ef4444" title="Incoming 911"
           count={incoming911.length} countAlert>
           {incoming911.length === 0
@@ -768,7 +768,7 @@ export default function DispatchPortal() {
           }
         </Column>
 
-        {/* Col 2 — Active Calls */}
+        {/* Col 2 * Active Calls */}
         <Column icon={MdRadio} iconColor="#3aaa44" title="Active Calls" count={activeCalls.length}>
           {activeCalls.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8">
@@ -783,7 +783,7 @@ export default function DispatchPortal() {
           }
         </Column>
 
-        {/* Col 3 — Units & Groups */}
+        {/* Col 3 * Units & Groups */}
         <div className="flex flex-col min-h-0 rounded-2xl overflow-hidden"
           style={{ background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.07)' }}>
           {/* Tab bar */}

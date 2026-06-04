@@ -151,7 +151,7 @@ export default function HelpEditor() {
 
   const stored = state.helpContent || {};
   const [activePortal, setActivePortal] = useState('civilian');
-  // Working copy — keyed by portal id
+  // Working copy * keyed by portal id
   const [drafts, setDrafts] = useState({});
 
   const color = PORTAL_COLOR[activePortal];

@@ -43,7 +43,7 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
 
   return (
     <div className="flex flex-col bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-      {/* Header — just nav actions, no title crowding */}
+      {/* Header * just nav actions, no title crowding */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border-base shrink-0"
         style={{ background: 'rgba(251,146,60,0.05)' }}>
         <button onClick={onBack}
@@ -67,7 +67,7 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
       {/* Supervisor comments banner */}
       {(report.supervisorComments || []).length > 0 && (
         <div className="px-4 py-3 border-b border-border-faint flex flex-col gap-2" style={{ background: 'rgba(251,146,60,0.04)' }}>
-          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-amber-500">Supervisor Notes — Please Address Before Resubmitting</div>
+          <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-amber-500">Supervisor Notes * Please Address Before Resubmitting</div>
           {(report.supervisorComments || []).map(c => (
             <div key={c.id} className="rounded-lg px-3 py-2.5 text-[12px] text-slate-300 leading-relaxed"
               style={{ background: 'rgba(251,146,60,0.07)', border: '1px solid rgba(251,146,60,0.18)' }}>
@@ -109,7 +109,7 @@ export default function OfficerProfile() {
   const nexumWeekly  = myOfficer?.dutyTimeWeek  ?? null; // minutes
   const nexumMonthly = myOfficer?.dutyTimeMonth ?? null; // minutes
   const fmtTime = (m) => {
-    if (m === null || m === undefined) return '—';
+    if (m === null || m === undefined) return '*';
     const h = Math.floor(m / 60), min = m % 60;
     if (!m) return '0m';
     if (!h) return `${min}m`;
@@ -173,7 +173,7 @@ export default function OfficerProfile() {
         style={{ borderLeft: `3px solid ${accentColor}` }}
       >
         <div className="flex items-center gap-4">
-          {/* Avatar — click to upload */}
+          {/* Avatar * click to upload */}
           <div
             className="relative w-14 h-14 rounded-xl shrink-0 cursor-pointer group overflow-hidden bg-app-elevated"
             style={{ border: `2px solid ${accentColor}` }}
@@ -357,7 +357,7 @@ export default function OfficerProfile() {
             <div className="flex flex-col gap-3">
               {returnedReports.length === 0 ? (
                 <div className="bg-app-panel/80 border border-border-base rounded-xl p-10 text-center text-slate-600 text-[13px]">
-                  No returned reports — you&apos;re all clear.
+                  No returned reports * you&apos;re all clear.
                 </div>
               ) : returnedReports.map(r => {
                 const latestComment = (r.supervisorComments || []).slice(-1)[0];
@@ -482,7 +482,7 @@ export default function OfficerProfile() {
             </button>
           </div>
 
-          {/* Filled-out report — locked read-only; supplements can still be added */}
+          {/* Filled-out report * locked read-only; supplements can still be added */}
           <div className="flex-1 overflow-y-auto bg-app-bg/40 p-4 lg:p-6">
             {(() => {
               const tpl = reportTemplates.find(t => t.name === liveReport.type);
@@ -643,7 +643,7 @@ function IdentifiersTab({ officer, accentColor }) {
                 const dept = departments.find(d => d.id === Number(e.target.value));
                 setDraft(p => ({ ...p, dept: Number(e.target.value), subdivision: dept?.subdivisions?.[0] || '' }));
               }}>
-                <option value="">— Select Agency —</option>
+                <option value="">* Select Agency *</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
@@ -651,7 +651,7 @@ function IdentifiersTab({ officer, accentColor }) {
               <div>
                 <label className={S_LABEL}>Subdivision</label>
                 <select className={S_INPUT} value={draft.subdivision} onChange={e => setDraftField('subdivision', e.target.value)}>
-                  <option value="">— None —</option>
+                  <option value="">* None *</option>
                   {selectedDeptSubs.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>

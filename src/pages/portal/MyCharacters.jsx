@@ -47,7 +47,7 @@ const _ETH  = ['White / Caucasian', 'Black / African American', 'Hispanic / Lati
 const _HAIR = ['Black', 'Brown', 'Dark Brown', 'Blonde', 'Light Brown', 'Auburn',
                'Red', 'Gray', 'Salt & Pepper', 'Bald'];
 const _EYES = ['Brown', 'Dark Brown', 'Hazel', 'Green', 'Blue', 'Gray'];
-// GTA V / FiveM — Los Santos & Blaine County street names
+// GTA V / FiveM * Los Santos & Blaine County street names
 const _STREETS = [
   'Vinewood Blvd', 'Spanish Ave', 'Alta St', 'Power St', 'Strawberry Ave',
   'Carcer Way', 'Decker St', 'Forum Dr', 'Hawick Ave', 'Jamestown St',

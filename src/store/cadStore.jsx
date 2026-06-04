@@ -16,7 +16,7 @@ import {
 
 /* ── Subdivision duty-hour tracking ───────────────────────────────────────
    Time accrues while an officer is on duty (any status except OFFDUTY) under a
-   specialised subdivision — anything other than "Patrol". We bank elapsed
+   specialised subdivision * anything other than "Patrol". We bank elapsed
    seconds into the subdivision they were accrued under on each transition and
    keep a running start stamp; a subdivision's live total is its banked seconds
    plus (now − start) for whoever is currently clocked into it.
@@ -188,7 +188,7 @@ const initialState = {
   myCallId: null,
   nextId: 1000,
   // Sequential report/record number. Every report or record filed through the
-  // CAD is stamped with the next value, zero-padded to 4 digits — the first
+  // CAD is stamped with the next value, zero-padded to 4 digits * the first
   // one ever submitted is 0001 and it climbs from there.
   reportSeq: 1,
   // Radio broadcast counters drive the MDT nav badge + toast. `radioCount` is
@@ -198,7 +198,7 @@ const initialState = {
   radioSeen: 0,
   lastRadio: null,
   panicAlert: null,
-  // Every unresolved officer panic, newest first — drives the Active Panics
+  // Every unresolved officer panic, newest first * drives the Active Panics
   // panel so LEOs can reference a panic after its toast is gone.
   activePanics: [],
   dispatchLog: [
@@ -387,9 +387,9 @@ function reducer(state, action) {
     }
     case 'DISPATCH_RADIO': {
       // Payload may be a plain string (legacy) or { text, from, to }:
-      //   from — sender's user id; the bridge never echoes a broadcast back to
+      //   from * sender's user id; the bridge never echoes a broadcast back to
       //          whoever sent it.
-      //   to   — optional array of recipient officer ids. When present, only
+      //   to   * optional array of recipient officer ids. When present, only
       //          those users see the toast (units attached to the scene); when
       //          absent/null the broadcast goes to everyone (general radio).
       const text = typeof action.payload === 'string' ? action.payload : action.payload?.text;
@@ -572,7 +572,7 @@ function reducer(state, action) {
       const officer = state.officers.find(o => o.badge === action.payload.officerBadge);
       const officerSignature = officer
         ? `${officer.badge} | ${(officer.rank || officer.role || 'OFFICER').toUpperCase()} | ${officer.name.toUpperCase()}`
-        : (action.payload.officerBadge || '—');
+        : (action.payload.officerBadge || '*');
       const reportNumber = String(state.reportSeq).padStart(4, '0');
       const newReport = {
         ...action.payload,
@@ -913,7 +913,7 @@ function reducer(state, action) {
 
     case 'ADD_TOW_JOB': {
       const job = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
-      const log = addDispatchLog(state, `Tow job #${state.nextId} created — ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
+      const log = addDispatchLog(state, `Tow job #${state.nextId} created * ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
       return { ...state, towJobs: [job, ...state.towJobs], nextId: state.nextId + 1, ...log };
     }
     case 'UPDATE_TOW_JOB': {
@@ -927,7 +927,7 @@ function reducer(state, action) {
     case 'ADD_TOW_UNIT': {
       // payload: { operatorName, discordId, companyId, companyName, truckId, truckName, zone }
       const unit = { ...action.payload, id: state.nextId, status: 'AVAILABLE', signedOnAt: Date.now() };
-      const log = addDispatchLog(state, `Tow unit online: ${unit.operatorName} (${unit.truckName}) — ${unit.zone}`, 'unit');
+      const log = addDispatchLog(state, `Tow unit online: ${unit.operatorName} (${unit.truckName}) * ${unit.zone}`, 'unit');
       return { ...state, towUnits: [...state.towUnits, unit], nextId: state.nextId + 1, ...log };
     }
     case 'UPDATE_TOW_UNIT': {
@@ -947,7 +947,7 @@ function reducer(state, action) {
       const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
       const log = addDispatchLog(
         state,
-        `FDOT assistance requested — ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        `FDOT assistance requested * ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
         'alert'
       );
       return { ...state, fdotRequests: [req, ...state.fdotRequests], nextId: state.nextId + 1, ...log };
@@ -974,7 +974,7 @@ function reducer(state, action) {
       const req = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
       const log = addDispatchLog(
         state,
-        `HCFR assistance requested — ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        `HCFR assistance requested * ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
         'alert'
       );
       return { ...state, hcfrRequests: [req, ...(state.hcfrRequests || [])], nextId: state.nextId + 1, ...log };

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { MdClose } from 'react-icons/md';
 
 /*
-  useMountTransition — keeps a component mounted long enough to play an exit
+  useMountTransition * keeps a component mounted long enough to play an exit
   animation after `open` flips to false.
 
   const { mounted, show } = useMountTransition(open, 240);
@@ -19,7 +19,7 @@ export function useMountTransition(open, exitMs = 240) {
     clearTimeout(timer.current);
     if (open) {
       // Mount and enter in the same commit. CSS keyframe animations play from
-      // their `from` state on insertion, so no rAF defer is needed — deferring
+      // their `from` state on insertion, so no rAF defer is needed * deferring
       // would leave one frame in the non-animated state and cause a flicker.
       setMounted(true);
       setShow(true);
@@ -34,7 +34,7 @@ export function useMountTransition(open, exitMs = 240) {
 }
 
 /*
-  Modal — animated, portaled dialog with backdrop fade + card entrance.
+  Modal * animated, portaled dialog with backdrop fade + card entrance.
 
   <Modal open={open} onClose={close} title="…" icon={MdStore} sheetOnMobile>
     …body…

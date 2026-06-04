@@ -1,5 +1,5 @@
 /* Generates a government-document-style PDF for reports and records.
-   Uses @react-pdf/renderer — all layout is React PDF primitives, no Tailwind. */
+   Uses @react-pdf/renderer * all layout is React PDF primitives, no Tailwind. */
 
 import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 
@@ -141,7 +141,7 @@ function renderField(f, value) {
     );
   }
 
-  const val = value != null && value !== '' ? String(value) : '—';
+  const val = value != null && value !== '' ? String(value) : '*';
   const isNarr = f.type === 'textarea';
   const span = f.span || 1;
   const blockStyle = isNarr ? styles.fieldBlockFull : span >= 3 ? styles.fieldBlockFull : span === 2 ? styles.fieldBlockHalf : styles.fieldBlock;
@@ -172,7 +172,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
   const ss = statusBadgeStyle(meta.status || 'Draft');
 
   return (
-    <Document title={`${template?.name || 'Report'} — ${meta.caseNumber || 'DRAFT'}`}
+    <Document title={`${template?.name || 'Report'} * ${meta.caseNumber || 'DRAFT'}`}
       author="Sunshine State RP CAD" creator="SSRP CAD System">
       <Page size="LETTER" style={styles.page}>
 
@@ -199,9 +199,9 @@ function ReportPDF({ template, data = {}, meta = {} }) {
         <View style={styles.metaBar}>
           {[
             { label: 'Date / Time', value: meta.dateTime || now.toLocaleString() },
-            { label: 'Primary Officer', value: meta.officer || '—' },
+            { label: 'Primary Officer', value: meta.officer || '*' },
             { label: 'Agency', value: meta.agency || 'HCSO' },
-            { label: 'Report Type', value: template?.name || '—' },
+            { label: 'Report Type', value: template?.name || '*' },
           ].map((m, i, arr) => (
             <View key={m.label} style={i === arr.length - 1 ? styles.metaCellLast : styles.metaCell}>
               <Text style={styles.metaLabel}>{m.label}</Text>
@@ -210,7 +210,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
           ))}
         </View>
 
-        {/* Sections — wrap freely so long content flows to the next page naturally */}
+        {/* Sections * wrap freely so long content flows to the next page naturally */}
         {sections.map(sec => {
           const regularFields = sec.fields.filter(f => f.type !== 'checkbox' && f.type !== 'charges' && f.type !== 'textarea' && f.type !== 'photos' && f.type !== 'image' && f.type !== 'mugshot' && f.type !== 'supplemental');
           const textareaFields = sec.fields.filter(f => f.type === 'textarea');
@@ -239,7 +239,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                   {checkboxFields.map(f => renderField(f, data[f.id]))}
                 </View>
               )}
-              {/* Charges — each row is atomic */}
+              {/* Charges * each row is atomic */}
               {chargeFields.map(f => {
                 const charges = Array.isArray(data[f.id]) ? data[f.id] : [];
                 return (
@@ -264,14 +264,14 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                   </View>
                 );
               })}
-              {/* Textareas — long narratives can span pages */}
+              {/* Textareas * long narratives can span pages */}
               {textareaFields.map(f => (
                 <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
                   <Text style={styles.fieldLabel}>{f.label}</Text>
-                  <Text style={styles.fieldValueNarr}>{data[f.id] || '—'}</Text>
+                  <Text style={styles.fieldValueNarr}>{data[f.id] || '*'}</Text>
                 </View>
               ))}
-              {/* Supplemental log — append-only follow-ups */}
+              {/* Supplemental log * append-only follow-ups */}
               {supplementalFields.map(f => {
                 const entries = Array.isArray(data[f.id]) ? data[f.id] : [];
                 return (
@@ -281,15 +281,15 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                       <Text style={styles.noCharges}>No supplements filed.</Text>
                     ) : entries.map((s, i) => (
                       <View key={s.id || i} wrap={false} style={{ marginTop: 3, paddingTop: 3, borderTop: i ? `0.5px solid ${lgray}` : undefined }}>
-                        <Text style={{ fontSize: 7, color: gray }}>SUPPLEMENT #{i + 1} — {s.date}</Text>
+                        <Text style={{ fontSize: 7, color: gray }}>SUPPLEMENT #{i + 1} * {s.date}</Text>
                         <Text style={styles.fieldValueNarr}>{s.text}</Text>
-                        <Text style={{ fontSize: 7, color: gray }}>— {s.authorLine || s.author || s.badge}</Text>
+                        <Text style={{ fontSize: 7, color: gray }}>* {s.authorLine || s.author || s.badge}</Text>
                       </View>
                     ))}
                   </View>
                 );
               })}
-              {/* Photo galleries — 4-up grid, each image aspect 4:3 */}
+              {/* Photo galleries * 4-up grid, each image aspect 4:3 */}
               {photoFields.map(f => {
                 const imgs = Array.isArray(data[f.id]) ? data[f.id].filter(Boolean) : [];
                 return (
@@ -314,19 +314,19 @@ function ReportPDF({ template, data = {}, meta = {} }) {
           );
         })}
 
-        {/* Signature lines — keep together, never split across pages */}
+        {/* Signature lines * keep together, never split across pages */}
         <View wrap={false} style={styles.sigsWrap}>
           <Text style={styles.sigTitle}>Signatures</Text>
           <View style={styles.sigRow}>
             {/* Officer signature */}
             <View style={styles.sigBlockOfficer}>
               <Text style={styles.sigLabelOfficer}>Observing Officer's Signature</Text>
-              <Text style={styles.sigValue}>{meta.officerSignature || (meta.officer || '—')}</Text>
+              <Text style={styles.sigValue}>{meta.officerSignature || (meta.officer || '*')}</Text>
             </View>
             {/* Supervisor signature */}
             <View style={styles.sigBlockSuper}>
               <Text style={styles.sigLabelSuper}>Supervisor Signature</Text>
-              <Text style={styles.sigValue}>{meta.supervisorSignature || '— Pending Supervisor Review —'}</Text>
+              <Text style={styles.sigValue}>{meta.supervisorSignature || '* Pending Supervisor Review *'}</Text>
             </View>
             {/* Date */}
             <View style={styles.sigBlock}>

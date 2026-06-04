@@ -175,7 +175,7 @@ export default function FileReport() {
                 <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>
                 <div className={`${PORTAL_INPUT} flex items-center gap-2 !cursor-default`}>
                   <MdPerson size={15} className="text-brand-bright shrink-0" />
-                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '—'}</span>
+                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '*'}</span>
                   <span className="text-[10px] text-slate-500 ml-auto">Active character</span>
                 </div>
               </div>

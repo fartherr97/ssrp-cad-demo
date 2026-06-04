@@ -159,7 +159,7 @@ export default function MyVehicles() {
                 <label className={PORTAL_LABEL}>Registered Owner</label>
                 <div className={`${PORTAL_INPUT} flex items-center gap-2 !cursor-default`}>
                   <MdPerson size={16} className="text-brand-bright shrink-0" />
-                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '—'}</span>
+                  <span className="font-semibold text-slate-200">{activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : '*'}</span>
                   <span className="text-[10px] text-slate-500 ml-auto">Active character</span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function MyVehicles() {
             {vehicleTemplate && (
               <div className="mt-5 pt-5 border-t border-border-faint">
                 <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-3 flex items-center gap-2">
-                  🚗 <span>{vehicleTemplate.name} — Additional Fields</span>
+                  🚗 <span>{vehicleTemplate.name} * Additional Fields</span>
                 </div>
                 <ReportForm
                   template={vehicleTemplate}

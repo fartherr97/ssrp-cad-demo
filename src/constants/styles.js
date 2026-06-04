@@ -10,7 +10,7 @@
 const _BTN_BASE = 'btn-glossy inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer font-semibold rounded-lg border disabled:opacity-40 disabled:cursor-not-allowed';
 
 export const S_BTN_PRIMARY   = `${_BTN_BASE} px-4 py-2 text-sm bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border-transparent`;
-// Emphasized call-to-action — solid blue, white text, larger + glowing so the
+// Emphasized call-to-action * solid blue, white text, larger + glowing so the
 // primary submit action on long forms can't be missed at the bottom of the page.
 export const S_BTN_SUBMIT    = `${_BTN_BASE} px-4 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white border-blue-400/50 shadow-lg shadow-blue-600/30`;
 export const S_BTN_SECONDARY = `${_BTN_BASE} px-4 py-2 text-sm bg-white/[0.08] hover:bg-white/[0.14] text-slate-200 border-transparent`;

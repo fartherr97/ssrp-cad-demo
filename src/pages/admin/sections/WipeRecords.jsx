@@ -77,7 +77,7 @@ export default function WipeRecords() {
         </WipeGrid>
       </AdminPanel>
 
-      {/* Dynamic — report templates */}
+      {/* Dynamic * report templates */}
       <AdminPanel
         title="Reports"
         subtitle="Wipe all submitted reports by type. New report templates you create will appear here automatically."
@@ -94,7 +94,7 @@ export default function WipeRecords() {
         )}
       </AdminPanel>
 
-      {/* Dynamic — record templates */}
+      {/* Dynamic * record templates */}
       <AdminPanel
         title="Records"
         subtitle="Wipe all saved records by type. New record templates you create will appear here automatically."

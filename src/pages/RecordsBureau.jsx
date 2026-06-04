@@ -20,7 +20,7 @@ function bizDaysLeft(issuedAt) {
 }
 
 function bizExpiryStr(issuedAt) {
-  if (!issuedAt) return '—';
+  if (!issuedAt) return '*';
   return new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 }
 
@@ -44,7 +44,7 @@ function Row({ label, value, mono }) {
   return (
     <div className="flex items-start justify-between gap-3">
       <span className="text-[11px] text-slate-500 shrink-0">{label}</span>
-      <span className={`text-[12.5px] text-slate-200 text-right ${mono ? 'font-mono' : 'font-medium'}`}>{value || '—'}</span>
+      <span className={`text-[12.5px] text-slate-200 text-right ${mono ? 'font-mono' : 'font-medium'}`}>{value || '*'}</span>
     </div>
   );
 }
@@ -63,7 +63,7 @@ function CollapsibleHistoryCard({ h }) {
   const dispClass = DISP_COLOR[h.disposition] || 'text-slate-400/80 bg-slate-400/[0.07] border-slate-400/20';
   return (
     <div className="flex flex-col bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
-      {/* Collapsed header — always visible */}
+      {/* Collapsed header * always visible */}
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
@@ -149,7 +149,7 @@ export default function RecordsBureau() {
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
-  // License suspension/reinstatement is a leadership action — admin/command portal only.
+  // License suspension/reinstatement is a leadership action * admin/command portal only.
   const canManageLicenses = currentUser?.portal === 'admin';
 
   const [searchType, setSearchType] = useState('PERSON');
@@ -160,7 +160,7 @@ export default function RecordsBureau() {
   const [searched, setSearched]     = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // CASES-specific filters (live — no need to press search)
+  // CASES-specific filters (live * no need to press search)
   const [caseKind, setCaseKind]     = useState('ALL');   // ALL | REPORTS | RECORDS
   const [caseStatus, setCaseStatus] = useState('ALL');
 
@@ -398,7 +398,7 @@ export default function RecordsBureau() {
                       <StatusChip status={r.status} />
                     </div>
                     <div className="text-[12.5px] font-semibold text-white leading-tight">{r.type}</div>
-                    <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '—'}</div>
+                    <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '*'}</div>
                   </button>
                 );
 
@@ -554,7 +554,7 @@ export default function RecordsBureau() {
                     <StatusChip status={selCase.status} />
                   </div>
 
-                  {/* Read-only document body — matches the profile/report viewer */}
+                  {/* Read-only document body * matches the profile/report viewer */}
                   <div className="flex-1 overflow-y-auto bg-app-bg/30 p-4 lg:p-6">
                     {tpl ? (
                       <ReportForm
@@ -610,7 +610,7 @@ export default function RecordsBureau() {
                       <Row label="Status"       value={
                         <span className="font-bold" style={{ color: licColor }}>{licLabel}</span>
                       } />
-                      <Row label="Issued"       value={selBiz.licenseIssuedAt || '—'} mono />
+                      <Row label="Issued"       value={selBiz.licenseIssuedAt || '*'} mono />
                       <Row label="Expires"      value={bizExpiryStr(selBiz.licenseIssuedAt)} mono />
                       {!licRevoked && days !== null && (
                         <div className="mt-1">
@@ -826,9 +826,9 @@ export default function RecordsBureau() {
 
                       <InfoCard title="Address(es)">
                         <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Primary Address</div>
-                        <div className="text-[12.5px] text-slate-200 leading-relaxed mb-3">{selCiv.address || '—'}</div>
+                        <div className="text-[12.5px] text-slate-200 leading-relaxed mb-3">{selCiv.address || '*'}</div>
                         <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Phone</div>
-                        <div className="text-[12.5px] text-slate-300 font-mono">{selCiv.phone || '—'}</div>
+                        <div className="text-[12.5px] text-slate-300 font-mono">{selCiv.phone || '*'}</div>
                       </InfoCard>
 
                       <InfoCard title="Additional Information">
@@ -964,7 +964,7 @@ export default function RecordsBureau() {
                         style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)' }}>
                         <MdShield size={16} className="text-amber-400 shrink-0 mt-0.5" />
                         <div className="text-[11px] text-amber-300/80 leading-relaxed">
-                          <span className="font-bold text-amber-300">LEO View</span> — showing safety-relevant information only.
+                          <span className="font-bold text-amber-300">LEO View</span> * showing safety-relevant information only.
                           Medications, emergency contacts, and clinical notes are restricted to Fire &amp; EMS.
                         </div>
                       </div>

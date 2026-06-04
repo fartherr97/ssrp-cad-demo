@@ -31,7 +31,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
 
   const me = officers.find(o => o.id === currentUser?.id);
   const senderName  = me?.name  || currentUser?.name  || 'Unknown';
-  const senderBadge = me?.badge || currentUser?.badge || '—';
+  const senderBadge = me?.badge || currentUser?.badge || '*';
 
   // Supervisors are always scoped to their own department.
   const myDeptId = me?.dept ?? null;
@@ -124,7 +124,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
               style={{ background: `${color}12`, border: `1px solid ${color}44`, borderLeft: `4px solid ${color}` }}>
               <div className="font-bold mb-0.5" style={{ color }}>{title || 'Title'}</div>
               <div className="text-slate-300 leading-snug whitespace-pre-wrap">{body || 'Message…'}</div>
-              <div className="text-slate-500 text-[10px] mt-1.5">— {senderName} ({senderBadge})</div>
+              <div className="text-slate-500 text-[10px] mt-1.5">* {senderName} ({senderBadge})</div>
             </div>
           </div>
         )}
@@ -194,7 +194,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
   const buildSupSig = () => {
     const me = allOfficers.find(o => o.id === currentUser?.id);
     if (me) return `${me.badge} | ${(me.rank || me.role || 'SUPERVISOR').toUpperCase()} | ${me.name.toUpperCase()}`;
-    return `${currentUser?.badge || '—'} | SUPERVISOR | ${(currentUser?.name || '—').toUpperCase()}`;
+    return `${currentUser?.badge || '*'} | SUPERVISOR | ${(currentUser?.name || '*').toUpperCase()}`;
   };
 
   const signAndApprove = () => {
@@ -221,7 +221,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         id: entry.id,
         comment: commentDraft.trim(),
         supervisorName: me?.name || currentUser?.name || 'Supervisor',
-        supervisorBadge: me?.badge || currentUser?.badge || '—',
+        supervisorBadge: me?.badge || currentUser?.badge || '*',
       },
     });
     toast.success(`${entry.caseNumber || entry.type} returned to officer.`, { title: 'Report Returned' });
@@ -236,7 +236,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         caseNumber: entry.caseNumber,
         status,
         dateTime: entry.date,
-        officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—'),
+        officer: officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '*'),
         agency: departments?.find(d => d.short === officer?.deptShort)?.name || officer?.deptShort || communityConfig?.name || 'SSRP',
         logoUrl: departments?.find(d => d.short === officer?.deptShort)?.logoUrl || communityConfig?.logoUrl,
         officerSignature: entry.officerSignature,
@@ -290,10 +290,10 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
       <div className="xl:hidden shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-border-faint overflow-x-auto"
         style={{ background: 'rgba(0,0,0,0.2)' }}>
         <StatusPill status={effectiveStatus} />
-        <span className="text-[11px] font-mono text-slate-400 shrink-0">{entry.caseNumber || '—'}</span>
+        <span className="text-[11px] font-mono text-slate-400 shrink-0">{entry.caseNumber || '*'}</span>
         <span className="text-[11px] text-slate-500 shrink-0">·</span>
         <span className="text-[11px] text-slate-400 shrink-0">
-          {officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '—')}
+          {officer ? `${officer.badge} · ${officer.name}` : (entry.officerBadge || '*')}
         </span>
         {effectiveSupSig && <span className="text-[10px] text-green-400 font-bold shrink-0 ml-auto">✓ Signed</span>}
       </div>
@@ -304,7 +304,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
 
         {/* CENTER: dark form (same as report writing) */}
         <main className="flex flex-col xl:min-h-0 xl:overflow-hidden">
-          {/* Status bar — hidden on mobile (compact strip above handles it) */}
+          {/* Status bar * hidden on mobile (compact strip above handles it) */}
           <div className="hidden xl:grid shrink-0 grid-cols-4 gap-x-4 gap-y-2 px-4 py-3 bg-app-panel/40 border-b border-border-faint">
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Report Status</div>
@@ -316,7 +316,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Case #</div>
-              <div className="text-[12.5px] font-mono text-slate-200 mt-0.5">{entry.caseNumber || '—'}</div>
+              <div className="text-[12.5px] font-mono text-slate-200 mt-0.5">{entry.caseNumber || '*'}</div>
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Sup. Signed</div>
@@ -324,7 +324,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
             </div>
           </div>
 
-          {/* Form fields — xl: this div scrolls; mobile: outer body div scrolls */}
+          {/* Form fields * xl: this div scrolls; mobile: outer body div scrolls */}
           <div data-doc-top className="xl:flex-1 xl:overflow-auto bg-app-bg/30 p-4 lg:p-6">
             {template ? (
               <ReportForm
@@ -340,7 +340,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
               </div>
             )}
 
-            {/* ── Status / Signature section at bottom of form — hidden when template has sReview ── */}
+            {/* ── Status / Signature section at bottom of form * hidden when template has sReview ── */}
             {!hasSReview && <div data-section="Status" className="mt-6 rounded-xl overflow-hidden border border-border-base">
               <div className="bg-red-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.7px] text-white">
                 Status
@@ -372,7 +372,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
                     Officer Signature
                   </div>
                   <div style={{ fontFamily: 'Courier New, monospace', fontSize: 11, fontWeight: 700, color: '#fbbf24', wordBreak: 'break-word' }}>
-                    {entry.officerSignature || '—'}
+                    {entry.officerSignature || '*'}
                   </div>
                 </div>
 
@@ -409,7 +409,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
         </main>
       </div>
 
-      {/* ── Return to Officer modal — works on all screen sizes ── */}
+      {/* ── Return to Officer modal * works on all screen sizes ── */}
       {returning && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
           style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)' }}
@@ -479,7 +479,7 @@ function EntryRow({ entry, officer, onClick, idx }) {
     <tr onClick={onClick}
       className={`cursor-pointer transition-colors hover:bg-white/[0.05] ${rowBg}`}>
       <td className="px-4 py-3 text-[12px] text-slate-400 border-b border-border-faint whitespace-nowrap font-mono">{entry.date}</td>
-      <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">{entry.caseNumber || '—'}</td>
+      <td className="px-4 py-3 text-[11.5px] text-slate-300 border-b border-border-faint whitespace-nowrap font-mono">{entry.caseNumber || '*'}</td>
       <td className="px-4 py-3 border-b border-border-faint">
         <div className="flex items-center gap-1.5">
           {entry.kind === 'report'
@@ -489,7 +489,7 @@ function EntryRow({ entry, officer, onClick, idx }) {
         </div>
       </td>
       <td className="px-4 py-3 border-b border-border-faint">
-        <span className="text-[12px] text-slate-300 font-mono">{officer?.deptShort || '—'}</span>
+        <span className="text-[12px] text-slate-300 font-mono">{officer?.deptShort || '*'}</span>
       </td>
       <td className="px-4 py-3 border-b border-border-faint">
         {officer ? (
@@ -498,7 +498,7 @@ function EntryRow({ entry, officer, onClick, idx }) {
             <div className="text-[10px] text-slate-500 font-mono">{officer.badge}</div>
           </div>
         ) : (
-          <span className="text-[12px] text-slate-500 font-mono">{entry.officerBadge || '—'}</span>
+          <span className="text-[12px] text-slate-500 font-mono">{entry.officerBadge || '*'}</span>
         )}
       </td>
       <td className="px-4 py-3 border-b border-border-faint"><StatusPill status={entry.status} /></td>
@@ -526,7 +526,7 @@ function MobileCard({ entry, officer, onClick }) {
             <StatusPill status={entry.status} />
           </div>
           <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
-            {entry.caseNumber || '—'} · {officer?.deptShort || '—'} · {entry.date}
+            {entry.caseNumber || '*'} · {officer?.deptShort || '*'} · {entry.date}
           </div>
           {officer && (
             <div className="text-[11px] text-slate-400 mt-0.5">{officer.name} · {officer.badge}</div>
@@ -568,9 +568,9 @@ function OfficerProfileView({ officer, submissions, departments, onOpenEntry }) 
       <div className="flex-1 overflow-y-auto p-5">
         <div className="grid grid-cols-2 gap-2.5 mb-4">
           {[
-            { label: 'Department', value: dept?.name || officer.deptShort || '—' },
-            { label: 'Unit ID',    value: officer.unitId || '—', mono: true },
-            { label: 'Location',   value: officer.location || '—' },
+            { label: 'Department', value: dept?.name || officer.deptShort || '*' },
+            { label: 'Unit ID',    value: officer.unitId || '*', mono: true },
+            { label: 'Location',   value: officer.location || '*' },
             { label: 'Call',       value: officer.callId || 'None', mono: !!officer.callId },
           ].map(({ label, value, mono }) => (
             <div key={label} className="bg-app-card/60 border border-border-faint rounded-lg px-3 py-2.5">
@@ -641,7 +641,7 @@ function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold
           <div className="grid grid-cols-2 gap-3">
             <div>
               <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px] mb-0.5">DL Number</div>
-              <div className="text-[12.5px] font-mono text-slate-200">{civilian.dlNumber || '—'}</div>
+              <div className="text-[12.5px] font-mono text-slate-200">{civilian.dlNumber || '*'}</div>
             </div>
             <div>
               <div className="text-[9px] text-slate-600 uppercase tracking-[0.5px] mb-0.5">Status</div>
@@ -821,7 +821,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
                         <span className="font-mono text-[11px] font-bold text-brand-bright">#{r.badge}</span>
                         <span className="text-[12.5px] font-bold text-white truncate">{r.name}</span>
                       </div>
-                      <div className="text-[10.5px] text-slate-500">{r.rank} · {r.deptShort || '—'} · {subs} submissions</div>
+                      <div className="text-[10.5px] text-slate-500">{r.rank} · {r.deptShort || '*'} · {subs} submissions</div>
                     </button>
                   );
                 }
@@ -829,7 +829,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
                 return (
                   <button key={r.id} type="button" className={base} onClick={() => setSelected(r.id)}>
                     <div className="text-[12.5px] font-bold text-white">{r.firstName} {r.lastName}</div>
-                    <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {r.dob} · DL {r.dlNumber || '—'}</div>
+                    <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {r.dob} · DL {r.dlNumber || '*'}</div>
                     <div className="flex gap-1 mt-1.5 flex-wrap items-center">
                       {r.dlStatus === 'SUSPENDED' && <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-orange-500/15 text-orange-400 border border-orange-500/25">DL SUSP</span>}
                       {r.flags?.map(f => <span key={f} className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-red-500/15 text-red-400 border border-red-500/25">{f}</span>)}

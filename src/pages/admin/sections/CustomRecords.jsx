@@ -225,7 +225,7 @@ function FieldRow({ field, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         </div>
         <div className="flex gap-0.5">
           <IconBtn icon={MdStar}        onClick={() => tog('required')}       active={!!field.required}       activeColor="#f59e0b" title="Required"        size={12} />
-          <IconBtn icon={MdTag}         onClick={() => onUpdate({ ...field, autoNumber: !field.autoNumber, mono: !field.autoNumber ? true : field.mono, label: !field.autoNumber ? 'Record Number' : field.label })} active={!!field.autoNumber} activeColor="#34d399" title="Auto Number — auto-fills the next sequential record/report number (0001+), titled 'Record Number'" size={12} />
+          <IconBtn icon={MdTag}         onClick={() => onUpdate({ ...field, autoNumber: !field.autoNumber, mono: !field.autoNumber ? true : field.mono, label: !field.autoNumber ? 'Record Number' : field.label })} active={!!field.autoNumber} activeColor="#34d399" title="Auto Number * auto-fills the next sequential record/report number (0001+), titled 'Record Number'" size={12} />
           <IconBtn icon={MdCode}        onClick={() => tog('mono')}           active={!!field.mono}           activeColor="#22d3ee" title="Monospace (IDs / plates / case #)" size={12} />
           <IconBtn icon={MdVisibility}  onClick={() => tog('readOnly')}       active={!!field.readOnly}       activeColor="#60a5fa" title="Read Only"       size={12} />
           <IconBtn icon={MdLock}        onClick={() => tog('supervisorOnly')} active={!!field.supervisorOnly} activeColor="#ef4444" title="Supervisor Only" size={12} />
@@ -644,7 +644,7 @@ function DLClassEditor({ draft, onChange }) {
             License Classes
           </span>
           <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal ml-1">
-            — defines the class options civilians see when applying
+            * defines the class options civilians see when applying
           </span>
         </div>
         <button type="button" onClick={add}
@@ -658,7 +658,7 @@ function DLClassEditor({ draft, onChange }) {
       <div className="p-3 flex flex-col gap-2">
         {classes.length === 0 && (
           <div className="text-[11px] text-slate-600 py-2 text-center italic">
-            No classes defined — civilians will see the default Florida classes.
+            No classes defined * civilians will see the default Florida classes.
           </div>
         )}
         {classes.map((cls, idx) => (
@@ -729,7 +729,7 @@ function RecordRoleToggles({ draft, onChange, isReport }) {
       <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Report Number</div>
       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
         style={{ background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)' }}
-        title="Report numbers are auto-assigned sequentially when a report is filed — starting at 0001.">
+        title="Report numbers are auto-assigned sequentially when a report is filed * starting at 0001.">
         <span className="text-[12px] font-bold tabular-nums" style={{ color: '#3d82f0', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
           #{nextReportNumber}
         </span>
@@ -829,7 +829,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
             <input
               className="flex-1 text-[10.5px] bg-transparent border-b border-transparent focus:border-white/20 outline-none transition-colors"
               style={{ color: '#93a4bd', paddingBottom: 1, fontFamily: 'var(--font-ui)' }}
-              placeholder="Issuing Agency (document header) — e.g. Tampa Police Department"
+              placeholder="Issuing Agency (document header) * e.g. Tampa Police Department"
               value={draft.agency || ''}
               onChange={e => up({ agency: e.target.value })}
             />
@@ -866,12 +866,12 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Meta bar — form code + role toggles */}
+      {/* Meta bar * form code + role toggles */}
       <RecordRoleToggles draft={draft} onChange={up} isReport={isReport} />
 
       {/* Sections (scrollable body) */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
-        {/* DL class editor — only visible when this template is the DL template */}
+        {/* DL class editor * only visible when this template is the DL template */}
         {draft.dlTemplate && (
           <DLClassEditor draft={draft} onChange={up} />
         )}
@@ -879,7 +879,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         {(draft.sections || []).length === 0 && (
           <div className="py-10 text-center" style={{ color: '#2d3f52' }}>
             <MdDescription size={34} style={{ opacity: 0.18, margin: '0 auto 8px' }} />
-            <div className="text-[12px]">No sections yet — add a custom or premade section below</div>
+            <div className="text-[12px]">No sections yet * add a custom or premade section below</div>
           </div>
         )}
 
@@ -924,12 +924,12 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
           </div>
         </div>
 
-        {/* Signature line labels — shown on the printed document footer */}
+        {/* Signature line labels * shown on the printed document footer */}
         <div className="mt-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.09)' }}>
           <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: '#0f1c31', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <MdEdit size={13} style={{ color: '#93a4bd' }} />
             <span className="text-[11px] font-bold uppercase tracking-[0.5px]" style={{ color: '#dde6f1' }}>Signature Lines</span>
-            <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal">— labels on the printed document footer, one per line</span>
+            <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal">* labels on the printed document footer, one per line</span>
           </div>
           <div className="p-3">
             <textarea
@@ -1019,7 +1019,7 @@ export default function CustomRecords() {
     <div className="-m-3 md:-m-6 flex overflow-hidden font-ui"
       style={{ height: 'calc(100vh - 56px)', background: '#08111d' }}>
 
-      {/* LIST PANEL — mobile: full width on 'list' view; xl+: fixed 260px sidebar */}
+      {/* LIST PANEL * mobile: full width on 'list' view; xl+: fixed 260px sidebar */}
       <div className={`flex-col overflow-hidden xl:flex xl:shrink-0 xl:w-[260px] ${mobileView === 'list' ? 'flex flex-1' : 'hidden xl:flex'}`}>
         <RecordListPanel
           templates={allTemplates}
@@ -1033,7 +1033,7 @@ export default function CustomRecords() {
         />
       </div>
 
-      {/* BUILDER + PREVIEW AREA — mobile: hidden on list view; xl+: always flex-1 */}
+      {/* BUILDER + PREVIEW AREA * mobile: hidden on list view; xl+: always flex-1 */}
       <div className={`xl:flex xl:flex-col xl:flex-1 xl:min-w-0 xl:overflow-hidden ${mobileView !== 'list' ? 'flex flex-col flex-1 min-w-0 overflow-hidden' : 'hidden xl:flex'}`}>
         {draft ? (
           <>

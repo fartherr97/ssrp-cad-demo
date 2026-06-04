@@ -53,13 +53,13 @@ export const CIVILIANS = [
     medicalProfile: { bloodType: "A-", organDonor: false, dnr: false, conditions: ["Generalized Anxiety Disorder"], allergies: ["Penicillin"], medications: ["Escitalopram 10mg daily"], emergencyContact: { name: "David Chen", phone: "555-0335", relationship: "Father" }, safetyNotes: "Known anxiety episodes; may appear agitated or erratic under stress.", notes: "" },
   },
   { id: 3, firstName: "Darnell", lastName: "Washington", dob: "1979-11-05", gender: "Male", ethnicity: "Black", height: "6'1\"", weight: "210 lbs", hair: "Black", eyes: "Dark Brown", ssn: "618-77-9901", phone: "555-0441", address: "330 Magnolia Blvd, Tampa", dlNumber: "W1109872", dlClass: "Class C", dlStatus: "SUSPENDED", dlExpiry: "2024-11-05", vehicles: [4], flags: ["WARRANT","CAUTION"],
-    medicalProfile: { bloodType: "B+", organDonor: false, dnr: false, conditions: ["Bipolar Disorder", "Substance Use Disorder (Cocaine)"], allergies: [], medications: ["Lithium 600mg daily"], emergencyContact: { name: "Donna Washington", phone: "555-0442", relationship: "Sister" }, safetyNotes: "History of combative behavior during manic episodes. Active cocaine dependency — may be under influence. Non-compliant with medication history.", notes: "" },
+    medicalProfile: { bloodType: "B+", organDonor: false, dnr: false, conditions: ["Bipolar Disorder", "Substance Use Disorder (Cocaine)"], allergies: [], medications: ["Lithium 600mg daily"], emergencyContact: { name: "Donna Washington", phone: "555-0442", relationship: "Sister" }, safetyNotes: "History of combative behavior during manic episodes. Active cocaine dependency * may be under influence. Non-compliant with medication history.", notes: "" },
   },
   { id: 4, firstName: "Jessica", lastName: "Huang", dob: "2001-04-18", gender: "Female", ethnicity: "Asian", height: "5'2\"", weight: "115 lbs", hair: "Brown", eyes: "Brown", ssn: "723-11-4456", phone: "555-0557", address: "21 College Ave Apt 4B, Tampa", dlNumber: "H4456012", dlClass: "Class C", dlStatus: "ACTIVE", dlExpiry: "2027-04-18", vehicles: [], flags: [],
     medicalProfile: { bloodType: "AB+", organDonor: true, dnr: false, conditions: [], allergies: ["Shellfish", "Sulfa drugs"], medications: [], emergencyContact: { name: "Linda Huang", phone: "555-0558", relationship: "Mother" }, safetyNotes: "", notes: "" },
   },
   { id: 5, firstName: "Robert", lastName: "Marino", dob: "1965-09-30", gender: "Male", ethnicity: "White", height: "5'9\"", weight: "195 lbs", hair: "Gray", eyes: "Blue", ssn: "301-55-8812", phone: "555-0678", address: "5 Harbor View Ct, Tampa", dlNumber: "M8812345", dlClass: "Class A", dlStatus: "ACTIVE", dlExpiry: "2025-09-30", vehicles: [5,6], flags: ["VIOLENT"],
-    medicalProfile: { bloodType: "A+", organDonor: false, dnr: true, conditions: ["Congestive Heart Failure", "Atrial Fibrillation"], allergies: ["Warfarin", "NSAIDs"], medications: ["Apixaban 5mg twice daily", "Carvedilol 25mg daily", "Furosemide 40mg daily"], emergencyContact: { name: "Monica Marino", phone: "555-0679", relationship: "Spouse" }, safetyNotes: "History of violent assault resulting in felony conviction. May become physically aggressive when confronted.", notes: "DNR in effect — do not resuscitate. Contact emergency contact prior to any transport." },
+    medicalProfile: { bloodType: "A+", organDonor: false, dnr: true, conditions: ["Congestive Heart Failure", "Atrial Fibrillation"], allergies: ["Warfarin", "NSAIDs"], medications: ["Apixaban 5mg twice daily", "Carvedilol 25mg daily", "Furosemide 40mg daily"], emergencyContact: { name: "Monica Marino", phone: "555-0679", relationship: "Spouse" }, safetyNotes: "History of violent assault resulting in felony conviction. May become physically aggressive when confronted.", notes: "DNR in effect * do not resuscitate. Contact emergency contact prior to any transport." },
   },
 ];
 
@@ -652,7 +652,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sV1", title: "Vehicle 1 — Primary", style: "dark", lookup: "vehicle",
+        id: "sV1", title: "Vehicle 1 * Primary", style: "dark", lookup: "vehicle",
         fields: [
           { id: "v1_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
           { id: "v1_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
@@ -664,7 +664,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sD1", title: "Driver 1 — Primary", style: "dark", lookup: "civilian",
+        id: "sD1", title: "Driver 1 * Primary", style: "dark", lookup: "civilian",
         fields: [
           { id: "d1_first", label: "First Name",      type: "text",     span: 2, required: true },
           { id: "d1_last",  label: "Last Name",       type: "text",     span: 2 },
@@ -682,7 +682,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sV2", title: "Vehicle 2 — Secondary", style: "dark", lookup: "vehicle",
+        id: "sV2", title: "Vehicle 2 * Secondary", style: "dark", lookup: "vehicle",
         fields: [
           { id: "v2_type",   label: "Vehicle Type",   type: "dropdown", span: 2, options: ["Sedan","SUV","Truck","Van","Motorcycle","Coupe","Convertible","Hatchback","Bus","Other"] },
           { id: "v2_plate",  label: "License Plate",  type: "text",     span: 2, mono: true },
@@ -694,7 +694,7 @@ export const REPORT_TEMPLATES = [
         ],
       },
       {
-        id: "sD2", title: "Driver 2 — Secondary", style: "dark", lookup: "civilian",
+        id: "sD2", title: "Driver 2 * Secondary", style: "dark", lookup: "civilian",
         fields: [
           { id: "d2_first", label: "First Name",      type: "text",     span: 2 },
           { id: "d2_last",  label: "Last Name",       type: "text",     span: 2 },
@@ -769,7 +769,7 @@ export const AUDIT_LOG = [
 ];
 
 export const MESSAGES = [
-  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "WARRANT ALERT * Darnell Washington", body: "Active arrest warrant on file. Subject is a felony warrant — do not approach without backup. Last seen near 330 Magnolia Blvd.",     timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
+  { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "WARRANT ALERT * Darnell Washington", body: "Active arrest warrant on file. Subject is a felony warrant * do not approach without backup. Last seen near 330 Magnolia Blvd.",     timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
   { id: 2, from: "Sgt. Reeves (TPD-831)", to: "All TPD Units", subject: "Briefing Update",           body: "All patrol units: increased gang activity in Riverside district. Exercise caution. Extra patrol ordered for evening shift.",                   timestamp: "2026-06-01 13:00", read: true,  priority: "NORMAL" },
   { id: 3, from: "Lt. Commander",     to: "Supervisors",    subject: "Use of Force Policy Update",   body: "New UOF reporting requirements effective Monday. All use of force incidents require supervisor review within 24 hours. See department portal.", timestamp: "2026-05-31 09:15", read: true,  priority: "NORMAL" },
 ];
@@ -826,9 +826,9 @@ export const BUSINESSES = [
     address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
     isTowCompany: true,
     fleet: [
-      { id: 1, name: 'T1 — Light Duty',  spawnCode: 'towtruck',  type: 'Light Duty'  },
-      { id: 2, name: 'T2 — Medium Duty', spawnCode: 'towtruck2', type: 'Medium Duty' },
-      { id: 3, name: 'T3 — Flatbed',     spawnCode: 'flatbed',   type: 'Flatbed'     },
+      { id: 1, name: 'T1 * Light Duty',  spawnCode: 'towtruck',  type: 'Light Duty'  },
+      { id: 2, name: 'T2 * Medium Duty', spawnCode: 'towtruck2', type: 'Medium Duty' },
+      { id: 3, name: 'T3 * Flatbed',     spawnCode: 'flatbed',   type: 'Flatbed'     },
     ],
     license: "BL-2026-0445", licenseExpiry: "2026-12-31", licenseIssuedAt: "2026-04-15", licenseStatus: "ACTIVE", ownedByPlayer: true,
     employees: [
@@ -843,8 +843,8 @@ export const BUSINESSES = [
     address: "FDOT District 7 HQ, 11201 N Malcolm McKinley Dr, Tampa", status: "ACTIVE",
     isTowCompany: true, isFDOT: true,
     fleet: [
-      { id: 1, name: 'FDOT-T1 — Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
-      { id: 2, name: 'FDOT-T2 — Medium Duty',   spawnCode: 'towtruck2', type: 'Medium Duty' },
+      { id: 1, name: 'FDOT-T1 * Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
+      { id: 2, name: 'FDOT-T2 * Medium Duty',   spawnCode: 'towtruck2', type: 'Medium Duty' },
     ],
     license: "GOV-FDOT-D7-2026", licenseExpiry: "2026-12-31", licenseIssuedAt: "2026-04-15", licenseStatus: "ACTIVE", ownedByPlayer: true,
     employees: [
@@ -889,7 +889,7 @@ export const FDOT_PERMITS = [
     holderName: 'Apex Logistics LLC',
     location: 'US-41 SB corridor',
     postal: '501',
-    description: 'Oversize load escort — 14-foot wide transformer in transit. LEO escort required at all highway on-ramps.',
+    description: 'Oversize load escort * 14-foot wide transformer in transit. LEO escort required at all highway on-ramps.',
     issuedAt: '2026-05-15',
     expiresAt: '2026-05-16',
     issuedBy: 'Jordan Maxwell',

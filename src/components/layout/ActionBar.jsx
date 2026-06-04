@@ -41,7 +41,7 @@ function Clock() {
   );
 }
 
-/* Primary nav button — stacked icon + label */
+/* Primary nav button * stacked icon + label */
 function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMouseEnter, onMouseLeave }) {
   return (
     <button
@@ -66,7 +66,7 @@ function NavBtn({ Icon: IconComp, label, onClick, active, dataTour, refCb, onMou
 /* Only one nav dropdown may be open at a time (prevents overlap). */
 let __navDropdownCloser = null;
 
-/* Dropdown nav button — hover to open a template picker */
+/* Dropdown nav button * hover to open a template picker */
 function DropdownNav({ Icon: IconComp, label, items, active, navigate, dataTour }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
@@ -184,7 +184,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
         x: c.x, y: c.y, z: c.z,
       },
     });
-    toast.error(`${unit} — ${location}`, { title: 'PANIC — Officer in Distress' });
+    toast.error(`${unit} * ${location}`, { title: 'PANIC * Officer in Distress' });
     setOpen(false);
   };
 
@@ -253,7 +253,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
               </div>
               <button onClick={triggerPanic}
                 className="w-full flex items-center justify-center gap-2 px-2.5 py-2 mb-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
-                <MdSos size={16} /> PANIC — Officer in Distress
+                <MdSos size={16} /> PANIC * Officer in Distress
               </button>
               <div className="h-px bg-border-faint my-1 mx-1" />
             </>
@@ -382,7 +382,7 @@ function NotificationBell({ notifications, dispatch }) {
                     <div className="text-[12px] font-semibold text-white leading-tight">{n.title}</div>
                     <div className="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-3">{n.body}</div>
                     {n.sender && (
-                      <div className="text-[11px] text-slate-500 mt-1 font-medium">— {n.sender}</div>
+                      <div className="text-[11px] text-slate-500 mt-1 font-medium">* {n.sender}</div>
                     )}
                     <div className="text-[10px] text-slate-600 mt-1">{n.time}</div>
                   </div>
@@ -536,7 +536,7 @@ export default function ActionBar() {
               </div>
             </div>
 
-            {/* Flat grouped list — scrolls independently, items stagger in */}
+            {/* Flat grouped list * scrolls independently, items stagger in */}
             <div className="flex-1 overflow-y-auto py-3">
               {navItems.map((item, idx) => {
                 const subItems = item.dropdown ? dropdownItems(item.dropdown) : null;
@@ -575,7 +575,7 @@ export default function ActionBar() {
               })}
             </div>
 
-            {/* Footer — always pinned at bottom */}
+            {/* Footer * always pinned at bottom */}
             <div className="shrink-0 border-t border-border-faint px-4 py-3 flex gap-2">
               <button onClick={() => { dispatch({ type: 'EXIT_TO_HOME' }); setMobileOpen(false); }}
                 className="press flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 text-[13px] font-semibold cursor-pointer hover:bg-white/[0.09] transition-all">

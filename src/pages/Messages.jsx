@@ -38,7 +38,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
     selectedOfficers.forEach(o => {
       onSend({
         fromName: currentUser?.name || 'Unknown',
-        fromBadge: currentUser?.badge || '—',
+        fromBadge: currentUser?.badge || '*',
         fromId: currentUser?.id,
         toName: o.name,
         toId: o.id,
@@ -55,7 +55,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
     const allNames = [currentUser?.name || 'Unknown', ...selectedOfficers.map(o => o.name)];
     onGroupSend({
       fromName: currentUser?.name || 'Unknown',
-      fromBadge: currentUser?.badge || '—',
+      fromBadge: currentUser?.badge || '*',
       fromId: currentUser?.id,
       participantIds: allIds,
       participantNames: allNames,
@@ -162,7 +162,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>
               Cancel
             </button>
-            {/* Send individually — available for 1+ recipients */}
+            {/* Send individually * available for 1+ recipients */}
             <button type="button" onClick={handleSendSeparately}
               disabled={!canSend}
               className="press flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
@@ -170,7 +170,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
               <MdSend size={13} />
               {toIds.size > 1 ? 'Send to Each' : 'Send'}
             </button>
-            {/* Group chat — only available for 2+ recipients */}
+            {/* Group chat * only available for 2+ recipients */}
             {toIds.size >= 2 && (
               <button type="button" onClick={handleGroupSend}
                 disabled={!canSend}

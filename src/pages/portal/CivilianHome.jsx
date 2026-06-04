@@ -124,7 +124,7 @@ export default function CivilianHome() {
         </div>
         <div className="flex-1 text-left">
           <div className="text-[16px] font-extrabold text-red-300 tracking-tight">Call 911</div>
-          <div className="text-[12px] text-red-300/60 mt-0.5">Report an emergency — dispatched immediately to law enforcement</div>
+          <div className="text-[12px] text-red-300/60 mt-0.5">Report an emergency * dispatched immediately to law enforcement</div>
         </div>
         <div className="text-[13px] font-bold text-red-400 border border-red-500/40 rounded-lg px-3 py-1.5 bg-red-500/10">
           EMERGENCY

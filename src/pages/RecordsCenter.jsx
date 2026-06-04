@@ -112,7 +112,7 @@ export default function RecordsCenter() {
 
   const submitRecord = () => {
     if (!selectedTemplate) return;
-    // Shares the global sequential report number — store stamps the value.
+    // Shares the global sequential report number * store stamps the value.
     const recNum = String(reportSeq).padStart(4, '0');
     dispatch({
       type: 'ADD_RECORD',
@@ -172,7 +172,7 @@ export default function RecordsCenter() {
     const Detail = ({ label, value }) => (
       <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
         <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{label}</span>
-        <span className="text-[12.5px] text-slate-200">{value || '—'}</span>
+        <span className="text-[12.5px] text-slate-200">{value || '*'}</span>
       </div>
     );
 
@@ -213,7 +213,7 @@ export default function RecordsCenter() {
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Record Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
-              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '*'}</div></div>
             </div>
             <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}

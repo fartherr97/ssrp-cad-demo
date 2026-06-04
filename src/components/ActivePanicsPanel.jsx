@@ -4,8 +4,8 @@ import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 
 /*
-  Persistent reference for every unresolved officer panic, so any LEO — whether
-  on the Dispatch Center or their MDT, self-dispatching or not — can still see
+  Persistent reference for every unresolved officer panic, so any LEO * whether
+  on the Dispatch Center or their MDT, self-dispatching or not * can still see
   who hit their panic after the toast disappears. Self-contained: reads the
   active panics from the store and handles locate/clear itself. Renders nothing
   when there are no active panics.

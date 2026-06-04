@@ -61,7 +61,7 @@ function TagInput({ tags = [], onChange, placeholder }) {
             </button>
           </span>
         ))}
-        {tags.length === 0 && <span className="text-[11px] text-slate-600 italic">None listed — type above and press Enter or +</span>}
+        {tags.length === 0 && <span className="text-[11px] text-slate-600 italic">None listed * type above and press Enter or +</span>}
       </div>
     </div>
   );
@@ -138,7 +138,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
               checked={form.dnr}
               onChange={v => set('dnr', v)}
               label="Do Not Resuscitate (DNR)"
-              description="Valid DNR directive on file — do not attempt resuscitation"
+              description="Valid DNR directive on file * do not attempt resuscitation"
               color="#ef4444"
             />
           </div>
@@ -151,7 +151,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
         <TagInput
           tags={form.conditions}
           onChange={v => set('conditions', v)}
-          placeholder="e.g. Type 2 Diabetes — press Enter to add"
+          placeholder="e.g. Type 2 Diabetes * press Enter to add"
         />
       </div>
 
@@ -161,7 +161,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
         <TagInput
           tags={form.allergies}
           onChange={v => set('allergies', v)}
-          placeholder="e.g. Penicillin — press Enter to add"
+          placeholder="e.g. Penicillin * press Enter to add"
         />
       </div>
 
@@ -171,7 +171,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
         <TagInput
           tags={form.medications}
           onChange={v => set('medications', v)}
-          placeholder="e.g. Metformin 500mg daily — press Enter to add"
+          placeholder="e.g. Metformin 500mg daily * press Enter to add"
         />
       </div>
 
@@ -197,7 +197,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* Safety Notes — LEO visible */}
+      {/* Safety Notes * LEO visible */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <div className="w-4 h-4 rounded flex items-center justify-center shrink-0"
@@ -207,14 +207,14 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
           <SectionHeader>Law Enforcement Safety Notes</SectionHeader>
         </div>
         <p className="text-[11px] text-amber-500/70 mb-2 -mt-1">
-          Visible to law enforcement — use for behavioral conditions, substance dependencies, or anything relevant to officer and public safety.
+          Visible to law enforcement * use for behavioral conditions, substance dependencies, or anything relevant to officer and public safety.
         </p>
         <textarea className={PORTAL_INPUT} rows={3} value={form.safetyNotes}
           onChange={e => set('safetyNotes', e.target.value)}
           placeholder="e.g. History of combative episodes. Active substance dependency. Non-compliant with medications." />
       </div>
 
-      {/* Medical Notes — EMS/Fire only */}
+      {/* Medical Notes * EMS/Fire only */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <div className="w-4 h-4 rounded flex items-center justify-center shrink-0"
@@ -224,7 +224,7 @@ function MedicalProfileEditor({ civilian, onSave, onCancel }) {
           <SectionHeader>Medical Notes (EMS / Fire Only)</SectionHeader>
         </div>
         <p className="text-[11px] text-red-400/60 mb-2 -mt-1">
-          Visible only to Fire &amp; EMS — include treatment preferences, surgical history, or other clinical notes.
+          Visible only to Fire &amp; EMS * include treatment preferences, surgical history, or other clinical notes.
         </p>
         <textarea className={PORTAL_INPUT} rows={3} value={form.notes}
           onChange={e => set('notes', e.target.value)}
@@ -383,7 +383,7 @@ export default function MedicalRecords() {
       <PortalHeader
         icon={MdLocalHospital}
         title="Medical Records"
-        subtitle="Manage your active character's medical profile — allergies, conditions, medications, and emergency contacts."
+        subtitle="Manage your active character's medical profile * allergies, conditions, medications, and emergency contacts."
         accent="brand"
       />
 

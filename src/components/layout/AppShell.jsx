@@ -23,7 +23,7 @@ function BlastToast() {
     if (lastBlast.id === seenId.current) return;
     seenId.current = lastBlast.id;
 
-    const toastBody = `${lastBlast.body}\n\n— ${lastBlast.senderName} (${lastBlast.senderBadge})`;
+    const toastBody = `${lastBlast.body}\n\n* ${lastBlast.senderName} (${lastBlast.senderBadge})`;
     const notifPayload = {
       title: lastBlast.title || 'Notification',
       body: lastBlast.body,

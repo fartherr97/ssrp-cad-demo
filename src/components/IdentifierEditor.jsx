@@ -84,7 +84,7 @@ export default function IdentifierEditor({ onClose }) {
       <div>
         <label className={S_LABEL}>Agency</label>
         <select className={S_SELECT} value={draft.dept} onChange={e => handleDeptChange(e.target.value)}>
-          <option value="">— Select Agency —</option>
+          <option value="">* Select Agency *</option>
           {departments.map(d => (
             <option key={d.id} value={d.id}>{d.name}</option>
           ))}
@@ -95,7 +95,7 @@ export default function IdentifierEditor({ onClose }) {
         <div>
           <label className={S_LABEL}>Subdivision</label>
           <select className={S_SELECT} value={draft.subdivision} onChange={e => set('subdivision', e.target.value)}>
-            <option value="">— None —</option>
+            <option value="">* None *</option>
             {subdivisions.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>

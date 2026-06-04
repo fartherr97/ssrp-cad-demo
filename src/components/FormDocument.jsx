@@ -123,7 +123,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         ) : type === 'dropdown' ? (
           <select style={{ ...inputStyle, cursor: 'pointer', appearance: 'auto' }} value={value || ''} onChange={e => onChange && onChange(e.target.value)}>
-            <option value="">—</option>
+            <option value="">*</option>
             {options.map(o => <option key={o}>{o}</option>)}
           </select>
         ) : (type === 'date' || type === 'datetime') ? (
@@ -144,7 +144,7 @@ export function FormCell({ label, value, onChange, type = 'text', options = [], 
           />
         )
       ) : (
-        <span style={valueStyle}>{value || <span style={{ color: '#bbb' }}>—</span>}</span>
+        <span style={valueStyle}>{value || <span style={{ color: '#bbb' }}>*</span>}</span>
       )}
     </div>
   );
@@ -225,7 +225,7 @@ export function FormCheckboxes({ label, items, values = {}, onChange, editable }
   );
 }
 
-/* Signature row — slots: string labels; values: { officerSignature, supervisorSignature, date } */
+/* Signature row * slots: string labels; values: { officerSignature, supervisorSignature, date } */
 export function FormSignatureRow({ slots, meta = {} }) {
   const slotValues = [meta.officerSignature, meta.supervisorSignature, meta.dateTime || meta.date];
   return (
@@ -704,13 +704,13 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
                   ) : entries.map((s, i) => (
                     <div key={s.id || i} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: i < entries.length - 1 ? '1px dashed #ddd' : 'none' }}>
                       <div style={{ fontSize: 8, fontWeight: 700, color: '#444', marginBottom: 2 }}>
-                        SUPPLEMENT #{i + 1} — {s.date}
+                        SUPPLEMENT #{i + 1} * {s.date}
                       </div>
                       <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#000', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                         {s.text}
                       </div>
                       <div style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: '#666', marginTop: 2 }}>
-                        — {s.authorLine || s.author || s.badge}
+                        * {s.authorLine || s.author || s.badge}
                       </div>
                     </div>
                   ))}

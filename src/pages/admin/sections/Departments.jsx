@@ -68,7 +68,7 @@ function DeptCard({ d, onSave, onDelete }) {
           </div>
         )}
         {dirty && (
-          <div className="text-[11px] text-amber-400">Unsaved changes — click Save to apply.</div>
+          <div className="text-[11px] text-amber-400">Unsaved changes * click Save to apply.</div>
         )}
       </div>
     </div>

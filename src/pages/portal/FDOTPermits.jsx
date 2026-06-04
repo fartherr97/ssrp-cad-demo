@@ -111,7 +111,7 @@ function DetailRow({ label, value, mono }) {
   return (
     <div>
       <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">{label}</div>
-      <div className={`text-[12.5px] text-slate-200 ${mono ? 'font-mono' : ''}`}>{value || '—'}</div>
+      <div className={`text-[12.5px] text-slate-200 ${mono ? 'font-mono' : ''}`}>{value || '*'}</div>
     </div>
   );
 }
