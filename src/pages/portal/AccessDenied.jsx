@@ -20,7 +20,7 @@ export default function AccessDenied({ portalName = 'this portal' }) {
         <button onClick={() => navigate('/')} type="button"
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold"
           style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', color: '#94a3b8' }}>
-          <MdArrowBack size={16} /> Back to Login
+          <MdArrowBack size={16} /> Back to Home
         </button>
       </div>
     </div>
