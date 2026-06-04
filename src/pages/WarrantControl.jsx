@@ -429,7 +429,7 @@ function WarrantForm({ me, communityConfig, departments, civilians, penalCode, o
 
             {/* DOB with iOS clipping wrapper */}
             <Box label="DOB">
-              <div className="relative overflow-hidden" style={{ height: 18 }}>
+              <div className="relative overflow-hidden" style={{ height: 28 }}>
                 <input
                   type="date"
                   value={form.dob}

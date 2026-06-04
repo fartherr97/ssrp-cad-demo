@@ -163,13 +163,9 @@ function DLForm({ civ, isRenewal, onSubmit, onCancel, dlTemplate }) {
             </div>
             <div>
               <label className={PORTAL_LABEL}>Expiration Date</label>
-              <input
-                type="date"
-                required
-                value={dlExpiry}
-                onChange={e => setDlExpiry(e.target.value)}
-                className={PORTAL_INPUT}
-              />
+              <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
+                <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" required value={dlExpiry} onChange={e => setDlExpiry(e.target.value)} style={{ colorScheme: 'dark' }} />
+              </div>
             </div>
           </div>
 

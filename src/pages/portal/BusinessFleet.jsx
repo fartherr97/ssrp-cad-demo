@@ -202,7 +202,9 @@ export default function BusinessFleet() {
               </div>
               <div>
                 <label className={PORTAL_LABEL}>Registration Expiry</label>
-                <input className={PORTAL_INPUT} type="date" value={form.regExpiry} onChange={e => setField('regExpiry', e.target.value)} />
+                <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
+                  <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.regExpiry} onChange={e => setField('regExpiry', e.target.value)} style={{ colorScheme: 'dark' }} />
+                </div>
               </div>
             </div>
 

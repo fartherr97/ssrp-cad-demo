@@ -238,7 +238,7 @@ export default function RecordsCenter() {
               <MdDownload size={15} /> {pdfLoading ? 'Generating…' : 'Save as PDF'}
             </button>
             <button className={`${S_BTN_DANGER} w-full md:w-auto`} onClick={() => setFormValues({})}><MdDeleteOutline size={15} /> Clear</button>
-            <button className={`${S_BTN_PRIMARY} col-span-2 w-full md:col-span-1 md:w-auto md:ml-auto`} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
+            <button className={`${S_BTN_PRIMARY} w-full md:w-auto md:ml-auto`} onClick={submitRecord}><MdCheckCircle size={15} /> Issue Record</button>
           </div>
         </div>
       </div>
