@@ -106,7 +106,7 @@ export default function Statutes() {
               <SonCell>{s.name}</SonCell>
               <SonCell color={ADMIN.textDim}>{s.category}</SonCell>
               <SonCell><SonBadge color={TYPE_COLOR[s.type] || ADMIN.textDim}>{s.type}</SonBadge></SonCell>
-              <SonCell align="right" mono color={ADMIN.green}>{s.fine > 0 ? `$${s.fine.toLocaleString()}` : '*'}</SonCell>
+              <SonCell align="right" mono color={ADMIN.green}>{s.fine > 0 ? `$${s.fine.toLocaleString()}` : '—'}</SonCell>
               <SonCell align="right" mono color={ADMIN.amber}>{s.jailTime}</SonCell>
               <SonCell align="right" mono color={s.points >= 7 ? ADMIN.red : s.points >= 4 ? ADMIN.amber : ADMIN.textDim}>{s.points}</SonCell>
             </SonRow>

@@ -160,11 +160,11 @@ export default function Employees() {
                 <div className="flex gap-6 mt-3.5 text-xs">
                   <div>
                     <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Phone</div>
-                    <div className="text-slate-200 mt-0.5">{emp.phone || '*'}</div>
+                    <div className="text-slate-200 mt-0.5">{emp.phone || '—'}</div>
                   </div>
                   <div>
                     <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Since</div>
-                    <div className="text-slate-200 mt-0.5">{emp.since || '*'}</div>
+                    <div className="text-slate-200 mt-0.5">{emp.since || '—'}</div>
                   </div>
                 </div>
               </PortalCard>

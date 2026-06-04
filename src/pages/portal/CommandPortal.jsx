@@ -138,9 +138,9 @@ function ReportModal({ report, officer, allTypes, onClose }) {
         </div>
         <div className="p-5 grid grid-cols-2 gap-4">
           <Field label="Type" value={report.type} />
-          <Field label="Case Number" value={report.caseNumber || '*'} mono />
-          <Field label="Officer Badge" value={report.officerBadge || '*'} mono />
-          <Field label="Date" value={report.date || '*'} />
+          <Field label="Case Number" value={report.caseNumber || '—'} mono />
+          <Field label="Officer Badge" value={report.officerBadge || '—'} mono />
+          <Field label="Date" value={report.date || '—'} />
           <div className="flex flex-col gap-0.5">
             <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-cad-muted">Status</span>
             <StatusPill status={report.status} />
@@ -277,7 +277,7 @@ function OverviewTab({ reports, officers, departments, reportTypes, onOpenReport
                 <MdPerson size={15} className="text-amber-400 shrink-0" />
                 <span className="text-[13px] font-semibold text-white flex-1">{o.name}</span>
                 <span className="font-mono text-[11px] text-slate-400">{o.badge}</span>
-                <span className="text-[10px] text-slate-500">{o.deptShort || deptById[o.dept]?.short || '*'}</span>
+                <span className="text-[10px] text-slate-500">{o.deptShort || deptById[o.dept]?.short || '—'}</span>
               </div>
             ))}
           </div>
@@ -428,7 +428,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
               </div>
               <div className="flex items-center justify-between mt-1 text-[10.5px] text-slate-500">
                 <span>Total: <span className="font-mono text-slate-300">{total}</span></span>
-                <span>Last: <span className="font-mono text-slate-300">{lastSub || '*'}</span></span>
+                <span>Last: <span className="font-mono text-slate-300">{lastSub || '—'}</span></span>
               </div>
             </PortalCard>
           ))}
@@ -476,7 +476,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
                       );
                     })}
                     <td className="px-4 py-3 border-b border-border-faint text-[13px] font-bold font-mono text-slate-200">{total}</td>
-                    <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-400 whitespace-nowrap">{lastSub || '*'}</td>
+                    <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-400 whitespace-nowrap">{lastSub || '—'}</td>
                     <td className="px-4 py-3 border-b border-border-faint"><CompBadge label={compStatus} color={compColor} /></td>
                   </tr>
                 ))}
@@ -686,7 +686,7 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
                   {off && <span className="text-[12.5px] text-slate-200 flex-1 truncate">{off.name}</span>}
                   {!off && <span className="flex-1" />}
                   <span className="text-[11px] text-slate-500 shrink-0 hidden sm:block">{r.date}</span>
-                  <span className="font-mono text-[10.5px] text-slate-600 shrink-0 hidden md:block">{r.caseNumber || '*'}</span>
+                  <span className="font-mono text-[10.5px] text-slate-600 shrink-0 hidden md:block">{r.caseNumber || '—'}</span>
                   <StatusPill status={r.status} />
                   <MdChevronRight size={14} className="text-slate-600 shrink-0" />
                 </button>
@@ -703,7 +703,7 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
    TAB 5: RESPONSE TIMES
 ══════════════════════════════════ */
 function fmtMin(m) {
-  if (m == null || isNaN(m)) return '*';
+  if (m == null || isNaN(m)) return '—';
   const mins = Math.floor(m);
   const secs = Math.round((m - mins) * 60);
   return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
@@ -1065,7 +1065,7 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
   const [sent, setSent]     = useState(false);
 
   const senderName  = myOfficer?.name  || currentUser?.name  || 'Unknown';
-  const senderBadge = myOfficer?.badge || currentUser?.badge || '*';
+  const senderBadge = myOfficer?.badge || currentUser?.badge || '—';
 
   const targetLabel = isAdmin
     ? (targetDeptId ? (leoDepts.find(d => String(d.id) === String(targetDeptId))?.short || 'Dept') : 'All Departments')

@@ -109,7 +109,7 @@ export default function OfficerProfile() {
   const nexumWeekly  = myOfficer?.dutyTimeWeek  ?? null; // minutes
   const nexumMonthly = myOfficer?.dutyTimeMonth ?? null; // minutes
   const fmtTime = (m) => {
-    if (m === null || m === undefined) return '*';
+    if (m === null || m === undefined) return '—';
     const h = Math.floor(m / 60), min = m % 60;
     if (!m) return '0m';
     if (!h) return `${min}m`;
@@ -331,7 +331,7 @@ export default function OfficerProfile() {
                     <TD>{r.type}</TD>
                     <TD muted>{r.date}</TD>
                     <td className="px-3 py-2 border-b border-border-faint"><StatusBadge status={r.status} /></td>
-                    <TD blue>{r.callId || '*'}</TD>
+                    <TD blue>{r.callId || '—'}</TD>
                   </tr>
                 ))}
                 {myReports.length === 0 && <tr><td colSpan={5} className="px-2.5 py-4 text-center text-slate-700">No reports filed.</td></tr>}

@@ -268,7 +268,7 @@ export default function IncidentDetail() {
           <Section title="Incident Information">
             <DetailRow label="Call #"    value={call.id} mono />
             <DetailRow label="Category"  value={call.category?.toUpperCase()} />
-            <DetailRow label="Rpt Party" value={call.reportingParty || '*'} />
+            <DetailRow label="Rpt Party" value={call.reportingParty || '—'} />
             <DetailRow label="Timestamp" value={call.timestamp} mono small />
             <DetailRow label="Priority"  value={`P${call.priority} · ${['Critical','High','Medium','Low'][call.priority-1] || ''}`} color={priColor} mono />
           </Section>
@@ -295,7 +295,7 @@ export default function IncidentDetail() {
                     <div key={uid} className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-app-card/70 border border-border-base">
                       <span className="font-mono font-bold text-[13px] min-w-[60px]" style={{ color: sc }}>{uid}</span>
                       {off?.deptShort && <DeptTag code={off.deptShort} />}
-                      <span className="text-xs flex-1 text-slate-200">{off?.name || '*'}</span>
+                      <span className="text-xs flex-1 text-slate-200">{off?.name || '—'}</span>
                       {off && <StatusBadge status={off.status} />}
                       {isDispatch && (
                         <button

@@ -82,7 +82,7 @@ export default function DispatchBoard() {
         ))}
         <div className="w-px h-[18px] bg-border-base mx-1" />
         <span className="text-[11px] text-slate-500 font-mono">
-          UNIT: <span className="text-brand-bright">{me?.unitId || '*'}</span>
+          UNIT: <span className="text-brand-bright">{me?.unitId || '—'}</span>
           {myCall && <> · CALL: <span className="text-brand-bright">{myCall.id} · {myCall.nature}</span></>}
         </span>
       </div>
@@ -128,7 +128,7 @@ export default function DispatchBoard() {
                         <span className={c.units.length > 0 ? 'text-emerald-400' : 'text-amber-400'}>
                           {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
                         </span>
-                        <span className="text-slate-600 ml-auto">{c.timestamp?.split(' ')[1] || '*'}</span>
+                        <span className="text-slate-600 ml-auto">{c.timestamp?.split(' ')[1] || '—'}</span>
                       </div>
                     </div>
                   ))}
@@ -166,7 +166,7 @@ export default function DispatchBoard() {
                             {c.units.length > 0 ? c.units.join(', ') : 'UNASSIGNED'}
                           </td>
                           <td className={`${S_TABLE_TD} font-mono text-[10px] text-slate-500`}>
-                            {c.timestamp?.split(' ')[1] || '*'}
+                            {c.timestamp?.split(' ')[1] || '—'}
                           </td>
                         </tr>
                       ))}
@@ -187,7 +187,7 @@ export default function DispatchBoard() {
                   </div>
                   <div className="text-[11.5px] text-slate-400 leading-[1.5]">{selCall.description}</div>
                   <div className="text-[10px] text-slate-500 font-mono mt-1">
-                    Reporting Party: {selCall.reportingParty || '*'} · {selCall.timestamp}
+                    Reporting Party: {selCall.reportingParty || '—'} · {selCall.timestamp}
                   </div>
                 </div>
                 {me && !selCall.units.includes(me.unitId) && (

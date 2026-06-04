@@ -102,7 +102,7 @@ function Box({ label, span = 1, children }) {
 function BVal({ v, mono }) {
   return (
     <div className={`text-[11.5px] font-bold text-slate-200 min-h-[16px] ${mono ? 'font-mono' : ''}`}>
-      {v || '*'}
+      {v || '—'}
     </div>
   );
 }
@@ -128,7 +128,7 @@ function BSelect({ value, onChange, options }) {
     >
       {options.map(o =>
         typeof o === 'string'
-          ? <option key={o} value={o} style={{ background: '#0b1424' }}>{o || '*'}</option>
+          ? <option key={o} value={o} style={{ background: '#0b1424' }}>{o || '—'}</option>
           : <option key={o.value} value={o.value} style={{ background: '#0b1424' }}>{o.label}</option>
       )}
     </select>
@@ -168,7 +168,7 @@ function CivSearch({ civilians, onSelect }) {
             <button key={c.id} type="button" onClick={() => onSelect(c)}
               className="text-left px-3 py-2 rounded-lg bg-app-elevated/60 border border-border-faint hover:border-brand/40 hover:bg-brand/[0.05] transition-all cursor-pointer">
               <div className="text-[12px] font-bold text-slate-200">{c.firstName} {c.lastName}</div>
-              <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {c.dob} · DL {c.dlNumber || '*'}</div>
+              <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {c.dob} · DL {c.dlNumber || '—'}</div>
             </button>
           ))}
         </div>
@@ -389,10 +389,10 @@ function WarrantForm({ me, communityConfig, departments, civilians, penalCode, o
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             <Box label="Record #"><BVal v="NEW" mono /></Box>
             <Box label="Agency"><BVal v={communityConfig?.name || 'SSRP'} /></Box>
-            <Box label="Department"><BVal v={dept?.short || me?.deptShort || '*'} /></Box>
-            <Box label="Subdivision"><BVal v={me?.subdivision || '*'} /></Box>
-            <Box label="Unit #"><BVal v={me?.badge || '*'} mono /></Box>
-            <Box label="Unit Name"><BVal v={me?.name || '*'} /></Box>
+            <Box label="Department"><BVal v={dept?.short || me?.deptShort || '—'} /></Box>
+            <Box label="Subdivision"><BVal v={me?.subdivision || '—'} /></Box>
+            <Box label="Unit #"><BVal v={me?.badge || '—'} mono /></Box>
+            <Box label="Unit Name"><BVal v={me?.name || '—'} /></Box>
             <Box label="Date" span={2}><BVal v={TODAY} mono /></Box>
           </div>
         </Section>
@@ -608,7 +608,7 @@ function WarrantDetail({ warrant, civilians }) {
       {/* Issued by */}
       <div className="bg-app-card/60 border border-border-faint rounded-xl p-3">
         <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-1">Issued By</div>
-        <div className="text-[12px] text-slate-200">{warrant.issuedBy || '*'}</div>
+        <div className="text-[12px] text-slate-200">{warrant.issuedBy || '—'}</div>
         <div className="text-[10.5px] font-mono text-slate-500 mt-0.5">{warrant.issuedDate}</div>
       </div>
 
@@ -645,7 +645,7 @@ function WarrantDetail({ warrant, civilians }) {
           </div>
           {warrant.charges.map((c, i) => (
             <div key={i} className={`py-1.5 ${i > 0 ? 'border-t border-border-faint' : ''}`}>
-              <div className="text-[12px] font-semibold text-slate-200">{c.charge || '*'}</div>
+              <div className="text-[12px] font-semibold text-slate-200">{c.charge || '—'}</div>
               <div className="text-[10px] text-slate-500 mt-0.5">
                 {[c.chargeType, c.titleCode, c.counts > 1 ? `×${c.counts}` : null, c.jailTime]
                   .filter(Boolean).join(' · ')}
@@ -811,7 +811,7 @@ export default function WarrantControl() {
                       <td className={`${S_TABLE_TD} font-semibold`}>{w.civilianName}</td>
                       <td className={S_TABLE_TD}><span className={BADGE.gray}>{w.type}</span></td>
                       <td className={`${S_TABLE_TD} max-w-[200px] truncate text-[11px]`}>
-                        {w.charges?.[0]?.charge || w.charge || '*'}
+                        {w.charges?.[0]?.charge || w.charge || '—'}
                       </td>
                       <td className={`${S_TABLE_TD} text-[10px] text-slate-500`}>{w.issuedBy}</td>
                       <td className={S_TABLE_TD}>

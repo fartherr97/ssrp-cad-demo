@@ -726,7 +726,7 @@ export default function DispatchCenter() {
                         <td className="px-4 py-2.5"><CallStatus status={c.status} /></td>
                         <td className="px-4 py-2.5 text-[12px]">{c.createdAt ? <Elapsed createdAt={c.createdAt} /> : <span className="text-slate-600">*</span>}</td>
                         <td className={`px-4 py-2.5 text-[12px] font-mono whitespace-nowrap ${c.units.length > 0 ? 'text-emerald-400' : 'text-slate-600'}`}>
-                          {c.units.length > 0 ? c.units.join(', ') : '*'}
+                          {c.units.length > 0 ? c.units.join(', ') : '—'}
                         </td>
                       </tr>
                     );
@@ -792,7 +792,7 @@ export default function DispatchCenter() {
                             ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={setUnitStatus} />
                             : <StatusBadge status={o.status} />}
                         </td>
-                        <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '*'}</td>
+                        <td className={`px-4 py-2.5 text-[12px] font-mono font-semibold whitespace-nowrap ${o.callId ? 'text-amber-300' : 'text-slate-600'}`}>{o.callId || '—'}</td>
                         <td className="px-4 py-2.5 text-[12.5px] whitespace-nowrap"><DeptTag code={o.deptShort} /></td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 max-w-[200px] truncate">{o.location}</td>
                         <td className="px-4 py-2.5 text-[12.5px] text-white whitespace-nowrap">

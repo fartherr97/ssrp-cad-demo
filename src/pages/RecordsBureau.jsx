@@ -20,7 +20,7 @@ function bizDaysLeft(issuedAt) {
 }
 
 function bizExpiryStr(issuedAt) {
-  if (!issuedAt) return '*';
+  if (!issuedAt) return '—';
   return new Date(new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 }
 
@@ -44,7 +44,7 @@ function Row({ label, value, mono }) {
   return (
     <div className="flex items-start justify-between gap-3">
       <span className="text-[11px] text-slate-500 shrink-0">{label}</span>
-      <span className={`text-[12.5px] text-slate-200 text-right ${mono ? 'font-mono' : 'font-medium'}`}>{value || '*'}</span>
+      <span className={`text-[12.5px] text-slate-200 text-right ${mono ? 'font-mono' : 'font-medium'}`}>{value || '—'}</span>
     </div>
   );
 }
@@ -398,7 +398,7 @@ export default function RecordsBureau() {
                       <StatusChip status={r.status} />
                     </div>
                     <div className="text-[12.5px] font-semibold text-white leading-tight">{r.type}</div>
-                    <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '*'}</div>
+                    <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '—'}</div>
                   </button>
                 );
 
@@ -610,7 +610,7 @@ export default function RecordsBureau() {
                       <Row label="Status"       value={
                         <span className="font-bold" style={{ color: licColor }}>{licLabel}</span>
                       } />
-                      <Row label="Issued"       value={selBiz.licenseIssuedAt || '*'} mono />
+                      <Row label="Issued"       value={selBiz.licenseIssuedAt || '—'} mono />
                       <Row label="Expires"      value={bizExpiryStr(selBiz.licenseIssuedAt)} mono />
                       {!licRevoked && days !== null && (
                         <div className="mt-1">
@@ -826,9 +826,9 @@ export default function RecordsBureau() {
 
                       <InfoCard title="Address(es)">
                         <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Primary Address</div>
-                        <div className="text-[12.5px] text-slate-200 leading-relaxed mb-3">{selCiv.address || '*'}</div>
+                        <div className="text-[12.5px] text-slate-200 leading-relaxed mb-3">{selCiv.address || '—'}</div>
                         <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-600 mb-1">Phone</div>
-                        <div className="text-[12.5px] text-slate-300 font-mono">{selCiv.phone || '*'}</div>
+                        <div className="text-[12.5px] text-slate-300 font-mono">{selCiv.phone || '—'}</div>
                       </InfoCard>
 
                       <InfoCard title="Additional Information">

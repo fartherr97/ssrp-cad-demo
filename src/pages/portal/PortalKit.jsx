@@ -116,7 +116,7 @@ export function Field({ label, value, mono }) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-[10px] font-bold tracking-[0.6px] uppercase text-cad-muted">{label}</span>
-      <span className={`text-[14px] text-cad-text ${mono ? 'font-mono' : ''}`}>{value || '*'}</span>
+      <span className={`text-[14px] text-cad-text ${mono ? 'font-mono' : ''}`}>{value || '—'}</span>
     </div>
   );
 }

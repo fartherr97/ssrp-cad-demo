@@ -187,11 +187,11 @@ export default function UnitManagement() {
                   <div className={S_DETAIL_ROW}><span className={S_DETAIL_LABEL}>Status</span><StatusBadge status={selOfficer.status} /></div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Assigned Call</span>
-                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '*'}</span>
+                    <span className={S_DETAIL_VALUE_MONO}>{selOfficer.callId || '—'}</span>
                   </div>
                   <div className={S_DETAIL_ROW}>
                     <span className={S_DETAIL_LABEL}>Location</span>
-                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '*'}</span>
+                    <span className={S_DETAIL_VALUE}>{selOfficer.location || '—'}</span>
                   </div>
                 </div>
 

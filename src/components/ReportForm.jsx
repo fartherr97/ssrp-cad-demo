@@ -470,7 +470,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
                 onChange={e => updateCharge(c.id, 'name', e.target.value)}
               />
               {readOnly ? (
-                <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '*'}</span>
+                <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '—'}</span>
               ) : (
                 <select
                   className="bg-transparent text-[12px] font-bold outline-none focus-visible:outline-none cursor-pointer shrink-0"
@@ -497,7 +497,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
               {cell('Code', txt('code', { placeholder: '§ Code', mono: true }))}
               {cell('Counts', txt('counts', { placeholder: '1', type: 'number' }))}
               {cell('Bond Type', readOnly
-                ? <span className="text-[13px] text-slate-200">{c.bondType || '*'}</span>
+                ? <span className="text-[13px] text-slate-200">{c.bondType || '—'}</span>
                 : (
                   <select
                     className="w-full bg-transparent text-[13px] text-slate-100 outline-none focus-visible:outline-none cursor-pointer"
@@ -1278,7 +1278,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
           value={value || ''} onChange={e => onChange(f.id, e.target.value)} />
       ) : f.type === 'dropdown' ? (
         <select className={`${S_SELECT} ${isSupOnly ? 'border-red-500/40' : ''}`} value={value || ''} onChange={e => onChange(f.id, e.target.value)}>
-          <option value="">{f.placeholder || '*'}</option>
+          <option value="">{f.placeholder || '—'}</option>
           {(f.options || []).map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (

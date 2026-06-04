@@ -255,8 +255,8 @@ function DLCard({ civ, onRenew }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
         <Field label="DL Number" value={civ.dlNumber} mono />
         <Field label="Class" value={civ.dlClass} />
-        <Field label="Issued" value={civ.dlIssuedAt || '*'} />
-        <Field label="Expires" value={civ.dlExpiry || '*'} />
+        <Field label="Issued" value={civ.dlIssuedAt || '—'} />
+        <Field label="Expires" value={civ.dlExpiry || '—'} />
       </div>
 
       {/* Expiry warning */}

@@ -262,7 +262,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
       <div>
         <div className="flex items-center gap-2">
           <MdDirectionsCar size={15} className="text-slate-500 shrink-0" />
-          <span className="text-[15px] font-extrabold text-slate-100 font-mono tracking-[1px]">{job.plate || '*'}</span>
+          <span className="text-[15px] font-extrabold text-slate-100 font-mono tracking-[1px]">{job.plate || '—'}</span>
           {job.color && <span className="text-sm text-slate-400">{job.color}</span>}
         </div>
         {(job.make || job.model) && (
@@ -275,7 +275,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
           <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
-          <span className="text-xs text-slate-300 leading-relaxed">{job.location || '*'}</span>
+          <span className="text-xs text-slate-300 leading-relaxed">{job.location || '—'}</span>
         </div>
         {job.pickupPostal && (
           <div className="text-[11px] text-slate-500 ml-[22px]">

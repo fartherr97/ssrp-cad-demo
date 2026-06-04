@@ -572,7 +572,7 @@ function reducer(state, action) {
       const officer = state.officers.find(o => o.badge === action.payload.officerBadge);
       const officerSignature = officer
         ? `${officer.badge} | ${(officer.rank || officer.role || 'OFFICER').toUpperCase()} | ${officer.name.toUpperCase()}`
-        : (action.payload.officerBadge || '*');
+        : (action.payload.officerBadge || '—');
       const reportNumber = String(state.reportSeq).padStart(4, '0');
       const newReport = {
         ...action.payload,

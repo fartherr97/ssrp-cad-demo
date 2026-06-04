@@ -124,7 +124,7 @@ export default function Flags() {
                   <MdFlag size={11} /> {f.name}
                 </span>
               </SonCell>
-              <SonCell color={ADMIN.textDim}>{f.description || '*'}</SonCell>
+              <SonCell color={ADMIN.textDim}>{f.description || '—'}</SonCell>
               <SonCell align="center">
                 <span className="text-[12px] font-mono" style={{ color: usageCount(f.id) > 0 ? ADMIN.amber : ADMIN.textMute }}>
                   {usageCount(f.id)}
@@ -155,7 +155,7 @@ export default function Flags() {
               {flagged.map((c, i) => (
                 <SonRow key={c.id} i={i}>
                   <SonCell bold>{c.firstName} {c.lastName}</SonCell>
-                  <SonCell mono color={ADMIN.textDim}>{c.dlNumber || '*'}</SonCell>
+                  <SonCell mono color={ADMIN.textDim}>{c.dlNumber || '—'}</SonCell>
                   <SonCell>
                     <div className="flex flex-wrap gap-1">
                       {(c.flags || []).map(fid => {

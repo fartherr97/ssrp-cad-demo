@@ -141,7 +141,7 @@ function renderField(f, value) {
     );
   }
 
-  const val = value != null && value !== '' ? String(value) : '*';
+  const val = value != null && value !== '' ? String(value) : '—';
   const isNarr = f.type === 'textarea';
   const span = f.span || 1;
   const blockStyle = isNarr ? styles.fieldBlockFull : span >= 3 ? styles.fieldBlockFull : span === 2 ? styles.fieldBlockHalf : styles.fieldBlock;
@@ -199,9 +199,9 @@ function ReportPDF({ template, data = {}, meta = {} }) {
         <View style={styles.metaBar}>
           {[
             { label: 'Date / Time', value: meta.dateTime || now.toLocaleString() },
-            { label: 'Primary Officer', value: meta.officer || '*' },
+            { label: 'Primary Officer', value: meta.officer || '—' },
             { label: 'Agency', value: meta.agency || 'HCSO' },
-            { label: 'Report Type', value: template?.name || '*' },
+            { label: 'Report Type', value: template?.name || '—' },
           ].map((m, i, arr) => (
             <View key={m.label} style={i === arr.length - 1 ? styles.metaCellLast : styles.metaCell}>
               <Text style={styles.metaLabel}>{m.label}</Text>
@@ -268,7 +268,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
               {textareaFields.map(f => (
                 <View key={f.id} style={{ paddingHorizontal: 4, paddingTop: 4 }}>
                   <Text style={styles.fieldLabel}>{f.label}</Text>
-                  <Text style={styles.fieldValueNarr}>{data[f.id] || '*'}</Text>
+                  <Text style={styles.fieldValueNarr}>{data[f.id] || '—'}</Text>
                 </View>
               ))}
               {/* Supplemental log * append-only follow-ups */}
@@ -321,7 +321,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
             {/* Officer signature */}
             <View style={styles.sigBlockOfficer}>
               <Text style={styles.sigLabelOfficer}>Observing Officer's Signature</Text>
-              <Text style={styles.sigValue}>{meta.officerSignature || (meta.officer || '*')}</Text>
+              <Text style={styles.sigValue}>{meta.officerSignature || (meta.officer || '—')}</Text>
             </View>
             {/* Supervisor signature */}
             <View style={styles.sigBlockSuper}>

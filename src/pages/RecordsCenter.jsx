@@ -119,7 +119,7 @@ export default function RecordsCenter() {
       payload: {
         type: selectedTemplate.name,
         recordNumber: recNum,
-        officerBadge: me?.badge || currentUser?.badge || '*',
+        officerBadge: me?.badge || currentUser?.badge || '—',
         status: 'Active',
         formData: { ...formValues },
         summary: Object.values(formValues).filter(v => typeof v === 'string' && v.length > 2).join(' | ').slice(0, 200) || 'Record created via CAD',
@@ -162,7 +162,7 @@ export default function RecordsCenter() {
           caseNumber: draftMeta.caseNumber,
           status: 'Draft',
           dateTime: now.toLocaleString(),
-          officer: `${me?.badge || currentUser?.badge || '*'} · ${me?.name || currentUser?.name || ''}`,
+          officer: `${me?.badge || currentUser?.badge || '—'} · ${me?.name || currentUser?.name || ''}`,
           agency: deptName,
           department: formValues._issuingDept || deptName,
           logoUrl: departments?.find(d => d.short === me?.deptShort)?.logoUrl || communityConfig?.logoUrl,
@@ -172,7 +172,7 @@ export default function RecordsCenter() {
     const Detail = ({ label, value }) => (
       <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
         <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{label}</span>
-        <span className="text-[12.5px] text-slate-200">{value || '*'}</span>
+        <span className="text-[12.5px] text-slate-200">{value || '—'}</span>
       </div>
     );
 
@@ -213,7 +213,7 @@ export default function RecordsCenter() {
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Record Status</div><div className="mt-1"><span className={BADGE.gray}>Draft</span></div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Date</div><div className="text-[12.5px] text-slate-200 mt-0.5">{now.toLocaleDateString()}</div></div>
               <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Review</div><div className="text-[12.5px] text-slate-200 mt-0.5">Not submitted</div></div>
-              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '*'}</div></div>
+              <div><div className="text-[9px] uppercase tracking-[0.5px] text-slate-500">Last Saved</div><div className="text-[12.5px] text-slate-200 mt-0.5">{savedAt ? savedAt.toLocaleTimeString() : '—'}</div></div>
             </div>
             <div className="flex-1 overflow-auto bg-app-bg/30 p-4 lg:p-6">
               <ReportForm template={tpl} data={formValues} onChange={handleFormChange}

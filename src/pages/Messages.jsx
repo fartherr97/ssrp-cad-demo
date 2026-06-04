@@ -38,7 +38,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
     selectedOfficers.forEach(o => {
       onSend({
         fromName: currentUser?.name || 'Unknown',
-        fromBadge: currentUser?.badge || '*',
+        fromBadge: currentUser?.badge || '—',
         fromId: currentUser?.id,
         toName: o.name,
         toId: o.id,
@@ -55,7 +55,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
     const allNames = [currentUser?.name || 'Unknown', ...selectedOfficers.map(o => o.name)];
     onGroupSend({
       fromName: currentUser?.name || 'Unknown',
-      fromBadge: currentUser?.badge || '*',
+      fromBadge: currentUser?.badge || '—',
       fromId: currentUser?.id,
       participantIds: allIds,
       participantNames: allNames,
