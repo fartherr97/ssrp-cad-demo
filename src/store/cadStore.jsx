@@ -122,6 +122,7 @@ const initialState = {
   businesses: BUSINESSES,
   permits: FDOT_PERMITS,
   incoming911: INCOMING_911,
+  incoming911HCFR: [],
   civilian911Log: [],
   unitGroups: UNIT_GROUPS,
   // ─── Admin customization config ───
@@ -437,11 +438,17 @@ function reducer(state, action) {
 
     case 'ADD_INCOMING_911':
       return { ...state, incoming911: [action.payload, ...state.incoming911] };
+    case 'DISMISS_HCFR_911':
+      return { ...state, incoming911HCFR: (state.incoming911HCFR || []).filter(c => c.id !== action.payload) };
     case 'ADD_CIVILIAN_911': {
       const { filerId, ...incPayload } = action.payload;
+      const esServices = incPayload.esServices?.length ? incPayload.esServices : ['LAW_ENFORCEMENT'];
+      const goesToLEO  = esServices.includes('LAW_ENFORCEMENT');
+      const goesToHCFR = esServices.includes('EMS') || esServices.includes('FIRE');
       const logEntry = {
         id: action.payload.id,
         filerId,
+        esServices,
         caller: action.payload.caller,
         message: action.payload.message,
         location: action.payload.location,
@@ -452,7 +459,8 @@ function reducer(state, action) {
       };
       return {
         ...state,
-        incoming911: [incPayload, ...state.incoming911],
+        incoming911:     goesToLEO  ? [incPayload, ...state.incoming911]                         : state.incoming911,
+        incoming911HCFR: goesToHCFR ? [incPayload, ...(state.incoming911HCFR || [])]             : (state.incoming911HCFR || []),
         civilian911Log: [logEntry, ...(state.civilian911Log || [])],
       };
     }

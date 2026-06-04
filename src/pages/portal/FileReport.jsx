@@ -3,8 +3,14 @@ import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
   MdReportProblem, MdCheckCircle, MdPerson, MdEventNote,
-  MdPlace, MdDescription, MdCategory,
+  MdPlace, MdDescription, MdCategory, MdLocalPolice,
 } from 'react-icons/md';
+
+const ES_SERVICES = [
+  { id: 'LAW_ENFORCEMENT', label: 'Law Enforcement', icon: '🚔', color: '#3a88e8' },
+  { id: 'EMS',             label: 'EMS',             icon: '🚑', color: '#22c55e' },
+  { id: 'FIRE',            label: 'Fire',             icon: '🔥', color: '#ef4444' },
+];
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY } from '../../constants/styles';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
@@ -26,6 +32,7 @@ const EMPTY_FORM = {
   incidentDate: '',
   location: '',
   description: '',
+  esServices: ['LAW_ENFORCEMENT'],
 };
 
 export default function FileReport() {
@@ -37,6 +44,11 @@ export default function FileReport() {
   const [submitted, setSubmitted] = useState(null);
 
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
+  const toggleService = id => setForm(f => {
+    const cur = f.esServices || ['LAW_ENFORCEMENT'];
+    const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+    return next.length ? { ...f, esServices: next } : f;
+  });
 
   // Keep the filer locked to whoever is the active character.
   useEffect(() => { if (activeChar) setForm(f => ({ ...f, filerId: String(activeChar.id) })); }, [activeChar?.id]);
@@ -53,6 +65,7 @@ export default function FileReport() {
     if (!canSubmit) return;
     const caseNumber = `CIT-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
     const filedBy = filerName(form.filerId);
+    const esServices = form.esServices?.length ? form.esServices : ['LAW_ENFORCEMENT'];
     dispatch({
       type: 'ADD_REPORT',
       payload: {
@@ -60,6 +73,7 @@ export default function FileReport() {
         caseNumber,
         officerBadge: 'CITIZEN',
         summary: form.description,
+        esServices,
         formData: {
           reportType: form.reportType,
           filedBy,
@@ -67,6 +81,7 @@ export default function FileReport() {
           incidentDate: form.incidentDate,
           location: form.location,
           description: form.description,
+          esServices,
         },
       },
     });
@@ -131,6 +146,24 @@ export default function FileReport() {
       ) : (
         <PortalCard accent={ACCENT}>
           <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className={PORTAL_LABEL}><MdLocalPolice size={13} className="inline align-[-2px] mr-[5px]" />Service(s) Needed *</label>
+              <div className="flex gap-2 flex-wrap mt-1.5">
+                {ES_SERVICES.map(svc => {
+                  const on = (form.esServices || []).includes(svc.id);
+                  return (
+                    <button key={svc.id} type="button" onClick={() => toggleService(svc.id)}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12.5px] font-semibold border cursor-pointer transition-all"
+                      style={on
+                        ? { background: `${svc.color}18`, border: `1px solid ${svc.color}45`, color: svc.color }
+                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.10)', color: '#64748b' }}>
+                      <span>{svc.icon}</span> {svc.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1.5">Select all that apply. Your report will be routed to the appropriate services.</p>
+            </div>
             <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))' }}>
               <div>
                 <label className={PORTAL_LABEL}><MdCategory size={13} className="inline align-[-2px] mr-[5px]" />Report Type</label>

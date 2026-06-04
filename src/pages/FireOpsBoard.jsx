@@ -15,7 +15,7 @@ import {
 import {
   MdLocalHospital, MdSearch, MdWarningAmber, MdPerson, MdShield,
   MdLocalFireDepartment, MdCheckCircle, MdThumbDownAlt, MdArrowForward,
-  MdLocationOn, MdLink, MdClose,
+  MdLocationOn, MdLink, MdClose, MdPhone,
 } from 'react-icons/md';
 
 function PriBadge({ p }) {
@@ -351,7 +351,7 @@ function MedicalLookup({ civilians }) {
 export default function FireOpsBoard() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { calls, officers, currentUser, hcfrRequests = [] } = state;
+  const { calls, officers, currentUser, hcfrRequests = [], incoming911HCFR = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
   const [rosterTab, setRosterTab] = useState('APPARATUS');
   const [dispatchingReq, setDispatchingReq] = useState(null);
@@ -452,6 +452,54 @@ export default function FireOpsBoard() {
           </div>
         ))}
       </div>
+
+      {/* Incoming Civilian 911 (EMS / Fire routed) */}
+      {incoming911HCFR.length > 0 && (
+        <div className="shrink-0">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
+            <MdPhone size={14} /> Incoming 911 — EMS / Fire ({incoming911HCFR.length})
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
+            {incoming911HCFR.map(c => (
+              <div key={c.id} className="rounded-xl p-3.5 flex flex-col gap-2"
+                style={{ background: 'rgba(251,191,36,0.07)', border: '1px solid rgba(251,191,36,0.25)' }}>
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-amber-400/15 border border-amber-400/25 mt-0.5">
+                    <MdPhone size={14} className="text-amber-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12.5px] font-semibold text-white leading-snug">{c.message}</div>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <MdLocationOn size={11} className="text-slate-500 shrink-0" />
+                      <span className="text-[11px] text-slate-400 truncate">{c.location}</span>
+                    </div>
+                  </div>
+                </div>
+                {c.caller && (
+                  <div className="text-[10.5px] text-slate-500">
+                    Caller: <span className="text-slate-300">{c.caller}</span>
+                    {c.callbackNumber && <span className="ml-1 text-slate-600">· {c.callbackNumber}</span>}
+                  </div>
+                )}
+                <div className="flex gap-1.5 flex-wrap">
+                  {(c.esServices || []).map(svc => (
+                    <span key={svc} className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
+                      style={svc === 'EMS' ? { background: 'rgba(34,197,94,0.12)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' }
+                           :                 { background: 'rgba(239,68,68,0.12)',  color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)'  }}>
+                      {svc === 'EMS' ? '🚑 EMS' : '🔥 Fire'}
+                    </span>
+                  ))}
+                  <button onClick={() => dispatch({ type: 'DISMISS_HCFR_911', payload: c.id })} type="button"
+                    className="ml-auto press flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: '#64748b' }}>
+                    <MdClose size={11} /> Dismiss
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Incoming LE assistance requests */}
       {inboundRequests.length > 0 && (

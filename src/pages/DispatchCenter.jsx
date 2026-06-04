@@ -242,6 +242,18 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
           {call.callbackNumber && <span className="ml-1 text-slate-600">· {call.callbackNumber}</span>}
         </div>
       )}
+      {call.esServices?.length > 0 && (
+        <div className="flex gap-1 flex-wrap">
+          {call.esServices.map(svc => (
+            <span key={svc} className="text-[9.5px] font-bold px-1.5 py-0.5 rounded"
+              style={svc === 'LAW_ENFORCEMENT' ? { background: 'rgba(58,136,232,0.15)', color: '#93c5fd', border: '1px solid rgba(58,136,232,0.25)' }
+                   : svc === 'EMS'             ? { background: 'rgba(34,197,94,0.12)',   color: '#86efac', border: '1px solid rgba(34,197,94,0.25)'   }
+                   :                             { background: 'rgba(239,68,68,0.12)',    color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)'   }}>
+              {svc === 'LAW_ENFORCEMENT' ? '🚔 LEO' : svc === 'EMS' ? '🚑 EMS' : '🔥 Fire'}
+            </span>
+          ))}
+        </div>
+      )}
       {(onDispatch || onDismiss) && (
         <div className="flex gap-1.5 mt-0.5">
           <button onClick={onDispatch}

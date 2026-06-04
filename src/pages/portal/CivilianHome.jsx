@@ -15,7 +15,13 @@ import {
   S_FIELD, S_LABEL, S_INPUT, S_TEXTAREA,
 } from '../../constants/styles';
 
-const BLANK_911 = { message: '', location: '', callbackNumber: '' };
+const BLANK_911 = { message: '', location: '', callbackNumber: '', esServices: ['LAW_ENFORCEMENT'] };
+
+const ES_SERVICES = [
+  { id: 'LAW_ENFORCEMENT', label: 'Law Enforcement', icon: '🚔', color: '#3a88e8' },
+  { id: 'EMS',             label: 'EMS',             icon: '🚑', color: '#22c55e' },
+  { id: 'FIRE',            label: 'Fire',             icon: '🔥', color: '#ef4444' },
+];
 
 const ACCENT = 'brand';
 
@@ -35,6 +41,11 @@ export default function CivilianHome() {
   const [show911, setShow911] = useState(false);
   const [form911, setForm911] = useState(BLANK_911);
   const set911 = k => e => setForm911(f => ({ ...f, [k]: e.target.value }));
+  const toggle911Service = id => setForm911(f => {
+    const cur = f.esServices || ['LAW_ENFORCEMENT'];
+    const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+    return next.length ? { ...f, esServices: next } : f; // require at least one
+  });
 
   const myVehicles = useMemo(() => vehicles.filter(v => v.ownerId === activeChar?.id), [vehicles, activeChar]);
   const myWarrants = useMemo(
@@ -46,6 +57,7 @@ export default function CivilianHome() {
 
   const submit911 = () => {
     if (!form911.message.trim() || !form911.location.trim()) return;
+    const esServices = form911.esServices?.length ? form911.esServices : ['LAW_ENFORCEMENT'];
     dispatch({
       type: 'ADD_CIVILIAN_911',
       payload: {
@@ -55,6 +67,7 @@ export default function CivilianHome() {
         callbackNumber: form911.callbackNumber.trim() || null,
         message: form911.message.trim(),
         location: form911.location.trim(),
+        esServices,
         receivedAt: Date.now(),
         priority: 1,
       },
@@ -200,6 +213,23 @@ export default function CivilianHome() {
             <div className={S_MODAL_BODY}>
               <div className="text-[12px] text-red-400/80 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 font-medium">
                 For genuine emergencies only. Misuse may result in in-game consequences.
+              </div>
+              <div className={S_FIELD}>
+                <label className={S_LABEL}>Services Needed *</label>
+                <div className="flex gap-2 flex-wrap">
+                  {ES_SERVICES.map(svc => {
+                    const on = (form911.esServices || []).includes(svc.id);
+                    return (
+                      <button key={svc.id} type="button" onClick={() => toggle911Service(svc.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold border cursor-pointer transition-all"
+                        style={on
+                          ? { background: `${svc.color}18`, border: `1px solid ${svc.color}45`, color: svc.color }
+                          : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.10)', color: '#64748b' }}>
+                        <span>{svc.icon}</span> {svc.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className={S_FIELD}>
                 <label className={S_LABEL}>What is your emergency? *</label>
