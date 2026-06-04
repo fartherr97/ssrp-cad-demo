@@ -155,7 +155,11 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
   const toggle = () => open ? doClose() : openMenu();
 
   const dot = statusOptions.find(s => s.code === myStatus)?.color || STATUS_COLORS[myStatus] || '#94a3b8';
-  const setStatus = (s) => { dispatch({ type: 'SET_STATUS', payload: s }); };
+  const setStatus = (s) => {
+    dispatch({ type: 'SET_STATUS', payload: s });
+    const opt = statusOptions.find(o => o.code === s);
+    toast.info(`Status set to ${opt?.label || s}`, { color: opt?.color });
+  };
   const triggerPanic = () => {
     const mockCoords = [
       { x:  428,  y:  -980, z:  30, area: 'Mission Row'    },
