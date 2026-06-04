@@ -152,6 +152,12 @@ input:-webkit-autofill:focus {
 select, option, input, textarea, button, a, label, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
+/* Drop the cheap-looking native number spinners (up/down arrows) everywhere —
+   our forms set values by typing, not stepping. */
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* Native <select> text can flicker on desktop Chrome when an ancestor uses
    backdrop-filter (our blurred toolbars/panels): opening the native popup
    re-rasterizes that layer and the value text strobes. Promoting the select to

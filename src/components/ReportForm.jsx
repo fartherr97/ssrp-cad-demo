@@ -442,7 +442,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
         const txt = (field, { placeholder, mono, type: iType = 'text' } = {}) => (
           <input
             type={iType}
-            className={`w-full bg-transparent text-[13px] font-medium text-slate-100 placeholder:text-slate-600 outline-none ${mono ? 'font-mono' : ''}`}
+            className={`w-full bg-transparent text-[13px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus-visible:outline-none ${mono ? 'font-mono' : ''}`}
             value={c[field] ?? ''}
             placeholder={placeholder}
             readOnly={readOnly}
@@ -450,7 +450,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
           />
         );
         const cell = (label, node) => (
-          <div className="flex flex-col gap-1 rounded-lg bg-app-input/50 border border-border-faint px-3 py-2 min-w-0">
+          <div className="flex flex-col gap-1 rounded-lg bg-app-input/50 border border-border-faint px-3 py-2 min-w-0 transition-colors focus-within:border-brand/50 focus-within:bg-app-input/80">
             <span className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-500">{label}</span>
             <div className="min-w-0">{node}</div>
           </div>
@@ -462,7 +462,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
               <span className="flex items-center justify-center w-6 h-6 rounded-md text-[11px] font-bold font-mono shrink-0"
                 style={{ background: 'rgba(0,0,0,0.25)', color: ts.color }}>{idx + 1}</span>
               <input
-                className="flex-1 min-w-0 bg-transparent text-[14px] font-bold text-white placeholder:text-slate-500 outline-none"
+                className="flex-1 min-w-0 bg-transparent text-[14px] font-bold text-white placeholder:text-slate-500 outline-none focus-visible:outline-none"
                 value={c.name ?? ''}
                 placeholder="Charge name"
                 readOnly={readOnly}
@@ -472,7 +472,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
                 <span className="text-[12px] font-bold shrink-0" style={{ color: ts.color }}>{c.type || '—'}</span>
               ) : (
                 <select
-                  className="bg-transparent text-[12px] font-bold outline-none cursor-pointer shrink-0"
+                  className="bg-transparent text-[12px] font-bold outline-none focus-visible:outline-none cursor-pointer shrink-0"
                   style={{ color: ts.color }}
                   value={c.type || ''}
                   onChange={e => updateCharge(c.id, 'type', e.target.value)}
@@ -499,7 +499,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
                 ? <span className="text-[13px] text-slate-200">{c.bondType || '—'}</span>
                 : (
                   <select
-                    className="w-full bg-transparent text-[13px] text-slate-100 outline-none cursor-pointer"
+                    className="w-full bg-transparent text-[13px] text-slate-100 outline-none focus-visible:outline-none cursor-pointer"
                     value={c.bondType || ''}
                     onChange={e => updateCharge(c.id, 'bondType', e.target.value)}
                   >
