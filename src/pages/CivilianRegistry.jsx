@@ -31,7 +31,7 @@ export default function CivilianRegistry() {
   const [createError, setCreateError] = useState('');
   const [vehError, setVehError] = useState('');
 
-  const fieldLabel = f => ({ ssn: 'SSN', dlNumber: 'DL Number', phone: 'Phone' }[f] || f);
+  const fieldLabel = f => ({ ssn: 'SSN', dlNumber: 'DL Number', phone: 'Phone', fullName: 'Full Name' }[f] || f);
 
   const selCiv = selected != null ? civilians.find(c => c.id === selected) : null;
   const civVehicles = selCiv ? vehicles.filter(v => selCiv.vehicles?.includes(v.id)) : [];
@@ -45,6 +45,15 @@ export default function CivilianRegistry() {
     if (!form.firstName || !form.lastName) return;
     const uniqueFields = state.uniqueIdentifiers?.civilian || [];
     for (const field of uniqueFields) {
+      if (field === 'fullName') {
+        const wanted = `${form.firstName} ${form.lastName}`.trim().toLowerCase();
+        const conflict = civilians.find(c => `${c.firstName} ${c.lastName}`.trim().toLowerCase() === wanted);
+        if (conflict) {
+          setCreateError(`The name "${form.firstName} ${form.lastName}" is already in use`);
+          return;
+        }
+        continue;
+      }
       if (form[field]) {
         const conflict = civilians.find(c => c[field] === form[field]);
         if (conflict) {

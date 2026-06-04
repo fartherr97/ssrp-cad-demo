@@ -4,6 +4,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import { AdminPageTitle, AdminPanel, SonButton, ADMIN } from '../AdminKit';
 
 const CIVILIAN_FIELDS = [
+  { key: 'fullName', label: 'Full Name (First + Last)', desc: "A civilian's first and last name combination must be unique — no two characters can share the same full name." },
   { key: 'ssn',      label: 'SSN',              desc: 'Social Security Number must be unique across all civilian records.' },
   { key: 'dlNumber', label: "Driver's License #", desc: "Driver's license number must be unique across all civilian records." },
   { key: 'phone',    label: 'Phone Number',       desc: 'Phone number must be unique across all civilian records.' },

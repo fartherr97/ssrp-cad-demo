@@ -797,7 +797,7 @@ export default function TowCAD() {
   };
   const handlerName = () => (activeBizCompany || fdotCompany)?.name || 'Tow';
   const acknowledgeRequest = (req) => {
-    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED', handledBy: handlerName() } });
     toast.info(`Acknowledged · ${req.assistType}`, { title: handlerName() });
     const to = recipientsFor(req);
     if (to.length > 0) {
@@ -836,7 +836,7 @@ export default function TowCAD() {
       },
     });
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
-    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED', handledBy: handlingCompany?.name || handlerName(), dispatchedUnit: unit?.truckName || '', dispatchedCompany: handlingCompany?.name || '' } });
     toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
     const to = recipientsFor(req);
     if (to.length > 0) {

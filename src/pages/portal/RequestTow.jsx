@@ -3,12 +3,20 @@ import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
   MdLocalShipping, MdLocationOn, MdPhone, MdDescription, MdDirectionsCar,
-  MdInfoOutline, MdCheckCircle, MdSend, MdBusiness,
+  MdInfoOutline, MdSend, MdBusiness,
+  MdHourglassEmpty, MdVisibility, MdBlock,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 
 const BLANK = { location: '', postal: '', phone: '', vehicle: '', description: '', companyId: '' };
+
+const REQ_STATUS = {
+  PENDING:      { label: 'Submitted',    sub: 'Waiting for a tow company to respond.',                  color: '#f59e0b', Icon: MdHourglassEmpty },
+  ACKNOWLEDGED: { label: 'Acknowledged', sub: 'Your request was seen and a unit is being assigned.',    color: '#06b6d4', Icon: MdVisibility },
+  DISPATCHED:   { label: 'Unit En Route', sub: 'A tow unit has been dispatched and is on the way.',      color: '#22c55e', Icon: MdLocalShipping },
+  DECLINED:     { label: 'Declined',     sub: 'No unit was available. Try another company or resubmit.', color: '#ef4444', Icon: MdBlock },
+};
 
 export default function RequestTow() {
   const { state, dispatch } = useCAD();
@@ -19,10 +27,18 @@ export default function RequestTow() {
   const fdotCompany = useMemo(() => towCompanies.find(b => b.isFDOT), [towCompanies]);
 
   const [form, setForm] = useState(BLANK);
-  const [submitted, setSubmitted] = useState(null); // { company } after submit
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
   const callerName = activeChar ? `${activeChar.firstName} ${activeChar.lastName}` : 'Civilian';
+
+  // Live status of this character's tow requests (newest first).
+  const myRequests = useMemo(
+    () => (state.fdotRequests || [])
+      .filter(r => r.source === 'CIVILIAN' && activeChar && r.filerId === activeChar.id)
+      .slice()
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
+    [state.fdotRequests, activeChar],
+  );
 
   const chosenCompany = form.companyId ? towCompanies.find(b => String(b.id) === String(form.companyId)) : null;
   const routedTo = chosenCompany || fdotCompany;
@@ -45,11 +61,11 @@ export default function RequestTow() {
         description: `${vehLine}${form.description.trim()}`,
         targetCompanyId: chosenCompany ? chosenCompany.id : null,
         requestedBy: callerName,
+        filerId: activeChar?.id ?? null,
         phone: form.phone.trim(),
         requestedByUnit: '',
       },
     });
-    setSubmitted({ company: routedTo?.name || 'FDOT Tow Operations', specific: !!chosenCompany });
     setForm(BLANK);
     toast.success(`Tow request sent to ${routedTo?.name || 'FDOT'}.`, { title: 'Request Submitted' });
   };
@@ -66,22 +82,47 @@ export default function RequestTow() {
       <div className="max-w-[760px]">
         <CivilianSwitcher />
 
-        {submitted && (
-          <PortalCard accent="green" style={{ marginBottom: 18 }}>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/30 flex items-center justify-center shrink-0">
-                <MdCheckCircle size={22} className="text-green-400" />
-              </div>
-              <div>
-                <div className="text-[14px] font-bold text-white mb-0.5">Tow request submitted</div>
-                <div className="text-[12.5px] text-slate-400 leading-relaxed">
-                  Your request was routed to <span className="font-semibold text-slate-200">{submitted.company}</span>
-                  {submitted.specific ? '.' : ' (auto-routed — no company was selected).'} A dispatcher will review it shortly.
-                  You can submit another request below if needed.
-                </div>
-              </div>
+        {myRequests.length > 0 && (
+          <div className="mb-5">
+            <div className="text-[11px] font-bold uppercase tracking-[0.7px] text-slate-500 mb-2.5">My Tow Requests</div>
+            <div className="flex flex-col gap-2.5">
+              {myRequests.map(req => {
+                const st = REQ_STATUS[req.status] || REQ_STATUS.PENDING;
+                const StIcon = st.Icon;
+                const dest = req.dispatchedCompany || req.handledBy
+                  || (req.targetCompanyId ? towCompanies.find(b => b.id === req.targetCompanyId)?.name : null)
+                  || fdotCompany?.name || 'FDOT';
+                return (
+                  <div key={req.id} className="rounded-xl border p-3.5 flex items-start gap-3"
+                    style={{ background: `${st.color}0d`, borderColor: `${st.color}40` }}>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: `${st.color}22`, border: `1px solid ${st.color}55` }}>
+                      <StIcon size={18} style={{ color: st.color }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[13px] font-bold" style={{ color: st.color }}>{st.label}</span>
+                        <span className="text-[11px] text-slate-500 font-mono">#{req.id}</span>
+                      </div>
+                      <div className="text-[12px] text-slate-300 mt-0.5">{st.sub}</div>
+                      {req.status === 'DISPATCHED' && (
+                        <div className="text-[11.5px] text-green-300/90 mt-1 flex items-center gap-1.5">
+                          <MdLocalShipping size={13} className="shrink-0" />
+                          {req.dispatchedUnit ? `${req.dispatchedUnit} · ${dest}` : dest} is en route.
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1.5">
+                        <MdLocationOn size={12} className="shrink-0" /> {req.location}
+                        {req.status !== 'DISPATCHED' && req.status !== 'DECLINED' && (
+                          <span className="ml-1">· routed to <span className="text-slate-400">{dest}</span></span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </PortalCard>
+          </div>
         )}
 
         <PortalCard accent="brand">

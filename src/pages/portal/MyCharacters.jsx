@@ -35,7 +35,7 @@ const _ETH  = ['White / Caucasian', 'Black / African American', 'Hispanic / Lati
 const _HAIR = ['Black', 'Brown', 'Dark Brown', 'Blonde', 'Light Brown', 'Auburn',
                'Red', 'Gray', 'Salt & Pepper', 'Bald'];
 const _EYES = ['Brown', 'Dark Brown', 'Hazel', 'Green', 'Blue', 'Gray'];
-// GTA V / FiveM * Los Santos & Blaine County street names
+// Tampa-area street names (Los Santos → Tampa, Paleto → Temple Terrace)
 const _STREETS = [
   'Vinewood Blvd', 'Spanish Ave', 'Alta St', 'Power St', 'Strawberry Ave',
   'Carcer Way', 'Decker St', 'Forum Dr', 'Hawick Ave', 'Jamestown St',
@@ -43,15 +43,15 @@ const _STREETS = [
   'Vespucci Blvd', 'West Eclipse Blvd', 'Boulevard Del Perro', 'Cougar Ave',
   'Davis Ave', 'El Rancho Blvd', 'Elgin Ave', 'Greenwich Pkwy', 'Little Bighorn Ave',
   'Marathon Ave', 'Portola Dr', 'Rockford Dr', 'Senora Way', 'Vinewood Park Dr',
-  'Paleto Blvd', 'Joshua Rd', 'Route 68', 'Niland Ave', 'Marina Dr',
+  'Temple Terrace Blvd', 'Joshua Rd', 'Route 68', 'Niland Ave', 'Marina Dr',
 ];
-// Los Santos neighborhoods + Blaine County towns
+// Tampa-area neighborhoods (Los Santos → Tampa, Paleto → Temple Terrace)
 const _AREAS = [
   'Vinewood', 'Downtown Vinewood', 'Vinewood Hills', 'Vespucci', 'Vespucci Beach',
   'Del Perro', 'Rockford Hills', 'Mirror Park', 'Strawberry', 'Davis',
   'Chamberlain Hills', 'Rancho', 'La Mesa', 'Little Seoul', 'Pillbox Hill',
   'Burton', 'Morningwood', 'Richman', 'El Burro Heights', 'Sandy Shores',
-  'Paleto Bay', 'Grapeseed', 'Harmony',
+  'Temple Terrace', 'Grapeseed', 'Harmony',
 ];
 
 const _pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -92,7 +92,7 @@ function generateCharacter(fields) {
   const height = `${ftBase}'${inBase}"`;
   const weight = gender === 'Male' ? `${_int(145, 225)} lbs` : `${_int(105, 165)} lbs`;
 
-  const address = `${_int(100, 9999)} ${_pick(_STREETS)}, ${_pick(_AREAS)}, Los Santos`;
+  const address = `${_int(100, 9999)} ${_pick(_STREETS)}, ${_pick(_AREAS)}, Tampa`;
   const phone = `(${_pick(['213', '310', '323', '424'])}) 555-${String(_int(0, 9999)).padStart(4, '0')}`;
 
   const base = { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
@@ -152,6 +152,19 @@ export default function MyCharacters() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Enforce admin-configured unique identifiers (e.g. unique full name).
+    const uniqueFields = state.uniqueIdentifiers?.civilian || [];
+    const allCivs = state.civilians || [];
+    for (const field of uniqueFields) {
+      if (field === 'fullName') {
+        const wanted = `${form.firstName} ${form.lastName}`.trim().toLowerCase();
+        const conflict = allCivs.find(c => c.id !== editingId && `${c.firstName} ${c.lastName}`.trim().toLowerCase() === wanted);
+        if (conflict) { toast.error(`The name "${form.firstName} ${form.lastName}" is already taken.`, { title: 'Name Unavailable' }); return; }
+      } else if (form[field]) {
+        const conflict = allCivs.find(c => c.id !== editingId && c[field] === form[field]);
+        if (conflict) { toast.error(`That ${field} is already in use.`, { title: 'Duplicate Value' }); return; }
+      }
+    }
     if (editingId != null) {
       dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: editingId, ...form } });
       toast.success(`${form.firstName} ${form.lastName} updated.`, { title: 'Character Saved' });
