@@ -404,6 +404,16 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
         {/* Supervisor-only toggle */}
         <IconBtn icon={MdLock} onClick={() => up({ supervisorOnly: !isSupOnly })} active={isSupOnly} activeColor="#ef4444" title="Supervisor only" />
 
+        {/* Section header style (issued document) */}
+        <div className="flex items-center gap-1 shrink-0 mx-0.5">
+          {[['gray', '#5d6f88'], ['blue', '#3a88e8'], ['dark', '#1a2740']].map(([val, color]) => (
+            <button key={val} type="button" title={`${val[0].toUpperCase()}${val.slice(1)} header`}
+              onClick={() => up({ style: val })}
+              className="w-3.5 h-3.5 rounded shrink-0 cursor-pointer border transition-transform hover:scale-110"
+              style={{ background: color, borderColor: (section.style || 'gray') === val ? '#fff' : 'rgba(255,255,255,0.2)' }} />
+          ))}
+        </div>
+
         {/* Section title */}
         <input
           className="flex-1 bg-transparent text-[12.5px] font-bold outline-none min-w-0 border-b border-transparent focus:border-white/20 transition-colors"

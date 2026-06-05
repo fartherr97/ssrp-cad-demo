@@ -897,8 +897,11 @@ function baseReducer(state, action) {
       return { ...state, reports, ...audit };
     }
     case 'ADD_REPORT_TEMPLATE': {
-      const newTpl = { ...action.payload, id: state.nextId };
-      return { ...state, reportTemplates: [...state.reportTemplates, newTpl], nextId: state.nextId + 1 };
+      // Keep the builder-assigned id (so it can keep editing the same template
+      // and per-template flags target the right id); only mint one if missing.
+      const hasId = action.payload.id != null;
+      const newTpl = { ...action.payload, id: hasId ? action.payload.id : state.nextId };
+      return { ...state, reportTemplates: [...state.reportTemplates, newTpl], nextId: hasId ? state.nextId : state.nextId + 1 };
     }
     case 'UPDATE_REPORT_TEMPLATE': {
       const reportTemplates = state.reportTemplates.map(t => t.id === action.payload.id ? action.payload : t);
@@ -1000,7 +1003,7 @@ function baseReducer(state, action) {
     }
 
     case 'ADD_RECORD_TEMPLATE':
-      return { ...state, recordTemplates: [...state.recordTemplates, { ...action.payload, id: `r${Date.now()}` }] };
+      return { ...state, recordTemplates: [...state.recordTemplates, { ...action.payload, id: action.payload.id || `r${Date.now()}` }] };
     case 'UPDATE_RECORD_TEMPLATE':
       return { ...state, recordTemplates: state.recordTemplates.map(t => t.id === action.payload.id ? action.payload : t) };
     case 'DELETE_RECORD_TEMPLATE':

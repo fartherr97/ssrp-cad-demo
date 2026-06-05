@@ -724,6 +724,22 @@ export default function RecordsBureau() {
                       <StatusChip status={r.status} />
                     </div>
                     <div className="text-[12.5px] font-semibold text-white leading-tight">{r.type}</div>
+                    {(() => {
+                      // Show fields the builder flagged "Show in Lookup".
+                      const lk = (r.templateSnapshot?.sections || []).flatMap(s => s.fields || [])
+                        .filter(f => f.showInLookup && r.formData?.[f.id] != null && r.formData[f.id] !== '')
+                        .slice(0, 3);
+                      if (!lk.length) return null;
+                      return (
+                        <div className="text-[10px] text-slate-400 mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                          {lk.map(f => (
+                            <span key={f.id} className="truncate max-w-full">
+                              <span className="text-slate-600">{f.label}:</span> {String(r.formData[f.id])}
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
                     <div className="text-[10px] text-slate-500 font-mono mt-0.5">{r.date || '—'}</div>
                   </button>
                 );
