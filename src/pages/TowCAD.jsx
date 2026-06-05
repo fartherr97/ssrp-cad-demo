@@ -229,6 +229,11 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
     if (job.unitId) {
       dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: job.unitId, status: nextStatus === 'COMPLETED' ? 'AVAILABLE' : 'ON_CALL' } });
     }
+    // Keep linked FDOT request in sync with the job.
+    if (job.fdotRequestId) {
+      const fdotStatus = { EN_ROUTE: 'DISPATCHED', ON_SCENE: 'ON_SCENE', TOWING: 'ON_SCENE', COMPLETED: 'COMPLETED' }[nextStatus];
+      if (fdotStatus) dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: job.fdotRequestId, status: fdotStatus } });
+    }
   };
 
   const cancel = () => {
@@ -242,6 +247,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
     const unit = towUnits.find(u => u.id === currentUnitId);
     dispatch({ type: 'UPDATE_TOW_JOB', payload: { id: job.id, unitId: currentUnitId, status: 'EN_ROUTE', driverName: unit?.operatorName || '' } });
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: currentUnitId, status: 'ON_CALL' } });
+    if (job.fdotRequestId) dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: job.fdotRequestId, status: 'DISPATCHED' } });
     toast.success(`Took job #${job.id}`);
   };
 
@@ -817,10 +823,11 @@ export default function TowCAD() {
       type: 'ADD_TOW_JOB',
       payload: {
         ...form,
-        companyId:   company?.id,
-        companyName: company?.name,
-        status:      form.unitId ? 'EN_ROUTE' : 'PENDING',
-        driverName:  assignedUnit?.operatorName || '',
+        companyId:      company?.id,
+        companyName:    company?.name,
+        status:         form.unitId ? 'EN_ROUTE' : 'PENDING',
+        driverName:     assignedUnit?.operatorName || '',
+        fdotRequestId:  pendingReqId || null,
       },
     });
     toast.success(`Tow job created for ${form.plate || 'vehicle'}`, { title: 'Job created' });
@@ -881,19 +888,20 @@ export default function TowCAD() {
     dispatch({
       type: 'ADD_TOW_JOB',
       payload: {
-        location:     req.location,
-        pickupPostal: req.postal || '',
-        towType:      isCiv ? 'Civilian Request' : 'FDOT Clearance',
-        priority:     req.priority || 2,
-        zone:         'Roaming',
-        notes:        `[${isCiv ? 'Civilian Tow Request' : 'FDOT Assist'}] ${req.assistType} · ${req.description}`,
-        callId:       req.callId || '',
-        companyId:    handlingCompany?.id,
-        companyName:  handlingCompany?.name || 'FDOT',
-        unitId:       primaryUnit?.id,
-        driverName:   primaryUnit?.operatorName || '',
-        status:       'EN_ROUTE',
-        plate:        '',
+        location:      req.location,
+        pickupPostal:  req.postal || '',
+        towType:       isCiv ? 'Civilian Request' : 'FDOT Clearance',
+        priority:      req.priority || 2,
+        zone:          'Roaming',
+        notes:         `[${isCiv ? 'Civilian Tow Request' : 'FDOT Assist'}] ${req.assistType} · ${req.description}`,
+        callId:        req.callId || '',
+        companyId:     handlingCompany?.id,
+        companyName:   handlingCompany?.name || 'FDOT',
+        unitId:        primaryUnit?.id,
+        driverName:    primaryUnit?.operatorName || '',
+        status:        'EN_ROUTE',
+        plate:         '',
+        fdotRequestId: req.id,
       },
     });
     for (const unit of units) {
