@@ -95,10 +95,11 @@ function generateCharacter(fields) {
   const weight = gender === 'Male' ? `${_int(145, 225)} lbs` : `${_int(105, 165)} lbs`;
 
   const address = `${_int(100, 9999)} ${_pick(_STREETS)}, ${_pick(_AREAS)}, Tampa`;
-  const phone = `(${_pick(['213', '310', '323', '424'])}) 555-${String(_int(0, 9999)).padStart(4, '0')}`;
 
+  // Phone is intentionally left blank — the in-game phone script assigns the
+  // real number, so a generated one wouldn't connect to anything.
   const base = { firstName, lastName, dob, gender, ethnicity: _pick(_ETH),
-                 height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone };
+                 height, weight, hair: _pick(_HAIR), eyes: _pick(_EYES), address, phone: '' };
 
   // Map onto the configured fields so the output matches the live schema exactly.
   return Object.fromEntries(fields.map(f => [f.key, _genForField(f, base)]));
