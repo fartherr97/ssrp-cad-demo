@@ -144,10 +144,10 @@ export default function LEORecords() {
   ].sort((a, b) => (b.id || 0) - (a.id || 0)), [myRecords, myReports]);
 
   const getRecordTemplate = (r) =>
-    (state.recordTemplates || []).find(t => t.name === r.type) || null;
+    r.templateSnapshot || (state.recordTemplates || []).find(t => t.name === r.type) || null;
 
   const getReportTemplate = (r) =>
-    (state.reportTemplates || []).find(t => t.name === r.type) || null;
+    r.templateSnapshot || (state.reportTemplates || []).find(t => t.name === r.type) || null;
 
   const empty = allItems.length === 0;
 

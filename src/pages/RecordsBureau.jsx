@@ -601,7 +601,7 @@ export default function RecordsBureau() {
             /* ── CASE DETAIL ── */
             (() => {
               const templates = selCaseKind === 'report' ? reportTemplates : recordTemplates;
-              const tpl = templates.find(t => t.name === selCase.type);
+              const tpl = selCase.templateSnapshot || templates.find(t => t.name === selCase.type);
               const data = {
                 ...(selCase.formData || {}),
                 ...(selCase.summary && !selCase.formData?.f10 ? { f10: selCase.summary } : {}),

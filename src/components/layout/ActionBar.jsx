@@ -501,7 +501,9 @@ export default function ActionBar() {
       <div className="ml-auto flex items-center shrink-0 pl-2">
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
-        <NotificationBell notifications={notifications} dispatch={dispatch} />
+        <NotificationBell
+          notifications={notifications.filter(n => !n.recipientBadge || n.recipientBadge === currentUser?.badge)}
+          dispatch={dispatch} />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}

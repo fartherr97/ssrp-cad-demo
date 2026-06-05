@@ -407,7 +407,7 @@ export default function ReportsCenter() {
             </div>
             <div className="flex-1 overflow-auto p-4 lg:p-6 bg-app-bg/30">
               {(() => {
-                const t = reportTemplates.find(t => t.name === selReport.type);
+                const t = selReport.templateSnapshot || reportTemplates.find(t => t.name === selReport.type);
                 if (t && selReport.formData) return <ReportForm template={t} data={selReport.formData} readOnly canSupplement
                   onSupplement={(fid, arr) => dispatch({ type: 'UPDATE_REPORT', payload: { id: selReport.id, formData: { ...selReport.formData, [fid]: arr } } })} />;
                 return (

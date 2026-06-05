@@ -978,7 +978,7 @@ export default function Supervisor() {
   /* ── If a record is open, show full editor ── */
   if (openEntry) {
     const allTpls = [...reportTemplates, ...recordTemplates];
-    const template = allTpls.find(t => t.name === openEntry.type);
+    const template = openEntry.templateSnapshot || allTpls.find(t => t.name === openEntry.type);
     const officer = officerByBadge[openEntry.officerBadge];
     return (
       <RecordEditor

@@ -1413,10 +1413,16 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
 
   const sections = template?.sections || [];
 
-  // Resolve the civilian this report is about (the first civilian-lookup field
-  // on the form that has been filled in). The Flags field binds to this person
-  // so flags ticked on a report apply to their record everywhere — one source.
+  // Resolve the civilian this report is about so the Flags field can bind to
+  // their record (one source of truth). The civilian lookup / autofill stamps
+  // `_civilianId` on the form data whenever a person is selected (covers both
+  // the dedicated civilian-lookup field and the section-level lookup pattern);
+  // fall back to matching a civilian-lookup field's name value.
   const subjectCiv = (() => {
+    if (data?._civilianId != null) {
+      const byId = (state.civilians || []).find(c => c.id === data._civilianId);
+      if (byId) return byId;
+    }
     for (const sec of sections) {
       const cf = (sec.fields || []).find(ff => ff.type === 'civilian_lookup');
       const name = (data?.[cf?.id] || '').trim().toLowerCase();

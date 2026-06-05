@@ -33,7 +33,7 @@ function resizeToDataUrl(file, maxPx = 300) {
 
 /* ── Returned report editor ── */
 function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResubmit }) {
-  const template = reportTemplates.find(t => t.name === report.type);
+  const template = report.templateSnapshot || reportTemplates.find(t => t.name === report.type);
   const [formData, setFormData] = useState({ ...(report.formData || {}) });
   const [submitted, setSubmitted] = useState(false);
 
@@ -428,7 +428,7 @@ export default function OfficerProfile() {
               <div className="text-[10px] font-mono text-brand-bright">{liveReport.caseNumber}</div>
             </div>
             {(() => {
-              const tpl = reportTemplates.find(t => t.name === liveReport.type);
+              const tpl = liveReport.templateSnapshot || reportTemplates.find(t => t.name === liveReport.type);
               if (!tpl) return null;
               const data = {
                 ...(liveReport.formData || {}),
@@ -472,7 +472,7 @@ export default function OfficerProfile() {
           {/* Filled-out report * locked read-only; supplements can still be added */}
           <div className="flex-1 overflow-y-auto bg-app-bg/40 p-4 lg:p-6">
             {(() => {
-              const tpl = reportTemplates.find(t => t.name === liveReport.type);
+              const tpl = liveReport.templateSnapshot || reportTemplates.find(t => t.name === liveReport.type);
               const data = {
                 ...(liveReport.formData || {}),
                 ...(liveReport.summary && !liveReport.formData?.f10 ? { f10: liveReport.summary } : {}),

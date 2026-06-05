@@ -63,6 +63,17 @@ function seedDutyOfficers(officers) {
   });
 }
 
+/* ── Template snapshots ───────────────────────────────────────────────────
+   A filed report/record stores a frozen copy of the template it was written
+   against, so it always renders with its original structure even after the
+   template is later edited, renamed or deleted. This is purely about how the
+   record is *rendered* — editing fields, supplements and officer/supervisor
+   sign-off still operate on the record's own data and signatures, so every
+   workflow stays functionally identical. */
+const cloneTemplate = (t) => (t ? JSON.parse(JSON.stringify(t)) : null);
+const snapshotFor = (templates, name, existing) =>
+  existing || cloneTemplate((templates || []).find(t => t.name === name));
+
 const initialState = {
   currentUser: null,
   currentPage: 'login',
@@ -79,7 +90,7 @@ const initialState = {
   warrants: WARRANTS,
   criminalHistory: CRIMINAL_HISTORY,
   penalCode: PENAL_CODE,
-  reports: REPORTS,
+  reports: REPORTS.map(r => ({ ...r, templateSnapshot: snapshotFor(REPORT_TEMPLATES, r.type, r.templateSnapshot) })),
   records: [],
   reportTemplates: REPORT_TEMPLATES,
   recordTemplates: RECORD_TEMPLATES,
@@ -606,6 +617,9 @@ function reducer(state, action) {
         date: new Date().toLocaleDateString(),
         officerSignature,
         supervisorSignature: null,
+        // Freeze the template structure so this report always renders, even if
+        // the template is later changed or deleted.
+        templateSnapshot: snapshotFor(state.reportTemplates, action.payload.type, action.payload.templateSnapshot),
       };
       const audit = addAuditEntry(state, `Filed ${newReport.type} report ${reportNumber}`, 'Reports');
       return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit };
@@ -839,7 +853,7 @@ function reducer(state, action) {
       const recordNumber = String(state.reportSeq).padStart(4, '0');
       const fd = action.payload.formData || {};
       const civId = action.payload.civilianId || fd._civilianId || undefined;
-      const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString(), ...(civId !== undefined ? { civilianId: civId } : {}) };
+      const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString(), templateSnapshot: snapshotFor(state.recordTemplates, action.payload.type, action.payload.templateSnapshot), ...(civId !== undefined ? { civilianId: civId } : {}) };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
     }
     case 'SET_DL_TEMPLATE': {
@@ -862,13 +876,31 @@ function reducer(state, action) {
     }
     case 'RETURN_REPORT': {
       // payload: { id, comment, supervisorName, supervisorBadge }
+      // Handles both reports and records (ids are unique across both since they
+      // share the nextId counter). Drops a notification into the authoring
+      // officer's inbox so they know to edit + resubmit.
       const { id: rid, comment, supervisorName, supervisorBadge } = action.payload;
       const newComment = { id: `cmt_${Date.now()}`, text: comment, supervisorName, supervisorBadge, timestamp: new Date().toLocaleString() };
-      const reports = state.reports.map(r =>
-        r.id === rid ? { ...r, status: 'Pending Changes', supervisorComments: [...(r.supervisorComments || []), newComment] } : r
-      );
-      const audit = addAuditEntry(state, `Returned report ${rid} to officer`, 'Reports');
-      return { ...state, reports, ...audit };
+      const mark = (r) => r.id === rid
+        ? { ...r, status: 'Pending Changes', supervisorComments: [...(r.supervisorComments || []), newComment] }
+        : r;
+      const reports = state.reports.map(mark);
+      const records = state.records.map(mark);
+      const item = state.reports.find(r => r.id === rid) || state.records.find(r => r.id === rid);
+      const label = state.records.some(r => r.id === rid) ? 'Record' : 'Report';
+      const notif = item ? {
+        id: `notif-ret-${Date.now()}`,
+        title: `${label} Returned for Changes`,
+        body: `${item.type || label} ${item.caseNumber || ''} was returned by ${supervisorName || 'a supervisor'}${comment ? ` — “${comment}”` : ''}. Open it to edit and resubmit.`,
+        sender: supervisorName ? `${supervisorName}${supervisorBadge ? ` (${supervisorBadge})` : ''}` : 'Supervisor',
+        color: '#f59e0b',
+        time: nowTime(),
+        read: false,
+        recipientBadge: item.officerBadge || null,
+      } : null;
+      const notifications = notif ? [notif, ...state.notifications] : state.notifications;
+      const audit = addAuditEntry(state, `Returned ${label.toLowerCase()} ${rid} to officer`, 'Reports');
+      return { ...state, reports, records, notifications, ...audit };
     }
     case 'RESUBMIT_REPORT': {
       // payload: { id, formData, officerSignature }
