@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -359,8 +360,10 @@ function MedicalLookup({ civilians }) {
 export default function FireOpsBoard() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const { isMobile } = useResponsive();
   const { calls, officers, currentUser, hcfrRequests = [], incoming911HCFR = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
+  const [mobileView, setMobileView] = useState('INCIDENTS'); // 'INCIDENTS' | 'DETAIL' | 'ROSTER'
   const me = officers.find(o => o.id === currentUser?.id);
   // HCFR field members land on their own status / self-dispatch tab.
   const isHCFR = me?.deptShort === 'HCFR';
@@ -370,6 +373,11 @@ export default function FireOpsBoard() {
     currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const [rosterTab, setRosterTab] = useState(isHCFR ? 'MYSTATUS' : 'APPARATUS');
   const [dispatchingReq, setDispatchingReq] = useState(null);
+
+  const handleSelectCall = (id) => {
+    setSelectedCall(id);
+    if (isMobile) setMobileView('DETAIL');
+  };
 
   const fireCalls = calls.filter(c => c.category === 'fire' && c.status !== 'CLOSED');
   const fireUnits = officers.filter(o => o.deptShort === 'HCFR' && o.status !== 'OFFDUTY');
@@ -537,9 +545,32 @@ export default function FireOpsBoard() {
         </div>
       )}
 
-      <div className="split-3 flex-1 min-h-0 gap-4 lg:gap-5">
+      {/* Mobile tab bar — switches between Incidents / Detail / Roster */}
+      {isMobile && (
+        <div className="flex shrink-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
+          {[
+            { id: 'INCIDENTS', label: 'Incidents', badge: fireCalls.length },
+            { id: 'DETAIL',    label: 'Incident',  badge: selectedCall ? 1 : 0 },
+            { id: 'ROSTER',    label: 'Roster',    badge: 0 },
+          ].map(t => (
+            <button key={t.id} onClick={() => setMobileView(t.id)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-bold uppercase tracking-wider border-b-[3px] transition-all
+                ${mobileView === t.id ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}>
+              {t.label}
+              {t.badge > 0 && (
+                <span className={`px-1.5 py-0 rounded-full text-[9.5px] font-bold
+                  ${mobileView === t.id ? 'bg-orange-500/25 text-orange-300' : 'bg-white/[0.07] text-slate-500'}`}>
+                  {t.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className={isMobile ? 'flex-1 min-h-0 flex flex-col' : 'split-3 flex-1 min-h-0 gap-4 lg:gap-5'}>
         {/* Fire Incidents */}
-        <div className={S_PANEL}>
+        <div className={`${S_PANEL} ${isMobile && mobileView !== 'INCIDENTS' ? 'hidden' : ''}`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Active Incidents</div>
             <span className="ml-auto px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 text-[11px] font-bold leading-none">{fireCalls.length}</span>
@@ -554,7 +585,7 @@ export default function FireOpsBoard() {
                 <div
                   key={c.id}
                   className={`rounded-xl border border-l-[3px] p-3 cursor-pointer transition-all backdrop-blur-sm ${priLeft} ${on ? 'bg-brand/15 border-brand/40' : 'bg-app-card/70 border-border-base hover:bg-white/[0.05]'}`}
-                  onClick={() => setSelectedCall(c.id)}
+                  onClick={() => handleSelectCall(c.id)}
                 >
                   <div className="flex gap-1.5 mb-1.5 items-center">
                     <PriBadge p={c.priority} />
@@ -575,20 +606,33 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Incident Detail */}
-        <div className={S_PANEL}>
+        <div className={`${S_PANEL} ${isMobile && mobileView !== 'DETAIL' ? 'hidden' : ''}`}>
           {!selCall ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-600 p-6">
               <span className="text-[48px] opacity-25">🔥</span>
               <div className="text-center">
                 <div className="text-[13px] font-semibold text-slate-400 mb-1">No incident selected</div>
-                <div className="text-[11px] text-slate-600">Select an incident from the queue</div>
+                <div className="text-[11px] text-slate-600 mb-4">Select an incident from the queue</div>
+                {isMobile && (
+                  <button onClick={() => setMobileView('INCIDENTS')}
+                    className="px-4 py-2 rounded-xl text-[12px] font-bold border border-orange-500/30 text-orange-400 bg-orange-500/10">
+                    ← View Incidents
+                  </button>
+                )}
               </div>
             </div>
           ) : (
             <>
               <div className={S_PANEL_HEADER}>
-                <div>
-                  <div className="text-[12px] font-bold uppercase tracking-[0.7px] text-slate-200">
+                {isMobile && (
+                  <button onClick={() => setMobileView('INCIDENTS')}
+                    className="text-orange-400 text-[11px] font-bold flex items-center gap-1 shrink-0 mr-2 hover:text-orange-300 transition-colors"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                    ← Back
+                  </button>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-bold uppercase tracking-[0.7px] text-slate-200 truncate">
                     <span className={S_DATA}>{selCall.id}</span> · {selCall.nature}
                   </div>
                   <div className="text-[10px] text-slate-500 font-mono mt-0.5">{selCall.timestamp}</div>
@@ -663,7 +707,7 @@ export default function FireOpsBoard() {
         </div>
 
         {/* Apparatus Roster + Medical Lookup */}
-        <div className={S_PANEL}>
+        <div className={`${S_PANEL} ${isMobile && mobileView !== 'ROSTER' ? 'hidden' : ''}`}>
           <div className="flex border-b border-border-faint shrink-0">
             {[
               ...(isHCFR ? [{ id: 'MYSTATUS', label: 'My Status', icon: MdMyLocation }] : []),
