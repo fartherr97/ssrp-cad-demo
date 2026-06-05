@@ -1251,23 +1251,38 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
             ? <div className="px-3.5 py-2.5 rounded-lg border bg-app-input border-border-base text-sm text-slate-600">— None —</div>
             : <div className="px-3 py-2.5 rounded-lg border bg-app-input border-border-base"><FlagRow flags={selected} /></div>
         ) : (
-          <div className="flex flex-wrap gap-2">
-            {defs.map(fl => {
-              const on = selected.includes(fl.id);
-              return (
-                <button key={fl.id} type="button" onClick={() => toggle(fl.id)} title={fl.description || fl.name}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12.5px] font-semibold border transition-all cursor-pointer hover:brightness-110"
-                  style={on
-                    ? { background: `${fl.color}22`, borderColor: `${fl.color}66`, color: fl.color }
-                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.10)', color: '#93a4bd' }}>
-                  <span className="w-4 h-4 rounded flex items-center justify-center border shrink-0"
-                    style={{ borderColor: on ? fl.color : 'rgba(255,255,255,0.25)', background: on ? fl.color : 'transparent' }}>
-                    {on && <MdCheck size={12} className="text-white" />}
-                  </span>
-                  <MdFlag size={11} /> {fl.name}
-                </button>
-              );
-            })}
+          <div className="flex flex-col gap-2">
+            {/* Tell the writer what's already on file so they don't re-add a flag. */}
+            {selected.length > 0 ? (
+              <div className="flex items-center gap-1.5 text-[10.5px] text-amber-300/85">
+                <MdCheck size={12} className="shrink-0" />
+                {civ.firstName} already has {selected.length} flag{selected.length > 1 ? 's' : ''} on file (checked below) — no need to re-add.
+              </div>
+            ) : (
+              <div className="text-[10.5px] text-slate-500">No flags on file for {civ.firstName} yet.</div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {defs.map(fl => {
+                const on = selected.includes(fl.id);
+                return (
+                  <button key={fl.id} type="button" onClick={() => toggle(fl.id)}
+                    title={on ? `On file — click to remove from ${civ.firstName}'s record` : (fl.description || fl.name)}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12.5px] font-semibold border transition-all cursor-pointer hover:brightness-110"
+                    style={on
+                      ? { background: `${fl.color}22`, borderColor: `${fl.color}66`, color: fl.color }
+                      : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.10)', color: '#93a4bd' }}>
+                    <span className="w-4 h-4 rounded flex items-center justify-center border shrink-0"
+                      style={{ borderColor: on ? fl.color : 'rgba(255,255,255,0.25)', background: on ? fl.color : 'transparent' }}>
+                      {on && <MdCheck size={12} className="text-white" />}
+                    </span>
+                    <MdFlag size={11} /> {fl.name}
+                    {on && (
+                      <span className="ml-0.5 px-1 py-0.5 rounded bg-black/25 text-[7.5px] font-bold tracking-[0.3px] leading-none">ON FILE</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
