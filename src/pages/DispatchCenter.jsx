@@ -19,7 +19,6 @@ import {
   MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
   MdPhone, MdSend, MdClose, MdAdd, MdCircle, MdRadio, MdPerson,
 } from 'react-icons/md';
-import ModifyIdentifier from '../components/ModifyIdentifier';
 
 /* ─── Elapsed timer ─── */
 function Elapsed({ createdAt }) {
@@ -508,6 +507,73 @@ function LEORespondModal({ call, myOfficer, onClose }) {
   );
 }
 
+/* ─── Swap Identifier: pick from saved identifiers ─── */
+function SwapIdentifierModal({ onClose }) {
+  const { state, dispatch } = useCAD();
+  const toast = useToast();
+  const { officers, currentUser } = state;
+  const me = officers.find(o => o.id === currentUser?.id);
+  const identifiers = me?.identifiers || [];
+
+  const load = (ident) => {
+    dispatch({ type: 'LOAD_IDENTIFIER', payload: ident.id });
+    toast.success(`Switched to ${ident.label}`, { title: 'Identifier Swapped' });
+    onClose();
+  };
+
+  return (
+    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={`${S_MODAL} max-w-[360px]`}>
+        <div className={S_MODAL_HEADER}>
+          <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
+            <MdBadge size={16} className="text-brand-bright shrink-0" /> Swap Identifier
+          </div>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+        </div>
+        <div className={S_MODAL_BODY}>
+          {identifiers.length === 0 ? (
+            <div className="text-center text-slate-500 text-[13px] py-6 leading-relaxed">
+              No saved identifiers.<br />
+              <span className="text-slate-600 text-[11px]">Save one from your profile to use this feature.</span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {identifiers.map(ident => {
+                const isActive = me?.unitId === ident.unitId && me?.rank === ident.rank;
+                return (
+                  <button
+                    key={ident.id}
+                    onClick={() => !isActive && load(ident)}
+                    disabled={isActive}
+                    className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all ${
+                      isActive
+                        ? 'bg-brand/10 border-brand/40 cursor-default'
+                        : 'bg-app-input border-border-base hover:border-border-strong hover:bg-white/[0.05] cursor-pointer press'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-bold text-slate-100 leading-tight">{ident.label}</div>
+                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">{ident.unitId}{ident.rank ? ` · ${ident.rank}` : ''}</div>
+                      {ident.name && <div className="text-[11px] text-slate-500 mt-0.5">{ident.name}</div>}
+                    </div>
+                    {isActive
+                      ? <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand/20 text-brand-bright border border-brand/30 uppercase">Active</span>
+                      : <span className="shrink-0 text-slate-600 text-[11px]">→</span>
+                    }
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div className={S_MODAL_FOOTER}>
+          <button className={S_BTN_SECONDARY} onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Simulate an incoming 911 ─── */
 function Sim911Modal({ onClose }) {
   const { dispatch } = useCAD();
@@ -667,7 +733,7 @@ export default function DispatchCenter() {
             {!isDispatcher && <QuickAction Icon={MdReceiptLong} label="Records" onClick={() => navigate('/records')} />}
             <QuickAction Icon={MdSearch} label="Search" onClick={() => navigate('/search')} />
             <QuickAction Icon={MdMap} label="Live Map" onClick={() => navigate('/map')} />
-            {showIdentifier && <ModifyIdentifier onClose={() => setShowIdentifier(false)} />}
+            {showIdentifier && <SwapIdentifierModal onClose={() => setShowIdentifier(false)} />}
           </div>
 
           {/* Filters */}
