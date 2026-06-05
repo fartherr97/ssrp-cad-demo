@@ -616,10 +616,15 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${PRIORITY_BADGE[req.priority]}`}>
             P{req.priority}
           </span>
-          {req.source === 'CIVILIAN' && (
+          {req.source === 'CIVILIAN' ? (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border"
               style={{ color: '#9090cc', borderColor: 'rgba(144,144,204,0.45)', background: 'rgba(144,144,204,0.14)' }}>
               Civilian
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border"
+              style={{ color: '#60a5fa', borderColor: 'rgba(96,165,250,0.45)', background: 'rgba(96,165,250,0.14)' }}>
+              Law Enforcement
             </span>
           )}
           <span className="text-[11px] text-slate-500 font-mono">#{req.id}</span>
