@@ -2,26 +2,7 @@ import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHigh, MdCameraAlt, MdDelete } from 'react-icons/md';
-
-// Downscale an uploaded image to a headshot-sized JPEG data URL.
-function resizePhoto(file, maxPx = 420) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1);
-        const canvas = document.createElement('canvas');
-        canvas.width  = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.82));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
+import { resizeImage } from '../../utils/image';
 import { PortalPage, PortalHeader, PortalCard, Field, CivFormField } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
 import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
@@ -269,7 +250,7 @@ export default function MyCharacters() {
                   <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white/[0.06] hover:bg-white/[0.1] border border-transparent text-slate-200 transition-all">
                     <MdCameraAlt size={14} /> {form.profilePhoto ? 'Replace' : 'Upload Photo'}
                     <input type="file" accept="image/*" className="hidden"
-                      onChange={async e => { const f = e.target.files?.[0]; if (f) setField('profilePhoto', await resizePhoto(f)); e.target.value = ''; }} />
+                      onChange={async e => { const f = e.target.files?.[0]; if (f) setField('profilePhoto', await resizeImage(f)); e.target.value = ''; }} />
                   </label>
                   {form.profilePhoto && (
                     <button type="button" onClick={() => setField('profilePhoto', '')}

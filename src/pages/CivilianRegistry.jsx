@@ -11,8 +11,9 @@ import {
   S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
   trHoverOn, trHoverOff, xs, sm,
 } from '../constants/styles';
-import { MdArrowBack } from 'react-icons/md';
+import { MdArrowBack, MdPerson, MdCameraAlt, MdDelete } from 'react-icons/md';
 import { ageFromDob } from '../utils/age';
+import { resizeImage } from '../utils/image';
 
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
@@ -27,7 +28,7 @@ export default function CivilianRegistry() {
   const [form, setForm] = useState({
     firstName: '', lastName: '', dob: '', gender: 'Male', ethnicity: 'White',
     height: "5'10\"", weight: '180 lbs', hair: 'Brown', eyes: 'Brown',
-    ssn: '', phone: '', address: '', dlNumber: '', dlClass: 'Class C', dlStatus: 'ACTIVE', dlExpiry: '',
+    ssn: '', phone: '', address: '', dlNumber: '', dlClass: 'Class C', dlStatus: 'ACTIVE', dlExpiry: '', profilePhoto: '',
   });
   const [vehForm, setVehForm] = useState({ plate: '', make: '', model: '', year: '', color: '', regStatus: 'VALID', regExpiry: '' });
   const [createError, setCreateError] = useState('');
@@ -67,7 +68,7 @@ export default function CivilianRegistry() {
     setCreateError('');
     dispatch({ type: 'ADD_CIVILIAN', payload: { ...form } });
     toast.success(`${form.firstName} ${form.lastName} added`, { title: 'Civilian created' });
-    setForm({ firstName:'',lastName:'',dob:'',gender:'Male',ethnicity:'White',height:"5'10\"",weight:'180 lbs',hair:'Brown',eyes:'Brown',ssn:'',phone:'',address:'',dlNumber:'',dlClass:'Class C',dlStatus:'ACTIVE',dlExpiry:'' });
+    setForm({ firstName:'',lastName:'',dob:'',gender:'Male',ethnicity:'White',height:"5'10\"",weight:'180 lbs',hair:'Brown',eyes:'Brown',ssn:'',phone:'',address:'',dlNumber:'',dlClass:'Class C',dlStatus:'ACTIVE',dlExpiry:'',profilePhoto:'' });
     setShowCreate(false);
   };
 
@@ -274,6 +275,30 @@ export default function CivilianRegistry() {
               <button className={sm(S_BTN_GHOST)} onClick={() => { setShowCreate(false); setCreateError(''); }}>✕</button>
             </div>
             <div className={S_MODAL_BODY}>
+              {/* Profile photo (ID / driver-license headshot) */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-20 rounded-lg overflow-hidden bg-app-elevated border border-border-base flex items-center justify-center shrink-0">
+                  {form.profilePhoto
+                    ? <img src={form.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                    : <MdPerson size={28} className="text-slate-700" />}
+                </div>
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <label className={S_LABEL} style={{ marginBottom: 0 }}>Profile Photo</label>
+                  <div className="flex gap-2">
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white/[0.06] hover:bg-white/[0.1] border border-transparent text-slate-200 transition-all">
+                      <MdCameraAlt size={14} /> {form.profilePhoto ? 'Replace' : 'Upload Photo'}
+                      <input type="file" accept="image/*" className="hidden"
+                        onChange={async e => { const f = e.target.files?.[0]; if (f) { const url = await resizeImage(f); setForm(p => ({ ...p, profilePhoto: url })); } e.target.value = ''; }} />
+                    </label>
+                    {form.profilePhoto && (
+                      <button type="button" onClick={() => setForm(p => ({ ...p, profilePhoto: '' }))}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-transparent transition-all cursor-pointer">
+                        <MdDelete size={14} /> Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>First Name *</label><input className={S_INPUT} value={form.firstName} onChange={e => setForm(p => ({...p, firstName: e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Last Name *</label><input className={S_INPUT} value={form.lastName} onChange={e => setForm(p => ({...p, lastName: e.target.value}))} /></div>

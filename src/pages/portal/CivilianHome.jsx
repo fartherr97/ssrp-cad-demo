@@ -181,7 +181,11 @@ export default function CivilianHome() {
                   className={isActive ? 'ring-2 ring-brand/60 border-brand/50' : ''}>
                   <div className="flex items-center justify-between gap-2.5">
                     <div className="flex items-center gap-3 min-w-0">
-                      <MdPerson size={22} className={`shrink-0 ${isActive ? 'text-brand-bright' : 'text-slate-400'}`} />
+                      <div className={`w-11 h-11 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border ${isActive ? 'border-brand/50' : 'border-border-base'} bg-app-elevated`}>
+                        {c.profilePhoto
+                          ? <img src={c.profilePhoto} alt="" className="w-full h-full object-cover" />
+                          : <MdPerson size={22} className={isActive ? 'text-brand-bright' : 'text-slate-400'} />}
+                      </div>
                       <div className="min-w-0">
                         <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
                         <div className="text-[11px] text-slate-500">DOB {c.dob}</div>
