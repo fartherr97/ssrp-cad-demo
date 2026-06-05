@@ -722,14 +722,53 @@ function reducer(state, action) {
           ? { ...c, flags: [...new Set([...(c.flags || []), flagId])] }
           : c
       );
-      return { ...state, civilians };
+      const civ = state.civilians.find(c => c.id === civilianId);
+      const fname = (state.customFlags.find(f => f.id === flagId) || {}).name || flagId;
+      const audit = addAuditEntry(state, `Flagged ${civ ? `${civ.firstName} ${civ.lastName}` : `civilian #${civilianId}`} · ${fname}`, 'Civilian Flags');
+      return { ...state, civilians, ...audit };
     }
     case 'REMOVE_CIVILIAN_FLAG': {
       const { civilianId, flagId } = action.payload;
       const civilians = state.civilians.map(c =>
         c.id === civilianId ? { ...c, flags: (c.flags || []).filter(f => f !== flagId) } : c
       );
-      return { ...state, civilians };
+      const civ = state.civilians.find(c => c.id === civilianId);
+      const fname = (state.customFlags.find(f => f.id === flagId) || {}).name || flagId;
+      const audit = addAuditEntry(state, `Removed flag from ${civ ? `${civ.firstName} ${civ.lastName}` : `civilian #${civilianId}`} · ${fname}`, 'Civilian Flags');
+      return { ...state, civilians, ...audit };
+    }
+    case 'ADD_CIVILIAN_NOTE': {
+      // Any LEO may add a short note; it locks once submitted (UI gates editing
+      // to supervisors/command).
+      const { civilianId, text, author } = action.payload;
+      const note = {
+        id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        text: String(text || '').slice(0, 300),
+        authorId: author?.id ?? null,
+        authorName: author?.name || 'Officer',
+        authorBadge: author?.badge || '',
+        timestamp: new Date().toLocaleString(),
+        edited: false,
+      };
+      const civilians = state.civilians.map(c =>
+        c.id === civilianId ? { ...c, notes: [note, ...(c.notes || [])] } : c
+      );
+      const civ = state.civilians.find(c => c.id === civilianId);
+      const audit = addAuditEntry(state, `Added note to ${civ ? `${civ.firstName} ${civ.lastName}` : `civilian #${civilianId}`}`, 'Civilian Notes');
+      return { ...state, civilians, ...audit };
+    }
+    case 'UPDATE_CIVILIAN_NOTE': {
+      const { civilianId, noteId, text, editor } = action.payload;
+      const civilians = state.civilians.map(c =>
+        c.id === civilianId
+          ? { ...c, notes: (c.notes || []).map(n => n.id === noteId
+              ? { ...n, text: String(text || '').slice(0, 300), edited: true, editedBy: editor?.badge || editor?.name || 'Supervisor', editedAt: new Date().toLocaleString() }
+              : n) }
+          : c
+      );
+      const civ = state.civilians.find(c => c.id === civilianId);
+      const audit = addAuditEntry(state, `Edited a note on ${civ ? `${civ.firstName} ${civ.lastName}` : `civilian #${civilianId}`}`, 'Civilian Notes');
+      return { ...state, civilians, ...audit };
     }
     case 'ADMIN_ADD': {
       const { key, item } = action.payload;

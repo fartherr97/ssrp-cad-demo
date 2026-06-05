@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Select from '../components/ui/Select';
+import Modal from '../components/ui/Modal';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { useResponsive } from '../hooks/useResponsive';
 import { RecordReturn } from '../components/FormDocument';
 import ReportForm from '../components/ReportForm';
@@ -13,7 +15,156 @@ import {
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore,
   MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
   MdVerifiedUser, MdLocationOn, MdClose,
+  MdStickyNote2, MdEdit, MdSend, MdLock, MdCheck,
 } from 'react-icons/md';
+
+// Ranks that may edit a note after it's been submitted (supervisors + command).
+const NOTE_EDITOR_RANKS = [
+  'Sergeant', 'Lieutenant', 'Captain', 'Major',
+  'Deputy Chief', 'Chief', 'Commander', 'Battalion Chief', 'Sheriff',
+];
+
+/* ── Civilian Notes tab ──────────────────────────────────────────────────
+   Short LEO notes about a civilian (≤300 chars). Any LEO can add a note, but
+   once submitted it locks — only supervisors/command (or admin) can edit it. */
+function CivilianNotesTab({ civ }) {
+  const { state, dispatch } = useCAD();
+  const toast = useToast();
+  const { currentUser, officers = [] } = state;
+  const me = officers.find(o => o.id === currentUser?.id);
+  const canEdit = currentUser?.role === 'admin' || NOTE_EDITOR_RANKS.includes(me?.rank);
+
+  const notes = civ.notes || [];
+  const [draft, setDraft] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const MAX = 300;
+
+  const author = { id: currentUser?.id, name: currentUser?.name || me?.name || 'Officer', badge: currentUser?.badge || me?.badge || '' };
+
+  const submitNote = () => {
+    const text = draft.trim();
+    if (!text) return;
+    dispatch({ type: 'ADD_CIVILIAN_NOTE', payload: { civilianId: civ.id, text, author } });
+    toast.success('Note added to this civilian.', { title: 'Note Submitted' });
+    setDraft('');
+    setConfirming(false);
+  };
+
+  const saveEdit = (noteId) => {
+    const text = editText.trim();
+    if (!text) return;
+    dispatch({ type: 'UPDATE_CIVILIAN_NOTE', payload: { civilianId: civ.id, noteId, text, editor: { name: author.name, badge: author.badge } } });
+    toast.success('Note updated.', { title: 'Note Edited' });
+    setEditingId(null);
+    setEditText('');
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Add-note message bar — available to every LEO */}
+      <InfoCard title="Add a Note">
+        <div className="flex flex-col gap-2">
+          <textarea
+            value={draft}
+            onChange={e => setDraft(e.target.value.slice(0, MAX))}
+            maxLength={MAX}
+            rows={2}
+            placeholder="Short note about this civilian… (max 300 characters)"
+            className="w-full resize-none bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]" />
+          <div className="flex items-center justify-between">
+            <span className={`text-[10.5px] font-mono ${draft.length >= MAX ? 'text-amber-400' : 'text-slate-600'}`}>{draft.length}/{MAX}</span>
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              disabled={!draft.trim()}
+              className="press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-bold cursor-pointer transition-all bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30 disabled:opacity-40 disabled:cursor-not-allowed">
+              <MdSend size={14} /> Submit Note
+            </button>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10.5px] text-slate-600">
+            <MdLock size={11} className="shrink-0" /> Once submitted, a note can only be edited by a supervisor or command.
+          </div>
+        </div>
+      </InfoCard>
+
+      {/* Notes list */}
+      <InfoCard title={`Notes (${notes.length})`}>
+        {notes.length === 0 ? (
+          <div className="text-[12px] text-slate-500">No notes on file for this civilian.</div>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {notes.map(n => (
+              <div key={n.id} className="rounded-xl border border-border-base bg-app-card/60 px-3.5 py-3">
+                {editingId === n.id ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={editText}
+                      onChange={e => setEditText(e.target.value.slice(0, MAX))}
+                      maxLength={MAX}
+                      rows={2}
+                      className="w-full resize-none bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]" />
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10.5px] font-mono ${editText.length >= MAX ? 'text-amber-400' : 'text-slate-600'}`}>{editText.length}/{MAX}</span>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => { setEditingId(null); setEditText(''); }}
+                          className="press px-3 py-1.5 rounded-lg text-[11.5px] font-semibold text-slate-300 bg-white/[0.06] hover:bg-white/[0.1] border border-transparent cursor-pointer transition-all">Cancel</button>
+                        <button type="button" onClick={() => saveEdit(n.id)} disabled={!editText.trim()}
+                          className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30 disabled:opacity-40 cursor-pointer transition-all">
+                          <MdCheck size={13} /> Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 min-w-0 text-[12.5px] text-slate-200 leading-relaxed whitespace-pre-wrap break-words">{n.text}</div>
+                      {canEdit && (
+                        <button type="button" title="Edit note (supervisor/command)"
+                          onClick={() => { setEditingId(n.id); setEditText(n.text); }}
+                          className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-brand-bright hover:bg-white/[0.08] cursor-pointer transition-colors">
+                          <MdEdit size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="mt-1.5 text-[10.5px] text-slate-500 font-mono flex flex-wrap items-center gap-x-2">
+                      <span>{n.authorBadge || ''}{n.authorName ? ` · ${n.authorName}` : ''}</span>
+                      <span className="text-slate-600">{n.timestamp}</span>
+                      {n.edited && <span className="text-amber-500/80">· edited{n.editedBy ? ` by ${n.editedBy}` : ''}</span>}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </InfoCard>
+
+      {/* Submit confirmation */}
+      <Modal open={confirming} onClose={() => setConfirming(false)} title="Submit Note" icon={MdStickyNote2} maxWidth={420}
+        footer={(
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={() => setConfirming(false)}
+              className="press px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-white/[0.06] hover:bg-white/[0.1] border border-transparent cursor-pointer transition-all">Cancel</button>
+            <button type="button" onClick={submitNote}
+              className="press inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30 cursor-pointer transition-all">
+              <MdSend size={15} /> Submit Note
+            </button>
+          </div>
+        )}>
+        <div className="px-5 py-4 flex flex-col gap-3">
+          <div className="text-[13px] text-slate-200">Are you sure you want to submit this note?</div>
+          <div className="rounded-lg border border-border-base bg-app-input px-3 py-2.5 text-[12.5px] text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{draft.trim()}</div>
+          <div className="flex items-center gap-1.5 text-[11px] text-amber-400/80">
+            <MdLock size={12} className="shrink-0" /> Once submitted you won't be able to edit it — only a supervisor or command can.
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
 
 function bizDaysLeft(issuedAt) {
   if (!issuedAt) return null;
@@ -354,7 +505,7 @@ export default function RecordsBureau() {
     ? caseFiles.filter(c => c.status === 'ACTIVE' && c.vehicles?.some(v => v.vehicleId === selVeh.id))
     : [];
 
-  const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES', 'MEDICAL'];
+  const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES', 'MEDICAL', 'NOTES'];
   const vehTabs    = ['RETURN', 'FLAGS'];
   const activeTabs = selCiv ? personTabs : selVeh ? vehTabs : ['RETURN'];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
@@ -1130,6 +1281,8 @@ export default function RecordsBureau() {
                     </div>
                   );
                 })()}
+
+                {tab === 'NOTES' && selCiv && <CivilianNotesTab civ={selCiv} />}
               </div>
             </>
           )}

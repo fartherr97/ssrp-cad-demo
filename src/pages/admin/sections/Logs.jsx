@@ -19,8 +19,8 @@ export default function Logs() {
 
   return (
     <AdminPanel
-      title="System Logs"
-      subtitle={`${filtered.length} entries`}
+      title="Master Audit Log"
+      subtitle={`${filtered.length} of ${auditLog.length} entries`}
       right={<>
         <Select style={{ ...SON_INPUT, width: 150 }} value={moduleFilter} onChange={e => setModuleFilter(e.target.value)}>
           {modules.map(m => <option key={m}>{m}</option>)}

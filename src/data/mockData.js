@@ -53,6 +53,9 @@ export const CIVILIANS = [
     medicalProfile: { bloodType: "A-", organDonor: false, dnr: false, conditions: ["Generalized Anxiety Disorder"], allergies: ["Penicillin"], medications: ["Escitalopram 10mg daily"], emergencyContact: { name: "David Chen", phone: "555-0335", relationship: "Father" }, safetyNotes: "Known anxiety episodes; may appear agitated or erratic under stress.", notes: "" },
   },
   { id: 3, firstName: "Darnell", lastName: "Washington", dob: "1979-11-05", gender: "Male", ethnicity: "Black", height: "6'1\"", weight: "210 lbs", hair: "Black", eyes: "Dark Brown", ssn: "618-77-9901", phone: "555-0441", address: "330 Magnolia Blvd, Tampa", dlNumber: "W1109872", dlClass: "Class E", dlStatus: "SUSPENDED", dlExpiry: "2024-11-05", vehicles: [4], flags: ["WARRANT","CAUTION"],
+    notes: [
+      { id: 'note_seed_3a', text: 'Known to frequent the 330 Magnolia Blvd area. Cooperative on last contact but flagged for caution — prior resisting charge.', authorId: 15, authorName: 'Det. Priya Nair', authorBadge: 'TPD-839', timestamp: '2026-04-13 09:14:22', edited: false },
+    ],
     medicalProfile: { bloodType: "B+", organDonor: false, dnr: false, conditions: ["Bipolar Disorder", "Substance Use Disorder (Cocaine)"], allergies: [], medications: ["Lithium 600mg daily"], emergencyContact: { name: "Donna Washington", phone: "555-0442", relationship: "Sister" }, safetyNotes: "History of combative behavior during manic episodes. Active cocaine dependency * may be under influence. Non-compliant with medication history.", notes: "" },
   },
   { id: 4, firstName: "Jessica", lastName: "Huang", dob: "2001-04-18", gender: "Female", ethnicity: "Asian", height: "5'2\"", weight: "115 lbs", hair: "Brown", eyes: "Brown", ssn: "723-11-4456", phone: "555-0557", address: "21 College Ave Apt 4B, Tampa", dlNumber: "H4456012", dlClass: "Class E", dlStatus: "ACTIVE", dlExpiry: "2027-04-18", vehicles: [], flags: [],

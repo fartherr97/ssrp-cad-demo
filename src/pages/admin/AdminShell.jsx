@@ -48,7 +48,7 @@ const GROUPS = [
     label: 'System',
     Icon: MdDns,
     items: [
-      { icon: MdHistory,         label: 'Logs',            route: '/admin/logs',            permKey: 'logs'           },
+      { icon: MdHistory,         label: 'Audit Log',       route: '/admin/logs',            permKey: 'logs'           },
       { icon: MdMessage,         label: 'Message Logs',    route: '/admin/message-logs',    permKey: 'messageLogs'    },
       { icon: MdVideogameAsset,  label: 'In-Game',         route: '/admin/in-game',         permKey: 'inGame'         },
       { icon: MdChat,            label: 'Discord',         route: '/admin/discord',         permKey: 'discord'        },
