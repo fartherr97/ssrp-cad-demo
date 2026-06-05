@@ -16,7 +16,7 @@ import {
 import {
   MdLocalHospital, MdSearch, MdWarningAmber, MdPerson, MdShield,
   MdLocalFireDepartment, MdCheckCircle, MdThumbDownAlt, MdArrowForward,
-  MdLocationOn, MdLink, MdClose, MdPhone, MdMyLocation,
+  MdLocationOn, MdLink, MdClose, MdPhone, MdMyLocation, MdAdd,
 } from 'react-icons/md';
 import MyStatusContent from '../components/MyStatusContent';
 
@@ -127,6 +127,8 @@ function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
 const HCFR_REQ_META = {
   PENDING:      { label: 'Pending',      color: '#ef4444' },
   ACKNOWLEDGED: { label: 'Acknowledged', color: '#06b6d4' },
+  DISPATCHED:   { label: 'En Route',     color: '#f59e0b' },
+  ON_SCENE:     { label: 'On Scene',     color: '#22c55e' },
 };
 
 function HCFRRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
@@ -374,6 +376,7 @@ export default function FireOpsBoard() {
     currentUser?.role === 'admin' || currentUser?.role === 'dispatch';
   const [rosterTab, setRosterTab] = useState(isHCFR ? 'MYSTATUS' : 'APPARATUS');
   const [dispatchingReq, setDispatchingReq] = useState(null);
+  const [addUnitId, setAddUnitId] = useState(null);
 
   const handleSelectCall = (id) => {
     setSelectedCall(id);
@@ -396,10 +399,22 @@ export default function FireOpsBoard() {
     [hcfrRequests]
   );
   const dispatchedRequests = useMemo(
-    () => hcfrRequests.filter(r => r.status === 'DISPATCHED'),
+    () => hcfrRequests.filter(r => r.status === 'DISPATCHED' || r.status === 'ON_SCENE'),
     [hcfrRequests]
   );
   const selReq = selectedReq ? hcfrRequests.find(r => r.id === selectedReq) : null;
+
+  // Returns dispatched units as an array — handles both the new array format and
+  // legacy single-unit fields (dispatchedUnitId / dispatchedUnitIdStr).
+  const getDispatchedUnits = (req) => {
+    if (req?.dispatchedUnits?.length) return req.dispatchedUnits;
+    if (req?.dispatchedUnitId) return [{
+      id: req.dispatchedUnitId,
+      unitIdStr: req.dispatchedUnitIdStr || String(req.dispatchedUnitId),
+      name: fireUnits.find(u => u.id === req.dispatchedUnitId)?.name || '',
+    }];
+    return [];
+  };
 
   const availableUnits = useMemo(
     () => fireUnits.filter(u => u.status === 'AVAILABLE'),
@@ -446,8 +461,13 @@ export default function FireOpsBoard() {
     if (req.callId) {
       dispatch({ type: 'ASSIGN_UNIT', payload: { callId: req.callId, unitId: unit?.unitId || String(unitId) } });
     }
-    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DISPATCHED', dispatchedUnitId: unitId, dispatchedUnitIdStr: unit?.unitId || String(unitId) } });
-    // Auto-select the dispatched request in the detail panel.
+    const newUnit = { id: unitId, unitIdStr: unit?.unitId || String(unitId), name: unit?.name || '' };
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: {
+      id: req.id, status: 'DISPATCHED',
+      dispatchedUnits: [newUnit],
+      // legacy compat
+      dispatchedUnitId: unitId, dispatchedUnitIdStr: unit?.unitId || String(unitId),
+    }});
     handleSelectReq(req.id);
     toast.success(`${unit?.name || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
     dispatch({
@@ -455,6 +475,33 @@ export default function FireOpsBoard() {
       payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has dispatched ${unit?.name || 'a unit'} (${unit?.unitId || ''}) to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
     });
     setDispatchingReq(null);
+  };
+
+  const addUnitToReq = (reqId, unitId) => {
+    const req = hcfrRequests.find(r => r.id === reqId);
+    const unit = fireUnits.find(u => u.id === unitId);
+    if (!req || !unit) return;
+    const current = getDispatchedUnits(req);
+    if (current.some(du => du.id === unitId)) return;
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: {
+      id: reqId,
+      dispatchedUnits: [...current, { id: unitId, unitIdStr: unit.unitId, name: unit.name }],
+    }});
+    setAddUnitId(null);
+    toast.success(`${unit.unitId} added to LE request.`, { title: 'Unit Added' });
+  };
+
+  const removeUnitFromReq = (reqId, unitId) => {
+    const req = hcfrRequests.find(r => r.id === reqId);
+    if (!req) return;
+    const remaining = getDispatchedUnits(req).filter(du => du.id !== unitId);
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: reqId, dispatchedUnits: remaining } });
+    if (remaining.length === 0) {
+      dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: reqId, status: 'PENDING' } });
+      setSelectedReq(null);
+    }
+    const u = fireUnits.find(u => u.id === unitId);
+    toast.info(`${u?.unitId || unitId} removed from LE request.`, { title: 'Unit Removed' });
   };
 
   const APPARATUS_TYPES = [
@@ -639,16 +686,17 @@ export default function FireOpsBoard() {
               );
             })}
 
-            {/* Dispatched LE Assistance requests */}
+            {/* Dispatched / On-Scene LE Assistance requests */}
             {dispatchedRequests.length > 0 && (
               <>
                 <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-blue-400/70 px-1 pt-1 pb-0.5 border-t border-border-faint mt-1">
-                  LE Assistance — En Route
+                  LE Assistance — Active
                 </div>
                 {dispatchedRequests.map(req => {
                   const on = selectedReq === req.id;
-                  const unit = fireUnits.find(u => u.id === req.dispatchedUnitId);
-                  const unitLabel = unit?.unitId || req.dispatchedUnitIdStr || '—';
+                  const units = getDispatchedUnits(req);
+                  const unitLabel = units.map(u => u.unitIdStr).join(', ') || '—';
+                  const isOnScene = req.status === 'ON_SCENE';
                   return (
                     <div key={req.id}
                       className={`rounded-xl border border-l-[3px] border-l-blue-500 p-3 cursor-pointer transition-all backdrop-blur-sm ${on ? 'bg-blue-500/15 border-blue-500/40' : 'bg-app-card/70 border-border-base hover:bg-white/[0.05]'}`}
@@ -656,11 +704,15 @@ export default function FireOpsBoard() {
                       <div className="flex gap-1.5 mb-1.5 items-center">
                         <MdShield size={12} className="text-blue-400 shrink-0" />
                         <span className="text-[10px] font-bold text-blue-400">LE ASSIST</span>
-                        <span className={`${BADGE.gray} ml-auto`}>ENRT</span>
+                        <span className={`ml-auto text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border ${isOnScene ? 'bg-green-500/15 text-green-400 border-green-500/30' : 'bg-amber-500/15 text-amber-400 border-amber-500/30'}`}>
+                          {isOnScene ? 'ON SCENE' : 'EN ROUTE'}
+                        </span>
                       </div>
                       <div className="text-[13px] font-semibold text-white mb-0.5">{req.assistType}</div>
                       <div className="text-[11.5px] text-slate-400">{req.location}</div>
-                      <div className="text-[10px] font-mono mt-1 text-emerald-400">{unitLabel} en route</div>
+                      <div className={`text-[10px] font-mono mt-1 ${isOnScene ? 'text-green-400' : 'text-amber-400'}`}>
+                        {unitLabel} · {isOnScene ? 'on scene' : 'en route'}
+                      </div>
                     </div>
                   );
                 })}
@@ -702,7 +754,15 @@ export default function FireOpsBoard() {
                   </div>
                   <div className="text-[10px] text-slate-500 font-mono mt-0.5">{elapsed(selReq.createdAt)}</div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 shrink-0">ENRT</span>
+                {(() => {
+                  const m = HCFR_REQ_META[selReq.status];
+                  return (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0"
+                      style={{ color: m?.color, borderColor: `${m?.color}55`, background: `${m?.color}18` }}>
+                      {m?.label || selReq.status}
+                    </span>
+                  );
+                })()}
               </div>
               <div className={`${S_PANEL_BODY} p-4 gap-4`}>
                 <div className={`${S_CARD} border-l-[3px] border-l-blue-500`}>
@@ -716,16 +776,60 @@ export default function FireOpsBoard() {
                   <div className="text-[12.5px] text-slate-300 leading-relaxed">{selReq.description}</div>
                 </div>
 
+                {/* Apparatus list with add / remove */}
                 <div className={S_CARD}>
-                  <div className={S_LABEL}>En Route Apparatus</div>
-                  {(() => {
-                    const unit = fireUnits.find(u => u.id === selReq.dispatchedUnitId);
-                    const label = unit?.unitId || selReq.dispatchedUnitIdStr || '—';
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={S_LABEL}>Apparatus ({getDispatchedUnits(selReq).length})</div>
+                    {canRemoveUnits && getDispatchedUnits(selReq).length > 0 && (
+                      <span className="ml-auto text-[9.5px] font-bold uppercase tracking-wide text-slate-500">tap ✕ to remove</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {getDispatchedUnits(selReq).map(du => {
+                      const liveUnit = fireUnits.find(u => u.id === du.id);
+                      const isOnScene = selReq.status === 'ON_SCENE';
+                      return (
+                        <div key={du.id} className="flex items-center gap-2 bg-app-elevated border border-border-base rounded-lg pl-2.5 pr-1.5 py-1.5">
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${isOnScene ? 'bg-green-400' : 'bg-amber-400'}`} />
+                          <span className="text-[13px] font-mono font-bold text-orange-400">{du.unitIdStr}</span>
+                          <span className="text-[12px] text-slate-300 flex-1 min-w-0 truncate">{du.name || liveUnit?.name || ''}</span>
+                          {canRemoveUnits && (
+                            <button
+                              onClick={() => removeUnitFromReq(selReq.id, du.id)}
+                              title={`Remove ${du.unitIdStr}`}
+                              className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-md text-slate-500 hover:text-red-300 hover:bg-red-500/15 cursor-pointer transition-colors"
+                              style={{ background: 'none', border: 'none' }}>
+                              <MdClose size={13} />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add unit picker */}
+                  {canRemoveUnits && (() => {
+                    const alreadyIds = getDispatchedUnits(selReq).map(du => du.id);
+                    const pickable = availableUnits.filter(u => !alreadyIds.includes(u.id));
+                    if (pickable.length === 0) return null;
                     return (
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                        <span className="text-[13px] font-mono font-bold text-orange-400">{label}</span>
-                        {unit && <span className="text-[12px] text-slate-300">{unit.name}</span>}
+                      <div className="flex gap-2 mt-3">
+                        <select
+                          value={addUnitId || ''}
+                          onChange={e => setAddUnitId(e.target.value ? Number(e.target.value) : null)}
+                          className="flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-2.5 py-1.5 text-[12px] text-slate-200 outline-none focus:border-orange-500/50 cursor-pointer">
+                          <option value="">Add apparatus…</option>
+                          {pickable.map(u => (
+                            <option key={u.id} value={u.id}>{u.unitId} — {u.name}</option>
+                          ))}
+                        </select>
+                        <button
+                          disabled={!addUnitId}
+                          onClick={() => addUnitToReq(selReq.id, addUnitId)}
+                          className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-colors border border-transparent disabled:opacity-40 disabled:cursor-not-allowed"
+                          style={{ background: addUnitId ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.05)', color: addUnitId ? '#fb923c' : '#64748b', borderColor: addUnitId ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)' }}>
+                          <MdAdd size={14} /> Add
+                        </button>
                       </div>
                     );
                   })()}
@@ -740,16 +844,25 @@ export default function FireOpsBoard() {
                   </div>
                 )}
 
-                <div className="flex gap-1.5">
-                  <button
-                    className={sm(S_BTN_SECONDARY)}
-                    onClick={() => {
-                      dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: selReq.id, status: 'COMPLETED' } });
-                      setSelectedReq(null);
-                    }}>
-                    Mark Complete
-                  </button>
-                </div>
+                {canRemoveUnits && (
+                  <div className="flex flex-wrap gap-2">
+                    {selReq.status === 'DISPATCHED' && (
+                      <button
+                        className={`${sm(S_BTN_FIRE)} flex items-center gap-1.5`}
+                        onClick={() => dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: selReq.id, status: 'ON_SCENE' } })}>
+                        <MdCheckCircle size={14} /> Units On Scene
+                      </button>
+                    )}
+                    <button
+                      className={sm(S_BTN_SECONDARY)}
+                      onClick={() => {
+                        dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: selReq.id, status: 'COMPLETED' } });
+                        setSelectedReq(null);
+                      }}>
+                      Mark Complete
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
