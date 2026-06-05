@@ -3,7 +3,8 @@ import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
   MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
-  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS, FDOT_PERMITS
+  BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS, FDOT_PERMITS,
+  CASE_FILES,
 } from '../data/mockData';
 import { DEFAULT_HELP_CONTENT } from '../data/helpDefaults';
 import { CIVILIAN_FORMS_DEFAULT } from '../data/civilianFormsDefaults';
@@ -152,6 +153,7 @@ const initialState = {
   limitsConfig: LIMITS_CONFIG,
   discordRoleMappings: DISCORD_ROLE_MAPPINGS_DEFAULT,
   adminTiers: ADMIN_TIERS_DEFAULT,
+  caseFiles: CASE_FILES,
   inGameConfig: {
     apiKey: 'a3f9e2b1-7c84-4d56-b012-9e3a7f2c10d8',
     liveMapEnabled: true,
@@ -1191,6 +1193,113 @@ function reducer(state, action) {
 
     case 'SET_TONE': {
       return { ...state, audioTones: { ...state.audioTones, ...action.payload } };
+    }
+
+    /* ─── Case Files / CID ─── */
+    case 'ADD_CASE_FILE': {
+      const seq = String((state.caseFiles || []).length + 1).padStart(4, '0');
+      const newCase = {
+        ...action.payload,
+        id: state.nextId,
+        caseNumber: `CID-${seq}`,
+        notes: [],
+        linkedCalls: [],
+        linkedReports: [],
+        createdAt: new Date().toISOString(),
+        closedAt: null,
+        closedBy: null,
+      };
+      const audit = addAuditEntry(state, `Opened case ${newCase.caseNumber}: ${newCase.title}`, 'CID');
+      return { ...state, caseFiles: [...(state.caseFiles || []), newCase], nextId: state.nextId + 1, ...audit };
+    }
+    case 'UPDATE_CASE_FILE': {
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === action.payload.id ? { ...c, ...action.payload } : c
+      );
+      return { ...state, caseFiles };
+    }
+    case 'CLOSE_CASE_FILE': {
+      const { id, closedBy, closedByName } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === id ? { ...c, status: 'CLOSED', closedAt: new Date().toISOString(), closedBy } : c
+      );
+      const target = (state.caseFiles || []).find(c => c.id === id);
+      const audit = addAuditEntry(state, `Closed case ${target?.caseNumber}: ${target?.title}`, 'CID');
+      return { ...state, caseFiles, ...audit };
+    }
+    case 'LOCK_CASE_FILE': {
+      const { id } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === id ? { ...c, status: 'LOCKED' } : c
+      );
+      const target = (state.caseFiles || []).find(c => c.id === id);
+      const audit = addAuditEntry(state, `Locked case ${target?.caseNumber}: ${target?.title}`, 'CID');
+      return { ...state, caseFiles, ...audit };
+    }
+    case 'REOPEN_CASE_FILE': {
+      const { id } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === id ? { ...c, status: 'ACTIVE', closedAt: null, closedBy: null } : c
+      );
+      return { ...state, caseFiles };
+    }
+    case 'ADD_CASE_NOTE': {
+      const { caseId, note } = action.payload;
+      const newNote = { ...note, id: state.nextId, timestamp: new Date().toISOString() };
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === caseId ? { ...c, notes: [...(c.notes || []), newNote] } : c
+      );
+      return { ...state, caseFiles, nextId: state.nextId + 1 };
+    }
+    case 'LINK_CASE_SUBJECT': {
+      const { caseId, subject } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c => {
+        if (c.id !== caseId) return c;
+        if ((c.subjects || []).some(s => s.civilianId === subject.civilianId)) return c;
+        return { ...c, subjects: [...(c.subjects || []), subject] };
+      });
+      return { ...state, caseFiles };
+    }
+    case 'UNLINK_CASE_SUBJECT': {
+      const { caseId, civilianId } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === caseId ? { ...c, subjects: (c.subjects || []).filter(s => s.civilianId !== civilianId) } : c
+      );
+      return { ...state, caseFiles };
+    }
+    case 'LINK_CASE_VEHICLE': {
+      const { caseId, vehicle } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c => {
+        if (c.id !== caseId) return c;
+        if ((c.vehicles || []).some(v => v.vehicleId === vehicle.vehicleId)) return c;
+        return { ...c, vehicles: [...(c.vehicles || []), vehicle] };
+      });
+      return { ...state, caseFiles };
+    }
+    case 'UNLINK_CASE_VEHICLE': {
+      const { caseId, vehicleId } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c =>
+        c.id === caseId ? { ...c, vehicles: (c.vehicles || []).filter(v => v.vehicleId !== vehicleId) } : c
+      );
+      return { ...state, caseFiles };
+    }
+    case 'LINK_CASE_CALL': {
+      const { caseId, callId } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c => {
+        if (c.id !== caseId) return c;
+        if ((c.linkedCalls || []).includes(callId)) return c;
+        return { ...c, linkedCalls: [...(c.linkedCalls || []), callId] };
+      });
+      return { ...state, caseFiles };
+    }
+    case 'LINK_CASE_REPORT': {
+      const { caseId, reportId } = action.payload;
+      const caseFiles = (state.caseFiles || []).map(c => {
+        if (c.id !== caseId) return c;
+        if ((c.linkedReports || []).includes(reportId)) return c;
+        return { ...c, linkedReports: [...(c.linkedReports || []), reportId] };
+      });
+      return { ...state, caseFiles };
     }
 
     default:

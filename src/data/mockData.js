@@ -1198,3 +1198,83 @@ export const CALL_RESPONSE_LOGS = [
   { id: 'RL-034', date: _dAgo(29), nature: 'Suspicious Person',      category: 'police', respondingDept: 'HCSO', priority: 3, assignedMin: 5,  onSceneMin: 13 },
 ];
 
+export const CASE_FILES = [
+  {
+    id: 1,
+    caseNumber: 'CID-0001',
+    title: 'Magnolia Boulevard Narcotics Investigation',
+    classification: 'Narcotics',
+    priority: 1,
+    status: 'ACTIVE',
+    assignedDetectives: [15],
+    subjects: [
+      { civilianId: 3, role: 'SUSPECT' },
+      { civilianId: 1, role: 'WITNESS' },
+    ],
+    vehicles: [
+      { vehicleId: 4, note: 'Registered to primary suspect. Observed at multiple known narcotics exchange locations.' },
+    ],
+    linkedCalls: ['26-0401'],
+    linkedReports: [2, 3],
+    summary: 'Active investigation into a suspected narcotics distribution network operating in the Magnolia Boulevard corridor. Primary suspect Darnell Washington has a prior drug arrest and an active arrest warrant on file. Surveillance initiated. CI indicates possible involvement of additional unknown subjects.',
+    notes: [
+      { id: 1, text: 'Investigation opened. CI provided initial tip regarding suspected hand-to-hand transactions at 330 Magnolia Blvd. Surveillance initiated.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-05-21T09:15:00', type: 'UPDATE' },
+      { id: 2, text: 'Vehicle SUS-1109 (Dodge Charger) observed departing location with unknown male. Tag confirmed valid. Photographed and logged.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-05-25T14:30:00', type: 'EVIDENCE' },
+      { id: 3, text: 'Patrol tip: Suspect seen at Adamo Dr & 50th St. Two unknown males present. No enforcement action taken to preserve surveillance.', authorId: 1, authorName: 'Sgt. James Reeves', timestamp: '2026-06-01T11:45:00', type: 'TIP' },
+      { id: 4, text: 'Active arrest warrant confirmed (WARR-2026-0412). Coordinating with patrol for warrant service window to minimize risk.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-06-03T16:00:00', type: 'LEAD' },
+    ],
+    createdAt: '2026-05-21T08:00:00',
+    createdBy: 15,
+    closedAt: null,
+    closedBy: null,
+  },
+  {
+    id: 2,
+    caseNumber: 'CID-0002',
+    title: 'Harbor View Aggravated Assault — Marino',
+    classification: 'Assault',
+    priority: 2,
+    status: 'ACTIVE',
+    assignedDetectives: [15],
+    subjects: [
+      { civilianId: 5, role: 'SUSPECT' },
+    ],
+    vehicles: [
+      { vehicleId: 5, note: "Suspect's BMW. Present at scene at time of offense." },
+    ],
+    linkedCalls: [],
+    linkedReports: [],
+    summary: 'Follow-up investigation into an aggravated assault at a Harbor View location. Suspect Robert Marino has a prior conviction for assault with a deadly weapon (TPD-2025-1120). Victim interview completed. Evidence file being built for prosecution.',
+    notes: [
+      { id: 5, text: 'Case file opened. Cross-referencing with prior arrest TPD-2025-1120. Victim contacted, interview scheduled.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-05-05T10:00:00', type: 'UPDATE' },
+      { id: 6, text: 'Victim interview completed. Consistent with initial report. Photos of injuries obtained and catalogued as physical evidence.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-05-12T14:00:00', type: 'EVIDENCE' },
+    ],
+    createdAt: '2026-05-05T09:00:00',
+    createdBy: 15,
+    closedAt: null,
+    closedBy: null,
+  },
+  {
+    id: 3,
+    caseNumber: 'CID-0003',
+    title: 'Bay Area Credit Card Fraud Network',
+    classification: 'Fraud',
+    priority: 3,
+    status: 'SUSPENDED',
+    assignedDetectives: [15],
+    subjects: [],
+    vehicles: [],
+    linkedCalls: [],
+    linkedReports: [],
+    summary: 'Investigation into a suspected card-skimming and fraud operation targeting gas stations in Hillsborough County. Six confirmed victim accounts across three locations. Case suspended pending bank subpoena responses.',
+    notes: [
+      { id: 7, text: 'Case opened via referral from fraud division. Six victim accounts at three gas station locations share same payment terminal service provider.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-04-20T11:00:00', type: 'UPDATE' },
+      { id: 8, text: 'SUSPENDED — Subpoenas issued to three financial institutions. Expected response: 30 days. No further action until records received.', authorId: 15, authorName: 'Det. Priya Nair', timestamp: '2026-04-25T15:00:00', type: 'UPDATE' },
+    ],
+    createdAt: '2026-04-20T10:00:00',
+    createdBy: 15,
+    closedAt: null,
+    closedBy: null,
+  },
+];
+

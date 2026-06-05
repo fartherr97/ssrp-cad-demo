@@ -12,7 +12,7 @@ import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore,
   MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
-  MdVerifiedUser, MdLocationOn,
+  MdVerifiedUser, MdLocationOn, MdClose,
 } from 'react-icons/md';
 
 function bizDaysLeft(issuedAt) {
@@ -143,9 +143,103 @@ const SEARCH_TYPES = [
   { id: 'PERMIT',   label: 'Permits',            Icon: MdVerifiedUser, activeClass: 'bg-green-400/15 border-green-400/40 text-green-300', hoverClass: 'hover:bg-green-400/[0.08] hover:border-green-400/25 hover:text-green-300' },
 ];
 
+function InvestigationFlag({ cases, onTip }) {
+  const [tipOpen, setTipOpen] = useState(false);
+  const [tipCase, setTipCase] = useState(null);
+  const [tipText, setTipText] = useState('');
+  const { dispatch } = useCAD();
+  const { state: { currentUser } } = useCAD();
+
+  const openTip = (c) => { setTipCase(c); setTipText(''); setTipOpen(true); };
+  const submitTip = () => {
+    if (!tipText.trim() || !tipCase) return;
+    dispatch({
+      type: 'ADD_CASE_NOTE',
+      payload: {
+        caseId: tipCase.id,
+        note: {
+          text: tipText.trim(),
+          type: 'TIP',
+          authorId: currentUser?.id,
+          authorName: currentUser?.name || 'Patrol',
+        },
+      },
+    });
+    setTipOpen(false);
+    setTipCase(null);
+  };
+
+  return (
+    <>
+      <div className="shrink-0 flex flex-col gap-2 px-5 pt-3 pb-0">
+        {cases.map(c => (
+          <div key={c.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border"
+            style={{ background: 'rgba(239,68,68,0.07)', borderColor: 'rgba(239,68,68,0.25)' }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(239,68,68,0.12)' }}>
+              <MdWarningAmber size={15} style={{ color: '#ef4444' }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#ef4444' }}>
+                Active Investigation
+              </div>
+              <div className="text-[11.5px] font-semibold text-slate-200 truncate">
+                {c.caseNumber} · {c.title}
+              </div>
+            </div>
+            <button onClick={() => openTip(c)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10.5px] font-bold shrink-0 transition-all"
+              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
+              Submit Tip
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {tipOpen && tipCase && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-md bg-app-card border border-border-base rounded-2xl overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border-faint">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-red-400">Submit Tip</div>
+                <div className="text-[13px] font-bold text-white">{tipCase.caseNumber} · {tipCase.title}</div>
+              </div>
+              <button onClick={() => setTipOpen(false)} className="text-slate-500 hover:text-slate-300 p-1">
+                <MdClose size={18} />
+              </button>
+            </div>
+            <div className="p-5 flex flex-col gap-3">
+              <textarea
+                rows={4}
+                autoFocus
+                placeholder="Enter your tip, observation, or information for the investigating detective..."
+                value={tipText}
+                onChange={e => setTipText(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg text-[12.5px] bg-app-elevated border border-border-base text-slate-100 placeholder-slate-600 focus:outline-none focus:border-red-500/40 resize-none leading-relaxed"
+              />
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setTipOpen(false)}
+                  className="px-4 py-2 rounded-lg text-[12px] font-semibold text-slate-400 hover:text-slate-200">
+                  Cancel
+                </button>
+                <button onClick={submitTip} disabled={!tipText.trim()}
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-[12px] font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#f87171' }}>
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
@@ -254,6 +348,14 @@ export default function RecordsBureau() {
   const vehOwner    = selVeh ? civilians.find(c => c.id === selVeh.ownerId) : null;
   const vehBizOwner = selVeh?.businessOwnerId ? businesses.find(b => b.id === selVeh.businessOwnerId) : null;
   const vehWarrants = vehOwner ? warrants.filter(w => w.civilianId === vehOwner.id) : [];
+
+  // Active investigation flag — cases that reference the selected person or vehicle
+  const activeCasesForCiv = selCiv
+    ? caseFiles.filter(c => c.status === 'ACTIVE' && c.subjects?.some(s => s.civilianId === selCiv.id))
+    : [];
+  const activeCasesForVeh = selVeh
+    ? caseFiles.filter(c => c.status === 'ACTIVE' && c.vehicles?.some(v => v.vehicleId === selVeh.id))
+    : [];
 
   const personTabs = ['SUMMARY', 'RETURN', 'CRIMINAL HISTORY', 'WARRANTS', 'VEHICLES', 'MEDICAL'];
   const vehTabs    = ['RETURN', 'FLAGS'];
@@ -753,6 +855,11 @@ export default function RecordsBureau() {
                   {vehBizOwner && <span className={BADGE.blue}>COMMERCIAL</span>}
                 </div>
               </div>
+
+              {/* Active investigation flags */}
+              {(activeCasesForCiv.length > 0 || activeCasesForVeh.length > 0) && (
+                <InvestigationFlag cases={[...activeCasesForCiv, ...activeCasesForVeh]} />
+              )}
 
               {/* Tabs */}
               <div className="flex gap-0.5 px-3 pt-2 border-b border-border-faint shrink-0 overflow-x-auto n-tabs-wrap">
