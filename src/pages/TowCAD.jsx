@@ -231,7 +231,7 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
     }
     // Keep linked FDOT request in sync with the job.
     if (job.fdotRequestId) {
-      const fdotStatus = { EN_ROUTE: 'DISPATCHED', ON_SCENE: 'ON_SCENE', TOWING: 'ON_SCENE', COMPLETED: 'COMPLETED' }[nextStatus];
+      const fdotStatus = { EN_ROUTE: 'DISPATCHED', ON_SCENE: 'ON_SCENE', TOWING: 'TOWING', COMPLETED: 'COMPLETED' }[nextStatus];
       if (fdotStatus) dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: job.fdotRequestId, status: fdotStatus } });
     }
   };
@@ -597,6 +597,7 @@ const FDOT_REQ_META = {
   ACKNOWLEDGED: { label: 'Acknowledged', color: '#06b6d4' },
   DISPATCHED:   { label: 'En Route',     color: '#f59e0b' },
   ON_SCENE:     { label: 'On Scene',     color: '#22c55e' },
+  TOWING:       { label: 'Towing',       color: '#a855f7' },
 };
 
 function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
@@ -711,7 +712,7 @@ export default function TowCAD() {
 
   const dispatchedFDOTRequests = useMemo(
     () => fdotRequests.filter(r => {
-      if (r.status !== 'DISPATCHED' && r.status !== 'ON_SCENE') return false;
+      if (!['DISPATCHED', 'ON_SCENE', 'TOWING'].includes(r.status)) return false;
       if (!activeBizCompany) return false;
       if (r.targetCompanyId) return r.targetCompanyId === activeBizCompany.id;
       return !!activeBizCompany.isFDOT;
@@ -857,7 +858,7 @@ export default function TowCAD() {
   const syncFDOTCardToJob = (req, newStatus) => {
     const linked = towJobs.find(j => j.fdotRequestId === req.id);
     if (!linked) return;
-    const jobStatus = { DISPATCHED: 'EN_ROUTE', ON_SCENE: 'ON_SCENE', COMPLETED: 'COMPLETED' }[newStatus];
+    const jobStatus = { DISPATCHED: 'EN_ROUTE', ON_SCENE: 'ON_SCENE', TOWING: 'TOWING', COMPLETED: 'COMPLETED' }[newStatus];
     if (!jobStatus || linked.status === jobStatus) return;
     dispatch({ type: 'UPDATE_TOW_JOB', payload: { id: linked.id, status: jobStatus } });
     if (linked.unitId) {
@@ -1014,7 +1015,7 @@ export default function TowCAD() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
             {dispatchedFDOTRequests.map(req => {
               const m = FDOT_REQ_META[req.status] || FDOT_REQ_META.DISPATCHED;
-              const isOnScene = req.status === 'ON_SCENE';
+              const isOnScene = req.status === 'ON_SCENE' || req.status === 'TOWING';
               const units = getDispatchedFDOTUnits(req);
               const pickable = visibleUnits.filter(u => u.status !== 'ON_CALL' && !units.some(du => du.id === u.id));
               const addVal = addFDOTUnits[req.id] || '';
