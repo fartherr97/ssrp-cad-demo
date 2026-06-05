@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
@@ -12,6 +12,7 @@ export default function TenCodes() {
   const toast = useToast();
   const [code, setCode] = useState('');
   const [label, setLabel] = useState('');
+  const fileRef = useRef(null);
 
   const add = () => {
     if (!code.trim() || !label.trim()) return;
@@ -26,12 +27,34 @@ export default function TenCodes() {
     a.href = URL.createObjectURL(blob); a.download = 'ten-codes.json'; a.click();
   };
 
+  const importJson = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) throw new Error('not an array');
+        let n = 0;
+        data.forEach(item => {
+          const c = String(item.code || '').trim();
+          const l = String(item.label || '').trim();
+          if (c && l) { dispatch({ type: 'ADMIN_ADD', payload: { key: 'tenCodes', item: { code: c, label: l } } }); n++; }
+        });
+        n ? toast.success(`Imported ${n} 10-code${n === 1 ? '' : 's'}.`) : toast.warning('No valid 10-codes found in file.');
+      } catch { toast.error('Invalid 10-codes JSON file.'); }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <AdminPanel
       title="10-Codes"
-      subtitle="Radio codes available to dispatch and units. Drag order controls display order."
+      subtitle="Radio codes available to dispatch and units. Use the arrows to control display order."
       right={<>
-        <SonButton size="sm" variant="green" onClick={exportJson}><MdFileUpload size={15} /> Import</SonButton>
+        <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={importJson} />
+        <SonButton size="sm" variant="green" onClick={() => fileRef.current?.click()}><MdFileUpload size={15} /> Import</SonButton>
         <SonButton size="sm" variant="red" onClick={exportJson}><MdFileDownload size={15} /> Export</SonButton>
       </>}
     >

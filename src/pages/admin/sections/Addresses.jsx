@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonSearch, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete, MdUploadFile, MdDownload, MdHelpOutline } from 'react-icons/md';
+import { MdAdd, MdDelete, MdUploadFile, MdDownload } from 'react-icons/md';
 
 export default function Addresses() {
   const { state, dispatch } = useCAD();
@@ -15,6 +15,7 @@ export default function Addresses() {
   const [street, setStreet] = useState('');
   const [area, setArea] = useState('');
   const [postal, setPostal] = useState('');
+  const fileRef = useRef(null);
 
   const add = () => {
     if (!name.trim() || !street.trim()) return;
@@ -32,6 +33,32 @@ export default function Addresses() {
     URL.revokeObjectURL(url);
   };
 
+  const handleImport = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const lines = String(ev.target.result || '').split(/\r?\n/).filter(l => l.trim());
+        let n = 0;
+        lines.forEach((line, idx) => {
+          const cells = line.includes('"')
+            ? [...line.matchAll(/"([^"]*)"/g)].map(m => m[1])
+            : line.split(',').map(c => c.trim());
+          const [name, street, area, postal] = cells;
+          if (idx === 0 && /name/i.test(name || '') && /street/i.test(street || '')) return; // header
+          if (name && street) {
+            dispatch({ type: 'ADMIN_ADD', payload: { key: 'adminAddresses', item: { name: name.trim(), street: street.trim(), area: (area || '').trim(), postal: (postal || '').trim() } } });
+            n++;
+          }
+        });
+        n ? toast.success(`Imported ${n} address${n === 1 ? '' : 'es'}.`) : toast.warning('No valid addresses found in file.');
+      } catch { toast.error('Could not parse CSV file.'); }
+    };
+    reader.readAsText(file);
+  };
+
   const q = query.toLowerCase();
   const filtered = adminAddresses.filter(a =>
     !q ||
@@ -46,14 +73,12 @@ export default function Addresses() {
       right={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <SonSearch value={query} onChange={setQuery} placeholder="Search name / street / area…" />
-          <SonButton variant="ghost" onClick={() => {}} title="Import from CSV">
+          <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleImport} />
+          <SonButton variant="ghost" onClick={() => fileRef.current?.click()} title="Import from CSV">
             <MdUploadFile size={15} /> Import
           </SonButton>
           <SonButton variant="ghost" onClick={() => handleExport()} title="Export to CSV">
             <MdDownload size={15} /> Export
-          </SonButton>
-          <SonButton variant="ghost" onClick={() => {}} title="Tutorial">
-            <MdHelpOutline size={15} /> Tutorial
           </SonButton>
         </div>
       }

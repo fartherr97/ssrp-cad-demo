@@ -642,6 +642,24 @@ function baseReducer(state, action) {
       return { ...state, [key]: value, ...audit };
     }
 
+    case 'WIPE': {
+      // Admin "Wipe Records" — permanently clears a data slice.
+      const target = action.payload;
+      const CLEARABLE = ['civilians', 'vehicles', 'warrants', 'criminalHistory', 'calls', 'dispatchLog', 'towLogs', 'auditLog', 'activeSessions', 'bannedUsers'];
+      let next;
+      if (target === 'allReports')        next = { ...state, reports: [] };
+      else if (target === 'allRecords')   next = { ...state, records: [] };
+      else if (typeof target === 'string' && target.startsWith('report:')) next = { ...state, reports: state.reports.filter(r => r.type !== target.slice(7)) };
+      else if (typeof target === 'string' && target.startsWith('record:')) next = { ...state, records: state.records.filter(r => r.type !== target.slice(7)) };
+      else if (target === 'civilianFlags') next = { ...state, civilians: state.civilians.map(c => ({ ...c, flags: [] })) };
+      else if (target === 'licensePoints') next = { ...state, civilians: state.civilians.map(c => ({ ...c, licensePoints: 0 })) };
+      else if (CLEARABLE.includes(target)) next = { ...state, [target]: [] };
+      else return state;
+      // Log the wipe (skip when we just cleared the audit log itself).
+      if (target === 'auditLog') return next;
+      return { ...next, ...addAuditEntry(next, `Wiped ${target}`, 'Admin') };
+    }
+
     case 'ADD_LICENSE_POINTS': {
       // Accumulate points on a driver; auto-suspend (and re-suspend for longer)
       // each time their total crosses one of the configured threshold tiers.
