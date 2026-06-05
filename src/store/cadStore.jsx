@@ -955,7 +955,7 @@ function reducer(state, action) {
     }
 
     case 'ADD_TOW_JOB': {
-      const job = { ...action.payload, id: state.nextId, status: 'PENDING', createdAt: Date.now() };
+      const job = { ...action.payload, id: state.nextId, status: action.payload.status || 'PENDING', createdAt: Date.now() };
       const log = addDispatchLog(state, `Tow job #${state.nextId} created * ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
       return { ...state, towJobs: [job, ...state.towJobs], nextId: state.nextId + 1, ...log };
     }
