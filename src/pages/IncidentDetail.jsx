@@ -204,17 +204,19 @@ export default function IncidentDetail() {
 
       {/* ── "You are attached" banner (field officer view) ── */}
       {!isDispatch && me && call.units.includes(me.unitId) && (
-        <div className="shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl"
+        <div className="shrink-0 flex flex-col gap-2.5 px-4 py-3 rounded-xl sm:flex-row sm:items-center"
           style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderLeft: '3px solid #22c55e' }}>
-          <MdPerson size={18} className="text-green-400 shrink-0" />
-          <div className="min-w-0 flex-1">
-            <div className="text-[12.5px] font-bold text-green-300">You are attached to this call</div>
-            <div className="text-[11px] text-slate-400 mt-px">
-              {me.unitId} · {me.name} ·{' '}
-              <span style={{ color: ST_COLOR[me.status] || '#93a4bd' }}>{CAD_STATUS_LABEL[me.status] || me.status}</span>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <MdPerson size={18} className="text-green-400 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-[12.5px] font-bold text-green-300">You are attached to this call</div>
+              <div className="text-[11px] text-slate-400 mt-px">
+                {me.unitId} · {me.name} ·{' '}
+                <span style={{ color: ST_COLOR[me.status] || '#93a4bd' }}>{CAD_STATUS_LABEL[me.status] || me.status}</span>
+              </div>
             </div>
           </div>
-          <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
+          <div className="flex gap-1.5 flex-wrap">
             {['ENRT','ARRVD','BUSY','AVAILABLE'].map(s => (
               <button
                 key={s}
