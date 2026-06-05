@@ -331,50 +331,57 @@ export default function LicensePoints() {
       >
         {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState>
           : drivers.length === 0 ? <EmptyState>No drivers match "{driverSearch}".</EmptyState> : (
-          <SonTable columns={[
-            { label: 'Driver' }, { label: 'DL #' }, { label: 'Status', align: 'center' },
-            { label: 'Points', width: 200 }, { label: 'Apply Violation', align: 'right' },
-          ]}>
-            {drivers.map((c, i) => {
+          <div className="flex flex-col gap-2">
+            {drivers.map((c) => {
               const pts = c.licensePoints || 0;
               const pct = Math.min(100, Math.round((pts / (threshold || 1)) * 100));
               const near = pct >= 75;
               const barColor = c.dlStatus === 'SUSPENDED' ? '#f87171' : near ? '#f59e0b' : '#3d82f0';
+              const suspended = c.dlStatus === 'SUSPENDED';
               return (
-                <SonRow key={c.id} i={i}>
-                  <SonCell bold>{c.firstName} {c.lastName}</SonCell>
-                  <SonCell mono color={ADMIN.textDim}>{c.dlNumber}</SonCell>
-                  <SonCell align="center"><SonBadge color={statusColor(c.dlStatus)}>{c.dlStatus || 'ACTIVE'}</SonBadge></SonCell>
-                  <SonCell>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden min-w-[80px]">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
-                      </div>
-                      <span className="text-[12px] font-mono shrink-0" style={{ color: near ? '#f59e0b' : ADMIN.textDim }}>
-                        {pts}/{threshold}
-                      </span>
+                <div key={c.id} className="rounded-xl border border-border-base bg-app-card/60 p-3 flex flex-col gap-2.5">
+                  {/* Identity + status */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-bold text-cad-text truncate">{c.firstName} {c.lastName}</div>
+                      <div className="text-[11px] font-mono text-cad-dim">DL {c.dlNumber}</div>
                     </div>
-                  </SonCell>
-                  <SonCell align="right">
-                    <div className="inline-flex items-center gap-1.5 justify-end flex-wrap">
-                      <Select style={{ ...SON_INPUT, padding: '6px 10px', width: 170 }}
-                        value={selViolation[c.id] || stored.schedule[0]?.id || ''}
-                        onChange={e => setSelViolation(p => ({ ...p, [c.id]: e.target.value }))}>
-                        {stored.schedule.map(v => <option key={v.id} value={v.id}>{v.label} (+{v.points})</option>)}
-                      </Select>
-                      <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
-                      <SonIconBtn icon={MdRestartAlt} title="Reset points" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }} />
-                      {c.dlStatus === 'SUSPENDED' ? (
-                        <SonIconBtn icon={MdLockOpen} title="Reinstate license" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success(`${c.firstName} ${c.lastName} reinstated.`); }} />
-                      ) : (
-                        <SonIconBtn icon={MdBlock} danger title="Suspend license" onClick={() => { dispatch({ type: 'MANUAL_SUSPEND', payload: { civilianId: c.id, reason: 'Manual admin action' } }); toast.success(`${c.firstName} ${c.lastName} suspended.`); }} />
-                      )}
+                    <SonBadge color={statusColor(c.dlStatus)}>{c.dlStatus || 'ACTIVE'}</SonBadge>
+                  </div>
+                  {/* Points bar */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden min-w-[80px]">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
                     </div>
-                  </SonCell>
-                </SonRow>
+                    <span className="text-[12px] font-mono shrink-0" style={{ color: near ? '#f59e0b' : ADMIN.textDim }}>
+                      {pts}/{threshold}
+                    </span>
+                  </div>
+                  {/* Actions — wrap on narrow screens */}
+                  <div className="flex items-stretch gap-2 flex-wrap">
+                    <Select className="flex-1 min-w-[150px]" style={{ ...SON_INPUT, padding: '6px 10px' }}
+                      value={selViolation[c.id] || stored.schedule[0]?.id || ''}
+                      onChange={e => setSelViolation(p => ({ ...p, [c.id]: e.target.value }))}>
+                      {stored.schedule.map(v => <option key={v.id} value={v.id}>{v.label} (+{v.points})</option>)}
+                    </Select>
+                    <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
+                    <SonButton size="sm" variant="ghost" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }}>
+                      <MdRestartAlt size={14} /> Reset
+                    </SonButton>
+                    {suspended ? (
+                      <SonButton size="sm" variant="green" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success(`${c.firstName} ${c.lastName} reinstated.`); }}>
+                        <MdLockOpen size={14} /> Reinstate
+                      </SonButton>
+                    ) : (
+                      <SonButton size="sm" variant="red" onClick={() => { dispatch({ type: 'MANUAL_SUSPEND', payload: { civilianId: c.id, reason: 'Manual admin action' } }); toast.success(`${c.firstName} ${c.lastName} suspended.`); }}>
+                        <MdBlock size={14} /> Suspend
+                      </SonButton>
+                    )}
+                  </div>
+                </div>
               );
             })}
-          </SonTable>
+          </div>
         )}
       </AdminPanel>
     </>
