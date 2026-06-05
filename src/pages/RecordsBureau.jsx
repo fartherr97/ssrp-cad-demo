@@ -240,7 +240,7 @@ const DISP_COLOR = {
   'Plea Deal':       'text-purple-400/75 bg-purple-400/[0.08] border-purple-400/22',
 };
 
-function CollapsibleHistoryCard({ h }) {
+function CollapsibleHistoryCard({ h, onOpenReport }) {
   const [open, setOpen] = useState(false);
   const dispClass = DISP_COLOR[h.disposition] || 'text-slate-400/80 bg-slate-400/[0.07] border-slate-400/20';
   return (
@@ -292,7 +292,46 @@ function CollapsibleHistoryCard({ h }) {
               </>
             )}
             {h.notes && <div className="mt-1 text-[12px] text-slate-400 italic">{h.notes}</div>}
+            {onOpenReport && (
+              <button type="button" onClick={onOpenReport}
+                className="press-sm mt-2 self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-brand/15 border border-brand/30 text-brand-bright hover:bg-brand/25 cursor-pointer transition-all">
+                <MdDescription size={13} /> View Full Report
+              </button>
+            )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Quick-preview warrant: a scannable header that expands to the full warrant. */
+function CollapsibleWarrantCard({ w }) {
+  const active = w.status === 'ACTIVE';
+  const [open, setOpen] = useState(active); // active warrants open by default
+  const sc = active ? '#f87171' : w.status === 'SERVED' ? '#4ade80' : '#94a3b8';
+  return (
+    <div className="flex flex-col bg-app-card/70 border rounded-xl overflow-hidden backdrop-blur-sm"
+      style={{ borderColor: active ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.10)' }}>
+      <button type="button" onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left cursor-pointer"
+        style={{ background: active ? 'rgba(239,68,68,0.05)' : 'transparent', border: 'none' }}>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <MdWarningAmber size={15} className="shrink-0" style={{ color: sc }} />
+          <div className="min-w-0">
+            <div className="text-[12.5px] font-semibold text-slate-200 truncate">{w.charge || w.type || 'Warrant'}</div>
+            <div className="text-[10.5px] text-slate-500">{w.type || 'Warrant'}{w.issuedDate || w.date ? ` · ${w.issuedDate || w.date}` : ''}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded border"
+            style={{ color: sc, background: `${sc}14`, borderColor: `${sc}40` }}>{w.status || 'ACTIVE'}</span>
+          <MdExpandMore className={`text-slate-600 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} style={{ fontSize: 16 }} />
+        </div>
+      </button>
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <div className="px-3 pb-3 pt-1"><RecordReturn type="WARRANT" data={w} /></div>
         </div>
       </div>
     </div>
@@ -434,6 +473,7 @@ export default function RecordsBureau() {
   const [selected, setSelected]     = useState(null); // for PERSON/VEHICLE/WARRANT: id; for CASES: "report:id" | "record:id"
   const [tab, setTab]               = useState('SUMMARY');
   const [lightbox, setLightbox]     = useState(null);  // full-screen image URL
+  const [previewItem, setPreviewItem] = useState(null); // report/record opened from criminal history
   const [searched, setSearched]     = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
@@ -1204,17 +1244,23 @@ export default function RecordsBureau() {
                     </div>
                     {civHistory.length === 0
                       ? <div className="text-slate-500 text-[12px] p-4 text-center">No criminal history on file</div>
-                      : civHistory.map(h => (
-                        <CollapsibleHistoryCard key={h.id} h={h} />
-                      ))}
+                      : civHistory.map(h => {
+                        const linkedReport = reports.find(r => r.caseNumber === h.caseNumber);
+                        const linkedRecord = !linkedReport && records.find(r => (r.caseNumber || r.recordNumber) === h.caseNumber);
+                        const linked = linkedReport || linkedRecord;
+                        return (
+                          <CollapsibleHistoryCard key={h.id} h={h}
+                            onOpenReport={linked ? () => setPreviewItem({ ...linked, _kind: linkedReport ? 'report' : 'record' }) : null} />
+                        );
+                      })}
                   </div>
                 )}
 
                 {tab === 'WARRANTS' && selCiv && (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2.5">
                     {civWarrants.length === 0
                       ? <div className="text-slate-500 text-[12px] p-4 text-center">No warrants on file</div>
-                      : civWarrants.map(w => <RecordReturn key={w.id} type="WARRANT" data={w} />)}
+                      : civWarrants.map(w => <CollapsibleWarrantCard key={w.id} w={w} />)}
                   </div>
                 )}
 
@@ -1341,6 +1387,28 @@ export default function RecordsBureau() {
         </div>
       </div>
       {lightbox && <ImageLightbox url={lightbox} onClose={() => setLightbox(null)} />}
+
+      {/* Quick-read report/record opened from a criminal-history entry */}
+      <Modal
+        open={!!previewItem}
+        onClose={() => setPreviewItem(null)}
+        title={previewItem ? `${previewItem.type} · ${previewItem.caseNumber || previewItem.recordNumber || ''}`.trim() : ''}
+        icon={MdDescription}
+        maxWidth={920}
+      >
+        {previewItem && (() => {
+          const tpl = previewItem.templateSnapshot
+            || (previewItem._kind === 'report' ? reportTemplates : recordTemplates).find(t => t.name === previewItem.type);
+          const data = { ...(previewItem.formData || {}) };
+          return (
+            <div className="p-4 bg-app-bg/30">
+              {tpl
+                ? <ReportForm template={tpl} data={data} readOnly />
+                : <div className="max-w-[680px] mx-auto"><RecordReturn type="PERSON" data={previewItem} /></div>}
+            </div>
+          );
+        })()}
+      </Modal>
     </div>
   );
 }
