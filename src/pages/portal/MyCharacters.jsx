@@ -302,8 +302,10 @@ export default function MyCharacters() {
             <PortalCard key={c.id} accent="brand" className={isActive ? 'ring-2 ring-brand/60 border-brand/50' : ''}>
               <div className="flex justify-between items-start gap-2.5 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[10px] shrink-0 flex items-center justify-center bg-brand/15 border border-brand/30">
-                    <MdPerson size={22} color="#3d82f0" />
+                  <div className="w-10 h-10 rounded-[10px] shrink-0 overflow-hidden flex items-center justify-center bg-brand/15 border border-brand/30">
+                    {c.profilePhoto
+                      ? <img src={c.profilePhoto} alt="" className="w-full h-full object-cover" />
+                      : <MdPerson size={22} color="#3d82f0" />}
                   </div>
                   <div>
                     <div className="text-base font-extrabold text-slate-100 flex items-center gap-2">
