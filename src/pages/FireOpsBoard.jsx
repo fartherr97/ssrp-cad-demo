@@ -464,20 +464,41 @@ export default function FireOpsBoard() {
       )}
 
       {/* Header stats */}
-      <div className="flex flex-wrap gap-4 lg:gap-6 items-center px-4 py-3 bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 shrink-0">
-        <DeptTag code="HCFR" />
-        {[
-          { label: 'Active', value: fireCalls.length, colorClass: 'text-orange-400' },
-          { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
-          { label: 'Apparatus On Duty', value: fireUnits.length, colorClass: 'text-white' },
-          { label: 'Available', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-emerald-400' },
-          ...(inboundRequests.length > 0 ? [{ label: 'LE Requests', value: inboundRequests.length, colorClass: 'text-red-400' }] : []),
-        ].map(s => (
-          <div key={s.label} className="flex flex-col gap-1 pl-4 border-l border-border-base">
-            <span className={`font-extrabold text-[24px] leading-none tabular-nums ${s.colorClass}`}>{s.value}</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">{s.label}</span>
+      <div className="bg-app-panel/80 border border-border-base rounded-xl backdrop-blur-sm shadow-lg shadow-black/20 shrink-0 px-4 py-3">
+        {/* Mobile layout */}
+        <div className="flex flex-col gap-3 lg:hidden">
+          <DeptTag code="HCFR" />
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: 'Active', value: fireCalls.length, colorClass: 'text-orange-400' },
+              { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
+              { label: 'On Duty', value: fireUnits.length, colorClass: 'text-white' },
+              { label: 'Available', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-emerald-400' },
+              ...(inboundRequests.length > 0 ? [{ label: 'LE Requests', value: inboundRequests.length, colorClass: 'text-red-400' }] : []),
+            ].map(s => (
+              <div key={s.label} className="flex flex-col items-center gap-0.5 bg-app-bg/40 rounded-lg px-2 py-2 border border-border-base/50">
+                <span className={`font-extrabold text-[22px] leading-none tabular-nums ${s.colorClass}`}>{s.value}</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.6px] text-slate-500 text-center leading-tight mt-0.5">{s.label}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        {/* Desktop layout */}
+        <div className="hidden lg:flex flex-wrap gap-6 items-center">
+          <DeptTag code="HCFR" />
+          {[
+            { label: 'Active', value: fireCalls.length, colorClass: 'text-orange-400' },
+            { label: 'P1 Incidents', value: fireCalls.filter(c => c.priority === 1).length, colorClass: 'text-red-400' },
+            { label: 'Apparatus On Duty', value: fireUnits.length, colorClass: 'text-white' },
+            { label: 'Available', value: fireUnits.filter(u => u.status === 'AVAILABLE').length, colorClass: 'text-emerald-400' },
+            ...(inboundRequests.length > 0 ? [{ label: 'LE Requests', value: inboundRequests.length, colorClass: 'text-red-400' }] : []),
+          ].map(s => (
+            <div key={s.label} className="flex flex-col gap-1 pl-4 border-l border-border-base">
+              <span className={`font-extrabold text-[24px] leading-none tabular-nums ${s.colorClass}`}>{s.value}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500">{s.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Incoming Civilian 911 (EMS / Fire routed) */}
