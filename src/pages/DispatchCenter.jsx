@@ -855,14 +855,18 @@ export default function DispatchCenter() {
                     <tr><td colSpan={8}><div className="p-8 text-center text-slate-600 text-[12px]">No active calls</div></td></tr>
                   ) : sortedCalls.map(c => {
                     const priColor = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' }[c.priority] || 'transparent';
+                    const isMyCall = me && c.units.includes(me.unitId);
                     return (
                       <tr key={c.id}
                         className="cursor-pointer transition-colors"
-                        style={{ borderLeft:`3px solid ${priColor}`, borderBottom:'1px solid rgba(255,255,255,0.04)' }}
+                        style={{ borderLeft:`3px solid ${isMyCall ? '#22c55e' : priColor}`, borderBottom:'1px solid rgba(255,255,255,0.04)', background: isMyCall ? 'rgba(34,197,94,0.05)' : undefined }}
                         onMouseEnter={trHoverOn} onMouseLeave={trHoverOff}
                         onClick={() => navigate('/cad/' + c.id)}>
                         <td className="px-4 py-2.5 text-[12.5px] font-mono font-bold text-white whitespace-nowrap">{c.id}</td>
-                        <td className="px-4 py-2.5 text-[12.5px] font-semibold text-white whitespace-nowrap">{c.nature}</td>
+                        <td className="px-4 py-2.5 text-[12.5px] font-semibold text-white whitespace-nowrap">
+                          {c.nature}
+                          {isMyCall && <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-green-500/20 text-green-400 border border-green-500/30">YOU</span>}
+                        </td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-300 max-w-[200px] truncate">{c.location}</td>
                         <td className="px-4 py-2.5 text-[12.5px] text-slate-400 whitespace-nowrap">{c.city}</td>
                         <td className="px-4 py-2.5"><PriBadge p={c.priority} /></td>
@@ -883,15 +887,17 @@ export default function DispatchCenter() {
                 <div className="p-8 text-center text-slate-600 text-[12px]">No active calls</div>
               ) : sortedCalls.map(c => {
                 const priColor = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' }[c.priority] || '#94a3b8';
+                const isMyCall = me && c.units.includes(me.unitId);
                 return (
                   <div key={c.id} onClick={() => navigate('/cad/' + c.id)}
                     className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-white/[0.03] transition-colors"
-                    style={{ borderLeft: `3px solid ${priColor}` }}>
+                    style={{ borderLeft: `3px solid ${isMyCall ? '#22c55e' : priColor}`, background: isMyCall ? 'rgba(34,197,94,0.04)' : undefined }}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
                         <span className="text-[13px] font-bold text-white">{c.nature}</span>
                         <PriBadge p={c.priority} />
                         <CallStatus status={c.status} />
+                        {isMyCall && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-green-500/20 text-green-400 border border-green-500/30">YOUR CALL</span>}
                       </div>
                       <div className="text-[11.5px] text-slate-400 truncate">{c.location}{c.city ? ` · ${c.city}` : ''}</div>
                       <div className="flex items-center gap-3 mt-1">
