@@ -264,7 +264,7 @@ function addAuditEntry(state, action, module) {
   return { auditLog: [entry, ...state.auditLog], nextId: state.nextId + 1 };
 }
 
-function reducer(state, action) {
+function baseReducer(state, action) {
   switch (action.type) {
     case 'CONNECT_DISCORD':
       return { ...state, discordConnected: true, discordAccount: action.payload || state.discordAccount };
@@ -1429,6 +1429,130 @@ function reducer(state, action) {
     default:
       return state;
   }
+}
+
+/* ── Centralized audit layer ──────────────────────────────────────────────
+   Every meaningful mutation is recorded in the Master Audit Log. Reducers that
+   already write their own audit entry are left alone (we detect that by the
+   auditLog reference changing); everything mapped here is auto-logged. Noisy
+   UI-only actions (page switches, read receipts, notification dismissals, duty
+   ticks, radio seen, etc.) are intentionally NOT mapped so the log stays clean. */
+const _civNm = (s, id) => {
+  const c = (s.civilians || []).find(c => c.id === id);
+  return c ? `${c.firstName} ${c.lastName}` : 'a civilian';
+};
+const _s = (v) => (v == null ? '' : String(v));
+
+const AUDIT_MAP = {
+  // Identifiers
+  SAVE_IDENTIFIER:   { module: 'Identifiers', msg: () => 'Saved an identifier' },
+  DELETE_IDENTIFIER: { module: 'Identifiers', msg: () => 'Deleted an identifier' },
+  LOAD_IDENTIFIER:   { module: 'Identifiers', msg: () => 'Switched active identifier' },
+
+  // Dispatch / units
+  UPDATE_CALL:      { module: 'Dispatch', msg: (p) => `Updated call ${_s(p.id)}`.trim() },
+  ASSIGN_UNIT:      { module: 'Dispatch', msg: (p) => `Assigned ${_s(p.unitId || p.unit) || 'a unit'} to call ${_s(p.callId)}`.trim() },
+  DETACH_UNIT:      { module: 'Dispatch', msg: (p) => `Detached ${_s(p.unitId || p.unit) || 'a unit'} from a call` },
+  PANIC:            { module: 'Dispatch', msg: (p) => `PANIC triggered · ${_s(p.unit)} ${_s(p.location)}`.trim() },
+  CLEAR_PANIC:      { module: 'Dispatch', msg: () => 'Cleared an active panic' },
+  SET_STATUS:       { module: 'Units', msg: (p) => `Set own status to ${_s(p) || 'a new status'}` },
+  SET_UNIT_STATUS:  { module: 'Units', msg: (p) => `Set ${_s(p.unitId || p.id) || 'a unit'} status${p.status ? ` to ${p.status}` : ''}` },
+  ADD_UNIT_GROUP:   { module: 'Dispatch', msg: (p) => `Created unit group ${_s(p.name)}`.trim() },
+  UPDATE_UNIT_GROUP:{ module: 'Dispatch', msg: () => 'Updated a unit group' },
+  DELETE_UNIT_GROUP:{ module: 'Dispatch', msg: () => 'Deleted a unit group' },
+
+  // Civilians / vehicles / licenses / medical
+  UPDATE_CIVILIAN:        { module: 'Civilians', msg: (p, s) => `Updated ${_civNm(s, p.id)}` },
+  DELETE_CIVILIAN:        { module: 'Civilians', msg: (p, s) => `Deleted ${_civNm(s, typeof p === 'object' ? p.id : p)}` },
+  ADD_VEHICLE:            { module: 'Vehicles', msg: (p) => `Registered vehicle ${_s(p.plate)}`.trim() },
+  UPDATE_VEHICLE:         { module: 'Vehicles', msg: (p) => `Updated vehicle ${_s(p.plate || p.id)}`.trim() },
+  UPDATE_MEDICAL_PROFILE: { module: 'Medical', msg: (p, s) => `Updated medical profile · ${_civNm(s, p.id)}` },
+  ISSUE_DRIVER_LICENSE:   { module: 'Licenses', msg: (p, s) => `Issued driver license · ${_civNm(s, p.civilianId)}` },
+  RENEW_DRIVER_LICENSE:   { module: 'Licenses', msg: (p, s) => `Renewed driver license · ${_civNm(s, p.civilianId)}` },
+
+  // Records
+  ADD_RECORD:           { module: 'Records', msg: (p) => `Filed ${_s(p.type) || 'a record'}` },
+  UPDATE_RECORD:        { module: 'Records', msg: (p) => `Updated record ${_s(p.id)}`.trim() },
+  UPDATE_RECORD_STATUS: { module: 'Records', msg: (p) => `Set record ${_s(p.id)} status to ${_s(p.status)}` },
+
+  // Penal code
+  UPDATE_CHARGE: { module: 'Penal Code', msg: () => 'Updated a charge' },
+  DELETE_CHARGE: { module: 'Penal Code', msg: () => 'Deleted a charge' },
+
+  // Flag definitions
+  ADD_FLAG_DEF:    { module: 'Flags', msg: (p) => `Created flag definition ${_s(p.name)}`.trim() },
+  UPDATE_FLAG_DEF: { module: 'Flags', msg: (p) => `Updated flag definition ${_s(p.name)}`.trim() },
+  DELETE_FLAG_DEF: { module: 'Flags', msg: () => 'Deleted a flag definition' },
+
+  // Templates
+  ADD_REPORT_TEMPLATE:       { module: 'Templates', msg: (p) => `Created report template ${_s(p.name)}`.trim() },
+  UPDATE_REPORT_TEMPLATE:    { module: 'Templates', msg: (p) => `Updated report template ${_s(p.name)}`.trim() },
+  DELETE_REPORT_TEMPLATE:    { module: 'Templates', msg: () => 'Deleted a report template' },
+  ADD_RECORD_TEMPLATE:       { module: 'Templates', msg: (p) => `Created record template ${_s(p.name)}`.trim() },
+  UPDATE_RECORD_TEMPLATE:    { module: 'Templates', msg: (p) => `Updated record template ${_s(p.name)}`.trim() },
+  DELETE_RECORD_TEMPLATE:    { module: 'Templates', msg: () => 'Deleted a record template' },
+  ADD_CUSTOM_RECORD_TYPE:    { module: 'Templates', msg: () => 'Added a custom record type' },
+  UPDATE_CUSTOM_RECORD_TYPE: { module: 'Templates', msg: () => 'Updated a custom record type' },
+
+  // Admin / customization
+  ADMIN_UPDATE:          { module: 'Customization', msg: (p) => `Updated ${_s(p.key) || 'a setting'}` },
+  ADMIN_REORDER:         { module: 'Customization', msg: (p) => `Reordered ${_s(p.key) || 'entries'}` },
+  UPDATE_DEPARTMENT:     { module: 'Customization', msg: () => 'Updated a department' },
+  SET_HELP_CONTENT:      { module: 'Customization', msg: () => 'Updated help content' },
+  UPDATE_CIVILIAN_FORMS: { module: 'Customization', msg: () => 'Updated civilian forms' },
+  SET_TONE:              { module: 'Customization', msg: () => 'Updated a notification tone' },
+
+  // Business
+  UPDATE_BUSINESS:   { module: 'Business', msg: () => 'Updated a business' },
+  ADD_EMPLOYEE:      { module: 'Business', msg: () => 'Added an employee' },
+  REMOVE_EMPLOYEE:   { module: 'Business', msg: () => 'Removed an employee' },
+  APPROVE_WHITELIST: { module: 'Admin', msg: () => 'Approved a whitelist application' },
+  DENY_WHITELIST:    { module: 'Admin', msg: () => 'Denied a whitelist application' },
+
+  // Tow / FDOT / HCFR
+  ADD_TOW_JOB:        { module: 'Tow', msg: () => 'Created a tow job' },
+  UPDATE_TOW_JOB:     { module: 'Tow', msg: () => 'Updated a tow job' },
+  CANCEL_TOW_JOB:     { module: 'Tow', msg: () => 'Cancelled a tow job' },
+  ADD_TOW_UNIT:       { module: 'Tow', msg: () => 'Tow unit signed on' },
+  REMOVE_TOW_UNIT:    { module: 'Tow', msg: () => 'Tow unit signed off' },
+  ADD_FDOT_REQUEST:   { module: 'FDOT', msg: () => 'Submitted an FDOT tow request' },
+  UPDATE_FDOT_REQUEST:{ module: 'FDOT', msg: () => 'Updated an FDOT tow request' },
+  ADD_HCFR_REQUEST:   { module: 'HCFR', msg: () => 'Submitted an HCFR request' },
+  UPDATE_HCFR_REQUEST:{ module: 'HCFR', msg: () => 'Updated an HCFR request' },
+
+  // Messages
+  SEND_DIRECT_MESSAGE: { module: 'Messages', msg: (p) => `Sent a message to ${_s(p.toName) || 'an officer'}` },
+  CREATE_GROUP_THREAD: { module: 'Messages', msg: () => 'Started a group message' },
+  SEND_GROUP_REPLY:    { module: 'Messages', msg: () => 'Replied to a group thread' },
+  NOTIFICATION_BLAST:  { module: 'Messages', msg: (p) => `Sent a notification blast: ${_s(p.title)}`.trim() },
+
+  // Case files
+  UPDATE_CASE_FILE:    { module: 'Case Files', msg: () => 'Updated a case file' },
+  REOPEN_CASE_FILE:    { module: 'Case Files', msg: () => 'Reopened a case file' },
+  ADD_CASE_NOTE:       { module: 'Case Files', msg: () => 'Added a case note' },
+  LINK_CASE_SUBJECT:   { module: 'Case Files', msg: () => 'Linked a subject to a case' },
+  UNLINK_CASE_SUBJECT: { module: 'Case Files', msg: () => 'Unlinked a subject from a case' },
+  LINK_CASE_VEHICLE:   { module: 'Case Files', msg: () => 'Linked a vehicle to a case' },
+  UNLINK_CASE_VEHICLE: { module: 'Case Files', msg: () => 'Unlinked a vehicle from a case' },
+};
+
+function reducer(state, action) {
+  const next = baseReducer(state, action);
+  // No-op, unmapped, or the reducer already wrote its own audit entry → leave it.
+  if (next === state || !AUDIT_MAP[action.type] || next.auditLog !== state.auditLog) return next;
+  const meta = AUDIT_MAP[action.type];
+  let text;
+  try { text = meta.msg(action.payload || {}, state, next); } catch { text = null; }
+  if (!text) return next;
+  const user = state.currentUser || next.currentUser;
+  const entry = {
+    id: next.nextId,
+    user: user ? `${user.name} (${user.badge || user.role})` : 'System',
+    action: text,
+    timestamp: new Date().toLocaleString(),
+    module: meta.module,
+  };
+  return { ...next, auditLog: [entry, ...next.auditLog], nextId: next.nextId + 1 };
 }
 
 const CADContext = createContext(null);
