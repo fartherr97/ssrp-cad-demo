@@ -104,6 +104,7 @@ const initialState = {
   messageLog: [],
   lastBlast: null,
   notifications: [],
+  wipeBackups: [],   // auto-saved snapshots from admin Wipe Records (restorable)
   audioTones: { toastUrl: null, toastName: null, panicUrl: null, panicName: null },
   customRecordTypes: CUSTOM_RECORD_TYPES,
   towLogs: TOW_LOGS,
@@ -643,22 +644,85 @@ function baseReducer(state, action) {
     }
 
     case 'WIPE': {
-      // Admin "Wipe Records" — permanently clears a data slice.
+      // Admin "Wipe Records" — clears a data slice AND auto-saves a restorable
+      // backup snapshot of exactly what was removed (see wipeBackups).
       const target = action.payload;
       const CLEARABLE = ['civilians', 'vehicles', 'warrants', 'criminalHistory', 'calls', 'dispatchLog', 'towLogs', 'auditLog', 'activeSessions', 'bannedUsers'];
       let next;
-      if (target === 'allReports')        next = { ...state, reports: [] };
-      else if (target === 'allRecords')   next = { ...state, records: [] };
-      else if (typeof target === 'string' && target.startsWith('report:')) next = { ...state, reports: state.reports.filter(r => r.type !== target.slice(7)) };
-      else if (typeof target === 'string' && target.startsWith('record:')) next = { ...state, records: state.records.filter(r => r.type !== target.slice(7)) };
-      else if (target === 'civilianFlags') next = { ...state, civilians: state.civilians.map(c => ({ ...c, flags: [] })) };
-      else if (target === 'licensePoints') next = { ...state, civilians: state.civilians.map(c => ({ ...c, licensePoints: 0 })) };
-      else if (CLEARABLE.includes(target)) next = { ...state, [target]: [] };
-      else return state;
+      let backup;   // { label, count, payload }
+      if (target === 'allReports') {
+        backup = { label: 'All Reports', count: state.reports.length, payload: { type: 'reports', items: state.reports } };
+        next = { ...state, reports: [] };
+      } else if (target === 'allRecords') {
+        backup = { label: 'All Records', count: state.records.length, payload: { type: 'records', items: state.records } };
+        next = { ...state, records: [] };
+      } else if (typeof target === 'string' && target.startsWith('report:')) {
+        const name = target.slice(7);
+        const removed = state.reports.filter(r => r.type === name);
+        backup = { label: `Reports · ${name}`, count: removed.length, payload: { type: 'reports', items: removed } };
+        next = { ...state, reports: state.reports.filter(r => r.type !== name) };
+      } else if (typeof target === 'string' && target.startsWith('record:')) {
+        const name = target.slice(7);
+        const removed = state.records.filter(r => r.type === name);
+        backup = { label: `Records · ${name}`, count: removed.length, payload: { type: 'records', items: removed } };
+        next = { ...state, records: state.records.filter(r => r.type !== name) };
+      } else if (target === 'civilianFlags') {
+        const map = {}; let count = 0;
+        state.civilians.forEach(c => { if ((c.flags || []).length) { map[c.id] = c.flags; count += c.flags.length; } });
+        backup = { label: 'Civilian Flags', count, payload: { type: 'civFlags', map } };
+        next = { ...state, civilians: state.civilians.map(c => ({ ...c, flags: [] })) };
+      } else if (target === 'licensePoints') {
+        const map = {}; let count = 0;
+        state.civilians.forEach(c => { if (c.licensePoints) { map[c.id] = c.licensePoints; count++; } });
+        backup = { label: 'License Points', count, payload: { type: 'civPoints', map } };
+        next = { ...state, civilians: state.civilians.map(c => ({ ...c, licensePoints: 0 })) };
+      } else if (CLEARABLE.includes(target)) {
+        const items = state[target] || [];
+        backup = { label: target, count: items.length, payload: { type: 'slice', key: target, items } };
+        next = { ...state, [target]: [] };
+      } else return state;
+
+      const entry = {
+        id: `bk_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+        time: new Date().toLocaleString(),
+        target,
+        label: backup.label,
+        count: backup.count,
+        payload: backup.payload,
+      };
+      const base = { ...next, wipeBackups: [entry, ...(state.wipeBackups || [])].slice(0, 25) };
       // Log the wipe (skip when we just cleared the audit log itself).
-      if (target === 'auditLog') return next;
-      return { ...next, ...addAuditEntry(next, `Wiped ${target}`, 'Admin') };
+      if (target === 'auditLog') return base;
+      return { ...base, ...addAuditEntry(base, `Wiped ${target} · backup saved (${backup.count})`, 'Admin') };
     }
+
+    case 'RESTORE_BACKUP': {
+      const bk = (state.wipeBackups || []).find(b => b.id === action.payload);
+      if (!bk) return state;
+      const p = bk.payload;
+      let next = state;
+      if (p.type === 'slice') {
+        const cur = state[p.key] || [];
+        const ids = new Set(cur.map(x => x.id));
+        next = { ...state, [p.key]: [...p.items.filter(x => !ids.has(x.id)), ...cur] };
+      } else if (p.type === 'reports') {
+        const ids = new Set(state.reports.map(r => r.id));
+        next = { ...state, reports: [...state.reports, ...p.items.filter(r => !ids.has(r.id))] };
+      } else if (p.type === 'records') {
+        const ids = new Set(state.records.map(r => r.id));
+        next = { ...state, records: [...state.records, ...p.items.filter(r => !ids.has(r.id))] };
+      } else if (p.type === 'civFlags') {
+        next = { ...state, civilians: state.civilians.map(c => p.map[c.id] ? { ...c, flags: p.map[c.id] } : c) };
+      } else if (p.type === 'civPoints') {
+        next = { ...state, civilians: state.civilians.map(c => p.map[c.id] != null ? { ...c, licensePoints: p.map[c.id] } : c) };
+      }
+      const wipeBackups = (state.wipeBackups || []).filter(b => b.id !== bk.id);
+      const audit = addAuditEntry({ ...next, wipeBackups }, `Restored backup · ${bk.label} (${bk.count})`, 'Admin');
+      return { ...next, wipeBackups, ...audit };
+    }
+
+    case 'DELETE_BACKUP':
+      return { ...state, wipeBackups: (state.wipeBackups || []).filter(b => b.id !== action.payload) };
 
     case 'ADD_LICENSE_POINTS': {
       // Accumulate points on a driver; auto-suspend (and re-suspend for longer)

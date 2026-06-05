@@ -5,7 +5,7 @@ import { AdminContent } from './AdminKit';
 import {
   MdPeople, MdFingerprint, MdVpnKey, MdBrush, MdInventory2, MdShield,
   MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
-  MdHourglassBottom, MdLayers, MdKey, MdLock, MdDelete,
+  MdHourglassBottom, MdLayers, MdKey, MdLock,
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
@@ -56,7 +56,6 @@ const GROUPS = [
       { icon: MdLayers,          label: 'Wipe Records',    route: '/admin/wipe',            permKey: 'wipeRecords'    },
       { icon: MdKey,             label: 'Community ID',    route: '/admin/community-id'                               },
       { icon: MdLock,            label: 'Authenticate',    route: '/admin/authenticate'                               },
-      { icon: MdDelete,          label: 'Transfer/Delete', route: '/admin/transfer'                                   },
     ],
   },
 ];

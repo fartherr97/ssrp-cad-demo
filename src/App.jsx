@@ -66,7 +66,6 @@ import Limits from './pages/admin/sections/Limits';
 import WipeRecords from './pages/admin/sections/WipeRecords';
 import CommunityId from './pages/admin/sections/CommunityId';
 import Authenticate from './pages/admin/sections/Authenticate';
-import Transfer from './pages/admin/sections/Transfer';
 import CommunityInfo from './pages/admin/sections/CommunityInfo';
 import Geographical from './pages/admin/sections/Geographical';
 import StatusCodes from './pages/admin/sections/StatusCodes';
@@ -179,7 +178,6 @@ function CADApp() {
           <Route path="wipe"               element={<WipeRecords />} />
           <Route path="community-id"       element={<CommunityId />} />
           <Route path="authenticate"       element={<Authenticate />} />
-          <Route path="transfer"           element={<Transfer />} />
           <Route path="businesses"         element={<AdminBusinesses />} />
           <Route path="community-info"     element={<CommunityInfo />} />
           <Route path="geographical"       element={<Geographical />} />

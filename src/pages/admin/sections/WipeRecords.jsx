@@ -1,7 +1,7 @@
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
-import { AdminPageTitle, AdminPanel } from '../AdminKit';
-import { MdDeleteForever, MdWarningAmber } from 'react-icons/md';
+import { AdminPageTitle, AdminPanel, SonButton, SonIconBtn } from '../AdminKit';
+import { MdDeleteForever, MdWarningAmber, MdRestore, MdDownload, MdClose, MdHistory } from 'react-icons/md';
 
 const CORE_TYPES = [
   { key: 'civilians',       label: 'Civilian Characters' },
@@ -20,9 +20,9 @@ const CORE_TYPES = [
 
 function WipeBtn({ label, onWipe, toast }) {
   const handle = () => {
-    if (window.confirm(`Permanently delete ALL "${label}" records? This cannot be undone.`)) {
+    if (window.confirm(`Delete ALL "${label}" records? A restorable backup is saved automatically.`)) {
       onWipe();
-      toast.warning(`${label} wiped.`);
+      toast.warning(`${label} wiped · backup saved.`);
     }
   };
   return (
@@ -46,10 +46,24 @@ function WipeGrid({ children }) {
 
 export default function WipeRecords() {
   const { state, dispatch } = useCAD();
-  const { reportTemplates = [], recordTemplates = [] } = state;
+  const { reportTemplates = [], recordTemplates = [], wipeBackups = [] } = state;
   const toast = useToast();
 
   const wipe = (target) => dispatch({ type: 'WIPE', payload: target });
+
+  const restore = (b) => {
+    dispatch({ type: 'RESTORE_BACKUP', payload: b.id });
+    toast.success(`Restored ${b.label} (${b.count} item${b.count === 1 ? '' : 's'}).`, { title: 'Backup Restored' });
+  };
+
+  const download = (b) => {
+    const blob = new Blob([JSON.stringify({ ...b, restoredFrom: 'SSRP CAD wipe backup' }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `wipe-backup-${b.target.replace(/[^a-z0-9]+/gi, '-')}-${b.id}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
 
   return (
     <>
@@ -67,6 +81,30 @@ export default function WipeRecords() {
           <span className="font-bold">Destructive action.</span> Wiped records are permanently deleted and cannot be restored. Use with caution.
         </div>
       </div>
+
+      {/* Auto-saved backups */}
+      {wipeBackups.length > 0 && (
+        <AdminPanel title="Auto-Saved Backups" subtitle="Every wipe is snapshotted here — restore re-imports the data or download it as JSON.">
+          <div className="flex flex-col gap-2">
+            {wipeBackups.map(b => (
+              <div key={b.id} className="flex items-center gap-3 rounded-lg px-3 py-2.5 border border-border-base bg-app-card/60 flex-wrap">
+                <MdHistory size={16} className="text-brand-bright shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12.5px] font-semibold text-cad-text truncate">
+                    {b.label} <span className="text-slate-500 font-normal">· {b.count} item{b.count === 1 ? '' : 's'}</span>
+                  </div>
+                  <div className="text-[10.5px] text-slate-500 font-mono">{b.time}</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <SonButton size="sm" variant="green" onClick={() => restore(b)}><MdRestore size={14} /> Restore</SonButton>
+                  <SonIconBtn icon={MdDownload} title="Download JSON" onClick={() => download(b)} />
+                  <SonIconBtn icon={MdClose} danger title="Discard backup" onClick={() => dispatch({ type: 'DELETE_BACKUP', payload: b.id })} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </AdminPanel>
+      )}
 
       {/* Core data types */}
       <AdminPanel title="Core Records" subtitle="Base data stored for your community.">
