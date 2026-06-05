@@ -587,6 +587,8 @@ function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCan
 const FDOT_REQ_META = {
   PENDING:      { label: 'Pending',      color: '#f59e0b' },
   ACKNOWLEDGED: { label: 'Acknowledged', color: '#06b6d4' },
+  DISPATCHED:   { label: 'En Route',     color: '#f59e0b' },
+  ON_SCENE:     { label: 'On Scene',     color: '#22c55e' },
 };
 
 function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
@@ -701,7 +703,7 @@ export default function TowCAD() {
 
   const dispatchedFDOTRequests = useMemo(
     () => fdotRequests.filter(r => {
-      if (r.status !== 'DISPATCHED') return false;
+      if (r.status !== 'DISPATCHED' && r.status !== 'ON_SCENE') return false;
       if (!activeBizCompany) return false;
       if (r.targetCompanyId) return r.targetCompanyId === activeBizCompany.id;
       return !!activeBizCompany.isFDOT;
@@ -716,6 +718,8 @@ export default function TowCAD() {
   const [formInitial,    setFormInitial]    = useState(null);
   const [pendingReqId,   setPendingReqId]   = useState(null);
   const [dispatchingReq, setDispatchingReq] = useState(null);
+  // { [reqId]: unitId } — tracks the "add unit" picker value per dispatched card
+  const [addFDOTUnits,   setAddFDOTUnits]   = useState({});
 
   const myUnit = useMemo(() =>
     towUnits.find(u =>
@@ -724,6 +728,49 @@ export default function TowCAD() {
     ),
     [towUnits, currentUser]
   );
+
+  const canManageFDOT = !!(myUnit || currentUser?.role === 'admin' || currentUser?.role === 'dispatch');
+
+  // Returns dispatched units as an array — handles both the new array format and
+  // legacy single-unit fields (dispatchedUnitId / dispatchedUnit string).
+  const getDispatchedFDOTUnits = (req) => {
+    if (req?.dispatchedUnits?.length) return req.dispatchedUnits;
+    const unitId = req?.dispatchedUnitId;
+    const unitName = req?.dispatchedUnit;
+    if (unitId || unitName) {
+      const unit = unitId
+        ? towUnits.find(u => u.id === unitId)
+        : towUnits.find(u => u.truckName === unitName);
+      return [{ id: unit?.id ?? unitId ?? unitName, truckName: unit?.truckName || unitName || String(unitId || ''), operatorName: unit?.operatorName || '' }];
+    }
+    return [];
+  };
+
+  const removeUnitFromFDOT = (reqId, unitId) => {
+    const req = fdotRequests.find(r => r.id === reqId);
+    if (!req) return;
+    const remaining = getDispatchedFDOTUnits(req).filter(du => du.id !== unitId);
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: reqId, dispatchedUnits: remaining } });
+    if (remaining.length === 0) {
+      dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: reqId, status: 'PENDING' } });
+    }
+    const u = towUnits.find(u => u.id === unitId);
+    toast.info(`${u?.truckName || unitId} removed from FDOT request.`, { title: 'Unit Removed' });
+  };
+
+  const addUnitToFDOT = (reqId, unitId) => {
+    const req = fdotRequests.find(r => r.id === reqId);
+    const unit = towUnits.find(u => u.id === Number(unitId));
+    if (!req || !unit) return;
+    const current = getDispatchedFDOTUnits(req);
+    if (current.some(du => du.id === unit.id)) return;
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: {
+      id: reqId,
+      dispatchedUnits: [...current, { id: unit.id, truckName: unit.truckName, operatorName: unit.operatorName }],
+    }});
+    setAddFDOTUnits(prev => ({ ...prev, [reqId]: '' }));
+    toast.success(`${unit.truckName} added to FDOT request.`, { title: 'Unit Added' });
+  };
 
   const activeCalls   = useMemo(() => calls.filter(c => c.status !== 'CLOSED'), [calls]);
   // Road Hazard / MVA calls that still have no tow job linked to them. Once a
@@ -847,7 +894,14 @@ export default function TowCAD() {
       },
     });
     dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
-    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DISPATCHED', handledBy: handlingCompany?.name || handlerName(), dispatchedUnit: unit?.truckName || '', dispatchedCompany: handlingCompany?.name || '' } });
+    dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: {
+      id: req.id, status: 'DISPATCHED',
+      handledBy: handlingCompany?.name || handlerName(),
+      dispatchedUnits: [{ id: unitId, truckName: unit?.truckName || '', operatorName: unit?.operatorName || '' }],
+      // legacy compat
+      dispatchedUnit: unit?.truckName || '', dispatchedUnitId: unitId,
+      dispatchedCompany: handlingCompany?.name || '',
+    }});
     toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
     const to = recipientsFor(req);
     if (to.length > 0) {
@@ -924,46 +978,113 @@ export default function TowCAD() {
         </div>
       )}
 
-      {/* Dispatched FDOT assistance requests — en route */}
+      {/* Dispatched / On-Scene FDOT assistance requests */}
       {isTowCompanyView && dispatchedFDOTRequests.length > 0 && (
         <div className="mb-6">
           <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
-            <MdEngineering size={14} /> En Route — FDOT Assistance ({dispatchedFDOTRequests.length})
+            <MdEngineering size={14} /> Active — FDOT Assistance ({dispatchedFDOTRequests.length})
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
             {dispatchedFDOTRequests.map(req => {
-              const unit = towUnits.find(u => u.truckName === req.dispatchedUnit || String(u.id) === String(req.dispatchedUnitId));
+              const m = FDOT_REQ_META[req.status] || FDOT_REQ_META.DISPATCHED;
+              const isOnScene = req.status === 'ON_SCENE';
+              const units = getDispatchedFDOTUnits(req);
+              const pickable = visibleUnits.filter(u => u.status !== 'ON_CALL' && !units.some(du => du.id === u.id));
+              const addVal = addFDOTUnits[req.id] || '';
               return (
                 <div key={req.id} className="bg-app-panel/80 border rounded-xl p-4 flex flex-col gap-3"
-                  style={{ borderColor: 'rgba(245,158,11,0.35)', borderLeft: '3px solid #f59e0b' }}>
+                  style={{ borderColor: `${m.color}55`, borderLeft: `3px solid ${m.color}` }}>
                   <div className="flex justify-between items-start gap-2 flex-wrap">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
-                      style={{ color: '#06b6d4', borderColor: 'rgba(6,182,212,0.35)', background: 'rgba(6,182,212,0.1)' }}>
-                      En Route
+                      style={{ color: m.color, borderColor: `${m.color}55`, background: `${m.color}18` }}>
+                      {m.label}
                     </span>
                     <span className="text-[10px] text-slate-500">{elapsed(req.createdAt)}</span>
                   </div>
+
                   <div className="flex items-center gap-2">
                     <MdEngineering size={16} className="text-amber-400 shrink-0" />
                     <span className="text-[14px] font-extrabold text-slate-100">{req.assistType}</span>
                   </div>
+
                   <div className="flex items-start gap-2">
                     <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
                     <span className="text-xs text-slate-300 leading-relaxed">{req.location}</span>
                   </div>
+
                   {req.description && (
                     <div className="text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
                   )}
-                  <div className="flex items-center gap-2 pt-1 border-t border-border-faint">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                    <span className="text-[12px] font-mono font-bold text-amber-300">{req.dispatchedUnit || '—'}</span>
-                    {req.dispatchedCompany && <span className="text-[11px] text-slate-400">· {req.dispatchedCompany}</span>}
+
+                  {/* Units list */}
+                  <div className="border-t border-border-faint pt-2 flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-[9.5px] font-bold uppercase tracking-[0.6px] text-slate-500">Units ({units.length})</span>
+                      {canManageFDOT && units.length > 0 && (
+                        <span className="ml-auto text-[9px] font-bold uppercase tracking-wide text-slate-600">tap ✕ to remove</span>
+                      )}
+                    </div>
+                    {units.map(du => (
+                      <div key={du.id} className="flex items-center gap-2 bg-app-elevated border border-border-base rounded-lg pl-2.5 pr-1.5 py-1.5">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${isOnScene ? 'bg-green-400' : 'bg-amber-400'}`} />
+                        <span className="text-[12px] font-mono font-bold text-amber-300 leading-none">{du.truckName}</span>
+                        {du.operatorName && <span className="text-[11px] text-slate-400 flex-1 min-w-0 truncate">{du.operatorName}</span>}
+                        {canManageFDOT && (
+                          <button
+                            onClick={() => removeUnitFromFDOT(req.id, du.id)}
+                            title={`Remove ${du.truckName}`}
+                            className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-md text-slate-500 hover:text-red-300 hover:bg-red-500/15 cursor-pointer transition-colors"
+                            style={{ background: 'none', border: 'none' }}>
+                            <MdClose size={13} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Add unit picker */}
+                    {canManageFDOT && pickable.length > 0 && (
+                      <div className="flex gap-2 mt-1">
+                        <select
+                          value={addVal}
+                          onChange={e => setAddFDOTUnits(prev => ({ ...prev, [req.id]: e.target.value }))}
+                          className="flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-2.5 py-1.5 text-[12px] text-slate-200 outline-none focus:border-orange-500/50 cursor-pointer">
+                          <option value="">Add unit…</option>
+                          {pickable.map(u => (
+                            <option key={u.id} value={u.id}>{u.truckName} — {u.operatorName}</option>
+                          ))}
+                        </select>
+                        <button
+                          disabled={!addVal}
+                          onClick={() => addUnitToFDOT(req.id, addVal)}
+                          className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11.5px] font-bold cursor-pointer transition-colors border disabled:opacity-40 disabled:cursor-not-allowed"
+                          style={{
+                            background: addVal ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.05)',
+                            color: addVal ? '#fb923c' : '#64748b',
+                            borderColor: addVal ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)',
+                          }}>
+                          <MdAdd size={14} /> Add
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <button
-                    onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'COMPLETED' } })}
-                    className="btn-glossy inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap w-full mt-1">
-                    <MdCheckCircle size={14} className="shrink-0" /> Mark Complete
-                  </button>
+
+                  {/* Status actions */}
+                  {canManageFDOT && (
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {!isOnScene && (
+                        <button
+                          onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ON_SCENE' } })}
+                          className="btn-glossy flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-orange-400/35 bg-orange-500/15 text-orange-200 hover:bg-orange-500/25 whitespace-nowrap">
+                          <MdCheckCircle size={14} className="shrink-0" /> Units On Scene
+                        </button>
+                      )}
+                      <button
+                        onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'COMPLETED' } })}
+                        className="btn-glossy flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap">
+                        <MdCheckCircle size={14} className="shrink-0" /> Mark Complete
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

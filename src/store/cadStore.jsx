@@ -1022,6 +1022,7 @@ function reducer(state, action) {
       if (prev && action.payload.status && action.payload.status !== prev.status) {
         const verb = {
           ACKNOWLEDGED: 'acknowledged', DISPATCHED: 'dispatched a unit for',
+          ON_SCENE: 'marked units on scene for',
           DECLINED: 'declined', COMPLETED: 'completed',
         }[action.payload.status] || 'updated';
         log = addDispatchLog(
