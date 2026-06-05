@@ -11,6 +11,7 @@ import {
   MdCarCrash, MdLocalHospital,
 } from 'react-icons/md';
 import { templatesForPortal, templateInPortal } from '../utils/templateScope';
+import { validateTemplate } from '../utils/templateValidation';
 import {
   BADGE, S_BTN_SECONDARY, S_BTN_DANGER,
   S_BTN_SUCCESS, S_BTN_SUBMIT, xs,
@@ -167,6 +168,9 @@ export default function ReportsCenter() {
 
   const submitReport = () => {
     if (!selectedTemplate) return;
+    // Enforce the template's required / unique field rules before filing.
+    const valid = validateTemplate(selectedTemplate, formValues, reports.filter(r => r.type === selectedTemplate.name));
+    if (!valid.ok) { toast.error(valid.error, { title: 'Cannot Submit' }); return; }
     // Sequential report number * the store stamps the authoritative value; we
     // mirror it here for the confirmation toast.
     const caseNum = String(reportSeq).padStart(4, '0');

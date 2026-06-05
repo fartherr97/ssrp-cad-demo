@@ -812,6 +812,19 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
     setTimeout(() => setSaved(false), 1600);
   };
 
+  // Which portals can file/see this template. Untagged = the default LEO +
+  // Dispatch scope (templateScope.js); tagging others routes it there too.
+  const PORTAL_CHOICES = [['leo', 'Law Enforcement'], ['dispatch', 'Dispatch'], ['fire', 'Fire & EMS']];
+  const portalOn = (id) => (Array.isArray(draft.portals) && draft.portals.length)
+    ? draft.portals.includes(id)
+    : (id === 'leo' || id === 'dispatch');
+  const togglePortal = (id) => {
+    const base = (Array.isArray(draft.portals) && draft.portals.length) ? draft.portals : ['leo', 'dispatch'];
+    const next = base.includes(id) ? base.filter(p => p !== id) : [...base, id];
+    const isDefault = next.length === 2 && next.includes('leo') && next.includes('dispatch');
+    up({ portals: (next.length === 0 || isDefault) ? undefined : next });
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#0b1424' }}>
 
@@ -850,6 +863,25 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
                 Show Department
               </span>
             </label>
+          </div>
+          {/* Portal visibility — which portals can file / see this template */}
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+            <span className="text-[9px] font-bold uppercase tracking-[0.5px] mr-0.5" style={{ color: '#4a7ba7' }}>Visible To</span>
+            {PORTAL_CHOICES.map(([id, label]) => {
+              const on = portalOn(id);
+              return (
+                <button key={id} type="button" onClick={() => togglePortal(id)}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-bold border cursor-pointer transition-colors"
+                  style={on
+                    ? { color: '#3d82f0', background: 'rgba(61,130,240,0.15)', borderColor: 'rgba(61,130,240,0.4)' }
+                    : { color: '#5a6678', background: 'transparent', borderColor: 'rgba(255,255,255,0.1)' }}>
+                  {label}
+                </button>
+              );
+            })}
+            {(!Array.isArray(draft.portals) || !draft.portals.length) && (
+              <span className="text-[9px] italic" style={{ color: '#3d5470' }}>default · LEO + Dispatch</span>
+            )}
           </div>
         </div>
         <div className="flex gap-2 shrink-0">

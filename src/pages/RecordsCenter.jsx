@@ -9,6 +9,7 @@ import {
   MdAssignment,
 } from 'react-icons/md';
 import { templatesForPortal, templateInPortal } from '../utils/templateScope';
+import { validateTemplate } from '../utils/templateValidation';
 import {
   BADGE, S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_SUBMIT, xs,
 } from '../constants/styles';
@@ -111,6 +112,9 @@ export default function RecordsCenter() {
 
   const submitRecord = () => {
     if (!selectedTemplate) return;
+    // Enforce the template's required / unique field rules before filing.
+    const valid = validateTemplate(selectedTemplate, formValues, records.filter(r => r.type === selectedTemplate.name));
+    if (!valid.ok) { toast.error(valid.error, { title: 'Cannot Submit' }); return; }
     // Shares the global sequential report number * store stamps the value.
     const recNum = String(reportSeq).padStart(4, '0');
     dispatch({
