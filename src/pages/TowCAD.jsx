@@ -699,6 +699,16 @@ export default function TowCAD() {
     [fdotRequests, activeBizCompany],
   );
 
+  const dispatchedFDOTRequests = useMemo(
+    () => fdotRequests.filter(r => {
+      if (r.status !== 'DISPATCHED') return false;
+      if (!activeBizCompany) return false;
+      if (r.targetCompanyId) return r.targetCompanyId === activeBizCompany.id;
+      return !!activeBizCompany.isFDOT;
+    }),
+    [fdotRequests, activeBizCompany],
+  );
+
   const [showForm,       setShowForm]       = useState(false);
   const [showSignOn,     setShowSignOn]     = useState(false);
   const [statusFilter,   setStatus]         = useState('ALL');
@@ -910,6 +920,53 @@ export default function TowCAD() {
                 onDispatch={dispatchFromRequest}
                 onDecline={declineRequest} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Dispatched FDOT assistance requests — en route */}
+      {isTowCompanyView && dispatchedFDOTRequests.length > 0 && (
+        <div className="mb-6">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
+            <MdEngineering size={14} /> En Route — FDOT Assistance ({dispatchedFDOTRequests.length})
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
+            {dispatchedFDOTRequests.map(req => {
+              const unit = towUnits.find(u => u.truckName === req.dispatchedUnit || String(u.id) === String(req.dispatchedUnitId));
+              return (
+                <div key={req.id} className="bg-app-panel/80 border rounded-xl p-4 flex flex-col gap-3"
+                  style={{ borderColor: 'rgba(245,158,11,0.35)', borderLeft: '3px solid #f59e0b' }}>
+                  <div className="flex justify-between items-start gap-2 flex-wrap">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                      style={{ color: '#06b6d4', borderColor: 'rgba(6,182,212,0.35)', background: 'rgba(6,182,212,0.1)' }}>
+                      En Route
+                    </span>
+                    <span className="text-[10px] text-slate-500">{elapsed(req.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MdEngineering size={16} className="text-amber-400 shrink-0" />
+                    <span className="text-[14px] font-extrabold text-slate-100">{req.assistType}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MdLocationOn size={14} className="text-slate-500 shrink-0 mt-0.5" />
+                    <span className="text-xs text-slate-300 leading-relaxed">{req.location}</span>
+                  </div>
+                  {req.description && (
+                    <div className="text-xs text-slate-400 leading-relaxed border-t border-border-faint pt-2">{req.description}</div>
+                  )}
+                  <div className="flex items-center gap-2 pt-1 border-t border-border-faint">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                    <span className="text-[12px] font-mono font-bold text-amber-300">{req.dispatchedUnit || '—'}</span>
+                    {req.dispatchedCompany && <span className="text-[11px] text-slate-400">· {req.dispatchedCompany}</span>}
+                  </div>
+                  <button
+                    onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'COMPLETED' } })}
+                    className="btn-glossy inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap w-full mt-1">
+                    <MdCheckCircle size={14} className="shrink-0" /> Mark Complete
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

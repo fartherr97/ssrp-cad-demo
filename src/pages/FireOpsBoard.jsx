@@ -363,6 +363,7 @@ export default function FireOpsBoard() {
   const { isMobile } = useResponsive();
   const { calls, officers, currentUser, hcfrRequests = [], incoming911HCFR = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
+  const [selectedReq,  setSelectedReq]  = useState(null); // dispatched LE request id
   const [mobileView, setMobileView] = useState('INCIDENTS'); // 'INCIDENTS' | 'DETAIL' | 'ROSTER'
   const me = officers.find(o => o.id === currentUser?.id);
   // HCFR field members land on their own status / self-dispatch tab.
@@ -376,6 +377,12 @@ export default function FireOpsBoard() {
 
   const handleSelectCall = (id) => {
     setSelectedCall(id);
+    setSelectedReq(null);
+    if (isMobile) setMobileView('DETAIL');
+  };
+  const handleSelectReq = (id) => {
+    setSelectedReq(id);
+    setSelectedCall(null);
     if (isMobile) setMobileView('DETAIL');
   };
 
@@ -388,6 +395,11 @@ export default function FireOpsBoard() {
     () => hcfrRequests.filter(r => r.status === 'PENDING' || r.status === 'ACKNOWLEDGED'),
     [hcfrRequests]
   );
+  const dispatchedRequests = useMemo(
+    () => hcfrRequests.filter(r => r.status === 'DISPATCHED'),
+    [hcfrRequests]
+  );
+  const selReq = selectedReq ? hcfrRequests.find(r => r.id === selectedReq) : null;
 
   const availableUnits = useMemo(
     () => fireUnits.filter(u => u.status === 'AVAILABLE'),
@@ -434,7 +446,9 @@ export default function FireOpsBoard() {
     if (req.callId) {
       dispatch({ type: 'ASSIGN_UNIT', payload: { callId: req.callId, unitId: unit?.unitId || String(unitId) } });
     }
-    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DISPATCHED' } });
+    dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DISPATCHED', dispatchedUnitId: unitId, dispatchedUnitIdStr: unit?.unitId || String(unitId) } });
+    // Auto-select the dispatched request in the detail panel.
+    handleSelectReq(req.id);
     toast.success(`${unit?.name || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
     dispatch({
       type: 'DISPATCH_RADIO',
@@ -570,8 +584,8 @@ export default function FireOpsBoard() {
       {isMobile && (
         <div className="flex shrink-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
           {[
-            { id: 'INCIDENTS', label: 'Incidents', badge: fireCalls.length },
-            { id: 'DETAIL',    label: 'Incident',  badge: selectedCall ? 1 : 0 },
+            { id: 'INCIDENTS', label: 'Incidents', badge: fireCalls.length + dispatchedRequests.length },
+            { id: 'DETAIL',    label: 'Incident',  badge: (selectedCall || selectedReq) ? 1 : 0 },
             { id: 'ROSTER',    label: 'Roster',    badge: 0 },
           ].map(t => (
             <button key={t.id} onClick={() => setMobileView(t.id)}
@@ -594,12 +608,13 @@ export default function FireOpsBoard() {
         <div className={`${S_PANEL} ${isMobile && mobileView !== 'INCIDENTS' ? 'hidden' : ''}`}>
           <div className={S_PANEL_HEADER}>
             <div className={S_PANEL_TITLE}>Active Incidents</div>
-            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 text-[11px] font-bold leading-none">{fireCalls.length}</span>
+            <span className="ml-auto px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 text-[11px] font-bold leading-none">{fireCalls.length + dispatchedRequests.length}</span>
           </div>
           <div className={`${S_PANEL_BODY} p-2.5 gap-2`}>
-            {fireCalls.length === 0 ? (
+            {fireCalls.length === 0 && dispatchedRequests.length === 0 ? (
               <div className="p-8 text-center text-slate-600 text-[12px]">No active fire/EMS incidents</div>
-            ) : fireCalls.sort((a,b) => a.priority - b.priority).map(c => {
+            ) : null}
+            {fireCalls.sort((a,b) => a.priority - b.priority).map(c => {
               const on = selectedCall === c.id;
               const priLeft = { 1:'border-l-red-500', 2:'border-l-orange-500', 3:'border-l-yellow-500', 4:'border-l-emerald-500' }[c.priority] || 'border-l-border-base';
               return (
@@ -623,12 +638,40 @@ export default function FireOpsBoard() {
                 </div>
               );
             })}
+
+            {/* Dispatched LE Assistance requests */}
+            {dispatchedRequests.length > 0 && (
+              <>
+                <div className="text-[9.5px] font-bold uppercase tracking-[0.7px] text-blue-400/70 px-1 pt-1 pb-0.5 border-t border-border-faint mt-1">
+                  LE Assistance — En Route
+                </div>
+                {dispatchedRequests.map(req => {
+                  const on = selectedReq === req.id;
+                  const unit = fireUnits.find(u => u.id === req.dispatchedUnitId);
+                  const unitLabel = unit?.unitId || req.dispatchedUnitIdStr || '—';
+                  return (
+                    <div key={req.id}
+                      className={`rounded-xl border border-l-[3px] border-l-blue-500 p-3 cursor-pointer transition-all backdrop-blur-sm ${on ? 'bg-blue-500/15 border-blue-500/40' : 'bg-app-card/70 border-border-base hover:bg-white/[0.05]'}`}
+                      onClick={() => handleSelectReq(req.id)}>
+                      <div className="flex gap-1.5 mb-1.5 items-center">
+                        <MdShield size={12} className="text-blue-400 shrink-0" />
+                        <span className="text-[10px] font-bold text-blue-400">LE ASSIST</span>
+                        <span className={`${BADGE.gray} ml-auto`}>ENRT</span>
+                      </div>
+                      <div className="text-[13px] font-semibold text-white mb-0.5">{req.assistType}</div>
+                      <div className="text-[11.5px] text-slate-400">{req.location}</div>
+                      <div className="text-[10px] font-mono mt-1 text-emerald-400">{unitLabel} en route</div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         </div>
 
         {/* Incident Detail */}
         <div className={`${S_PANEL} ${isMobile && mobileView !== 'DETAIL' ? 'hidden' : ''}`}>
-          {!selCall ? (
+          {!selCall && !selReq ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-600 p-6">
               <span className="text-[48px] opacity-25">🔥</span>
               <div className="text-center">
@@ -642,6 +685,73 @@ export default function FireOpsBoard() {
                 )}
               </div>
             </div>
+          ) : selReq ? (
+            /* ── LE Assistance Request Detail ── */
+            <>
+              <div className={S_PANEL_HEADER}>
+                {isMobile && (
+                  <button onClick={() => setMobileView('INCIDENTS')}
+                    className="text-orange-400 text-[11px] font-bold flex items-center gap-1 shrink-0 mr-2 hover:text-orange-300 transition-colors"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                    ← Back
+                  </button>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-bold uppercase tracking-[0.7px] text-blue-300 truncate flex items-center gap-1.5">
+                    <MdShield size={13} /> LE Assistance · {selReq.assistType}
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">{elapsed(selReq.createdAt)}</div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 shrink-0">ENRT</span>
+              </div>
+              <div className={`${S_PANEL_BODY} p-4 gap-4`}>
+                <div className={`${S_CARD} border-l-[3px] border-l-blue-500`}>
+                  <div className={S_LABEL}>Location</div>
+                  <div className="text-[13px] font-semibold text-white">{selReq.location}</div>
+                  {selReq.postal && <div className="text-[11.5px] text-slate-400 font-mono">Postal {selReq.postal}</div>}
+                </div>
+
+                <div className={S_CARD}>
+                  <div className={S_LABEL}>Details</div>
+                  <div className="text-[12.5px] text-slate-300 leading-relaxed">{selReq.description}</div>
+                </div>
+
+                <div className={S_CARD}>
+                  <div className={S_LABEL}>En Route Apparatus</div>
+                  {(() => {
+                    const unit = fireUnits.find(u => u.id === selReq.dispatchedUnitId);
+                    const label = unit?.unitId || selReq.dispatchedUnitIdStr || '—';
+                    return (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                        <span className="text-[13px] font-mono font-bold text-orange-400">{label}</span>
+                        {unit && <span className="text-[12px] text-slate-300">{unit.name}</span>}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {selReq.requestedBy && (
+                  <div className={S_CARD}>
+                    <div className={S_LABEL}>Requested By</div>
+                    <div className="text-[12.5px] text-slate-300">
+                      {selReq.requestedBy}{selReq.requestedByUnit ? ` · ${selReq.requestedByUnit}` : ''}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-1.5">
+                  <button
+                    className={sm(S_BTN_SECONDARY)}
+                    onClick={() => {
+                      dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: selReq.id, status: 'COMPLETED' } });
+                      setSelectedReq(null);
+                    }}>
+                    Mark Complete
+                  </button>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div className={S_PANEL_HEADER}>
