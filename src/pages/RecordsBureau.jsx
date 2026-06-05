@@ -239,11 +239,15 @@ function InvestigationFlag({ cases, onTip }) {
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [], adminTiers = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
-  const canManageLicenses = currentUser?.portal === 'admin' || currentUser?.portal === 'leo';
+  const canManageLicenses = currentUser?.portal === 'admin' && (() => {
+    if (!currentUser?.adminTierId) return true; // no tier = full access
+    const tier = adminTiers.find(t => t.id === currentUser.adminTierId);
+    return !!tier?.permissions?.licensePoints;
+  })();
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
