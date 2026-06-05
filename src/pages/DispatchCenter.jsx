@@ -17,7 +17,7 @@ import {
   MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong, MdCampaign,
   MdGpsFixed, MdSos, MdCheckCircle, MdDirectionsCar, MdWarningAmber,
   MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
-  MdPhone, MdSend, MdClose, MdAdd, MdCircle, MdRadio,
+  MdPhone, MdSend, MdClose, MdAdd, MdCircle, MdRadio, MdPerson,
 } from 'react-icons/md';
 import ModifyIdentifier from '../components/ModifyIdentifier';
 
@@ -251,7 +251,7 @@ const NOTIF_COLOR = {
 
 
 /* ─── 911 urgency timer card ─── */
-function IncomingCallCard({ call, onDispatch, onDismiss }) {
+function IncomingCallCard({ call, onDispatch, onDismiss, onRespond }) {
   const [elapsed, setElapsed] = useState('00:00');
   const [urgency, setUrgency] = useState(0);
   useEffect(() => {
@@ -270,7 +270,9 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
   const bdr   = ['rgba(255,255,255,0.07)','rgba(251,146,60,0.35)','rgba(248,113,113,0.45)'][urgency];
   const clr   = ['#94a3b8','#fb923c','#f87171'][urgency];
   return (
-    <div className="rounded-lg p-2.5 flex flex-col gap-1.5" style={{ background: bg, border: `1px solid ${bdr}` }}>
+    <div className={`rounded-lg p-2.5 flex flex-col gap-1.5 ${onRespond ? 'cursor-pointer hover:brightness-110 transition-all' : ''}`}
+      style={{ background: bg, border: `1px solid ${bdr}` }}
+      onClick={onRespond || undefined}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="text-[12px] font-semibold text-white leading-snug line-clamp-2">{call.message}</div>
@@ -298,16 +300,25 @@ function IncomingCallCard({ call, onDispatch, onDismiss }) {
       )}
       {(onDispatch || onDismiss) && (
         <div className="flex gap-1.5 mt-0.5">
-          <button onClick={onDispatch}
+          <button onClick={e => { e.stopPropagation(); onDispatch(); }}
             className="press flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
             style={{ background: 'rgba(58,136,232,0.22)', border: '1px solid rgba(58,136,232,0.38)', color: '#93c5fd' }}>
             <MdSend size={11} /> Dispatch
           </button>
-          <button onClick={onDismiss}
+          <button onClick={e => { e.stopPropagation(); onDismiss(); }}
             className="px-2 py-1 rounded-md text-slate-500 hover:text-red-400 cursor-pointer transition-colors"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <MdClose size={13} />
           </button>
+        </div>
+      )}
+      {onRespond && (
+        <div className="flex gap-1.5 mt-0.5">
+          <div
+            className="flex-1 flex items-center justify-center gap-1.5 py-1 rounded-md text-[11px] font-semibold"
+            style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', color: '#86efac' }}>
+            <MdPerson size={11} /> Tap to view &amp; respond
+          </div>
         </div>
       )}
     </div>
@@ -409,6 +420,94 @@ function Dispatch911Modal({ call, onClose }) {
   );
 }
 
+/* ─── LEO officer respond to 911 ─── */
+function LEORespondModal({ call, myOfficer, onClose }) {
+  const { state, dispatch } = useCAD();
+  const toast = useToast();
+  const { callNatures = [] } = state;
+  const [nature, setNature] = useState('');
+  const [customNature, setCustomNature] = useState('');
+  const finalNature = nature === '__custom__' ? customNature.trim() : nature;
+
+  const submit = () => {
+    const callNature = finalNature || call.message;
+    dispatch({ type: 'CREATE_CALL', payload: {
+      nature: callNature,
+      location: call.location || '',
+      priority: call.priority || 2,
+      category: 'police',
+      description: call.message,
+      reportingParty: call.caller ? `911 - ${call.caller}${call.callbackNumber ? ` (${call.callbackNumber})` : ''}` : '911 Caller',
+      city: '', county: '',
+      status: myOfficer ? 'ACTIVE' : 'PENDING',
+      units: myOfficer ? [myOfficer.unitId] : [],
+      timestamp: new Date().toISOString().slice(0,16).replace('T',' '),
+    }});
+    if (myOfficer) {
+      dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: myOfficer.unitId, status: 'ENRT' } });
+    }
+    dispatch({ type: 'REMOVE_INCOMING_911', payload: call.id });
+    toast.success(`Responding to ${callNature}`, { title: 'En Route' });
+    onClose();
+  };
+
+  return (
+    <div className={S_OVERLAY} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={`${S_MODAL} max-w-[460px]`}>
+        <div className={S_MODAL_HEADER}>
+          <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
+            <MdPhone size={16} className="text-red-400 shrink-0" /> Incoming 911 Call
+          </div>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+        </div>
+        <div className={S_MODAL_BODY}>
+          <div className="px-3 py-2.5 rounded-lg mb-1 text-[12px] text-slate-300 leading-relaxed"
+            style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)' }}>
+            <span className="font-semibold text-red-400 mr-1">911 Message:</span>{call.message}
+          </div>
+          {call.location && (
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Location</label>
+              <div className="text-[12.5px] text-slate-200 px-1">{call.location}</div>
+            </div>
+          )}
+          {call.caller && (
+            <div className={S_FIELD}>
+              <label className={S_LABEL}>Caller</label>
+              <div className="text-[12.5px] text-slate-200 px-1">{call.caller}{call.callbackNumber ? ` · ${call.callbackNumber}` : ''}</div>
+            </div>
+          )}
+          <div className={S_FIELD}>
+            <label className={S_LABEL}>Call Nature</label>
+            <Select className={S_SELECT} value={nature} onChange={e => setNature(e.target.value)}>
+              <option value="">— Select or type below —</option>
+              {callNatures.map(n => <option key={n.id ?? n} value={n.name ?? n}>{n.name ?? n}</option>)}
+              <option value="__custom__">Custom…</option>
+            </Select>
+            {nature === '__custom__' && (
+              <input className={`${S_INPUT} mt-1.5`} placeholder="Describe the incident…"
+                value={customNature} onChange={e => setCustomNature(e.target.value)} autoFocus />
+            )}
+          </div>
+          {myOfficer && (
+            <div className="px-3 py-2 rounded-lg text-[11.5px] text-slate-300 flex items-center gap-2"
+              style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.20)' }}>
+              <MdPerson size={14} className="text-green-400 shrink-0" />
+              <span><span className="font-semibold text-green-300">{myOfficer.unitId}</span> will be assigned and set En Route</span>
+            </div>
+          )}
+        </div>
+        <div className={S_MODAL_FOOTER}>
+          <button className={S_BTN_SECONDARY} onClick={onClose}>Cancel</button>
+          <button className={`press ${S_BTN_PRIMARY}`} onClick={submit}>
+            <MdSend size={14} /> Respond to Call
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Simulate an incoming 911 ─── */
 function Sim911Modal({ onClose }) {
   const { dispatch } = useCAD();
@@ -491,8 +590,9 @@ export default function DispatchCenter() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [unitFilter, setUnitFilter] = useState('ALL');
   const [showIdentifier, setShowIdentifier] = useState(false);
-  const [dispatchTarget, setDispatchTarget] = useState(null);
-  const [showSim911, setShowSim911] = useState(false);
+  const [dispatchTarget,    setDispatchTarget]    = useState(null);
+  const [leoRespondTarget,  setLeoRespondTarget]  = useState(null);
+  const [showSim911,        setShowSim911]         = useState(false);
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -622,7 +722,8 @@ export default function DispatchCenter() {
                   {[...incoming911].map(c => (
                     <IncomingCallCard key={c.id} call={c}
                       onDispatch={isDispatcher ? () => setDispatchTarget(c) : null}
-                      onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null} />
+                      onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null}
+                      onRespond={!isDispatcher && currentUser?.portal === 'leo' ? () => setLeoRespondTarget(c) : null} />
                   ))}
                 </div>
               )}
@@ -917,6 +1018,11 @@ export default function DispatchCenter() {
       {/* Dispatch 911 Modal */}
       {dispatchTarget && (
         <Dispatch911Modal call={dispatchTarget} onClose={() => setDispatchTarget(null)} />
+      )}
+
+      {/* LEO Respond Modal */}
+      {leoRespondTarget && (
+        <LEORespondModal call={leoRespondTarget} myOfficer={me} onClose={() => setLeoRespondTarget(null)} />
       )}
 
       {/* Simulate 911 Modal */}
