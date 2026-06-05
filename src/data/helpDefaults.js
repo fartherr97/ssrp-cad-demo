@@ -182,6 +182,31 @@ export const DEFAULT_HELP_CONTENT = {
         { id: 'b1', text: 'See active calls and live unit positions on the map.' },
       ],
     },
+    {
+      id: 'leo-8', iconKey: 'MdWork', title: 'Case Files (CID)',
+      tip: 'Case Files is the detective investigation system — patrol interacts with it through the investigation flag, not directly.',
+      bullets: [
+        { id: 'b1', text: 'Access Case Files from the Cases link in the nav bar. This is the CID investigation management system.' },
+        { id: 'b2', text: 'Detectives assigned to the Detectives subdivision can create and manage cases — open, edit, add subjects, link vehicles, and update the timeline.' },
+        { id: 'b3', text: 'Each case has a priority (High / Medium / Low), a classification (Narcotics, Assault, Fraud, etc.), and a status (Active, Suspended, Closed, Locked).' },
+        { id: 'b4', text: 'Cases have four tabs: Overview (summary and status controls), Subjects (linked civilians and their roles), Vehicles (linked plates), and Timeline (chronological notes, evidence, leads, and tips).' },
+        { id: 'b5', text: 'Supervisors and Command can view all cases and lock a closed case to prevent any further modifications.' },
+        { id: 'b6', text: 'Status guide: Active = investigation ongoing. Suspended = paused, waiting on evidence or legal process. Closed = investigation concluded. Locked = sealed by supervisor, no further edits.' },
+      ],
+    },
+    {
+      id: 'leo-9', iconKey: 'MdWarningAmber', title: 'Active Investigation Flag',
+      tip: 'When you see this flag, the subject or vehicle is part of an ongoing CID investigation — read carefully before taking action.',
+      bullets: [
+        { id: 'b1', text: 'A red "Active Investigation" banner appears at the top of a search return when the person or vehicle is linked to an active case in the CID system.' },
+        { id: 'b2', text: 'The banner shows the case number and title so you know which investigation it belongs to.' },
+        { id: 'b3', text: 'Do NOT disclose to the subject that they are under investigation. Mentioning the case can compromise surveillance, tip off suspects, or damage an ongoing prosecution.' },
+        { id: 'b4', text: 'If you have new information — a location, an associate, something you observed — tap Submit Tip on the flag. Your tip posts directly to the case timeline and notifies the assigned detective.' },
+        { id: 'b5', text: 'If you make an arrest on an unrelated charge and the subject has an active investigation flag, contact CID before transporting. The detective may need to respond to scene or coordinate the process.' },
+        { id: 'b6', text: 'A subject with a flag is not automatically a wanted person. The flag is informational. Check for active warrants separately and follow normal enforcement procedures.' },
+        { id: 'b7', text: 'Vehicles flagged as linked to an active case — treat the same way. Note the encounter in your tip and let CID know where and when you observed the vehicle.' },
+      ],
+    },
   ],
 
   fire: [

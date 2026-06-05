@@ -7,6 +7,7 @@ import {
   MdCheckCircle, MdSearch, MdCampaign, MdBarChart, MdAccessTime,
   MdOutlineRateReview, MdChevronRight, MdInfoOutline,
   MdDashboard, MdMap, MdLocalFireDepartment, MdLocalPolice, MdEngineering,
+  MdWork, MdWarningAmber,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader } from './PortalKit';
 import { DEFAULT_HELP_CONTENT } from '../../data/helpDefaults';
@@ -19,6 +20,7 @@ export const HELP_ICON_MAP = {
   MdShield, MdSearch, MdCampaign, MdBarChart, MdAccessTime,
   MdOutlineRateReview, MdHelpOutline,
   MdDashboard, MdMap, MdLocalFireDepartment, MdLocalPolice, MdEngineering,
+  MdWork, MdWarningAmber,
 };
 
 export const PORTAL_COLOR = {
