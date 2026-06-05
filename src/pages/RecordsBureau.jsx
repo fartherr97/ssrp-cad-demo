@@ -166,6 +166,40 @@ function CivilianNotesTab({ civ }) {
   );
 }
 
+/* The civilian's current mugshot = the most recent mugshot-type field value
+   across any report/record filed for them. Mugshots live on reports/records
+   (not on the civilian) and never touch the self-uploaded profile photo. */
+function latestMugshot(civId, reports = [], records = []) {
+  let best = null;
+  for (const it of [...reports, ...records]) {
+    const linked = it.formData?._civilianId === civId || it.civilianId === civId;
+    if (!linked) continue;
+    const tpl = it.templateSnapshot;
+    const fields = tpl ? (tpl.sections || []).flatMap(s => s.fields || []) : [];
+    const mugField = fields.find(f => f.type === 'mugshot');
+    const url = mugField ? it.formData?.[mugField.id] : null;
+    if (!url) continue;
+    if (!best || (it.id || 0) > best.id) best = { url, id: it.id || 0 };
+  }
+  return best?.url || null;
+}
+
+/* Full-screen image viewer (ID photo / mugshot click-to-zoom). */
+function ImageLightbox({ url, onClose }) {
+  return (
+    <div onClick={onClose}
+      className="fixed inset-0 z-[5000] flex items-center justify-center p-6 anim-overlay-in"
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)' }}>
+      <img src={url} alt="" onClick={e => e.stopPropagation()}
+        className="max-w-full max-h-full rounded-xl shadow-2xl object-contain anim-modal-in" />
+      <button onClick={onClose} aria-label="Close"
+        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors">
+        <MdClose size={22} />
+      </button>
+    </div>
+  );
+}
+
 function bizDaysLeft(issuedAt) {
   if (!issuedAt) return null;
   const expiry = new Date(issuedAt).getTime() + 90 * 24 * 60 * 60 * 1000;
@@ -399,6 +433,7 @@ export default function RecordsBureau() {
   const [results, setResults]       = useState([]);
   const [selected, setSelected]     = useState(null); // for PERSON/VEHICLE/WARRANT: id; for CASES: "report:id" | "record:id"
   const [tab, setTab]               = useState('SUMMARY');
+  const [lightbox, setLightbox]     = useState(null);  // full-screen image URL
   const [searched, setSearched]     = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
@@ -490,6 +525,7 @@ export default function RecordsBureau() {
   })() : null;
   const selCaseKind = typeof selected === 'string' && selected.startsWith('report') ? 'report' : 'record';
 
+  const civMugshot = selCiv ? (latestMugshot(selCiv.id, reports, records) || selCiv.photoUrl || null) : null;
   const civVehicles = selCiv ? vehicles.filter(v => selCiv.vehicles?.includes(v.id)) : [];
   const civWarrants = selCiv ? warrants.filter(w => w.civilianId === selCiv.id) : [];
   const civHistory  = selCiv ? criminalHistory.filter(h => h.civilianId === selCiv.id) : [];
@@ -980,6 +1016,16 @@ export default function RecordsBureau() {
             <>
               {/* Header */}
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border-faint shrink-0">
+                {selCiv && (
+                  <button type="button"
+                    onClick={() => selCiv.profilePhoto && setLightbox(selCiv.profilePhoto)}
+                    title={selCiv.profilePhoto ? 'View ID photo' : 'No ID photo on file'}
+                    className={`w-12 h-14 rounded-lg overflow-hidden border border-border-base bg-app-elevated flex items-center justify-center shrink-0 transition-colors ${selCiv.profilePhoto ? 'cursor-pointer hover:border-brand/50' : 'cursor-default'}`}>
+                    {selCiv.profilePhoto
+                      ? <img src={selCiv.profilePhoto} alt="ID" className="w-full h-full object-cover" />
+                      : <MdPerson size={24} className="text-slate-700" />}
+                  </button>
+                )}
                 <div className="min-w-0">
                   <div className="text-[18px] font-extrabold text-white tracking-[-0.2px] truncate">
                     {selCiv ? `${selCiv.firstName} ${selCiv.lastName}`
@@ -1085,13 +1131,19 @@ export default function RecordsBureau() {
 
                     {/* Row 2: Photo (vertical) · Active Warrants · Active BOLOs */}
                     <div className="grid gap-4" style={{ gridTemplateColumns: isMobile ? '1fr' : '180px 1fr 1fr' }}>
-                      <InfoCard title="Photo">
-                        <div className="flex items-center justify-center w-full rounded-lg bg-app-elevated border border-border-base overflow-hidden"
+                      <InfoCard title="Mugshot">
+                        <button type="button"
+                          onClick={() => civMugshot && setLightbox(civMugshot)}
+                          title={civMugshot ? 'View mugshot' : 'No mugshot on file'}
+                          className={`flex flex-col items-center justify-center gap-1.5 w-full rounded-lg bg-app-elevated border border-border-base overflow-hidden transition-colors ${civMugshot ? 'cursor-pointer hover:border-brand/50' : 'cursor-default'}`}
                           style={{ aspectRatio: '3 / 4' }}>
-                          {selCiv.photoUrl
-                            ? <img src={selCiv.photoUrl} alt="Mugshot" className="w-full h-full object-cover" />
-                            : <MdPerson size={56} className="text-slate-700" />}
-                        </div>
+                          {civMugshot
+                            ? <img src={civMugshot} alt="Mugshot" className="w-full h-full object-cover" />
+                            : <>
+                                <MdPerson size={52} className="text-slate-700" />
+                                <span className="text-[10px] text-slate-600">No mugshot on file</span>
+                              </>}
+                        </button>
                       </InfoCard>
 
                       <InfoCard title={`Active Warrants (${activeWarrants.length})`}>
@@ -1288,6 +1340,7 @@ export default function RecordsBureau() {
           )}
         </div>
       </div>
+      {lightbox && <ImageLightbox url={lightbox} onClose={() => setLightbox(null)} />}
     </div>
   );
 }

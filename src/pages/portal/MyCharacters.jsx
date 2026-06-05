@@ -1,7 +1,27 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
-import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHigh } from 'react-icons/md';
+import { MdPerson, MdAdd, MdEdit, MdClose, MdWarning, MdCheckCircle, MdAutoFixHigh, MdCameraAlt, MdDelete } from 'react-icons/md';
+
+// Downscale an uploaded image to a headshot-sized JPEG data URL.
+function resizePhoto(file, maxPx = 420) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 import { PortalPage, PortalHeader, PortalCard, Field, CivFormField } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, BADGE, sm } from '../../constants/styles';
 import { CIVILIAN_FORMS_DEFAULT } from '../../data/civilianFormsDefaults';
@@ -127,8 +147,12 @@ export default function MyCharacters() {
   };
 
   const openEdit = (c) => {
-    // Seed each configured field from the character record (falling back to blank).
-    setForm(Object.fromEntries(characterFields.map(f => [f.key, c[f.key] ?? EMPTY_FORM[f.key]])));
+    // Seed each configured field from the character record (falling back to blank),
+    // plus the profile photo which lives outside the configurable field schema.
+    setForm({
+      ...Object.fromEntries(characterFields.map(f => [f.key, c[f.key] ?? EMPTY_FORM[f.key]])),
+      profilePhoto: c.profilePhoto || '',
+    });
     setEditingId(c.id);
     setShowForm(true);
   };
@@ -231,6 +255,31 @@ export default function MyCharacters() {
             </div>
           </div>
           <form onSubmit={handleSubmit}>
+            {/* Profile photo (the character's ID / DL photo) */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-20 h-24 rounded-lg overflow-hidden bg-app-elevated border border-border-base flex items-center justify-center shrink-0">
+                {form.profilePhoto
+                  ? <img src={form.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                  : <MdPerson size={34} className="text-slate-700" />}
+              </div>
+              <div className="flex flex-col gap-1.5 min-w-0">
+                <div className="text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500">Profile Photo</div>
+                <div className="text-[11px] text-slate-500 leading-snug">A headshot of your character — used as their ID / driver-license photo.</div>
+                <div className="flex gap-2 mt-0.5">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white/[0.06] hover:bg-white/[0.1] border border-transparent text-slate-200 transition-all">
+                    <MdCameraAlt size={14} /> {form.profilePhoto ? 'Replace' : 'Upload Photo'}
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={async e => { const f = e.target.files?.[0]; if (f) setField('profilePhoto', await resizePhoto(f)); e.target.value = ''; }} />
+                  </label>
+                  {form.profilePhoto && (
+                    <button type="button" onClick={() => setField('profilePhoto', '')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-transparent transition-all cursor-pointer">
+                      <MdDelete size={14} /> Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
               {characterFields.map(f => {
                 const isAge = f.type === 'age';

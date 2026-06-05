@@ -625,7 +625,7 @@ function CivilianProfileView({ civilian, activeWarrants, civHistory, ptThreshold
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-4 border-b border-border-faint flex items-center gap-4 shrink-0">
         <div className="w-14 h-14 rounded-xl bg-slate-500/15 border border-slate-500/30 flex items-center justify-center shrink-0 overflow-hidden">
-          {civilian.photoUrl ? <img src={civilian.photoUrl} alt="" className="w-full h-full object-cover" /> : <MdPerson size={28} className="text-slate-500" />}
+          {(civilian.profilePhoto || civilian.photoUrl) ? <img src={civilian.profilePhoto || civilian.photoUrl} alt="" className="w-full h-full object-cover" /> : <MdPerson size={28} className="text-slate-500" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[18px] font-extrabold text-white">{civilian.firstName} {civilian.lastName}</div>
