@@ -5,7 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import RequestFDOTModal from '../components/RequestFDOTModal';
 import RequestHCFRModal from '../components/RequestHCFRModal';
-import { MdEngineering, MdLocalFireDepartment, MdWarning, MdCheck, MdClose } from 'react-icons/md';
+import { MdEngineering, MdLocalFireDepartment, MdWarning, MdCheck, MdClose, MdPerson } from 'react-icons/md';
 import {
   cadElapsed, cadPri, cadCallStatus, cadStatus, CAD_STATUS_LABEL,
   S_BTN_SECONDARY, S_BTN_DANGER, S_BTN_PRIMARY, sm,
@@ -201,6 +201,36 @@ export default function IncidentDetail() {
           )
         )}
       </div>
+
+      {/* ── "You are attached" banner (field officer view) ── */}
+      {!isDispatch && me && call.units.includes(me.unitId) && (
+        <div className="shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl"
+          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderLeft: '3px solid #22c55e' }}>
+          <MdPerson size={18} className="text-green-400 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="text-[12.5px] font-bold text-green-300">You are attached to this call</div>
+            <div className="text-[11px] text-slate-400 mt-px">
+              {me.unitId} · {me.name} ·{' '}
+              <span style={{ color: ST_COLOR[me.status] || '#93a4bd' }}>{CAD_STATUS_LABEL[me.status] || me.status}</span>
+            </div>
+          </div>
+          <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
+            {['ENRT','ARRVD','BUSY','AVAILABLE'].map(s => (
+              <button
+                key={s}
+                onClick={() => setUnitStatus(me.unitId, s)}
+                className={`press-sm px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold cursor-pointer border transition-all ${
+                  me.status === s
+                    ? 'bg-green-500/20 text-green-300 border-green-500/40'
+                    : 'bg-white/[0.04] text-slate-400 border-border-base hover:bg-white/[0.08] hover:text-slate-200'
+                }`}
+              >
+                {s === 'AVAILABLE' ? 'AVL' : s}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── FDOT request status banner ── */}
       {fdotReq && (() => {
