@@ -1140,8 +1140,8 @@ function UnitLookupField({ f, value, onChange, readOnly }) {
   );
 }
 
-function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement }) {
-  const { state } = useCAD();
+function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement, subjectCiv }) {
+  const { state, dispatch } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
   const isSupOnly = !!f.supervisorOnly;
   // Honor the builder's field-level read-only flag in addition to supervisor gating.
@@ -1201,23 +1201,51 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
   // configured colour. Value is an array of selected flag IDs.
   if (f.type === 'flags') {
     const defs = state.customFlags || [];
-    const selected = Array.isArray(value) ? value : [];
+    // Single source of truth: the Flags field reads/writes the linked civilian's
+    // own flags — the exact same set shown in the Civilian Registry, the admin
+    // Flags page, and on a LEO search. Checking a flag here applies it to that
+    // civilian everywhere; there is no separate per-report flag list.
+    const civ = subjectCiv ? (state.civilians || []).find(c => c.id === subjectCiv.id) : null;
+    const selected = civ?.flags || [];
     const toggle = (id) => {
-      if (effectiveReadOnly) return;
-      onChange(f.id, selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
+      if (effectiveReadOnly || !civ) return;
+      dispatch({
+        type: selected.includes(id) ? 'REMOVE_CIVILIAN_FLAG' : 'ADD_CIVILIAN_FLAG',
+        payload: { civilianId: civ.id, flagId: id },
+      });
     };
     return (
       <div className={`flex flex-col ${FULL}`}>
         <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
           <MdFlag size={12} /> {f.label || 'Flags'}{f.required && <span className="text-red-400"> *</span>}
-          {!effectiveReadOnly && (
-            <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[8px] font-bold tracking-[0.4px] normal-case">FLAGS</span>
+          {civ && (
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[8px] font-bold tracking-[0.4px] normal-case">
+              {civ.firstName} {civ.lastName}
+            </span>
           )}
         </label>
         {defs.length === 0 ? (
           <div className="px-3 py-2.5 rounded-lg border border-border-base bg-app-input text-[12px] text-slate-600 italic">
             No flags configured — add them in Admin → Civilian Flags.
           </div>
+        ) : !civ ? (
+          effectiveReadOnly ? (
+            // Builder preview / report with no linked civilian — show the
+            // available flags as a disabled picker so the field reads clearly.
+            <div className="flex flex-wrap gap-2 opacity-50">
+              {defs.map(fl => (
+                <span key={fl.id} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12.5px] font-semibold border"
+                  style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.10)', color: '#93a4bd' }}>
+                  <span className="w-4 h-4 rounded border shrink-0" style={{ borderColor: 'rgba(255,255,255,0.25)' }} />
+                  <MdFlag size={11} /> {fl.name}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="px-3 py-2.5 rounded-lg border border-dashed border-border-base bg-app-input text-[12px] text-slate-500 italic">
+              Select a civilian on this form to apply flags.
+            </div>
+          )
         ) : effectiveReadOnly ? (
           selected.length === 0
             ? <div className="px-3.5 py-2.5 rounded-lg border bg-app-input border-border-base text-sm text-slate-600">— None —</div>
@@ -1369,6 +1397,21 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
   const deptDisplay = data._issuingDept || (!readOnly ? liveDeptName : '');
 
   const sections = template?.sections || [];
+
+  // Resolve the civilian this report is about (the first civilian-lookup field
+  // on the form that has been filled in). The Flags field binds to this person
+  // so flags ticked on a report apply to their record everywhere — one source.
+  const subjectCiv = (() => {
+    for (const sec of sections) {
+      const cf = (sec.fields || []).find(ff => ff.type === 'civilian_lookup');
+      const name = (data?.[cf?.id] || '').trim().toLowerCase();
+      if (!name) continue;
+      const civ = (state.civilians || []).find(c => `${c.firstName} ${c.lastName}`.toLowerCase() === name);
+      if (civ) return civ;
+    }
+    return null;
+  })();
+
   // Per-key change; fall back to bulk if a single onChange isn't supplied.
   const change = (k, v) => {
     if (onChange) onChange(k, v);
@@ -1416,7 +1459,7 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
             {sec.fields.map(f => (
               <Field key={f.id} f={f} value={data[f.id]} data={data}
                 onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly}
-                onSupplement={onSupplement} canSupplement={canSupplement} />
+                onSupplement={onSupplement} canSupplement={canSupplement} subjectCiv={subjectCiv} />
             ))}
           </div>
         </section>
