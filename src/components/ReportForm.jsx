@@ -1195,16 +1195,31 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
     );
   }
 
-  // Checkbox * compact toggle row
+  // Checkbox — full-width card with orange border + custom indicator when checked
   if (f.type === 'checkbox') {
+    const checked = !!value;
     return (
-      <label className={`${SPAN[span]} flex items-center gap-2.5 self-end px-3 py-2.5 rounded-lg border text-[12.5px] text-slate-200 ${effectiveReadOnly ? '' : 'cursor-pointer hover:border-border-strong'} transition-colors
-        ${isSupOnly && !isSupervisor ? 'bg-red-500/5 border-red-500/30' : 'bg-app-input border-border-base'}`}>
-        <input type="checkbox" checked={!!value} disabled={effectiveReadOnly}
+      <label className={`${SPAN[span]} flex items-center gap-3 px-4 py-3.5 rounded-xl border text-[13px] font-medium text-slate-100 transition-all select-none
+        ${effectiveReadOnly ? 'cursor-default' : 'cursor-pointer'}
+        ${isSupOnly && !isSupervisor
+          ? 'bg-red-500/5 border-red-500/30'
+          : checked
+            ? 'bg-app-input border-orange-500/60'
+            : 'bg-app-input border-border-base hover:border-border-strong'
+        }`}>
+        <input type="checkbox" checked={checked} disabled={effectiveReadOnly}
           onChange={e => onChange(f.id, e.target.checked)}
-          className="w-4 h-4 accent-brand cursor-pointer disabled:cursor-default" />
-        {f.label}
-        {isSupOnly && <span className="ml-auto px-1 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold">{isSupervisor ? 'SUP' : '🔒'}</span>}
+          className="sr-only" />
+        <span className={`w-[26px] h-[26px] rounded-lg flex items-center justify-center shrink-0 transition-all
+          ${checked ? 'bg-orange-500' : 'border-2 border-slate-600 bg-transparent'}`}>
+          {checked && (
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+        <span className="flex-1 min-w-0">{f.label}</span>
+        {isSupOnly && <span className="ml-auto px-1 py-0.5 rounded bg-red-500/20 text-red-400 text-[8px] font-bold shrink-0">{isSupervisor ? 'SUP' : '🔒'}</span>}
       </label>
     );
   }
