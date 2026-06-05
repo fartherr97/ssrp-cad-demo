@@ -3,7 +3,7 @@ import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
-  ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT,
+  ADMIN, AdminPageTitle, AdminPanel, SonButton, SON_INPUT,
   SonTable, SonRow, SonCell, SonBadge, SonIconBtn, EmptyState,
 } from '../AdminKit';
 import {
@@ -198,13 +198,23 @@ export default function LicensePoints() {
   const setSched = (id, patch) => setCfg(p => ({ ...p, schedule: p.schedule.map(s => s.id === id ? { ...s, ...patch } : s) }));
   const delSched = (id) => setCfg(p => ({ ...p, schedule: p.schedule.filter(s => s.id !== id) }));
 
+  // ── Escalating suspension thresholds (tiers) ──
+  const tierUid = () => `lt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`;
+  const tierList = [...(cfg.tiers || [])].sort((a, b) => (a.threshold || 0) - (b.threshold || 0));
+  const setTier = (id, patch) => setCfg(p => ({ ...p, tiers: (p.tiers || []).map(t => t.id === id ? { ...t, ...patch } : t) }));
+  const addTier = () => setCfg(p => ({ ...p, tiers: [...(p.tiers || []), { id: tierUid(), threshold: 0, suspensionDays: 30 }] }));
+  const delTier = (id) => setCfg(p => ({ ...p, tiers: (p.tiers || []).filter(t => t.id !== id) }));
+
   const handleImport = (entries) => {
     setCfg(p => ({ ...p, schedule: [...p.schedule, ...entries] }));
     setShowImport(false);
   };
 
   const allDrivers = (state.civilians || []).filter(c => c.dlNumber);
-  const threshold = stored.threshold || 0;
+  // Bar maxes out at the highest configured threshold.
+  const threshold = (stored.tiers && stored.tiers.length)
+    ? Math.max(...stored.tiers.map(t => t.threshold || 0))
+    : (stored.threshold || 0);
   const drivers = (() => {
     const q = driverSearch.trim().toLowerCase();
     if (!q) return allDrivers;
@@ -245,30 +255,49 @@ export default function LicensePoints() {
       </AdminPageTitle>
 
       {/* ── Rules ── */}
-      <AdminPanel title="Suspension Rules" subtitle="Points accumulate as violations are applied; once a driver reaches the threshold their license is automatically suspended.">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="flex flex-col gap-4">
+      <AdminPanel title="Suspension Rules" subtitle="Points accumulate as violations are applied; a license is auto-suspended each time the driver's total crosses one of the thresholds below.">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-10">
             <Toggle on={cfg.enabled} onClick={() => setField('enabled', !cfg.enabled)}
               label="Enable auto-suspension" hint="Master switch for the points engine" />
             <Toggle on={cfg.resetAfterSuspend} onClick={() => setField('resetAfterSuspend', !cfg.resetAfterSuspend)}
-              label="Reset points after suspension" hint="Zero the driver's points once a suspension triggers" />
+              label="Reset points after suspension" hint="Only applies with a single threshold; tiers keep accumulating" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <SonField label="Point Threshold">
-              <input type="number" min="1" style={SON_INPUT} value={cfg.threshold}
-                onChange={e => setField('threshold', Number(e.target.value))} />
-            </SonField>
-            <SonField label="Suspension (days)">
-              <input type="number" min="1" style={SON_INPUT} value={cfg.suspensionDays}
-                onChange={e => setField('suspensionDays', Number(e.target.value))} />
-            </SonField>
+
+          {/* Threshold tiers */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-[0.6px] text-slate-500">Suspension Thresholds</span>
+              <SonButton size="sm" onClick={addTier}><MdAdd size={14} /> Add Threshold</SonButton>
+            </div>
+            {tierList.length === 0 ? (
+              <div className="text-[12px] text-slate-500 italic px-1 py-2">No thresholds yet — add one to enable auto-suspension.</div>
+            ) : tierList.map((t, i) => (
+              <div key={t.id} className="flex items-center gap-2 flex-wrap bg-app-card/60 border border-border-base rounded-lg px-3 py-2">
+                <span className="text-[10px] font-bold text-slate-600 w-5 shrink-0">#{i + 1}</span>
+                <span className="text-[12px] text-slate-400">At</span>
+                <input type="number" min="1" style={{ ...SON_INPUT, width: 76, padding: '6px 8px' }} value={t.threshold}
+                  onChange={e => setTier(t.id, { threshold: Number(e.target.value) })} />
+                <span className="text-[12px] text-slate-400">pts → suspend</span>
+                <input type="number" min="1" style={{ ...SON_INPUT, width: 76, padding: '6px 8px' }} value={t.suspensionDays}
+                  onChange={e => setTier(t.id, { suspensionDays: Number(e.target.value) })} />
+                <span className="text-[12px] text-slate-400">days</span>
+                <button type="button" onClick={() => delTier(t.id)} title="Remove threshold"
+                  className="ml-auto shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-red-300 hover:bg-red-500/10 cursor-pointer transition-colors">
+                  <MdClose size={15} />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="mt-4 flex items-center gap-2 text-[12px] text-slate-400 bg-app-card/60 border border-border-base rounded-lg px-3.5 py-2.5">
-          <MdBolt size={15} className="text-brand-bright shrink-0" />
-          {cfg.enabled
-            ? <span>At <b className="text-cad-text">{cfg.threshold}</b> points a driver is auto-suspended for <b className="text-cad-text">{cfg.suspensionDays}</b> days{cfg.resetAfterSuspend ? ', then points reset to 0' : ''}.</span>
-            : <span>Auto-suspension is currently <b className="text-red-400">disabled</b> · points still accumulate but no suspension triggers.</span>}
+
+        <div className="mt-4 flex items-start gap-2 text-[12px] text-slate-400 bg-app-card/60 border border-border-base rounded-lg px-3.5 py-2.5">
+          <MdBolt size={15} className="text-brand-bright shrink-0 mt-0.5" />
+          {!cfg.enabled
+            ? <span>Auto-suspension is currently <b className="text-red-400">disabled</b> · points still accumulate but no suspension triggers.</span>
+            : tierList.length === 0
+              ? <span>No thresholds configured — add at least one.</span>
+              : <span>A driver is auto-suspended as their points cross each threshold: {tierList.map(t => `${t.threshold} pts → ${t.suspensionDays}d`).join(' · ')}.</span>}
         </div>
       </AdminPanel>
 
@@ -311,7 +340,7 @@ export default function LicensePoints() {
       {/* ── Drivers ── */}
       <AdminPanel
         title="Driver License Points"
-        subtitle={`Live points per licensed driver · auto-suspends at ${threshold} pts · search to manually suspend or reinstate`}
+        subtitle={`Live points per licensed driver · auto-suspends at the configured thresholds · search to manually suspend or reinstate`}
         right={
           <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2 w-[260px] max-w-full">
             <MdSearch size={14} className="text-slate-500 shrink-0" />

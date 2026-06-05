@@ -194,9 +194,16 @@ const initialState = {
   // ─── Auto license-suspension engine (configurable in Admin) ───
   licensePointsConfig: {
     enabled: true,
-    threshold: 12,
+    threshold: 12,        // legacy single threshold (kept for back-compat)
     suspensionDays: 90,
-    resetAfterSuspend: true,
+    resetAfterSuspend: false,
+    // Escalating suspension thresholds — a driver is re-suspended (for longer)
+    // as their points climb past each tier. Admin can add/remove tiers.
+    tiers: [
+      { id: 'lt1', threshold: 12, suspensionDays: 90 },
+      { id: 'lt2', threshold: 18, suspensionDays: 180 },
+      { id: 'lt3', threshold: 24, suspensionDays: 365 },
+    ],
     schedule: [
       { id: 'v1', label: 'Speeding (1–15 over)',   points: 3 },
       { id: 'v2', label: 'Speeding (16+ over)',    points: 4 },
@@ -636,22 +643,36 @@ function baseReducer(state, action) {
     }
 
     case 'ADD_LICENSE_POINTS': {
-      // Accumulate points on a driver; auto-suspend once the configured
-      // threshold is reached (per the Auto License Suspend admin settings).
+      // Accumulate points on a driver; auto-suspend (and re-suspend for longer)
+      // each time their total crosses one of the configured threshold tiers.
       const cfg = state.licensePointsConfig || {};
       const { civilianId, points, reason } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
+      // Tier ladder (fall back to the legacy single threshold if none set).
+      const tiers = (cfg.tiers && cfg.tiers.length)
+        ? [...cfg.tiers].filter(t => t.threshold > 0).sort((a, b) => a.threshold - b.threshold)
+        : [{ threshold: cfg.threshold, suspensionDays: cfg.suspensionDays }];
+      const multiTier = tiers.length > 1;
       let suspended = false;
+      let firedTier = null;
       let expiry = null;
       const civilians = state.civilians.map(c => {
         if (c.id !== civilianId) return c;
-        const newPoints = (c.licensePoints || 0) + Number(points || 0);
-        if (cfg.enabled && newPoints >= cfg.threshold && c.dlStatus !== 'SUSPENDED') {
+        const oldPoints = c.licensePoints || 0;
+        const newPoints = oldPoints + Number(points || 0);
+        // Tiers newly crossed by this increment (so each tier fires once).
+        const crossed = cfg.enabled
+          ? tiers.filter(t => oldPoints < t.threshold && newPoints >= t.threshold)
+          : [];
+        if (crossed.length) {
           suspended = true;
-          expiry = new Date(Date.now() + (cfg.suspensionDays || 0) * 86400000).toISOString().slice(0, 10);
+          firedTier = crossed[crossed.length - 1]; // highest tier crossed
+          expiry = new Date(Date.now() + (firedTier.suspensionDays || 0) * 86400000).toISOString().slice(0, 10);
           return {
             ...c,
-            licensePoints: cfg.resetAfterSuspend ? 0 : newPoints,
+            // Keep points climbing across tiers; only zero them when a single
+            // legacy threshold is configured with reset-after-suspension on.
+            licensePoints: (cfg.resetAfterSuspend && !multiTier) ? 0 : newPoints,
             dlStatus: 'SUSPENDED',
             dlExpiry: expiry,
             suspendedUntil: expiry,
@@ -666,7 +687,7 @@ function baseReducer(state, action) {
         'License Points'
       );
       const log = suspended
-        ? addDispatchLog(state, `LICENSE AUTO-SUSPENDED · ${name} reached ${cfg.threshold} pts · ${cfg.suspensionDays}-day suspension`, 'alert')
+        ? addDispatchLog(state, `LICENSE AUTO-SUSPENDED · ${name} reached ${firedTier.threshold} pts · ${firedTier.suspensionDays}-day suspension`, 'alert')
         : {};
       return { ...state, civilians, ...audit, ...log };
     }
