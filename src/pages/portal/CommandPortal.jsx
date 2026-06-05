@@ -16,6 +16,7 @@ import {
 } from './PortalKit';
 import AccessDenied from './AccessDenied';
 import { getScopeDeptId } from '../../utils/deptScope';
+import { isESDept } from '../../constants/portals';
 
 const COMMAND_RANKS = [
   'Sergeant', 'Lieutenant', 'Captain',
@@ -1080,10 +1081,10 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
   const { dispatch } = useCAD();
   const toast = useToast();
 
-  const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
+  const esDepts = useMemo(() => departments.filter(isESDept), [departments]);
 
-  // Admins can choose which dept (or all); non-admin commanders are locked to their dept.
-  const [targetDeptId, setTargetDeptId] = useState(isAdmin ? '' : (myOfficer?.dept ?? ''));
+  // Admins default to "All"; dept-scoped command users default to their own dept.
+  const [targetDeptId, setTargetDeptId] = useState(isAdmin ? '' : String(myOfficer?.dept ?? ''));
   const [title, setTitle]   = useState('');
   const [color, setColor]   = useState('#3b82f6');
   const [body, setBody]     = useState('');
@@ -1092,9 +1093,9 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
   const senderName  = myOfficer?.name  || currentUser?.name  || 'Unknown';
   const senderBadge = myOfficer?.badge || currentUser?.badge || '—';
 
-  const targetLabel = isAdmin
-    ? (targetDeptId ? (leoDepts.find(d => String(d.id) === String(targetDeptId))?.short || 'Dept') : 'All Departments')
-    : (leoDepts.find(d => d.id === myOfficer?.dept)?.short || 'Your Department');
+  const targetLabel = targetDeptId
+    ? (esDepts.find(d => String(d.id) === String(targetDeptId))?.name || 'Selected Dept')
+    : 'All Departments';
 
   const handleSend = () => {
     if (!title.trim() || !body.trim()) return;
@@ -1131,25 +1132,21 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
           <span className="text-[10.5px] font-mono text-slate-500 ml-0.5">({senderBadge})</span>
         </div>
 
-        {/* Target dept selector * only for admins */}
-        {isAdmin ? (
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Send To</label>
-            <Select
-              className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 outline-none focus:border-brand/60 transition-[border-color,box-shadow] cursor-pointer"
-              value={targetDeptId}
-              onChange={e => setTargetDeptId(e.target.value)}>
-              <option value="">All Departments</option>
-              {leoDepts.map(d => <option key={d.id} value={String(d.id)}>{d.name} ({d.short})</option>)}
-            </Select>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <span className="text-[11.5px] text-slate-400">Sending to: </span>
-            <span className="text-[11.5px] font-bold text-white">{targetLabel}</span>
-          </div>
-        )}
+        {/* Target dept selector */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-400">Send To</label>
+          <Select
+            className="w-full bg-app-input border border-border-base rounded-xl px-3.5 py-2.5 text-[13px] text-slate-200 outline-none focus:border-brand/60 transition-[border-color,box-shadow] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            value={targetDeptId}
+            disabled={!isAdmin && !!myOfficer?.dept}
+            onChange={e => setTargetDeptId(e.target.value)}>
+            {isAdmin && <option value="">All Departments</option>}
+            {esDepts.map(d => <option key={d.id} value={String(d.id)}>{d.name} ({d.short})</option>)}
+          </Select>
+          {!isAdmin && (
+            <span className="text-[10px] text-slate-600 mt-0.5">Locked to your department</span>
+          )}
+        </div>
 
         {/* Title */}
         <div className="flex flex-col gap-1">
