@@ -958,36 +958,33 @@ export default function RecordsBureau() {
                           ))}
                       </InfoCard>
 
-                      <InfoCard title="Active BOLOs / Locations (0)">
-                        <div className="text-[12px] text-slate-500">No active BOLOs or lookout notices.</div>
+                      <InfoCard title={`Recent Incidents (${civHistory.length})`}>
+                        {civHistory.length === 0
+                          ? <div className="text-[12px] text-slate-500">No recent incidents on file.</div>
+                          : (
+                            <div className="flex flex-col gap-2">
+                              {civHistory.slice(0, 4).map(h => (
+                                <div key={h.id} className="flex items-start gap-2">
+                                  <MdDescription size={15} className="text-slate-500 mt-0.5 shrink-0" />
+                                  <div className="min-w-0">
+                                    <div className="text-[12.5px] font-semibold text-slate-200 truncate">
+                                      {h.charges?.length ? h.charges.join(', ') : h.caseNumber}
+                                    </div>
+                                    <div className="text-[11px] text-slate-500 truncate">
+                                      {[h.date, h.disposition, h.agency].filter(Boolean).join(' · ')}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                              {civHistory.length > 4 && (
+                                <div className="text-[11px] text-slate-600 pt-0.5">
+                                  +{civHistory.length - 4} more — see Criminal History tab
+                                </div>
+                              )}
+                            </div>
+                          )}
                       </InfoCard>
                     </div>
-
-                    {/* Row 3: Recent Incidents */}
-                    <InfoCard title="Recent Incidents">
-                      {civHistory.length === 0
-                        ? <div className="text-[12px] text-slate-500">No criminal history on file</div>
-                        : (
-                          <table className="w-full border-collapse -mx-1">
-                            <thead>
-                              <tr>{['DATE','CASE #','CHARGES','DISPOSITION','AGENCY'].map(h => (
-                                <th key={h} className="px-1.5 py-1.5 text-left text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 border-b border-border-faint">{h}</th>
-                              ))}</tr>
-                            </thead>
-                            <tbody>
-                              {civHistory.map(h => (
-                                <tr key={h.id} className="border-b border-border-faint last:border-0">
-                                  <td className="px-1.5 py-2 text-[12px] text-slate-400 font-mono whitespace-nowrap">{h.date}</td>
-                                  <td className="px-1.5 py-2 text-[12px] text-slate-300 font-mono whitespace-nowrap">{h.caseNumber}</td>
-                                  <td className="px-1.5 py-2 text-[12px] text-slate-200">{h.charges?.join(', ')}</td>
-                                  <td className="px-1.5 py-2 text-[12px] text-slate-400">{h.disposition}</td>
-                                  <td className="px-1.5 py-2 text-[12px] text-slate-400 whitespace-nowrap">{h.agency}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                    </InfoCard>
                   </div>
                 )}
 

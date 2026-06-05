@@ -26,6 +26,7 @@ const FIELD_TYPES = [
   { type: 'datetime',        label: 'Date & Time'   },
   { type: 'dropdown',        label: 'Select'        },
   { type: 'checkbox',        label: 'Checkbox'      },
+  { type: 'flags',           label: 'Flags'         },
   { type: 'civilian_lookup', label: 'Civilian'      },
   { type: 'vehicle_lookup',  label: 'Vehicle'       },
   { type: 'badge_lookup',    label: 'Officer Badge' },
@@ -41,7 +42,7 @@ const FIELD_TYPES = [
 const TYPE_COLOR = {
   text: '#60a5fa', number: '#60a5fa', textarea: '#60a5fa',
   date: '#fb923c', datetime: '#fb923c',
-  dropdown: '#34d399', checkbox: '#34d399',
+  dropdown: '#34d399', checkbox: '#34d399', flags: '#fbbf24',
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
   charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee', photos: '#22d3ee',
   supplemental: '#fbbf24', linked_records: '#2dd4bf', unit_lookup: '#3a88e8',
@@ -80,10 +81,9 @@ const PREMADE_SECTIONS = [
   { key: 'flags', label: 'FLAGS', make: () => ({
     id: sid(), title: 'Flags', style: 'gray',
     fields: [
-      { id: uid(), label: 'Escape Risk', type: 'checkbox', span: 1 },
-      { id: uid(), label: 'Armed',       type: 'checkbox', span: 1 },
-      { id: uid(), label: 'Dangerous',   type: 'checkbox', span: 1 },
-      { id: uid(), label: 'Felon',       type: 'checkbox', span: 1 },
+      // Live flag picker — checkboxes are generated from the flag definitions
+      // managed in Admin → Civilian Flags, so this stays in sync automatically.
+      { id: uid(), label: 'Flags', type: 'flags', span: 4 },
     ],
   })},
   { key: 'civilian', label: 'CIVILIAN', make: () => ({
@@ -336,7 +336,7 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   const up = (patch) => onUpdate({ ...section, ...patch });
 
   const addField = (type) => {
-    const span = ['charges','textarea','supplemental','linked_records','unit_lookup'].includes(type) ? 4 : type === 'checkbox' ? 1 : 2;
+    const span = ['charges','textarea','supplemental','linked_records','unit_lookup','flags'].includes(type) ? 4 : type === 'checkbox' ? 1 : 2;
     up({ fields: [...(section.fields || []), { id: uid(), label: '', type, span }] });
     setShowAddField(false);
   };

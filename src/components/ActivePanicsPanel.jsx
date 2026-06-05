@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { MdSos, MdLocationOn, MdCheckCircle } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
@@ -15,7 +14,6 @@ import { useToast } from '../contexts/ToastContext';
 export default function ActivePanicsPanel({ className = '' }) {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const navigate = useNavigate();
   const { activePanics = [], currentUser } = state;
 
   if (!activePanics.length) return null;
@@ -54,11 +52,6 @@ export default function ActivePanicsPanel({ className = '' }) {
                 {p.time && <span className="text-red-300/40 ml-1">· {p.time}</span>}
               </div>
             </div>
-            <button onClick={() => navigate('/map')}
-              className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-red-200 cursor-pointer border border-red-500/35 hover:bg-red-500/15 transition-colors"
-              style={{ background: 'rgba(239,68,68,0.08)' }} title="Show on live map">
-              <MdLocationOn size={13} /> Locate
-            </button>
             {canClear(p) && (
               <button onClick={() => clear(p.officerId)}
                 className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-300 cursor-pointer border border-border-base hover:bg-white/[0.07] hover:text-white transition-colors"

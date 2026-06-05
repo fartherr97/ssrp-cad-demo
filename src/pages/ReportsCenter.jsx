@@ -8,13 +8,12 @@ import {
   MdDirectionsCar, MdGavel, MdPerson, MdReport,
   MdRecordVoiceOver, MdNote, MdDescription, MdAssignment,
   MdArrowBack, MdDownload, MdDeleteOutline, MdSend,
-  MdInventory2, MdPhone, MdShield, MdCarCrash, MdLocalHospital,
+  MdCarCrash, MdLocalHospital,
 } from 'react-icons/md';
-import { DeptBadge } from '../constants/deptLogos';
 import { templatesForPortal, templateInPortal } from '../utils/templateScope';
 import {
-  BADGE, S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_GHOST, S_BTN_DANGER,
-  S_BTN_SUCCESS, S_BTN_WARNING, S_BTN_SUBMIT, xs,
+  BADGE, S_BTN_SECONDARY, S_BTN_DANGER,
+  S_BTN_SUCCESS, S_BTN_SUBMIT, xs,
 } from '../constants/styles';
 
 const TEMPLATE_ICONS = {
@@ -42,7 +41,7 @@ const DRAFT_KEY = (tplId) => `ssrp_report_draft_${tplId}`;
 export default function ReportsCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { reports, reportTemplates, currentUser, officers, calls = [], myCallId, communityConfig, departments, reportSeq = 1 } = state;
+  const { reports, reportTemplates, currentUser, officers, communityConfig, departments, reportSeq = 1 } = state;
   const [searchParams] = useSearchParams();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formValues, setFormValues]             = useState({});
@@ -209,17 +208,12 @@ export default function ReportsCenter() {
     const tpl = selectedTemplate;
     const sectionTitles = tpl.sections ? tpl.sections.map(s => s.title) : ['Narrative'];
     const tabs = ['Report', ...sectionTitles];
-    const relatedCall = (formValues.callId || myCallId)
-      ? calls.find(c => c.id === (formValues.callId || myCallId)) : null;
     const now = new Date();
 
     const scrollTo = (title) => {
       setActiveTab(title);
       const sel = title === 'Report' ? '[data-doc-top]' : `[data-section="${title}"]`;
       document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-    const saveDraftNow = () => {
-      try { localStorage.setItem(DRAFT_KEY(tpl.id), JSON.stringify(formValues)); setSavedAt(new Date()); } catch { /* ignore */ }
     };
     const exportPDF = async () => {
       setPdfLoading(true);
@@ -234,13 +228,6 @@ export default function ReportsCenter() {
         });
       } finally { setPdfLoading(false); }
     };
-    const Detail = ({ label, value }) => (
-      <div className="flex flex-col gap-0.5 py-2 border-b border-border-faint last:border-0">
-        <span className="text-[9.5px] uppercase tracking-[0.5px] text-slate-500">{label}</span>
-        <span className="text-[12.5px] text-slate-200">{value || '—'}</span>
-      </div>
-    );
-
     return (
       <div className="flex flex-col h-full overflow-hidden font-ui">
 

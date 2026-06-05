@@ -283,6 +283,10 @@ export default function Messages() {
   const [composing,    setComposing]    = useState(false);
   const [tab,          setTab]          = useState('inbox');
   const [search,       setSearch]       = useState('');
+  const [replyText,    setReplyText]    = useState('');
+
+  // Clear any in-progress reply whenever the open message changes.
+  useEffect(() => { setReplyText(''); }, [selectedId]);
 
   // Switching tabs always clears the open message
   const switchTab = (newTab) => {
@@ -357,6 +361,21 @@ export default function Messages() {
   };
 
   const handleSend = (payload) => dispatch({ type: 'SEND_DIRECT_MESSAGE', payload });
+  const handleDirectReply = () => {
+    const body = replyText.trim();
+    if (!body || !selMsg || selMsg.type === 'system') return;
+    const baseSubject = (selMsg.subject || '').replace(/^re:\s*/i, '');
+    dispatch({ type: 'SEND_DIRECT_MESSAGE', payload: {
+      fromName: currentUser?.name || 'Unknown',
+      fromBadge: currentUser?.badge || '—',
+      fromId: currentUser?.id,
+      toName: selMsg.fromName,
+      toId: selMsg.fromId,
+      subject: `RE: ${baseSubject}`,
+      body,
+    }});
+    setReplyText('');
+  };
   const handleGroupSend = (payload) => dispatch({ type: 'CREATE_GROUP_THREAD', payload });
   const handleGroupReply = (threadId, body) => {
     dispatch({ type: 'SEND_GROUP_REPLY', payload: {
@@ -511,6 +530,31 @@ export default function Messages() {
               <div className="p-4 flex-1 overflow-auto">
                 <div className="text-[12.5px] leading-[1.8] text-cad-text whitespace-pre-wrap">{selMsg.body}</div>
               </div>
+
+              {/* Reply composer — direct messages only (system notices can't be replied to) */}
+              {selMsg.type !== 'system' && (
+                <div className="shrink-0 border-t border-border-faint p-3 bg-app-card/30">
+                  <div className="text-[9.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-1.5 px-0.5">
+                    Reply to {selMsg.fromName}
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <textarea
+                      value={replyText}
+                      onChange={e => setReplyText(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleDirectReply(); } }}
+                      rows={2}
+                      placeholder="Write a reply…  (Enter to send, Shift+Enter for new line)"
+                      className="flex-1 resize-none bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]" />
+                    <button
+                      type="button"
+                      onClick={handleDirectReply}
+                      disabled={!replyText.trim()}
+                      className="press shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-bold cursor-pointer transition-all bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30 disabled:opacity-40 disabled:cursor-not-allowed">
+                      <MdSend size={14} /> Send
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

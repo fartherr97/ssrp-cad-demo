@@ -106,18 +106,6 @@ export default function OfficerProfile() {
   const returnedReports = reports.filter(r => r.officerBadge === myOfficer?.badge && r.status === 'Pending Changes');
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
 
-  // Activity time sourced from Nexum duty-log integration (not yet wired)
-  const nexumWeekly  = myOfficer?.dutyTimeWeek  ?? null; // minutes
-  const nexumMonthly = myOfficer?.dutyTimeMonth ?? null; // minutes
-  const fmtTime = (m) => {
-    if (m === null || m === undefined) return '—';
-    const h = Math.floor(m / 60), min = m % 60;
-    if (!m) return '0m';
-    if (!h) return `${min}m`;
-    if (!min) return `${h}h`;
-    return `${h}h ${min}m`;
-  };
-
   const [tab, setTab] = useState('info');
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
@@ -228,13 +216,11 @@ export default function OfficerProfile() {
         </div>
         <div
           className="grid gap-2.5 mt-4"
-          style={{ gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)' }}
+          style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
         >
           {[
-            { label: 'Reports Filed',       val: myReports.length },
-            { label: 'Calls Attended',      val: myCallHistory.length },
-            { label: 'Activity This Week',  val: fmtTime(nexumWeekly) },
-            { label: 'Activity This Month', val: fmtTime(nexumMonthly) },
+            { label: 'Reports Filed',  val: myReports.length },
+            { label: 'Calls Attended', val: myCallHistory.length },
           ].map(s => (
             <div key={s.label} className="bg-app-card/70 border border-border-base rounded-xl backdrop-blur-sm px-3.5 py-3">
               <div className="text-white text-2xl font-extrabold leading-none">{s.val}</div>
@@ -690,15 +676,6 @@ function InfoCard({ title, accentColor, children }) {
         {title}
       </div>
       {children}
-    </div>
-  );
-}
-
-function InfoRow({ label, value }) {
-  return (
-    <div className="flex justify-between gap-3 mb-1.5 text-sm">
-      <span className="text-slate-500 shrink-0">{label}</span>
-      <span className="text-slate-300 text-right">{value}</span>
     </div>
   );
 }

@@ -395,7 +395,7 @@ function UnitPicker({ officers, selected, onToggle, multi = true }) {
 
 // ─── Dispatch 911 modal ────────────────────────────────────────────────────────
 
-function DispatchModal({ call, officers, onConfirm, onClose }) {
+function DispatchModal({ call, officers, callNatures = [], onConfirm, onClose }) {
   const [nature, setNature]       = useState('');
   const [customNature, setCustomNature] = useState('');
   const [location, setLocation]   = useState(call?.location || '');
@@ -835,7 +835,7 @@ export default function DispatchPortal() {
       </div>
 
       {/* Modals */}
-      {dispatchTarget    && <DispatchModal       call={dispatchTarget}    officers={officers} onConfirm={handleDispatch}       onClose={() => setDispatchTarget(null)}    />}
+      {dispatchTarget    && <DispatchModal       call={dispatchTarget}    officers={officers} callNatures={callNatures} onConfirm={handleDispatch}       onClose={() => setDispatchTarget(null)}    />}
       {showSim911        && <Sim911Modal                                                      onConfirm={handleSim911}         onClose={() => setShowSim911(false)}        />}
       {addUnitCallTarget && <AddUnitToCallModal  call={addUnitCallTarget} officers={officers} onConfirm={handleAddUnitToCall}  onClose={() => setAddUnitCallTarget(null)} />}
       {addUnitGrpTarget  && <AddUnitToGroupModal group={addUnitGrpTarget} officers={officers} onConfirm={handleAddUnitToGroup} onClose={() => setAddUnitGrpTarget(null)}  />}

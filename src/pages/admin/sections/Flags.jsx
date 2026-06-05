@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
-  ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT, SON_LABEL,
-  SonTable, SonRow, SonCell, SonBadge, SonIconBtn, EmptyState,
+  ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT,
+  SonTable, SonRow, SonCell, SonIconBtn, EmptyState,
 } from '../AdminKit';
 import { MdFlag, MdAdd, MdDelete, MdEdit, MdCheck, MdClose } from 'react-icons/md';
+import { FlagManager } from '../../../components/CivilianFlags';
 
 const PRESET_COLORS = [
   '#ef4444', '#dc2626', '#b91c1c',
@@ -143,36 +144,20 @@ export default function Flags() {
       </AdminPanel>
 
       {/* ── Civilians with flags ── */}
-      <AdminPanel title="Flagged Civilians" subtitle="All civilians currently carrying at least one flag.">
+      <AdminPanel title="Flagged Civilians" subtitle="Add or remove flags directly — changes appear on the civilian's record when searched by law enforcement.">
         {(() => {
           const flagged = civilians.filter(c => (c.flags || []).length > 0);
           if (flagged.length === 0) return <EmptyState>No flagged civilians.</EmptyState>;
           return (
             <SonTable columns={[
-              { label: 'Name' }, { label: 'DL #' }, { label: 'Flags' },
-              { label: '', align: 'right', width: 40 },
+              { label: 'Name' }, { label: 'DL #' }, { label: 'Manage Flags' },
             ]}>
               {flagged.map((c, i) => (
                 <SonRow key={c.id} i={i}>
                   <SonCell bold>{c.firstName} {c.lastName}</SonCell>
                   <SonCell mono color={ADMIN.textDim}>{c.dlNumber || '—'}</SonCell>
                   <SonCell>
-                    <div className="flex flex-wrap gap-1">
-                      {(c.flags || []).map(fid => {
-                        const def = customFlags.find(f => f.id === fid);
-                        if (!def) return null;
-                        return (
-                          <span key={fid} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
-                            style={{ background: `${def.color}22`, color: def.color, border: `1px solid ${def.color}55` }}>
-                            <MdFlag size={9} /> {def.name}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </SonCell>
-                  <SonCell align="right">
-                    <SonIconBtn icon={MdFlag} title="Manage flags"
-                      onClick={() => {}} color={ADMIN.textDim} />
+                    <FlagManager civilianId={c.id} flags={c.flags || []} />
                   </SonCell>
                 </SonRow>
               ))}

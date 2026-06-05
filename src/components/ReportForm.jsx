@@ -6,7 +6,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Select from './ui/Select';
 import { createPortal } from 'react-dom';
-import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight, MdLink, MdGroups } from 'react-icons/md';
+import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight, MdLink, MdGroups, MdFlag, MdCheck } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
 import { useCAD } from '../store/cadStore';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
@@ -1191,6 +1191,57 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
           )}
         </label>
         <ChargesField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />
+      </div>
+    );
+  }
+
+  // Flags * live checkbox grid generated from the admin-managed flag
+  // definitions (Admin → Civilian Flags). Adding/removing a flag definition
+  // there updates this field everywhere automatically. Each flag uses its
+  // configured colour. Value is an array of selected flag IDs.
+  if (f.type === 'flags') {
+    const defs = state.customFlags || [];
+    const selected = Array.isArray(value) ? value : [];
+    const toggle = (id) => {
+      if (effectiveReadOnly) return;
+      onChange(f.id, selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
+    };
+    return (
+      <div className={`flex flex-col ${FULL}`}>
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+          <MdFlag size={12} /> {f.label || 'Flags'}{f.required && <span className="text-red-400"> *</span>}
+          {!effectiveReadOnly && (
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 text-[8px] font-bold tracking-[0.4px] normal-case">FLAGS</span>
+          )}
+        </label>
+        {defs.length === 0 ? (
+          <div className="px-3 py-2.5 rounded-lg border border-border-base bg-app-input text-[12px] text-slate-600 italic">
+            No flags configured — add them in Admin → Civilian Flags.
+          </div>
+        ) : effectiveReadOnly ? (
+          selected.length === 0
+            ? <div className="px-3.5 py-2.5 rounded-lg border bg-app-input border-border-base text-sm text-slate-600">— None —</div>
+            : <div className="px-3 py-2.5 rounded-lg border bg-app-input border-border-base"><FlagRow flags={selected} /></div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {defs.map(fl => {
+              const on = selected.includes(fl.id);
+              return (
+                <button key={fl.id} type="button" onClick={() => toggle(fl.id)} title={fl.description || fl.name}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12.5px] font-semibold border transition-all cursor-pointer hover:brightness-110"
+                  style={on
+                    ? { background: `${fl.color}22`, borderColor: `${fl.color}66`, color: fl.color }
+                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.10)', color: '#93a4bd' }}>
+                  <span className="w-4 h-4 rounded flex items-center justify-center border shrink-0"
+                    style={{ borderColor: on ? fl.color : 'rgba(255,255,255,0.25)', background: on ? fl.color : 'transparent' }}>
+                    {on && <MdCheck size={12} className="text-white" />}
+                  </span>
+                  <MdFlag size={11} /> {fl.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
