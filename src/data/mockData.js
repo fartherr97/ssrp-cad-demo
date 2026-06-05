@@ -232,12 +232,6 @@ const _agencyInfo = () => ({
   ],
 });
 
-const _deptId = () => ({
-  id: 'sDept', title: 'Department Identification', style: 'gray', fields: [
-    { id: 'dept_sel', label: 'Department', type: 'dropdown', span: 4, required: true, options: _DEPTS },
-  ],
-});
-
 const _flags = (opts) => ({
   id: 'sFlags', title: 'Flags', style: 'gray',
   fields: (opts || ['Escape Risk','Armed','Dangerous','Felon']).map((o, i) => ({ id: `flag_${i}`, label: o, type: 'checkbox', span: 1 })),
@@ -302,7 +296,6 @@ export const REPORT_TEMPLATES = [
     formCode: 'FHP-CRASH-001',
     signatureSlots: ['Reporting Unit', 'Supervisor Signature', 'Date'],
     sections: [
-      _deptId(),
       _agencyInfo(),
       { id: 'sCID', title: 'Crash Identifiers', style: 'blue', fields: [
         { id: 'cid_county',   label: 'County / City of Crash', type: 'dropdown', span: 2, required: true, options: _CITIES },
@@ -367,7 +360,6 @@ export const REPORT_TEMPLATES = [
     formCode: 'LE-GPR-001',
     signatureSlots: ['Observing Unit', 'Supervisor Signature', 'Date'],
     sections: [
-      _deptId(),
       _agencyInfo(),
       _civ(),
       _veh(),
@@ -389,7 +381,6 @@ export const REPORT_TEMPLATES = [
     formCode: 'LE-UOF-001',
     signatureSlots: ['Officer Involved', 'Supervisor Signature', 'Date'],
     sections: [
-      _deptId(),
       _agencyInfo(),
       { id: 'sInc', title: 'Incident Information', style: 'blue', fields: [
         { id: 'uof_f1', label: 'Force Type (Primary)',   type: 'dropdown', span: 4, required: true, options: _FORCE },
@@ -426,7 +417,6 @@ export const REPORT_TEMPLATES = [
     formCode: 'FHP-CVI-001',
     signatureSlots: ['Inspector Signature', 'Supervisor Signature', 'Date'],
     sections: [
-      _deptId(),
       _agencyInfo(),
       { id: 'sInsp', title: 'Inspection Details', style: 'gray', fields: [
         { id: 'in_usdot',   label: 'USDOT #', type: 'text', span: 2, mono: true, required: true },
@@ -500,7 +490,6 @@ export const REPORT_TEMPLATES = [
     formCode: 'LE-AR-001',
     signatureSlots: ['Observing Officer', 'Supervisor Signature', 'Date'],
     sections: [
-      _deptId(),
       _flags(),
       _agencyInfo(),
       { id: 'sLoc', title: 'Location of Occurrence', style: 'blue', fields: [
@@ -939,7 +928,6 @@ export const RECORD_TEMPLATES = [
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-HL-001',
     sections: [
-      _deptId(),
       _agencyInfo(),
       _civ(),
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
@@ -957,7 +945,6 @@ export const RECORD_TEMPLATES = [
     agency: 'FLORIDA FISH AND WILDLIFE CONSERVATION COMMISSION',
     formCode: 'FWC-FL-001',
     sections: [
-      _deptId(),
       _agencyInfo(),
       _civ(),
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
@@ -1127,7 +1114,6 @@ export const RECORD_TEMPLATES = [
     agency: 'SSRP LAW ENFORCEMENT',
     formCode: 'LE-GC-001',
     sections: [
-      _deptId(),
       _flags(),
       _agencyInfo(),
       _civ(),
@@ -1154,7 +1140,6 @@ export const RECORD_TEMPLATES = [
     agency: 'SSRP LAW ENFORCEMENT',
     formCode: 'LE-WW-001',
     sections: [
-      _deptId(),
       _agencyInfo(),
       _civ(),
       { id: 'sSpeed', title: 'Speed Information', style: 'gray', fields: [
