@@ -7,7 +7,7 @@ import {
   SonTable, SonRow, SonCell, SonBadge, SonIconBtn, EmptyState,
 } from '../AdminKit';
 import {
-  MdGavel, MdAdd, MdDelete, MdRestartAlt, MdLockOpen, MdSave, MdBolt,
+  MdGavel, MdAdd, MdDelete, MdLockOpen, MdSave, MdBolt,
   MdSearch, MdClose, MdBlock,
 } from 'react-icons/md';
 
@@ -187,7 +187,6 @@ export default function LicensePoints() {
   const stored = state.licensePointsConfig;
   const penalCode = state.penalCode || [];
   const [cfg, setCfg] = useState(() => blank(stored));
-  const [selViolation, setSelViolation] = useState({});
   const [showImport, setShowImport] = useState(false);
   const [driverSearch, setDriverSearch] = useState('');
 
@@ -224,14 +223,6 @@ export default function LicensePoints() {
       c.ssn?.includes(q)
     );
   })();
-
-  const applyPoints = (civ) => {
-    const vId = selViolation[civ.id] || stored.schedule[0]?.id;
-    const v = stored.schedule.find(s => s.id === vId);
-    if (!v) return;
-    dispatch({ type: 'ADD_LICENSE_POINTS', payload: { civilianId: civ.id, points: v.points, reason: v.label } });
-    toast.success(`+${v.points} points applied.`);
-  };
 
   const statusColor = (s) => s === 'SUSPENDED' ? '#f87171' : s === 'ACTIVE' ? '#22c55e' : ADMIN.textMute;
 
@@ -386,17 +377,8 @@ export default function LicensePoints() {
                       {pts}/{threshold}
                     </span>
                   </div>
-                  {/* Actions — wrap on narrow screens */}
-                  <div className="flex items-stretch gap-2 flex-wrap">
-                    <Select className="flex-1 min-w-[150px]" style={{ ...SON_INPUT, padding: '6px 10px' }}
-                      value={selViolation[c.id] || stored.schedule[0]?.id || ''}
-                      onChange={e => setSelViolation(p => ({ ...p, [c.id]: e.target.value }))}>
-                      {stored.schedule.map(v => <option key={v.id} value={v.id}>{v.label} (+{v.points})</option>)}
-                    </Select>
-                    <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
-                    <SonButton size="sm" variant="ghost" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }}>
-                      <MdRestartAlt size={14} /> Reset
-                    </SonButton>
+                  {/* Actions — manual suspend / reinstate */}
+                  <div className="flex">
                     {suspended ? (
                       <SonButton size="sm" variant="green" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success(`${c.firstName} ${c.lastName} reinstated.`); }}>
                         <MdLockOpen size={14} /> Reinstate
