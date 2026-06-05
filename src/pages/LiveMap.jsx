@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -67,6 +68,7 @@ function priBorderColor(p) {
 
 export default function LiveMap() {
   const { state } = useCAD();
+  const navigate = useNavigate();
   const { officers, calls } = state;
 
   const [showUnits, setShowUnits] = useState(true);
@@ -160,6 +162,7 @@ export default function LiveMap() {
                   <g key={call.id}
                     onMouseEnter={() => setHover(`call-${call.id}`)}
                     onMouseLeave={() => setHover(null)}
+                    onClick={() => navigate(`/cad/${call.id}`)}
                     style={{ cursor: 'pointer' }}>
                     <circle cx={pos.x} cy={pos.y} r={isHovered ? 10 : 7}
                       fill={`${bc}22`} stroke={bc} strokeWidth="1.5"/>
@@ -186,6 +189,7 @@ export default function LiveMap() {
                   <g key={o.id}
                     onMouseEnter={() => setHover(`unit-${o.id}`)}
                     onMouseLeave={() => setHover(null)}
+                    onClick={() => navigate(o.callId ? `/cad/${o.callId}` : '/units')}
                     style={{ cursor: 'pointer' }}>
                     <rect x={pos.x - 14} y={pos.y - 8} width={28} height={16}
                       fill="#0a1622" stroke={sc} strokeWidth="1.2" rx="2"/>
@@ -258,7 +262,9 @@ export default function LiveMap() {
             </div>
             <div className={S_PANEL_BODY}>
               {onDuty.map(o => (
-                <div key={o.id} className={S_UNIT_ROW}>
+                <div key={o.id} className={S_UNIT_ROW}
+                  onClick={() => navigate(o.callId ? `/cad/${o.callId}` : '/units')}
+                  title={o.callId ? `Open call ${o.callId}` : 'View units'}>
                   <div className="w-2 h-2 rounded-full shrink-0" style={{ background: statusColor(o.status) }} />
                   <span className={`${S_DATA} min-w-[44px] text-[10px] text-brand-bright`}>{o.unitId}</span>
                   <span className="flex-1 text-[11px] text-slate-300 overflow-hidden text-ellipsis whitespace-nowrap">{o.name}</span>
@@ -275,7 +281,8 @@ export default function LiveMap() {
             </div>
             <div className={S_PANEL_BODY}>
               {activeCalls.map(c => (
-                <div key={c.id} className="px-4 py-2 border-b border-border-faint flex gap-2 items-center hover:bg-white/[0.03] transition-colors">
+                <div key={c.id} onClick={() => navigate(`/cad/${c.id}`)} title={`Open call ${c.id}`}
+                  className="px-4 py-2 border-b border-border-faint flex gap-2 items-center cursor-pointer hover:bg-white/[0.03] transition-colors">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: priBorderColor(c.priority) }} />
                   <span className={`${S_DATA} text-[10px] min-w-[56px]`}>{c.id}</span>
                   <span className="text-[11px] flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-slate-300">{c.nature}</span>

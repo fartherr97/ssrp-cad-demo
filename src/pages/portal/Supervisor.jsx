@@ -3,7 +3,7 @@ import Select from '../../components/ui/Select';
 import {
   MdSupervisorAccount, MdSearch, MdFilterList, MdChevronRight,
   MdDescription, MdFolder, MdDownload, MdOutlineRateReview, MdArrowBack,
-  MdSave, MdCheckCircle, MdShield, MdReply, MdComment,
+  MdSave, MdCheckCircle, MdShield, MdReply, MdClose,
   MdPerson, MdWarningAmber, MdCampaign,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
@@ -424,7 +424,7 @@ function RecordEditor({ entry, officer, template, currentUser, allOfficers, comm
               <span className="text-[14px] font-bold text-white flex-1">Return Report to Officer</span>
               <button type="button" onClick={() => setReturning(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 4 }}>
-                <MdComment size={16} className="text-slate-500 hover:text-slate-300" />
+                <MdClose size={16} className="text-slate-500 hover:text-slate-300" />
               </button>
             </div>
             <div className="text-[11.5px] text-slate-400 -mt-1">
