@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { isESDept } from '../../../constants/portals';
 import {
   AdminPageTitle, AdminPanel, SonButton, SonIconBtn, SonBadge, EmptyState, ADMIN, SON_INPUT, SON_LABEL,
 } from '../AdminKit';
@@ -190,9 +191,16 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
               <label style={SON_LABEL}>Auto-assign Department</label>
               <Select style={SON_INPUT} value={draft.deptId ?? ''} onChange={e => set({ deptId: e.target.value ? Number(e.target.value) : null })}>
                 <option value="">None / Any</option>
-                {departments.map(d => (
-                  <option key={d.id} value={d.id}>{d.name} ({d.short})</option>
-                ))}
+                <optgroup label="Emergency Services">
+                  {departments.filter(isESDept).map(d => (
+                    <option key={d.id} value={d.id}>{d.name} ({d.short})</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Support / Civilian">
+                  {departments.filter(d => !isESDept(d)).map(d => (
+                    <option key={d.id} value={d.id}>{d.name} ({d.short})</option>
+                  ))}
+                </optgroup>
               </Select>
               <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 3 }}>Automatically assigns the user to this department on sign-in.</div>
             </div>

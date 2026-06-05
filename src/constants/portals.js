@@ -99,3 +99,13 @@ export const PORTALS = {
 };
 
 export const DEFAULT_PORTAL = 'leo';
+
+/* Department type categories.
+   ES_DEPT_TYPES covers Emergency Services — these are the departments that
+   have Command / Supervisor Discord roles and are subject to dept scoping.
+   Civilian-type departments (FDOT, CIV-OPS) are support/operational and are
+   intentionally excluded from ES-specific filters and portal scoping. */
+export const ES_DEPT_TYPES = ['LEO', 'Fire'];
+export const CIVILIAN_DEPT_TYPES = ['Civilian'];
+export const isESDept   = (d) => ES_DEPT_TYPES.includes(d?.type);
+export const isCivDept  = (d) => CIVILIAN_DEPT_TYPES.includes(d?.type);

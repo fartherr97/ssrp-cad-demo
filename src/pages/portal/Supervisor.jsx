@@ -147,6 +147,7 @@ import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
 import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
 import { getScopeDeptId } from '../../utils/deptScope';
+import { isESDept } from '../../constants/portals';
 
 /* ── Status helpers ── */
 const STATUS_META = {
@@ -886,7 +887,7 @@ export default function Supervisor() {
      review their own department's submissions (see utils/deptScope.js).
      Community admins are unrestricted and keep the full dept filter. */
   const myOfficer = useMemo(() => officers.find(o => o.id === currentUser?.id), [officers, currentUser]);
-  const { deptId: scopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer);
+  const { deptId: scopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer, departments);
   const scopeDept = departments.find(d => d.id === scopeDeptId) ?? null;
 
   // Officers belonging to the supervisor's department (used to scope submissions).
@@ -901,11 +902,16 @@ export default function Supervisor() {
   ].filter(e => !scopedBadges || scopedBadges.has(e.officerBadge)),
   [reports, records, scopedBadges]);
 
+  // Only ES departments (LEO / Fire) in the filter — Civilian depts are excluded.
+  const esDeptShorts = useMemo(
+    () => new Set(departments.filter(isESDept).map(d => d.short)),
+    [departments]
+  );
   const deptOptions = useMemo(() => {
     const seen = new Set();
-    officers.forEach(o => { if (o.deptShort) seen.add(o.deptShort); });
+    officers.forEach(o => { if (o.deptShort && esDeptShorts.has(o.deptShort)) seen.add(o.deptShort); });
     return ['All', ...Array.from(seen).sort()];
-  }, [officers]);
+  }, [officers, esDeptShorts]);
 
   const typeOptions = useMemo(() => {
     const seen = new Set();

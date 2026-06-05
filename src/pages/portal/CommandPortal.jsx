@@ -1382,7 +1382,7 @@ export default function CommandPortal() {
   const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
   const [adminDeptId, setAdminDeptId] = useState(null);
 
-  const { deptId: ownScopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer);
+  const { deptId: ownScopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer, departments);
   const scopeDeptId = unrestricted ? adminDeptId : ownScopeDeptId;
   const scopeDept   = departments.find(d => d.id === scopeDeptId) ?? null;
 
