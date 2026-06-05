@@ -146,6 +146,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
 import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
 import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
+import { getScopeDeptId } from '../../utils/deptScope';
 
 /* ── Status helpers ── */
 const STATUS_META = {
@@ -880,10 +881,25 @@ export default function Supervisor() {
   const [search, setSearch]             = useState('');
   const [openEntry, setOpenEntry]       = useState(null); // null = list, object = edit
 
+  /* ── Department scoping ──
+     A supervisor holds a single dept Supervisor Discord role and may only
+     review their own department's submissions (see utils/deptScope.js).
+     Community admins are unrestricted and keep the full dept filter. */
+  const myOfficer = useMemo(() => officers.find(o => o.id === currentUser?.id), [officers, currentUser]);
+  const { deptId: scopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer);
+  const scopeDept = departments.find(d => d.id === scopeDeptId) ?? null;
+
+  // Officers belonging to the supervisor's department (used to scope submissions).
+  const scopedBadges = useMemo(() => {
+    if (unrestricted || scopeDeptId == null) return null; // null = no restriction
+    return new Set(officers.filter(o => o.dept === scopeDeptId).map(o => o.badge));
+  }, [officers, scopeDeptId, unrestricted]);
+
   const combined = useMemo(() => [
     ...reports.map(r => ({ ...r, kind: 'report' })),
     ...records.map(r => ({ ...r, kind: 'record' })),
-  ], [reports, records]);
+  ].filter(e => !scopedBadges || scopedBadges.has(e.officerBadge)),
+  [reports, records, scopedBadges]);
 
   const deptOptions = useMemo(() => {
     const seen = new Set();
@@ -1024,7 +1040,7 @@ export default function Supervisor() {
       {/* ── Personnel Lookup ── */}
       {portalMode === 'personnel' && (
         <PersonnelLookup
-          officers={officers}
+          officers={scopedBadges ? officers.filter(o => o.dept === scopeDeptId) : officers}
           civilians={civilians}
           warrants={warrants}
           criminalHistory={criminalHistory}
@@ -1058,14 +1074,22 @@ export default function Supervisor() {
                 className="text-slate-600 hover:text-slate-300 cursor-pointer text-[11px] font-bold shrink-0">✕</button>
             )}
           </div>
-          <Select
-            className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
-            value={deptFilter}
-            onChange={e => setDeptFilter(e.target.value)}
-          >
-            <option value="All">All Depts</option>
-            {deptOptions.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
-          </Select>
+          {scopeDept ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11.5px] font-bold border shrink-0"
+              style={{ background: 'rgba(56,189,248,0.08)', borderColor: 'rgba(56,189,248,0.25)', color: '#7dd3fc' }}
+              title={`You can only review ${scopeDept.name} submissions`}>
+              <DeptBadge deptShort={scopeDept.short} size={14} /> {scopeDept.short} only
+            </span>
+          ) : (
+            <Select
+              className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer shrink-0"
+              value={deptFilter}
+              onChange={e => setDeptFilter(e.target.value)}
+            >
+              <option value="All">All Depts</option>
+              {deptOptions.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+            </Select>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-2 px-4 pt-2">

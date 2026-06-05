@@ -15,6 +15,7 @@ import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
 } from './PortalKit';
 import AccessDenied from './AccessDenied';
+import { getScopeDeptId } from '../../utils/deptScope';
 
 const COMMAND_RANKS = [
   'Sergeant', 'Lieutenant', 'Captain',
@@ -1221,7 +1222,7 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
 /* ══════════════════════════════════
    TAB 8: DETECTIVE ROSTER
 ══════════════════════════════════ */
-function DetectiveRosterTab({ officers, departments, dispatch }) {
+function DetectiveRosterTab({ officers, departments, scopeDept, dispatch }) {
   const [search, setSearch] = useState('');
 
   const leoDeptIds = useMemo(
@@ -1266,9 +1267,15 @@ function DetectiveRosterTab({ officers, departments, dispatch }) {
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-faint">
           <MdPerson size={15} className="text-slate-500" />
           <span className="text-[12.5px] font-bold text-slate-200">{leoOfficers.length}</span>
-          <span className="text-[11px] text-slate-500">LEO officers</span>
+          <span className="text-[11px] text-slate-500">{scopeDept ? `${scopeDept.short} officers` : 'LEO officers'}</span>
         </div>
       </div>
+
+      {scopeDept && (
+        <div className="text-[11px] text-slate-500 -mt-1">
+          You can only designate detectives within <span className="font-semibold text-slate-300">{scopeDept.name}</span>.
+        </div>
+      )}
 
       {/* Search */}
       <div className="relative">
@@ -1369,11 +1376,14 @@ export default function CommandPortal() {
 
   if (!hasCommandAccess) return <AccessDenied portalName="the Command Portal" />;
 
-  /* ── Department scoping ── */
+  /* ── Department scoping ──
+     Non-admin command users are locked to their own department's command role
+     (see utils/deptScope.js). Admins get an unrestricted view + dept picker. */
   const leoDepts = useMemo(() => departments.filter(d => d.type === 'LEO'), [departments]);
   const [adminDeptId, setAdminDeptId] = useState(null);
 
-  const scopeDeptId = isAdmin ? adminDeptId : (myOfficer?.dept ?? null);
+  const { deptId: ownScopeDeptId, unrestricted } = getScopeDeptId(currentUser, myOfficer);
+  const scopeDeptId = unrestricted ? adminDeptId : ownScopeDeptId;
   const scopeDept   = departments.find(d => d.id === scopeDeptId) ?? null;
 
   const scopedOfficers = useMemo(() => {
@@ -1511,8 +1521,9 @@ export default function CommandPortal() {
       )}
       {activeTab === 'Detective Roster' && (
         <DetectiveRosterTab
-          officers={officers}
-          departments={departments}
+          officers={scopedOfficers}
+          departments={scopedDepts}
+          scopeDept={scopeDept}
           dispatch={dispatch}
         />
       )}
