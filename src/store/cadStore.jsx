@@ -897,6 +897,8 @@ function reducer(state, action) {
         time: nowTime(),
         read: false,
         recipientBadge: item.officerBadge || null,
+        // Reports open straight into the officer's returned-report editor.
+        link: label === 'Report' ? `/profile?returned=${rid}` : undefined,
       } : null;
       const notifications = notif ? [notif, ...state.notifications] : state.notifications;
       const audit = addAuditEntry(state, `Returned ${label.toLowerCase()} ${rid} to officer`, 'Reports');

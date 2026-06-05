@@ -283,7 +283,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
 }
 
 /* ─── Notification Bell ─── */
-function NotificationBell({ notifications, dispatch }) {
+function NotificationBell({ notifications, dispatch, navigate }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
@@ -371,7 +371,8 @@ function NotificationBell({ notifications, dispatch }) {
               notifications.map(n => (
                 <div
                   key={n.id}
-                  className="flex gap-3 px-3 py-2.5 rounded-xl border transition-colors"
+                  onClick={n.link ? () => { doClose(); navigate?.(n.link); } : undefined}
+                  className={`flex gap-3 px-3 py-2.5 rounded-xl border transition-colors ${n.link ? 'cursor-pointer hover:border-white/20' : ''}`}
                   style={{
                     background: n.read ? 'rgba(255,255,255,0.02)' : `${n.color || '#3a88e8'}0f`,
                     borderColor: n.read ? 'rgba(255,255,255,0.07)' : `${n.color || '#3a88e8'}35`,
@@ -387,7 +388,7 @@ function NotificationBell({ notifications, dispatch }) {
                     <div className="text-[10px] text-slate-600 mt-1">{n.time}</div>
                   </div>
                   <button
-                    onClick={() => dispatch({ type: 'DISMISS_NOTIFICATION', payload: n.id })}
+                    onClick={(e) => { e.stopPropagation(); dispatch({ type: 'DISMISS_NOTIFICATION', payload: n.id }); }}
                     title="Dismiss"
                     className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.08] cursor-pointer transition-colors"
                     style={{ background: 'none', border: 'none' }}
@@ -503,7 +504,7 @@ export default function ActionBar() {
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
         <NotificationBell
           notifications={notifications.filter(n => !n.recipientBadge || n.recipientBadge === currentUser?.badge)}
-          dispatch={dispatch} />
+          dispatch={dispatch} navigate={navigate} />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}

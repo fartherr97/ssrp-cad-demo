@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Select from '../components/ui/Select';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
@@ -113,6 +114,18 @@ export default function OfficerProfile() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [editingReturned, setEditingReturned] = useState(null);
   const { isMobile } = useResponsive();
+
+  // Deep-link from the "Report Returned" notification: ?returned=<id> opens that
+  // report straight in the resubmit editor.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const rid = searchParams.get('returned');
+    if (!rid) return;
+    const rep = reports.find(r => String(r.id) === String(rid) && r.status === 'Pending Changes');
+    if (rep) { setTab('returned'); setEditingReturned(rep); }
+    searchParams.delete('returned');
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams, reports, setSearchParams]);
   // Keep the open report in sync with the store so freshly-added supplements
   // appear immediately (viewReport only holds the id-bearing snapshot).
   const liveReport = viewReport ? (reports.find(r => r.id === viewReport.id) || viewReport) : null;
