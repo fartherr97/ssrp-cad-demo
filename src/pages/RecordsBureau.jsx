@@ -239,15 +239,9 @@ function InvestigationFlag({ cases, onTip }) {
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
-  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [], adminTiers = [] } = state;
+  const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [] } = state;
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
-
-  const canManageLicenses = currentUser?.portal === 'admin' && (() => {
-    if (!currentUser?.adminTierId) return true; // no tier = full access
-    const tier = adminTiers.find(t => t.id === currentUser.adminTierId);
-    return !!tier?.permissions?.licensePoints;
-  })();
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
@@ -911,26 +905,7 @@ export default function RecordsBureau() {
                           );
                         })()} />
                         <Row label="DL Status"       value={
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus || 'ACTIVE'}</span>
-                            {canManageLicenses && (
-                              selCiv.dlStatus === 'SUSPENDED' ? (
-                                <button
-                                  onClick={() => dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: selCiv.id, dlStatus: 'ACTIVE' } })}
-                                  className="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors"
-                                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.28)', color: '#22c55e' }}>
-                                  Reinstate
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => dispatch({ type: 'UPDATE_CIVILIAN', payload: { id: selCiv.id, dlStatus: 'SUSPENDED' } })}
-                                  className="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors"
-                                  style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.28)', color: '#f97316' }}>
-                                  Suspend
-                                </button>
-                              )
-                            )}
-                          </div>
+                          <span className={statusBadge(selCiv.dlStatus)}>{selCiv.dlStatus || 'ACTIVE'}</span>
                         } />
                       </InfoCard>
 

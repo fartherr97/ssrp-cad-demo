@@ -665,6 +665,24 @@ function reducer(state, action) {
         c.id === action.payload ? { ...c, dlStatus: 'ACTIVE', licensePoints: 0, suspendedUntil: null } : c);
       return { ...state, civilians, ...addAuditEntry(state, 'License suspension lifted (reinstated)', 'License Points') };
     }
+    case 'MANUAL_SUSPEND': {
+      // Manually suspend a driver's license from the admin Auto Suspend page
+      // (independent of point accumulation). Uses the configured suspension
+      // length when available.
+      const cfg = state.licensePointsConfig || {};
+      const { civilianId, reason } = action.payload;
+      const civ = state.civilians.find(c => c.id === civilianId);
+      if (!civ) return state;
+      const expiry = cfg.suspensionDays
+        ? new Date(Date.now() + cfg.suspensionDays * 86400000).toISOString().slice(0, 10)
+        : null;
+      const civilians = state.civilians.map(c =>
+        c.id === civilianId ? { ...c, dlStatus: 'SUSPENDED', suspendedUntil: expiry } : c);
+      const name = `${civ.firstName} ${civ.lastName}`;
+      const audit = addAuditEntry(state, `License manually suspended · ${name}${reason ? ` (${reason})` : ''}`, 'License Points');
+      const log = addDispatchLog(state, `LICENSE SUSPENDED (manual) · ${name}`, 'alert');
+      return { ...state, civilians, ...audit, ...log };
+    }
     // ── Custom flag definitions ──
     case 'ADD_FLAG_DEF': {
       const flag = { ...action.payload, id: `flag_${Date.now()}` };

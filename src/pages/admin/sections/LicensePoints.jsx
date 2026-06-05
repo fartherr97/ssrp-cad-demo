@@ -8,7 +8,7 @@ import {
 } from '../AdminKit';
 import {
   MdGavel, MdAdd, MdDelete, MdRestartAlt, MdLockOpen, MdSave, MdBolt,
-  MdSearch, MdClose,
+  MdSearch, MdClose, MdBlock,
 } from 'react-icons/md';
 
 const blank = (cfg) => JSON.parse(JSON.stringify(cfg));
@@ -189,6 +189,7 @@ export default function LicensePoints() {
   const [cfg, setCfg] = useState(() => blank(stored));
   const [selViolation, setSelViolation] = useState({});
   const [showImport, setShowImport] = useState(false);
+  const [driverSearch, setDriverSearch] = useState('');
 
   const dirty = JSON.stringify(cfg) !== JSON.stringify(stored);
   const save = () => { dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } }); toast.success('License points config saved.'); };
@@ -202,8 +203,17 @@ export default function LicensePoints() {
     setShowImport(false);
   };
 
-  const drivers = (state.civilians || []).filter(c => c.dlNumber);
+  const allDrivers = (state.civilians || []).filter(c => c.dlNumber);
   const threshold = stored.threshold || 0;
+  const drivers = (() => {
+    const q = driverSearch.trim().toLowerCase();
+    if (!q) return allDrivers;
+    return allDrivers.filter(c =>
+      `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
+      c.dlNumber?.toLowerCase().includes(q) ||
+      c.ssn?.includes(q)
+    );
+  })();
 
   const applyPoints = (civ) => {
     const vId = selViolation[civ.id] || stored.schedule[0]?.id;
@@ -299,8 +309,28 @@ export default function LicensePoints() {
       </AdminPanel>
 
       {/* ── Drivers ── */}
-      <AdminPanel title="Driver License Points" subtitle={`Live points per licensed driver · suspends at ${threshold} pts`}>
-        {drivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState> : (
+      <AdminPanel
+        title="Driver License Points"
+        subtitle={`Live points per licensed driver · auto-suspends at ${threshold} pts · search to manually suspend or reinstate`}
+        right={
+          <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2 w-[260px] max-w-full">
+            <MdSearch size={14} className="text-slate-500 shrink-0" />
+            <input
+              className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
+              placeholder="Search name, DL #, or SSN…"
+              value={driverSearch}
+              onChange={e => setDriverSearch(e.target.value)}
+            />
+            {driverSearch && (
+              <button onClick={() => setDriverSearch('')} className="text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0 shrink-0">
+                <MdClose size={15} />
+              </button>
+            )}
+          </div>
+        }
+      >
+        {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState>
+          : drivers.length === 0 ? <EmptyState>No drivers match "{driverSearch}".</EmptyState> : (
           <SonTable columns={[
             { label: 'Driver' }, { label: 'DL #' }, { label: 'Status', align: 'center' },
             { label: 'Points', width: 200 }, { label: 'Apply Violation', align: 'right' },
@@ -334,8 +364,10 @@ export default function LicensePoints() {
                       </Select>
                       <SonButton size="sm" onClick={() => applyPoints(c)}><MdAdd size={14} /> Add</SonButton>
                       <SonIconBtn icon={MdRestartAlt} title="Reset points" onClick={() => { dispatch({ type: 'RESET_LICENSE_POINTS', payload: c.id }); toast.success('Points reset.'); }} />
-                      {c.dlStatus === 'SUSPENDED' && (
-                        <SonIconBtn icon={MdLockOpen} title="Lift suspension" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success('Suspension lifted.'); }} />
+                      {c.dlStatus === 'SUSPENDED' ? (
+                        <SonIconBtn icon={MdLockOpen} title="Reinstate license" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success(`${c.firstName} ${c.lastName} reinstated.`); }} />
+                      ) : (
+                        <SonIconBtn icon={MdBlock} danger title="Suspend license" onClick={() => { dispatch({ type: 'MANUAL_SUSPEND', payload: { civilianId: c.id, reason: 'Manual admin action' } }); toast.success(`${c.firstName} ${c.lastName} suspended.`); }} />
                       )}
                     </div>
                   </SonCell>
