@@ -897,8 +897,9 @@ function reducer(state, action) {
         time: nowTime(),
         read: false,
         recipientBadge: item.officerBadge || null,
-        // Reports open straight into the officer's returned-report editor.
-        link: label === 'Report' ? `/profile?returned=${rid}` : undefined,
+        // Opens straight into the officer's returned-item resubmit editor
+        // (works for both reports and records).
+        link: `/profile?returned=${rid}`,
       } : null;
       const notifications = notif ? [notif, ...state.notifications] : state.notifications;
       const audit = addAuditEntry(state, `Returned ${label.toLowerCase()} ${rid} to officer`, 'Reports');
@@ -912,6 +913,15 @@ function reducer(state, action) {
       );
       const audit = addAuditEntry(state, `Officer resubmitted report ${rid2}`, 'Reports');
       return { ...state, reports, ...audit };
+    }
+    case 'RESUBMIT_RECORD': {
+      // payload: { id, formData, officerSignature }
+      const { id: rid3, formData, officerSignature } = action.payload;
+      const records = state.records.map(r =>
+        r.id === rid3 ? { ...r, formData, status: 'Pending Review', ...(officerSignature ? { officerSignature } : {}) } : r
+      );
+      const audit = addAuditEntry(state, `Officer resubmitted record ${rid3}`, 'Records');
+      return { ...state, records, ...audit };
     }
     case 'UPDATE_RECORD': {
       const records = state.records.map(r =>

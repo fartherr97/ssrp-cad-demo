@@ -100,11 +100,15 @@ function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResu
 export default function OfficerProfile() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { currentUser, officers, departments, reports, calls, reportTemplates = [] } = state;
+  const { currentUser, officers, departments, reports, records = [], calls, reportTemplates = [], recordTemplates = [] } = state;
   const myOfficer = officers.find(o => o.id === currentUser?.id);
   const myDept = departments.find(d => d.id === myOfficer?.dept);
   const myReports = reports.filter(r => r.officerBadge === myOfficer?.badge && r.status !== 'Pending Changes');
-  const returnedReports = reports.filter(r => r.officerBadge === myOfficer?.badge && r.status === 'Pending Changes');
+  // Returned reports AND records the officer needs to fix and resubmit.
+  const returnedItems = [
+    ...reports.filter(r => r.officerBadge === myOfficer?.badge && r.status === 'Pending Changes').map(r => ({ ...r, _kind: 'report' })),
+    ...records.filter(r => r.officerBadge === myOfficer?.badge && r.status === 'Pending Changes').map(r => ({ ...r, _kind: 'record' })),
+  ];
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
 
   const [tab, setTab] = useState('info');
@@ -115,17 +119,19 @@ export default function OfficerProfile() {
   const [editingReturned, setEditingReturned] = useState(null);
   const { isMobile } = useResponsive();
 
-  // Deep-link from the "Report Returned" notification: ?returned=<id> opens that
-  // report straight in the resubmit editor.
+  // Deep-link from the "Returned for Changes" notification: ?returned=<id> opens
+  // that report OR record straight in the resubmit editor.
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
     const rid = searchParams.get('returned');
     if (!rid) return;
     const rep = reports.find(r => String(r.id) === String(rid) && r.status === 'Pending Changes');
-    if (rep) { setTab('returned'); setEditingReturned(rep); }
+    const rec = records.find(r => String(r.id) === String(rid) && r.status === 'Pending Changes');
+    const item = rep ? { ...rep, _kind: 'report' } : rec ? { ...rec, _kind: 'record' } : null;
+    if (item) { setTab('returned'); setEditingReturned(item); }
     searchParams.delete('returned');
     setSearchParams(searchParams, { replace: true });
-  }, [searchParams, reports, setSearchParams]);
+  }, [searchParams, reports, records, setSearchParams]);
   // Keep the open report in sync with the store so freshly-added supplements
   // appear immediately (viewReport only holds the id-bearing snapshot).
   const liveReport = viewReport ? (reports.find(r => r.id === viewReport.id) || viewReport) : null;
@@ -261,9 +267,9 @@ export default function OfficerProfile() {
           >
             <span className="flex items-center gap-1.5">
               {l}
-              {k === 'returned' && returnedReports.length > 0 && (
+              {k === 'returned' && returnedItems.length > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none bg-amber-500/20 text-amber-400">
-                  {returnedReports.length}
+                  {returnedItems.length}
                 </span>
               )}
             </span>
@@ -344,22 +350,23 @@ export default function OfficerProfile() {
           editingReturned ? (
             <ReturnedReportEditor
               report={editingReturned}
-              reportTemplates={reportTemplates}
+              reportTemplates={editingReturned._kind === 'record' ? recordTemplates : reportTemplates}
               officer={myOfficer}
               onBack={() => setEditingReturned(null)}
               onResubmit={(formData) => {
-                dispatch({ type: 'RESUBMIT_REPORT', payload: { id: editingReturned.id, formData } });
-                toast.success('Report resubmitted for review.', { title: 'Resubmitted' });
+                const isRecord = editingReturned._kind === 'record';
+                dispatch({ type: isRecord ? 'RESUBMIT_RECORD' : 'RESUBMIT_REPORT', payload: { id: editingReturned.id, formData } });
+                toast.success(`${isRecord ? 'Record' : 'Report'} resubmitted for review.`, { title: 'Resubmitted' });
                 setEditingReturned(null);
               }}
             />
           ) : (
             <div className="flex flex-col gap-3">
-              {returnedReports.length === 0 ? (
+              {returnedItems.length === 0 ? (
                 <div className="bg-app-panel/80 border border-border-base rounded-xl p-10 text-center text-slate-600 text-[13px]">
-                  No returned reports · you&apos;re all clear.
+                  No returned reports or records · you&apos;re all clear.
                 </div>
-              ) : returnedReports.map(r => {
+              ) : returnedItems.map(r => {
                 const latestComment = (r.supervisorComments || []).slice(-1)[0];
                 return (
                   <div key={r.id} className="bg-app-panel/80 border rounded-xl overflow-hidden backdrop-blur-sm"
