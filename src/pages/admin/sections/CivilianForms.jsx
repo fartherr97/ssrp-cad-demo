@@ -120,8 +120,8 @@ function FieldListEditor({ fields, onChange, accent, note }) {
           const isCore = !!f.core;
           return (
             <div key={f.key} className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <div className="flex items-center gap-2">
-                <input style={{ ...INPUT, flex: 1 }} value={f.label} placeholder="Field label"
+              <div className="flex flex-wrap items-center gap-2">
+                <input style={{ ...INPUT, flex: '1 1 140px', minWidth: 140 }} value={f.label} placeholder="Field label"
                   onChange={e => up(idx, { label: e.target.value })} />
                 {isCore ? (
                   <span className="inline-flex items-center justify-center text-[11px] font-bold rounded-lg shrink-0"

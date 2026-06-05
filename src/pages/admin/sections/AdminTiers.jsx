@@ -193,19 +193,19 @@ function TierModal({ draft, setDraft, onSave, onClose, isNew }) {
         <div className="overflow-y-auto flex-1 p-5 flex flex-col gap-4">
 
           {/* Identity */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2 sm:col-span-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-1">
               <label style={SON_LABEL}>Tier Name <span style={{ color: '#ef4444' }}>*</span></label>
               <input style={SON_INPUT} placeholder="e.g. Senior Admin"
                 value={draft.name} onChange={e => set({ name: e.target.value })} />
             </div>
-            <div>
+            <div className="sm:col-span-1">
               <label style={SON_LABEL}>Authority Level (1 – 100)</label>
               <input style={SON_INPUT} type="number" min={1} max={100}
                 value={draft.level} onChange={e => set({ level: Math.min(100, Math.max(1, Number(e.target.value) || 1)) })} />
               <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 3 }}>Higher level tiers supersede lower ones in authority.</div>
             </div>
-            <div>
+            <div className="sm:col-span-1">
               <label style={SON_LABEL}>Badge Color</label>
               <div className="flex items-center gap-2">
                 <input type="color" value={draft.color} onChange={e => set({ color: e.target.value })}

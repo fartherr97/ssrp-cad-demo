@@ -137,7 +137,7 @@ export default function DiscordPresence() {
               {[0, 1].map(i => (
                 <div key={i} style={{ display: 'flex', gap: 8 }}>
                   <input
-                    style={{ ...SON_INPUT, width: 160, flexShrink: 0 }}
+                    style={{ ...SON_INPUT, flex: '1 1 120px', minWidth: 0 }}
                     placeholder={`Button ${i + 1} Label`}
                     value={buttons[i]?.label || ''}
                     onChange={e => setButton(i, 'label', e.target.value)}

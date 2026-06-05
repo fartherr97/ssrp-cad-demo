@@ -122,7 +122,7 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
           </div>
 
           {/* Discord role name + ID */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label style={SON_LABEL}>Discord Role Name</label>
               <input style={SON_INPUT} placeholder="e.g. TPD Officer"
@@ -138,7 +138,7 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
           </div>
 
           {/* Portal + Role */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label style={SON_LABEL}>CAD Portal <span style={{ color: '#ef4444' }}>*</span></label>
               <Select style={SON_INPUT} value={draft.cadPortal}
@@ -186,7 +186,7 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
           )}
 
           {/* Department + rank */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label style={SON_LABEL}>Auto-assign Department</label>
               <Select style={SON_INPUT} value={draft.deptId ?? ''} onChange={e => set({ deptId: e.target.value ? Number(e.target.value) : null })}>
@@ -213,7 +213,7 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
           </div>
 
           {/* Priority */}
-          <div className="grid grid-cols-2 gap-3 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
             <div>
               <label style={SON_LABEL}>Priority (1 – 100)</label>
               <input style={SON_INPUT} type="number" min={1} max={100}

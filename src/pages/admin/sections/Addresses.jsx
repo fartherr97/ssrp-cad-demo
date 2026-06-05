@@ -85,13 +85,13 @@ export default function Addresses() {
     >
       {/* New row */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        <input style={{ ...SON_INPUT, width: 200 }} placeholder="Name" value={name}
+        <input style={{ ...SON_INPUT, flex: '1 1 160px', minWidth: 130 }} placeholder="Name" value={name}
           onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, flex: 1, minWidth: 200 }} placeholder="Street" value={street}
+        <input style={{ ...SON_INPUT, flex: '2 1 200px', minWidth: 160 }} placeholder="Street" value={street}
           onChange={e => setStreet(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, width: 180 }} placeholder="Area" value={area}
+        <input style={{ ...SON_INPUT, flex: '1 1 140px', minWidth: 120 }} placeholder="Area" value={area}
           onChange={e => setArea(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <input style={{ ...SON_INPUT, width: 120 }} placeholder="Postal" value={postal}
+        <input style={{ ...SON_INPUT, flex: '1 1 100px', minWidth: 100 }} placeholder="Postal" value={postal}
           onChange={e => setPostal(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
         <SonButton variant="red" onClick={add}><MdAdd size={16} /> Add</SonButton>
       </div>

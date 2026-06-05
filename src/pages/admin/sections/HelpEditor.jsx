@@ -85,7 +85,7 @@ function SectionEditor({ sec, color, onChange, onDelete, onMoveUp, onMoveDown, i
       {open && (
         <div className="p-4 flex flex-col gap-4">
           {/* Title + Icon row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={LBL}>Section Title</label>
               <input className={INP} value={sec.title} onChange={e => setField('title', e.target.value)} placeholder="e.g. My Vehicles" />

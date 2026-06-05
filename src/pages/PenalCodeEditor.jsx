@@ -230,7 +230,7 @@ export default function PenalCodeEditor() {
               </div>
               <div className={S_FIELD}><label className={S_LABEL}>Offense Name *</label><input className={S_INPUT} value={form.name} onChange={e => setForm(p=>({...p,name:e.target.value}))} /></div>
               <div className={S_FIELD}><label className={S_LABEL}>Category</label><input className={S_INPUT} placeholder="e.g. Crimes Against Property" value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} /></div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className={S_FIELD}><label className={S_LABEL}>Fine ($)</label><input className={S_INPUT} type="number" value={form.fine} onChange={e => setForm(p=>({...p,fine:e.target.value}))} /></div>
                 <div className={S_FIELD}><label className={S_LABEL}>Jail Time</label><input className={S_INPUT} placeholder="e.g. 5 Years" value={form.jailTime} onChange={e => setForm(p=>({...p,jailTime:e.target.value}))} /></div>
                 <div className={S_FIELD}>

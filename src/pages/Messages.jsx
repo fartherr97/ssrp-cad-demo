@@ -156,7 +156,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2 flex-col xs:flex-row">
+          <div className="flex gap-2 flex-col sm:flex-row">
             <button type="button" onClick={onClose}
               className="flex-1 py-2.5 rounded-xl text-[12px] font-bold cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}>

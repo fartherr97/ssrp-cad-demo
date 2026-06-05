@@ -101,7 +101,7 @@ function DeptCard({ d, onSave, onDelete, officers = [] }) {
           <input style={SON_INPUT} value={draft.short} onChange={e => set({ short: e.target.value })} />
         </div>
         {open && (
-          <div className="expand-section grid grid-cols-2 gap-[10px]">
+          <div className="expand-section grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
             <div>
               <label style={SON_LABEL}>Type</label>
               <Select style={SON_INPUT} value={draft.type || 'Law Enforcement'} onChange={e => set({ type: e.target.value })}>
@@ -121,10 +121,10 @@ function DeptCard({ d, onSave, onDelete, officers = [] }) {
                 {ROUTING_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </Select>
             </div>
-            <div className="col-span-2" style={{ fontSize: 11, color: ADMIN.textMute, marginTop: -4 }}>
+            <div className="sm:col-span-2" style={{ fontSize: 11, color: ADMIN.textMute, marginTop: -4 }}>
               Routing role pins this agency to a specific request feed (HCFR → Fire Board, FDOT → Tow dispatch). Agencies with a role cannot be deleted without a warning.
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label style={SON_LABEL}>Subdivisions (comma separated)</label>
               <input style={SON_INPUT} value={(draft.subdivisions || []).join(', ')}
                 onChange={e => set({ subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
@@ -132,7 +132,7 @@ function DeptCard({ d, onSave, onDelete, officers = [] }) {
                 Subdivisions become selectable for this department's units and register in the Command Portal's Subdivision Hours tracker.
               </div>
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label style={SON_LABEL}>Department Logo URL</label>
               <div className="flex items-center gap-3">
                 <input style={{ ...SON_INPUT, flex: 1 }} value={draft.logoUrl || ''} placeholder="https://…"
