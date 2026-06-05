@@ -919,17 +919,6 @@ function baseReducer(state, action) {
       const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString(), templateSnapshot: snapshotFor(state.recordTemplates, action.payload.type, action.payload.templateSnapshot), ...(civId !== undefined ? { civilianId: civId } : {}) };
       return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
     }
-    case 'SET_DL_TEMPLATE': {
-      const { templateId } = action.payload;
-      const recordTemplates = state.recordTemplates.map(t => ({ ...t, dlTemplate: t.id === templateId }));
-      return { ...state, recordTemplates };
-    }
-    case 'SET_TEMPLATE_FLAG': {
-      // Generic: sets flag to true on one template, false on all others. templateId:null clears all.
-      const { flag, templateId } = action.payload;
-      const recordTemplates = state.recordTemplates.map(t => ({ ...t, [flag]: t.id === templateId }));
-      return { ...state, recordTemplates };
-    }
     case 'UPDATE_REPORT': {
       const reports = state.reports.map(r =>
         r.id === action.payload.id ? { ...r, ...action.payload } : r

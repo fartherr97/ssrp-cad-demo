@@ -3,11 +3,10 @@ import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import ReportForm from '../../../components/ReportForm';
-import { ADMIN } from '../AdminKit';
 import {
   MdAdd, MdDelete, MdContentCopy, MdArrowUpward, MdArrowDownward,
   MdDescription, MdFolder, MdSearch, MdExpandMore, MdChevronRight,
-  MdPerson, MdDirectionsCar, MdGavel, MdSave, MdLock,
+  MdPerson, MdDirectionsCar, MdSave, MdLock,
   MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar, MdCode, MdTag,
 } from 'react-icons/md';
 
@@ -626,150 +625,24 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
   );
 }
 
-/* ── DL Class Editor (shown inside TemplateEditor when dlTemplate is active) ── */
-function DLClassEditor({ draft, onChange }) {
-  const classes = draft.dlClasses || [];
-
-  const add = () => onChange({
-    dlClasses: [...classes, { value: `Class ${classes.length + 1}`, label: `Class ${classes.length + 1}`, desc: '' }],
-  });
-
-  const update = (idx, patch) => {
-    const updated = classes.map((c, i) => {
-      if (i !== idx) return c;
-      const merged = { ...c, ...patch };
-      if (patch.label !== undefined) merged.value = patch.label; // keep value in sync with label
-      return merged;
-    });
-    onChange({ dlClasses: updated });
-  };
-
-  const remove = (idx) => onChange({ dlClasses: classes.filter((_, i) => i !== idx) });
-
-  return (
-    <div className="mb-4 rounded-xl overflow-hidden"
-      style={{ border: '1px solid rgba(74,222,128,0.2)', background: 'rgba(74,222,128,0.04)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5"
-        style={{ background: 'rgba(74,222,128,0.08)', borderBottom: '1px solid rgba(74,222,128,0.15)' }}>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">🪪</span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.6px]" style={{ color: '#4ade80' }}>
-            License Classes
-          </span>
-          <span className="text-[9.5px] text-slate-600 normal-case tracking-normal font-normal ml-1">
-            · defines the class options civilians see when applying
-          </span>
-        </div>
-        <button type="button" onClick={add}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer border-none"
-          style={{ background: 'rgba(74,222,128,0.15)', color: '#4ade80' }}>
-          <MdAdd size={13} /> Add Class
-        </button>
-      </div>
-
-      {/* Class rows */}
-      <div className="p-3 flex flex-col gap-2">
-        {classes.length === 0 && (
-          <div className="text-[11px] text-slate-600 py-2 text-center italic">
-            No classes defined · civilians will see the default Florida classes.
-          </div>
-        )}
-        {classes.map((cls, idx) => (
-          <div key={idx} className="flex items-start gap-2 p-2 rounded-lg"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Label</div>
-                  <input
-                    className="w-full bg-app-input border border-border-faint rounded px-2 py-1.5 text-[12px] font-bold text-slate-200 outline-none focus:border-brand/50"
-                    value={cls.label}
-                    placeholder="e.g. Class E"
-                    onChange={e => update(idx, { label: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="text-[8.5px] font-bold uppercase tracking-[0.5px] text-slate-600 mb-0.5">Description</div>
-                <input
-                  className="w-full bg-app-input border border-border-faint rounded px-2 py-1.5 text-[12px] text-slate-300 outline-none focus:border-brand/50"
-                  value={cls.desc || ''}
-                  placeholder="e.g. Standard license for vehicles under 26,001 lbs"
-                  onChange={e => update(idx, { desc: e.target.value })}
-                />
-              </div>
-            </div>
-            <button type="button" onClick={() => remove(idx)}
-              className="shrink-0 mt-5 p-1.5 rounded-lg cursor-pointer border-none"
-              style={{ background: 'rgba(248,113,113,0.12)', color: '#f87171' }}>
-              <MdDelete size={13} />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Record role toggles (DL / Vehicle Reg / Weapon Permit) ── */
-const RECORD_ROLES = [
-  { flag: 'dlTemplate',           emoji: '🪪', label: 'Driver License',      hint: 'Civilians use this to apply for their DL',          col: '#4ade80' },
-  { flag: 'vehicleTemplate',      emoji: '🚗', label: 'Vehicle Registration', hint: 'Adds extra fields to vehicle registration',          col: '#60a5fa' },
-  { flag: 'weaponPermitTemplate', emoji: '🔫', label: 'Weapon Permit',        hint: 'Reserved for future weapon-permit self-service',     col: '#c084fc' },
-];
-
-function RecordRoleToggles({ draft, onChange, isReport }) {
-  const { state, dispatch } = useCAD();
-  const toast = useToast();
-  const nextReportNumber = String(state.reportSeq || 1).padStart(4, '0');
-
-  const toggle = (flag) => {
-    const next = !draft[flag];
-    const templateId = next ? draft.id : null;
-    if (flag === 'dlTemplate') {
-      dispatch({ type: 'SET_DL_TEMPLATE', payload: { templateId } });
-    } else {
-      dispatch({ type: 'SET_TEMPLATE_FLAG', payload: { flag, templateId } });
-    }
-    onChange({ [flag]: next });
-    const roleLabel = RECORD_ROLES.find(r => r.flag === flag)?.label || 'Role';
-    toast.success(`${roleLabel} ${next ? 'enabled' : 'disabled'}.`);
-  };
-
+/* ── Next-number meta bar ── */
+function RecordNumberBar({ isReport }) {
+  const { state } = useCAD();
+  const nextNumber = String(state.reportSeq || 1).padStart(4, '0');
   return (
     <div className="shrink-0 px-4 py-2 flex items-center gap-3 flex-wrap"
       style={{ background: '#0a1520', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>Report Number</div>
+      <div className="text-[8.5px] font-bold uppercase tracking-[0.5px]" style={{ color: '#3d5470' }}>{isReport ? 'Report' : 'Record'} Number</div>
       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
         style={{ background: 'rgba(61,130,240,0.10)', border: '1px solid rgba(61,130,240,0.22)' }}
-        title="Report numbers are auto-assigned sequentially when a report is filed · starting at 0001.">
+        title="Numbers are auto-assigned sequentially when filed · starting at 0001.">
         <span className="text-[12px] font-bold tabular-nums" style={{ color: '#3d82f0', fontFamily: 'var(--font-ui)', letterSpacing: '0.04em' }}>
-          #{nextReportNumber}
+          #{nextNumber}
         </span>
         <span className="text-[8px] font-bold uppercase tracking-[0.4px] px-1 py-0.5 rounded" style={{ color: '#3d5470', background: 'rgba(255,255,255,0.05)' }}>
           next · auto
         </span>
       </div>
-      {!isReport && (
-        <>
-          <div className="h-3.5 w-px mx-0.5" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          {RECORD_ROLES.map(({ flag, emoji, label, hint, col }) => {
-            const active = !!draft[flag];
-            return (
-              <button key={flag} type="button" onClick={() => toggle(flag)}
-                title={active ? `Remove ${label} designation` : hint}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-bold cursor-pointer transition-all border"
-                style={active
-                  ? { background: `${col}1e`, color: col, borderColor: `${col}55` }
-                  : { background: 'rgba(255,255,255,0.04)', color: '#4b5563', borderColor: 'rgba(255,255,255,0.08)' }
-                }>
-                {emoji} {active ? `${label} ✓` : label}
-              </button>
-            );
-          })}
-        </>
-      )}
     </div>
   );
 }
@@ -912,15 +785,11 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Meta bar * form code + role toggles */}
-      <RecordRoleToggles draft={draft} onChange={up} isReport={isReport} />
+      {/* Meta bar * next auto-assigned number */}
+      <RecordNumberBar isReport={isReport} />
 
       {/* Sections (scrollable body) */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
-        {/* DL class editor * only visible when this template is the DL template */}
-        {draft.dlTemplate && (
-          <DLClassEditor draft={draft} onChange={up} />
-        )}
 
         {(draft.sections || []).length === 0 && (
           <div className="py-10 text-center" style={{ color: '#2d3f52' }}>
