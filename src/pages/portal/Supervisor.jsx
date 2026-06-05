@@ -928,6 +928,9 @@ export default function Supervisor() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return combined.filter(entry => {
+      // The review queue is only for items that still need a supervisor —
+      // approved submissions are done and drop off the list.
+      if (entry.status === 'Approved') return false;
       const officer = officerByBadge[entry.officerBadge];
       if (deptFilter !== 'All' && officer?.deptShort !== deptFilter) return false;
       if (typeFilter !== 'All' && entry.type !== typeFilter) return false;
@@ -943,7 +946,7 @@ export default function Supervisor() {
 
   const reportCount = filtered.filter(e => e.kind === 'report').length;
   const recordCount = filtered.filter(e => e.kind === 'record').length;
-  const STATUS_PILLS = ['All', 'Pending Review', 'Pending Changes', 'Approved', 'Rejected'];
+  const STATUS_PILLS = ['All', 'Pending Review', 'Pending Changes', 'Rejected'];
 
   /* ── Open / save handlers ── */
   const openRecord = (entry) => {
