@@ -5,6 +5,7 @@ import {
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
   MdFilterList, MdTimer, MdDirectionsRun, MdInfoOutline,
   MdAccessTime, MdFiberManualRecord, MdCampaign,
+  MdBadge, MdWork, MdRemoveCircle, MdAddCircle,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
@@ -1218,12 +1219,141 @@ function NotificationBlastTab({ currentUser, myOfficer, isAdmin, departments }) 
 }
 
 /* ══════════════════════════════════
+   TAB 8: DETECTIVE ROSTER
+══════════════════════════════════ */
+function DetectiveRosterTab({ officers, departments, dispatch }) {
+  const [search, setSearch] = useState('');
+
+  const leoDeptIds = useMemo(
+    () => new Set(departments.filter(d => d.type === 'LEO').map(d => d.id)),
+    [departments]
+  );
+
+  const leoOfficers = useMemo(
+    () => officers.filter(o => leoDeptIds.has(o.dept)),
+    [officers, leoDeptIds]
+  );
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return leoOfficers;
+    return leoOfficers.filter(o =>
+      o.name.toLowerCase().includes(q) ||
+      o.badge?.toLowerCase().includes(q) ||
+      o.unitId?.toLowerCase().includes(q)
+    );
+  }, [leoOfficers, search]);
+
+  const designated = leoOfficers.filter(o =>
+    o.isDetective || o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective')
+  );
+
+  const toggle = (o) => {
+    if (o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective')) return;
+    dispatch({ type: 'SET_DETECTIVE', payload: { officerId: o.id, isDetective: !o.isDetective } });
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Summary strip */}
+      <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border"
+          style={{ background: 'rgba(56,189,248,0.07)', borderColor: 'rgba(56,189,248,0.22)' }}>
+          <MdWork size={15} className="text-sky-400" />
+          <span className="text-[12.5px] font-bold text-slate-200">{designated.length}</span>
+          <span className="text-[11px] text-slate-500">detective{designated.length !== 1 ? 's' : ''} designated</span>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-faint">
+          <MdPerson size={15} className="text-slate-500" />
+          <span className="text-[12.5px] font-bold text-slate-200">{leoOfficers.length}</span>
+          <span className="text-[11px] text-slate-500">LEO officers</span>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <MdSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+        <input
+          type="text"
+          placeholder="Search by name, badge, or unit ID…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-8 pr-4 py-2.5 rounded-xl text-[12.5px] bg-app-input border border-border-base text-slate-200 placeholder:text-slate-600 outline-none focus:border-sky-400/40 transition-all"
+        />
+      </div>
+
+      {/* Officer list */}
+      <div className="flex flex-col gap-2">
+        {filtered.length === 0 && (
+          <div className="py-10 text-center text-slate-600 text-[12px]">No officers found</div>
+        )}
+        {filtered.map(o => {
+          const isOfficialDet = o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective');
+          const isDet = isOfficialDet || !!o.isDetective;
+          const dept = departments.find(d => d.id === o.dept);
+
+          return (
+            <div key={o.id} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all
+              ${isDet ? 'border-sky-500/25 bg-sky-500/[0.05]' : 'border-border-faint bg-app-elevated/40'}`}>
+
+              {/* Status dot */}
+              <div className={`w-2 h-2 rounded-full shrink-0 ${
+                o.status === 'AVAILABLE' ? 'bg-emerald-400' :
+                o.status === 'OFFDUTY'   ? 'bg-slate-600'   : 'bg-amber-400'
+              }`} />
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[13px] font-semibold text-slate-200">{o.name}</span>
+                  {isDet && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-bold border"
+                      style={{ color: '#38bdf8', background: 'rgba(56,189,248,0.1)', borderColor: 'rgba(56,189,248,0.3)' }}>
+                      <MdWork size={9} /> Detective
+                    </span>
+                  )}
+                </div>
+                <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">
+                  {o.badge} · {o.rank} · {dept?.short || o.deptShort}
+                </div>
+              </div>
+
+              {/* Toggle button */}
+              {isOfficialDet ? (
+                <span className="text-[10px] text-slate-600 italic shrink-0 hidden sm:block">Role-based</span>
+              ) : (
+                <button
+                  onClick={() => toggle(o)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all shrink-0"
+                  style={isDet
+                    ? { color: '#f87171', background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.25)' }
+                    : { color: '#38bdf8', background: 'rgba(56,189,248,0.08)', borderColor: 'rgba(56,189,248,0.25)' }
+                  }>
+                  {isDet
+                    ? <><MdRemoveCircle size={12} /> Remove</>
+                    : <><MdAddCircle size={12} /> Designate</>
+                  }
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="text-[10.5px] text-slate-600 leading-relaxed">
+        Designated detectives gain full access to Case Files — they can open and manage CID investigations, add subjects and vehicles, and update the case timeline. Officers whose rank or subdivision is already "Detectives" are automatically included and cannot be toggled here.
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
    MAIN: COMMAND PORTAL
 ══════════════════════════════════ */
-const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'Report Tracker', 'Response Times', 'Notification Blast'];
+const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'Report Tracker', 'Response Times', 'Notification Blast', 'Detective Roster'];
 
 export default function CommandPortal() {
-  const { state } = useCAD();
+  const { state, dispatch } = useCAD();
   const {
     reports = [], officers = [], departments = [], calls = [],
     reportTemplates = [], currentUser, callLogs = [],
@@ -1377,6 +1507,13 @@ export default function CommandPortal() {
           myOfficer={myOfficer}
           isAdmin={isAdmin}
           departments={departments}
+        />
+      )}
+      {activeTab === 'Detective Roster' && (
+        <DetectiveRosterTab
+          officers={officers}
+          departments={departments}
+          dispatch={dispatch}
         />
       )}
 

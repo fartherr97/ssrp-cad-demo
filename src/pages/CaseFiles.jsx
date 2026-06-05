@@ -135,7 +135,7 @@ function CaseListItem({ c, active, onClick, officers }) {
 function CaseModal({ caseFile, officers, currentUser, onSave, onClose }) {
   const isEdit = !!caseFile;
   const detectives = officers.filter(o =>
-    o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective')
+    o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective') || o.isDetective === true
   );
   const meId = currentUser?.id;
   const [form, setForm] = useState({
@@ -821,7 +821,7 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
   const canManage = (
     currentUser?.portal === 'admin' ||
     currentUser?.portal === 'supervisor' ||
-    officers.find(o => o.id === currentUser?.id)?.subdivision === 'Detectives' ||
+    (() => { const me = officers.find(o => o.id === currentUser?.id); return me?.subdivision === 'Detectives' || me?.rank?.toLowerCase().includes('detective') || me?.isDetective === true; })() ||
     caseFile.assignedDetectives?.includes(currentUser?.id)
   );
 
@@ -837,7 +837,7 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
   };
 
   return (
-    <div className="flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
+    <div className="flex flex-col min-h-0 h-full bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
       {/* Header */}
       <div className="flex items-start gap-3 px-4 sm:px-5 py-4 border-b border-border-faint shrink-0">
         {isMobile && (

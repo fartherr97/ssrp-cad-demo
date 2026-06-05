@@ -1249,7 +1249,28 @@ function reducer(state, action) {
       const caseFiles = (state.caseFiles || []).map(c =>
         c.id === caseId ? { ...c, notes: [...(c.notes || []), newNote] } : c
       );
-      return { ...state, caseFiles, nextId: state.nextId + 1 };
+      // Tips fire a notification so assigned detectives are alerted
+      let notifState = {};
+      if (note.type === 'TIP') {
+        const targetCase = (state.caseFiles || []).find(c => c.id === caseId);
+        if (targetCase) {
+          notifState = addSystemNotif(state, {
+            title: `Tip — ${targetCase.caseNumber}`,
+            body: `New patrol tip on "${targetCase.title}" from ${note.authorName || 'Unknown'}. Check case timeline.`,
+            color: '#22c55e',
+          });
+        }
+      }
+      return { ...state, caseFiles, nextId: state.nextId + 1, ...notifState };
+    }
+    case 'SET_DETECTIVE': {
+      const { officerId, isDetective } = action.payload;
+      const officers = state.officers.map(o =>
+        o.id === officerId ? { ...o, isDetective } : o
+      );
+      const target = state.officers.find(o => o.id === officerId);
+      const audit = addAuditEntry(state, `${isDetective ? 'Designated' : 'Removed'} detective designation for ${target?.name} (${target?.badge})`, 'Command');
+      return { ...state, officers, ...audit };
     }
     case 'LINK_CASE_SUBJECT': {
       const { caseId, subject } = action.payload;
