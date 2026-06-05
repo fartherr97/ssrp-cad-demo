@@ -853,6 +853,18 @@ export default function TowCAD() {
     setShowSignOn(false);
   };
 
+  // When an FDOT card status button is clicked, sync the linked tow job too.
+  const syncFDOTCardToJob = (req, newStatus) => {
+    const linked = towJobs.find(j => j.fdotRequestId === req.id);
+    if (!linked) return;
+    const jobStatus = { DISPATCHED: 'EN_ROUTE', ON_SCENE: 'ON_SCENE', COMPLETED: 'COMPLETED' }[newStatus];
+    if (!jobStatus || linked.status === jobStatus) return;
+    dispatch({ type: 'UPDATE_TOW_JOB', payload: { id: linked.id, status: jobStatus } });
+    if (linked.unitId) {
+      dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: linked.unitId, status: jobStatus === 'COMPLETED' ? 'AVAILABLE' : 'ON_CALL' } });
+    }
+  };
+
   /* ── FDOT request actions ── */
   // Officer ids to notify: units attached to that scene's call, plus the
   // officer who made the request (matched by unit/badge).
@@ -1088,13 +1100,19 @@ export default function TowCAD() {
                     <div className="flex flex-wrap gap-2 mt-1">
                       {!isOnScene && (
                         <button
-                          onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ON_SCENE' } })}
+                          onClick={() => {
+                            dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'ON_SCENE' } });
+                            syncFDOTCardToJob(req, 'ON_SCENE');
+                          }}
                           className="btn-glossy flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-orange-400/35 bg-orange-500/15 text-orange-200 hover:bg-orange-500/25 whitespace-nowrap">
                           <MdCheckCircle size={14} className="shrink-0" /> Units On Scene
                         </button>
                       )}
                       <button
-                        onClick={() => dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'COMPLETED' } })}
+                        onClick={() => {
+                          dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'COMPLETED' } });
+                          syncFDOTCardToJob(req, 'COMPLETED');
+                        }}
                         className="btn-glossy flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-[11.5px] font-bold cursor-pointer border border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:border-white/20 whitespace-nowrap">
                         <MdCheckCircle size={14} className="shrink-0" /> Mark Complete
                       </button>
