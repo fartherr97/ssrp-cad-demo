@@ -1,7 +1,7 @@
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import { AdminPageTitle, AdminPanel, SonButton, SonIconBtn } from '../AdminKit';
-import { MdDeleteForever, MdWarningAmber, MdRestore, MdDownload, MdClose, MdHistory } from 'react-icons/md';
+import { MdDeleteForever, MdWarningAmber, MdRestore, MdDownload, MdHistory } from 'react-icons/md';
 
 const CORE_TYPES = [
   { key: 'civilians',       label: 'Civilian Characters' },
@@ -98,7 +98,6 @@ export default function WipeRecords() {
                 <div className="flex items-center gap-1.5 shrink-0">
                   <SonButton size="sm" variant="green" onClick={() => restore(b)}><MdRestore size={14} /> Restore</SonButton>
                   <SonIconBtn icon={MdDownload} title="Download JSON" onClick={() => download(b)} />
-                  <SonIconBtn icon={MdClose} danger title="Discard backup" onClick={() => dispatch({ type: 'DELETE_BACKUP', payload: b.id })} />
                 </div>
               </div>
             ))}

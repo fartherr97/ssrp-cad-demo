@@ -721,9 +721,6 @@ function baseReducer(state, action) {
       return { ...next, wipeBackups, ...audit };
     }
 
-    case 'DELETE_BACKUP':
-      return { ...state, wipeBackups: (state.wipeBackups || []).filter(b => b.id !== action.payload) };
-
     case 'ADD_LICENSE_POINTS': {
       // Accumulate points on a driver; auto-suspend (and re-suspend for longer)
       // each time their total crosses one of the configured threshold tiers.
