@@ -501,16 +501,15 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
   );
 }
 
-/* ── Quick Dispatch Modal * pick a unit, send it en route ── */
+/* ── Quick Dispatch Modal * pick one or more units, send them en route ── */
 function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCancel }) {
-  const [selectedUnitId, setSelectedUnitId] = useState(
-    availableUnits.length === 1 ? availableUnits[0].id : null
+  const [selectedIds, setSelectedIds] = useState(
+    availableUnits.length === 1 ? [availableUnits[0].id] : []
   );
 
-  const handleConfirm = () => {
-    if (!selectedUnitId) return;
-    onConfirm(req, selectedUnitId);
-  };
+  const toggle = (id) => setSelectedIds(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center anim-overlay-in"
@@ -537,11 +536,11 @@ function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCan
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Unit</div>
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Units — tap to toggle</div>
             {availableUnits.map(u => {
-              const active = selectedUnitId === u.id;
+              const active = selectedIds.includes(u.id);
               return (
-                <button key={u.id} type="button" onClick={() => setSelectedUnitId(u.id)}
+                <button key={u.id} type="button" onClick={() => toggle(u.id)}
                   className="press w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all cursor-pointer"
                   style={{
                     background: active ? 'rgba(249,115,22,0.12)' : 'rgba(255,255,255,0.04)',
@@ -555,9 +554,10 @@ function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCan
                     <div className="text-[13px] font-bold text-slate-100">{u.truckName}</div>
                     {u.operatorName && <div className="text-[11px] text-slate-400">{u.operatorName}</div>}
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">
-                    {u.status || 'AVAILABLE'}
-                  </span>
+                  {active
+                    ? <MdCheckCircle size={18} style={{ color: '#f97316' }} className="shrink-0" />
+                    : <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">{u.status || 'AVAILABLE'}</span>
+                  }
                 </button>
               );
             })}
@@ -570,11 +570,13 @@ function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCan
             className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-border-base bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
             Cancel
           </button>
-          <button type="button" onClick={handleConfirm} disabled={!selectedUnitId}
+          <button type="button" onClick={() => selectedIds.length > 0 && onConfirm(req, selectedIds)}
+            disabled={selectedIds.length === 0}
             className="press flex-[2] py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer transition-colors border-0 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: selectedUnitId ? '#f97316' : '#f9731650', color: '#0c0f14' }}>
+            style={{ background: selectedIds.length > 0 ? '#f97316' : '#f9731650', color: '#0c0f14' }}>
             <span className="flex items-center justify-center gap-1.5">
-              <MdArrowForward size={14} /> Dispatch En Route
+              <MdArrowForward size={14} />
+              Dispatch En Route{selectedIds.length > 1 ? ` (${selectedIds.length})` : ''}
             </span>
           </button>
         </div>
@@ -871,43 +873,48 @@ export default function TowCAD() {
   };
   const dispatchFromRequest = (req) => setDispatchingReq(req);
 
-  const confirmQuickDispatch = (req, unitId) => {
-    const unit = towUnits.find(u => u.id === unitId);
+  const confirmQuickDispatch = (req, unitIds) => {
+    const units = unitIds.map(id => towUnits.find(u => u.id === id)).filter(Boolean);
+    const primaryUnit = units[0];
     const handlingCompany = activeBizCompany || fdotCompany;
     const isCiv = req.source === 'CIVILIAN';
     dispatch({
       type: 'ADD_TOW_JOB',
       payload: {
-        location:    req.location,
+        location:     req.location,
         pickupPostal: req.postal || '',
-        towType:     isCiv ? 'Civilian Request' : 'FDOT Clearance',
-        priority:    req.priority || 2,
-        zone:        'Roaming',
-        notes:       `[${isCiv ? 'Civilian Tow Request' : 'FDOT Assist'}] ${req.assistType} · ${req.description}`,
-        callId:      req.callId || '',
-        companyId:   handlingCompany?.id,
-        companyName: handlingCompany?.name || 'FDOT',
-        unitId,
-        driverName:  unit?.operatorName || '',
-        status:      'EN_ROUTE',
-        plate:       '',
+        towType:      isCiv ? 'Civilian Request' : 'FDOT Clearance',
+        priority:     req.priority || 2,
+        zone:         'Roaming',
+        notes:        `[${isCiv ? 'Civilian Tow Request' : 'FDOT Assist'}] ${req.assistType} · ${req.description}`,
+        callId:       req.callId || '',
+        companyId:    handlingCompany?.id,
+        companyName:  handlingCompany?.name || 'FDOT',
+        unitId:       primaryUnit?.id,
+        driverName:   primaryUnit?.operatorName || '',
+        status:       'EN_ROUTE',
+        plate:        '',
       },
     });
-    dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unitId, status: 'ON_CALL' } });
+    for (const unit of units) {
+      dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: unit.id, status: 'ON_CALL' } });
+    }
+    const dispatchedUnits = units.map(u => ({ id: u.id, truckName: u.truckName, operatorName: u.operatorName }));
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: {
       id: req.id, status: 'DISPATCHED',
       handledBy: handlingCompany?.name || handlerName(),
-      dispatchedUnits: [{ id: unitId, truckName: unit?.truckName || '', operatorName: unit?.operatorName || '' }],
-      // legacy compat
-      dispatchedUnit: unit?.truckName || '', dispatchedUnitId: unitId,
+      dispatchedUnits,
+      // legacy compat (first unit)
+      dispatchedUnit: primaryUnit?.truckName || '', dispatchedUnitId: primaryUnit?.id,
       dispatchedCompany: handlingCompany?.name || '',
     }});
-    toast.success(`${unit?.truckName || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
+    const names = units.map(u => u.truckName).join(', ');
+    toast.success(`${names} dispatched en route.`, { title: 'Units Dispatched' });
     const to = recipientsFor(req);
     if (to.length > 0) {
       dispatch({
         type: 'DISPATCH_RADIO',
-        payload: { from: currentUser?.id, to, text: `${handlingCompany?.name || 'FDOT'} has dispatched ${unit?.truckName || 'a unit'} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
+        payload: { from: currentUser?.id, to, text: `${handlingCompany?.name || 'FDOT'} has dispatched ${names} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Units are en route.` },
       });
     }
     setDispatchingReq(null);

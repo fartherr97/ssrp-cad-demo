@@ -46,8 +46,12 @@ const PRIORITY_BADGE = {
 
 /* ── HCFR Quick Dispatch Modal ── */
 function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
-  const [selectedId, setSelectedId] = useState(
-    availableUnits.length === 1 ? availableUnits[0].id : null
+  const [selectedIds, setSelectedIds] = useState(
+    availableUnits.length === 1 ? [availableUnits[0].id] : []
+  );
+
+  const toggle = (id) => setSelectedIds(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
   );
 
   return (
@@ -77,11 +81,11 @@ function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Apparatus</div>
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Select Apparatus — tap to toggle</div>
             {availableUnits.map(u => {
-              const active = selectedId === u.id;
+              const active = selectedIds.includes(u.id);
               return (
-                <button key={u.id} type="button" onClick={() => setSelectedId(u.id)}
+                <button key={u.id} type="button" onClick={() => toggle(u.id)}
                   className="press w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all cursor-pointer"
                   style={{
                     background: active ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.04)',
@@ -95,9 +99,10 @@ function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
                     <div className="text-[13px] font-bold text-slate-100">{u.unitId}</div>
                     <div className="text-[11px] text-slate-400">{u.name} · {u.subdivision || u.rank}</div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">
-                    {u.status}
-                  </span>
+                  {active
+                    ? <MdCheckCircle size={18} style={{ color: '#ef4444' }} className="shrink-0" />
+                    : <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">{u.status}</span>
+                  }
                 </button>
               );
             })}
@@ -109,12 +114,13 @@ function HCFRDispatchModal({ req, availableUnits, onConfirm, onCancel }) {
             className="press flex-1 py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer border border-[rgba(255,255,255,0.1)] bg-white/[0.04] text-slate-400 hover:text-slate-200 transition-colors">
             Cancel
           </button>
-          <button type="button" onClick={() => selectedId && onConfirm(req, selectedId)}
-            disabled={!selectedId}
+          <button type="button" onClick={() => selectedIds.length > 0 && onConfirm(req, selectedIds)}
+            disabled={selectedIds.length === 0}
             className="press flex-[2] py-2.5 rounded-xl text-[12.5px] font-bold cursor-pointer transition-colors border-0 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: selectedId ? '#ef4444' : '#ef444450', color: '#fff' }}>
+            style={{ background: selectedIds.length > 0 ? '#ef4444' : '#ef444450', color: '#fff' }}>
             <span className="flex items-center justify-center gap-1.5">
-              <MdArrowForward size={14} /> Dispatch En Route
+              <MdArrowForward size={14} />
+              Dispatch En Route{selectedIds.length > 1 ? ` (${selectedIds.length})` : ''}
             </span>
           </button>
         </div>
@@ -456,23 +462,26 @@ export default function FireOpsBoard() {
     toast.warning(`Declined * ${req.assistType}`, { title: 'HCFR' });
   };
 
-  const confirmQuickDispatch = (req, unitId) => {
-    const unit = fireUnits.find(u => u.id === unitId);
-    if (req.callId) {
-      dispatch({ type: 'ASSIGN_UNIT', payload: { callId: req.callId, unitId: unit?.unitId || String(unitId) } });
+  const confirmQuickDispatch = (req, unitIds) => {
+    const units = unitIds.map(id => fireUnits.find(u => u.id === id)).filter(Boolean);
+    for (const unit of units) {
+      if (req.callId) {
+        dispatch({ type: 'ASSIGN_UNIT', payload: { callId: req.callId, unitId: unit.unitId || String(unit.id) } });
+      }
     }
-    const newUnit = { id: unitId, unitIdStr: unit?.unitId || String(unitId), name: unit?.name || '' };
+    const dispatchedUnits = units.map(u => ({ id: u.id, unitIdStr: u.unitId || String(u.id), name: u.name || '' }));
     dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: {
       id: req.id, status: 'DISPATCHED',
-      dispatchedUnits: [newUnit],
-      // legacy compat
-      dispatchedUnitId: unitId, dispatchedUnitIdStr: unit?.unitId || String(unitId),
+      dispatchedUnits,
+      // legacy compat (first unit)
+      dispatchedUnitId: units[0]?.id, dispatchedUnitIdStr: units[0]?.unitId || String(units[0]?.id || ''),
     }});
     handleSelectReq(req.id);
-    toast.success(`${unit?.name || 'Unit'} dispatched en route.`, { title: 'Unit Dispatched' });
+    const names = units.map(u => u.name || u.unitId).join(', ');
+    toast.success(`${names} dispatched en route.`, { title: 'Units Dispatched' });
     dispatch({
       type: 'DISPATCH_RADIO',
-      payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has dispatched ${unit?.name || 'a unit'} (${unit?.unitId || ''}) to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Unit is en route.` },
+      payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has dispatched ${names} to the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}. Units are en route.` },
     });
     setDispatchingReq(null);
   };
