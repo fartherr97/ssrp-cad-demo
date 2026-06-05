@@ -243,8 +243,7 @@ export default function RecordsBureau() {
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
-  // License suspension/reinstatement is a leadership action * admin/command portal only.
-  const canManageLicenses = currentUser?.portal === 'admin';
+  const canManageLicenses = currentUser?.portal === 'admin' || currentUser?.portal === 'leo';
 
   const [searchType, setSearchType] = useState('PERSON');
   const [query, setQuery]           = useState('');
