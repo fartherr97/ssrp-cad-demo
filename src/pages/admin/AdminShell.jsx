@@ -267,7 +267,7 @@ export default function AdminShell() {
     <div className="flex flex-col flex-1 w-full h-full min-w-0 bg-app-bg">
 
       {/* ── Top nav bar ── */}
-      <div className="flex items-stretch h-14 shrink-0 bg-app-toolbar/80 backdrop-blur-md border-b border-border-base gap-1 px-1">
+      <div className="flex items-stretch h-14 shrink-0 bg-app-toolbar border-b border-border-base gap-1 px-1">
 
         {/* Brand (click to return to portal-selection screen) */}
         <button

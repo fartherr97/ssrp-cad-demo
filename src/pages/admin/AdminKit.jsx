@@ -33,7 +33,7 @@ export function AdminContent({ children }) {
 export function AdminPanel({ title, subtitle, right, children, center, style = {} }) {
   return (
     <div
-      className="rounded-xl mb-5 overflow-hidden bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20"
+      className="rounded-xl mb-5 overflow-hidden bg-app-panel border border-border-base shadow-lg shadow-black/20"
       style={style}
     >
       {(title || right) && (
@@ -57,7 +57,7 @@ export function AdminPanel({ title, subtitle, right, children, center, style = {
 /* Page-level header (e.g. "Community Customization") */
 export function AdminPageTitle({ children, right }) {
   return (
-    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl px-5 py-4 mb-5 bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20">
+    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl px-5 py-4 mb-5 bg-app-panel border border-border-base shadow-lg shadow-black/20">
       <div className="text-[18px] font-bold text-white tracking-[-0.2px]">{children}</div>
       {right && <div className="flex gap-2 flex-wrap">{right}</div>}
     </div>
@@ -69,7 +69,7 @@ export function SonCard({ icon: Icon, title, desc, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="son-card text-left rounded-xl p-5 cursor-pointer flex flex-col gap-7 min-h-[120px] bg-app-card/70 border border-border-base backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-brand/50 hover:bg-app-elevated/70"
+      className="son-card text-left rounded-xl p-5 cursor-pointer flex flex-col gap-7 min-h-[120px] bg-app-card border border-border-base transition-all duration-150 hover:-translate-y-0.5 hover:border-brand/50 hover:bg-app-elevated"
     >
       {Icon && <Icon size={26} className="text-brand-bright" />}
       <div>
@@ -136,7 +136,7 @@ export function SonTable({ columns, children }) {
     <div className="overflow-auto max-h-[600px] rounded-xl border border-border-base">
       <table className="w-full border-collapse text-[13px]">
         <thead className="sticky top-0 z-[1]">
-          <tr className="bg-app-panel backdrop-blur-sm">
+          <tr className="bg-app-panel">
             {columns.map((c, i) => (
               <th key={i} className="text-[10px] font-bold tracking-[0.7px] uppercase py-3 px-4 whitespace-nowrap text-slate-500 border-b border-border-base"
                 style={{ textAlign: c.align || 'left', width: c.width }}>{c.label}</th>

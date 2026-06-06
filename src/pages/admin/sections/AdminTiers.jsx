@@ -416,7 +416,7 @@ export default function AdminTiers() {
   return (
     <>
       {/* Page header */}
-      <div className="flex items-start justify-between gap-3 flex-wrap rounded-xl px-5 py-4 mb-5 bg-app-panel/80 border border-border-base backdrop-blur-sm shadow-lg shadow-black/20">
+      <div className="flex items-start justify-between gap-3 flex-wrap rounded-xl px-5 py-4 mb-5 bg-app-panel border border-border-base shadow-lg shadow-black/20">
         <div>
           <div className="text-[18px] font-bold text-white tracking-[-0.2px]">Management Roles</div>
           <div className="text-[12px] mt-1" style={{ color: ADMIN.textMute }}>

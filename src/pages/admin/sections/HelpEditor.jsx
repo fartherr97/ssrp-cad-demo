@@ -207,7 +207,7 @@ export default function HelpEditor() {
   return (
     <div className="flex flex-col h-full overflow-hidden font-ui">
       {/* Top bar */}
-      <div className="shrink-0 flex flex-wrap items-center gap-3 px-5 py-3.5 bg-app-toolbar/80 border-b border-border-base backdrop-blur-md">
+      <div className="shrink-0 flex flex-wrap items-center gap-3 px-5 py-3.5 bg-app-toolbar border-b border-border-base">
         <MdHelpOutline size={18} className="text-brand-bright shrink-0" />
         <span className="text-[13px] font-bold text-white tracking-[0.3px]">Help Center Editor</span>
         <span className="text-[11px] text-slate-500">Edit what players see on the /portal/help page for each portal.</span>
@@ -220,7 +220,7 @@ export default function HelpEditor() {
 
       <div className="flex-1 min-h-0 overflow-auto p-5">
         {/* Portal tabs */}
-        <div className="flex gap-1.5 flex-wrap mb-6 p-1 rounded-xl bg-app-panel/60 border border-border-base backdrop-blur-sm w-fit">
+        <div className="flex gap-1.5 flex-wrap mb-6 p-1 rounded-xl bg-app-panel border border-border-base w-fit">
           {PORTAL_TABS.map(t => {
             const on = t.id === activePortal;
             const tc = PORTAL_COLOR[t.id];
