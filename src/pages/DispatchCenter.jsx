@@ -640,6 +640,44 @@ function Sim911Modal({ onClose }) {
   );
 }
 
+/* Non-emergency (citizen-filed report) queue card — reused in the side panel
+   and the "view all" modal. */
+function NonEmergencyCard({ r, dispatch }) {
+  return (
+    <div className="bg-white/[0.02] border border-border-faint rounded-lg p-2.5">
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <div className="min-w-0">
+          <div className="text-[12px] font-bold text-slate-200 truncate">{r.formData?.reportType || r.type}</div>
+          <div className="text-[10px] font-mono text-slate-500">{r.caseNumber}</div>
+        </div>
+        <span className={`shrink-0 text-[9.5px] font-bold px-1.5 py-0.5 rounded-md uppercase ${
+          r.status === 'On Scene'     ? 'bg-orange-500/20 text-orange-400' :
+          r.status === 'En Route'     ? 'bg-amber-500/20 text-amber-400'  :
+          r.status === 'Under Review' ? 'bg-blue-500/20 text-blue-400'    :
+                                        'bg-slate-500/20 text-slate-400'
+        }`}>{r.status || 'Pending Review'}</span>
+      </div>
+      {r.formData?.location && (
+        <div className="text-[11px] text-slate-400 mb-2 flex items-center gap-1">
+          <MdLocationOn size={12} className="text-slate-500 shrink-0" />
+          {r.formData.location}
+        </div>
+      )}
+      <Select
+        className="w-full bg-app-input border border-border-faint rounded-md px-2 py-1 text-[11px] text-slate-200 outline-none cursor-pointer"
+        value={r.status || 'Pending Review'}
+        onChange={e => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: e.target.value } })}
+      >
+        <option value="Pending Review">Pending Review</option>
+        <option value="Under Review">Under Review</option>
+        <option value="En Route">En Route</option>
+        <option value="On Scene">On Scene</option>
+        <option value="Resolved">Resolved</option>
+      </Select>
+    </div>
+  );
+}
+
 export default function DispatchCenter() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
@@ -659,6 +697,8 @@ export default function DispatchCenter() {
   const [dispatchTarget,    setDispatchTarget]    = useState(null);
   const [leoRespondTarget,  setLeoRespondTarget]  = useState(null);
   const [showSim911,        setShowSim911]         = useState(false);
+  const [show911All,        setShow911All]         = useState(false);
+  const [showNonEmergAll,   setShowNonEmergAll]    = useState(false);
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -715,7 +755,7 @@ export default function DispatchCenter() {
   const fleet          = onDutyOfficers.length || 1;
   const pct            = (n) => `${Math.round((n / fleet) * 100)}% of fleet`;
 
-  const notifications = [...dispatchLog].slice(-7).reverse();
+  const notifications = [...dispatchLog].slice(-10).reverse();
 
   // ════════════════════════════════════════════
   return (
@@ -785,12 +825,18 @@ export default function DispatchCenter() {
                 <div className="text-center text-slate-600 text-[11px] py-2">No incoming calls</div>
               ) : (
                 <div className="flex flex-col gap-2 overflow-y-auto max-h-[420px] pr-0.5">
-                  {[...incoming911].map(c => (
+                  {incoming911.slice(0, 5).map(c => (
                     <IncomingCallCard key={c.id} call={c}
                       onDispatch={isDispatcher ? () => setDispatchTarget(c) : null}
                       onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null}
                       onRespond={!isDispatcher && currentUser?.portal === 'leo' ? () => setLeoRespondTarget(c) : null} />
                   ))}
+                  {incoming911.length > 5 && (
+                    <button type="button" onClick={() => setShow911All(true)}
+                      className="mt-0.5 w-full text-center py-1.5 rounded-lg text-[11px] font-semibold text-red-300 bg-red-500/10 border border-red-500/25 hover:bg-red-500/20 cursor-pointer transition-colors">
+                      View all {incoming911.length} →
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -810,39 +856,15 @@ export default function DispatchCenter() {
                 <div className="text-center text-slate-600 text-[11px] py-2">No pending reports</div>
               ) : (
               <div className="flex flex-col gap-2 overflow-y-auto max-h-[460px] pr-0.5">
-              {nonEmergencyCalls.map(r => (
-                <div key={r.id} className="bg-white/[0.02] border border-border-faint rounded-lg p-2.5">
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <div className="min-w-0">
-                      <div className="text-[12px] font-bold text-slate-200 truncate">{r.formData?.reportType || r.type}</div>
-                      <div className="text-[10px] font-mono text-slate-500">{r.caseNumber}</div>
-                    </div>
-                    <span className={`shrink-0 text-[9.5px] font-bold px-1.5 py-0.5 rounded-md uppercase ${
-                      r.status === 'On Scene'     ? 'bg-orange-500/20 text-orange-400' :
-                      r.status === 'En Route'     ? 'bg-amber-500/20 text-amber-400'  :
-                      r.status === 'Under Review' ? 'bg-blue-500/20 text-blue-400'    :
-                                                    'bg-slate-500/20 text-slate-400'
-                    }`}>{r.status || 'Pending Review'}</span>
-                  </div>
-                  {r.formData?.location && (
-                    <div className="text-[11px] text-slate-400 mb-2 flex items-center gap-1">
-                      <MdLocationOn size={12} className="text-slate-500 shrink-0" />
-                      {r.formData.location}
-                    </div>
-                  )}
-                  <Select
-                    className="w-full bg-app-input border border-border-faint rounded-md px-2 py-1 text-[11px] text-slate-200 outline-none cursor-pointer"
-                    value={r.status || 'Pending Review'}
-                    onChange={e => dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id: r.id, status: e.target.value } })}
-                  >
-                    <option value="Pending Review">Pending Review</option>
-                    <option value="Under Review">Under Review</option>
-                    <option value="En Route">En Route</option>
-                    <option value="On Scene">On Scene</option>
-                    <option value="Resolved">Resolved</option>
-                  </Select>
-                </div>
+              {nonEmergencyCalls.slice(0, 5).map(r => (
+                <NonEmergencyCard key={r.id} r={r} dispatch={dispatch} />
               ))}
+              {nonEmergencyCalls.length > 5 && (
+                <button type="button" onClick={() => setShowNonEmergAll(true)}
+                  className="mt-0.5 w-full text-center py-1.5 rounded-lg text-[11px] font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/25 hover:bg-blue-500/20 cursor-pointer transition-colors">
+                  View all {nonEmergencyCalls.length} →
+                </button>
+              )}
               </div>
               )}
             </div>
@@ -919,7 +941,7 @@ export default function DispatchCenter() {
                 <tbody>
                   {sortedCalls.length === 0 ? (
                     <tr><td colSpan={8}><div className="p-8 text-center text-slate-600 text-[12px]">No active calls</div></td></tr>
-                  ) : sortedCalls.map(c => {
+                  ) : sortedCalls.slice(0, 10).map(c => {
                     const priColor = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' }[c.priority] || 'transparent';
                     const isMyCall = me && c.units.includes(me.unitId);
                     return (
@@ -951,7 +973,7 @@ export default function DispatchCenter() {
             <div className="lg:hidden flex flex-col divide-y divide-border-faint max-h-[60vh] overflow-auto">
               {sortedCalls.length === 0 ? (
                 <div className="p-8 text-center text-slate-600 text-[12px]">No active calls</div>
-              ) : sortedCalls.map(c => {
+              ) : sortedCalls.slice(0, 10).map(c => {
                 const priColor = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' }[c.priority] || '#94a3b8';
                 const isMyCall = me && c.units.includes(me.unitId);
                 return (
@@ -1100,6 +1122,49 @@ export default function DispatchCenter() {
       {/* Simulate 911 Modal */}
       {showSim911 && (
         <Sim911Modal onClose={() => setShowSim911(false)} />
+      )}
+
+      {/* View-all: Incoming 911 */}
+      {show911All && (
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && setShow911All(false)}>
+          <div className={`${S_MODAL} max-w-[480px]`}>
+            <div className={S_MODAL_HEADER}>
+              <MdPhone size={16} className="text-red-400 shrink-0" />
+              <div className={S_MODAL_TITLE}>Incoming 911 · {incoming911.length}</div>
+              <button className={xs(S_BTN_GHOST)} onClick={() => setShow911All(false)} aria-label="Close">✕</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <div className="flex flex-col gap-2">
+                {incoming911.map(c => (
+                  <IncomingCallCard key={c.id} call={c}
+                    onDispatch={isDispatcher ? () => { setDispatchTarget(c); setShow911All(false); } : null}
+                    onDismiss={isDispatcher ? () => dispatch({ type: 'REMOVE_INCOMING_911', payload: c.id }) : null}
+                    onRespond={!isDispatcher && currentUser?.portal === 'leo' ? () => { setLeoRespondTarget(c); setShow911All(false); } : null} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View-all: Non-Emergency */}
+      {showNonEmergAll && (
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && setShowNonEmergAll(false)}>
+          <div className={`${S_MODAL} max-w-[480px]`}>
+            <div className={S_MODAL_HEADER}>
+              <MdDescription size={16} className="text-blue-400 shrink-0" />
+              <div className={S_MODAL_TITLE}>Non-Emergency Calls · {nonEmergencyCalls.length}</div>
+              <button className={xs(S_BTN_GHOST)} onClick={() => setShowNonEmergAll(false)} aria-label="Close">✕</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <div className="flex flex-col gap-2">
+                {nonEmergencyCalls.map(r => (
+                  <NonEmergencyCard key={r.id} r={r} dispatch={dispatch} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Create Call Modal */}
