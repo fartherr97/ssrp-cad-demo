@@ -699,6 +699,7 @@ export default function DispatchCenter() {
   const [showSim911,        setShowSim911]         = useState(false);
   const [show911All,        setShow911All]         = useState(false);
   const [showNonEmergAll,   setShowNonEmergAll]    = useState(false);
+  const [showUnitsAll,      setShowUnitsAll]       = useState(false);
   const [newCall, setNewCall] = useState({
     nature:'', location:'', city:'Tampa', county:'Hillsborough',
     priority:1, category:'police', description:'', reportingParty:'',
@@ -1002,7 +1003,8 @@ export default function DispatchCenter() {
 
           {/* Field units */}
           <Reveal show={showUnits}>
-            <SectionCard title="Field Units" count={onDutyOfficers.length}>
+            <SectionCard title="Field Units" count={onDutyOfficers.length}
+              action={filteredUnits.length > 10 ? 'View All' : null} onAction={() => setShowUnitsAll(true)}>
               {/* Desktop table */}
               <div className="hidden lg:block overflow-auto max-h-[min(40vh,460px)]">
                 <table className="w-full border-collapse">
@@ -1016,7 +1018,7 @@ export default function DispatchCenter() {
                   <tbody>
                     {filteredUnits.length === 0 ? (
                       <tr><td colSpan={6}><div className="p-8 text-center text-slate-600 text-[12px]">No units on duty</div></td></tr>
-                    ) : filteredUnits.map(o => (
+                    ) : filteredUnits.slice(0, 10).map(o => (
                       <tr key={o.id}
                         className={`${o.callId ? 'cursor-pointer' : ''} transition-colors`}
                         style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}
@@ -1160,6 +1162,38 @@ export default function DispatchCenter() {
               <div className="flex flex-col gap-2">
                 {nonEmergencyCalls.map(r => (
                   <NonEmergencyCard key={r.id} r={r} dispatch={dispatch} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View-all: Field Units */}
+      {showUnitsAll && (
+        <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && setShowUnitsAll(false)}>
+          <div className={`${S_MODAL} max-w-[560px]`}>
+            <div className={S_MODAL_HEADER}>
+              <MdBadge size={16} className="text-brand-bright shrink-0" />
+              <div className={S_MODAL_TITLE}>Field Units · {filteredUnits.length}</div>
+              <button className={xs(S_BTN_GHOST)} onClick={() => setShowUnitsAll(false)} aria-label="Close">✕</button>
+            </div>
+            <div className={S_MODAL_BODY}>
+              <div className="flex flex-col divide-y divide-border-faint">
+                {filteredUnits.map(o => (
+                  <div key={o.id}
+                    onClick={() => { if (o.callId) { navigate('/cad/' + o.callId); setShowUnitsAll(false); } }}
+                    className={`flex items-center gap-3 px-1 py-2.5 ${o.callId ? 'cursor-pointer hover:bg-white/[0.03]' : ''} transition-colors`}>
+                    <span className="text-[13px] font-mono font-bold w-14 shrink-0" style={{ color: statusColor(o.status) }}>{o.unitId}</span>
+                    {isDispatcher
+                      ? <DispatchStatusPicker unit={o} options={statusOptions} onSet={setUnitStatus} />
+                      : <StatusBadge status={o.status} />}
+                    <span className="flex-1 min-w-0 text-[12.5px] text-white truncate">
+                      {o.name}{o.rank && <span className="text-slate-500 ml-1">· {o.rank}</span>}
+                    </span>
+                    {o.callId && <span className="font-mono text-[11px] font-semibold text-amber-300 shrink-0">{o.callId}</span>}
+                    <DeptTag code={o.deptShort} />
+                  </div>
                 ))}
               </div>
             </div>
