@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
-import { MdArrowBack, MdShield } from 'react-icons/md';
+import { MdArrowBack, MdLock } from 'react-icons/md';
 
 const DiscordSVG = () => (
   <svg width="18" height="14" viewBox="0 0 71 55" fill="currentColor">
@@ -128,17 +128,7 @@ export default function AccessDeniedPage() {
               borderRadius: 16,
               background: 'radial-gradient(circle, rgba(120,60,220,0.15) 0%, transparent 70%)',
             }} />
-            <MdShield size={96} style={{ color: 'rgba(160,100,255,0.7)', position: 'relative', zIndex: 1 }} />
-            {/* Lock overlay */}
-            <div style={{
-              position: 'absolute', bottom: 32, right: 32,
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18,
-            }}>
-              🔒
-            </div>
+            <MdLock size={96} style={{ color: 'rgba(160,100,255,0.7)', position: 'relative', zIndex: 1 }} />
           </div>
 
           {/* Text content */}

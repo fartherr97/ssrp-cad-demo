@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import Select from '../components/ui/Select';
+import Modal from '../components/ui/Modal';
 import { useToast } from '../contexts/ToastContext';
 import { useResponsive } from '../hooks/useResponsive';
 import { useTabParam } from '../hooks/useTabParam';
@@ -135,20 +136,30 @@ function CaseListItem({ c, active, onClick, officers }) {
 
 /* ── Create / Edit modal ─────────────────────────────────────────────────── */
 
-function CaseModal({ caseFile, officers, currentUser, onSave, onClose }) {
+function CaseModal({ open, caseFile, officers, currentUser, onSave, onClose }) {
   const isEdit = !!caseFile;
   const detectives = officers.filter(o =>
     o.subdivision === 'Detectives' || o.rank?.toLowerCase().includes('detective') || o.isDetective === true
   );
   const meId = currentUser?.id;
   const [form, setForm] = useState({
-    title: caseFile?.title || '',
-    classification: caseFile?.classification || CLASSIFICATIONS[0],
-    priority: caseFile?.priority || 2,
-    status: caseFile?.status || 'ACTIVE',
-    summary: caseFile?.summary || '',
-    assignedDetectives: caseFile?.assignedDetectives || (meId ? [meId] : []),
+    title: '', classification: CLASSIFICATIONS[0], priority: 2, status: 'ACTIVE', summary: '',
+    assignedDetectives: meId ? [meId] : [],
   });
+
+  // Reset the form each time the modal opens (covers new vs edit targets).
+  useEffect(() => {
+    if (!open) return;
+    setForm({
+      title: caseFile?.title || '',
+      classification: caseFile?.classification || CLASSIFICATIONS[0],
+      priority: caseFile?.priority || 2,
+      status: caseFile?.status || 'ACTIVE',
+      summary: caseFile?.summary || '',
+      assignedDetectives: caseFile?.assignedDetectives || (meId ? [meId] : []),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, caseFile?.id]);
 
   const toggleDet = (id) => {
     setForm(f => ({
@@ -165,24 +176,29 @@ function CaseModal({ caseFile, officers, currentUser, onSave, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-lg bg-app-card border border-border-base rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border-faint shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-sky-500/15">
-              <MdWork size={16} className="text-sky-400" />
-            </div>
-            <span className="text-[14px] font-bold text-white">{isEdit ? 'Edit Case' : 'New Case File'}</span>
-          </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors p-1">
-            <MdClose size={18} />
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={isEdit ? 'Edit Case' : 'New Case File'}
+      icon={MdWork}
+      iconColor="#3a88e8"
+      maxWidth={560}
+      footer={
+        <div className="flex items-center justify-end gap-2.5">
+          <button onClick={onClose}
+            className="px-4 py-2 rounded-lg text-[12px] font-semibold text-slate-400 hover:text-slate-200 transition-colors">
+            Cancel
+          </button>
+          <button onClick={handleSave} disabled={!form.title.trim()}
+            className="flex items-center gap-2 px-5 py-2 rounded-lg text-[12.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: 'rgba(58,136,232,0.2)', border: '1px solid rgba(58,136,232,0.4)', color: '#3a88e8' }}>
+            {isEdit ? <MdEdit size={14} /> : <MdAdd size={14} />}
+            {isEdit ? 'Save Changes' : 'Open Case'}
           </button>
         </div>
-
-        {/* Form */}
-        <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+      }
+    >
+      <div className="px-5 py-4 flex flex-col gap-4">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Case Title *</label>
@@ -287,22 +303,7 @@ function CaseModal({ caseFile, officers, currentUser, onSave, onClose }) {
             )}
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-border-faint shrink-0">
-          <button onClick={onClose}
-            className="px-4 py-2 rounded-lg text-[12px] font-semibold text-slate-400 hover:text-slate-200 transition-colors">
-            Cancel
-          </button>
-          <button onClick={handleSave} disabled={!form.title.trim()}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg text-[12.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: 'rgba(58,136,232,0.2)', border: '1px solid rgba(58,136,232,0.4)', color: '#3a88e8' }}>
-            {isEdit ? <MdEdit size={14} /> : <MdAdd size={14} />}
-            {isEdit ? 'Save Changes' : 'Open Case'}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -517,8 +518,8 @@ function SubjectsTab({ caseFile, civilians, dispatch, canManage }) {
                 <MdPerson size={16} className="text-slate-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold text-slate-100">{civ.firstName} {civ.lastName}</div>
-                <div className="text-[10.5px] text-slate-500 font-mono">
+                <div className="text-[14px] font-semibold text-slate-100">{civ.firstName} {civ.lastName}</div>
+                <div className="text-[12px] text-slate-400 font-mono mt-0.5">
                   {civ.dob} · {civ.dlNumber || '—'}
                 </div>
               </div>
@@ -892,6 +893,7 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
 
       {/* Tab content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+        <div className="w-full max-w-4xl">
         {tab === 'OVERVIEW' && (
           <OverviewTab
             caseFile={caseFile}
@@ -925,6 +927,7 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
             dispatch={dispatch}
           />
         )}
+        </div>
       </div>
     </div>
   );
@@ -1079,32 +1082,25 @@ export default function CaseFiles() {
         )}
       </div>
 
-      {/* Modals */}
-      {showNewModal && (
-        <CaseModal
-          officers={state.officers || []}
-          currentUser={state.currentUser}
-          onSave={(data) => {
-            dispatch({ type: 'ADD_CASE_FILE', payload: data });
-            toast.success('Case created');
-            setShowNewModal(false);
-          }}
-          onClose={() => setShowNewModal(false)}
-        />
-      )}
-      {editCase && (
-        <CaseModal
-          caseFile={editCase}
-          officers={state.officers || []}
-          currentUser={state.currentUser}
-          onSave={(data) => {
+      {/* Case create/edit modal (single instance so it can animate in AND out) */}
+      <CaseModal
+        open={showNewModal || !!editCase}
+        caseFile={editCase}
+        officers={state.officers || []}
+        currentUser={state.currentUser}
+        onSave={(data) => {
+          if (editCase) {
             dispatch({ type: 'UPDATE_CASE_FILE', payload: data });
             toast.success('Case updated');
-            setEditCase(null);
-          }}
-          onClose={() => setEditCase(null)}
-        />
-      )}
+          } else {
+            dispatch({ type: 'ADD_CASE_FILE', payload: data });
+            toast.success('Case created');
+          }
+          setShowNewModal(false);
+          setEditCase(null);
+        }}
+        onClose={() => { setShowNewModal(false); setEditCase(null); }}
+      />
     </div>
   );
 }
