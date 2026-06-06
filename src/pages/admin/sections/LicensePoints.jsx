@@ -215,7 +215,7 @@ export default function LicensePoints() {
     : (stored.threshold || 0);
   const drivers = (() => {
     const q = driverSearch.trim().toLowerCase();
-    if (!q) return allDrivers;
+    if (!q) return [];   // search-first: don't render the whole roster
     return allDrivers.filter(c =>
       `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
       c.dlNumber?.toLowerCase().includes(q) ||
@@ -351,7 +351,8 @@ export default function LicensePoints() {
         }
       >
         {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState>
-          : drivers.length === 0 ? <EmptyState>No drivers match "{driverSearch}".</EmptyState> : (
+          : !driverSearch.trim() ? <EmptyState>Search by name, DL #, SSN, or Discord ID to view a driver&apos;s points and suspend or reinstate their license.</EmptyState>
+          : drivers.length === 0 ? <EmptyState>No drivers match &quot;{driverSearch}&quot;.</EmptyState> : (
           <div className="flex flex-col gap-2">
             {drivers.map((c) => {
               const pts = c.licensePoints || 0;
