@@ -188,7 +188,8 @@ export default function LicensePoints() {
   const penalCode = state.penalCode || [];
   const [cfg, setCfg] = useState(() => blank(stored));
   const [showImport, setShowImport] = useState(false);
-  const [driverSearch, setDriverSearch] = useState('');
+  const [driverQuery, setDriverQuery] = useState('');
+  const [selectedDriverId, setSelectedDriverId] = useState(null);
 
   const dirty = JSON.stringify(cfg) !== JSON.stringify(stored);
   const save = () => { dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } }); toast.success('License points config saved.'); };
@@ -213,17 +214,21 @@ export default function LicensePoints() {
   const threshold = (stored.tiers && stored.tiers.length)
     ? Math.max(...stored.tiers.map(t => t.threshold || 0))
     : (stored.threshold || 0);
-  const drivers = (() => {
-    const q = driverSearch.trim().toLowerCase();
-    if (!q) return [];   // search-first: don't render the whole roster
+  // Type-ahead suggestions (capped); a driver renders only once picked.
+  const driverMatches = (() => {
+    const q = driverQuery.trim().toLowerCase();
+    if (!q) return [];
     return allDrivers.filter(c =>
       `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
       c.dlNumber?.toLowerCase().includes(q) ||
       c.ssn?.includes(q) ||
       c.ownerDiscordId?.includes(q) ||
       c.discordId?.includes(q)
-    );
+    ).slice(0, 10);
   })();
+  // Look the selected driver up live from state so the card reflects suspends/reinstates.
+  const selectedDriver = selectedDriverId != null ? allDrivers.find(c => c.id === selectedDriverId) : null;
+  const pickDriver = (c) => { setSelectedDriverId(c.id); setDriverQuery(''); };
 
   const statusColor = (s) => s === 'SUSPENDED' ? '#f87171' : s === 'ACTIVE' ? '#22c55e' : ADMIN.textMute;
 
@@ -332,45 +337,69 @@ export default function LicensePoints() {
       {/* ── Drivers ── */}
       <AdminPanel
         title="Driver License Points"
-        subtitle={`Live points per licensed driver · auto-suspends at the configured thresholds · search to manually suspend or reinstate`}
-        right={
-          <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-2 w-[260px] max-w-full">
-            <MdSearch size={14} className="text-slate-500 shrink-0" />
-            <input
-              className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-              placeholder="Search name, DL #, SSN, or Discord ID…"
-              value={driverSearch}
-              onChange={e => setDriverSearch(e.target.value)}
-            />
-            {driverSearch && (
-              <button onClick={() => setDriverSearch('')} className="text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0 shrink-0">
-                <MdClose size={15} />
-              </button>
-            )}
-          </div>
-        }
+        subtitle={`Search a licensed driver to view their points and manually suspend or reinstate · auto-suspends at the configured thresholds`}
       >
-        {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState>
-          : !driverSearch.trim() ? <EmptyState>Search by name, DL #, SSN, or Discord ID to view a driver&apos;s points and suspend or reinstate their license.</EmptyState>
-          : drivers.length === 0 ? <EmptyState>No drivers match &quot;{driverSearch}&quot;.</EmptyState> : (
-          <div className="flex flex-col gap-2">
-            {drivers.map((c) => {
+        {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState> : (
+          <div className="flex flex-col gap-3">
+            {/* Type-ahead search */}
+            <div className="relative">
+              <MdSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+              <input
+                className="w-full bg-app-input border border-border-base rounded-lg pl-11 pr-10 py-3 text-[14px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
+                placeholder="Search a driver by name, DL #, SSN, or Discord ID…"
+                value={driverQuery}
+                onChange={e => { setDriverQuery(e.target.value); setSelectedDriverId(null); }}
+                aria-label="Search drivers"
+              />
+              {driverQuery && (
+                <button onClick={() => setDriverQuery('')} aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0">
+                  <MdClose size={16} />
+                </button>
+              )}
+
+              {/* Suggestions */}
+              {driverQuery.trim() && (
+                <div className="mt-1.5 rounded-lg border border-border-base bg-app-card overflow-hidden max-h-[320px] overflow-y-auto">
+                  {driverMatches.length === 0 ? (
+                    <div className="px-3.5 py-3 text-[12.5px] text-slate-500">No drivers match &quot;{driverQuery}&quot;.</div>
+                  ) : driverMatches.map(c => (
+                    <button key={c.id} type="button" onClick={() => pickDriver(c)}
+                      className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-left cursor-pointer transition-colors border-b border-border-faint last:border-0 hover:bg-white/[0.06]">
+                      <span className="min-w-0">
+                        <span className="block text-[13px] font-semibold text-cad-text truncate">{c.firstName} {c.lastName}</span>
+                        <span className="block text-[11px] font-mono text-cad-dim">DL {c.dlNumber} · {c.licensePoints || 0} pts</span>
+                      </span>
+                      <SonBadge color={statusColor(c.dlStatus)}>{c.dlStatus || 'ACTIVE'}</SonBadge>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Picked driver */}
+            {selectedDriver ? (() => {
+              const c = selectedDriver;
               const pts = c.licensePoints || 0;
               const pct = Math.min(100, Math.round((pts / (threshold || 1)) * 100));
               const near = pct >= 75;
               const barColor = c.dlStatus === 'SUSPENDED' ? '#f87171' : near ? '#f59e0b' : '#3d82f0';
               const suspended = c.dlStatus === 'SUSPENDED';
               return (
-                <div key={c.id} className="rounded-xl border border-border-base bg-app-card/60 p-3 flex flex-col gap-2.5">
-                  {/* Identity + status */}
+                <div className="rounded-xl border border-border-base bg-app-card/60 p-4 flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="min-w-0">
-                      <div className="text-[13px] font-bold text-cad-text truncate">{c.firstName} {c.lastName}</div>
+                      <div className="text-[14px] font-bold text-cad-text truncate">{c.firstName} {c.lastName}</div>
                       <div className="text-[11px] font-mono text-cad-dim">DL {c.dlNumber}</div>
                     </div>
-                    <SonBadge color={statusColor(c.dlStatus)}>{c.dlStatus || 'ACTIVE'}</SonBadge>
+                    <div className="flex items-center gap-2">
+                      <SonBadge color={statusColor(c.dlStatus)}>{c.dlStatus || 'ACTIVE'}</SonBadge>
+                      <button onClick={() => setSelectedDriverId(null)} aria-label="Clear selection"
+                        className="text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0">
+                        <MdClose size={16} />
+                      </button>
+                    </div>
                   </div>
-                  {/* Points bar */}
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden min-w-[80px]">
                       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
@@ -379,7 +408,6 @@ export default function LicensePoints() {
                       {pts}/{threshold}
                     </span>
                   </div>
-                  {/* Actions — manual suspend / reinstate */}
                   <div className="flex">
                     {suspended ? (
                       <SonButton size="sm" variant="green" onClick={() => { dispatch({ type: 'LIFT_SUSPENSION', payload: c.id }); toast.success(`${c.firstName} ${c.lastName} reinstated.`); }}>
@@ -393,7 +421,9 @@ export default function LicensePoints() {
                   </div>
                 </div>
               );
-            })}
+            })() : !driverQuery.trim() && (
+              <div className="text-[12.5px] text-slate-500 px-1 py-2">Start typing to find a driver.</div>
+            )}
           </div>
         )}
       </AdminPanel>
