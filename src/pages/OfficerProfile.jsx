@@ -722,7 +722,7 @@ function THead({ cols }) {
     <thead>
       <tr>
         {cols.map(h => (
-          <th key={h} className="px-3 py-2.5 text-left text-slate-500 text-[10px] font-bold uppercase tracking-[0.7px] bg-app-bg/60 backdrop-blur-sm border-b border-border-base whitespace-nowrap sticky top-0">{h}</th>
+          <th key={h} className="px-3 py-2.5 text-left text-slate-500 text-[10px] font-bold uppercase tracking-[0.7px] bg-app-bg border-b border-border-base whitespace-nowrap sticky top-0">{h}</th>
         ))}
       </tr>
     </thead>

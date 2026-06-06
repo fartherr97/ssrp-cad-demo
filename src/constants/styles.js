@@ -81,7 +81,7 @@ export const S_FIELD    = 'flex flex-col gap-0.5';
 // ─── Tables ────────────────────────────────────────────────
 
 export const S_TABLE    = 'w-full border-collapse table-fixed';
-export const S_TABLE_TH = 'px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 bg-app-bg/60 backdrop-blur-sm border-b border-border-base sticky top-0';
+export const S_TABLE_TH = 'px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.7px] text-slate-500 bg-app-bg border-b border-border-base sticky top-0';
 export const S_TABLE_TD = 'px-4 py-2.5 text-[12.5px] text-slate-300 border-b border-border-faint';
 
 export const trHoverOn  = (e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; };

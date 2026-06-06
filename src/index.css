@@ -176,7 +176,7 @@ button:disabled { opacity: 0.38; cursor: not-allowed; }
    These are kept so mobile media queries can target them.
    ════════════════════════════════════════ */
 
-.cad-shell     { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--n-bg-gradient); background-attachment: fixed; }
+.cad-shell     { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--n-bg-gradient); }
 .cad-workspace { flex: 1; overflow: hidden; display: flex; min-height: 0; }
 /* page-enter animation is handled by PageWrapper in App.jsx (rAF-driven transition for mobile compat) */
 
@@ -418,6 +418,20 @@ tbody tr { transition: background-color 0.13s ease, box-shadow 0.13s ease; }
 /* ── Small mobile (≤ 480px) ── */
 @media (max-width: 480px) {
   .form-row  { flex-direction: column; }
+}
+
+/* ════════════════════════════════════════
+   PERFORMANCE — scroll smoothness
+   backdrop-filter:blur is GPU-expensive and the UI applies it to many stacked
+   surfaces (panels, cards, sticky table headers, toolbars). Scrolling a page
+   with several blurred layers re-rasterizes them every frame and tanks FPS,
+   especially on desktop. On this solid dark theme the blur is barely visible,
+   so we neutralize it globally and keep the translucent fills. Sticky headers
+   are made fully opaque (see styles.js) so rows don't show through.
+   ════════════════════════════════════════ */
+[class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* ─── Honor reduced-motion ─── */
