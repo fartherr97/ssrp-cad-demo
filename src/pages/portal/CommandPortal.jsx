@@ -10,6 +10,8 @@ import {
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
+import { useTabParam } from '../../hooks/useTabParam';
+import { slugify, unslugTab } from '../../utils/slug';
 import { DeptBadge, deptLogo } from '../../constants/deptLogos';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
@@ -1415,7 +1417,9 @@ export default function CommandPortal() {
   }, [reportTemplates, scopedReports]);
 
   /* ── UI state ── */
-  const [activeTab,   setActiveTab]   = useState('Overview');
+  const [tabSlug, setTabSlug] = useTabParam('tab', slugify(TABS[0]));
+  const activeTab = unslugTab(tabSlug, TABS);
+  const setActiveTab = (t) => setTabSlug(slugify(t));
   const [modalReport, setModalReport] = useState(null);
 
   const officerByBadge = useMemo(() => {

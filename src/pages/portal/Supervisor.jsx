@@ -8,6 +8,7 @@ import {
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
+import { useTabParam } from '../../hooks/useTabParam';
 import { DeptBadge } from '../../constants/deptLogos';
 
 /* ══════════════════════════════════
@@ -878,7 +879,7 @@ export default function Supervisor() {
     civilians = [], warrants = [], criminalHistory = [], licensePointsConfig = {},
   } = state;
 
-  const [portalMode, setPortalMode]     = useState('submissions');
+  const [portalMode, setPortalMode]     = useTabParam('tab', 'submissions');
   const [deptFilter, setDeptFilter]     = useState('All');
   const [typeFilter, setTypeFilter]     = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');

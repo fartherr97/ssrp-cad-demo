@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useTabParam } from '../hooks/useTabParam';
 import {
   MdInbox, MdSend, MdSearch, MdClose, MdPerson, MdLock,
   MdArrowBack, MdInfo, MdGroup, MdReply,
@@ -281,7 +282,7 @@ export default function Messages() {
   const [selectedId,   setSelectedId]   = useState(null);
   const [selectedType, setSelectedType] = useState(null); // 'system' | 'direct' | 'group'
   const [composing,    setComposing]    = useState(false);
-  const [tab,          setTab]          = useState('inbox');
+  const [tab,          setTab]          = useTabParam('tab', 'inbox');
   const [search,       setSearch]       = useState('');
   const [replyText,    setReplyText]    = useState('');
 

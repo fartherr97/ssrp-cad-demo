@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useTabParam } from '../hooks/useTabParam';
 import { useToast } from '../contexts/ToastContext';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
@@ -36,7 +37,7 @@ export default function RecordsCenter() {
   const [savedAt, setSavedAt]                   = useState(null);
   const [activeTab, setActiveTab]               = useState('Record');
   const [pdfLoading, setPdfLoading]             = useState(false);
-  const [mobileTab, setMobileTab]               = useState('new'); // 'new' | 'history'
+  const [mobileTab, setMobileTab]               = useTabParam('tab', 'new'); // 'new' | 'history'
 
   const openTemplate = (tpl) => {
     setSelectedTemplate(tpl);

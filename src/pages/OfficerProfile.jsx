@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTabParam } from '../hooks/useTabParam';
 import Select from '../components/ui/Select';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
@@ -111,7 +112,7 @@ export default function OfficerProfile() {
   ];
   const myCallHistory = calls.filter(c => c.units.includes(myOfficer?.unitId));
 
-  const [tab, setTab] = useState('info');
+  const [tab, setTab] = useTabParam('tab', 'info');
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
   const [viewReport, setViewReport] = useState(null);
@@ -128,9 +129,13 @@ export default function OfficerProfile() {
     const rep = reports.find(r => String(r.id) === String(rid) && r.status === 'Pending Changes');
     const rec = records.find(r => String(r.id) === String(rid) && r.status === 'Pending Changes');
     const item = rep ? { ...rep, _kind: 'report' } : rec ? { ...rec, _kind: 'record' } : null;
-    if (item) { setTab('returned'); setEditingReturned(item); }
-    searchParams.delete('returned');
-    setSearchParams(searchParams, { replace: true });
+    if (item) setEditingReturned(item);
+    setSearchParams(prev => {
+      const sp = new URLSearchParams(prev);
+      sp.delete('returned');
+      if (item) sp.set('tab', 'returned');
+      return sp;
+    }, { replace: true });
   }, [searchParams, reports, records, setSearchParams]);
   // Keep the open report in sync with the store so freshly-added supplements
   // appear immediately (viewReport only holds the id-bearing snapshot).

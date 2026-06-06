@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTabParam } from '../../../hooks/useTabParam';
 import { HELP_ICON_MAP, PORTAL_COLOR } from '../../portal/HelpCenter';
 import { DEFAULT_HELP_CONTENT } from '../../../data/helpDefaults';
 import {
@@ -151,7 +152,7 @@ export default function HelpEditor() {
   const toast = useToast();
 
   const stored = state.helpContent || {};
-  const [activePortal, setActivePortal] = useState('civilian');
+  const [activePortal, setActivePortal] = useTabParam('tab', 'civilian');
   // Working copy * keyed by portal id
   const [drafts, setDrafts] = useState({});
 

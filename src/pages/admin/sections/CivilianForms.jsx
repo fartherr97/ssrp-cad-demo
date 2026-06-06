@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTabParam } from '../../../hooks/useTabParam';
 import {
   MdBadge, MdDirectionsCar, MdPerson, MdLocalHospital,
   MdAdd, MdDelete, MdArrowUpward, MdArrowDownward, MdSave, MdCheckCircle,
@@ -198,7 +199,7 @@ function FieldsPreview({ fields, accent }) {
 export default function CivilianForms() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const [activeTab, setActiveTab] = useState('driverLicense');
+  const [activeTab, setActiveTab] = useTabParam('tab', 'driverLicense');
   const [saved, setSaved] = useState(false);
 
   // Deep-clone the stored config into local editable draft

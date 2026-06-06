@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTabParam } from '../../../hooks/useTabParam';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SON_INPUT, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -39,7 +40,7 @@ export default function CallTypes() {
   const callNatures = state.callNatures || [];
 
   const [name, setName]         = useState('');
-  const [category, setCategory] = useState('police');
+  const [category, setCategory] = useTabParam('tab', 'police');
 
   const add = () => {
     if (!name.trim()) return;

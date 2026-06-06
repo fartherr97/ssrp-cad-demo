@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Select from '../components/ui/Select';
 import Modal from '../components/ui/Modal';
 import { useCAD } from '../store/cadStore';
@@ -467,11 +468,31 @@ export default function RecordsBureau() {
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
-  const [searchType, setSearchType] = useState('PERSON');
+  // ── Tab/selection state lives in the URL so the LEO search is deep-linkable:
+  //   /search?type=PERSON&sel=3&tab=WARRANTS
+  // Multi-key changes (type+sel+tab) are written in a single patch so they
+  // can't clobber one another. ──
+  const [sp, setSp] = useSearchParams();
+  const patchParams = (obj) => setSp(prev => {
+    const next = new URLSearchParams(prev);
+    for (const [k, v] of Object.entries(obj)) {
+      if (v == null || v === '') next.delete(k); else next.set(k, String(v));
+    }
+    return next;
+  }, { replace: true });
+
+  const searchType = sp.get('type') || 'PERSON';
+  const selRaw     = sp.get('sel') || '';
+  const selected   = selRaw === '' ? null : (searchType === 'CASES' ? selRaw : Number(selRaw));
+  const tab        = sp.get('tab') || 'SUMMARY';
+
+  const setSearchType = (t) => patchParams({ type: t === 'PERSON' ? '' : t, sel: '', tab: '' });
+  const setSelected   = (v) => patchParams({ sel: v });
+  const setTab        = (t) => patchParams({ tab: t });
+  const selectResult  = (id, tabVal) => patchParams({ sel: id, tab: tabVal });
+
   const [query, setQuery]           = useState('');
   const [results, setResults]       = useState([]);
-  const [selected, setSelected]     = useState(null); // for PERSON/VEHICLE/WARRANT: id; for CASES: "report:id" | "record:id"
-  const [tab, setTab]               = useState('SUMMARY');
   const [lightbox, setLightbox]     = useState(null);  // full-screen image URL
   const [previewItem, setPreviewItem] = useState(null); // report/record opened from criminal history
   const [searched, setSearched]     = useState(false);
@@ -528,8 +549,7 @@ export default function RecordsBureau() {
       setResults(warrants.filter(w =>
         w.civilianName?.toLowerCase().includes(q) || w.charge?.toLowerCase().includes(q)));
     }
-    setSelected(null);
-    setTab(searchType === 'PERSON' ? 'SUMMARY' : 'RETURN');
+    patchParams({ sel: '', tab: searchType === 'PERSON' ? 'SUMMARY' : 'RETURN' });
   };
 
   const runCaseSearch = (q, kind, status) => {
@@ -614,7 +634,7 @@ export default function RecordsBureau() {
               const on = searchType === t.id;
               return (
                 <button key={t.id}
-                  onClick={() => { setSearchType(t.id); setResults([]); setSelected(null); setSearched(false); setQuery(''); }}
+                  onClick={() => { setSearchType(t.id); setResults([]); setSearched(false); setQuery(''); }}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : `bg-transparent border-transparent text-slate-400 ${t.hoverClass || 'hover:bg-white/[0.05] hover:text-slate-200'}`}`}>
                   <t.Icon size={15} /> {t.label}
                 </button>
@@ -745,7 +765,7 @@ export default function RecordsBureau() {
                 );
 
                 if (searchType === 'PERSON') return (
-                  <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('SUMMARY'); }}>
+                  <button key={r.id} className={base} onClick={() => selectResult(r.id, 'SUMMARY')}>
                     <div className="text-[12.5px] font-bold text-white">{r.firstName} {r.lastName}</div>
                     <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">DOB {r.dob} · {r.gender}</div>
                     <div className="flex gap-1 mt-1.5 flex-wrap items-center">
@@ -757,7 +777,7 @@ export default function RecordsBureau() {
                 if (searchType === 'VEHICLE') {
                   const bizOwner = r.businessOwnerId ? businesses.find(b => b.id === r.businessOwnerId) : null;
                   return (
-                    <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                    <button key={r.id} className={base} onClick={() => selectResult(r.id, 'RETURN')}>
                       <div className="text-[13px] font-bold font-mono text-brand-bright">{r.plate}</div>
                       <div className="text-[11px] text-slate-300 mt-0.5">{r.year} {r.make} {r.model} · {r.color}</div>
                       {bizOwner && <div className="text-[10.5px] text-cyan-400 mt-0.5">{bizOwner.name}</div>}
@@ -807,7 +827,7 @@ export default function RecordsBureau() {
                   );
                 }
                 return (
-                  <button key={r.id} className={base} onClick={() => { setSelected(r.id); setTab('RETURN'); }}>
+                  <button key={r.id} className={base} onClick={() => selectResult(r.id, 'RETURN')}>
                     <div className="text-[12.5px] font-semibold text-white">{r.civilianName}</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">{r.charge}</div>
                     <div className="flex gap-1 mt-1.5">

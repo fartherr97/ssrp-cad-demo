@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
+import { useTabParam } from '../hooks/useTabParam';
 import {
   MdWork, MdAdd, MdArrowBack, MdSearch, MdLock, MdEdit, MdClose,
   MdPerson, MdDirectionsCar, MdDelete, MdPersonAdd, MdSend,
@@ -812,7 +813,7 @@ const DETAIL_TABS = [
 ];
 
 function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) {
-  const [tab, setTab] = useState('OVERVIEW');
+  const [tab, setTab] = useTabParam('tab', 'OVERVIEW');
   const { isMobile } = useResponsive();
   const officers = state.officers || [];
   const civilians = state.civilians || [];
@@ -932,7 +933,9 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
 export default function CaseFiles() {
   const { state, dispatch } = useCAD();
   const { isMobile } = useResponsive();
-  const [selectedId, setSelectedId] = useState(null);
+  const [caseParam, setCaseParam] = useTabParam('case', '');
+  const selectedId = caseParam ? Number(caseParam) : null;
+  const setSelectedId = (id) => setCaseParam(id == null ? '' : String(id));
   const [showNewModal, setShowNewModal] = useState(false);
   const [editCase, setEditCase] = useState(null);
   const [filterStatus, setFilterStatus] = useState('ALL');

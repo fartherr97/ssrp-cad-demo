@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
+import { useTabParam } from '../hooks/useTabParam';
 import { useToast } from '../contexts/ToastContext';
 import ReportForm from '../components/ReportForm';
 import { downloadReportPDF } from '../components/ReportPDF';
@@ -51,7 +52,7 @@ export default function ReportsCenter() {
   const [savedAt, setSavedAt]                   = useState(null);
   const [activeTab, setActiveTab]               = useState('Report');
   const [pdfLoading, setPdfLoading]             = useState(false);
-  const [mobileTab, setMobileTab]               = useState('new'); // 'new' | 'queue'
+  const [mobileTab, setMobileTab]               = useTabParam('tab', 'new'); // 'new' | 'queue'
 
   // Open a template for editing, restoring any auto-saved draft.
   const openTemplate = (tpl) => {
