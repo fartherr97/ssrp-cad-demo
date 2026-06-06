@@ -642,15 +642,15 @@ export default function RecordsBureau() {
             <span className="text-[12px] font-bold uppercase tracking-[0.7px] text-slate-200">Records Search</span>
           </div>
 
-          {/* Type tabs */}
-          <div className="flex flex-wrap gap-1 p-2 border-b border-border-faint shrink-0">
+          {/* Type tabs — uniform 3-col grid so every button is the same size */}
+          <div className="grid grid-cols-3 gap-1 p-2 border-b border-border-faint shrink-0">
             {SEARCH_TYPES.map(t => {
               const on = searchType === t.id;
               return (
                 <button key={t.id}
                   onClick={() => { setSearchType(t.id); setResults([]); setSearched(false); setQuery(''); }}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : `bg-transparent border-transparent text-slate-400 ${t.hoverClass || 'hover:bg-white/[0.05] hover:text-slate-200'}`}`}>
-                  <t.Icon size={15} /> {t.label}
+                  className={`flex items-center justify-center gap-1.5 px-2 min-h-[42px] rounded-lg text-[11px] font-semibold leading-tight text-center cursor-pointer transition-all border ${on ? (t.activeClass || 'bg-brand/15 border-brand/40 text-brand-bright') : `bg-transparent border-transparent text-slate-400 ${t.hoverClass || 'hover:bg-white/[0.05] hover:text-slate-200'}`}`}>
+                  <t.Icon size={15} className="shrink-0" /> {t.label}
                 </button>
               );
             })}

@@ -442,6 +442,15 @@ tbody tr { transition: background-color 0.13s ease, box-shadow 0.13s ease; }
   -webkit-backdrop-filter: none !important;
 }
 
+/* The dark theme stacks ~120 semi-transparent panels/cards over the gradient.
+   Alpha-blending all those layers (overdraw) is the main remaining scroll-FPS
+   cost. Force the common surface tints opaque — visually near-identical on this
+   dark theme, but far cheaper to paint (the browser can skip what's behind). */
+.bg-app-panel\/80, .bg-app-panel\/60 { background-color: #101d31 !important; }
+.bg-app-card\/70, .bg-app-card\/60   { background-color: #13233b !important; }
+.bg-app-elevated\/60                 { background-color: #192f4d !important; }
+.bg-app-input\/80                    { background-color: #0d1a2c !important; }
+
 /* ─── Honor reduced-motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
