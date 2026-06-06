@@ -10,6 +10,7 @@ import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useTabParam } from '../../hooks/useTabParam';
 import { DeptBadge } from '../../constants/deptLogos';
+import { usePager, Pager } from '../admin/AdminKit';
 
 /* ══════════════════════════════════
    NOTIFICATION BLAST
@@ -945,6 +946,7 @@ export default function Supervisor() {
 
   const reportCount = filtered.filter(e => e.kind === 'report').length;
   const recordCount = filtered.filter(e => e.kind === 'record').length;
+  const pager = usePager(filtered, 25);
   const STATUS_PILLS = ['All', 'Pending Review', 'Pending Changes', 'Rejected'];
 
   /* ── Open / save handlers ── */
@@ -1170,7 +1172,7 @@ export default function Supervisor() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((entry, idx) => (
+                  {pager.pageItems.map((entry, idx) => (
                     <EntryRow
                       key={`${entry.kind}-${entry.id}`}
                       entry={entry}
@@ -1185,7 +1187,7 @@ export default function Supervisor() {
 
             {/* Mobile cards */}
             <div className="block sm:hidden p-3">
-              {filtered.map(entry => (
+              {pager.pageItems.map(entry => (
                 <MobileCard
                   key={`${entry.kind}-${entry.id}`}
                   entry={entry}
@@ -1194,6 +1196,7 @@ export default function Supervisor() {
                 />
               ))}
             </div>
+            <div className="px-3 pb-3"><Pager {...pager} /></div>
           </>
         )}
       </div>

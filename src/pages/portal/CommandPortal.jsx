@@ -13,6 +13,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { useTabParam } from '../../hooks/useTabParam';
 import { slugify, unslugTab } from '../../utils/slug';
 import { DeptBadge } from '../../constants/deptLogos';
+import { usePager, Pager } from '../admin/AdminKit';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
 } from './PortalKit';
@@ -647,6 +648,8 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   }, [reports, typeFilter, statusFilter, dateFrom, dateTo, officerSearch, officerByBadge]);
 
+  const pager = usePager(filtered, 25);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Filter row 1 */}
@@ -683,8 +686,9 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
         {filtered.length === 0 ? (
           <div className="text-[13px] text-slate-600 py-6 text-center">No reports match your filters.</div>
         ) : (
+          <>
           <div className="flex flex-col">
-            {filtered.map((r, idx) => {
+            {pager.pageItems.map((r, idx) => {
               const off = officerByBadge[r.officerBadge];
               return (
                 <button key={r.id} type="button" onClick={() => onOpenReport(r)}
@@ -701,6 +705,8 @@ function ReportTrackerTab({ reports, officers, reportTypes, onOpenReport }) {
               );
             })}
           </div>
+          <Pager {...pager} />
+          </>
         )}
       </PortalCard>
     </div>
