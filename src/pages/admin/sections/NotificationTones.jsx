@@ -17,8 +17,8 @@ function ToneSlot({ icon: Icon, accentColor, label, desc, url, name, onUpload, o
           setStatus('done');
           setTimeout(() => setStatus(null), 1800);
         };
-      }).catch(() => {});
-    } catch (_) {}
+      }).catch(() => { /* ignore */ });
+    } catch (_) { /* ignore */ }
   };
 
   return (

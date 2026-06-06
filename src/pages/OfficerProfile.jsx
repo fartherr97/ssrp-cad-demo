@@ -35,7 +35,7 @@ function resizeToDataUrl(file, maxPx = 300) {
 }
 
 /* ── Returned report editor ── */
-function ReturnedReportEditor({ report, reportTemplates, officer, onBack, onResubmit }) {
+function ReturnedReportEditor({ report, reportTemplates, officer: _officer, onBack, onResubmit }) {
   const template = report.templateSnapshot || reportTemplates.find(t => t.name === report.type);
   const [formData, setFormData] = useState({ ...(report.formData || {}) });
   const [submitted, setSubmitted] = useState(false);
@@ -372,7 +372,6 @@ export default function OfficerProfile() {
                   No returned reports or records · you&apos;re all clear.
                 </div>
               ) : returnedItems.map(r => {
-                const latestComment = (r.supervisorComments || []).slice(-1)[0];
                 return (
                   <div key={r.id} className="bg-app-panel/80 border rounded-xl overflow-hidden backdrop-blur-sm"
                     style={{ borderColor: 'rgba(251,146,60,0.30)' }}>

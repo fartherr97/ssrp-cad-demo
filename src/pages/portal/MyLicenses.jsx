@@ -4,7 +4,7 @@ import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import {
   MdBadge, MdDriveEta, MdPerson, MdLock,
-  MdCheckCircle, MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
+  MdWarningAmber, MdRefresh, MdAddCircleOutline, MdErrorOutline,
 } from 'react-icons/md';
 import {
   PortalPage, PortalHeader, PortalCard, Field, CivFormField,

@@ -13,7 +13,7 @@ import { MdArrowBack } from 'react-icons/md';
 
 export default function MDT() {
   const { state, dispatch } = useCAD();
-  const { messages, dispatchLog, civilians, vehicles, warrants, currentUser } = state;
+  const { messages, dispatchLog, civilians, vehicles } = state;
 
   const [tab, setTab] = useState('MESSAGES');
   const [selectedMsg, setSelectedMsg] = useState(null);

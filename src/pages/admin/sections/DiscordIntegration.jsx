@@ -150,12 +150,6 @@ function WebhookRow({ hook, onChange, onDelete, isCustom }) {
 }
 
 /* ── Custom webhook modal ── */
-const CUSTOM_EVENT_OPTIONS = [
-  { key: 'new',      label: 'New' },
-  { key: 'modified', label: 'Modified' },
-  { key: 'removed',  label: 'Removed' },
-];
-
 function AddCustomModal({ onAdd, onClose }) {
   const [label, setLabel] = useState('');
   const [url, setUrl]   = useState('');

@@ -14,7 +14,7 @@ import {
   trHoverOn, trHoverOff,
 } from '../constants/styles';
 import {
-  MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong, MdCampaign,
+  MdAddCall, MdDescription, MdSearch, MdMap, MdReceiptLong,
   MdGpsFixed, MdSos, MdCheckCircle, MdDirectionsCar, MdWarningAmber,
   MdLocationOn, MdDoNotDisturb, MdPowerSettingsNew, MdNotificationsActive, MdBadge,
   MdPhone, MdSend, MdClose, MdAdd, MdCircle, MdRadio, MdPerson,
@@ -654,7 +654,7 @@ export default function DispatchCenter() {
 
   const [priFilter, setPriFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [unitFilter, setUnitFilter] = useState('ALL');
+  const [unitFilter] = useState('ALL');
   const [showIdentifier, setShowIdentifier] = useState(false);
   const [dispatchTarget,    setDispatchTarget]    = useState(null);
   const [leoRespondTarget,  setLeoRespondTarget]  = useState(null);

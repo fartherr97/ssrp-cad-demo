@@ -5,14 +5,14 @@ import {
   MdCheckCircle, MdClose, MdDescription, MdChevronRight,
   MdFilterList, MdTimer, MdDirectionsRun, MdInfoOutline,
   MdAccessTime, MdFiberManualRecord, MdCampaign,
-  MdBadge, MdWork, MdRemoveCircle, MdAddCircle,
+  MdWork, MdRemoveCircle, MdAddCircle,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { useTabParam } from '../../hooks/useTabParam';
 import { slugify, unslugTab } from '../../utils/slug';
-import { DeptBadge, deptLogo } from '../../constants/deptLogos';
+import { DeptBadge } from '../../constants/deptLogos';
 import {
   PortalPage, PortalHeader, PortalCard, StatCard, Field,
 } from './PortalKit';
@@ -1363,7 +1363,7 @@ const TABS = ['Overview', 'By Officer', 'By Department', 'Subdivision Hours', 'R
 export default function CommandPortal() {
   const { state, dispatch } = useCAD();
   const {
-    reports = [], officers = [], departments = [], calls = [],
+    reports = [], officers = [], departments = [],
     reportTemplates = [], currentUser, callLogs = [],
   } = state;
 

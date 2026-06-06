@@ -7,7 +7,7 @@ import {
   MdWarning, MdMenuBook, MdChevronRight, MdLocalHospital,
   MdPhone, MdClose,
 } from 'react-icons/md';
-import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
+import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 import {
   BADGE, S_BTN_DANGER, S_BTN_SECONDARY, S_BTN_GHOST, sm,

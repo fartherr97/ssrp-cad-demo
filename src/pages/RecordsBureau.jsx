@@ -14,7 +14,7 @@ import { FlagRow } from '../components/CivilianFlags';
 import {
   MdPerson, MdDirectionsCar, MdGavel, MdSearch, MdArrowBack,
   MdWarningAmber, MdFolder, MdDescription, MdExpandMore,
-  MdLocalHospital, MdShield, MdStore, MdReceiptLong, MdGroup, MdBusiness,
+  MdLocalHospital, MdShield, MdStore, MdGroup, MdBusiness,
   MdVerifiedUser, MdLocationOn, MdClose,
   MdStickyNote2, MdEdit, MdSend, MdLock, MdCheck,
 } from 'react-icons/md';
@@ -368,7 +368,7 @@ const SEARCH_TYPES = [
   { id: 'PERMIT',   label: 'Permits',            Icon: MdVerifiedUser, activeClass: 'bg-green-400/15 border-green-400/40 text-green-300', hoverClass: 'hover:bg-green-400/[0.08] hover:border-green-400/25 hover:text-green-300' },
 ];
 
-function InvestigationFlag({ cases, onTip }) {
+function InvestigationFlag({ cases, onTip: _onTip }) {
   const [tipOpen, setTipOpen] = useState(false);
   const [tipCase, setTipCase] = useState(null);
   const [tipText, setTipText] = useState('');

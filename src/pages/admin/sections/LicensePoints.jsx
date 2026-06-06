@@ -194,7 +194,6 @@ export default function LicensePoints() {
   const save = () => { dispatch({ type: 'ADMIN_SET', payload: { key: 'licensePointsConfig', value: cfg } }); toast.success('License points config saved.'); };
 
   const setField = (k, v) => setCfg(p => ({ ...p, [k]: v }));
-  const setSched = (id, patch) => setCfg(p => ({ ...p, schedule: p.schedule.map(s => s.id === id ? { ...s, ...patch } : s) }));
   const delSched = (id) => setCfg(p => ({ ...p, schedule: p.schedule.filter(s => s.id !== id) }));
 
   // ── Escalating suspension thresholds (tiers) ──

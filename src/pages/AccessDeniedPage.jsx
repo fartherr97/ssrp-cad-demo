@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCAD } from '../store/cadStore';
 import { MdArrowBack, MdShield } from 'react-icons/md';
-import { FaDiscord } from 'react-icons/fa6';
 
 const DiscordSVG = () => (
   <svg width="18" height="14" viewBox="0 0 71 55" fill="currentColor">

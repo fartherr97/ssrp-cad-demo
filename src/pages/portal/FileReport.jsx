@@ -37,7 +37,7 @@ const EMPTY_FORM = {
 };
 
 export default function FileReport() {
-  const { state, dispatch } = useCAD();
+  const { dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar } = useActiveCivilian();
 

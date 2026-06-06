@@ -3,7 +3,7 @@ import {
   MdPerson, MdBusiness, MdGroup, MdPhone, MdCalendarToday,
   MdVerifiedUser, MdStore, MdCheck,
 } from 'react-icons/md';
-import { PortalPage, PortalHeader, PortalCard, StatCard, SectionTitle } from './PortalKit';
+import { PortalPage, PortalHeader, PortalCard, SectionTitle } from './PortalKit';
 import AccessDenied from './AccessDenied';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 import { BADGE } from '../../constants/styles';

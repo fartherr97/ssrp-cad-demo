@@ -6,7 +6,7 @@ import { useToast } from '../contexts/ToastContext';
    Renders nothing itself * replaced the old bottom-right toast card. */
 function playAudio(url) {
   if (!url) return;
-  try { new Audio(url).play().catch(() => {}); } catch (_) {}
+  try { new Audio(url).play().catch(() => { /* autoplay blocked until user gesture */ }); } catch (_) { /* ignore */ }
 }
 
 export default function RadioToast() {

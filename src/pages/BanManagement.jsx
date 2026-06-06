@@ -16,7 +16,7 @@ export default function BanManagement() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const confirm = useConfirm();
-  const { bannedUsers, currentUser } = state;
+  const { bannedUsers } = state;
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('ALL');
   const [query, setQuery] = useState('');

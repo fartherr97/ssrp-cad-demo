@@ -515,7 +515,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
 }
 
 /* ── Quick Dispatch Modal * pick one or more units, send them en route ── */
-function QuickDispatchModal({ req, availableUnits, fdotCompany, onConfirm, onCancel }) {
+function QuickDispatchModal({ req, availableUnits, fdotCompany: _fdotCompany, onConfirm, onCancel }) {
   const [selectedIds, setSelectedIds] = useState(
     availableUnits.length === 1 ? [availableUnits[0].id] : []
   );

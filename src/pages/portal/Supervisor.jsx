@@ -141,7 +141,7 @@ function NotificationBlast({ currentUser, officers, departments }) {
 }
 import ReportForm from '../../components/ReportForm';
 import { downloadReportPDF } from '../../components/ReportPDF';
-import { BADGE, S_BTN_SECONDARY, S_BTN_GHOST, xs } from '../../constants/styles';
+import { S_BTN_SECONDARY, xs } from '../../constants/styles';
 import { getScopeDeptId } from '../../utils/deptScope';
 import { isESDept } from '../../constants/portals';
 

@@ -25,7 +25,7 @@ export function FlagBadge({ flag, onRemove }) {
 }
 
 /* Row of flag badges for a civilian (read-only) */
-export function FlagRow({ flags = [], size = 'sm' }) {
+export function FlagRow({ flags = [], _size = 'sm' }) {
   const { state } = useCAD();
   const defs = state.customFlags || [];
   const resolved = flags.map(id => defs.find(f => f.id === id)).filter(Boolean);

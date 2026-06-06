@@ -5,12 +5,12 @@ import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../contexts/ConfirmContext';
 import { FlagRow, FlagManager } from '../components/CivilianFlags';
 import {
-  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
-  S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
+  BADGE, S_PAGE, S_PANEL_HEADER, S_PANEL_TITLE,
+  S_CARD, S_BTN_PRIMARY, S_BTN_SECONDARY,
   S_BTN_DANGER, S_BTN_GHOST, S_INPUT, S_SELECT, S_LABEL, S_FIELD, S_DATA,
   S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
   S_DETAIL_ROW, S_DETAIL_LABEL, S_DETAIL_VALUE, S_DETAIL_VALUE_MONO,
-  trHoverOn, trHoverOff, xs, sm,
+  xs, sm,
 } from '../constants/styles';
 import { MdArrowBack, MdPerson, MdCameraAlt, MdDelete } from 'react-icons/md';
 import { ageFromDob } from '../utils/age';

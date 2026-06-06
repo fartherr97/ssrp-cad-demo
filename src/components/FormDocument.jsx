@@ -1,6 +1,6 @@
 /* PDF-style government form document components */
 
-import React, { useState } from 'react';
+import React from 'react';
 import Select from './ui/Select';
 import { MdPerson, MdDirectionsCar, MdGavel } from 'react-icons/md';
 import { useCAD } from '../store/cadStore';
@@ -287,7 +287,6 @@ export function FormAlert({ text, level = 'red' }) {
 
 export function TrafficStopDoc({ data = {}, editable, onChange, meta = {} }) {
   const fv = (k) => data[k] || '';
-  const ch = (k) => !!data[k];
   const set = (k) => (v) => onChange && onChange(k, v);
 
   return (

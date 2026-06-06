@@ -4,11 +4,10 @@ import { useCAD } from '../../store/cadStore';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
 import { useToast } from '../../contexts/ToastContext';
 import {
-  MdDirectionsCar, MdAdd, MdClose, MdStore, MdLock, MdErrorOutline,
-  MdBadge, MdCalendarToday,
+  MdDirectionsCar, MdAdd, MdClose, MdStore, MdLock,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, Field, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
-import { S_BTN_PRIMARY, S_BTN_SECONDARY, sm, BADGE } from '../../constants/styles';
+import { S_BTN_SECONDARY, sm, BADGE } from '../../constants/styles';
 
 const VEHICLE_TYPES = [
   'Sedan', 'SUV', 'Truck', 'Pickup', 'Van', 'Box Truck',

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useCAD } from '../store/cadStore';
 import Select from '../components/ui/Select';
 import { useToast } from '../contexts/ToastContext';
@@ -6,10 +6,10 @@ import { useResponsive } from '../hooks/useResponsive';
 import { useTabParam } from '../hooks/useTabParam';
 import {
   MdWork, MdAdd, MdArrowBack, MdSearch, MdLock, MdEdit, MdClose,
-  MdPerson, MdDirectionsCar, MdDelete, MdPersonAdd, MdSend,
-  MdFiberManualRecord, MdCheckCircle, MdPauseCircle, MdLockOutline,
-  MdRefresh, MdExpandMore, MdTimeline, MdLink, MdFolder, MdNotes,
-  MdWarningAmber, MdAssignment, MdCalendarToday, MdBadge,
+  MdPerson, MdDirectionsCar, MdDelete, MdSend,
+  MdFiberManualRecord, MdCheckCircle, MdPauseCircle,
+  MdRefresh, MdTimeline, MdNotes,
+  MdBadge,
 } from 'react-icons/md';
 import { FaUserSecret } from 'react-icons/fa6';
 

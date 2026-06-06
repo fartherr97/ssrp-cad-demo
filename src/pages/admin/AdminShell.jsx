@@ -241,8 +241,6 @@ export default function AdminShell() {
   const isActive = (item) =>
     item.exact ? pathname === item.route : (pathname === item.route || pathname.startsWith(item.route + '/'));
 
-  const community = state.communityConfig?.name || 'Sunshine State RP';
-
   // ── Tier-based nav filtering ──────────────────────────────────────────
   // If the signed-in admin user has an adminTierId, filter nav items to only
   // the sections their tier's permissions allow. No tierId = full access.

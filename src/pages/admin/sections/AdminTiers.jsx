@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react';
-import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, EmptyState, ADMIN, SON_INPUT, SON_LABEL,
 } from '../AdminKit';
 import {
-  MdAdd, MdEdit, MdDelete, MdSave, MdShield, MdCheck, MdClose,
+  MdAdd, MdEdit, MdDelete, MdSave, MdCheck, MdClose,
   MdWarning, MdExpandMore, MdLock, MdAdminPanelSettings,
 } from 'react-icons/md';
 

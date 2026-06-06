@@ -4,7 +4,7 @@ import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../contexts/ConfirmContext';
 import {
-  BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
+  BADGE, S_PAGE, S_PANEL_HEADER, S_PANEL_TITLE,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
   S_BTN_DANGER, S_BTN_GHOST, S_INPUT, S_SELECT, S_LABEL, S_FIELD, S_DATA,
   S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
