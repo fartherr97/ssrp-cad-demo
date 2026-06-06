@@ -1148,11 +1148,30 @@ function WarrantLookupField({ f, value, data, onChange, onBulk, allFields, charg
   const { state } = useCAD();
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
+  const ref = useRef(null);
+  const boxRef = useRef(null);
   const items = Array.isArray(value) ? value : [];
   const penal = state.penalCode || [];
   const accent = '#f43f5e';
 
   const applyBulk = onBulk || ((updates) => Object.entries(updates).forEach(([k, v]) => onChange(k, v)));
+
+  // Render the dropdown through a portal (fixed-positioned) so it floats above
+  // the report's blurred section cards instead of being trapped behind them.
+  const place = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ left: r.left, top: r.bottom + 4, width: r.width });
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => { if (!ref.current?.contains(e.target) && !boxRef.current?.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
 
   // Convert a warrant's charges to the Charges-field shape, reusing the matching
   // penal-code entry's id when we can so the picker dedupes correctly.
@@ -1255,25 +1274,29 @@ function WarrantLookupField({ f, value, data, onChange, onBulk, allFields, charg
       )}
 
       {!readOnly && (
-        <div className="relative">
-          <input value={q} onChange={e => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 150)}
+        <div className="relative" ref={ref}>
+          <input value={q}
+            onChange={e => { setQ(e.target.value); place(); setOpen(true); }}
+            onFocus={() => { place(); setOpen(true); }}
             placeholder="Search active warrants by subject or charge…" className={S_INPUT} />
-          {open && results.length > 0 && (
-            <div className="absolute z-[60] left-0 right-0 mt-1 bg-app-card border border-border-strong rounded-xl shadow-2xl shadow-black/60 p-1 max-h-[280px] overflow-y-auto">
-              {results.map(w => (
-                <button key={w.id} type="button" onMouseDown={e => e.preventDefault()} onClick={() => pick(w)}
-                  className="w-full flex items-start gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-white/[0.06] cursor-pointer" style={{ background: 'none', border: 'none' }}>
-                  <MdGavel size={15} className="text-rose-300/80 shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-semibold text-white truncate">{w.civilianName} <span className="text-slate-400 font-normal">· {w.type}</span></div>
-                    <div className="text-[11px] text-slate-500 truncate">{chargeSummary(w)}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+      )}
+      {!readOnly && open && results.length > 0 && coords && createPortal(
+        <div ref={boxRef}
+          className="fixed z-[3000] bg-app-card border border-border-strong rounded-xl shadow-2xl shadow-black/60 p-1 max-h-[280px] overflow-y-auto"
+          style={{ left: coords.left, top: coords.top, width: coords.width, animation: 'dropdownFadeIn 0.12s ease-out' }}>
+          {results.map(w => (
+            <button key={w.id} type="button" onMouseDown={e => e.preventDefault()} onClick={() => pick(w)}
+              className="w-full flex items-start gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-white/[0.06] cursor-pointer" style={{ background: 'none', border: 'none' }}>
+              <MdGavel size={15} className="text-rose-300/80 shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-semibold text-white truncate">{w.civilianName} <span className="text-slate-400 font-normal">· {w.type}</span></div>
+                <div className="text-[11px] text-slate-500 truncate">{chargeSummary(w)}</div>
+              </div>
+            </button>
+          ))}
+        </div>,
+        document.body,
       )}
       {readOnly && items.length === 0 && <span className="text-[12px] text-slate-600 italic">No warrant linked</span>}
     </div>
