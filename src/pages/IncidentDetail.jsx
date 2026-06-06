@@ -90,6 +90,14 @@ export default function IncidentDetail() {
     dispatch({ type:'DETACH_UNIT', payload:{ callId:call.id, unitId } });
     toast.info(`${unitId} detached`);
   };
+  // Field officer attaches themselves using their active identifier — no need to
+  // type or pick a callsign, it's resolved silently from `me`.
+  const selfAttach = () => {
+    if (!call || !me) return;
+    dispatch({ type:'ASSIGN_UNIT', payload:{ callId:call.id, unitId: me.unitId } });
+    dispatch({ type:'SET_MY_CALL', payload: call.id });
+    toast.success(`You are now attached to ${call.id}`, { title: 'Self-Attached' });
+  };
   const updateStatus = (status) => {
     if (!call) return;
     dispatch({ type:'UPDATE_CALL', payload:{ id:call.id, status } });
@@ -211,7 +219,7 @@ export default function IncidentDetail() {
             <div className="min-w-0">
               <div className="text-[12.5px] font-bold text-green-300">You are attached to this call</div>
               <div className="text-[11px] text-slate-400 mt-px">
-                {me.unitId} · {me.name} ·{' '}
+                {me.name} ·{' '}
                 <span style={{ color: ST_COLOR[me.status] || '#93a4bd' }}>{CAD_STATUS_LABEL[me.status] || me.status}</span>
               </div>
             </div>
@@ -231,6 +239,26 @@ export default function IncidentDetail() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ── Self-attach prompt (field officer, not yet on this call) ── */}
+      {!isDispatch && me && !call.units.includes(me.unitId) && (
+        <div className="shrink-0 flex flex-col gap-2.5 px-4 py-3 rounded-xl sm:flex-row sm:items-center"
+          style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.2)', borderLeft: '3px solid #22c55e' }}>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <MdPerson size={18} className="text-green-400 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-[12.5px] font-bold text-green-300">Respond to this call</div>
+              <div className="text-[11px] text-slate-400 mt-px">Attach yourself to set your status and appear on the unit roster.</div>
+            </div>
+          </div>
+          <button
+            onClick={selfAttach}
+            className="press shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[12px] font-bold cursor-pointer bg-green-600 hover:bg-green-500 text-white transition-colors w-full sm:w-auto"
+          >
+            <MdPerson size={15} /> Self-Attach
+          </button>
         </div>
       )}
 
