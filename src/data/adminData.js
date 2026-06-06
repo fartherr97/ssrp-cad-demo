@@ -73,14 +73,14 @@ export const UNIT_STATUS_CODES = [
 ];
 
 export const ADMIN_ACCOUNTS = [
-  { id: 1, username: 'fartherr',     status: 'ACTIVE',    permissions: ['Admin','Dispatch','Police'], lastLogin: '2026-06-01 15:14', joined: '2025-04-08', apiIds: ['205947291075078247'] },
-  { id: 2, username: 'jreeves831',   status: 'ACTIVE',    permissions: ['Police','Supervisor'],       lastLogin: '2026-06-01 14:02', joined: '2025-02-11', apiIds: ['309182746800440531'] },
-  { id: 3, username: 'msantos819',   status: 'ACTIVE',    permissions: ['Police'],                    lastLogin: '2026-05-31 22:46', joined: '2025-05-19', apiIds: ['419283746878013440'] },
-  { id: 4, username: 'tbrooks422',   status: 'ACTIVE',    permissions: ['Police'],                    lastLogin: '2026-05-30 09:16', joined: '2025-06-23', apiIds: ['520394857504573451'] },
-  { id: 5, username: 'cmendes209',   status: 'ACTIVE',    permissions: ['Police','Fire'],             lastLogin: '2026-05-29 18:31', joined: '2025-07-02', apiIds: ['621405968426967632'] },
-  { id: 6, username: 'lpark_m3',     status: 'ACTIVE',    permissions: ['Fire','EMS'],                lastLogin: '2026-05-28 11:50', joined: '2025-03-07', apiIds: ['722516079504573451'] },
-  { id: 7, username: 'newrecruit44', status: 'SUSPENDED', permissions: [],                            lastLogin: '2026-04-17 19:57', joined: '2026-04-17', apiIds: ['846025956057546792'] },
-  { id: 8, username: 'oldmember19',  status: 'BANNED',    permissions: [],                            lastLogin: '2025-12-05 21:16', joined: '2025-01-16', apiIds: ['133596276453074536'] },
+  { id: 1, username: 'fartherr',     status: 'ACTIVE',    permissions: ['Admin','Dispatch','Police'], lastLogin: '2026-06-01 15:14', joined: '2025-04-08', discordIds: ['205947291075078247'] },
+  { id: 2, username: 'jreeves831',   status: 'ACTIVE',    permissions: ['Police','Supervisor'],       lastLogin: '2026-06-01 14:02', joined: '2025-02-11', discordIds: ['309182746800440531'] },
+  { id: 3, username: 'msantos819',   status: 'ACTIVE',    permissions: ['Police'],                    lastLogin: '2026-05-31 22:46', joined: '2025-05-19', discordIds: ['419283746878013440'] },
+  { id: 4, username: 'tbrooks422',   status: 'ACTIVE',    permissions: ['Police'],                    lastLogin: '2026-05-30 09:16', joined: '2025-06-23', discordIds: ['520394857504573451'] },
+  { id: 5, username: 'cmendes209',   status: 'ACTIVE',    permissions: ['Police','Fire'],             lastLogin: '2026-05-29 18:31', joined: '2025-07-02', discordIds: ['621405968426967632'] },
+  { id: 6, username: 'lpark_m3',     status: 'ACTIVE',    permissions: ['Fire','EMS'],                lastLogin: '2026-05-28 11:50', joined: '2025-03-07', discordIds: ['722516079504573451'] },
+  { id: 7, username: 'newrecruit44', status: 'SUSPENDED', permissions: [],                            lastLogin: '2026-04-17 19:57', joined: '2026-04-17', discordIds: ['846025956057546792'] },
+  { id: 8, username: 'oldmember19',  status: 'BANNED',    permissions: [],                            lastLogin: '2025-12-05 21:16', joined: '2025-01-16', discordIds: ['133596276453074536'] },
 ];
 
 export const PERMISSION_KEYS = [

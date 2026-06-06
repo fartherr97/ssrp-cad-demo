@@ -18,7 +18,7 @@ export default function Accounts() {
 
   const filtered = adminAccounts.filter(a =>
     (statusFilter === 'ALL' || a.status === statusFilter) &&
-    (!query || a.username.toLowerCase().includes(query.toLowerCase()) || a.apiIds.some(id => id.includes(query))));
+    (!query || a.username.toLowerCase().includes(query.toLowerCase()) || (a.discordIds || []).some(id => id.includes(query))));
 
   const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const pageItems = filtered.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
@@ -60,7 +60,7 @@ export default function Accounts() {
                 </SonCell>
                 <SonCell color={ADMIN.textDim} mono>{a.lastLogin}</SonCell>
                 <SonCell color={ADMIN.textDim} mono>{a.joined}</SonCell>
-                <SonCell mono color={ADMIN.textMute}>{a.apiIds.join(', ')}</SonCell>
+                <SonCell mono color={ADMIN.textMute}>{(a.discordIds || []).join(', ')}</SonCell>
               </SonRow>
             ))}
           </SonTable>
