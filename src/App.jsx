@@ -76,12 +76,10 @@ const Authenticate = lazy(() => import('./pages/admin/sections/Authenticate'));
 const CommunityInfo = lazy(() => import('./pages/admin/sections/CommunityInfo'));
 const Geographical = lazy(() => import('./pages/admin/sections/Geographical'));
 const StatusCodes = lazy(() => import('./pages/admin/sections/StatusCodes'));
-const LoginPageEditor = lazy(() => import('./pages/admin/sections/LoginPageEditor'));
 const QuickLinks = lazy(() => import('./pages/admin/sections/QuickLinks'));
 const NotificationTones = lazy(() => import('./pages/admin/sections/NotificationTones'));
 const Restrictions = lazy(() => import('./pages/admin/sections/Restrictions'));
 const HelpEditor = lazy(() => import('./pages/admin/sections/HelpEditor'));
-const Servers = lazy(() => import('./pages/admin/sections/Servers'));
 const Addresses = lazy(() => import('./pages/admin/sections/Addresses'));
 const LookupTypes = lazy(() => import('./pages/admin/sections/LookupTypes'));
 const ToneBoard = lazy(() => import('./pages/admin/sections/ToneBoard'));
@@ -196,11 +194,9 @@ function CADApp() {
           <Route path="community-info"     element={<CommunityInfo />} />
           <Route path="geographical"       element={<Geographical />} />
           <Route path="status-codes"       element={<StatusCodes />} />
-          <Route path="login-page"         element={<LoginPageEditor />} />
           <Route path="quick-links"        element={<QuickLinks />} />
           <Route path="notification-tones" element={<NotificationTones />} />
           <Route path="restrictions"       element={<Restrictions />} />
-          <Route path="servers"            element={<Servers />} />
           <Route path="addresses"          element={<Addresses />} />
           <Route path="lookup-types"       element={<LookupTypes />} />
           <Route path="tone-board"         element={<ToneBoard />} />
