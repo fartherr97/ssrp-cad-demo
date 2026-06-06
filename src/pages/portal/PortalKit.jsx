@@ -39,11 +39,16 @@ function resolveHex(accent) {
 }
 
 export function PortalPage({ children }) {
+  // The brand glow lives on a NON-scrolling layer behind a transparent scroller,
+  // so it's painted once instead of being re-rasterized every scroll frame
+  // (a gradient set directly on the scrolling element tanks scroll FPS).
   return (
-    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-4 py-5 sm:px-10 sm:py-7 font-ui bg-app-bg"
-      style={{ background: 'radial-gradient(ellipse at 20% -10%, rgba(61,130,240,0.12) 0%, transparent 55%), var(--n-bg-app)' }}
-    >
-      {children}
+    <div className="relative flex-1 w-full min-w-0 h-full overflow-hidden">
+      <div className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse at 20% -10%, rgba(61,130,240,0.12) 0%, transparent 55%), var(--n-bg-app)' }} />
+      <div className="relative h-full overflow-auto box-border px-4 py-5 sm:px-10 sm:py-7 font-ui">
+        {children}
+      </div>
     </div>
   );
 }

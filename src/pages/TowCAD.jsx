@@ -975,8 +975,7 @@ export default function TowCAD() {
   };
 
   return (
-    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-4 py-5 sm:px-10 sm:py-7 font-ui bg-app-bg"
-      style={{ background: 'radial-gradient(ellipse at 20% -10%, rgba(234,88,12,0.10) 0%, transparent 55%), var(--n-bg-app)' }}>
+    <div className="flex-1 w-full min-w-0 h-full overflow-auto box-border px-4 py-5 sm:px-10 sm:py-7 font-ui bg-app-bg">
 
       {showSignOn && (
         <SignOnModal
