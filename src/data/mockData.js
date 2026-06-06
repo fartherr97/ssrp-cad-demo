@@ -286,7 +286,7 @@ const _admin = () => ({
   id: 'sAdmin', title: 'Administrative', style: 'gray', fields: [
     { id: 'adm_obs',    label: 'Observing Unit',        type: 'text',     span: 2, required: true },
     { id: 'adm_status', label: 'Status',                type: 'dropdown', span: 2, required: true, options: ['Active','Pending Review','Closed'] },
-    { id: 'adm_sup',    label: 'Supervisor Signature',  type: 'text',     span: 2, required: true },
+    { id: 'adm_sup',    label: 'Supervisor Signature',  type: 'text',     span: 2 },
     { id: 'adm_date',   label: 'Date',                  type: 'date',     span: 2, required: true },
   ],
 });
@@ -408,7 +408,7 @@ export const REPORT_TEMPLATES = [
         { id: 'st_officer', label: 'Officer Involved', type: 'text', span: 2, required: true },
         { id: 'st_date',    label: 'Date of Occurrence', type: 'date', span: 2 },
         { id: 'st_status',  label: 'Status', type: 'dropdown', span: 2, options: ['Active','Under Review','Justified','Not Justified','Closed'] },
-        { id: 'st_sup',     label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_sup',     label: 'Supervisor Signature', type: 'text', span: 2 },
       ]},
     ],
   },
@@ -480,7 +480,7 @@ export const REPORT_TEMPLATES = [
       { id: 'sAuth', title: 'Report Authorization', style: 'gray', fields: [
         { id: 'au_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Pending','Closed'] },
         { id: 'au_insp',   label: 'Inspector Signature', type: 'signature', span: 2, required: true },
-        { id: 'au_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'au_sup',    label: 'Supervisor Signature', type: 'text', span: 2 },
         { id: 'au_date',   label: 'Date', type: 'date', span: 2, required: true },
       ]},
     ],
@@ -519,7 +519,7 @@ export const REPORT_TEMPLATES = [
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
         { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Booked','Released','Pending'] },
         { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
-        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2 },
         { id: 'st_date',   label: 'Date', type: 'date', span: 2 },
       ]},
     ],
@@ -948,7 +948,7 @@ export const RECORD_TEMPLATES = [
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
         { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Expired','Revoked','Suspended'] },
         { id: 'st_exp',    label: 'Expiration Date', type: 'date', span: 2, required: true },
-        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2 },
         { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
       ]},
     ],
@@ -965,7 +965,7 @@ export const RECORD_TEMPLATES = [
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
         { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Expired','Revoked','Suspended'] },
         { id: 'st_exp',    label: 'Expiration Date', type: 'date', span: 2, required: true },
-        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2 },
         { id: 'st_obs',    label: "Observing Officer's Signature", type: 'signature', span: 2, required: true },
       ]},
     ],
@@ -1118,7 +1118,7 @@ export const RECORD_TEMPLATES = [
       { id: 'sSign', title: 'Signatures', style: 'gray', fields: [
         { id: 'sg_status',  label: 'Status', type: 'dropdown', span: 1, options: ['Active','Paid','Court Pending','Dismissed'] },
         { id: 'sg_officer', label: 'Officer Signature', type: 'signature', span: 3, required: true },
-        { id: 'sg_sup',     label: 'Supervisor Signature', type: 'text', span: 4, required: true },
+        { id: 'sg_sup',     label: 'Supervisor Signature', type: 'text', span: 4 },
       ]},
     ],
   },
@@ -1143,7 +1143,7 @@ export const RECORD_TEMPLATES = [
       { id: 'sStatus', title: 'Status', style: 'gray', fields: [
         { id: 'st_status', label: 'Status', type: 'dropdown', span: 2, required: true, options: ['Active','Paid','Court Pending','Dismissed'] },
         { id: 'st_date',   label: 'Date', type: 'date', span: 2 },
-        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2, required: true },
+        { id: 'st_sup',    label: 'Supervisor Signature', type: 'text', span: 2 },
         { id: 'st_obs',    label: "Observing Unit's Signature", type: 'signature', span: 2, required: true },
       ]},
     ],
