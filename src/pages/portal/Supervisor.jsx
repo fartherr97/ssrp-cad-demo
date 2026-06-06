@@ -562,6 +562,7 @@ function OfficerProfileView({ officer, submissions, departments, onOpenEntry }) 
             Badge <span className="font-mono text-brand-bright">#{officer.badge}</span>
             {officer.rank && <span className="ml-2 text-slate-500">· {officer.rank}</span>}
           </div>
+          {officer.discordId && <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">Discord ID {officer.discordId}</div>}
         </div>
         <span className="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase"
           style={{ background: `${sc}22`, color: sc, border: `1px solid ${sc}44` }}>
@@ -750,11 +751,12 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
     const q = query.trim().toLowerCase();
     if (!q) return;
     if (type === 'officers') {
-      setResults(officers.filter(o => o.name?.toLowerCase().includes(q) || o.badge?.toLowerCase().includes(q)));
+      setResults(officers.filter(o => o.name?.toLowerCase().includes(q) || o.badge?.toLowerCase().includes(q) || String(o.discordId || '').includes(q)));
     } else {
       setResults(civilians.filter(c =>
         `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
-        c.dlNumber?.toLowerCase().includes(q) || c.ssn?.includes(q)
+        c.dlNumber?.toLowerCase().includes(q) || c.ssn?.includes(q) ||
+        String(c.ownerDiscordId || '').includes(q) || String(c.discordId || '').includes(q)
       ));
     }
     setSearched(true);
@@ -792,7 +794,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
           <div className="flex gap-2">
             <input
               className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-all"
-              placeholder={type === 'officers' ? 'Name or badge #…' : 'Name, DL # or SSN…'}
+              placeholder={type === 'officers' ? 'Name, badge #, or Discord ID…' : 'Name, DL #, SSN, or Discord ID…'}
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && doSearch()}
@@ -807,7 +809,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
         <div className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
           {!searched ? (
             <div className="p-4 text-[11px] text-slate-600 leading-relaxed">
-              Search for {type === 'officers' ? 'an officer by name or badge #' : 'a civilian by name, DL #, or SSN'}
+              Search for {type === 'officers' ? 'an officer by name, badge #, or Discord ID' : 'a civilian by name, DL #, SSN, or Discord ID'}
             </div>
           ) : results.length === 0 ? (
             <div className="p-6 text-center text-slate-600 text-[12px]">No {type} found</div>
@@ -825,6 +827,7 @@ function PersonnelLookup({ officers, civilians, warrants, criminalHistory, repor
                         <span className="text-[12.5px] font-bold text-white truncate">{r.name}</span>
                       </div>
                       <div className="text-[10.5px] text-slate-500">{r.rank} · {r.deptShort || '—'} · {subs} submissions</div>
+                      {r.discordId && <div className="text-[10px] text-slate-600 font-mono mt-0.5">Discord {r.discordId}</div>}
                     </button>
                   );
                 }

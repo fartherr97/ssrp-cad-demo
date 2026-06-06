@@ -352,7 +352,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
     return leoOfficers
       .filter(o => {
         const q = search.trim().toLowerCase();
-        if (q && !o.name.toLowerCase().includes(q) && !o.badge.toLowerCase().includes(q)) return false;
+        if (q && !o.name.toLowerCase().includes(q) && !o.badge.toLowerCase().includes(q) && !String(o.discordId || '').includes(q)) return false;
         if (deptFilter !== 'All' && o.deptShort !== deptFilter) return false;
         return true;
       })
@@ -385,7 +385,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
         <div className="flex items-center gap-2 flex-1 min-w-[180px] bg-app-input border border-border-base rounded-lg px-3 py-2">
           <MdSearch size={14} className="text-slate-500 shrink-0" />
           <input className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-            placeholder="Name or badge…" value={search} onChange={e => setSearch(e.target.value)} />
+            placeholder="Name, badge, or Discord ID…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <Select className="bg-app-input border border-border-base rounded-lg px-3 py-2 text-[12.5px] text-slate-200 outline-none cursor-pointer"
           value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
@@ -413,6 +413,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-white truncate">{o.name}</div>
                   <div className="text-[10.5px] text-slate-500 font-mono">{o.badge} · {o.deptShort}</div>
+                  {o.discordId && <div className="text-[10px] text-slate-600 font-mono">Discord {o.discordId}</div>}
                 </div>
                 <CompBadge label={compStatus} color={compColor} />
               </div>
@@ -466,6 +467,7 @@ function ByOfficerTab({ reports, officers, departments, reportTypes }) {
                         <DeptBadge deptShort={o.deptShort} size={14} fallbackClassName="text-violet-400" />
                         <span className="text-[12.5px] text-slate-200">{o.name}</span>
                       </div>
+                      {o.discordId && <div className="text-[10px] text-slate-600 font-mono mt-0.5 pl-6">Discord {o.discordId}</div>}
                     </td>
                     <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-300 whitespace-nowrap">{o.badge}</td>
                     <td className="px-4 py-3 border-b border-border-faint text-[11.5px] font-mono text-slate-400 whitespace-nowrap">{o.deptShort}</td>
