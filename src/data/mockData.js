@@ -786,19 +786,28 @@ export const BANNED_USERS = [
 ];
 
 export const AUDIT_LOG = [
-  { id: 1, user: "Sgt. Reeves (TPD-831)",  action: "Created warrant for Darnell Washington",         timestamp: "2026-06-01 14:00", module: "Warrants" },
-  { id: 2, user: "Ofc. Santos (TPD-819)",  action: "Created call 26-1042 (Traffic Stop)",            timestamp: "2026-06-01 14:22", module: "Dispatch" },
-  { id: 3, user: "Admin Mercer (ECC-1)",   action: "Banned user xX_GunRunner_Xx (Permanent)",        timestamp: "2026-04-30 21:14", module: "Admin"    },
-  { id: 4, user: "Sgt. Reeves (TPD-831)",  action: "Approved report TPD-2026-0401",                  timestamp: "2026-04-02 09:30", module: "Reports"  },
-  { id: 5, user: "Cpl. Walsh (TPD-807)",   action: "Status changed to AVAILABLE",                    timestamp: "2026-06-01 14:05", module: "CAD"      },
-  { id: 6, user: "Det. Nair (TPD-839)",    action: "Ran plate lookup: SUS-1109",                     timestamp: "2026-06-01 14:18", module: "Returns"  },
-  { id: 7, user: "System",                 action: "New user registered: Jessica Huang (Discord: 722516079)", timestamp: "2026-05-10 18:44", module: "Admin" },
+  { id: 1, user: "Sgt. Reeves (TPD-831)",  discordId: "205947291", action: "Created warrant for Darnell Washington",         timestamp: "2026-06-01 14:00", module: "Warrants" },
+  { id: 2, user: "Ofc. Santos (TPD-819)",  discordId: "309182746", action: "Created call 26-1042 (Traffic Stop)",            timestamp: "2026-06-01 14:22", module: "Dispatch" },
+  { id: 3, user: "Admin Mercer (ECC-1)",   discordId: "100200300", action: "Banned user xX_GunRunner_Xx (Permanent)",        timestamp: "2026-04-30 21:14", module: "Admin"    },
+  { id: 4, user: "Sgt. Reeves (TPD-831)",  discordId: "205947291", action: "Approved report TPD-2026-0401",                  timestamp: "2026-04-02 09:30", module: "Reports"  },
+  { id: 5, user: "Cpl. Walsh (TPD-807)",   discordId: "419283746", action: "Status changed to AVAILABLE",                    timestamp: "2026-06-01 14:05", module: "CAD"      },
+  { id: 6, user: "Det. Nair (TPD-839)",    discordId: "924738291", action: "Ran plate lookup: SUS-1109",                     timestamp: "2026-06-01 14:18", module: "Returns"  },
+  { id: 7, user: "System",                 discordId: "738291046512330817", action: "New user registered: Jessica Huang (Discord: 738291046512330817)", timestamp: "2026-05-10 18:44", module: "Admin" },
 ];
 
 export const MESSAGES = [
   { id: 1, from: "Dispatch (ECC-1)", to: "All Units",       subject: "WARRANT ALERT * Darnell Washington", body: "Active arrest warrant on file. Subject is a felony warrant * do not approach without backup. Last seen near 330 Magnolia Blvd.",     timestamp: "2026-06-01 14:05", read: false, priority: "HIGH"   },
   { id: 2, from: "Sgt. Reeves (TPD-831)", to: "All TPD Units", subject: "Briefing Update",           body: "All patrol units: increased gang activity in Riverside district. Exercise caution. Extra patrol ordered for evening shift.",                   timestamp: "2026-06-01 13:00", read: true,  priority: "NORMAL" },
   { id: 3, from: "Lt. Commander",     to: "Supervisors",    subject: "Use of Force Policy Update",   body: "New UOF reporting requirements effective Monday. All use of force incidents require supervisor review within 24 hours. See department portal.", timestamp: "2026-05-31 09:15", read: true,  priority: "NORMAL" },
+];
+
+// Seed for Admin → Message Logs. Discord IDs are tracked so staff can audit
+// who sent what by account, not just display name.
+export const MESSAGE_LOG = [
+  { id: 9001, type: 'direct', from: 'Sgt. Reeves', fromBadge: 'TPD-831', fromDiscordId: '205947291', to: 'Ofc. Santos', toDiscordId: '309182746', subject: 'Riverside patrol', body: 'Take the east side of Riverside tonight, extra gang activity reported.', timestamp: '2026-06-01 13:12' },
+  { id: 9002, type: 'blast', from: 'Dispatch Mercer (ECC-1)', fromDiscordId: '100200300', subject: 'BOLO — Stolen Charger', body: 'Charcoal Dodge Charger, plate SUS-1109. Owner wanted. Do not approach alone.', timestamp: '2026-06-01 14:20' },
+  { id: 9003, type: 'group', from: 'Det. Nair', fromBadge: 'TPD-839', fromDiscordId: '924738291', to: 'Sgt. Reeves, Cpl. Walsh', toDiscordId: '205947291, 419283746', subject: 'Magnolia case sync', body: 'Looping you both in on the Washington warrant follow-up.', timestamp: '2026-06-01 15:02' },
+  { id: 9004, type: 'direct', from: 'Dep. Brooks', fromBadge: 'HCSO-422', fromDiscordId: '520394857', to: 'Sgt. Reeves', toDiscordId: '205947291', subject: 'Mutual aid', body: 'HCSO can spare a unit for the evening shift if you still need coverage.', timestamp: '2026-05-31 22:40' },
 ];
 
 export const CUSTOM_RECORD_TYPES = [

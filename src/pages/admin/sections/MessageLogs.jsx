@@ -30,7 +30,8 @@ export default function MessageLogs() {
     const q = search.trim().toLowerCase();
     return messageLog.filter(m => {
       if (typeFilter !== 'All' && m.type !== typeFilter) return false;
-      if (q && !m.from?.toLowerCase().includes(q) && !m.subject?.toLowerCase().includes(q) && !m.to?.toLowerCase().includes(q) && !m.body?.toLowerCase().includes(q)) return false;
+      if (q && !m.from?.toLowerCase().includes(q) && !m.subject?.toLowerCase().includes(q) && !m.to?.toLowerCase().includes(q) && !m.body?.toLowerCase().includes(q)
+        && !String(m.fromDiscordId || '').includes(q) && !String(m.toDiscordId || '').includes(q)) return false;
       return true;
     });
   }, [messageLog, search, typeFilter]);
@@ -46,7 +47,7 @@ export default function MessageLogs() {
             <MdSearch size={14} className="text-slate-500 shrink-0" />
             <input
               className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-              placeholder="Search by sender, recipient, subject…"
+              placeholder="Search by sender, recipient, subject, or Discord ID…"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -107,9 +108,11 @@ export default function MessageLogs() {
                           <span className="text-[12px] text-slate-200 whitespace-nowrap">{m.from}</span>
                         </div>
                         {m.fromBadge && <div className="text-[10px] font-mono text-slate-500 pl-5">{m.fromBadge}</div>}
+                        {m.fromDiscordId && <div className="text-[10px] font-mono text-slate-600 pl-5">ID {m.fromDiscordId}</div>}
                       </td>
                       <td className="px-4 py-3 border-b border-border-faint text-[12px] text-slate-300 whitespace-nowrap">
                         {m.type === 'blast' ? <span className="text-amber-400 font-semibold">{m.subject}</span> : (m.to || '—')}
+                        {m.toDiscordId && <div className="text-[10px] font-mono text-slate-600">ID {m.toDiscordId}</div>}
                       </td>
                       <td className="px-4 py-3 border-b border-border-faint text-[12px] text-slate-200 max-w-[160px] truncate">
                         {m.subject}

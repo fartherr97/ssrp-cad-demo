@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer } from 'react';
 import {
   OFFICERS, CALLS, CIVILIANS, VEHICLES, WARRANTS, CRIMINAL_HISTORY,
   PENAL_CODE, REPORTS, REPORT_TEMPLATES, BANNED_USERS, AUDIT_LOG,
-  MESSAGES, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
+  MESSAGES, MESSAGE_LOG, CUSTOM_RECORD_TYPES, TOW_LOGS, DEPARTMENTS, WHITELIST_APPS, ACTIVE_SESSIONS,
   BUSINESSES, RECORD_TEMPLATES, INCOMING_911, UNIT_GROUPS, CALL_RESPONSE_LOGS, FDOT_PERMITS,
   CASE_FILES,
 } from '../data/mockData';
@@ -101,7 +101,7 @@ const initialState = {
   messages: MESSAGES,
   directMessages: [],
   groupThreads: [],
-  messageLog: [],
+  messageLog: MESSAGE_LOG,
   lastBlast: null,
   notifications: [],
   wipeBackups: [],   // auto-saved snapshots from admin Wipe Records (restorable)
@@ -265,6 +265,7 @@ function addAuditEntry(state, action, module) {
   const entry = {
     id: state.nextId,
     user: user ? `${user.name} (${user.badge || user.role})` : 'System',
+    discordId: user?.discordId || '',
     action,
     timestamp: new Date().toLocaleString(),
     module,
@@ -1326,10 +1327,12 @@ function baseReducer(state, action) {
         messages: [{ id: `gm-${state.nextId}`, fromId, fromName, body, timestamp: ts }],
         readBy: [fromId],
       };
+      const discOf = (oid) => state.officers.find(o => o.id === oid)?.discordId || '';
       const logEntry = {
         id: state.nextId + 1, type: 'group',
-        from: fromName, fromBadge,
+        from: fromName, fromBadge, fromDiscordId: discOf(fromId),
         to: participantNames.filter((_, i) => participantIds[i] !== fromId).join(', '),
+        toDiscordId: participantIds.filter(pid => pid !== fromId).map(discOf).filter(Boolean).join(', '),
         subject, body, timestamp: ts,
       };
       return {
@@ -1366,7 +1369,8 @@ function baseReducer(state, action) {
       const now = new Date();
       const ts = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       const entry = { id: state.nextId, fromName, fromBadge, fromId, toName, toId, subject, body, timestamp: ts, read: false, type: 'direct' };
-      const logEntry = { id: state.nextId, from: fromName, fromBadge, to: toName, subject, body, timestamp: ts };
+      const discOf = (oid) => state.officers.find(o => o.id === oid)?.discordId || '';
+      const logEntry = { id: state.nextId, from: fromName, fromBadge, fromDiscordId: discOf(fromId), to: toName, toDiscordId: discOf(toId), subject, body, timestamp: ts };
       return {
         ...state,
         directMessages: [...state.directMessages, entry],
@@ -1379,7 +1383,7 @@ function baseReducer(state, action) {
       const { senderName, senderBadge, senderId, title, color, body, targetDeptId } = action.payload;
       const id = `blast-${Date.now()}`;
       const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const logEntry = { id: state.nextId, from: `${senderName} (${senderBadge})`, subject: title, body, timestamp: ts, type: 'blast' };
+      const logEntry = { id: state.nextId, from: `${senderName} (${senderBadge})`, fromDiscordId: state.officers.find(o => o.id === senderId)?.discordId || '', subject: title, body, timestamp: ts, type: 'blast' };
       return {
         ...state,
         messageLog: [logEntry, ...state.messageLog],
