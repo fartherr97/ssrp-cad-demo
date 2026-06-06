@@ -212,7 +212,9 @@ export default function Select({
             ${show ? 'anim-dropdown-in' : 'anim-dropdown-out'}`}
           style={{
             left: rect.left,
-            width: rect.width,
+            minWidth: rect.width,
+            width: 'max-content',
+            maxWidth: `calc(100vw - ${Math.round(rect.left)}px - 8px)`,
             top: rect.top,
             bottom: rect.bottom,
             maxHeight: Math.min(MAX_MENU_H, rect.maxH),

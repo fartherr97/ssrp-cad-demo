@@ -216,7 +216,7 @@ const age = ageFromDob;
 
 function InfoCard({ title, children, className = '' }) {
   return (
-    <div className={`flex flex-col bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm ${className}`}>
+    <div className={`flex flex-col shrink-0 bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm ${className}`}>
       <div className="px-4 py-2.5 border-b border-border-faint text-[10px] font-bold uppercase tracking-[0.7px] text-slate-400">{title}</div>
       <div className="p-4 flex flex-col gap-2">{children}</div>
     </div>
@@ -245,7 +245,7 @@ function CollapsibleHistoryCard({ h, onOpenReport }) {
   const [open, setOpen] = useState(false);
   const dispClass = DISP_COLOR[h.disposition] || 'text-slate-400/80 bg-slate-400/[0.07] border-slate-400/20';
   return (
-    <div className="flex flex-col bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
+    <div className="flex flex-col shrink-0 bg-app-card/70 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm">
       {/* Collapsed header * always visible */}
       <button
         type="button"
@@ -312,7 +312,7 @@ function CollapsibleWarrantCard({ w }) {
   const [open, setOpen] = useState(active); // active warrants open by default
   const sc = active ? '#f87171' : w.status === 'SERVED' ? '#4ade80' : '#94a3b8';
   return (
-    <div className="flex flex-col bg-app-card/70 border rounded-xl overflow-hidden backdrop-blur-sm"
+    <div className="flex flex-col shrink-0 bg-app-card/70 border rounded-xl overflow-hidden backdrop-blur-sm"
       style={{ borderColor: active ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.10)' }}>
       <button type="button" onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left cursor-pointer"
