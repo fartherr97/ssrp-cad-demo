@@ -144,17 +144,19 @@ input:-webkit-autofill:focus {
 }
 
 /* ─── Focus ─── */
-/* Visible, AA-friendly focus ring on the dark theme. Form controls get a soft
-   ROUNDED ring (box-shadow follows border-radius) instead of a square outline,
-   so rounded inputs don't look boxed when clicked. */
+/* Buttons, links and other controls keep a visible focus outline (accessibility).
+   Text fields / search bars show NO focus box or ring — just their own
+   border-color change — so typing never draws a blue box. This overrides the
+   Tailwind focus:ring on inputs and focus-within:ring on field wrappers. */
 *:focus-visible { outline: 2px solid #5a97f5; outline-offset: 1px; }
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
-[aria-haspopup="listbox"]:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(90,151,245,0.45);
+input:focus, input:focus-visible,
+textarea:focus, textarea:focus-visible,
+select:focus, select:focus-visible,
+[aria-haspopup="listbox"]:focus, [aria-haspopup="listbox"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
+[class*="focus-within:ring"]:focus-within { box-shadow: none !important; }
 
 /* ─── Kill the webkit/mobile tap-highlight flash that makes selects,
        dropdowns and buttons flicker the instant they're clicked ─── */
