@@ -5,6 +5,7 @@ import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
 import DutyGuard from './components/DutyGuard';
 import HydrationGate, { LoadingScreen } from './components/HydrationGate';
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 import { BusinessProvider } from './contexts/BusinessContext';
 import { CivilianProvider } from './contexts/CivilianContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -151,6 +152,7 @@ function PortalFallback() {
 
 function CADApp() {
   return (
+    <RouteErrorBoundary>
     <Suspense fallback={<LoadingScreen label="Loading…" />}>
     <Routes>
       <Route path="/" element={<LoginRoute />} />
@@ -247,6 +249,7 @@ function CADApp() {
       </Route>
     </Routes>
     </Suspense>
+    </RouteErrorBoundary>
   );
 }
 
