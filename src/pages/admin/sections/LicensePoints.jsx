@@ -342,21 +342,23 @@ export default function LicensePoints() {
         {allDrivers.length === 0 ? <EmptyState>No licensed drivers on file.</EmptyState> : (
           <div className="flex flex-col gap-3">
             {/* Type-ahead search */}
-            <div className="relative">
-              <MdSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
-              <input
-                className="w-full bg-app-input border border-border-base rounded-lg pl-11 pr-10 py-3 text-[14px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
-                placeholder="Search a driver by name, DL #, SSN, or Discord ID…"
-                value={driverQuery}
-                onChange={e => { setDriverQuery(e.target.value); setSelectedDriverId(null); }}
-                aria-label="Search drivers"
-              />
-              {driverQuery && (
-                <button onClick={() => setDriverQuery('')} aria-label="Clear search"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0">
-                  <MdClose size={16} />
-                </button>
-              )}
+            <div>
+              <div className="relative">
+                <MdSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                <input
+                  className="w-full bg-app-input border border-border-base rounded-lg pl-11 pr-10 py-3 text-[14px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color,box-shadow]"
+                  placeholder="Search a driver by name, DL #, SSN, or Discord ID…"
+                  value={driverQuery}
+                  onChange={e => { setDriverQuery(e.target.value); setSelectedDriverId(null); }}
+                  aria-label="Search drivers"
+                />
+                {driverQuery && (
+                  <button onClick={() => setDriverQuery('')} aria-label="Clear search"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 cursor-pointer bg-transparent border-none p-0">
+                    <MdClose size={16} />
+                  </button>
+                )}
+              </div>
 
               {/* Suggestions */}
               {driverQuery.trim() && (

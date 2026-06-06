@@ -144,9 +144,17 @@ input:-webkit-autofill:focus {
 }
 
 /* ─── Focus ─── */
-/* Visible, AA-friendly focus ring on the dark theme: a brighter 2px brand ring
-   with a small offset so it reads against panels, inputs and buttons alike. */
-*:focus-visible { outline: 2px solid #5a97f5; outline-offset: 1px; border-radius: 2px; }
+/* Visible, AA-friendly focus ring on the dark theme. Form controls get a soft
+   ROUNDED ring (box-shadow follows border-radius) instead of a square outline,
+   so rounded inputs don't look boxed when clicked. */
+*:focus-visible { outline: 2px solid #5a97f5; outline-offset: 1px; }
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[aria-haspopup="listbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(90,151,245,0.45);
+}
 
 /* ─── Kill the webkit/mobile tap-highlight flash that makes selects,
        dropdowns and buttons flicker the instant they're clicked ─── */
