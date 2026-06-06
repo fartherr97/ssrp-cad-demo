@@ -60,73 +60,88 @@ const GROUPS = [
 ];
 
 /* Only one dropdown open at a time */
-let __adminDropdownCloser = null;
+/* Shared hover state for the nav group dropdowns: exactly one open at a time,
+   driven by a single shared close timer. Lifting this out of the individual
+   dropdowns removes the fast-hover races (stale per-instance timers) that could
+   leave a menu stuck closed when sweeping the pointer quickly across groups. */
+function GroupNav({ groups, isActive, onNavigate }) {
+  const [openLabel, setOpenLabel] = useState(null);
+  const closeTimer = useRef(null);
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  const open = (label) => { clearTimeout(closeTimer.current); setOpenLabel(label); };
+  const scheduleClose = () => { clearTimeout(closeTimer.current); closeTimer.current = setTimeout(() => setOpenLabel(null), 140); };
+  const cancelClose = () => clearTimeout(closeTimer.current);
+  const closeNow = () => { clearTimeout(closeTimer.current); setOpenLabel(null); };
+  return (
+    <nav className="hidden md:flex items-stretch gap-0.5 flex-1 min-w-0">
+      {groups.map(group => (
+        <GroupDropdown
+          key={group.label}
+          group={group}
+          isActive={isActive}
+          onNavigate={onNavigate}
+          isOpen={openLabel === group.label}
+          onOpen={() => open(group.label)}
+          onScheduleClose={scheduleClose}
+          onCancelClose={cancelClose}
+          onCloseNow={closeNow}
+        />
+      ))}
+    </nav>
+  );
+}
 
-function GroupDropdown({ group, isActive, onNavigate }) {
-  const [open, setOpen] = useState(false);
+function GroupDropdown({ group, isActive, onNavigate, isOpen, onOpen, onScheduleClose, onCancelClose, onCloseNow }) {
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const btnRef = useRef(null);
   const menuRef = useRef(null);
-  const closeTimer = useRef(null);
   const containerRef = useRef(null);
-
-  useEffect(() => () => clearTimeout(closeTimer.current), []);
 
   // Close on outside click
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return undefined;
     const h = (e) => {
-      if (!containerRef.current?.contains(e.target) && !menuRef.current?.contains(e.target)) {
-        doClose();
-      }
+      if (!containerRef.current?.contains(e.target) && !menuRef.current?.contains(e.target)) onCloseNow();
     };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
-  }, [open]);
+  }, [isOpen, onCloseNow]);
 
   const anyActive = group.items.some(item => isActive(item));
   const GroupIcon = group.Icon;
 
-  const place = () => {
+  const openMenu = () => {
     if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
       setCoords({ left: r.left, top: r.bottom + 4 });
     }
+    onOpen();
   };
-  const doClose = () => { setOpen(false); if (__adminDropdownCloser === setOpen) __adminDropdownCloser = null; };
-  const openMenu = () => {
-    clearTimeout(closeTimer.current);
-    if (__adminDropdownCloser && __adminDropdownCloser !== setOpen) __adminDropdownCloser(false);
-    __adminDropdownCloser = setOpen;
-    place();
-    setOpen(true);
-  };
-  const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
-  const toggle = () => open ? doClose() : openMenu();
+  const toggle = () => (isOpen ? onCloseNow() : openMenu());
 
   return (
-    <div ref={containerRef} className="relative flex items-stretch" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
+    <div ref={containerRef} className="relative flex items-stretch" onMouseEnter={openMenu} onMouseLeave={onScheduleClose}>
       <button
         ref={btnRef}
         onClick={toggle}
         className={`relative flex items-center gap-1.5 my-2 px-3.5 rounded-lg whitespace-nowrap cursor-pointer border-none text-[13px] tracking-[0.2px] shrink-0 transition-all duration-75 font-ui
-          ${anyActive || open
+          ${anyActive || isOpen
             ? 'font-bold bg-brand/15 text-brand-bright'
             : 'font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'}`}
       >
         <GroupIcon size={16} className="shrink-0" />
         {group.label}
-        <MdExpandMore size={15} className={`transition-transform duration-75 ${open ? 'rotate-180' : ''}`} />
+        <MdExpandMore size={15} className={`transition-transform duration-75 ${isOpen ? 'rotate-180' : ''}`} />
         {anyActive && (
           <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[3px] w-7 rounded-full bg-brand" />
         )}
       </button>
 
-      {open && createPortal(
+      {isOpen && createPortal(
         <div
           ref={menuRef}
-          onMouseEnter={openMenu}
-          onMouseLeave={scheduleClose}
+          onMouseEnter={onCancelClose}
+          onMouseLeave={onScheduleClose}
           className="fixed z-[3000] bg-app-card border border-border-strong shadow-2xl shadow-black/60 rounded-xl min-w-[210px] p-1.5"
           style={{ left: coords.left, top: coords.top, animation: 'dropdownFadeIn 0.13s ease-out' }}
         >
@@ -139,7 +154,7 @@ function GroupDropdown({ group, isActive, onNavigate }) {
             return (
               <button
                 key={item.route}
-                onClick={() => { onNavigate(item.route); doClose(); }}
+                onClick={() => { onNavigate(item.route); onCloseNow(); }}
                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[12.5px] font-medium cursor-pointer transition-all duration-75 hover:-translate-y-0.5 ${
                   active
                     ? 'bg-brand/15 text-brand-bright font-semibold'
@@ -293,11 +308,7 @@ export default function AdminShell() {
         </div>
 
         {/* Desktop: group dropdowns */}
-        <nav className="hidden md:flex items-stretch gap-0.5 flex-1 min-w-0">
-          {visibleGroups.map(group => (
-            <GroupDropdown key={group.label} group={group} isActive={isActive} onNavigate={navigate} />
-          ))}
-        </nav>
+        <GroupNav groups={visibleGroups} isActive={isActive} onNavigate={navigate} />
 
         {/* Right actions */}
         <div className="flex items-stretch gap-0.5 shrink-0 pl-1 ml-1 border-l border-border-base">
