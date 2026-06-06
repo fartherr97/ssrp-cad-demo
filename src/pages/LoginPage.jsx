@@ -105,6 +105,9 @@ export default function LoginPage() {
           role: role.id,
           badge: role.id === 'civilian' ? 'CIV' : 'BIZ',
           deptShort: role.id === 'civilian' ? 'CIV' : 'BIZ',
+          discordId: '205947291075078247',
+          discordUsername: 'jordanmaxwell',
+          memberSince: '2024-06-01',
         };
       } else {
         // Emergency-service portals log in as a representative officer.

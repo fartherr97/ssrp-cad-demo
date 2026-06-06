@@ -35,6 +35,7 @@ import LEORecords from './pages/portal/LEORecords';
 import RequestTow from './pages/portal/RequestTow';
 import CitizenLaws from './pages/portal/CitizenLaws';
 import MedicalRecords from './pages/portal/MedicalRecords';
+import MyAccount from './pages/portal/MyAccount';
 import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
 import Employees from './pages/portal/Employees';
@@ -212,6 +213,7 @@ function CADApp() {
         <Route path="/portal/complaint"   element={<FileComplaint />} />
         <Route path="/portal/laws"        element={<CitizenLaws />} />
         <Route path="/portal/medical"     element={<MedicalRecords />} />
+        <Route path="/portal/account"     element={<MyAccount />} />
 
         {/* ── Supervisor portal ── */}
         <Route path="/portal/supervisor"  element={<Supervisor />} />

@@ -289,6 +289,11 @@ function baseReducer(state, action) {
       return { ...state, currentUser: null, currentPage: 'login', myCallId: null, selfDispatch: false, discordConnected: false };
     case 'SET_SIGNATURE':
       return { ...state, currentUser: { ...state.currentUser, signature: action.payload } };
+
+    case 'UPDATE_CURRENT_USER':
+      // Merge a patch into the logged-in account (display name, avatar,
+      // notification prefs, etc.). Used by the civilian My Account page.
+      return { ...state, currentUser: { ...state.currentUser, ...action.payload } };
     case 'SET_PAGE':
       return { ...state, currentPage: action.payload };
 
