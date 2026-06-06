@@ -1456,7 +1456,7 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
   if (f.type === 'checkbox') {
     const checked = !!value;
     return (
-      <label className={`${SPAN[span]} flex items-center gap-3 px-4 py-3.5 rounded-xl border text-[13px] font-medium text-slate-100 transition-all select-none
+      <label className={`${SPAN[span]} flex items-center gap-3 px-3.5 py-2.5 rounded-xl border text-[13px] font-medium text-slate-100 transition-all select-none
         ${effectiveReadOnly ? 'cursor-default' : 'cursor-pointer'}
         ${isSupOnly && !isSupervisor
           ? 'bg-red-500/5 border-red-500/30'
@@ -1467,10 +1467,10 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
         <input type="checkbox" checked={checked} disabled={effectiveReadOnly}
           onChange={e => onChange(f.id, e.target.checked)}
           className="sr-only" />
-        <span className={`w-[26px] h-[26px] rounded-lg flex items-center justify-center shrink-0 transition-all
+        <span className={`w-[18px] h-[18px] rounded-md flex items-center justify-center shrink-0 transition-all
           ${checked ? 'bg-orange-500' : 'border-2 border-slate-600 bg-transparent'}`}>
           {checked && (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
               <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
