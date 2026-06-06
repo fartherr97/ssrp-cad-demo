@@ -464,7 +464,9 @@ function InvestigationFlag({ cases, onTip }) {
 
 export default function RecordsBureau() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { civilians, vehicles, warrants, criminalHistory, reports = [], records = [], reportTemplates = [], recordTemplates = [], currentUser, officers = [], departments = [], communityConfig = {}, licensePointsConfig = {}, businesses = [], permits = [], caseFiles = [] } = state;
+  const me = officers.find(o => o.id === currentUser?.id);
   const ptThreshold = licensePointsConfig.threshold || 12;
   const { isMobile } = useResponsive();
 
@@ -605,6 +607,16 @@ export default function RecordsBureau() {
   const vehTabs    = ['RETURN', 'FLAGS'];
   const activeTabs = selCiv ? personTabs : selVeh ? vehTabs : ['RETURN'];
   const activeWarrants = civWarrants.filter(w => w.status === 'ACTIVE');
+
+  // Let the arresting officer clear a warrant straight from the person lookup —
+  // marking it served here is what stops other officers re-arresting on it.
+  const serveWarrant = (w) => {
+    const servedBy = me
+      ? `${me.badge} | ${(me.rank || 'OFFICER').toUpperCase()} | ${me.name.toUpperCase()}`
+      : '';
+    dispatch({ type: 'SERVE_WARRANT', payload: { id: w.id, servedBy } });
+    toast.success(`Warrant marked served · ${w.charge || w.type}`, { title: 'Warrant cleared' });
+  };
 
   const allCaseStatuses = [...new Set([...reports, ...records].map(i => i.status).filter(Boolean))].sort();
 
@@ -1228,11 +1240,17 @@ export default function RecordsBureau() {
                           : activeWarrants.map(w => (
                             <div key={w.id} className="flex items-start gap-2 mb-2 last:mb-0">
                               <MdWarningAmber size={16} className="text-red-400 mt-0.5 shrink-0" />
-                              <div className="min-w-0">
+                              <div className="min-w-0 flex-1">
                                 <div className="text-[12.5px] font-semibold text-slate-200">{w.charge}</div>
                                 <div className="text-[11px] text-slate-500">{w.type} · {w.issuedDate || w.date || ''}</div>
                                 {w.issuedBy && <div className="text-[10.5px] text-slate-600">Issued by: {w.issuedBy}</div>}
                               </div>
+                              <button
+                                onClick={() => serveWarrant(w)}
+                                title="Mark this warrant as served (e.g. subject arrested on it)"
+                                className="press shrink-0 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.3px] bg-green-500/15 border border-green-500/30 text-green-300 hover:bg-green-500/25 cursor-pointer transition-colors">
+                                Mark Served
+                              </button>
                             </div>
                           ))}
                       </InfoCard>

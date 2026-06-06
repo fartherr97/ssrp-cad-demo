@@ -98,8 +98,9 @@ Actions marked **(read-receipt/UI-only)** are local-only and need no backend (or
 - `LIFT_SUSPENSION` — civilianId.
 
 ### Warrants
-- `ADD_WARRANT` — warrant.
-- `SERVE_WARRANT` — id.
+- `ADD_WARRANT` — warrant (also stamps a `WARRANT` flag on the civilian).
+- `SERVE_WARRANT` — warrant id, or `{ id, servedBy, caseNumber? }` — marks SERVED, stamps
+  `servedBy`/`servedDate`(/`servedCaseNumber`), and clears the civilian's `WARRANT` flag once no ACTIVE warrants remain.
 
 ### Reports & records (templated documents)
 - `ADD_REPORT` — `{ type, caseNumber, officerBadge, callId, civilianId, summary, formData }`
@@ -207,7 +208,7 @@ uniqueIdentifiers, licensePointsConfig, nextId, reportSeq, dispatchLog, activePa
 - **Vehicle:** `id, plate, type, make, model, year, color, regStatus, regExpiry, ownerId, businessOwnerId, stolen, flags[]`
 - **Call:** `id, nature, category, location, city, county, priority, status, units[], description, timestamp, reportingParty`
 - **Report/Record:** `id, type, caseNumber/recordNumber, officerBadge, date, status, callId, civilianId, summary, formData{}, templateSnapshot{}, officerSignature, supervisorSignature, supervisorComments[]`
-- **Warrant:** `id, civilianId, civilianName, type, charge, issuedBy, issuedDate, status, notes`
+- **Warrant:** `id, civilianId, civilianName, type, charge, issuedBy, issuedDate, status, notes` (+ on serve: `servedBy, servedDate, servedCaseNumber`)
 - **Template:** `id, name, agency, formCode, showDept, portals[], sections[ { id, title, style, lookup, supervisorOnly, fields[ {id,label,type,span,required,unique,readOnly,…} ] } ]`
 
 > Full canonical examples live in `src/data/mockData.js` — point Steve there for exact fields.

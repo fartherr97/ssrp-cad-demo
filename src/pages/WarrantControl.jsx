@@ -613,6 +613,18 @@ function WarrantDetail({ warrant, civilians }) {
         <div className="text-[10.5px] font-mono text-slate-500 mt-0.5">{warrant.issuedDate}</div>
       </div>
 
+      {/* Served by (once the warrant has been cleared) */}
+      {warrant.status === 'SERVED' && (warrant.servedBy || warrant.servedDate) && (
+        <div className="bg-green-500/[0.05] border border-green-500/20 rounded-xl p-3">
+          <div className="text-[9px] text-cad-muted uppercase tracking-[0.7px] mb-1">Served By</div>
+          <div className="text-[12px] text-slate-200">{warrant.servedBy || '—'}</div>
+          <div className="text-[10.5px] font-mono text-slate-500 mt-0.5">
+            {[warrant.servedDate, warrant.servedCaseNumber && `Case ${warrant.servedCaseNumber}`]
+              .filter(Boolean).join(' · ')}
+          </div>
+        </div>
+      )}
+
       {/* Subject info */}
       {(subj.dob || subj.sex || subj.residence) && (
         <div className="bg-app-card/60 border border-border-faint rounded-xl p-3">
@@ -725,7 +737,10 @@ export default function WarrantControl() {
   };
 
   const handleServe = () => {
-    dispatch({ type: 'SERVE_WARRANT', payload: selected });
+    const servedBy = me
+      ? `${me.badge} | ${(me.rank || 'OFFICER').toUpperCase()} | ${me.name.toUpperCase()}`
+      : '';
+    dispatch({ type: 'SERVE_WARRANT', payload: { id: selected, servedBy } });
     toast.success('Warrant marked served');
     setSelected(null);
   };

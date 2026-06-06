@@ -605,9 +605,31 @@ function baseReducer(state, action) {
       return { ...state, warrants: [...state.warrants, newWar], civilians, nextId: state.nextId + 1, ...audit };
     }
     case 'SERVE_WARRANT': {
-      const warrants = state.warrants.map(w => w.id === action.payload ? { ...w, status: 'SERVED' } : w);
-      const audit = addAuditEntry(state, `Marked warrant ${action.payload} as served`, 'Warrants');
-      return { ...state, warrants, ...audit };
+      // Payload may be a bare warrant id (legacy) or { id, servedBy, caseNumber }.
+      const id         = typeof action.payload === 'object' ? action.payload.id : action.payload;
+      const servedBy   = (typeof action.payload === 'object' && action.payload.servedBy) || '';
+      const caseNumber = (typeof action.payload === 'object' && action.payload.caseNumber) || '';
+      const servedDate = new Date().toISOString().split('T')[0];
+      const served = state.warrants.find(w => w.id === id);
+      const warrants = state.warrants.map(w =>
+        w.id === id
+          ? { ...w, status: 'SERVED', servedBy: servedBy || w.servedBy || '', servedDate,
+              ...(caseNumber ? { servedCaseNumber: caseNumber } : {}) }
+          : w
+      );
+      // Clear the civilian's stale WARRANT flag once no ACTIVE warrants remain,
+      // so other officers don't see a warrant indicator for an already-served one.
+      let civilians = state.civilians;
+      if (served?.civilianId != null) {
+        const stillActive = warrants.some(w => w.civilianId === served.civilianId && w.status === 'ACTIVE');
+        if (!stillActive) {
+          civilians = state.civilians.map(c =>
+            c.id === served.civilianId ? { ...c, flags: (c.flags || []).filter(f => f !== 'WARRANT') } : c
+          );
+        }
+      }
+      const audit = addAuditEntry(state, `Marked warrant ${id} as served`, 'Warrants');
+      return { ...state, warrants, civilians, ...audit };
     }
 
     case 'ADD_ARREST': {
