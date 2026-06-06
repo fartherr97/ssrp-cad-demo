@@ -21,16 +21,56 @@ export function BusinessProvider({ children }) {
     [myBizList, activeBizId]
   );
 
+  const isOwner = useMemo(() =>
+    !!(activeBiz && (activeBiz.ownedByPlayer || activeBiz.ownerDiscordId === currentUser?.discordId)),
+    [activeBiz, currentUser]
+  );
+
+  const myEmployeeRecord = useMemo(() =>
+    isOwner ? null : (activeBiz?.employees?.find(e => e.discordId === currentUser?.discordId) || null),
+    [activeBiz, currentUser, isOwner]
+  );
+
+  // Owner or employee with Manager role can add/remove staff.
+  const canManage = useMemo(() => {
+    if (isOwner) return true;
+    const roles = Array.isArray(myEmployeeRecord?.roles) ? myEmployeeRecord.roles : [myEmployeeRecord?.role].filter(Boolean);
+    return roles.includes('Manager');
+  }, [isOwner, myEmployeeRecord]);
+
   return (
-    <BusinessContext.Provider value={{ myBizList, activeBiz, setActiveBizId }}>
+    <BusinessContext.Provider value={{ myBizList, activeBiz, setActiveBizId, isOwner, myEmployeeRecord, canManage }}>
       {children}
     </BusinessContext.Provider>
   );
 }
 
 export function useActiveBusiness() {
-  return useContext(BusinessContext) || { myBizList: [], activeBiz: null, setActiveBizId: () => {} };
+  return useContext(BusinessContext) || { myBizList: [], activeBiz: null, setActiveBizId: () => {}, isOwner: false, myEmployeeRecord: null, canManage: false };
 }
+
+/* Renders a business switcher banner when the user belongs to >1 business. */
+export function BusinessSwitcher() {
+  const { myBizList, activeBiz, setActiveBizId } = useActiveBusiness();
+  if (myBizList.length <= 1) return null;
+
+  return (
+    <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl border border-border-base bg-app-card/60">
+      <MdSwapHoriz size={20} className="text-brand-bright shrink-0" />
+      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0">Active Business</span>
+      <Select
+        className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm text-cad-text outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
+        value={activeBiz?.id ?? ''}
+        onChange={e => setActiveBizId(Number(e.target.value))}
+      >
+        {myBizList.map(b => (
+          <option key={b.id} value={b.id}>{b.name}</option>
+        ))}
+      </Select>
+    </div>
+  );
+}
+
 
 /* Renders a business switcher banner when the user belongs to >1 business. */
 export function BusinessSwitcher() {

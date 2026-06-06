@@ -38,6 +38,7 @@ import MedicalRecords from './pages/portal/MedicalRecords';
 import MyAccount from './pages/portal/MyAccount';
 import BusinessHome from './pages/portal/BusinessHome';
 import MyBusiness from './pages/portal/MyBusiness';
+import EmployeeProfile from './pages/portal/EmployeeProfile';
 import Employees from './pages/portal/Employees';
 import BusinessFleet from './pages/portal/BusinessFleet';
 import FDOTPermits from './pages/portal/FDOTPermits';
@@ -225,9 +226,10 @@ function CADApp() {
         <Route path="/portal/command"     element={<CommandPortal />} />
 
         {/* ── Business portal ── */}
-        <Route path="/portal/business"        element={<BusinessHome />} />
-        <Route path="/portal/my-business"     element={<MyBusiness />} />
-        <Route path="/portal/employees"       element={<Employees />} />
+        <Route path="/portal/business"           element={<BusinessHome />} />
+        <Route path="/portal/my-business"        element={<MyBusiness />} />
+        <Route path="/portal/employee-profile"   element={<EmployeeProfile />} />
+        <Route path="/portal/employees"          element={<Employees />} />
         <Route path="/portal/business-fleet"  element={<BusinessFleet />} />
         <Route path="/portal/permits"          element={<FDOTPermits />} />
         <Route path="/portal/help"             element={<HelpCenter />} />

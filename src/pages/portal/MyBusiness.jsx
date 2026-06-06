@@ -12,7 +12,7 @@ const BLANK = { name: '', type: '', owner: '', ein: '', phone: '', address: '' }
 export default function MyBusiness() {
   const { dispatch } = useCAD();
   const toast = useToast();
-  const { activeBiz: myBiz } = useActiveBusiness();
+  const { activeBiz: myBiz, isOwner } = useActiveBusiness();
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(
@@ -44,7 +44,7 @@ export default function MyBusiness() {
         title="My Business"
         subtitle="Your registered business profile."
         accent="brand"
-        action={!editing && (
+        action={isOwner && !editing && (
           <button className={`${sm(S_BTN_SECONDARY)} flex items-center gap-1.5`} onClick={startEdit}>
             <MdEdit size={16} /> Edit
           </button>

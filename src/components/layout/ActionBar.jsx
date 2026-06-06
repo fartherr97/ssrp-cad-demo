@@ -260,12 +260,14 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
           )}
 
           {(() => {
-            // Civilians have an account-level profile; LEO/ES portals use the officer profile.
-            const profileRoute = portal.id === 'civilian' ? '/portal/account' : '/profile';
+            const profileRoute = portal.id === 'civilian' ? '/portal/account'
+              : portal.id === 'business' ? '/portal/employee-profile'
+              : '/profile';
+            const profileLabel = portal.id === 'civilian' ? 'My Account' : 'My Profile';
             return (
               <button onClick={() => { navigate(profileRoute); setOpen(false); }}
                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium cursor-pointer transition-all duration-75 hover:-translate-y-0.5 hover:bg-white/[0.06] ${isActive(profileRoute) ? 'text-brand-bright' : 'text-slate-300 hover:text-white'}`}>
-                <MdPerson size={16} /> {portal.id === 'civilian' ? 'My Account' : 'My Profile'}
+                <MdPerson size={16} /> {profileLabel}
               </button>
             );
           })()}

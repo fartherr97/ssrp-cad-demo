@@ -50,7 +50,7 @@ function RoleCheckboxes({ selected, onChange }) {
 export default function Employees() {
   const { dispatch } = useCAD();
   const toast = useToast();
-  const { activeBiz: myBiz } = useActiveBusiness();
+  const { activeBiz: myBiz, canManage } = useActiveBusiness();
 
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(BLANK);
@@ -82,7 +82,7 @@ export default function Employees() {
         title="Employees"
         subtitle={`Staff roster for ${myBiz.name}`}
         accent={ACCENT}
-        action={(
+        action={canManage && (
           <button className={`${S_BTN_PRIMARY} flex items-center gap-1.5`} onClick={() => setAdding(v => !v)}>
             <MdAdd size={18} /> Add Employee
           </button>
@@ -150,12 +150,14 @@ export default function Employees() {
                       ))}
                     </div>
                   </div>
-                  <button
-                    className={`${sm(S_BTN_DANGER)} press-sm flex items-center gap-1`}
-                    onClick={() => removeEmployee(emp)}
-                  >
-                    <MdDelete size={16} /> Remove
-                  </button>
+                  {canManage && (
+                    <button
+                      className={`${sm(S_BTN_DANGER)} press-sm flex items-center gap-1`}
+                      onClick={() => removeEmployee(emp)}
+                    >
+                      <MdDelete size={16} /> Remove
+                    </button>
+                  )}
                 </div>
                 <div className="flex gap-6 mt-3.5 text-xs">
                   <div>
