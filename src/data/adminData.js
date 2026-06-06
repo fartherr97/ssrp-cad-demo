@@ -194,7 +194,7 @@ export const LIMITS_CONFIG = {
 /* ── Discord → CAD Role Mappings ───────────────────────────────────────────
    Each entry maps one Discord role (identified by its snowflake role ID, to
    be filled in by the backend developer) to a CAD portal and permission level.
-   When a user authenticates via Discord OAuth, Steve's backend reads this
+   When a user authenticates via Discord OAuth, the backend reads this
    table, finds the highest-priority rule that matches one of their Discord
    roles, and assigns them the corresponding cadPortal + cadRole.
 

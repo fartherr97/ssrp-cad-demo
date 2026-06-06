@@ -41,7 +41,7 @@ function DeleteGuard({ dept, officerCount, onConfirm, onCancel }) {
               </li>
             )}
           </ul>
-          <div className="mt-2" style={{ color: '#94a3b8' }}>This cannot be undone. Steve's backend may need to be updated.</div>
+          <div className="mt-2" style={{ color: '#94a3b8' }}>This cannot be undone. The backend configuration may need to be updated.</div>
         </div>
       </div>
       <div className="flex gap-2">

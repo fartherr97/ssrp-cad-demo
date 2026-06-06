@@ -130,7 +130,7 @@ function MappingModal({ draft, setDraft, departments, adminTiers, onSave, onClos
               <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 3 }}>Reference only — the role's display name in Discord.</div>
             </div>
             <div>
-              <label style={SON_LABEL}>Discord Role ID <span style={{ color: '#f59e0b' }}>⬅ Steve fills this</span></label>
+              <label style={SON_LABEL}>Discord Role ID</label>
               <input style={{ ...SON_INPUT, fontFamily: 'monospace' }} placeholder="e.g. 1234567890123456789"
                 value={draft.discordRoleId} onChange={e => set({ discordRoleId: e.target.value.trim() })} />
               <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 3 }}>Snowflake ID from Server Settings → Roles.</div>
@@ -285,7 +285,7 @@ function ExportPanel({ mappings }) {
         style={{ background: 'transparent', border: 'none' }}>
         <MdCode size={18} style={{ color: '#3a88e8', flexShrink: 0 }} />
         <div className="flex-1">
-          <div className="text-[13px] font-bold text-white">Configuration Export — for Steve</div>
+          <div className="text-[13px] font-bold text-white">Configuration Export</div>
           <div className="text-[11px] mt-0.5" style={{ color: ADMIN.textMute }}>
             JSON payload the backend uses to map Discord role IDs to CAD portals on OAuth login.
             {missingIds > 0 && <span style={{ color: '#f59e0b' }}> {missingIds} role{missingIds !== 1 ? 's' : ''} still need Discord IDs.</span>}

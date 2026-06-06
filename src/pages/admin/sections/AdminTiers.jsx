@@ -435,7 +435,7 @@ export default function AdminTiers() {
           {[
             { label: 'Define Tiers', desc: 'Create management roles (Admin, Senior Admin, Head Admin, etc.) with specific permissions here.', color: '#3a88e8' },
             { label: 'Assign in Role Mapping', desc: 'Link each tier to a Discord server role in Users → Role Mapping. When portal is set to "Admin", pick the tier.', color: '#a855f7' },
-            { label: 'Automatic on Login', desc: "When a member logs in via Discord, Steve's backend reads their roles, finds the right tier, and scopes their admin nav.", color: '#22c55e' },
+            { label: 'Automatic on Login', desc: "When a member logs in via Discord, the backend reads their roles, finds the right tier, and scopes their admin nav.", color: '#22c55e' },
           ].map(step => (
             <div key={step.label} className="flex-1 min-w-[200px] p-3 rounded-lg"
               style={{ background: `${step.color}0c`, border: `1px solid ${step.color}25` }}>

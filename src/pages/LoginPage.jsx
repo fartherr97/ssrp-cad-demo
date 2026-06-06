@@ -258,10 +258,10 @@ export default function LoginPage() {
             </button>
           )}
 
-          {/* Demo note */}
+          {/* Tagline */}
           {!connected && (
             <div style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)', textAlign: 'center' }}>
-              Demo environment, select your role after connecting
+              Connect with Discord to select your role and access the system
             </div>
           )}
 
@@ -330,7 +330,7 @@ export default function LoginPage() {
                 marginTop: 16, fontSize: 11, color: 'rgba(120,160,200,0.35)',
                 textAlign: 'center',
               }}>
-                Demo environment · All activity logged and subject to command review
+                All activity is logged and subject to command review
               </div>
             </div>
           )}

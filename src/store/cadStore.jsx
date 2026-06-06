@@ -141,7 +141,7 @@ const initialState = {
   incoming911HCFR: [],
   civilian911Log: [],
   // Requests that could not be delivered because their receiver (business or
-  // routing-role department) no longer exists. Steve's backend should monitor
+  // routing-role department) no longer exists. The backend should monitor
   // this queue and alert ops staff. Items are never auto-discarded.
   unroutedRequests: [],
   unitGroups: UNIT_GROUPS,

@@ -1,7 +1,7 @@
 /* ────────────────────────────────────────────────────────────────────────────
    Department scoping for the Command & Supervisor portals.
 
-   FOUNDATION — read before wiring the backend (Steve):
+   FOUNDATION — read before wiring the backend:
 
    Every ES (Emergency Services) department has its OWN Command role and its
    OWN Supervisor role in Discord (e.g. "TPD Command", "TPD Supervisor",
@@ -46,7 +46,7 @@ export function getScopeDeptId(currentUser, myOfficer, departments = []) {
   if (currentUser?.role === 'admin') {
     return { deptId: null, unrestricted: true };
   }
-  // Steve: prefer the dept carried by the Command/Supervisor Discord role.
+  // Prefer the dept carried by the Command/Supervisor Discord role.
   const deptId = currentUser?.dept ?? myOfficer?.dept ?? null;
   // Ensure the resolved dept is actually an ES department.
   const dept = departments.find(d => d.id === deptId);
