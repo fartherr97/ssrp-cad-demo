@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdminPageTitle, SonCard } from '../AdminKit';
 import {
   MdListAlt, MdPublic, MdShield, MdLogin, MdLink, MdNotificationsActive,
-  MdPersonOff, MdChat, MdDns, MdLocationOn, MdSearch, MdGraphicEq,
+  MdPersonOff, MdDns, MdLocationOn, MdSearch, MdGraphicEq,
 } from 'react-icons/md';
 
 const CARDS = [
@@ -13,7 +13,6 @@ const CARDS = [
   { icon: MdLink,               title: 'Quick Links',              desc: 'Shortcut links shown across the CAD.',        route: '/admin/quick-links' },
   { icon: MdNotificationsActive,title: 'Notification Tones',       desc: 'Audio tones for dispatch events.',            route: '/admin/notification-tones' },
   { icon: MdPersonOff,          title: 'User Account Restrictions',desc: 'Whitelist, age gates, and 2FA rules.',        route: '/admin/restrictions' },
-  { icon: MdChat,               title: 'Discord Rich Presence',    desc: 'On-duty presence shown in Discord.',          route: '/admin/discord-presence' },
   { icon: MdDns,                title: 'Servers',                  desc: 'Connected game servers and status.',          route: '/admin/servers' },
   { icon: MdLocationOn,         title: 'Addresses',                desc: 'Named addresses for quick dispatch.',         route: '/admin/addresses' },
   { icon: MdSearch,             title: 'Lookup Types',             desc: 'Dropdown value lists used in records.',       route: '/admin/lookup-types' },

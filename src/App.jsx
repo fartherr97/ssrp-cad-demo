@@ -68,11 +68,9 @@ const LicensePoints = lazy(() => import('./pages/admin/sections/LicensePoints'))
 const Flags = lazy(() => import('./pages/admin/sections/Flags'));
 const Logs = lazy(() => import('./pages/admin/sections/Logs'));
 const MessageLogs = lazy(() => import('./pages/admin/sections/MessageLogs'));
-const InGame = lazy(() => import('./pages/admin/sections/InGame'));
 const DiscordIntegration = lazy(() => import('./pages/admin/sections/DiscordIntegration'));
 const Limits = lazy(() => import('./pages/admin/sections/Limits'));
 const WipeRecords = lazy(() => import('./pages/admin/sections/WipeRecords'));
-const CommunityId = lazy(() => import('./pages/admin/sections/CommunityId'));
 const Authenticate = lazy(() => import('./pages/admin/sections/Authenticate'));
 const CommunityInfo = lazy(() => import('./pages/admin/sections/CommunityInfo'));
 const Geographical = lazy(() => import('./pages/admin/sections/Geographical'));
@@ -81,7 +79,6 @@ const LoginPageEditor = lazy(() => import('./pages/admin/sections/LoginPageEdito
 const QuickLinks = lazy(() => import('./pages/admin/sections/QuickLinks'));
 const NotificationTones = lazy(() => import('./pages/admin/sections/NotificationTones'));
 const Restrictions = lazy(() => import('./pages/admin/sections/Restrictions'));
-const DiscordPresence = lazy(() => import('./pages/admin/sections/DiscordPresence'));
 const HelpEditor = lazy(() => import('./pages/admin/sections/HelpEditor'));
 const Servers = lazy(() => import('./pages/admin/sections/Servers'));
 const Addresses = lazy(() => import('./pages/admin/sections/Addresses'));
@@ -189,11 +186,9 @@ function CADApp() {
           <Route path="flags"              element={<Flags />} />
           <Route path="logs"               element={<Logs />} />
           <Route path="message-logs"       element={<MessageLogs />} />
-          <Route path="in-game"            element={<InGame />} />
           <Route path="discord"            element={<DiscordIntegration />} />
           <Route path="limits"             element={<Limits />} />
           <Route path="wipe"               element={<WipeRecords />} />
-          <Route path="community-id"       element={<CommunityId />} />
           <Route path="authenticate"       element={<Authenticate />} />
           <Route path="businesses"         element={<AdminBusinesses />} />
           <Route path="community-info"     element={<CommunityInfo />} />
@@ -203,7 +198,6 @@ function CADApp() {
           <Route path="quick-links"        element={<QuickLinks />} />
           <Route path="notification-tones" element={<NotificationTones />} />
           <Route path="restrictions"       element={<Restrictions />} />
-          <Route path="discord-presence"   element={<DiscordPresence />} />
           <Route path="servers"            element={<Servers />} />
           <Route path="addresses"          element={<Addresses />} />
           <Route path="lookup-types"       element={<LookupTypes />} />

@@ -4,8 +4,8 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { AdminContent } from './AdminKit';
 import {
   MdPeople, MdFingerprint, MdVpnKey, MdBrush, MdInventory2, MdShield,
-  MdFormatListNumbered, MdGavel, MdHistory, MdVideogameAsset, MdChat,
-  MdHourglassBottom, MdLayers, MdKey, MdLock,
+  MdFormatListNumbered, MdGavel, MdHistory, MdChat,
+  MdHourglassBottom, MdLayers, MdLock,
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
@@ -51,11 +51,9 @@ const GROUPS = [
     items: [
       { icon: MdHistory,         label: 'Audit Log',       route: '/admin/logs',            permKey: 'logs'           },
       { icon: MdMessage,         label: 'Message Logs',    route: '/admin/message-logs',    permKey: 'messageLogs'    },
-      { icon: MdVideogameAsset,  label: 'In-Game',         route: '/admin/in-game',         permKey: 'inGame'         },
       { icon: MdChat,            label: 'Discord',         route: '/admin/discord',         permKey: 'discord'        },
       { icon: MdHourglassBottom, label: 'Limits',          route: '/admin/limits',          permKey: 'limits'         },
       { icon: MdLayers,          label: 'Wipe Records',    route: '/admin/wipe',            permKey: 'wipeRecords'    },
-      { icon: MdKey,             label: 'Community ID',    route: '/admin/community-id'                               },
       { icon: MdLock,            label: 'Authenticate',    route: '/admin/authenticate'                               },
     ],
   },
