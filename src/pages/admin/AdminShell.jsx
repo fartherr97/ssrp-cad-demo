@@ -9,7 +9,7 @@ import {
   MdHome, MdLogout, MdRemoveModerator,
   MdMenu, MdClose, MdFlag, MdMessage,
   MdManageAccounts, MdTune, MdDns, MdExpandMore, MdStore, MdLocalPhone,
-  MdHelpOutline, MdContactPage, MdSwapHoriz, MdAdminPanelSettings,
+  MdHelpOutline, MdContactPage, MdSwapHoriz, MdAdminPanelSettings, MdReportProblem,
 } from 'react-icons/md';
 import { useCAD } from '../../store/cadStore';
 
@@ -38,6 +38,7 @@ const GROUPS = [
       { icon: MdHelpOutline,        label: 'Help Center',    route: '/admin/help-center',         permKey: 'helpCenter'           },
       { icon: MdShield,             label: 'Departments',    route: '/admin/departments',         permKey: 'departments'          },
       { icon: MdLocalPhone,         label: 'Call Types',     route: '/admin/call-types',          permKey: 'callTypes'            },
+      { icon: MdReportProblem,      label: 'Citizen Report Types', route: '/admin/citizen-report-types', permKey: 'callTypes'      },
       { icon: MdFormatListNumbered, label: '10-Codes',       route: '/admin/ten-codes',           permKey: 'tenCodes'             },
       { icon: MdGavel,              label: 'Penal Code',     route: '/admin/statutes',            permKey: 'statutes'             },
       { icon: MdRemoveModerator,    label: 'Auto Suspend',   route: '/admin/license-points',      permKey: 'licensePoints'        },

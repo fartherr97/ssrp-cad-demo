@@ -89,6 +89,7 @@ const LookupTypes = lazy(() => import('./pages/admin/sections/LookupTypes'));
 const ToneBoard = lazy(() => import('./pages/admin/sections/ToneBoard'));
 const AdminBusinesses = lazy(() => import('./pages/admin/sections/AdminBusinesses'));
 const CallTypes = lazy(() => import('./pages/admin/sections/CallTypes'));
+const CitizenReportTypes = lazy(() => import('./pages/admin/sections/CitizenReportTypes'));
 const RoleMapping = lazy(() => import('./pages/admin/sections/RoleMapping'));
 const AdminTiers = lazy(() => import('./pages/admin/sections/AdminTiers'));
 const CaseFiles = lazy(() => import('./pages/CaseFiles'));
@@ -181,6 +182,7 @@ function CADApp() {
           <Route path="civilian-forms"     element={<CivilianForms />} />
           <Route path="departments"        element={<Departments />} />
           <Route path="call-types"          element={<CallTypes />} />
+          <Route path="citizen-report-types" element={<CitizenReportTypes />} />
           <Route path="ten-codes"          element={<TenCodes />} />
           <Route path="statutes"           element={<Statutes />} />
           <Route path="license-points"     element={<LicensePoints />} />

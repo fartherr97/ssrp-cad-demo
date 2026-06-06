@@ -1,5 +1,33 @@
 /* Seed data for the Sonoran-style Admin Customization suite. */
 
+/* Non-emergency report types citizens can pick when filing a report from the
+   civilian portal (admin-editable under Admin → Citizen Report Types). The UI
+   always appends an "Other" free-text option, so it is intentionally omitted. */
+export const CITIZEN_REPORT_TYPES_DEFAULT = [
+  { id: 8101, name: 'Theft' },
+  { id: 8102, name: 'Burglary' },
+  { id: 8103, name: 'Vehicle Theft' },
+  { id: 8104, name: 'Lost Property' },
+  { id: 8105, name: 'Found Property' },
+  { id: 8106, name: 'Vandalism / Mischief' },
+  { id: 8107, name: 'Property Damage' },
+  { id: 8108, name: 'Noise Complaint' },
+  { id: 8109, name: 'Suspicious Activity' },
+  { id: 8110, name: 'Trespassing' },
+  { id: 8111, name: 'Harassment' },
+  { id: 8112, name: 'Threats' },
+  { id: 8113, name: 'Fraud / Scam' },
+  { id: 8114, name: 'Identity Theft' },
+  { id: 8115, name: 'Hit and Run' },
+  { id: 8116, name: 'Abandoned Vehicle' },
+  { id: 8117, name: 'Parking Complaint' },
+  { id: 8118, name: 'Missing Person' },
+  { id: 8119, name: 'Animal Complaint' },
+  { id: 8120, name: 'Civil Dispute' },
+  { id: 8121, name: 'Welfare Check Request' },
+  { id: 8122, name: 'Lost / Stolen License Plate' },
+];
+
 export const CALL_NATURES_DEFAULT = [
   { id: 101, name: 'Traffic Stop',             category: 'police' },
   { id: 102, name: 'Suspicious Person',         category: 'police' },

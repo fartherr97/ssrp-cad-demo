@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Select from '../../components/ui/Select';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
@@ -18,24 +18,11 @@ import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianCont
 
 const ACCENT = 'brand';
 
-const REPORT_TYPES = [
-  'Theft',
-  'Burglary',
-  'Lost Property',
-  'Vandalism',
-  'Property Damage',
-  'Noise Complaint',
-  'Suspicious Activity',
-  'Harassment',
-  'Fraud / Scam',
-  'Hit and Run',
-  'Missing Person',
-  'Animal Complaint',
-  'Other',
-];
+// Fallback used only if an admin has cleared the configured list entirely.
+const FALLBACK_REPORT_TYPES = ['Theft', 'Lost Property', 'Vandalism', 'Noise Complaint', 'Suspicious Activity'];
 
 const EMPTY_FORM = {
-  reportType: 'Theft',
+  reportType: '',
   customType: '',
   filerId: '',
   incidentDate: '',
@@ -45,11 +32,20 @@ const EMPTY_FORM = {
 };
 
 export default function FileReport() {
-  const { dispatch } = useCAD();
+  const { state, dispatch } = useCAD();
   const toast = useToast();
   const { myChars, activeChar } = useActiveCivilian();
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, filerId: activeChar ? String(activeChar.id) : '' });
+  // Report types are admin-managed (Admin → Citizen Report Types); "Other"
+  // (free-text) is always offered.
+  const reportTypeOptions = useMemo(() => {
+    const cfg = (state.citizenReportTypes || []).map(t => t.name).filter(Boolean);
+    const base = cfg.length ? cfg : FALLBACK_REPORT_TYPES;
+    return base.includes('Other') ? base : [...base, 'Other'];
+  }, [state.citizenReportTypes]);
+  const defaultType = reportTypeOptions[0] || 'Other';
+
+  const [form, setForm] = useState(() => ({ ...EMPTY_FORM, reportType: defaultType, filerId: activeChar ? String(activeChar.id) : '' }));
   const [submitted, setSubmitted] = useState(null);
 
   const setField = (key, value) => setForm(f => ({ ...f, [key]: value }));
@@ -104,7 +100,7 @@ export default function FileReport() {
   };
 
   const fileAnother = () => {
-    setForm({ ...EMPTY_FORM, filerId: activeChar ? String(activeChar.id) : '' });
+    setForm({ ...EMPTY_FORM, reportType: defaultType, filerId: activeChar ? String(activeChar.id) : '' });
     setSubmitted(null);
   };
 
@@ -182,7 +178,7 @@ export default function FileReport() {
               <div>
                 <label className={PORTAL_LABEL}><MdCategory size={13} className="inline align-[-2px] mr-[5px]" />Report Type</label>
                 <Select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
-                  {REPORT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  {reportTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
                 </Select>
                 {isOther && (
                   <input
