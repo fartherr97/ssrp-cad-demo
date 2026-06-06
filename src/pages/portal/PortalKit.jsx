@@ -95,7 +95,7 @@ export function PortalCard({ children, accent, style = {}, onClick, hover, class
   return (
     <div
       onClick={onClick}
-      className={`${noAnim ? '' : 'portal-card-enter'} bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm transition-[border-color,box-shadow,transform] ${hover ? 'portal-card-hover lift cursor-pointer' : ''} ${className}`}
+      className={`cv-auto ${noAnim ? '' : 'portal-card-enter'} bg-app-panel/80 border border-border-base rounded-xl p-4 sm:p-5 backdrop-blur-sm transition-[border-color,box-shadow,transform] ${hover ? 'portal-card-hover lift cursor-pointer' : ''} ${className}`}
       style={{
         ...(hex ? { borderColor: `${hex}44`, borderLeft: `3px solid ${hex}` } : {}),
         ...style,
@@ -127,7 +127,7 @@ export function Field({ label, value, mono }) {
   );
 }
 
-export const PORTAL_INPUT = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-cad-text placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-all';
+export const PORTAL_INPUT = 'w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-cad-text placeholder:text-slate-600 outline-none focus:border-brand/60 transition-colors';
 
 export const PORTAL_LABEL = 'block text-[11px] font-bold tracking-[0.5px] uppercase text-cad-muted mb-1.5';
 

@@ -157,6 +157,22 @@ select:focus, select:focus-visible,
   box-shadow: none !important;
 }
 [class*="focus-within:ring"]:focus-within { box-shadow: none !important; }
+/* Inputs must never transition box-shadow: the suppressed Tailwind ring carries
+   a white ring-offset that would otherwise flash white as focus transitions out
+   (transition-all animates it). Restrict their transitions to color/border. */
+input, textarea, select, [aria-haspopup="listbox"], [class*="focus-within:ring"] {
+  transition-property: color, background-color, border-color, opacity !important;
+}
+
+/* content-visibility: let the browser skip rendering/painting off-screen panels
+   and cards until they scroll near the viewport. Big scroll-FPS win on dense
+   pages (admin sections, Command/Supervisor, portals) with no visual change.
+   `contain-intrinsic-size: auto …` reserves space and remembers real sizes so
+   the scrollbar stays stable. Unsupported browsers simply ignore it. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
 
 /* ─── Kill the webkit/mobile tap-highlight flash that makes selects,
        dropdowns and buttons flicker the instant they're clicked ─── */

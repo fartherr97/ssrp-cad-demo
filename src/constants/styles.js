@@ -71,9 +71,9 @@ export const S_CARD         = 'bg-app-card/70 border border-border-base rounded-
 
 // ─── Form controls ─────────────────────────────────────────
 
-export const S_INPUT    = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
-export const S_SELECT   = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 outline-none cursor-pointer focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
-export const S_TEXTAREA = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[90px] focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]';
+export const S_INPUT    = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-[border-color]';
+export const S_SELECT   = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 outline-none cursor-pointer focus:border-brand/60 transition-[border-color]';
+export const S_TEXTAREA = 'w-full min-w-0 max-w-full bg-app-input border border-border-base rounded-lg px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 outline-none resize-y min-h-[90px] focus:border-brand/60 transition-[border-color]';
 export const S_LABEL    = 'block text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5';
 export const S_FIELD    = 'flex flex-col gap-0.5';
 

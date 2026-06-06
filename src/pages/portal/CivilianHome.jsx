@@ -10,7 +10,7 @@ import {
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import { useActiveCivilian, CivilianSwitcher } from '../../contexts/CivilianContext';
 import {
-  BADGE, S_BTN_DANGER, S_BTN_SECONDARY, S_BTN_GHOST, sm,
+  S_BTN_DANGER, S_BTN_SECONDARY, S_BTN_GHOST, sm,
   S_OVERLAY, S_MODAL, S_MODAL_HEADER, S_MODAL_TITLE, S_MODAL_BODY, S_MODAL_FOOTER,
   S_FIELD, S_LABEL, S_INPUT, S_TEXTAREA,
 } from '../../constants/styles';
@@ -25,18 +25,12 @@ const ES_SERVICES = [
 
 const ACCENT = 'brand';
 
-const DL_BADGE = {
-  ACTIVE:    BADGE.green,
-  SUSPENDED: BADGE.red,
-  EXPIRED:   BADGE.orange,
-};
-
 export default function CivilianHome() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
   const navigate = useNavigate();
   const { vehicles, warrants, currentUser } = state;
-  const { myChars, activeChar, setActiveCharId } = useActiveCivilian();
+  const { myChars, activeChar } = useActiveCivilian();
 
   const [show911, setShow911] = useState(false);
   const [form911, setForm911] = useState(BLANK_911);
@@ -162,45 +156,6 @@ export default function CivilianHome() {
         ))}
       </div>
 
-      <SectionTitle accent={ACCENT}>My Characters</SectionTitle>
-      {myChars.length === 0 ? (
-        <PortalCard accent={ACCENT}>
-          <div className="text-sm text-slate-400">
-            You haven't registered any characters yet. Head to{' '}
-            <span className="text-brand-bright font-semibold">My Characters</span> to get started.
-          </div>
-        </PortalCard>
-      ) : (
-        <>
-          <div className="text-[12px] text-slate-500 mb-3">Select a character to make them active across the portal.</div>
-          <div className="stagger grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
-            {myChars.map(c => {
-              const isActive = c.id === activeChar?.id;
-              return (
-                <PortalCard key={c.id} accent={ACCENT} hover onClick={() => setActiveCharId(c.id)}
-                  className={isActive ? 'ring-2 ring-brand/60 border-brand/50' : ''}>
-                  <div className="flex items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-11 h-11 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border ${isActive ? 'border-brand/50' : 'border-border-base'} bg-app-elevated`}>
-                        {c.profilePhoto
-                          ? <img src={c.profilePhoto} alt={`${c.firstName} ${c.lastName}`} className="w-full h-full object-cover" />
-                          : <MdPerson size={22} className={isActive ? 'text-brand-bright' : 'text-slate-400'} />}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-[15px] font-bold text-slate-100">{c.firstName} {c.lastName}</div>
-                        <div className="text-[11px] text-slate-500">DOB {c.dob}</div>
-                      </div>
-                    </div>
-                    {isActive
-                      ? <span className="text-[9px] font-bold uppercase tracking-wider text-brand-bright bg-brand/15 border border-brand/30 rounded px-1.5 py-0.5 shrink-0">Active</span>
-                      : <span className={DL_BADGE[c.dlStatus] || BADGE.gray}>{c.dlStatus || 'N/A'}</span>}
-                  </div>
-                </PortalCard>
-              );
-            })}
-          </div>
-        </>
-      )}
       {/* 911 Modal */}
       {show911 && (
         <div className={`${S_OVERLAY} anim-overlay-in`} onClick={e => e.target === e.currentTarget && (setShow911(false), setForm911(BLANK_911))}>
