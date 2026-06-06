@@ -314,7 +314,6 @@ export default function OfficerProfile() {
                 >
                   Open Transfer Portal
                 </a>
-                <p className="text-[10px] text-slate-600 font-mono">transfer.ssrp.us</p>
               </div>
             </InfoCard>
           </div>

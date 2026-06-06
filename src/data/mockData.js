@@ -862,7 +862,7 @@ export const BUSINESSES = [
   {
     id: 1, name: "Bayshore Auto & Towing", type: "Automotive / Towing",
     owner: "Jordan Maxwell", ownerDiscordId: "205947291", ein: "FL-88-2210445", phone: "555-0710",
-    address: "412 Industrial Pkwy, Tampa", status: "ACTIVE",
+    address: "412 Industrial Pkwy, Tampa", status: "ACTIVE", opStatus: "OPEN",
     isTowCompany: true,
     fleet: [
       { id: 1, name: 'T1, Light Duty',  spawnCode: 'towtruck',  type: 'Light Duty'  },
@@ -879,7 +879,7 @@ export const BUSINESSES = [
   {
     id: 2, name: "FDOT Tow Operations", type: "Government / Towing",
     owner: "State of Florida – FDOT District 7", ownerDiscordId: "100200305", ein: "FL-GOV-FDOT-TOW-7", phone: "800-511-0000",
-    address: "FDOT District 7 HQ, 11201 N Malcolm McKinley Dr, Tampa", status: "ACTIVE",
+    address: "FDOT District 7 HQ, 11201 N Malcolm McKinley Dr, Tampa", status: "ACTIVE", opStatus: "OPEN",
     isTowCompany: true, isFDOT: true,
     fleet: [
       { id: 1, name: 'FDOT-T1, Heavy Rotator', spawnCode: 'rotator',   type: 'Heavy Duty'  },
