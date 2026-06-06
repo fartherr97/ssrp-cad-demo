@@ -81,7 +81,7 @@ export default function Geographical() {
         title="CAD Naming & Codes"
         subtitle="Configure terminology and emergency codes used across the CAD."
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
           <SonField label="Emergency Code">
             <input style={SON_INPUT} placeholder="911"
               value={draft.emergencyCode ?? '911'}

@@ -78,7 +78,7 @@ export default function UnitManagement() {
         </div>
       </div>
 
-      <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: '1fr 300px' }}>
+      <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5" style={{ gridTemplateColumns: 'minmax(0, 1fr) 300px' }}>
         {/* Roster table */}
         <div className={`mob-list-panel${selected ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>

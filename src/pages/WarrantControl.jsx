@@ -798,7 +798,7 @@ export default function WarrantControl() {
 
       {/* Two-pane: table left, detail right */}
       <div className="mob-two-pane grid flex-1 overflow-hidden min-h-0 gap-4 lg:gap-5"
-        style={{ gridTemplateColumns: '1fr 320px' }}>
+        style={{ gridTemplateColumns: 'minmax(0, 1fr) 320px' }}>
 
         {/* Registry table */}
         <div className={`mob-list-panel${selected != null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>

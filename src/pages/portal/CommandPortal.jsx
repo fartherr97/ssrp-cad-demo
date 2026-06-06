@@ -102,7 +102,7 @@ function DateRangeBar({ dateFrom, setDateFrom, dateTo, setDateTo }) {
           >{p.label}</button>
         );
       })}
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         <div className="relative overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-violet-400/50 transition-all w-[130px]" style={{ height: 32 }}>
           <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
             className="absolute inset-0 w-full h-full bg-transparent px-2.5 text-[11.5px] text-slate-300 outline-none cursor-pointer"

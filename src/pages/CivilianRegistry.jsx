@@ -114,7 +114,7 @@ export default function CivilianRegistry() {
 
   return (
     <div className={`${S_PAGE} !p-0 overflow-hidden !gap-0`}>
-      <div className="mob-two-pane grid overflow-hidden flex-1 min-h-0 p-3 md:p-5 gap-4 lg:gap-5" style={{ gridTemplateColumns: '280px 1fr' }}>
+      <div className="mob-two-pane grid overflow-hidden flex-1 min-h-0 p-3 md:p-5 gap-4 lg:gap-5" style={{ gridTemplateColumns: '280px minmax(0, 1fr)' }}>
         {/* LEFT: Civilian List */}
         <div className={`mob-list-panel${selected != null ? ' mob-gone' : ''} flex flex-col min-h-0 bg-app-panel/80 border border-border-base rounded-xl overflow-hidden backdrop-blur-sm shadow-lg shadow-black/20`}>
           <div className={S_PANEL_HEADER}>
