@@ -1140,7 +1140,147 @@ function UnitLookupField({ f, value, onChange, readOnly }) {
   );
 }
 
-function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement, subjectCiv }) {
+/* Warrant link — search ACTIVE warrants and attach one (or more) as chips.
+   Linking a warrant merges its charges into the form's Charges field and
+   back-fills the subject's civilian info into any empty person fields; filing
+   the report/record then marks the warrant served (handled in the reducer). */
+function WarrantLookupField({ f, value, data, onChange, onBulk, allFields, chargesFieldId, readOnly }) {
+  const { state } = useCAD();
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const items = Array.isArray(value) ? value : [];
+  const penal = state.penalCode || [];
+  const accent = '#f43f5e';
+
+  const applyBulk = onBulk || ((updates) => Object.entries(updates).forEach(([k, v]) => onChange(k, v)));
+
+  // Convert a warrant's charges to the Charges-field shape, reusing the matching
+  // penal-code entry's id when we can so the picker dedupes correctly.
+  const warrantToCharges = (w) => {
+    const list = Array.isArray(w.charges) && w.charges.length
+      ? w.charges
+      : (w.charge ? [{ charge: w.charge }] : []);
+    return list.map((wc, i) => {
+      const match = penal.find(p =>
+        (wc.titleCode && p.code === wc.titleCode) ||
+        p.name?.toLowerCase() === (wc.charge || wc.name || '').toLowerCase());
+      const fine = Number(wc.bondFineAmount ?? wc.fine ?? match?.fine ?? 0);
+      return {
+        id: match?.id ?? `war-${w.id}-${i}`,
+        code: wc.titleCode || wc.code || match?.code || '',
+        name: wc.charge || wc.name || match?.name || '',
+        type: wc.chargeType || wc.type || match?.type || '',
+        fine,
+        jailTime: wc.jailTime || match?.jailTime || '',
+        bondType: wc.bondType || (fine > 0 ? 'Bond Available' : 'No Bail'),
+        bondAmount: String(wc.bondFineAmount ?? wc.fine ?? fine ?? 0),
+        counts: String(wc.counts || 1),
+      };
+    });
+  };
+
+  const pick = (w) => {
+    if (items.some(i => i.warrantId === w.id)) { setQ(''); setOpen(false); return; }
+    const chip = {
+      key: `war-${w.id}`, warrantId: w.id,
+      civilianId: w.civilianId ?? null,
+      civilianName: w.civilianName || 'Unknown',
+      label: `${w.civilianName || 'Unknown'} · ${w.type || 'Warrant'}`,
+    };
+    const updates = { [f.id]: [...items, chip] };
+
+    // Merge the warrant's charges into the Charges field (dedupe by code/name).
+    if (chargesFieldId) {
+      const existing = Array.isArray(data[chargesFieldId]) ? data[chargesFieldId] : [];
+      const seen = new Set(existing.map(c => `${c.code || ''}|${(c.name || '').toLowerCase()}`));
+      const add = warrantToCharges(w).filter(c => !seen.has(`${c.code || ''}|${(c.name || '').toLowerCase()}`));
+      if (add.length) updates[chargesFieldId] = [...existing, ...add];
+    }
+
+    // Back-fill the subject civilian into any empty person fields on the form.
+    const civ = w.civilianId != null ? (state.civilians || []).find(c => c.id === w.civilianId) : null;
+    if (civ) {
+      const fill = buildAutofill('civilian', civ, allFields || [], state.civilians);
+      for (const [k, v] of Object.entries(fill)) {
+        if (k === '_civilianId') { updates._civilianId = v; continue; }
+        if (data[k] == null || data[k] === '') updates[k] = v;
+      }
+    }
+
+    applyBulk(updates);
+    setQ('');
+    setOpen(false);
+  };
+
+  const remove = (warrantId) => onChange(f.id, items.filter(i => i.warrantId !== warrantId));
+
+  const results = (open && q.trim())
+    ? (state.warrants || [])
+        .filter(w => w.status === 'ACTIVE' && !items.some(i => i.warrantId === w.id))
+        .filter(w => {
+          const s = q.trim().toLowerCase();
+          return (w.civilianName || '').toLowerCase().includes(s) ||
+            (w.charge || '').toLowerCase().includes(s) ||
+            (w.charges || []).some(c => (c.charge || '').toLowerCase().includes(s)) ||
+            String(w.id).includes(s);
+        })
+        .slice(0, 8)
+    : [];
+
+  const chargeSummary = (w) =>
+    (Array.isArray(w.charges) && w.charges.length ? w.charges.map(c => c.charge).filter(Boolean).join(', ') : w.charge) || 'No charges listed';
+
+  return (
+    <div className="flex flex-col sm:col-span-2 lg:col-span-4">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.5px] text-slate-500 mb-1.5">
+        <MdGavel size={12} />{f.label || 'Linked Warrant'}{f.required && <span className="text-red-400"> *</span>}
+        {!readOnly && <span className="px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 text-[8px] font-bold tracking-[0.4px] normal-case">AUTO-SERVES</span>}
+      </label>
+
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {items.map(chip => (
+            <span key={chip.key} className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg text-[12px] font-semibold"
+              style={{ background: `${accent}1a`, border: `1px solid ${accent}40`, color: accent }}>
+              <MdGavel size={11} /> {chip.label}
+              {!readOnly && (
+                <button type="button" onClick={() => remove(chip.warrantId)}
+                  className="flex items-center justify-center w-4 h-4 rounded hover:bg-white/10 cursor-pointer" style={{ background: 'none', border: 'none', color: 'inherit' }}>
+                  <MdClose size={12} />
+                </button>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {!readOnly && (
+        <div className="relative">
+          <input value={q} onChange={e => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            placeholder="Search active warrants by subject or charge…" className={S_INPUT} />
+          {open && results.length > 0 && (
+            <div className="absolute z-[60] left-0 right-0 mt-1 bg-app-card border border-border-strong rounded-xl shadow-2xl shadow-black/60 p-1 max-h-[280px] overflow-y-auto">
+              {results.map(w => (
+                <button key={w.id} type="button" onMouseDown={e => e.preventDefault()} onClick={() => pick(w)}
+                  className="w-full flex items-start gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-white/[0.06] cursor-pointer" style={{ background: 'none', border: 'none' }}>
+                  <MdGavel size={15} className="text-rose-300/80 shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold text-white truncate">{w.civilianName} <span className="text-slate-400 font-normal">· {w.type}</span></div>
+                    <div className="text-[11px] text-slate-500 truncate">{chargeSummary(w)}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {readOnly && items.length === 0 && <span className="text-[12px] text-slate-600 italic">No warrant linked</span>}
+    </div>
+  );
+}
+
+function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSupplement, canSupplement, subjectCiv, allFields, chargesFieldId }) {
   const { state, dispatch } = useCAD();
   const isSupervisor = ['admin', 'supervisor'].includes(state.currentUser?.role);
   const isSupOnly = !!f.supervisorOnly;
@@ -1328,6 +1468,13 @@ function Field({ f, value, data, onChange, onBulk, sectionFields, readOnly, onSu
     return <UnitLookupField f={f} value={value} onChange={onChange} readOnly={effectiveReadOnly} />;
   }
 
+  // Warrant link * attach an active warrant; auto-fills charges + subject and
+  // serves the warrant on submit.
+  if (f.type === 'warrant_lookup') {
+    return <WarrantLookupField f={f} value={value} data={data} onChange={onChange} onBulk={onBulk}
+      allFields={allFields} chargesFieldId={chargesFieldId} readOnly={effectiveReadOnly} />;
+  }
+
   const isNarr = f.type === 'textarea';
   const cls = isNarr ? FULL : (SPAN[span] || SPAN[1]);
 
@@ -1413,6 +1560,11 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
 
   const sections = template?.sections || [];
 
+  // Form-wide field metadata so a warrant link in one section can populate the
+  // Charges field / person fields that live in other sections.
+  const allFields = sections.flatMap(s => s.fields || []);
+  const chargesFieldId = allFields.find(ff => ff.type === 'charges')?.id || null;
+
   // Resolve the civilian this report is about so the Flags field can bind to
   // their record (one source of truth). The civilian lookup / autofill stamps
   // `_civilianId` on the form data whenever a person is selected (covers both
@@ -1480,7 +1632,8 @@ export default function ReportForm({ template, data = {}, onChange, onBulkChange
             {sec.fields.map(f => (
               <Field key={f.id} f={f} value={data[f.id]} data={data}
                 onChange={change} onBulk={onBulkChange} sectionFields={sec.fields} readOnly={readOnly}
-                onSupplement={onSupplement} canSupplement={canSupplement} subjectCiv={subjectCiv} />
+                onSupplement={onSupplement} canSupplement={canSupplement} subjectCiv={subjectCiv}
+                allFields={allFields} chargesFieldId={chargesFieldId} />
             ))}
           </div>
         </section>

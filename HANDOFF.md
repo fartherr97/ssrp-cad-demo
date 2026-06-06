@@ -101,6 +101,13 @@ Actions marked **(read-receipt/UI-only)** are local-only and need no backend (or
 - `ADD_WARRANT` — warrant (also stamps a `WARRANT` flag on the civilian).
 - `SERVE_WARRANT` — warrant id, or `{ id, servedBy, caseNumber? }` — marks SERVED, stamps
   `servedBy`/`servedDate`(/`servedCaseNumber`), and clears the civilian's `WARRANT` flag once no ACTIVE warrants remain.
+- **Auto-serve on filing:** a `warrant_lookup` template field stores linked warrants as
+  `[{ warrantId, civilianId, civilianName, label }]`. `ADD_REPORT` / `ADD_RECORD` read those
+  off the filed form (via the template snapshot) and serve each linked warrant automatically —
+  same effect as `SERVE_WARRANT`, stamped with the filing officer + that report/record's number.
+  Linking a warrant in the UI also merges its charges into the form's `charges` field and
+  back-fills the subject civilian. `warrant_lookup` is a first-class field type in the records
+  creator (Admin → Custom Records), so it can be added to any report/record template.
 
 ### Reports & records (templated documents)
 - `ADD_REPORT` — `{ type, caseNumber, officerBadge, callId, civilianId, summary, formData }`

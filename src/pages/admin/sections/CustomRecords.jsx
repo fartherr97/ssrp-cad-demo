@@ -37,6 +37,7 @@ const FIELD_TYPES = [
   { type: 'supplemental',    label: 'Supplemental'  },
   { type: 'linked_records',  label: 'Linked Records'},
   { type: 'unit_lookup',     label: 'Unit Lookup'   },
+  { type: 'warrant_lookup',  label: 'Warrant'       },
 ];
 
 const TYPE_COLOR = {
@@ -46,6 +47,7 @@ const TYPE_COLOR = {
   civilian_lookup: '#f97316', vehicle_lookup: '#f97316', badge_lookup: '#a78bfa',
   charges: '#f87171', mugshot: '#e879f9', image: '#22d3ee', photos: '#22d3ee',
   supplemental: '#fbbf24', linked_records: '#2dd4bf', unit_lookup: '#3a88e8',
+  warrant_lookup: '#f43f5e',
 };
 
 /* ── Premade sections matching template structure ── */
@@ -336,7 +338,7 @@ function SectionBlock({ section, onUpdate, onDelete, onMoveUp, onMoveDown }) {
   const up = (patch) => onUpdate({ ...section, ...patch });
 
   const addField = (type) => {
-    const span = ['charges','textarea','supplemental','linked_records','unit_lookup','flags'].includes(type) ? 4 : type === 'checkbox' ? 1 : 2;
+    const span = ['charges','textarea','supplemental','linked_records','unit_lookup','flags','warrant_lookup'].includes(type) ? 4 : type === 'checkbox' ? 1 : 2;
     up({ fields: [...(section.fields || []), { id: uid(), label: '', type, span }] });
     setShowAddField(false);
   };

@@ -129,6 +129,17 @@ function renderField(f, value) {
     );
   }
 
+  if (f.type === 'warrant_lookup') {
+    const chips = Array.isArray(value) ? value : [];
+    const text = chips.map(c => c.label || c.civilianName || '').filter(Boolean).join(', ');
+    return (
+      <View key={f.id} style={styles.fieldBlockFull}>
+        <Text style={styles.fieldLabel}>{f.label || 'Linked Warrant'}</Text>
+        <Text style={styles.fieldValue}>{text || '—'}</Text>
+      </View>
+    );
+  }
+
   if (f.type === 'checkbox') {
     const checked = !!value;
     return (

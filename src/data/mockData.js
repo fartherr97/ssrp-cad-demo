@@ -504,6 +504,9 @@ export const REPORT_TEMPLATES = [
       ]},
       _civ({ mugshot: true }),
       _veh(),
+      { id: 'sWarrant', title: 'Linked Warrant', style: 'gray', fields: [
+        { id: 'wl_warrant', label: 'Linked Warrant', type: 'warrant_lookup', span: 4 },
+      ]},
       _charges({ required: true }),
       { id: 'sInfo', title: 'Information Cont.', style: 'gray', fields: [
         { id: 'ic_weapons', label: 'Weapon(s)', type: 'text', span: 2 },

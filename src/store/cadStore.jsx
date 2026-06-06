@@ -273,6 +273,57 @@ function addAuditEntry(state, action, module) {
   return { auditLog: [entry, ...state.auditLog], nextId: state.nextId + 1 };
 }
 
+/* Mark one or more warrants SERVED — stamping who/when (+ optional case number)
+   and clearing each affected civilian's WARRANT flag once they have no ACTIVE
+   warrants left. Shared by the manual SERVE_WARRANT action and the auto-serve
+   that fires when a report/record links a warrant. Returns the next warrants +
+   civilians slices; already-served warrants are left untouched. */
+function serveWarrants(state, ids, { servedBy = '', caseNumber = '' } = {}) {
+  const idSet = new Set(ids);
+  if (idSet.size === 0) return { warrants: state.warrants, civilians: state.civilians };
+  const servedDate = new Date().toISOString().split('T')[0];
+  const warrants = state.warrants.map(w =>
+    idSet.has(w.id) && w.status === 'ACTIVE'
+      ? { ...w, status: 'SERVED', servedBy: servedBy || w.servedBy || '', servedDate,
+          ...(caseNumber ? { servedCaseNumber: caseNumber } : {}) }
+      : w
+  );
+  const affectedCivIds = new Set(
+    state.warrants.filter(w => idSet.has(w.id) && w.civilianId != null).map(w => w.civilianId)
+  );
+  let civilians = state.civilians;
+  if (affectedCivIds.size) {
+    civilians = state.civilians.map(c => {
+      if (!affectedCivIds.has(c.id)) return c;
+      const stillActive = warrants.some(w => w.civilianId === c.id && w.status === 'ACTIVE');
+      return stillActive ? c : { ...c, flags: (c.flags || []).filter(f => f !== 'WARRANT') };
+    });
+  }
+  return { warrants, civilians };
+}
+
+/* Collect the warrant ids linked on a filed report/record: scans the template
+   snapshot for warrant_lookup fields and reads the warrantId off each chip. */
+function linkedWarrantIds(templateSnapshot, formData = {}) {
+  const ids = [];
+  for (const sec of templateSnapshot?.sections || []) {
+    for (const f of sec.fields || []) {
+      if (f.type === 'warrant_lookup' && Array.isArray(formData[f.id])) {
+        formData[f.id].forEach(chip => { if (chip && chip.warrantId != null) ids.push(chip.warrantId); });
+      }
+    }
+  }
+  return [...new Set(ids)];
+}
+
+/* Officer signature line (badge | rank | name) used to stamp who served a warrant. */
+function officerSignatureFor(state, badge) {
+  const o = state.officers.find(off => off.badge === badge);
+  return o
+    ? `${o.badge} | ${(o.rank || o.role || 'OFFICER').toUpperCase()} | ${o.name.toUpperCase()}`
+    : (badge || '');
+}
+
 function baseReducer(state, action) {
   switch (action.type) {
     case 'CONNECT_DISCORD':
@@ -609,25 +660,7 @@ function baseReducer(state, action) {
       const id         = typeof action.payload === 'object' ? action.payload.id : action.payload;
       const servedBy   = (typeof action.payload === 'object' && action.payload.servedBy) || '';
       const caseNumber = (typeof action.payload === 'object' && action.payload.caseNumber) || '';
-      const servedDate = new Date().toISOString().split('T')[0];
-      const served = state.warrants.find(w => w.id === id);
-      const warrants = state.warrants.map(w =>
-        w.id === id
-          ? { ...w, status: 'SERVED', servedBy: servedBy || w.servedBy || '', servedDate,
-              ...(caseNumber ? { servedCaseNumber: caseNumber } : {}) }
-          : w
-      );
-      // Clear the civilian's stale WARRANT flag once no ACTIVE warrants remain,
-      // so other officers don't see a warrant indicator for an already-served one.
-      let civilians = state.civilians;
-      if (served?.civilianId != null) {
-        const stillActive = warrants.some(w => w.civilianId === served.civilianId && w.status === 'ACTIVE');
-        if (!stillActive) {
-          civilians = state.civilians.map(c =>
-            c.id === served.civilianId ? { ...c, flags: (c.flags || []).filter(f => f !== 'WARRANT') } : c
-          );
-        }
-      }
+      const { warrants, civilians } = serveWarrants(state, [id], { servedBy, caseNumber });
       const audit = addAuditEntry(state, `Marked warrant ${id} as served`, 'Warrants');
       return { ...state, warrants, civilians, ...audit };
     }
@@ -657,8 +690,16 @@ function baseReducer(state, action) {
         // the template is later changed or deleted.
         templateSnapshot: snapshotFor(state.reportTemplates, action.payload.type, action.payload.templateSnapshot),
       };
-      const audit = addAuditEntry(state, `Filed ${newReport.type} report ${reportNumber}`, 'Reports');
-      return { ...state, reports: [...state.reports, newReport], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit };
+      // Auto-serve any warrants linked on the form (warrant_lookup fields),
+      // stamping this report's officer + case number so an arrest filed on a
+      // warrant clears it everywhere other officers look.
+      const wIds = linkedWarrantIds(newReport.templateSnapshot, action.payload.formData);
+      const { warrants, civilians } = serveWarrants(state, wIds, { servedBy: officerSignature, caseNumber: reportNumber });
+      const auditMsg = wIds.length
+        ? `Filed ${newReport.type} report ${reportNumber} (served ${wIds.length} warrant${wIds.length > 1 ? 's' : ''})`
+        : `Filed ${newReport.type} report ${reportNumber}`;
+      const audit = addAuditEntry(state, auditMsg, 'Reports');
+      return { ...state, reports: [...state.reports, newReport], warrants, civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit };
     }
 
     /* ─── Generic admin-customization CRUD ───
@@ -1045,7 +1086,10 @@ function baseReducer(state, action) {
       const fd = action.payload.formData || {};
       const civId = action.payload.civilianId || fd._civilianId || undefined;
       const newRecord = { ...action.payload, id: state.nextId, recordNumber, caseNumber: recordNumber, status: action.payload.status || 'Pending Review', date: new Date().toLocaleDateString(), templateSnapshot: snapshotFor(state.recordTemplates, action.payload.type, action.payload.templateSnapshot), ...(civId !== undefined ? { civilianId: civId } : {}) };
-      return { ...state, records: [...state.records, newRecord], nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
+      // Records can carry a warrant_lookup field too — serve any linked warrants.
+      const wIds = linkedWarrantIds(newRecord.templateSnapshot, fd);
+      const { warrants, civilians } = serveWarrants(state, wIds, { servedBy: officerSignatureFor(state, action.payload.officerBadge), caseNumber: recordNumber });
+      return { ...state, records: [...state.records, newRecord], warrants, civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
     }
     case 'UPDATE_REPORT': {
       const reports = state.reports.map(r =>
