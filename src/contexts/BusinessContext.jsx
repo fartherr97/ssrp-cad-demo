@@ -71,25 +71,3 @@ export function BusinessSwitcher() {
   );
 }
 
-
-/* Renders a business switcher banner when the user belongs to >1 business. */
-export function BusinessSwitcher() {
-  const { myBizList, activeBiz, setActiveBizId } = useActiveBusiness();
-  if (myBizList.length <= 1) return null;
-
-  return (
-    <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl border border-border-base bg-app-card/60">
-      <MdSwapHoriz size={20} className="text-brand-bright shrink-0" />
-      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0">Active Business</span>
-      <Select
-        className="flex-1 bg-app-input border border-border-base rounded-lg px-3 py-2 text-sm text-cad-text outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20 transition-[border-color,box-shadow]"
-        value={activeBiz?.id ?? ''}
-        onChange={e => setActiveBizId(Number(e.target.value))}
-      >
-        {myBizList.map(b => (
-          <option key={b.id} value={b.id}>{b.name}</option>
-        ))}
-      </Select>
-    </div>
-  );
-}
