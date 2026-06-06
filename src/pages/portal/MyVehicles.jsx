@@ -95,6 +95,13 @@ export default function MyVehicles() {
   };
 
   const handleConfirm = () => {
+    const uniqueFields = state.uniqueIdentifiers?.vehicle || [];
+    for (const field of uniqueFields) {
+      if (form[field]) {
+        const conflict = (state.vehicles || []).find(v => v[field] === form[field]);
+        if (conflict) { toast.error(`A vehicle with that ${field.toUpperCase()} is already registered.`, { title: 'Duplicate Value' }); setConfirming(false); return; }
+      }
+    }
     const { ownerId, regExpiry, ...rest } = form;
     dispatch({
       type: 'ADD_VEHICLE',

@@ -578,6 +578,21 @@ function baseReducer(state, action) {
       if (!autoSSN) {
         do { autoSSN = genSSN(); } while (takenSSNs.has(autoSSN));
       }
+      // Enforce uniqueness for admin-configured civilian fields (excluding SSN which is auto-generated).
+      const civUniqueFields = state.uniqueIdentifiers?.civilian || [];
+      for (const field of civUniqueFields) {
+        if (field === 'ssn') continue;
+        const val = field === 'fullName'
+          ? `${action.payload.firstName} ${action.payload.lastName}`.trim().toLowerCase()
+          : action.payload[field];
+        if (!val) continue;
+        const taken = state.civilians.some(c =>
+          field === 'fullName'
+            ? `${c.firstName} ${c.lastName}`.trim().toLowerCase() === val
+            : c[field] === val,
+        );
+        if (taken) return state;
+      }
       const newCiv = { ...action.payload, ssn: autoSSN, id: state.nextId, vehicles: [], flags: [] };
       const audit = addAuditEntry(state, `Created civilian record: ${newCiv.firstName} ${newCiv.lastName}`, 'Civilian');
       return { ...state, civilians: [...state.civilians, newCiv], nextId: state.nextId + 1, ...audit };
@@ -643,6 +658,12 @@ function baseReducer(state, action) {
     }
 
     case 'ADD_VEHICLE': {
+      const vehUniqueFields = state.uniqueIdentifiers?.vehicle || [];
+      for (const field of vehUniqueFields) {
+        const val = action.payload[field];
+        if (!val) continue;
+        if (state.vehicles.some(v => v[field] === val)) return state;
+      }
       const newVeh = { ...action.payload, id: state.nextId, flags: [], stolen: false };
       if (action.payload.businessOwnerId) {
         return { ...state, vehicles: [...state.vehicles, newVeh], nextId: state.nextId + 1 };
