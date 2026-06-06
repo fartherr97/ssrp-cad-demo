@@ -74,7 +74,9 @@ function StatusChip({ status }) {
   );
 }
 
-function ElapsedTimer({ receivedAt, now }) {
+function ElapsedTimer({ receivedAt }) {
+  // Self-contained 1s tick so only this tiny span re-renders — not the whole page.
+  const now = useNow();
   const ms = now - receivedAt;
   const mins = ms / 60000;
   const color = mins >= 5 ? '#ef4444' : mins >= 2 ? '#f97316' : '#64748b';
@@ -153,7 +155,8 @@ function PriorityRow({ value, onChange }) {
 
 // ─── Incoming 911 card ─────────────────────────────────────────────────────────
 
-function IncomingCard({ call, now, onDispatch }) {
+function IncomingCard({ call, onDispatch }) {
+  const now = useNow();
   const ms = now - call.receivedAt;
   const mins = ms / 60000;
   const urgBg     = mins >= 5 ? 'rgba(239,68,68,0.10)' : mins >= 2 ? 'rgba(249,115,22,0.05)' : 'rgba(255,255,255,0.02)';
@@ -164,7 +167,7 @@ function IncomingCard({ call, now, onDispatch }) {
       <div className="flex items-center gap-2 px-3 pt-2.5 pb-1">
         <PBadge p={call.priority} />
         <span className="text-[12px] font-semibold text-slate-200 truncate flex-1">{call.caller || 'Unknown Caller'}</span>
-        <ElapsedTimer receivedAt={call.receivedAt} now={now} />
+        <ElapsedTimer receivedAt={call.receivedAt} />
       </div>
       {call.location && (
         <div className="flex items-center gap-1 px-3 pb-1">
@@ -192,7 +195,7 @@ function IncomingCard({ call, now, onDispatch }) {
 
 // ─── Active call card ──────────────────────────────────────────────────────────
 
-function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose }) {
+function ActiveCallCard({ call, officers, onAddUnit, onDetachUnit, onClose }) {
   const [open, setOpen] = useState(false);
   const sc = CALL_STATUS_CFG[call.status] || CALL_STATUS_CFG.PENDING;
   const assigned = officers.filter(o => call.units?.includes(o.unitId));
@@ -218,7 +221,7 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <span className="text-[10px] font-mono text-slate-600">#{call.id}</span>
-          <ElapsedTimer receivedAt={call.createdAt || Date.now()} now={now} />
+          <ElapsedTimer receivedAt={call.createdAt || Date.now()} />
         </div>
       </div>
 
@@ -658,7 +661,6 @@ function Column({ icon: Icon, iconColor, title, count, countAlert, action, child
 export default function DispatchPortal() {
   const { state, dispatch } = useCAD();
   const { isMobile } = useResponsive();
-  const now = useNow();
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -776,7 +778,7 @@ export default function DispatchPortal() {
                 <span className="text-[11px] text-slate-700 text-center">No incoming calls</span>
               </div>
             : incoming911.map(c => (
-              <IncomingCard key={c.id} call={c} now={now} onDispatch={setDispatchTarget} />
+              <IncomingCard key={c.id} call={c} onDispatch={setDispatchTarget} />
             ))
           }
         </Column>
@@ -788,7 +790,7 @@ export default function DispatchPortal() {
                 <span className="text-[11px] text-slate-700">No active calls</span>
               </div>
             : activeCalls.map(c => (
-              <ActiveCallCard key={c.id} call={c} now={now} officers={officers}
+              <ActiveCallCard key={c.id} call={c} officers={officers}
                 onAddUnit={setAddUnitCallTarget}
                 onDetachUnit={handleDetachUnit}
                 onClose={handleCloseCall} />

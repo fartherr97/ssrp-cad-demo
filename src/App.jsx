@@ -106,9 +106,12 @@ function PageWrapper({ children }) {
     <div
       className="flex flex-col flex-1 min-h-0 overflow-hidden"
       style={{
-        transition: 'opacity 280ms cubic-bezier(0.22,1,0.36,1), transform 280ms cubic-bezier(0.22,1,0.36,1)',
+        /* Opacity-only fade: animating a transform/scale on a whole heavy page
+           forces the browser to rasterize the entire subtree into a layer and
+           scale it, which stutters on dense pages (CAD, Fire board). A plain
+           opacity fade is far cheaper and feels snappier when navigating. */
+        transition: 'opacity 160ms ease-out',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0) scale(1)' : 'translateY(14px) scale(0.99)',
       }}
     >
       {children}
