@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import { FlagRow, FlagManager } from '../components/CivilianFlags';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -18,6 +19,7 @@ import { resizeImage } from '../utils/image';
 export default function CivilianRegistry() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { civilians, vehicles, warrants } = state;
 
   const [selected, setSelected] = useState(null);
@@ -45,7 +47,10 @@ export default function CivilianRegistry() {
   );
 
   const createCivilian = () => {
-    if (!form.firstName || !form.lastName) return;
+    if (!form.firstName || !form.lastName) {
+      setCreateError('First and last name are required.');
+      return;
+    }
     const uniqueFields = state.uniqueIdentifiers?.civilian || [];
     for (const field of uniqueFields) {
       if (field === 'fullName') {
@@ -73,7 +78,10 @@ export default function CivilianRegistry() {
   };
 
   const addVehicle = () => {
-    if (!vehForm.plate || !vehForm.make || !selCiv) return;
+    if (!vehForm.plate || !vehForm.make || !selCiv) {
+      setVehError('License plate and make are required.');
+      return;
+    }
     const uniqueFields = state.uniqueIdentifiers?.vehicle || [];
     for (const field of uniqueFields) {
       if (vehForm[field]) {
@@ -92,12 +100,16 @@ export default function CivilianRegistry() {
     setShowAddVeh(false);
   };
 
-  const deleteCiv = (id) => {
-    if (confirm('Delete this civilian record?')) {
-      dispatch({ type: 'DELETE_CIVILIAN', payload: id });
-      toast.success('Civilian record deleted');
-      setSelected(null);
-    }
+  const deleteCiv = async (id) => {
+    if (!(await confirm({
+      title: 'Delete civilian?',
+      message: 'This permanently removes the record and all linked data.',
+      confirmLabel: 'Delete',
+      danger: true,
+    }))) return;
+    dispatch({ type: 'DELETE_CIVILIAN', payload: id });
+    toast.success('Civilian record deleted');
+    setSelected(null);
   };
 
   return (
@@ -119,9 +131,10 @@ export default function CivilianRegistry() {
             {filtered.map(c => {
               const hasWarrant = warrants.some(w => w.civilianId === c.id && w.status === 'ACTIVE');
               return (
-                <div
+                <button
+                  type="button"
                   key={c.id}
-                  className={`my-1 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
+                  className={`my-1 px-3 py-2.5 rounded-lg cursor-pointer border transition-all text-left w-full ${
                     selected === c.id
                       ? 'border-brand/40 bg-brand/15'
                       : 'border-border-faint bg-white/[0.02] hover:bg-white/[0.05] hover:border-border-base'
@@ -136,7 +149,7 @@ export default function CivilianRegistry() {
                   <div className="flex gap-1 mt-1 flex-wrap">
                     <FlagRow flags={c.flags || []} />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

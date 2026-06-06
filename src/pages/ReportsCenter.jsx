@@ -197,7 +197,8 @@ export default function ReportsCenter() {
 
   const reviewReport = (id, status) => {
     dispatch({ type: 'UPDATE_REPORT_STATUS', payload: { id, status } });
-    toast.success(`Report marked ${status}.`, { title: 'Report Updated' });
+    if (status === 'Rejected') toast.warning(`Report marked ${status}.`, { title: 'Report Updated' });
+    else toast.success(`Report marked ${status}.`, { title: 'Report Updated' });
   };
 
   const showForm   = selectedTemplate !== null;
@@ -497,9 +498,9 @@ export default function ReportsCenter() {
           {displayedReports.length === 0 ? (
             <div className="p-5 text-center text-cad-muted text-[11px]">No reports</div>
           ) : displayedReports.map(r => (
-            <div key={r.id}
+            <button type="button" key={r.id}
               onClick={() => { setSelectedReport(r.id); setSelectedTemplate(null); setFormValues({}); setMobileTab('new'); }}
-              className={`px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
+              className={`w-full text-left px-2.5 py-2 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedReport === r.id
                   ? 'border-l-brand bg-brand/10'
                   : 'border-l-transparent bg-transparent hover:bg-white/[0.04]'
@@ -513,7 +514,7 @@ export default function ReportsCenter() {
               <div className="flex items-center gap-1.5">
                 <span className="text-[9px] text-cad-muted font-mono">{r.caseNumber}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 

@@ -183,7 +183,7 @@ export default function CivilianHome() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className={`w-11 h-11 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border ${isActive ? 'border-brand/50' : 'border-border-base'} bg-app-elevated`}>
                         {c.profilePhoto
-                          ? <img src={c.profilePhoto} alt="" className="w-full h-full object-cover" />
+                          ? <img src={c.profilePhoto} alt={`${c.firstName} ${c.lastName}`} className="w-full h-full object-cover" />
                           : <MdPerson size={22} className={isActive ? 'text-brand-bright' : 'text-slate-400'} />}
                       </div>
                       <div className="min-w-0">
@@ -224,7 +224,7 @@ export default function CivilianHome() {
                   {ES_SERVICES.map(svc => {
                     const on = (form911.esServices || []).includes(svc.id);
                     return (
-                      <button key={svc.id} type="button" onClick={() => toggle911Service(svc.id)}
+                      <button key={svc.id} type="button" aria-pressed={on} onClick={() => toggle911Service(svc.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold border cursor-pointer transition-all"
                         style={on
                           ? { background: `${svc.color}18`, border: `1px solid ${svc.color}45`, color: svc.color }

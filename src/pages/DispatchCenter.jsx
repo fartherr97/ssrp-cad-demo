@@ -352,7 +352,7 @@ function Dispatch911Modal({ call, onClose }) {
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
             <MdPhone size={16} className="text-red-400 shrink-0" /> Dispatch 911 Call
           </div>
-          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className={S_MODAL_BODY}>
           {/* caller summary */}
@@ -457,7 +457,7 @@ function LEORespondModal({ call, myOfficer, onClose }) {
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
             <MdPhone size={16} className="text-red-400 shrink-0" /> Incoming 911 Call
           </div>
-          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className={S_MODAL_BODY}>
           <div className="px-3 py-2.5 rounded-lg mb-1 text-[12px] text-slate-300 leading-relaxed"
@@ -528,7 +528,7 @@ function SwapIdentifierModal({ onClose }) {
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
             <MdBadge size={16} className="text-brand-bright shrink-0" /> Swap Identifier
           </div>
-          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className={S_MODAL_BODY}>
           {identifiers.length === 0 ? (
@@ -600,7 +600,7 @@ function Sim911Modal({ onClose }) {
           <div className={`${S_MODAL_TITLE} flex items-center gap-2`}>
             <MdPhone size={16} className="text-red-400 shrink-0" /> Simulate 911 Call
           </div>
-          <button className={xs(S_BTN_GHOST)} onClick={onClose}>✕</button>
+          <button className={xs(S_BTN_GHOST)} onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className={S_MODAL_BODY}>
           <div className={S_FIELD}>
@@ -1108,7 +1108,7 @@ export default function DispatchCenter() {
           <div className={`${S_MODAL} max-w-[640px]`}>
             <div className={S_MODAL_HEADER}>
               <div className={S_MODAL_TITLE}>Create New Incident</div>
-              <button className={xs(S_BTN_GHOST)} onClick={closeCreate}>✕</button>
+              <button className={xs(S_BTN_GHOST)} onClick={closeCreate} aria-label="Close">✕</button>
             </div>
             <div className={S_MODAL_BODY}>
               <div className="n-grid-2">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { DeptTag } from '../constants/deptLogos.jsx';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
@@ -33,6 +34,7 @@ const tabCls = (active) =>
 
 export default function DispatchBoard() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { calls, officers, currentUser } = state;
   const [filter, setFilter] = useState('ALL');
   const [selectedCall, setSelectedCall] = useState(null);
@@ -51,9 +53,13 @@ export default function DispatchBoard() {
     if (!selectedCall || !me) return;
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall, unitId: me.unitId } });
     dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
+    toast.success(`You are now attached to ${selectedCall}`, { title: 'Self-Attached' });
   };
 
-  const setMyStatus = (s) => dispatch({ type: 'SET_STATUS', payload: s });
+  const setMyStatus = (s) => {
+    dispatch({ type: 'SET_STATUS', payload: s });
+    toast.info(`Status set to ${s}`);
+  };
 
   const TABS = ['ALL', 'PENDING', 'ACTIVE', 'ENRT'];
 
@@ -207,6 +213,9 @@ export default function DispatchBoard() {
             <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{onDuty.length} ON</span>
           </div>
           <div className={S_PANEL_BODY}>
+            {onDuty.length === 0 && (
+              <div className="p-8 text-center text-slate-600 text-[12px]">No units on duty</div>
+            )}
             {onDuty.map(o => {
               const assignedCall = o.callId ? calls.find(c => c.id === o.callId) : null;
               return (

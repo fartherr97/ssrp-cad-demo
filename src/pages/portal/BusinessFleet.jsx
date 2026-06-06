@@ -89,6 +89,14 @@ export default function BusinessFleet() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!form.plate.trim()) {
+      toast.error('License plate is required.');
+      return;
+    }
+    if (!/^\d{4}$/.test(String(form.year).trim())) {
+      toast.error('Year must be a 4-digit number.');
+      return;
+    }
     setConfirming(true);
   };
 

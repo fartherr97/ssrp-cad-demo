@@ -66,6 +66,19 @@ function priBorderColor(p) {
   return p === 1 ? '#d83838' : p === 2 ? '#c06828' : p === 3 ? '#b09818' : '#249848';
 }
 
+// Deterministic fallback position derived from the call id so markers stay
+// stable across renders (instead of jittering with Math.random()).
+function fallbackCallPos(id) {
+  const s = String(id);
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) | 0;
+  hash = Math.abs(hash);
+  return {
+    x: 350 + (hash % 100),         // 350–449
+    y: 200 + ((hash >> 8) % 100),  // 200–299
+  };
+}
+
 export default function LiveMap() {
   const { state } = useCAD();
   const navigate = useNavigate();
@@ -155,7 +168,7 @@ export default function LiveMap() {
 
               {/* Call markers */}
               {showCalls && activeCalls.map(call => {
-                const pos = CALL_POSITIONS[call.id] || { x: 400 + Math.random() * 100 - 50, y: 250 + Math.random() * 100 - 50 };
+                const pos = CALL_POSITIONS[call.id] || fallbackCallPos(call.id);
                 const bc = priBorderColor(call.priority);
                 const isHovered = hover === `call-${call.id}`;
                 return (
@@ -261,6 +274,9 @@ export default function LiveMap() {
               <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{onDuty.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
+              {onDuty.length === 0 && (
+                <div className="px-4 py-6 text-center text-slate-600 text-[12px]">No units on duty</div>
+              )}
               {onDuty.map(o => (
                 <div key={o.id} className={S_UNIT_ROW}
                   onClick={() => navigate(o.callId ? `/cad/${o.callId}` : '/units')}
@@ -280,6 +296,9 @@ export default function LiveMap() {
               <span className="ml-auto px-1.5 py-0.5 rounded-md bg-brand/15 text-brand-bright text-[11px] font-bold leading-none">{activeCalls.length}</span>
             </div>
             <div className={S_PANEL_BODY}>
+              {activeCalls.length === 0 && (
+                <div className="px-4 py-6 text-center text-slate-600 text-[12px]">No active calls</div>
+              )}
               {activeCalls.map(c => (
                 <div key={c.id} onClick={() => navigate(`/cad/${c.id}`)} title={`Open call ${c.id}`}
                   className="px-4 py-2 border-b border-border-faint flex gap-2 items-center cursor-pointer hover:bg-white/[0.03] transition-colors">

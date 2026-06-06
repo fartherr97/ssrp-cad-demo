@@ -17,5 +17,14 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Allow intentional "omit via destructure" and ignored args/catch vars
+      // when prefixed with an underscore (a common, deliberate convention).
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'none',
+      }],
+    },
   },
 ])

@@ -163,6 +163,10 @@ export default function FDOTPermits() {
 
   const handleIssue = () => {
     if (!form.holderName.trim() || !form.location.trim()) return;
+    if (new Date(form.expiresAt) <= new Date(form.issuedAt)) {
+      toast.error('Expiry date must be after the issue date.');
+      return;
+    }
     dispatch({ type: 'ADD_PERMIT', payload: { ...form, issuedBy: currentUser?.name || activeBiz.owner } });
     toast.success('Permit issued.', { title: form.holderName });
     setIsNew(false);
@@ -243,7 +247,7 @@ export default function FDOTPermits() {
             style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#060e18' }}>
             <div className="flex items-center gap-2 min-w-0">
               {isMobile && (
-                <button onClick={closePanel} type="button"
+                <button onClick={closePanel} type="button" aria-label="Back"
                   style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', marginRight: 4 }}>
                   <MdArrowBack size={18} className="text-slate-400" />
                 </button>
@@ -254,7 +258,7 @@ export default function FDOTPermits() {
               {selPermit && !isNew && <StatusBadge status={permitStatus(selPermit)} />}
             </div>
             {!isMobile && (
-              <button onClick={closePanel} type="button"
+              <button onClick={closePanel} type="button" aria-label="Close"
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}>
                 <MdClose size={18} className="text-slate-600" />
               </button>

@@ -255,6 +255,7 @@ function ChargeRow({ charge, idx, penalCode, onChange, onRemove, canRemove }) {
 /* ── Full Warrant Form ────────────────────────────────────────────────────── */
 
 function WarrantForm({ me, communityConfig, departments, civilians, penalCode, onCancel, onSubmit }) {
+  const toast = useToast();
   const [form, setForm] = useState(blankForm);
   const [showCivSearch, setShowCivSearch] = useState(false);
 
@@ -293,13 +294,17 @@ function WarrantForm({ me, communityConfig, departments, civilians, penalCode, o
     (s, c) => s + (Number(c.bondFineAmount) || 0) * (Number(c.counts) || 1), 0,
   );
 
-  const age       = calcAge(form.dob);
-  const canSubmit = form.firstName.trim() || form.lastName.trim();
+  const age        = calcAge(form.dob);
+  const hasSubject = !!(form.firstName.trim() || form.lastName.trim());
+  const hasCharge  = form.charges.some(c => (c.charge || '').trim());
+  const canSubmit  = hasSubject && hasCharge;
 
   const buildSig = () =>
     me ? `${me.badge} | ${(me.rank || 'OFFICER').toUpperCase()} | ${me.name.toUpperCase()}` : '';
 
   const handleSubmit = () => {
+    if (!hasSubject) { toast.error('A subject name is required'); return; }
+    if (!hasCharge) { toast.error('At least one charge is required'); return; }
     const civName      = [form.firstName, form.middleName, form.lastName].filter(Boolean).join(' ');
     const primaryCharge = form.charges[0]?.charge || '';
     const flagList     = FLAG_DEFS.filter(f => form.flags[f.key]).map(f => f.label);

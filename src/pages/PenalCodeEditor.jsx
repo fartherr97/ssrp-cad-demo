@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -14,6 +15,7 @@ import {
 export default function PenalCodeEditor() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { penalCode, currentUser } = state;
 
   const [filter, setFilter] = useState('');
@@ -60,6 +62,18 @@ export default function PenalCodeEditor() {
     setShowAdd(false);
   };
 
+  const deleteCharge = async (charge) => {
+    if (!(await confirm({
+      title: 'Delete charge',
+      message: `Remove ${charge.code} ${charge.name} from the penal code? This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    }))) return;
+    dispatch({ type: 'DELETE_CHARGE', payload: charge.id });
+    toast.success(`${charge.code} ${charge.name} removed.`, { title: 'Charge Deleted' });
+    setSelected(null);
+  };
+
   const typeBadge = { Felony: BADGE.red, Misdemeanor: BADGE.orange, Infraction: BADGE.green };
 
   return (
@@ -103,6 +117,13 @@ export default function PenalCodeEditor() {
                 </tr>
               </thead>
               <tbody>
+                {filtered.length === 0 && (
+                  <tr>
+                    <td className={`${S_TABLE_TD} text-center text-cad-muted text-[11px] py-6`} colSpan={7}>
+                      No charges match.
+                    </td>
+                  </tr>
+                )}
                 {filtered.map(p => (
                   <tr key={p.id}
                     className={`cursor-pointer ${selected === p.id ? 'bg-app-selected' : ''}`}
@@ -180,7 +201,7 @@ export default function PenalCodeEditor() {
                 {isAdmin && (
                   <div className="flex gap-1">
                     <button className={sm(S_BTN_SECONDARY)} onClick={() => startEdit(selCharge)}>Edit</button>
-                    <button className={sm(S_BTN_DANGER)} onClick={() => { dispatch({type:'DELETE_CHARGE',payload:selCharge.id}); toast.success(`${selCharge.code} ${selCharge.name} removed.`, { title: 'Charge Deleted' }); setSelected(null); }}>Delete</button>
+                    <button className={sm(S_BTN_DANGER)} onClick={() => deleteCharge(selCharge)}>Delete</button>
                   </div>
                 )}
               </div>

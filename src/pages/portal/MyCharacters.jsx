@@ -159,6 +159,11 @@ export default function MyCharacters() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Require core identity fields before registering a character.
+    if (!form.firstName?.trim() || !form.lastName?.trim() || !form.dob?.trim()) {
+      toast.error('First name, last name, and date of birth are required');
+      return;
+    }
     // Enforce admin-configured unique identifiers (e.g. unique full name).
     const uniqueFields = state.uniqueIdentifiers?.civilian || [];
     const allCivs = state.civilians || [];
@@ -305,7 +310,7 @@ export default function MyCharacters() {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[10px] shrink-0 overflow-hidden flex items-center justify-center bg-brand/15 border border-brand/30">
                     {c.profilePhoto
-                      ? <img src={c.profilePhoto} alt="" className="w-full h-full object-cover" />
+                      ? <img src={c.profilePhoto} alt={`${c.firstName} ${c.lastName}`} className="w-full h-full object-cover" />
                       : <MdPerson size={22} color="#3d82f0" />}
                   </div>
                   <div>

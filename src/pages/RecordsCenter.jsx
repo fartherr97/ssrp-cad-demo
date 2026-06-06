@@ -381,9 +381,9 @@ export default function RecordsCenter() {
           {records.length === 0 ? (
             <div className="p-5 text-center text-cad-muted text-[11px]">No records issued yet</div>
           ) : records.map(r => (
-            <div key={r.id}
+            <button type="button" key={r.id}
               onClick={() => { setSelectedRecord(r.id); setSelectedTemplate(null); setFormValues({}); setMobileTab('new'); }}
-              className={`px-3 py-2.5 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
+              className={`w-full text-left px-3 py-2.5 cursor-pointer border-b border-border-faint border-l-[3px] transition-colors ${
                 selectedRecord === r.id
                   ? 'border-l-brand bg-brand/15'
                   : 'border-l-transparent bg-transparent hover:bg-white/[0.04]'
@@ -395,7 +395,7 @@ export default function RecordsCenter() {
               </div>
               <div className="text-[12.5px] font-semibold text-white mb-0.5 leading-[1.2]">{r.type}</div>
               <div className="text-[10px] text-slate-500 font-mono">{r.recordNumber}</div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

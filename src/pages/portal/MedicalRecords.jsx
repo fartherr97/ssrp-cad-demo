@@ -81,7 +81,11 @@ function CheckToggle({ checked, onChange, label, description, color = '#3d82f0' 
   return (
     <label className="flex items-start gap-3 cursor-pointer select-none group">
       <div
+        role="checkbox"
+        tabIndex={0}
+        aria-checked={checked}
         onClick={() => onChange(!checked)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(!checked); } }}
         className="mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all"
         style={{
           background: checked ? `${color}22` : 'transparent',

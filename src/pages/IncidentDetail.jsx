@@ -485,6 +485,9 @@ export default function IncidentDetail() {
               </span>
             </div>
             <div className="flex-1 overflow-y-auto px-2.5 py-2">
+              {dispatchLog.length === 0 && (
+                <div className="px-4 py-6 text-center text-slate-600 text-[12px]">No log entries yet</div>
+              )}
               {dispatchLog.slice(0, 100).map(e => (
                 <div key={e.id} className={S_TX_ENTRY}>
                   <span className={S_TX_TIME}>{e.time}</span>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import {
   ADMIN, AdminPageTitle, AdminPanel, SonButton, SonField, SON_INPUT,
   SonTable, SonRow, SonCell, SonIconBtn, EmptyState,
@@ -35,6 +36,7 @@ export default function Flags() {
   const { state, dispatch } = useCAD();
   const { customFlags = [], civilians = [] } = state;
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [editing, setEditing] = useState(null); // flagId being edited, or 'new'
   const [draft, setDraft] = useState(blank);
@@ -57,8 +59,13 @@ export default function Flags() {
     cancel();
   };
 
-  const del = (id) => {
-    if (!window.confirm('Delete this flag? It will be removed from all civilians.')) return;
+  const del = async (id) => {
+    if (!(await confirm({
+      title: 'Delete flag',
+      message: 'Delete this flag? It will be removed from all civilians.',
+      confirmLabel: 'Delete',
+      danger: true,
+    }))) return;
     dispatch({ type: 'DELETE_FLAG_DEF', payload: id });
     toast.success('Flag deleted.');
   };

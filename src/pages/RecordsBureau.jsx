@@ -191,7 +191,7 @@ function ImageLightbox({ url, onClose }) {
     <div onClick={onClose}
       className="fixed inset-0 z-[5000] flex items-center justify-center p-6 anim-overlay-in"
       style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)' }}>
-      <img src={url} alt="" onClick={e => e.stopPropagation()}
+      <img src={url} alt="Enlarged photo" onClick={e => e.stopPropagation()}
         className="max-w-full max-h-full rounded-xl shadow-2xl object-contain anim-modal-in" />
       <button onClick={onClose} aria-label="Close"
         className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors">
@@ -374,6 +374,7 @@ function InvestigationFlag({ cases, onTip }) {
   const [tipText, setTipText] = useState('');
   const { dispatch } = useCAD();
   const { state: { currentUser } } = useCAD();
+  const toast = useToast();
 
   const openTip = (c) => { setTipCase(c); setTipText(''); setTipOpen(true); };
   const submitTip = () => {
@@ -390,6 +391,7 @@ function InvestigationFlag({ cases, onTip }) {
         },
       },
     });
+    toast.success('Tip submitted to investigating detective');
     setTipOpen(false);
     setTipCase(null);
   };

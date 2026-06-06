@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonSearch, SonBadge, SonButton, EmptyState, ADMIN,
 } from '../AdminKit';
@@ -12,6 +13,7 @@ export default function Accounts() {
   const { state, dispatch } = useCAD();
   const { adminAccounts } = state;
   const toast = useToast();
+  const confirm = useConfirm();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(0);
@@ -23,8 +25,16 @@ export default function Accounts() {
   const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const pageItems = filtered.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
 
-  const cycleStatus = (a) => {
+  const cycleStatus = async (a) => {
     const next = a.status === 'ACTIVE' ? 'SUSPENDED' : a.status === 'SUSPENDED' ? 'BANNED' : 'ACTIVE';
+    if (next === 'SUSPENDED' || next === 'BANNED') {
+      if (!(await confirm({
+        title: next === 'BANNED' ? 'Ban account' : 'Suspend account',
+        message: `Set ${a.username} to ${next}?`,
+        confirmLabel: next === 'BANNED' ? 'Ban' : 'Suspend',
+        danger: true,
+      }))) return;
+    }
     dispatch({ type: 'ADMIN_UPDATE', payload: { key: 'adminAccounts', item: { id: a.id, status: next } } });
     toast.success(`${a.username} set to ${next}.`);
   };
@@ -51,7 +61,9 @@ export default function Accounts() {
               <SonRow key={a.id} i={i}>
                 <SonCell bold>{a.username}</SonCell>
                 <SonCell>
-                  <span style={{ cursor: 'pointer' }} onClick={() => cycleStatus(a)} title="Click to change status">
+                  <span style={{ cursor: 'pointer' }} role="button" tabIndex={0}
+                    aria-label={`Change status for ${a.username} (currently ${a.status})`}
+                    onClick={() => cycleStatus(a)} title="Click to change status">
                     <SonBadge color={STATUS_COLOR[a.status]}>{a.status}</SonBadge>
                   </span>
                 </SonCell>

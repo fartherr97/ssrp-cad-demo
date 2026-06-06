@@ -3,6 +3,7 @@ import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useResponsive } from '../hooks/useResponsive';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import {
   MdPhone, MdLocationOn, MdClose, MdAdd, MdRadio,
   MdSend, MdGroup, MdDelete, MdPerson, MdHeadsetMic,
@@ -238,6 +239,7 @@ function ActiveCallCard({ call, now, officers, onAddUnit, onDetachUnit, onClose 
                   style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   <span className="font-mono text-slate-200">{u.badge}</span>
                   <button onClick={() => onDetachUnit(call.id, u.unitId)}
+                    aria-label={`Detach ${u.badge} from call ${call.id}`}
                     style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 1, display: 'flex' }}>
                     <MdClose size={10} className="text-slate-500" />
                   </button>
@@ -343,6 +345,7 @@ function GroupCard({ group, officers, onDelete, onRename, onAddUnit, onRemoveUni
         }
         <span className="text-[10px] text-slate-600 shrink-0">{members.length} units</span>
         <button onClick={() => onDelete(group.id)} type="button"
+          aria-label={`Delete group ${group.name}`}
           style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}>
           <MdDelete size={14} className="text-slate-700 hover:text-red-400" />
         </button>
@@ -353,6 +356,7 @@ function GroupCard({ group, officers, onDelete, onRename, onAddUnit, onRemoveUni
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
             <span className="font-mono text-slate-300">{u.badge}</span>
             <button onClick={() => onRemoveUnit(group.id, u.unitId)} type="button"
+              aria-label={`Remove ${u.badge} from group ${group.name}`}
               style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 1, display: 'flex' }}>
               <MdClose size={9} className="text-slate-600 hover:text-red-400" />
             </button>
@@ -656,6 +660,7 @@ export default function DispatchPortal() {
   const { isMobile } = useResponsive();
   const now = useNow();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [unitTab,           setUnitTab]           = useState('UNITS');
   const [dispatchTarget,    setDispatchTarget]    = useState(null);
@@ -709,7 +714,14 @@ export default function DispatchPortal() {
     dispatch({ type: 'UPDATE_UNIT_GROUP', payload: { id, changes: { name } } });
   };
 
-  const handleDeleteGroup = id => {
+  const handleDeleteGroup = async id => {
+    const grp = unitGroups.find(g => g.id === id);
+    if (!(await confirm({
+      title: 'Delete Unit Group',
+      message: `Delete the group "${grp?.name || id}"? This cannot be undone.`,
+      confirmLabel: 'Delete Group',
+      danger: true,
+    }))) return;
     dispatch({ type: 'DELETE_UNIT_GROUP', payload: id });
     toast.info('Group deleted');
   };

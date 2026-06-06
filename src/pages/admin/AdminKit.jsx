@@ -174,9 +174,9 @@ export function SonCell({ children, align, mono, color, bold, width }) {
 }
 
 /* Small round icon action button (reorder / delete in lists) */
-export function SonIconBtn({ icon: Icon, onClick, color = ADMIN.textDim, title, danger }) {
+export function SonIconBtn({ icon: Icon, onClick, color = ADMIN.textDim, title, danger, 'aria-label': ariaLabel }) {
   return (
-    <button onClick={onClick} title={title}
+    <button onClick={onClick} title={title} aria-label={ariaLabel || title}
       className={`w-7 h-7 rounded-lg inline-flex items-center justify-center cursor-pointer transition-all duration-150 border
         ${danger
           ? 'bg-red-500/12 border-red-500/40 text-red-400 hover:bg-red-500/20'

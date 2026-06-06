@@ -406,7 +406,7 @@ export default function AdminTiers() {
   const deleteTier = (tier) => {
     const inUse = mappings.filter(m => m.adminTierId === tier.id).length;
     if (inUse > 0) {
-      toast.success(`Cannot delete — ${inUse} role mapping(s) reference this tier. Update them first.`);
+      toast.error(`Cannot delete — ${inUse} role mapping(s) reference this tier. Update them first.`);
       return;
     }
     dispatch({ type: 'ADMIN_REMOVE', payload: { key: 'adminTiers', id: tier.id } });

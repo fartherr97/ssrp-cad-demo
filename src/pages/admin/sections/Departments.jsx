@@ -221,7 +221,7 @@ export default function Departments() {
           </div>
         )}
         <div className="mt-4">
-          <SonButton variant="red" onClick={() => { dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'LEO', color: '#3a88e8', subdivisions: [], radioChannel: '', routingRole: null } }); toast.success('Agency added.'); }}>
+          <SonButton variant="red" onClick={() => { dispatch({ type: 'ADD_DEPARTMENT', payload: { name: 'New Agency', short: 'NEW', type: 'Law Enforcement', color: '#3a88e8', subdivisions: [], radioChannel: '', routingRole: null } }); toast.success('Agency added.'); }}>
             <MdAdd size={16} /> Add Agency
           </SonButton>
         </div>

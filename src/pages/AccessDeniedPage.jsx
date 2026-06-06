@@ -24,12 +24,12 @@ const ERROR_CONFIGS = {
   },
 };
 
-const today = new Date().toISOString().split('T')[0];
-
 export default function AccessDeniedPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { dispatch } = useCAD();
+  // Computed per render so the footer reflects the denial time, not bundle load.
+  const today = new Date().toISOString().split('T')[0];
 
   const { code = 'AUTH_ROLE_MISSING', portal = '', reason } = location.state || {};
   const cfg = ERROR_CONFIGS[code] || ERROR_CONFIGS.AUTH_ROLE_MISSING;
@@ -210,7 +210,7 @@ export default function AccessDeniedPage() {
                 onMouseEnter={e => { e.currentTarget.style.background = '#6875f5'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(88,101,242,0.5)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#5865F2'; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 20px rgba(88,101,242,0.35)'; }}
               >
-                <DiscordSVG /> Login with Discord
+                <DiscordSVG /> Sign in again
               </button>
             </div>
           </div>

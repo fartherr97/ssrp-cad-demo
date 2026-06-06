@@ -12,7 +12,27 @@ import {
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
   MdMenu, MdClose, MdCircle, MdInbox, MdNotifications, MdNotificationsNone,
+  MdAddCircleOutline,
 } from 'react-icons/md';
+
+/* Close a popover on outside pointer-down or Escape. Complements the hover
+   timers so click/touch/keyboard users can always dismiss menus. */
+function useDismiss(open, close, refs) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const inside = (t) => refs.some(r => r.current && r.current.contains(t));
+    const onDown = (e) => { if (!inside(e.target)) close(); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('pointerdown', onDown, true);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('keydown', onKey);
+    };
+    // refs are stable useRef objects; re-subscribe only when open toggles.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+}
 
 // Icons matched to standard status codes; custom admin codes fall back to a dot.
 const STATUS_ICONS = {
@@ -92,6 +112,7 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate }) {
     setOpen(true);
   };
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 25); };
+  useDismiss(open, doClose, [btnRef, menuRef]);
 
   return (
     <div className="relative" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
@@ -153,6 +174,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
   };
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
   const toggle = () => open ? doClose() : openMenu();
+  useDismiss(open, doClose, [ref, menuRef]);
 
   const dot = portal.id === 'civilian' || portal.id === 'business' ? '#4ade80'
     : (statusOptions.find(s => s.code === myStatus)?.color || STATUS_COLORS[myStatus] || '#94a3b8');
@@ -194,6 +216,9 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
     <div className="relative" ref={ref} onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <button
         onClick={toggle}
+        aria-label={`Account menu for ${currentUser?.name || 'user'}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-75 hover:bg-white/[0.05] border border-transparent hover:border-border-base"
       >
         <span className="relative shrink-0">
@@ -293,7 +318,7 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, 
 }
 
 /* ─── Notification Bell ─── */
-function NotificationBell({ notifications, dispatch, navigate }) {
+function NotificationBell({ notifications, dispatch, navigate, recipientBadge }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const ref = useRef(null);
@@ -321,10 +346,11 @@ function NotificationBell({ notifications, dispatch, navigate }) {
     __navDropdownCloser = setOpen;
     place();
     setOpen(true);
-    dispatch({ type: 'MARK_NOTIFICATIONS_READ' });
+    dispatch({ type: 'MARK_NOTIFICATIONS_READ', payload: { recipientBadge } });
   };
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
   const toggle = () => (open ? doClose() : openPanel());
+  useDismiss(open, doClose, [ref, menuRef]);
 
   const unread = notifications.filter(n => !n.read).length;
 
@@ -333,6 +359,9 @@ function NotificationBell({ notifications, dispatch, navigate }) {
       <button
         onClick={toggle}
         title="Notifications"
+        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className="relative flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 cursor-pointer transition-colors"
       >
         {unread > 0 ? <MdNotifications size={20} /> : <MdNotificationsNone size={20} />}
@@ -362,7 +391,8 @@ function NotificationBell({ notifications, dispatch, navigate }) {
             <span className="text-[12px] font-bold text-white">Notifications</span>
             {notifications.length > 0 && (
               <button
-                onClick={() => dispatch({ type: 'CLEAR_NOTIFICATIONS' })}
+                onClick={() => dispatch({ type: 'CLEAR_NOTIFICATIONS', payload: { recipientBadge } })}
+                aria-label="Clear all notifications"
                 className="text-[11px] text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
                 style={{ background: 'none', border: 'none' }}
               >
@@ -382,6 +412,9 @@ function NotificationBell({ notifications, dispatch, navigate }) {
                 <div
                   key={n.id}
                   onClick={n.link ? () => { doClose(); navigate?.(n.link); } : undefined}
+                  role={n.link ? 'button' : undefined}
+                  tabIndex={n.link ? 0 : undefined}
+                  onKeyDown={n.link ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doClose(); navigate?.(n.link); } } : undefined}
                   className={`flex gap-3 px-3 py-2.5 rounded-xl border transition-colors ${n.link ? 'cursor-pointer hover:border-white/20' : ''}`}
                   style={{
                     background: n.read ? 'rgba(255,255,255,0.02)' : `${n.color || '#3a88e8'}0f`,
@@ -400,6 +433,7 @@ function NotificationBell({ notifications, dispatch, navigate }) {
                   <button
                     onClick={(e) => { e.stopPropagation(); dispatch({ type: 'DISMISS_NOTIFICATION', payload: n.id }); }}
                     title="Dismiss"
+                    aria-label="Dismiss notification"
                     className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.08] cursor-pointer transition-colors"
                     style={{ background: 'none', border: 'none' }}
                   >
@@ -508,13 +542,24 @@ export default function ActionBar() {
         )}
       </nav>
 
-      {/* ── Far right: clock + search + user + mobile menu ── */}
+      {/* ── Far right: new call + clock + notifications + user + mobile menu ── */}
       <div className="ml-auto flex items-center shrink-0 pl-2">
+        {portal.showNewCall && (
+          <button
+            onClick={() => go('/cad?new=1')}
+            title="New Call"
+            aria-label="Create new call"
+            className="press inline-flex items-center gap-2 mr-1 px-2.5 lg:px-3.5 h-9 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white border border-blue-400/50 shadow-lg shadow-blue-600/30 cursor-pointer transition-colors"
+          >
+            <MdAddCircleOutline size={18} />
+            <span className="hidden lg:inline">New Call</span>
+          </button>
+        )}
         <div className="hidden md:flex"><Clock /></div>
         <div className="hidden sm:block w-px h-8 bg-border-base mx-1" />
         <NotificationBell
           notifications={notifications.filter(n => !n.recipientBadge || n.recipientBadge === currentUser?.badge)}
-          dispatch={dispatch} navigate={navigate} />
+          dispatch={dispatch} navigate={navigate} recipientBadge={currentUser?.badge} />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}
@@ -557,6 +602,14 @@ export default function ActionBar() {
 
             {/* Flat grouped list * scrolls independently, items stagger in */}
             <div className="flex-1 overflow-y-auto py-3">
+              {portal.showNewCall && (
+                <div className="px-4 pb-2">
+                  <button onClick={() => go('/cad?new=1')}
+                    className="press w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[14px] font-bold border border-blue-400/50 shadow-lg shadow-blue-600/30 cursor-pointer transition-colors">
+                    <MdAddCircleOutline size={18} /> New Call
+                  </button>
+                </div>
+              )}
               {navItems.map((item, idx) => {
                 const subItems = item.dropdown ? dropdownItems(item.dropdown) : null;
 

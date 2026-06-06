@@ -77,7 +77,7 @@ export default function RequestHCFRModal({ call, officer, onClose }) {
             <div className="text-[15px] font-extrabold text-white leading-tight">Request HCFR Assistance</div>
             {call && <div className="text-[11px] text-red-400/80 font-mono">Call {call.id} · {call.nature}</div>}
           </div>
-          <button type="button" onClick={onClose}
+          <button type="button" onClick={onClose} aria-label="Close"
             className="press shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
             style={{ background: 'none', border: 'none' }}>
             <MdClose size={18} />

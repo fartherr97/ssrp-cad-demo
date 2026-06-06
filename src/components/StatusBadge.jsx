@@ -35,6 +35,18 @@ const STATUS_COLORS = {
   Lifted: '#6b7280',
 };
 
+/* Pick readable text (near-black vs white) for a solid fill so light status
+   colors (greens/ambers) don't render white-on-light below AA contrast. */
+function readableText(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return '#fff';
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  // Relative luminance (sRGB approximation).
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.6 ? '#0a0f1a' : '#fff';
+}
+
 export default function StatusBadge({ status, style }) {
   const key = typeof status === 'string' ? status.toUpperCase().replace(/ /g,'_') : '';
   const color = STATUS_COLORS[status] || STATUS_COLORS[key] || '#6b7280';
@@ -46,7 +58,7 @@ export default function StatusBadge({ status, style }) {
       fontSize: '12px',
       fontWeight: 700,
       letterSpacing: '0.05em',
-      color: '#fff',
+      color: readableText(color),
       backgroundColor: color,
       border: `1px solid ${color}`,
       whiteSpace: 'nowrap',

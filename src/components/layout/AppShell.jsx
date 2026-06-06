@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import ActionBar from './ActionBar';
 import RadioToast from '../RadioToast';
@@ -92,9 +92,7 @@ function PanicTone() {
 }
 
 export default function AppShell({ children }) {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const onCreateCall = () => navigate('/cad?new=1');
 
   // The Admin suite is a self-contained sub-app: it renders its own top nav
   // (AdminShell) and fills the whole shell, so the global chrome is hidden.
@@ -104,7 +102,7 @@ export default function AppShell({ children }) {
 
   return (
     <div className="cad-shell">
-      {!inAdmin && <ActionBar onCreateCall={onCreateCall} />}
+      {!inAdmin && <ActionBar />}
       <div className="cad-workspace">
         {children}
       </div>

@@ -153,7 +153,7 @@ export default function FileReport() {
                 {ES_SERVICES.map(svc => {
                   const on = (form.esServices || []).includes(svc.id);
                   return (
-                    <button key={svc.id} type="button" onClick={() => toggleService(svc.id)}
+                    <button key={svc.id} type="button" aria-pressed={on} onClick={() => toggleService(svc.id)}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12.5px] font-semibold border cursor-pointer transition-all"
                       style={on
                         ? { background: `${svc.color}18`, border: `1px solid ${svc.color}45`, color: svc.color }
@@ -183,7 +183,7 @@ export default function FileReport() {
               <div>
                 <label className={PORTAL_LABEL}><MdEventNote size={13} className="inline align-[-2px] mr-[5px]" />Incident Date</label>
                 <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
-                  <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.incidentDate} onChange={e => setField('incidentDate', e.target.value)} required style={{ colorScheme: 'dark' }} />
+                  <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.incidentDate} max={new Date().toISOString().split('T')[0]} onChange={e => setField('incidentDate', e.target.value)} required style={{ colorScheme: 'dark' }} />
                 </div>
               </div>
               <div>

@@ -58,13 +58,46 @@ export default function Modal({
   zIndex = 50,
 }) {
   const { mounted, show } = useMountTransition(open, 260);
+  const dialogRef = useRef(null);
+  const lastFocused = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { onClose?.(); return; }
+      // Focus trap: keep Tab cycling within the dialog.
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll(
+          'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
+
+  // Move focus into the dialog on open; restore it to the trigger on close.
+  useEffect(() => {
+    if (!open) return undefined;
+    lastFocused.current = document.activeElement;
+    const id = requestAnimationFrame(() => {
+      const el = dialogRef.current;
+      if (!el) return;
+      const focusable = el.querySelector(
+        'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])'
+      );
+      (focusable || el).focus?.();
+    });
+    return () => {
+      cancelAnimationFrame(id);
+      lastFocused.current?.focus?.();
+    };
+  }, [open]);
 
   if (!mounted) return null;
 
@@ -79,7 +112,12 @@ export default function Modal({
       onClick={e => closeOnBackdrop && e.target === e.currentTarget && onClose?.()}
     >
       <div
-        className={`w-full bg-app-card border border-border-strong shadow-2xl shadow-black/60 flex flex-col overflow-hidden
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={typeof title === 'string' ? title : undefined}
+        tabIndex={-1}
+        className={`w-full bg-app-card border border-border-strong shadow-2xl shadow-black/60 flex flex-col overflow-hidden outline-none
           ${sheet ? 'rounded-t-2xl sm:rounded-2xl max-h-[92dvh]' : 'rounded-2xl max-h-[88dvh]'}
           ${show ? cardEnter : cardExit}`}
         style={{ maxWidth }}

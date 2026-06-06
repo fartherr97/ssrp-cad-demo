@@ -29,7 +29,6 @@ function NotificationBlast({ currentUser, officers, departments }) {
   const [title, setTitle]   = useState('');
   const [color, setColor]   = useState('#3b82f6');
   const [body, setBody]     = useState('');
-  const [sent, setSent]     = useState(false);
 
   const me = officers.find(o => o.id === currentUser?.id);
   const senderName  = me?.name  || currentUser?.name  || 'Unknown';
@@ -44,8 +43,6 @@ function NotificationBlast({ currentUser, officers, departments }) {
     if (!title.trim() || !body.trim()) return;
     dispatch({ type: 'NOTIFICATION_BLAST', payload: { senderName, senderBadge, senderId: me?.id ?? currentUser?.id, title: title.trim(), color, body: body.trim(), targetDeptId: myDeptId } });
     toast.success(`Blast "${title.trim()}" sent to ${targetLabel}.`, { title: 'Blast Sent', color });
-    setSent(true);
-    setTimeout(() => setSent(false), 3000);
     setTitle('');
     setBody('');
   };
@@ -133,12 +130,10 @@ function NotificationBlast({ currentUser, officers, departments }) {
 
         {/* Send button */}
         <button type="button" onClick={handleSend}
-          disabled={!title.trim() || !body.trim() || sent}
+          disabled={!title.trim() || !body.trim()}
           className="press flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[13px] font-bold cursor-pointer transition-all disabled:opacity-40"
           style={{ background: `${color}22`, border: `1px solid ${color}55`, color }}>
-          {sent
-            ? <><MdCheckCircle size={16} /> Blast Sent!</>
-            : <><MdCampaign size={16} /> Send to {targetLabel}</>}
+          <MdCampaign size={16} /> Send to {targetLabel}
         </button>
       </div>
     </div>

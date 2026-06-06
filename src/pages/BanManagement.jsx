@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import {
   BADGE, S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD, S_TABLE, S_TABLE_TH, S_TABLE_TD, S_BTN_PRIMARY, S_BTN_SECONDARY,
@@ -14,6 +15,7 @@ const S_TEXTAREA = 'w-full bg-app-input border border-border-base rounded-lg px-
 export default function BanManagement() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { bannedUsers, currentUser } = state;
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('ALL');
@@ -29,14 +31,24 @@ export default function BanManagement() {
 
   const issueBan = () => {
     if (!form.name || !form.discordId || !form.reason) return;
-    dispatch({ type: 'BAN_USER', payload: { ...form } });
+    if (!/^\d{17,19}$/.test(form.discordId.trim())) {
+      toast.error('Enter a valid Discord ID (17–19 digits).', { title: 'Invalid Discord ID' });
+      return;
+    }
+    dispatch({ type: 'BAN_USER', payload: { ...form, discordId: form.discordId.trim() } });
     toast.success(`${form.name} banned`, { title: 'Ban issued' });
     setForm({ name:'',discordId:'',reason:'',duration:'Permanent' });
     setShowForm(false);
   };
 
-  const unban = (id) => {
-    dispatch({ type: 'UNBAN_USER', payload: id });
+  const unban = async (b) => {
+    if (!(await confirm({
+      title: 'Lift ban',
+      message: `Lift the ban on ${b.name}? They will regain access.`,
+      confirmLabel: 'Lift ban',
+      danger: true,
+    }))) return;
+    dispatch({ type: 'UNBAN_USER', payload: b.id });
     toast.success('Ban lifted');
   };
 
@@ -142,7 +154,7 @@ export default function BanManagement() {
                       <td className={`${S_TABLE_TD} text-[11px] text-slate-500 max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap`}>{b.reason}</td>
                       <td className={S_TABLE_TD}>
                         {b.status === 'Active' && (
-                          <button className={`press-sm ${xs(S_BTN_WARNING)}`} onClick={() => unban(b.id)}>Lift Ban</button>
+                          <button className={`press-sm ${xs(S_BTN_WARNING)}`} onClick={() => unban(b)}>Lift Ban</button>
                         )}
                       </td>
                     </tr>

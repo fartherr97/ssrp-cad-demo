@@ -1,5 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useCAD } from '../store/cadStore';
+import Select from '../components/ui/Select';
+import { useToast } from '../contexts/ToastContext';
 import { useResponsive } from '../hooks/useResponsive';
 import { useTabParam } from '../hooks/useTabParam';
 import {
@@ -197,13 +199,13 @@ function CaseModal({ caseFile, officers, currentUser, onSave, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Classification</label>
-              <select
+              <Select
                 value={form.classification}
                 onChange={e => setForm(f => ({ ...f, classification: e.target.value }))}
                 className="w-full px-3 py-2.5 rounded-lg text-[12.5px] bg-app-elevated border border-border-base text-slate-100 focus:outline-none focus:border-sky-500/50 cursor-pointer"
               >
                 {CLASSIFICATIONS.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+              </Select>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Priority</label>
@@ -522,7 +524,7 @@ function SubjectsTab({ caseFile, civilians, dispatch, canManage }) {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {canManage && !isLocked ? (
-                  <select
+                  <Select
                     value={role}
                     onChange={e => changeRole(civ.id, e.target.value)}
                     className="text-[10.5px] font-bold px-2 py-1 rounded border bg-app-bg cursor-pointer focus:outline-none"
@@ -535,7 +537,7 @@ function SubjectsTab({ caseFile, civilians, dispatch, canManage }) {
                     {Object.entries(SUBJECT_ROLE_META).map(([k, m]) => (
                       <option key={k} value={k} style={{ color: '#fff', background: '#1e293b' }}>{m.label}</option>
                     ))}
-                  </select>
+                  </Select>
                 ) : (
                   <SubjectRoleBadge role={role} />
                 )}
@@ -932,6 +934,7 @@ function CaseDetail({ caseFile, state, dispatch, currentUser, onBack, onEdit }) 
 
 export default function CaseFiles() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { isMobile } = useResponsive();
   const [caseParam, setCaseParam] = useTabParam('case', '');
   const selectedId = caseParam ? Number(caseParam) : null;
@@ -1083,6 +1086,7 @@ export default function CaseFiles() {
           currentUser={state.currentUser}
           onSave={(data) => {
             dispatch({ type: 'ADD_CASE_FILE', payload: data });
+            toast.success('Case created');
             setShowNewModal(false);
           }}
           onClose={() => setShowNewModal(false)}
@@ -1095,6 +1099,7 @@ export default function CaseFiles() {
           currentUser={state.currentUser}
           onSave={(data) => {
             dispatch({ type: 'UPDATE_CASE_FILE', payload: data });
+            toast.success('Case updated');
             setEditCase(null);
           }}
           onClose={() => setEditCase(null)}

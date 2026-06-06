@@ -1,5 +1,6 @@
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { AdminPageTitle, AdminPanel, SonButton, SonIconBtn } from '../AdminKit';
 import { MdDeleteForever, MdWarningAmber, MdRestore, MdDownload, MdHistory } from 'react-icons/md';
 
@@ -18,9 +19,14 @@ const CORE_TYPES = [
   { key: 'licensePoints',   label: 'License Points' },
 ];
 
-function WipeBtn({ label, onWipe, toast }) {
-  const handle = () => {
-    if (window.confirm(`Delete ALL "${label}" records? A restorable backup is saved automatically.`)) {
+function WipeBtn({ label, onWipe, toast, confirm }) {
+  const handle = async () => {
+    if (await confirm({
+      title: 'Wipe records',
+      message: `Delete ALL "${label}" records? A restorable backup is saved automatically.`,
+      confirmLabel: 'Delete all',
+      danger: true,
+    })) {
       onWipe();
       toast.warning(`${label} wiped · backup saved.`);
     }
@@ -48,6 +54,7 @@ export default function WipeRecords() {
   const { state, dispatch } = useCAD();
   const { reportTemplates = [], recordTemplates = [], wipeBackups = [] } = state;
   const toast = useToast();
+  const confirm = useConfirm();
 
   const wipe = (target) => dispatch({ type: 'WIPE', payload: target });
 
@@ -78,7 +85,7 @@ export default function WipeRecords() {
       <div className="mb-5 flex items-start gap-3 px-4 py-3.5 rounded-xl bg-red-500/10 border border-red-500/30">
         <MdWarningAmber size={18} className="text-red-400 mt-0.5 shrink-0" />
         <div className="text-[12px] text-red-300 leading-relaxed">
-          <span className="font-bold">Destructive action.</span> Wiped records are permanently deleted and cannot be restored. Use with caution.
+          <span className="font-bold">Destructive action.</span> Every wipe automatically saves a restorable backup (see below), so wiped records can be brought back. Use with caution.
         </div>
       </div>
 
@@ -109,7 +116,7 @@ export default function WipeRecords() {
       <AdminPanel title="Core Records" subtitle="Base data stored for your community.">
         <WipeGrid>
           {CORE_TYPES.map(t => (
-            <WipeBtn key={t.key} label={t.label} onWipe={() => wipe(t.key)} toast={toast} />
+            <WipeBtn key={t.key} label={t.label} onWipe={() => wipe(t.key)} toast={toast} confirm={confirm} />
           ))}
         </WipeGrid>
       </AdminPanel>
@@ -123,9 +130,9 @@ export default function WipeRecords() {
           <div className="text-[12px] text-slate-500 italic">No report templates configured.</div>
         ) : (
           <WipeGrid>
-            <WipeBtn label="All Reports" onWipe={() => wipe('allReports')} toast={toast} />
+            <WipeBtn label="All Reports" onWipe={() => wipe('allReports')} toast={toast} confirm={confirm} />
             {reportTemplates.map(t => (
-              <WipeBtn key={t.id} label={t.name} onWipe={() => wipe(`report:${t.name}`)} toast={toast} />
+              <WipeBtn key={t.id} label={t.name} onWipe={() => wipe(`report:${t.name}`)} toast={toast} confirm={confirm} />
             ))}
           </WipeGrid>
         )}
@@ -140,9 +147,9 @@ export default function WipeRecords() {
           <div className="text-[12px] text-slate-500 italic">No record templates configured.</div>
         ) : (
           <WipeGrid>
-            <WipeBtn label="All Records" onWipe={() => wipe('allRecords')} toast={toast} />
+            <WipeBtn label="All Records" onWipe={() => wipe('allRecords')} toast={toast} confirm={confirm} />
             {recordTemplates.map(t => (
-              <WipeBtn key={t.id} label={t.name} onWipe={() => wipe(`record:${t.name}`)} toast={toast} />
+              <WipeBtn key={t.id} label={t.name} onWipe={() => wipe(`record:${t.name}`)} toast={toast} confirm={confirm} />
             ))}
           </WipeGrid>
         )}

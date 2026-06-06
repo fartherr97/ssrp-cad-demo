@@ -5,6 +5,7 @@ import Select from '../components/ui/Select';
 import { createPortal } from 'react-dom';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import StatusBadge from '../components/StatusBadge';
 import IdentifierEditor from '../components/IdentifierEditor';
 import ReportForm from '../components/ReportForm';
@@ -529,6 +530,7 @@ export default function OfficerProfile() {
 function IdentifiersTab({ officer, accentColor }) {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { departments, unitStatusCodes } = state;
   const identifiers = officer.identifiers || [];
   const [editing, setEditing] = useState(null); // null | 'new' | id
@@ -556,6 +558,18 @@ function IdentifiersTab({ officer, accentColor }) {
       location: officer.location || '', aop: officer.aop || '',
       dept: officer.dept, deptShort: officer.deptShort, subdivision: officer.subdivision,
     }});
+    toast.success(`Saved current setup as "${label}".`, { title: 'Identifier Saved' });
+  };
+
+  const deleteIdentifier = async (ident) => {
+    if (!(await confirm({
+      title: 'Delete identifier',
+      message: `Delete the identifier "${ident.label}"? This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    }))) return;
+    dispatch({ type: 'DELETE_IDENTIFIER', payload: ident.id });
+    toast.success(`Identifier "${ident.label}" removed.`, { title: 'Identifier Deleted' });
   };
 
   const submitDraft = () => {
@@ -607,7 +621,7 @@ function IdentifiersTab({ officer, accentColor }) {
               <button className={S_BTN_SECONDARY + ' press !px-3 !py-1.5 !text-xs'} onClick={() => openEdit(ident)}>
                 <MdEdit size={13} style={{ display: 'inline', marginRight: 4 }} />Edit
               </button>
-              <button className={S_BTN_DANGER + ' press !px-2 !py-1.5 !text-xs'} onClick={() => { dispatch({ type: 'DELETE_IDENTIFIER', payload: ident.id }); toast.success(`Identifier "${ident.label}" removed.`, { title: 'Identifier Deleted' }); }}>
+              <button className={S_BTN_DANGER + ' press !px-2 !py-1.5 !text-xs'} onClick={() => deleteIdentifier(ident)}>
                 <MdDelete size={13} />
               </button>
             </div>

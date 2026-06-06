@@ -216,6 +216,11 @@ const initialState = {
     ],
   },
   myCallId: null,
+  // Hydration status for the backend handoff. Mock data is synchronous so the
+  // app starts hydrated; a real backend can set this false in initialState,
+  // fetch, then dispatch HYDRATE_SUCCESS / HYDRATE_ERROR. See HydrationGate.
+  hydrated: true,
+  hydrationError: null,
   nextId: 1000,
   // Sequential report/record number. Every report or record filed through the
   // CAD is stamped with the next value, zero-padded to 4 digits * the first
@@ -326,6 +331,14 @@ function officerSignatureFor(state, badge) {
 
 function baseReducer(state, action) {
   switch (action.type) {
+    /* ─── Hydration (backend handoff seam) ─── */
+    case 'HYDRATE_START':
+      return { ...state, hydrated: false, hydrationError: null };
+    case 'HYDRATE_SUCCESS':
+      return { ...state, ...(action.payload || {}), hydrated: true, hydrationError: null };
+    case 'HYDRATE_ERROR':
+      return { ...state, hydrated: false, hydrationError: action.payload || 'Failed to load.' };
+
     case 'CONNECT_DISCORD':
       return { ...state, discordConnected: true, discordAccount: action.payload || state.discordAccount };
     case 'TOGGLE_SELF_DISPATCH':
@@ -1500,7 +1513,11 @@ function baseReducer(state, action) {
     }
 
     case 'MARK_NOTIFICATIONS_READ': {
-      return { ...state, notifications: state.notifications.map(n => ({ ...n, read: true })) };
+      // Only mark the current recipient's notifications read (unaddressed ones
+      // are owned by everyone). Without a badge, fall back to marking all.
+      const badge = action.payload?.recipientBadge;
+      const owned = (n) => !badge || !n.recipientBadge || n.recipientBadge === badge;
+      return { ...state, notifications: state.notifications.map(n => (owned(n) ? { ...n, read: true } : n)) };
     }
 
     case 'DISMISS_NOTIFICATION': {
@@ -1508,7 +1525,11 @@ function baseReducer(state, action) {
     }
 
     case 'CLEAR_NOTIFICATIONS': {
-      return { ...state, notifications: [] };
+      // Clear only the current recipient's notifications, leaving other users'
+      // targeted notifications intact (multi-user correct).
+      const badge = action.payload?.recipientBadge;
+      if (!badge) return { ...state, notifications: [] };
+      return { ...state, notifications: state.notifications.filter(n => n.recipientBadge && n.recipientBadge !== badge) };
     }
 
     case 'SET_TONE': {
@@ -1539,7 +1560,7 @@ function baseReducer(state, action) {
       return { ...state, caseFiles };
     }
     case 'CLOSE_CASE_FILE': {
-      const { id, closedBy, closedByName } = action.payload;
+      const { id, closedBy } = action.payload;
       const caseFiles = (state.caseFiles || []).map(c =>
         c.id === id ? { ...c, status: 'CLOSED', closedAt: new Date().toISOString(), closedBy } : c
       );

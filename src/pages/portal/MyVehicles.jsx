@@ -91,6 +91,14 @@ export default function MyVehicles() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!form.plate?.trim()) {
+      toast.error('License plate is required');
+      return;
+    }
+    if (!/^\d{4}$/.test(String(form.year).trim())) {
+      toast.error('Year must be a 4-digit number');
+      return;
+    }
     setConfirming(true);
   };
 
@@ -188,7 +196,7 @@ export default function MyVehicles() {
               <div>
                 <label className={PORTAL_LABEL}>Registration Expiry</label>
                 <div className="relative w-full overflow-hidden rounded-lg border border-border-base bg-app-input focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/20 transition-all" style={{ height: 42 }}>
-                  <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.regExpiry} onChange={e => setField('regExpiry', e.target.value)} style={{ colorScheme: 'dark' }} />
+                  <input className="absolute inset-0 w-full h-full bg-transparent px-3.5 text-sm text-cad-text outline-none" type="date" value={form.regExpiry} min={new Date().toISOString().split('T')[0]} onChange={e => setField('regExpiry', e.target.value)} style={{ colorScheme: 'dark' }} />
                 </div>
               </div>
             </div>

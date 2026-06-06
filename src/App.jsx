@@ -1,92 +1,97 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { CADProvider, useCAD } from './store/cadStore';
 import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
 import DutyGuard from './components/DutyGuard';
-import LoginPage from './pages/LoginPage';
-import AccessDeniedPage from './pages/AccessDeniedPage';
-import DispatchCenter from './pages/DispatchCenter';
-import IncidentDetail from './pages/IncidentDetail';
-import DispatchBoard from './pages/DispatchBoard';
-import DispatchPortal from './pages/DispatchPortal';
-import FireOpsBoard from './pages/FireOpsBoard';
-import RecordsBureau from './pages/RecordsBureau';
-import ReportsCenter from './pages/ReportsCenter';
-import RecordsCenter from './pages/RecordsCenter';
-import UnitManagement from './pages/UnitManagement';
-import WarrantControl from './pages/WarrantControl';
-import CivilianRegistry from './pages/CivilianRegistry';
-import PenalCodeEditor from './pages/PenalCodeEditor';
-import BanManagement from './pages/BanManagement';
-import LiveMap from './pages/LiveMap';
-import Messages from './pages/Messages';
-import OfficerProfile from './pages/OfficerProfile';
-// Citizen portals
-import Supervisor from './pages/portal/Supervisor';
-import CommandPortal from './pages/portal/CommandPortal';
-import CivilianHome from './pages/portal/CivilianHome';
-import MyCharacters from './pages/portal/MyCharacters';
-import MyVehicles from './pages/portal/MyVehicles';
-import MyLicenses from './pages/portal/MyLicenses';
-import FileReport from './pages/portal/FileReport';
-import MyReports from './pages/portal/MyReports';
-import FileComplaint from './pages/portal/FileComplaint';
-import LEORecords from './pages/portal/LEORecords';
-import RequestTow from './pages/portal/RequestTow';
-import CitizenLaws from './pages/portal/CitizenLaws';
-import MedicalRecords from './pages/portal/MedicalRecords';
-import MyAccount from './pages/portal/MyAccount';
-import BusinessHome from './pages/portal/BusinessHome';
-import MyBusiness from './pages/portal/MyBusiness';
-import EmployeeProfile from './pages/portal/EmployeeProfile';
-import Employees from './pages/portal/Employees';
-import BusinessFleet from './pages/portal/BusinessFleet';
-import FDOTPermits from './pages/portal/FDOTPermits';
-import HelpCenter from './pages/portal/HelpCenter';
-import TowCAD from './pages/TowCAD';
+import HydrationGate, { LoadingScreen } from './components/HydrationGate';
 import { BusinessProvider } from './contexts/BusinessContext';
 import { CivilianProvider } from './contexts/CivilianContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { ConfirmProvider } from './contexts/ConfirmContext';
+
+/* Route components are code-split so the initial bundle stays small — each
+   page loads on demand behind the <Suspense> boundary below. */
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AccessDeniedPage = lazy(() => import('./pages/AccessDeniedPage'));
+const DispatchCenter = lazy(() => import('./pages/DispatchCenter'));
+const IncidentDetail = lazy(() => import('./pages/IncidentDetail'));
+const DispatchBoard = lazy(() => import('./pages/DispatchBoard'));
+const DispatchPortal = lazy(() => import('./pages/DispatchPortal'));
+const FireOpsBoard = lazy(() => import('./pages/FireOpsBoard'));
+const RecordsBureau = lazy(() => import('./pages/RecordsBureau'));
+const ReportsCenter = lazy(() => import('./pages/ReportsCenter'));
+const RecordsCenter = lazy(() => import('./pages/RecordsCenter'));
+const UnitManagement = lazy(() => import('./pages/UnitManagement'));
+const WarrantControl = lazy(() => import('./pages/WarrantControl'));
+const CivilianRegistry = lazy(() => import('./pages/CivilianRegistry'));
+const PenalCodeEditor = lazy(() => import('./pages/PenalCodeEditor'));
+const BanManagement = lazy(() => import('./pages/BanManagement'));
+const LiveMap = lazy(() => import('./pages/LiveMap'));
+const Messages = lazy(() => import('./pages/Messages'));
+const OfficerProfile = lazy(() => import('./pages/OfficerProfile'));
+// Citizen portals
+const Supervisor = lazy(() => import('./pages/portal/Supervisor'));
+const CommandPortal = lazy(() => import('./pages/portal/CommandPortal'));
+const CivilianHome = lazy(() => import('./pages/portal/CivilianHome'));
+const MyCharacters = lazy(() => import('./pages/portal/MyCharacters'));
+const MyVehicles = lazy(() => import('./pages/portal/MyVehicles'));
+const MyLicenses = lazy(() => import('./pages/portal/MyLicenses'));
+const FileReport = lazy(() => import('./pages/portal/FileReport'));
+const MyReports = lazy(() => import('./pages/portal/MyReports'));
+const FileComplaint = lazy(() => import('./pages/portal/FileComplaint'));
+const LEORecords = lazy(() => import('./pages/portal/LEORecords'));
+const RequestTow = lazy(() => import('./pages/portal/RequestTow'));
+const CitizenLaws = lazy(() => import('./pages/portal/CitizenLaws'));
+const MedicalRecords = lazy(() => import('./pages/portal/MedicalRecords'));
+const MyAccount = lazy(() => import('./pages/portal/MyAccount'));
+const BusinessHome = lazy(() => import('./pages/portal/BusinessHome'));
+const MyBusiness = lazy(() => import('./pages/portal/MyBusiness'));
+const EmployeeProfile = lazy(() => import('./pages/portal/EmployeeProfile'));
+const Employees = lazy(() => import('./pages/portal/Employees'));
+const BusinessFleet = lazy(() => import('./pages/portal/BusinessFleet'));
+const FDOTPermits = lazy(() => import('./pages/portal/FDOTPermits'));
+const HelpCenter = lazy(() => import('./pages/portal/HelpCenter'));
+const TowCAD = lazy(() => import('./pages/TowCAD'));
 // Admin (Sonoran-style customization suite)
-import AdminShell from './pages/admin/AdminShell';
-import CustomizationHub from './pages/admin/sections/CustomizationHub';
-import Accounts from './pages/admin/sections/Accounts';
-import Identifiers from './pages/admin/sections/Identifiers';
-import PermissionKeys from './pages/admin/sections/PermissionKeys';
-import CustomRecords from './pages/admin/sections/CustomRecords';
-import CivilianForms from './pages/admin/sections/CivilianForms';
-import Departments from './pages/admin/sections/Departments';
-import TenCodes from './pages/admin/sections/TenCodes';
-import Statutes from './pages/admin/sections/Statutes';
-import LicensePoints from './pages/admin/sections/LicensePoints';
-import Flags from './pages/admin/sections/Flags';
-import Logs from './pages/admin/sections/Logs';
-import MessageLogs from './pages/admin/sections/MessageLogs';
-import InGame from './pages/admin/sections/InGame';
-import DiscordIntegration from './pages/admin/sections/DiscordIntegration';
-import Limits from './pages/admin/sections/Limits';
-import WipeRecords from './pages/admin/sections/WipeRecords';
-import CommunityId from './pages/admin/sections/CommunityId';
-import Authenticate from './pages/admin/sections/Authenticate';
-import CommunityInfo from './pages/admin/sections/CommunityInfo';
-import Geographical from './pages/admin/sections/Geographical';
-import StatusCodes from './pages/admin/sections/StatusCodes';
-import LoginPageEditor from './pages/admin/sections/LoginPageEditor';
-import QuickLinks from './pages/admin/sections/QuickLinks';
-import NotificationTones from './pages/admin/sections/NotificationTones';
-import Restrictions from './pages/admin/sections/Restrictions';
-import DiscordPresence from './pages/admin/sections/DiscordPresence';
-import HelpEditor from './pages/admin/sections/HelpEditor';
-import Servers from './pages/admin/sections/Servers';
-import Addresses from './pages/admin/sections/Addresses';
-import LookupTypes from './pages/admin/sections/LookupTypes';
-import ToneBoard from './pages/admin/sections/ToneBoard';
-import AdminBusinesses from './pages/admin/sections/AdminBusinesses';
-import CallTypes from './pages/admin/sections/CallTypes';
-import RoleMapping from './pages/admin/sections/RoleMapping';
-import AdminTiers from './pages/admin/sections/AdminTiers';
-import CaseFiles from './pages/CaseFiles';
+const AdminShell = lazy(() => import('./pages/admin/AdminShell'));
+const CustomizationHub = lazy(() => import('./pages/admin/sections/CustomizationHub'));
+const Accounts = lazy(() => import('./pages/admin/sections/Accounts'));
+const Identifiers = lazy(() => import('./pages/admin/sections/Identifiers'));
+const PermissionKeys = lazy(() => import('./pages/admin/sections/PermissionKeys'));
+const CustomRecords = lazy(() => import('./pages/admin/sections/CustomRecords'));
+const CivilianForms = lazy(() => import('./pages/admin/sections/CivilianForms'));
+const Departments = lazy(() => import('./pages/admin/sections/Departments'));
+const TenCodes = lazy(() => import('./pages/admin/sections/TenCodes'));
+const Statutes = lazy(() => import('./pages/admin/sections/Statutes'));
+const LicensePoints = lazy(() => import('./pages/admin/sections/LicensePoints'));
+const Flags = lazy(() => import('./pages/admin/sections/Flags'));
+const Logs = lazy(() => import('./pages/admin/sections/Logs'));
+const MessageLogs = lazy(() => import('./pages/admin/sections/MessageLogs'));
+const InGame = lazy(() => import('./pages/admin/sections/InGame'));
+const DiscordIntegration = lazy(() => import('./pages/admin/sections/DiscordIntegration'));
+const Limits = lazy(() => import('./pages/admin/sections/Limits'));
+const WipeRecords = lazy(() => import('./pages/admin/sections/WipeRecords'));
+const CommunityId = lazy(() => import('./pages/admin/sections/CommunityId'));
+const Authenticate = lazy(() => import('./pages/admin/sections/Authenticate'));
+const CommunityInfo = lazy(() => import('./pages/admin/sections/CommunityInfo'));
+const Geographical = lazy(() => import('./pages/admin/sections/Geographical'));
+const StatusCodes = lazy(() => import('./pages/admin/sections/StatusCodes'));
+const LoginPageEditor = lazy(() => import('./pages/admin/sections/LoginPageEditor'));
+const QuickLinks = lazy(() => import('./pages/admin/sections/QuickLinks'));
+const NotificationTones = lazy(() => import('./pages/admin/sections/NotificationTones'));
+const Restrictions = lazy(() => import('./pages/admin/sections/Restrictions'));
+const DiscordPresence = lazy(() => import('./pages/admin/sections/DiscordPresence'));
+const HelpEditor = lazy(() => import('./pages/admin/sections/HelpEditor'));
+const Servers = lazy(() => import('./pages/admin/sections/Servers'));
+const Addresses = lazy(() => import('./pages/admin/sections/Addresses'));
+const LookupTypes = lazy(() => import('./pages/admin/sections/LookupTypes'));
+const ToneBoard = lazy(() => import('./pages/admin/sections/ToneBoard'));
+const AdminBusinesses = lazy(() => import('./pages/admin/sections/AdminBusinesses'));
+const CallTypes = lazy(() => import('./pages/admin/sections/CallTypes'));
+const RoleMapping = lazy(() => import('./pages/admin/sections/RoleMapping'));
+const AdminTiers = lazy(() => import('./pages/admin/sections/AdminTiers'));
+const CaseFiles = lazy(() => import('./pages/CaseFiles'));
 
 function landingFor(user) {
   return (PORTALS[user?.portal] || PORTALS[DEFAULT_PORTAL]).landing;
@@ -121,6 +126,7 @@ function AuthShell() {
   if (!state.currentUser) return <Navigate to="/" replace />;
   return (
     <AppShell>
+      <HydrationGate>
       <DutyGuard />
       {/* Key on pathname (not location.key) so the page only remounts on a real
           page change. Keying on location.key remounted on every query-string
@@ -128,6 +134,7 @@ function AuthShell() {
       <PageWrapper key={location.pathname}>
         <Outlet />
       </PageWrapper>
+      </HydrationGate>
     </AppShell>
   );
 }
@@ -146,6 +153,7 @@ function PortalFallback() {
 
 function CADApp() {
   return (
+    <Suspense fallback={<LoadingScreen label="Loading…" />}>
     <Routes>
       <Route path="/" element={<LoginRoute />} />
       <Route path="/access-denied" element={<AccessDeniedPage />} />
@@ -242,6 +250,7 @@ function CADApp() {
         <Route path="*" element={<PortalFallback />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }
 
@@ -249,13 +258,15 @@ export default function App() {
   return (
     <CADProvider>
       <ToastProvider>
-        <BrowserRouter>
-          <BusinessProvider>
-            <CivilianProvider>
-              <CADApp />
-            </CivilianProvider>
-          </BusinessProvider>
-        </BrowserRouter>
+        <ConfirmProvider>
+          <BrowserRouter>
+            <BusinessProvider>
+              <CivilianProvider>
+                <CADApp />
+              </CivilianProvider>
+            </BusinessProvider>
+          </BrowserRouter>
+        </ConfirmProvider>
       </ToastProvider>
     </CADProvider>
   );

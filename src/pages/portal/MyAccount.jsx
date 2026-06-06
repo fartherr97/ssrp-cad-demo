@@ -157,7 +157,7 @@ export default function MyAccount() {
               <PortalCard key={c.id} accent={isActive ? ACCENT : undefined} noAnim className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl overflow-hidden bg-app-input border border-border-base flex items-center justify-center shrink-0">
                   {c.profilePhoto
-                    ? <img src={c.profilePhoto} alt="" className="w-full h-full object-cover" />
+                    ? <img src={c.profilePhoto} alt={`${c.firstName} ${c.lastName}`} className="w-full h-full object-cover" />
                     : <MdPerson size={24} className="text-slate-600" />}
                 </div>
                 <div className="min-w-0 flex-1">

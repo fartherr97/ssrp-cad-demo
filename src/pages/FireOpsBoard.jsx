@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useCAD } from '../store/cadStore';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import { useResponsive } from '../hooks/useResponsive';
 import { DeptTag } from '../constants/deptLogos.jsx';
+import Select from '../components/ui/Select';
 import {
   S_PAGE, S_PANEL, S_PANEL_HEADER, S_PANEL_TITLE, S_PANEL_BODY,
   S_CARD,
@@ -368,6 +370,7 @@ function MedicalLookup({ civilians }) {
 export default function FireOpsBoard() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { isMobile } = useResponsive();
   const { calls, officers, currentUser, hcfrRequests = [], incoming911HCFR = [] } = state;
   const [selectedCall, setSelectedCall] = useState(null);
@@ -431,6 +434,7 @@ export default function FireOpsBoard() {
     if (!selectedCall || !me) return;
     dispatch({ type: 'ASSIGN_UNIT', payload: { callId: selectedCall, unitId: me.unitId } });
     dispatch({ type: 'SET_MY_CALL', payload: selectedCall });
+    toast.success(`${me.unitId} assigned to ${selectedCall}`, { title: 'Apparatus Assigned' });
   };
 
   const removeUnit = (callId, unitId) => {
@@ -823,7 +827,7 @@ export default function FireOpsBoard() {
                     if (pickable.length === 0) return null;
                     return (
                       <div className="flex gap-2 mt-3">
-                        <select
+                        <Select
                           value={addUnitId || ''}
                           onChange={e => setAddUnitId(e.target.value ? Number(e.target.value) : null)}
                           className="flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-2.5 py-1.5 text-[12px] text-slate-200 outline-none focus:border-orange-500/50 cursor-pointer">
@@ -831,7 +835,7 @@ export default function FireOpsBoard() {
                           {pickable.map(u => (
                             <option key={u.id} value={u.id}>{u.unitId} — {u.name}</option>
                           ))}
-                        </select>
+                        </Select>
                         <button
                           disabled={!addUnitId}
                           onClick={() => addUnitToReq(selReq.id, addUnitId)}
@@ -950,7 +954,17 @@ export default function FireOpsBoard() {
                 <div className="flex gap-1.5">
                   <button
                     className={sm(S_BTN_SECONDARY)}
-                    onClick={() => dispatch({ type: 'CLOSE_CALL', payload: selCall.id }) || setSelectedCall(null)}>
+                    onClick={async () => {
+                      if (!(await confirm({
+                        title: 'Clear Incident',
+                        message: `Clear ${selCall.id} — ${selCall.nature}? This closes the call and clears all attached apparatus.`,
+                        confirmLabel: 'Clear Incident',
+                        danger: true,
+                      }))) return;
+                      dispatch({ type: 'CLOSE_CALL', payload: selCall.id });
+                      setSelectedCall(null);
+                      toast.success(`${selCall.id} cleared and attached units released.`, { title: 'Incident Cleared' });
+                    }}>
                     Clear Incident
                   </button>
                 </div>

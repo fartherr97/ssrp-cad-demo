@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import { MdSearch, MdPerson, MdDirectionsCar, MdShield, MdGavel, MdAdd, MdClose, MdAutorenew, MdDelete, MdCameraAlt, MdDriveFileRenameOutline, MdAddPhotoAlternate, MdZoomIn, MdChevronLeft, MdChevronRight, MdLink, MdGroups, MdFlag, MdCheck } from 'react-icons/md';
 import { DeptBadge } from '../constants/deptLogos';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import { S_INPUT, S_SELECT, S_TEXTAREA } from '../constants/styles';
 import { ageFromDob } from '../utils/age';
 import { FlagRow } from './CivilianFlags';
@@ -572,6 +573,7 @@ function ChargesField({ f, value, onChange, readOnly }) {
 
 /* ── Mugshot upload field ── */
 function MugshotField({ f, value, onChange, readOnly }) {
+  const toast = useToast();
   const fileRef = useRef(null);
   const span = Math.min(f.span || 1, 4);
   const cls = SPAN[span] || SPAN[1];
@@ -579,7 +581,7 @@ function MugshotField({ f, value, onChange, readOnly }) {
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) { alert('Image must be under 4 MB'); return; }
+    if (file.size > 4 * 1024 * 1024) { toast.error('Image must be under 4 MB'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => onChange(f.id, ev.target.result);
     reader.readAsDataURL(file);
@@ -649,6 +651,7 @@ function MugshotField({ f, value, onChange, readOnly }) {
 
 /* ── Generic image upload field (landscape; spans by f.span) ── */
 function ImageField({ f, value, onChange, readOnly }) {
+  const toast = useToast();
   const fileRef = useRef(null);
   const span = Math.min(f.span || 2, 4);
   const cls = SPAN[span] || SPAN[2];
@@ -656,7 +659,7 @@ function ImageField({ f, value, onChange, readOnly }) {
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) { alert('Image must be under 4 MB'); return; }
+    if (file.size > 4 * 1024 * 1024) { toast.error('Image must be under 4 MB'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => onChange(f.id, ev.target.result);
     reader.readAsDataURL(file);
@@ -827,6 +830,7 @@ function PhotoLightbox({ open, photos, index, onClose, onNavigate }) {
 
 /* ── Multi-photo gallery field (up to `f.max` photos, default 8) ── */
 function PhotoGalleryField({ f, value, onChange, readOnly }) {
+  const toast = useToast();
   const max = Math.min(f.max || 8, 8);
   const photos = Array.isArray(value) ? value : [];
   const fileRefs = useRef([]);
@@ -836,15 +840,15 @@ function PhotoGalleryField({ f, value, onChange, readOnly }) {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
-    if (file.size > PHOTO_HARD_CAP) { alert('That image is unusually large (over 40 MB). Please pick a smaller file.'); return; }
+    if (!file.type.startsWith('image/')) { toast.error('Please choose an image file.'); return; }
+    if (file.size > PHOTO_HARD_CAP) { toast.error('That image is unusually large (over 40 MB). Please pick a smaller file.'); return; }
     try {
       const dataUrl = await downscaleImage(file);
       const updated = [...photos];
       updated[idx] = dataUrl;
       onChange(f.id, updated.filter(Boolean));
     } catch {
-      alert('Could not read that image. Please try a different file.');
+      toast.error('Could not read that image. Please try a different file.');
     }
   };
 

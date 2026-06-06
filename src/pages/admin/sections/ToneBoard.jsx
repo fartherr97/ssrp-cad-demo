@@ -58,9 +58,14 @@ export default function ToneBoard() {
                     {t.enabled ? 'Active' : 'Off'}
                   </button>
                 </div>
-                <button type="button" onClick={() => play(t.url, t.name)}
-                  className="press w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[12px] font-bold cursor-pointer transition-colors bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30">
-                  <MdPlayArrow size={16} /> Play
+                <button type="button" onClick={() => play(t.url, t.name)} disabled={!t.url}
+                  title={t.url ? 'Play tone' : 'No audio file uploaded'}
+                  className={`press w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[12px] font-bold transition-colors ${
+                    t.url
+                      ? 'cursor-pointer bg-brand/20 border border-brand/40 text-brand-bright hover:bg-brand/30'
+                      : 'cursor-not-allowed bg-white/[0.03] border border-white/10 text-slate-600'
+                  }`}>
+                  <MdPlayArrow size={16} /> {t.url ? 'Play' : 'No Audio'}
                 </button>
               </div>
             ))}

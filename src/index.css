@@ -58,7 +58,7 @@
   --st-av-bg:   rgba(34,197,94,0.14);  --st-av-border:   rgba(34,197,94,0.40);  --st-av-text:   #4ade80;
   --st-enrt-bg: rgba(139,92,246,0.14); --st-enrt-border: rgba(139,92,246,0.40); --st-enrt-text: #a78bfa;
   --st-busy-bg: rgba(239,68,68,0.14);  --st-busy-border: rgba(239,68,68,0.40);  --st-busy-text: #f87171;
-  --st-arv-bg:  rgba(34,197,94,0.14);  --st-arv-border:  rgba(34,197,94,0.40);  --st-arv-text:  #4ade80;
+  --st-arv-bg:  rgba(45,212,191,0.14); --st-arv-border:  rgba(45,212,191,0.40); --st-arv-text:  #2dd4bf;
   --st-unav-bg: rgba(217,70,239,0.14); --st-unav-border: rgba(217,70,239,0.40); --st-unav-text: #e879f9;
   --st-od-bg:   rgba(148,163,184,0.12);--st-od-border:   rgba(148,163,184,0.30);--st-od-text:   #94a3b8;
 
@@ -144,7 +144,9 @@ input:-webkit-autofill:focus {
 }
 
 /* ─── Focus ─── */
-*:focus-visible { outline: 1px solid #1060a8; outline-offset: 0px; }
+/* Visible, AA-friendly focus ring on the dark theme: a brighter 2px brand ring
+   with a small offset so it reads against panels, inputs and buttons alike. */
+*:focus-visible { outline: 2px solid #5a97f5; outline-offset: 1px; border-radius: 2px; }
 
 /* ─── Kill the webkit/mobile tap-highlight flash that makes selects,
        dropdowns and buttons flicker the instant they're clicked ─── */

@@ -3,6 +3,7 @@ import Select from '../components/ui/Select';
 import { useCAD } from '../store/cadStore';
 import { useActiveBusiness } from '../contexts/BusinessContext';
 import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import {
   MdLocalShipping, MdAdd, MdClose, MdFilterList, MdLink,
   MdCancel, MdDirectionsCar, MdLocationOn,
@@ -214,7 +215,7 @@ function UnitCard({ unit, isMe, dispatch, toast }) {
 }
 
 /* ── Job card ── */
-function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toast }) {
+function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toast, confirm }) {
   const sm           = statusMeta(job.status);
   const company      = companies.find(b => b.id === job.companyId);
   const linkedCall   = job.callId ? calls.find(c => c.id === job.callId) : null;
@@ -236,7 +237,13 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
     }
   };
 
-  const cancel = () => {
+  const cancel = async () => {
+    if (!(await confirm({
+      title: 'Cancel job?',
+      message: `Cancel tow job #${job.id}${job.plate ? ` (${job.plate})` : ''}? This cannot be undone.`,
+      confirmLabel: 'Cancel Job',
+      danger: true,
+    }))) return;
     dispatch({ type: 'CANCEL_TOW_JOB', payload: job.id });
     toast.warning(`Job #${job.id} cancelled`);
     if (job.unitId) dispatch({ type: 'UPDATE_TOW_UNIT', payload: { id: job.unitId, status: 'AVAILABLE' } });
@@ -683,6 +690,7 @@ export default function TowCAD() {
   const { towJobs, towUnits = [], calls, businesses, currentUser, officers = [], fdotRequests = [] } = state;
   const bizCtx = useActiveBusiness();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const isBusinessPortal = currentUser?.portal === 'business';
   const towCompanies = useMemo(() => businesses.filter(b => b.isTowCompany), [businesses]);
@@ -892,7 +900,13 @@ export default function TowCAD() {
       });
     }
   };
-  const declineRequest = (req) => {
+  const declineRequest = async (req) => {
+    if (!(await confirm({
+      title: 'Decline request?',
+      message: `Decline the ${req.assistType} request at ${req.location}? The requester will need to find another resource.`,
+      confirmLabel: 'Decline',
+      danger: true,
+    }))) return;
     dispatch({ type: 'UPDATE_FDOT_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
     toast.warning(`Declined · ${req.assistType}`, { title: handlerName() });
   };
@@ -1077,15 +1091,16 @@ export default function TowCAD() {
                     {/* Add unit picker */}
                     {canManageFDOT && pickable.length > 0 && (
                       <div className="flex gap-2 mt-1">
-                        <select
+                        <Select
                           value={addVal}
+                          placeholder="Add unit…"
                           onChange={e => setAddFDOTUnits(prev => ({ ...prev, [req.id]: e.target.value }))}
                           className="flex-1 min-w-0 bg-app-input border border-border-base rounded-lg px-2.5 py-1.5 text-[12px] text-slate-200 outline-none focus:border-orange-500/50 cursor-pointer">
                           <option value="">Add unit…</option>
                           {pickable.map(u => (
                             <option key={u.id} value={u.id}>{u.truckName} — {u.operatorName}</option>
                           ))}
-                        </select>
+                        </Select>
                         <button
                           disabled={!addVal}
                           onClick={() => addUnitToFDOT(req.id, addVal)}
@@ -1231,7 +1246,7 @@ export default function TowCAD() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 14 }}>
           {filtered.map(job => (
             <JobCard key={job.id} job={job} companies={towCompanies} calls={activeCalls}
-              towUnits={towUnits} currentUnitId={myUnit?.id} dispatch={dispatch} toast={toast} />
+              towUnits={towUnits} currentUnitId={myUnit?.id} dispatch={dispatch} toast={toast} confirm={confirm} />
           ))}
         </div>
       )}

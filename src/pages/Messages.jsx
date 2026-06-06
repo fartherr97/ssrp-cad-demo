@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
+import { useToast } from '../contexts/ToastContext';
 import {
   MdSend, MdSearch, MdClose, MdPerson, MdLock,
   MdArrowBack, MdGroup, MdForum,
@@ -278,6 +279,7 @@ function ChatView({ header, badge, badgeCls, subtitle, messages, currentUserId, 
 ════════════════════════════════ */
 export default function Messages() {
   const { state, dispatch } = useCAD();
+  const toast = useToast();
   const { directMessages, groupThreads = [], currentUser, officers } = state;
 
   const [selectedKey, setSelectedKey] = useState(null); // 'direct:<id>' | 'group:<id>' | 'system'
@@ -356,8 +358,14 @@ export default function Messages() {
     }
   };
 
-  const handleSend = (payload) => dispatch({ type: 'SEND_DIRECT_MESSAGE', payload });
-  const handleGroupSend = (payload) => dispatch({ type: 'CREATE_GROUP_THREAD', payload });
+  const handleSend = (payload) => {
+    dispatch({ type: 'SEND_DIRECT_MESSAGE', payload });
+    toast.success(`Message sent to ${payload.toName}.`, { title: 'Message Sent' });
+  };
+  const handleGroupSend = (payload) => {
+    dispatch({ type: 'CREATE_GROUP_THREAD', payload });
+    toast.success(`Group "${payload.subject}" created.`, { title: 'Group Created' });
+  };
 
   const replyDirect = (convo) => (body) => {
     dispatch({ type: 'SEND_DIRECT_MESSAGE', payload: {
@@ -369,6 +377,7 @@ export default function Messages() {
       subject: 'Direct Message',
       body,
     }});
+    toast.success(`Reply sent to ${convo.otherName}.`, { title: 'Message Sent' });
   };
 
   const replyGroup = (thread) => (body) => {
@@ -378,6 +387,7 @@ export default function Messages() {
       fromName: currentUser?.name || currentUser?.username || 'Unknown',
       body,
     }});
+    toast.success('Reply sent to group.', { title: 'Message Sent' });
   };
 
   const initialOf = (name) => (name || '?').charAt(0).toUpperCase();

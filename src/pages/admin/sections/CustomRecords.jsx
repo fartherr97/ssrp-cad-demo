@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import ReportForm from '../../../components/ReportForm';
 import {
   MdAdd, MdDelete, MdContentCopy, MdArrowUpward, MdArrowDownward,
@@ -671,6 +672,7 @@ function RecordNumberBar({ isReport }) {
 
 /* ── Center: template editor ── */
 function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
+  const toast = useToast();
   const [showPremade, setShowPremade]   = useState(false);
   const [saved, setSaved]               = useState(false);
   const premadeRef = useRef(null);
@@ -711,7 +713,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
   };
 
   const handleSave = () => {
-    if (!draft.name?.trim()) { alert('Template name is required.'); return; }
+    if (!draft.name?.trim()) { toast.error('Template name is required.'); return; }
     onSave();
     setSaved(true);
     setTimeout(() => setSaved(false), 1600);
@@ -891,6 +893,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
 export default function CustomRecords() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
+  const confirm = useConfirm();
   const { reportTemplates = [], recordTemplates = [], reports = [], records = [] } = state;
 
   const [typeFilter, setTypeFilter]       = useState('all');
@@ -918,7 +921,7 @@ export default function CustomRecords() {
   };
 
   const saveTemplate = () => {
-    if (!draft?.name?.trim()) { alert('Template name is required.'); return; }
+    if (!draft?.name?.trim()) { toast.error('Template name is required.'); return; }
     const { isReport, isNew } = editingMeta;
     const payload = { ...draft };
     delete payload._kind;
@@ -932,8 +935,13 @@ export default function CustomRecords() {
     }
   };
 
-  const deleteTemplate = (tpl) => {
-    if (!confirm(`Delete "${tpl.name}"?`)) return;
+  const deleteTemplate = async (tpl) => {
+    if (!(await confirm({
+      title: 'Delete template',
+      message: `Delete "${tpl.name}"? This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    }))) return;
     dispatch({ type: tpl._kind === 'report' ? 'DELETE_REPORT_TEMPLATE' : 'DELETE_RECORD_TEMPLATE', payload: tpl.id });
     toast.success('Template deleted.');
     if (editingMeta?.id === tpl.id) { setDraft(null); setEditingMeta(null); setMobileView('list'); }
@@ -979,7 +987,7 @@ export default function CustomRecords() {
 
   const importBundle = (file) => {
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       let data;
       try { data = JSON.parse(ev.target.result); }
       catch { toast.error('That file is not valid JSON.'); return; }
@@ -996,9 +1004,12 @@ export default function CustomRecords() {
         has('records')         && `${data.records.length} record(s)`,
       ].filter(Boolean);
 
-      if (!window.confirm(
-        `Import will REPLACE the current ${counts.join(', ')} with the file's contents. Continue?`
-      )) return;
+      if (!(await confirm({
+        title: 'Replace all records data',
+        message: `Import will REPLACE the current ${counts.join(', ')} with the file's contents. Continue?`,
+        confirmLabel: 'Replace all',
+        danger: true,
+      }))) return;
 
       dispatch({ type: 'IMPORT_BUILDER_BUNDLE', payload: data });
       handleClose();

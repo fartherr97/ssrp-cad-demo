@@ -1375,8 +1375,6 @@ export default function CommandPortal() {
   );
   const hasCommandAccess = isAdmin || (myOfficer && COMMAND_RANKS.includes(myOfficer.rank));
 
-  if (!hasCommandAccess) return <AccessDenied portalName="the Command Portal" />;
-
   /* ── Department scoping ──
      Non-admin command users are locked to their own department's command role
      (see utils/deptScope.js). Admins get an unrestricted view + dept picker. */
@@ -1427,6 +1425,10 @@ export default function CommandPortal() {
     officers.forEach(o => { m[o.badge] = o; });
     return m;
   }, [officers]);
+
+  // Access control is evaluated AFTER all hooks so hook order stays stable
+  // across renders (e.g. when officers/currentUser hydrate from the backend).
+  if (!hasCommandAccess) return <AccessDenied portalName="the Command Portal" />;
 
   return (
     <PortalPage>

@@ -49,7 +49,7 @@ export const BADGE = {
   available:   `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
   busy:        `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
   enrt:        `${_BADGE} bg-violet-500/15 text-violet-400 border-violet-500/30`,
-  arrvd:       `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  arrvd:       `${_BADGE} bg-teal-500/15 text-teal-300 border-teal-500/30`,
   offduty:     `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
   unavailable: `${_BADGE} bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30`,
   p1:          `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
@@ -104,7 +104,7 @@ export const cadStatus = (s) => ({
   AVAILABLE:   `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
   BUSY:        `${_BADGE} bg-red-500/15 text-red-400 border-red-500/30`,
   ENRT:        `${_BADGE} bg-violet-500/15 text-violet-400 border-violet-500/30`,
-  ARRVD:       `${_BADGE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`,
+  ARRVD:       `${_BADGE} bg-teal-500/15 text-teal-300 border-teal-500/30`,
   OFFDUTY:     `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`,
   UNAVAILABLE: `${_BADGE} bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30`,
 }[s] || `${_BADGE} bg-slate-500/15 text-slate-400 border-slate-500/30`);

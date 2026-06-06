@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
-import { MdGroup, MdAdd, MdDelete, MdCheck } from 'react-icons/md';
+import { MdGroup, MdAdd, MdDelete, MdCheck, MdClose } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, PORTAL_INPUT, PORTAL_LABEL } from './PortalKit';
 import { S_BTN_PRIMARY, S_BTN_SECONDARY, S_BTN_SUCCESS, S_BTN_DANGER, sm } from '../../constants/styles';
 import AccessDenied from './AccessDenied';
@@ -84,7 +84,7 @@ export default function Employees() {
         accent={ACCENT}
         action={canManage && (
           <button className={`${S_BTN_PRIMARY} flex items-center gap-1.5`} onClick={() => setAdding(v => !v)}>
-            <MdAdd size={18} /> Add Employee
+            {adding ? <><MdClose size={18} /> Close</> : <><MdAdd size={18} /> Add Employee</>}
           </button>
         )}
       />
