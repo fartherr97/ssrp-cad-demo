@@ -69,14 +69,26 @@ function elapsed(ts) {
 }
 
 /* ── Sign-on modal ── */
-function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
+function SignOnModal({ companies, vehicles = [], currentUser, onSignOn, onCancel }) {
   const defaultCo = companies[0];
   const [companyId, setCompanyId] = useState(String(defaultCo?.id || ''));
   const [truckId,   setTruckId]   = useState('');
   const [zone,      setZone]      = useState('City');
 
   const company = companies.find(b => b.id === Number(companyId)) || companies[0];
-  const fleet   = company?.fleet || [];
+  // The sign-on truck list IS the company's registered Business Fleet (vehicles
+  // with businessOwnerId === this company). A driver can only sign onto a truck
+  // their company actually owns.
+  const fleet = useMemo(
+    () => (vehicles || [])
+      .filter(v => v.businessOwnerId === company?.id)
+      .map(v => ({
+        id: v.id,
+        name: [v.year, v.make, v.model].filter(Boolean).join(' ').trim() || v.type || 'Vehicle',
+        plate: v.plate,
+      })),
+    [vehicles, company],
+  );
 
   const INPUT = 'w-full bg-[#111e2d] border border-[rgba(255,255,255,0.10)] rounded-lg px-3.5 py-2.5 text-sm text-white outline-none focus:border-orange-500/60 transition-all';
   const LABEL = 'block text-[11px] font-bold tracking-[0.5px] uppercase text-slate-500 mb-1.5';
@@ -90,7 +102,7 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
       companyId:   company.id,
       companyName: company.name,
       truckId:     truck?.id   || null,
-      truckName:   truck?.name || 'No truck assigned',
+      truckName:   truck ? `${truck.name} [${truck.plate}]` : 'No truck assigned',
       zone,
       operatorName: currentUser?.name     || 'Unknown',
       discordId:    currentUser?.discordId || '',
@@ -124,11 +136,13 @@ function SignOnModal({ companies, currentUser, onSignOn, onCancel }) {
           <div>
             <label className={LABEL}>Assign Truck</label>
             {fleet.length === 0 ? (
-              <div className="text-[12px] text-slate-500 italic px-1">No fleet configured for this company.</div>
+              <div className="text-[12px] text-slate-500 italic px-1">
+                No fleet vehicles registered for this company yet. Add them under Business → Fleet.
+              </div>
             ) : (
               <Select className={INPUT} value={truckId} onChange={e => setTruckId(e.target.value)} required>
                 <option value="">* Select truck *</option>
-                {fleet.map(t => <option key={t.id} value={t.id}>{t.name} ({t.spawnCode})</option>)}
+                {fleet.map(t => <option key={t.id} value={t.id}>{t.name} · {t.plate}</option>)}
               </Select>
             )}
           </div>
@@ -687,7 +701,7 @@ function FDOTRequestCard({ req, calls, onAcknowledge, onDispatch, onDecline }) {
 /* ── Main page ── */
 export default function TowCAD() {
   const { state, dispatch } = useCAD();
-  const { towJobs, towUnits = [], calls, businesses, currentUser, officers = [], fdotRequests = [] } = state;
+  const { towJobs, towUnits = [], calls, businesses, currentUser, officers = [], fdotRequests = [], vehicles = [] } = state;
   const bizCtx = useActiveBusiness();
   const toast = useToast();
   const confirm = useConfirm();
@@ -967,6 +981,7 @@ export default function TowCAD() {
       {showSignOn && (
         <SignOnModal
           companies={visibleCompanies.length > 0 ? visibleCompanies : towCompanies}
+          vehicles={vehicles}
           currentUser={currentUser}
           onSignOn={handleSignOn}
           onCancel={() => setShowSignOn(false)}
