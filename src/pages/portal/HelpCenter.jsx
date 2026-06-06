@@ -185,7 +185,7 @@ export default function HelpCenter() {
       <PortalHeader
         icon={MdHelpOutline}
         title="Help Center"
-        subtitle="Frequently asked questions for your portal — search or browse by topic."
+        subtitle="Frequently asked questions for your portal, search or browse by topic."
         accent="brand"
       />
 

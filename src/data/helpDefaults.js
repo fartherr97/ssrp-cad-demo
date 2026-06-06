@@ -9,9 +9,9 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'civ-1', iconKey: 'MdPerson', title: 'Characters',
       faqs: [
-        { id: 'q1', q: 'Can I have more than one character?', a: 'Yes. You can register multiple character identities under a single account. Everything in the portal — vehicles, licenses, reports, and medical records — scopes to whichever character is currently active.' },
+        { id: 'q1', q: 'Can I have more than one character?', a: 'Yes. You can register multiple character identities under a single account. Everything in the portal, vehicles, licenses, reports, and medical records, scopes to whichever character is currently active.' },
         { id: 'q2', q: 'How do I switch my active character?', a: 'Use the character banner at the top of any page. When you switch, every section updates automatically to that character. Your active character also persists after you close and reopen the portal.' },
-        { id: 'q3', q: 'What does the "Generate with AI" button do?', a: 'It fills a full character profile in one click — randomised demographics, address, and phone number — so you can create a character instantly instead of typing every field.' },
+        { id: 'q3', q: 'What does the "Generate with AI" button do?', a: 'It fills a full character profile in one click, randomised demographics, address, and phone number, so you can create a character instantly instead of typing every field.' },
       ],
     },
     {
@@ -19,7 +19,7 @@ export const DEFAULT_HELP_CONTENT = {
       faqs: [
         { id: 'q1', q: 'How do I call 911?', a: 'Tap "Call 911" on the home page to open the emergency form, then fill in your emergency description, location, and an optional callback number.' },
         { id: 'q2', q: 'What happens after I submit a 911 call?', a: 'The call is stamped with your active character\'s name and appears immediately in the dispatch queue. You can track its status under My Reports.' },
-        { id: 'q3', q: 'Can I get in trouble for misusing 911?', a: 'Yes. 911 is for genuine in-game emergencies only — misuse may result in in-game consequences.' },
+        { id: 'q3', q: 'Can I get in trouble for misusing 911?', a: 'Yes. 911 is for genuine in-game emergencies only, misuse may result in in-game consequences.' },
       ],
     },
     {
@@ -32,9 +32,9 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'civ-4', iconKey: 'MdBadge', title: 'Licenses',
       faqs: [
-        { id: 'q1', q: 'How do I get a driver license?', a: 'Apply from My Licenses — it is issued instantly once you submit.' },
+        { id: 'q1', q: 'How do I get a driver license?', a: 'Apply from My Licenses, it is issued instantly once you submit.' },
         { id: 'q2', q: 'How do I renew my license?', a: 'Renew a license approaching expiry from the same My Licenses page.' },
-        { id: 'q3', q: 'My license is suspended or revoked — what can I do?', a: 'While suspended or revoked you cannot apply or renew. Contact an admin to appeal.' },
+        { id: 'q3', q: 'My license is suspended or revoked, what can I do?', a: 'While suspended or revoked you cannot apply or renew. Contact an admin to appeal.' },
       ],
     },
     {
@@ -64,7 +64,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'biz-1', iconKey: 'MdStore', title: 'Business Dashboard',
       faqs: [
-        { id: 'q1', q: 'What does the dashboard show?', a: 'An overview of your business — employee count, licence status, and current standing at a glance — plus quick-action cards that navigate to every section of the portal.' },
+        { id: 'q1', q: 'What does the dashboard show?', a: 'An overview of your business, employee count, licence status, and current standing at a glance, plus quick-action cards that navigate to every section of the portal.' },
       ],
     },
     {
@@ -114,7 +114,7 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'leo-2', iconKey: 'MdSearch', title: 'Records Search',
       faqs: [
         { id: 'q1', q: 'How do I look up a person?', a: 'Search People by name, DOB, SSN, or DL number to pull a full civilian profile. Exact and partial matches are both supported.' },
-        { id: 'q2', q: 'How do I run a vehicle or plate?', a: 'Search Vehicle by plate or make/model — results include commercial / business-owned vehicles.' },
+        { id: 'q2', q: 'How do I run a vehicle or plate?', a: 'Search Vehicle by plate or make/model, results include commercial / business-owned vehicles.' },
         { id: 'q3', q: 'What else can I search?', a: 'Warrants (by subject name or charge), Businesses (by name, owner, or type), FDOT Permits (by holder, location, or permit number), and Reports & Records (by case number, type, or status).' },
       ],
     },
@@ -122,7 +122,7 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'leo-3', iconKey: 'MdReportProblem', title: 'Filing Reports',
       faqs: [
         { id: 'q1', q: 'How do I file a report?', a: 'File incident, arrest, and supplemental reports from the Reports center. Forms auto-fill your agency, unit, and badge details, and each report is stamped with a sequential case number on submission.' },
-        { id: 'q2', q: 'Can I export or submit a report for review?', a: 'Yes — save any report as a PDF, or submit it for supervisor review.' },
+        { id: 'q2', q: 'Can I export or submit a report for review?', a: 'Yes, save any report as a PDF, or submit it for supervisor review.' },
       ],
     },
     {
@@ -136,8 +136,8 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'leo-5', iconKey: 'MdGavel', title: 'Warrants',
       faqs: [
         { id: 'q1', q: 'Where do I see a person\'s warrants?', a: 'A subject with an active warrant is flagged in their profile and on every search return. Warrant Control lists all warrants and lets you filter by Active, Served, or All.' },
-        { id: 'q2', q: 'Someone was arrested on a warrant — how do I clear it so other officers don\'t re-arrest them?', a: 'Mark the warrant served. Fastest way: open the subject in Records Search and tap "Mark Served" on the active warrant. You can also do it from Warrant Control by selecting the warrant and choosing "Mark as Served". Once served, it stamps who cleared it and when, and it drops off the active-warrant flags other officers see — so nobody arrests on it again.' },
-        { id: 'q3', q: 'Does a served warrant disappear from the system?', a: 'No. Served warrants are kept permanently and stay fully searchable — filter to Served (or All) in Warrant Control, or open the subject\'s Warrants tab in Records Search. The record keeps who served it, the date, and any linked case number for later review.' },
+        { id: 'q2', q: 'Someone was arrested on a warrant, how do I clear it so other officers don\'t re-arrest them?', a: 'Mark the warrant served. Fastest way: open the subject in Records Search and tap "Mark Served" on the active warrant. You can also do it from Warrant Control by selecting the warrant and choosing "Mark as Served". Once served, it stamps who cleared it and when, and it drops off the active-warrant flags other officers see, so nobody arrests on it again.' },
+        { id: 'q3', q: 'Does a served warrant disappear from the system?', a: 'No. Served warrants are kept permanently and stay fully searchable, filter to Served (or All) in Warrant Control, or open the subject\'s Warrants tab in Records Search. The record keeps who served it, the date, and any linked case number for later review.' },
       ],
     },
     {
@@ -155,7 +155,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'leo-8', iconKey: 'MdWork', title: 'Case Files (CID)',
       faqs: [
-        { id: 'q1', q: 'What are Case Files?', a: 'Case Files (reached from the Cases link in the nav bar) is the CID detective investigation system. Detectives in the Detectives subdivision create and manage cases — opening them, adding subjects, linking vehicles, and updating the timeline.' },
+        { id: 'q1', q: 'What are Case Files?', a: 'Case Files (reached from the Cases link in the nav bar) is the CID detective investigation system. Detectives in the Detectives subdivision create and manage cases, opening them, adding subjects, linking vehicles, and updating the timeline.' },
         { id: 'q2', q: 'How is a case organised?', a: 'Each case has a priority (High / Medium / Low), a classification (Narcotics, Assault, Fraud, etc.), and four tabs: Overview (summary and status controls), Subjects (linked civilians and roles), Vehicles (linked plates), and Timeline (notes, evidence, leads, and tips).' },
         { id: 'q3', q: 'What do the case statuses mean?', a: 'Active = investigation ongoing. Suspended = paused, waiting on evidence or legal process. Closed = investigation concluded. Locked = sealed by a supervisor, no further edits. Supervisors and Command can view all cases and lock a closed one.' },
       ],
@@ -163,9 +163,9 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'leo-9', iconKey: 'MdWarningAmber', title: 'Active Investigation Flag',
       faqs: [
-        { id: 'q1', q: 'What is the red "Active Investigation" banner on a search return?', a: 'It means the person or vehicle is linked to an active CID case. The banner shows the case number and title so you know which investigation it belongs to. The flag is informational — it does not by itself make someone a wanted person, so check for active warrants separately.' },
-        { id: 'q2', q: 'What should I do — and not do — when I see it?', a: 'Do NOT disclose to the subject that they are under investigation; it can compromise surveillance or a prosecution. If you have new information (a location, an associate, something you observed), tap Submit Tip on the flag — it posts to the case timeline and notifies the assigned detective.' },
-        { id: 'q3', q: 'I made an unrelated arrest on a flagged subject — what now?', a: 'Contact CID before transporting. The detective may need to respond to scene or coordinate the process. Flagged vehicles are treated the same way — note where and when you observed it in your tip.' },
+        { id: 'q1', q: 'What is the red "Active Investigation" banner on a search return?', a: 'It means the person or vehicle is linked to an active CID case. The banner shows the case number and title so you know which investigation it belongs to. The flag is informational, it does not by itself make someone a wanted person, so check for active warrants separately.' },
+        { id: 'q2', q: 'What should I do, and not do, when I see it?', a: 'Do NOT disclose to the subject that they are under investigation; it can compromise surveillance or a prosecution. If you have new information (a location, an associate, something you observed), tap Submit Tip on the flag, it posts to the case timeline and notifies the assigned detective.' },
+        { id: 'q3', q: 'I made an unrelated arrest on a flagged subject, what now?', a: 'Contact CID before transporting. The detective may need to respond to scene or coordinate the process. Flagged vehicles are treated the same way, note where and when you observed it in your tip.' },
       ],
     },
   ],
@@ -188,7 +188,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'fire-3', iconKey: 'MdShield', title: 'LE Assistance Requests',
       faqs: [
-        { id: 'q1', q: 'How do law enforcement requests reach us?', a: 'Officers can request HCFR support directly from a call. Incoming requests appear on the Fire board — acknowledge, dispatch a unit, or decline. Dispatching a unit notifies the requesting officer over radio.' },
+        { id: 'q1', q: 'How do law enforcement requests reach us?', a: 'Officers can request HCFR support directly from a call. Incoming requests appear on the Fire board, acknowledge, dispatch a unit, or decline. Dispatching a unit notifies the requesting officer over radio.' },
       ],
     },
     {
@@ -223,14 +223,14 @@ export const DEFAULT_HELP_CONTENT = {
       id: 'sup-2', iconKey: 'MdSearch', title: 'Personnel Lookup',
       faqs: [
         { id: 'q1', q: 'How do I look up an officer\'s activity?', a: 'Search officers by name or badge number to pull their full submission history, with pending, approved, and total counts at a glance.' },
-        { id: 'q2', q: 'Can I look up civilians too?', a: 'Yes — search civilians by name, DL number, or SSN.' },
+        { id: 'q2', q: 'Can I look up civilians too?', a: 'Yes, search civilians by name, DL number, or SSN.' },
       ],
     },
     {
       id: 'sup-3', iconKey: 'MdCampaign', title: 'Notification Blast',
       faqs: [
         { id: 'q1', q: 'How do I send a department notification?', a: 'Send an instant toast notification to all online personnel in your department. Choose a title, message body, and colour (Blue, Green, Amber, Red, Violet, Cyan); it shows your name and badge as the sender.' },
-        { id: 'q2', q: 'Can I send to other departments?', a: 'No. Supervisor blasts are department-scoped — you can only send to your own department. (Command can target any department.)' },
+        { id: 'q2', q: 'Can I send to other departments?', a: 'No. Supervisor blasts are department-scoped, you can only send to your own department. (Command can target any department.)' },
       ],
     },
   ],
@@ -239,7 +239,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'cmd-1', iconKey: 'MdBarChart', title: 'Overview',
       faqs: [
-        { id: 'q1', q: 'What does the Overview dashboard show?', a: 'Top-level stats across all departments — active calls, units on duty, pending submissions, open warrants — plus charts for call volume, incident category breakdown, and unit status. Filter by time range (Today / Last 7 Days / Last 30 Days).' },
+        { id: 'q1', q: 'What does the Overview dashboard show?', a: 'Top-level stats across all departments, active calls, units on duty, pending submissions, open warrants, plus charts for call volume, incident category breakdown, and unit status. Filter by time range (Today / Last 7 Days / Last 30 Days).' },
       ],
     },
     {
@@ -263,7 +263,7 @@ export const DEFAULT_HELP_CONTENT = {
     {
       id: 'cmd-5', iconKey: 'MdAssignment', title: 'Report Tracker',
       faqs: [
-        { id: 'q1', q: 'What is the Report Tracker?', a: 'A full cross-department view of all submitted reports — status, type, filing officer, and date — so you can quickly identify overdue or un-reviewed submissions.' },
+        { id: 'q1', q: 'What is the Report Tracker?', a: 'A full cross-department view of all submitted reports, status, type, filing officer, and date, so you can quickly identify overdue or un-reviewed submissions.' },
       ],
     },
     {
