@@ -102,11 +102,15 @@ function FaqItem({ faq, color, forceOpen }) {
           style={{ color, transform: show ? 'rotate(90deg)' : 'rotate(0deg)' }} />
         <span className="flex-1 text-[13.5px] font-semibold text-slate-100 leading-snug">{faq.q}</span>
       </button>
-      {show && (
-        <div className="pl-[30px] pr-2 pb-3 -mt-0.5 text-[13px] text-slate-400 leading-relaxed whitespace-pre-wrap">
-          {faq.a}
+      {/* Animated expand/collapse — grid-rows 0fr→1fr smoothly tweens the height
+         with no fixed measurement, and the inner content fades + slides in. */}
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${show ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <div className={`pl-[30px] pr-2 pb-3 -mt-0.5 text-[13px] text-slate-400 leading-relaxed whitespace-pre-wrap transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'}`}>
+            {faq.a}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
