@@ -572,8 +572,13 @@ function baseReducer(state, action) {
     case 'ADD_CIVILIAN': {
       const rPad = (n) => String(Math.floor(Math.random() * (10 ** n))).padStart(n, '0');
       const ssnPrefix = state.uniqueIdentifiers?.ssnPrefix?.trim();
-      const autoSSN = ssnPrefix ? `${ssnPrefix}-${rPad(2)}-${rPad(4)}` : `${rPad(3)}-${rPad(2)}-${rPad(4)}`;
-      const newCiv = { ...action.payload, ssn: action.payload.ssn || autoSSN, id: state.nextId, vehicles: [], flags: [] };
+      const genSSN = () => ssnPrefix ? `${ssnPrefix}-${rPad(2)}-${rPad(4)}` : `${rPad(3)}-${rPad(2)}-${rPad(4)}`;
+      const takenSSNs = new Set(state.civilians.map(c => c.ssn).filter(Boolean));
+      let autoSSN = action.payload.ssn;
+      if (!autoSSN) {
+        do { autoSSN = genSSN(); } while (takenSSNs.has(autoSSN));
+      }
+      const newCiv = { ...action.payload, ssn: autoSSN, id: state.nextId, vehicles: [], flags: [] };
       const audit = addAuditEntry(state, `Created civilian record: ${newCiv.firstName} ${newCiv.lastName}`, 'Civilian');
       return { ...state, civilians: [...state.civilians, newCiv], nextId: state.nextId + 1, ...audit };
     }
