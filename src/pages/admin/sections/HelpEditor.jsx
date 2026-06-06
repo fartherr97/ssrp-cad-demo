@@ -7,7 +7,7 @@ import { HELP_ICON_MAP, PORTAL_COLOR } from '../../portal/HelpCenter';
 import { DEFAULT_HELP_CONTENT } from '../../../data/helpDefaults';
 import {
   MdPerson, MdStore, MdSupervisorAccount, MdShield,
-  MdAdd, MdDelete, MdDragIndicator, MdSave, MdUndo,
+  MdAdd, MdDelete, MdSave, MdUndo,
   MdExpandMore, MdExpandLess, MdHelpOutline,
   MdLocalPolice, MdLocalFireDepartment,
 } from 'react-icons/md';
@@ -36,21 +36,23 @@ function SectionEditor({ sec, color, onChange, onDelete, onMoveUp, onMoveDown, i
 
   const setField = (key, val) => onChange({ ...sec, [key]: val });
 
-  const setBullet = (id, text) =>
-    onChange({ ...sec, bullets: sec.bullets.map(b => b.id === id ? { ...b, text } : b) });
+  const faqs = sec.faqs || [];
 
-  const addBullet = () =>
-    onChange({ ...sec, bullets: [...sec.bullets, { id: uid(), text: '' }] });
+  const setFaq = (id, key, val) =>
+    onChange({ ...sec, faqs: faqs.map(f => f.id === id ? { ...f, [key]: val } : f) });
 
-  const removeBullet = (id) =>
-    onChange({ ...sec, bullets: sec.bullets.filter(b => b.id !== id) });
+  const addFaq = () =>
+    onChange({ ...sec, faqs: [...faqs, { id: uid(), q: '', a: '' }] });
 
-  const moveBullet = (idx, dir) => {
-    const arr = [...sec.bullets];
+  const removeFaq = (id) =>
+    onChange({ ...sec, faqs: faqs.filter(f => f.id !== id) });
+
+  const moveFaq = (idx, dir) => {
+    const arr = [...faqs];
     const swap = idx + dir;
     if (swap < 0 || swap >= arr.length) return;
     [arr[idx], arr[swap]] = [arr[swap], arr[idx]];
-    onChange({ ...sec, bullets: arr });
+    onChange({ ...sec, faqs: arr });
   };
 
   return (
@@ -85,11 +87,11 @@ function SectionEditor({ sec, color, onChange, onDelete, onMoveUp, onMoveDown, i
 
       {open && (
         <div className="p-4 flex flex-col gap-4">
-          {/* Title + Icon row */}
+          {/* Category Title + Icon row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className={LBL}>Section Title</label>
-              <input className={INP} value={sec.title} onChange={e => setField('title', e.target.value)} placeholder="e.g. My Vehicles" />
+              <label className={LBL}>Category Title</label>
+              <input className={INP} value={sec.title} onChange={e => setField('title', e.target.value)} placeholder="e.g. Warrants" />
             </div>
             <div>
               <label className={LBL}>Icon</label>
@@ -100,41 +102,40 @@ function SectionEditor({ sec, color, onChange, onDelete, onMoveUp, onMoveDown, i
             </div>
           </div>
 
-          {/* Tip */}
+          {/* Questions & Answers */}
           <div>
-            <label className={LBL}>Tip / Subtitle <span className="normal-case font-normal text-slate-600">(optional)</span></label>
-            <input className={INP} value={sec.tip || ''} onChange={e => setField('tip', e.target.value)} placeholder="Shown as a muted callout above the bullets" />
-          </div>
-
-          {/* Bullets */}
-          <div>
-            <label className={LBL}>Bullet Points</label>
-            <div className="flex flex-col gap-2">
-              {sec.bullets.map((b, idx) => (
-                <div key={b.id} className="flex items-center gap-2">
-                  <MdDragIndicator size={14} className="text-slate-600 shrink-0" />
-                  <div className="flex gap-1 shrink-0">
-                    <button onClick={() => moveBullet(idx, -1)} disabled={idx === 0}
-                      className="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-25 cursor-pointer"
-                      style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 700 }}>▲</button>
-                    <button onClick={() => moveBullet(idx, 1)} disabled={idx === sec.bullets.length - 1}
-                      className="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-25 cursor-pointer"
-                      style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 700 }}>▼</button>
+            <label className={LBL}>Questions &amp; Answers</label>
+            <div className="flex flex-col gap-3">
+              {faqs.map((f, idx) => (
+                <div key={f.id} className="rounded-lg border border-border-base bg-app-panel/40 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.5px] text-slate-500 flex-1">Q{idx + 1}</span>
+                    <div className="flex gap-1 shrink-0">
+                      <button onClick={() => moveFaq(idx, -1)} disabled={idx === 0}
+                        className="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-25 cursor-pointer"
+                        style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 700 }}>▲</button>
+                      <button onClick={() => moveFaq(idx, 1)} disabled={idx === faqs.length - 1}
+                        className="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-25 cursor-pointer"
+                        style={{ background: 'transparent', border: 'none', fontSize: 10, fontWeight: 700 }}>▼</button>
+                      <button onClick={() => removeFaq(f.id)}
+                        className="w-6 h-6 flex items-center justify-center rounded-lg text-red-500/60 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        style={{ background: 'transparent', border: 'none' }}>
+                        <MdDelete size={14} />
+                      </button>
+                    </div>
                   </div>
-                  <input className={`${INP} flex-1`} value={b.text}
-                    onChange={e => setBullet(b.id, e.target.value)}
-                    placeholder={`Bullet ${idx + 1}`} />
-                  <button onClick={() => removeBullet(b.id)}
-                    className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-red-500/60 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                    style={{ background: 'transparent', border: 'none' }}>
-                    <MdDelete size={14} />
-                  </button>
+                  <input className={`${INP} mb-2`} value={f.q}
+                    onChange={e => setFaq(f.id, 'q', e.target.value)}
+                    placeholder="Question, e.g. How do I clear a served warrant?" />
+                  <textarea className={`${INP} resize-y min-h-[64px]`} rows={3} value={f.a}
+                    onChange={e => setFaq(f.id, 'a', e.target.value)}
+                    placeholder="Answer the question players are asking." />
                 </div>
               ))}
-              <button onClick={addBullet}
+              <button onClick={addFaq}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-border-base text-[12px] text-slate-500 hover:text-slate-300 hover:border-slate-500 transition-colors cursor-pointer w-fit"
                 style={{ background: 'transparent' }}>
-                <MdAdd size={14} /> Add Bullet
+                <MdAdd size={14} /> Add Question
               </button>
             </div>
           </div>
@@ -186,9 +187,8 @@ export default function HelpEditor() {
     setSections([...sections, {
       id: uid(),
       iconKey: 'MdCheckCircle',
-      title: 'New Section',
-      tip: '',
-      bullets: [{ id: uid(), text: '' }],
+      title: 'New Category',
+      faqs: [{ id: uid(), q: '', a: '' }],
     }]);
   };
 
@@ -243,7 +243,7 @@ export default function HelpEditor() {
 
         {/* Section count + actions */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-[12px] text-slate-500">{sections.length} section{sections.length !== 1 ? 's' : ''}</span>
+          <span className="text-[12px] text-slate-500">{sections.length} categor{sections.length !== 1 ? 'ies' : 'y'}</span>
           <div className="ml-auto flex gap-2">
             <button onClick={handleReset}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-base bg-white/[0.03] text-[12px] font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
@@ -276,7 +276,7 @@ export default function HelpEditor() {
           <button onClick={addSection}
             className="flex items-center gap-2 px-4 py-3 rounded-xl border border-dashed border-border-base text-[13px] text-slate-500 hover:text-slate-300 hover:border-slate-500 transition-colors cursor-pointer"
             style={{ background: 'transparent' }}>
-            <MdAdd size={16} /> Add Section
+            <MdAdd size={16} /> Add Category
           </button>
         </div>
       </div>

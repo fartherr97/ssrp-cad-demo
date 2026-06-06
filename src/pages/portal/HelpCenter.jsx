@@ -5,7 +5,7 @@ import {
   MdPhone, MdReportProblem, MdAssignment, MdMenuBook, MdGavel,
   MdStore, MdGroup, MdLocalShipping, MdSupervisorAccount, MdShield,
   MdCheckCircle, MdSearch, MdCampaign, MdBarChart, MdAccessTime,
-  MdOutlineRateReview, MdChevronRight, MdInfoOutline,
+  MdOutlineRateReview, MdChevronRight,
   MdDashboard, MdMap, MdLocalFireDepartment, MdLocalPolice, MdEngineering,
   MdWork, MdWarningAmber,
 } from 'react-icons/md';
@@ -86,45 +86,50 @@ function primaryTab(currentUser, allowed) {
   return allowed.includes(pref) ? pref : allowed[0];
 }
 
-function Section({ sec, color }) {
-  const [open, setOpen] = useState(true);
-  const Icon = HELP_ICON_MAP[sec.iconKey] || MdCheckCircle;
+/* A single question row — click to expand the answer. While a search is active,
+   matching rows are forced open so players see answers without extra clicks. */
+function FaqItem({ faq, color, forceOpen }) {
+  const [open, setOpen] = useState(false);
+  const show = open || forceOpen;
   return (
-    <div className="portal-card-enter rounded-xl border border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+    <div className="border-t border-border-faint first:border-t-0">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer text-left transition-colors hover:bg-white/[0.03]"
+        className="w-full flex items-start gap-2.5 px-2 py-3 cursor-pointer text-left transition-colors hover:bg-white/[0.02]"
         style={{ background: 'transparent', border: 'none' }}
       >
+        <MdChevronRight size={16} className="shrink-0 mt-0.5 transition-transform"
+          style={{ color, transform: show ? 'rotate(90deg)' : 'rotate(0deg)' }} />
+        <span className="flex-1 text-[13.5px] font-semibold text-slate-100 leading-snug">{faq.q}</span>
+      </button>
+      {show && (
+        <div className="pl-[30px] pr-2 pb-3 -mt-0.5 text-[13px] text-slate-400 leading-relaxed whitespace-pre-wrap">
+          {faq.a}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* A category groups related questions under an icon + title header. */
+function Category({ sec, color, forceOpen }) {
+  const Icon = HELP_ICON_MAP[sec.iconKey] || MdCheckCircle;
+  const faqs = sec.faqs || [];
+  if (faqs.length === 0) return null;
+  return (
+    <div className="portal-card-enter rounded-xl border border-border-base bg-app-panel/80 backdrop-blur-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border-faint">
         <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center"
           style={{ background: `${color}18`, border: `1px solid ${color}40` }}>
           <Icon size={16} style={{ color }} />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-bold text-slate-100">{sec.title}</div>
-          {sec.tip && !open && (
-            <div className="text-[11px] text-slate-500 truncate mt-0.5">{sec.tip}</div>
-          )}
-        </div>
-        <MdChevronRight size={18} className="text-slate-500 shrink-0 transition-transform"
-          style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }} />
-      </button>
-      {open && (
-        <div className="px-4 pb-4 pt-1 border-t border-border-faint flex flex-col gap-0.5">
-          {sec.tip && (
-            <div className="flex items-start gap-2 mb-2 px-2 py-1.5 rounded-lg bg-white/[0.025] text-[11.5px] text-slate-500 leading-relaxed">
-              <MdInfoOutline size={13} className="shrink-0 mt-0.5 text-slate-600" />
-              {sec.tip}
-            </div>
-          )}
-          {(sec.bullets || []).map(b => (
-            <div key={b.id} className="flex items-start gap-2.5 py-1.5">
-              <MdCheckCircle size={14} style={{ color, flexShrink: 0, marginTop: 2 }} />
-              <span className="text-[13px] text-slate-300 leading-relaxed">{b.text}</span>
-            </div>
-          ))}
-        </div>
-      )}
+        <div className="text-[13.5px] font-bold text-slate-100">{sec.title}</div>
+      </div>
+      <div className="px-2 py-1">
+        {faqs.map(f => (
+          <FaqItem key={f.id} faq={f} color={color} forceOpen={forceOpen} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -157,12 +162,30 @@ export default function HelpCenter() {
   const helpContent = state.helpContent || {};
   const sections = helpContent[safeActive] || DEFAULT_HELP_CONTENT[safeActive] || [];
 
+  // FAQ search — filters questions + answers (and category titles) live.
+  const [query, setQuery] = useState('');
+  const q = query.trim().toLowerCase();
+  const filtered = !q
+    ? sections
+    : sections
+        .map(sec => {
+          const titleHit = (sec.title || '').toLowerCase().includes(q);
+          const faqs = (sec.faqs || []).filter(f =>
+            titleHit ||
+            (f.q || '').toLowerCase().includes(q) ||
+            (f.a || '').toLowerCase().includes(q)
+          );
+          return { ...sec, faqs };
+        })
+        .filter(sec => (sec.faqs || []).length > 0);
+  const resultCount = filtered.reduce((n, s) => n + (s.faqs || []).length, 0);
+
   return (
     <PortalPage>
       <PortalHeader
         icon={MdHelpOutline}
         title="Help Center"
-        subtitle="Feature guides for your portal, pick a section below."
+        subtitle="Frequently asked questions for your portal — search or browse by topic."
         accent="brand"
       />
 
@@ -172,7 +195,7 @@ export default function HelpCenter() {
           const on = t.id === safeActive;
           const tc = PORTAL_COLOR[t.id];
           return (
-            <button key={t.id} onClick={() => setActiveTab(t.id)}
+            <button key={t.id} onClick={() => { setActiveTab(t.id); setQuery(''); }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12.5px] font-bold cursor-pointer transition-all border"
               style={on
                 ? { background: `${tc}20`, borderColor: `${tc}50`, color: tc }
@@ -195,13 +218,45 @@ export default function HelpCenter() {
         </p>
       </div>
 
+      {/* Search box — filters questions and answers live */}
+      <div className="flex items-center gap-2.5 mb-4 px-3.5 py-2.5 rounded-xl border bg-app-panel/60 backdrop-blur-sm focus-within:bg-app-panel/80 transition-colors"
+        style={{ borderColor: `${color}30` }}>
+        <MdSearch size={18} style={{ color }} className="shrink-0" />
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search frequently asked questions…"
+          className="flex-1 bg-transparent text-[13px] text-slate-200 placeholder:text-slate-600 outline-none"
+        />
+        {query && (
+          <button onClick={() => setQuery('')}
+            className="text-[11px] font-semibold text-slate-500 hover:text-slate-300 cursor-pointer shrink-0"
+            style={{ background: 'transparent', border: 'none' }}>
+            Clear
+          </button>
+        )}
+      </div>
+
+      {q && (
+        <div className="mb-3 text-[11.5px] text-slate-500">
+          {resultCount} result{resultCount !== 1 ? 's' : ''} for “{query.trim()}”
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
-        {sections.map(sec => (
-          <Section key={sec.id} sec={sec} color={color} />
+        {filtered.map(sec => (
+          <Category key={sec.id} sec={sec} color={color} forceOpen={!!q} />
         ))}
         {sections.length === 0 && (
           <div className="text-center py-12 text-slate-500 text-[13px]">
             No help content configured for this portal yet.
+          </div>
+        )}
+        {sections.length > 0 && filtered.length === 0 && (
+          <div className="flex flex-col items-center gap-2 text-center py-12 text-slate-500">
+            <MdSearch size={28} className="opacity-30" />
+            <span className="text-[13px]">No questions match “{query.trim()}”.</span>
+            <span className="text-[11.5px] text-slate-600">Try a different keyword, or clear the search to browse all topics.</span>
           </div>
         )}
       </div>
