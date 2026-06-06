@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import Select from '../../../components/ui/Select';
 import { MdMessage, MdSearch, MdShield, MdCampaign } from 'react-icons/md';
 import { useCAD } from '../../../store/cadStore';
-import { AdminPanel, AdminPageTitle } from '../AdminKit';
+import { AdminPanel, AdminPageTitle, usePager, Pager } from '../AdminKit';
 
 const TYPE_META = {
   direct: { label: 'Direct',    cls: 'bg-violet-500/15 text-violet-400 border-violet-500/30' },
@@ -35,6 +35,8 @@ export default function MessageLogs() {
       return true;
     });
   }, [messageLog, search, typeFilter]);
+
+  const pager = usePager(filtered, 25);
 
   return (
     <div className="flex flex-col gap-5 p-4 lg:p-6 font-ui">
@@ -94,7 +96,7 @@ export default function MessageLogs() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((m, idx) => (
+                  {pager.pageItems.map((m, idx) => (
                     <tr key={m.id} className={idx % 2 === 0 ? '' : 'bg-white/[0.02]'}>
                       <td className="px-4 py-3 text-[11px] font-mono text-slate-500 border-b border-border-faint whitespace-nowrap">
                         {m.timestamp}
@@ -128,7 +130,7 @@ export default function MessageLogs() {
 
             {/* Mobile cards */}
             <div className="block sm:hidden flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
-              {filtered.map(m => (
+              {pager.pageItems.map(m => (
                 <div key={m.id} className="bg-app-card/60 border border-border-faint rounded-xl p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <TypeBadge type={m.type} />
@@ -143,6 +145,7 @@ export default function MessageLogs() {
                 </div>
               ))}
             </div>
+            <Pager {...pager} />
           </>
         )}
       </AdminPanel>

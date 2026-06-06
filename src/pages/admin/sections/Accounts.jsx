@@ -4,10 +4,10 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonSearch, SonBadge, SonButton, EmptyState, ADMIN,
+  usePager, Pager,
 } from '../AdminKit';
 
 const STATUS_COLOR = { ACTIVE: ADMIN.green, SUSPENDED: ADMIN.amber, BANNED: ADMIN.red };
-const PER_PAGE = 6;
 
 export default function Accounts() {
   const { state, dispatch } = useCAD();
@@ -16,14 +16,12 @@ export default function Accounts() {
   const confirm = useConfirm();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [page, setPage] = useState(0);
 
   const filtered = adminAccounts.filter(a =>
     (statusFilter === 'ALL' || a.status === statusFilter) &&
     (!query || a.username.toLowerCase().includes(query.toLowerCase()) || (a.discordIds || []).some(id => id.includes(query))));
 
-  const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const pageItems = filtered.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+  const pager = usePager(filtered, 10);
 
   const cycleStatus = async (a) => {
     const next = a.status === 'ACTIVE' ? 'SUSPENDED' : a.status === 'SUSPENDED' ? 'BANNED' : 'ACTIVE';
@@ -46,9 +44,9 @@ export default function Accounts() {
       right={<>
         {['ALL', 'ACTIVE', 'SUSPENDED', 'BANNED'].map(s => (
           <SonButton key={s} size="sm" variant={statusFilter === s ? 'red' : 'ghost'}
-            onClick={() => { setStatusFilter(s); setPage(0); }}>{s}</SonButton>
+            onClick={() => { setStatusFilter(s); pager.setPage(1); }}>{s}</SonButton>
         ))}
-        <SonSearch value={query} onChange={v => { setQuery(v); setPage(0); }} placeholder="Search username / Discord ID…" />
+        <SonSearch value={query} onChange={v => { setQuery(v); pager.setPage(1); }} placeholder="Search username / Discord ID…" />
       </>}
     >
       {filtered.length === 0 ? <EmptyState>No accounts match.</EmptyState> : (
@@ -57,7 +55,7 @@ export default function Accounts() {
             { label: 'Username' }, { label: 'Status' }, { label: 'Permissions' },
             { label: 'Last Login' }, { label: 'Joined' }, { label: 'Discord ID' },
           ]}>
-            {pageItems.map((a, i) => (
+            {pager.pageItems.map((a, i) => (
               <SonRow key={a.id} i={i}>
                 <SonCell bold>{a.username}</SonCell>
                 <SonCell>
@@ -76,12 +74,7 @@ export default function Accounts() {
               </SonRow>
             ))}
           </SonTable>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 14, color: ADMIN.textDim, fontSize: 12 }}>
-            <span>{page * PER_PAGE + 1}–{Math.min((page + 1) * PER_PAGE, filtered.length)} of {filtered.length}</span>
-            <SonButton size="sm" variant="ghost" disabled={page === 0} onClick={() => setPage(p => p - 1)}>‹ Prev</SonButton>
-            <span>{page + 1} / {pages}</span>
-            <SonButton size="sm" variant="ghost" disabled={page >= pages - 1} onClick={() => setPage(p => p + 1)}>Next ›</SonButton>
-          </div>
+          <Pager {...pager} />
         </>
       )}
     </AdminPanel>

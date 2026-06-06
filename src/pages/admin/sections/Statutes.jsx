@@ -4,7 +4,7 @@ import { useCAD } from '../../../store/cadStore';
 import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonButton, SonIconBtn, SonSearch, SonBadge,
-  SON_INPUT, EmptyState, ADMIN,
+  SON_INPUT, EmptyState, ADMIN, usePager, Pager,
 } from '../AdminKit';
 import { MdAdd, MdDelete, MdEdit, MdClose } from 'react-icons/md';
 
@@ -32,6 +32,8 @@ export default function Statutes() {
     p.name.toLowerCase().includes(query.toLowerCase()) ||
     p.code.toLowerCase().includes(query.toLowerCase()) ||
     (p.category || '').toLowerCase().includes(query.toLowerCase()));
+
+  const pager = usePager(filtered, 25);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -88,12 +90,13 @@ export default function Statutes() {
       )}
 
       {filtered.length === 0 ? <EmptyState>No statutes match.</EmptyState> : (
+        <>
         <SonTable columns={[
           { label: 'Action', width: 80 }, { label: 'Code', width: 110 }, { label: 'Name' },
           { label: 'Category' }, { label: 'Type' },
           { label: 'Fine', align: 'right' }, { label: 'Jail', align: 'right' }, { label: 'Pts', align: 'right', width: 60 },
         ]}>
-          {filtered.map((s, i) => (
+          {pager.pageItems.map((s, i) => (
             <SonRow key={s.id} i={i}>
               <SonCell>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -113,6 +116,8 @@ export default function Statutes() {
             </SonRow>
           ))}
         </SonTable>
+        <Pager {...pager} />
+        </>
       )}
     </AdminPanel>
   );

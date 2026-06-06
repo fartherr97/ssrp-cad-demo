@@ -1,6 +1,10 @@
 /* SSRP Admin customization UI kit.
    Deep navy panels, blue accent, translucent rounded cards. Shared by every admin section. */
 
+import { useState, useMemo } from 'react';
+import Select from '../../components/ui/Select';
+import { MdFirstPage, MdChevronLeft, MdChevronRight, MdLastPage } from 'react-icons/md';
+
 export const ADMIN = {
   red:      '#3d82f0',
   redHi:    '#5a97f5',
@@ -198,6 +202,62 @@ export function SonBadge({ children, color = ADMIN.blue }) {
 export function EmptyState({ children }) {
   return (
     <div className="text-center py-[50px] text-[13px] text-slate-500">{children}</div>
+  );
+}
+
+/* ── Pagination ──────────────────────────────────────────────
+   Splits a (already-filtered) array into pages and clamps the current page
+   when the list shrinks (e.g. after filtering). Pair with <Pager>:
+     const pager = usePager(filtered, 25);
+     …{pager.pageItems.map(...)}…
+     <Pager {...pager} />
+*/
+export function usePager(items, initialSize = 25) {
+  const [pageSize, setPageSize] = useState(initialSize);
+  const [rawPage, setPage] = useState(1);
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  // Clamp during render (not in an effect) so a shrinking list never leaves us
+  // stranded on an out-of-range page, with no extra re-render.
+  const page = Math.min(Math.max(1, rawPage), totalPages);
+  const start = (page - 1) * pageSize;
+  const pageItems = useMemo(() => items.slice(start, start + pageSize), [items, start, pageSize]);
+  return { page, setPage, pageSize, setPageSize, total, totalPages, start, pageItems };
+}
+
+function PagerBtn({ icon: Icon, onClick, disabled, label }) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} aria-label={label} title={label}
+      className="w-8 h-8 inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-300 enabled:hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
+      <Icon size={16} />
+    </button>
+  );
+}
+
+/* Rows-per-page selector + first/prev/next/last. Spread a usePager() result
+   straight in: <Pager {...pager} />. Renders nothing for an empty list. */
+export function Pager({ page, setPage, pageSize, setPageSize, total, totalPages, sizes = [10, 25, 50, 100] }) {
+  if (!total) return null;
+  const from = (page - 1) * pageSize + 1;
+  const to = Math.min(total, page * pageSize);
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap pt-4 mt-2 border-t border-border-faint">
+      <div className="flex items-center gap-2 text-[12px] text-slate-500">
+        <span className="hidden sm:inline">Rows per page</span>
+        <Select style={{ ...SON_INPUT, width: 78, padding: '6px 8px' }} value={String(pageSize)}
+          onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}>
+          {sizes.map(s => <option key={s} value={s}>{s}</option>)}
+        </Select>
+        <span className="ml-1 whitespace-nowrap">{from}–{to} of {total}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <PagerBtn icon={MdFirstPage}    onClick={() => setPage(1)}           disabled={page <= 1}          label="First page" />
+        <PagerBtn icon={MdChevronLeft}  onClick={() => setPage(page - 1)}    disabled={page <= 1}          label="Previous page" />
+        <span className="px-2.5 text-[12px] font-semibold text-slate-300 whitespace-nowrap">Page {page} / {totalPages}</span>
+        <PagerBtn icon={MdChevronRight} onClick={() => setPage(page + 1)}    disabled={page >= totalPages} label="Next page" />
+        <PagerBtn icon={MdLastPage}     onClick={() => setPage(totalPages)}  disabled={page >= totalPages} label="Last page" />
+      </div>
+    </div>
   );
 }
 

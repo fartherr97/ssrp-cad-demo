@@ -3,6 +3,7 @@ import Select from '../../../components/ui/Select';
 import { useCAD } from '../../../store/cadStore';
 import {
   AdminPanel, SonTable, SonRow, SonCell, SonSearch, EmptyState, ADMIN, SON_INPUT,
+  usePager, Pager,
 } from '../AdminKit';
 
 export default function Logs() {
@@ -18,6 +19,8 @@ export default function Logs() {
     (moduleFilter === 'ALL' || l.module === moduleFilter) &&
     (!query || l.action.toLowerCase().includes(q) || (l.user || '').toLowerCase().includes(q) || String(l.discordId || '').includes(query)));
 
+  const pager = usePager(filtered, 25);
+
   return (
     <AdminPanel
       title="Master Audit Log"
@@ -30,10 +33,11 @@ export default function Logs() {
       </>}
     >
       {filtered.length === 0 ? <EmptyState>No log entries match.</EmptyState> : (
+        <>
         <SonTable columns={[
           { label: 'ID', width: 70 }, { label: 'Time', width: 180 }, { label: 'Module', width: 140 }, { label: 'Action' }, { label: 'User', width: 200 }, { label: 'Discord ID', width: 160 },
         ]}>
-          {filtered.map((l, i) => (
+          {pager.pageItems.map((l, i) => (
             <SonRow key={l.id} i={i}>
               <SonCell mono color={ADMIN.textMute}>{l.id}</SonCell>
               <SonCell mono color={ADMIN.textDim}>{l.timestamp}</SonCell>
@@ -44,6 +48,8 @@ export default function Logs() {
             </SonRow>
           ))}
         </SonTable>
+        <Pager {...pager} />
+        </>
       )}
     </AdminPanel>
   );
