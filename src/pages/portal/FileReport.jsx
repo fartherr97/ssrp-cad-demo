@@ -20,15 +20,23 @@ const ACCENT = 'brand';
 
 const REPORT_TYPES = [
   'Theft',
+  'Burglary',
   'Lost Property',
   'Vandalism',
+  'Property Damage',
   'Noise Complaint',
   'Suspicious Activity',
+  'Harassment',
+  'Fraud / Scam',
+  'Hit and Run',
+  'Missing Person',
+  'Animal Complaint',
   'Other',
 ];
 
 const EMPTY_FORM = {
   reportType: 'Theft',
+  customType: '',
   filerId: '',
   incidentDate: '',
   location: '',
@@ -59,7 +67,12 @@ export default function FileReport() {
     return c ? `${c.firstName} ${c.lastName}` : '';
   };
 
-  const canSubmit = form.description.trim() && form.location.trim() && form.incidentDate;
+  // When "Other" is chosen, the typed custom type is the effective report type.
+  const isOther = form.reportType === 'Other';
+  const effectiveType = isOther ? form.customType.trim() : form.reportType;
+
+  const canSubmit = form.description.trim() && form.location.trim() && form.incidentDate
+    && (!isOther || form.customType.trim());
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -70,13 +83,13 @@ export default function FileReport() {
     dispatch({
       type: 'ADD_REPORT',
       payload: {
-        type: `Citizen, ${form.reportType}`,
+        type: `Citizen, ${effectiveType}`,
         caseNumber,
         officerBadge: 'CITIZEN',
         summary: form.description,
         esServices,
         formData: {
-          reportType: form.reportType,
+          reportType: effectiveType,
           filedBy,
           filerId: form.filerId ? Number(form.filerId) : null,
           incidentDate: form.incidentDate,
@@ -86,7 +99,7 @@ export default function FileReport() {
         },
       },
     });
-    setSubmitted({ caseNumber, reportType: form.reportType, filedBy, location: form.location, incidentDate: form.incidentDate });
+    setSubmitted({ caseNumber, reportType: effectiveType, filedBy, location: form.location, incidentDate: form.incidentDate });
     toast.success(`Case ${caseNumber} filed.`, { title: 'Report Submitted' });
   };
 
@@ -171,6 +184,18 @@ export default function FileReport() {
                 <Select className={PORTAL_INPUT} value={form.reportType} onChange={e => setField('reportType', e.target.value)}>
                   {REPORT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </Select>
+                {isOther && (
+                  <input
+                    className={`${PORTAL_INPUT} mt-2`}
+                    type="text"
+                    value={form.customType}
+                    onChange={e => setField('customType', e.target.value)}
+                    placeholder="Describe the report type *"
+                    maxLength={60}
+                    required
+                    autoFocus
+                  />
+                )}
               </div>
               <div>
                 <label className={PORTAL_LABEL}><MdPerson size={13} className="inline align-[-2px] mr-[5px]" />Filing As</label>
