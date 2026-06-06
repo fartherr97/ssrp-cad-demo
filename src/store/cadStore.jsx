@@ -322,6 +322,77 @@ function linkedWarrantIds(templateSnapshot, formData = {}) {
   return [...new Set(ids)];
 }
 
+/* Pull the Charges-field array off a filed form (the 'charges' field type,
+   with a fallback scan for a charge-like array if the template uses a custom id). */
+function chargesFromForm(templateSnapshot, formData = {}) {
+  let fieldId = null;
+  for (const sec of templateSnapshot?.sections || []) {
+    for (const f of sec.fields || []) {
+      if (f.type === 'charges') fieldId = f.id;
+    }
+  }
+  if (fieldId && Array.isArray(formData[fieldId])) return formData[fieldId];
+  for (const v of Object.values(formData || {})) {
+    if (Array.isArray(v) && v.length && v.every(x => x && typeof x === 'object' && ('code' in x || 'name' in x))) return v;
+  }
+  return [];
+}
+
+/* Total license points for a filed form's charges. A charge's points come from
+   the admin Auto-Suspend schedule when it's listed there (matched by penal-code
+   id); otherwise from the penal code entry's own `points` value. Multi-count
+   charges multiply by their count. */
+function licensePointsForForm(state, templateSnapshot, formData) {
+  const cfg = state.licensePointsConfig || {};
+  if (!cfg.enabled) return 0;
+  const charges = chargesFromForm(templateSnapshot, formData);
+  if (!charges.length) return 0;
+  const sched = new Map((cfg.schedule || []).filter(s => s.penalCodeId != null).map(s => [s.penalCodeId, Number(s.points) || 0]));
+  const pc = new Map((state.penalCode || []).map(p => [p.id, Number(p.points) || 0]));
+  return charges.reduce((sum, c) => {
+    const per = sched.has(c.id) ? sched.get(c.id) : (pc.get(c.id) || 0);
+    const count = Math.max(1, Number(c.count) || 1);
+    return sum + (Number.isFinite(per) ? per * count : 0);
+  }, 0);
+}
+
+/* Apply license points to one driver inside a civilians array and auto-suspend
+   across the configured threshold tiers (each tier fires once as it's crossed).
+   Returns the next array + whether a suspension fired and which tier. Shared by
+   ADD_LICENSE_POINTS and the automatic accrual when citations/charges are filed. */
+function accrueLicensePoints(civilians, cfg = {}, civilianId, addPoints) {
+  const pts = Number(addPoints) || 0;
+  if (civilianId == null || pts <= 0) return { civilians, suspended: false, firedTier: null };
+  const tiers = (cfg.tiers && cfg.tiers.length)
+    ? [...cfg.tiers].filter(t => t.threshold > 0).sort((a, b) => a.threshold - b.threshold)
+    : [{ threshold: cfg.threshold, suspensionDays: cfg.suspensionDays }];
+  const multiTier = tiers.length > 1;
+  let suspended = false;
+  let firedTier = null;
+  const next = civilians.map(c => {
+    if (c.id !== civilianId) return c;
+    const oldPoints = c.licensePoints || 0;
+    const newPoints = oldPoints + pts;
+    const crossed = cfg.enabled
+      ? tiers.filter(t => oldPoints < t.threshold && newPoints >= t.threshold)
+      : [];
+    if (crossed.length) {
+      suspended = true;
+      firedTier = crossed[crossed.length - 1];
+      const expiry = new Date(Date.now() + (firedTier.suspensionDays || 0) * 86400000).toISOString().slice(0, 10);
+      return {
+        ...c,
+        licensePoints: (cfg.resetAfterSuspend && !multiTier) ? 0 : newPoints,
+        dlStatus: 'SUSPENDED',
+        dlExpiry: expiry,
+        suspendedUntil: expiry,
+      };
+    }
+    return { ...c, licensePoints: newPoints };
+  });
+  return { civilians: next, suspended, firedTier };
+}
+
 /* Officer signature line (badge | rank | name) used to stamp who served a warrant. */
 function officerSignatureFor(state, badge) {
   const o = state.officers.find(off => off.badge === badge);
@@ -738,11 +809,20 @@ function baseReducer(state, action) {
       // warrant clears it everywhere other officers look.
       const wIds = linkedWarrantIds(newReport.templateSnapshot, action.payload.formData);
       const { warrants, civilians } = serveWarrants(state, wIds, { servedBy: officerSignature, caseNumber: reportNumber });
+      // Auto license-points: any scheduled/penal-code charges filed against the
+      // subject civilian accrue points and may auto-suspend their license.
+      const subjectId = action.payload.civilianId ?? action.payload.formData?._civilianId;
+      const addPts = licensePointsForForm(state, newReport.templateSnapshot, action.payload.formData);
+      const acc = accrueLicensePoints(civilians, state.licensePointsConfig || {}, subjectId, addPts);
+      const subj = state.civilians.find(c => c.id === subjectId);
+      const susLog = acc.suspended
+        ? addDispatchLog(state, `LICENSE AUTO-SUSPENDED · ${subj ? `${subj.firstName} ${subj.lastName}` : 'driver'} reached ${acc.firedTier.threshold} pts · report ${reportNumber}`, 'alert')
+        : {};
       const auditMsg = wIds.length
         ? `Filed ${newReport.type} report ${reportNumber} (served ${wIds.length} warrant${wIds.length > 1 ? 's' : ''})`
         : `Filed ${newReport.type} report ${reportNumber}`;
       const audit = addAuditEntry(state, auditMsg, 'Reports');
-      return { ...state, reports: [...state.reports, newReport], warrants, civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit };
+      return { ...state, reports: [...state.reports, newReport], warrants, civilians: acc.civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...audit, ...susLog };
     }
 
     /* ─── Generic admin-customization CRUD ───
@@ -860,38 +940,7 @@ function baseReducer(state, action) {
       const cfg = state.licensePointsConfig || {};
       const { civilianId, points, reason } = action.payload;
       const civ = state.civilians.find(c => c.id === civilianId);
-      // Tier ladder (fall back to the legacy single threshold if none set).
-      const tiers = (cfg.tiers && cfg.tiers.length)
-        ? [...cfg.tiers].filter(t => t.threshold > 0).sort((a, b) => a.threshold - b.threshold)
-        : [{ threshold: cfg.threshold, suspensionDays: cfg.suspensionDays }];
-      const multiTier = tiers.length > 1;
-      let suspended = false;
-      let firedTier = null;
-      let expiry = null;
-      const civilians = state.civilians.map(c => {
-        if (c.id !== civilianId) return c;
-        const oldPoints = c.licensePoints || 0;
-        const newPoints = oldPoints + Number(points || 0);
-        // Tiers newly crossed by this increment (so each tier fires once).
-        const crossed = cfg.enabled
-          ? tiers.filter(t => oldPoints < t.threshold && newPoints >= t.threshold)
-          : [];
-        if (crossed.length) {
-          suspended = true;
-          firedTier = crossed[crossed.length - 1]; // highest tier crossed
-          expiry = new Date(Date.now() + (firedTier.suspensionDays || 0) * 86400000).toISOString().slice(0, 10);
-          return {
-            ...c,
-            // Keep points climbing across tiers; only zero them when a single
-            // legacy threshold is configured with reset-after-suspension on.
-            licensePoints: (cfg.resetAfterSuspend && !multiTier) ? 0 : newPoints,
-            dlStatus: 'SUSPENDED',
-            dlExpiry: expiry,
-            suspendedUntil: expiry,
-          };
-        }
-        return { ...c, licensePoints: newPoints };
-      });
+      const { civilians, suspended, firedTier } = accrueLicensePoints(state.civilians, cfg, civilianId, points);
       const name = civ ? `${civ.firstName} ${civ.lastName}` : 'Driver';
       const audit = addAuditEntry(
         state,
@@ -1132,7 +1181,14 @@ function baseReducer(state, action) {
       // Records can carry a warrant_lookup field too — serve any linked warrants.
       const wIds = linkedWarrantIds(newRecord.templateSnapshot, fd);
       const { warrants, civilians } = serveWarrants(state, wIds, { servedBy: officerSignatureFor(state, action.payload.officerBadge), caseNumber: recordNumber });
-      return { ...state, records: [...state.records, newRecord], warrants, civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1 };
+      // Auto license-points from charges filed against the subject civilian.
+      const addPts = licensePointsForForm(state, newRecord.templateSnapshot, fd);
+      const acc = accrueLicensePoints(civilians, state.licensePointsConfig || {}, civId, addPts);
+      const subj = state.civilians.find(c => c.id === civId);
+      const susLog = acc.suspended
+        ? addDispatchLog(state, `LICENSE AUTO-SUSPENDED · ${subj ? `${subj.firstName} ${subj.lastName}` : 'driver'} reached ${acc.firedTier.threshold} pts · record ${recordNumber}`, 'alert')
+        : {};
+      return { ...state, records: [...state.records, newRecord], warrants, civilians: acc.civilians, nextId: state.nextId + 1, reportSeq: state.reportSeq + 1, ...susLog };
     }
     case 'UPDATE_REPORT': {
       const reports = state.reports.map(r =>
