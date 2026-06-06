@@ -120,7 +120,10 @@ function AuthShell() {
   return (
     <AppShell>
       <DutyGuard />
-      <PageWrapper key={location.key}>
+      {/* Key on pathname (not location.key) so the page only remounts on a real
+          page change. Keying on location.key remounted on every query-string
+          update too — wiping in-page state like the records search results. */}
+      <PageWrapper key={location.pathname}>
         <Outlet />
       </PageWrapper>
     </AppShell>
