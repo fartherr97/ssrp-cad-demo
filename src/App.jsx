@@ -18,7 +18,6 @@ const AccessDeniedPage = lazy(() => import('./pages/AccessDeniedPage'));
 const DispatchCenter = lazy(() => import('./pages/DispatchCenter'));
 const IncidentDetail = lazy(() => import('./pages/IncidentDetail'));
 const DispatchBoard = lazy(() => import('./pages/DispatchBoard'));
-const DispatchPortal = lazy(() => import('./pages/DispatchPortal'));
 const FireOpsBoard = lazy(() => import('./pages/FireOpsBoard'));
 const RecordsBureau = lazy(() => import('./pages/RecordsBureau'));
 const ReportsCenter = lazy(() => import('./pages/ReportsCenter'));
@@ -158,7 +157,6 @@ function CADApp() {
       <Route path="/" element={<LoginRoute />} />
       <Route path="/access-denied" element={<AccessDeniedPage />} />
       <Route element={<AuthShell />}>
-        <Route path="/dispatch"      element={<DispatchPortal />} />
         <Route path="/cad"           element={<DispatchCenter />} />
         <Route path="/cad/:callId"   element={<IncidentDetail />} />
         <Route path="/search"        element={<RecordsBureau />} />
