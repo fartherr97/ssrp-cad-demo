@@ -103,7 +103,7 @@ export default function Geographical() {
               onChange={e => setCode('currencyDelimiter', e.target.value)} />
           </SonField>
         </div>
-        {codesDirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes * click "Save Changes" to apply.</div>}
+        {codesDirty && <div className="mt-3 text-[11px] text-amber-400">Unsaved changes, click "Save Changes" to apply.</div>}
       </AdminPanel>
 
       <AdminPanel title="Geographical Settings" subtitle="Cities, counties and postal codes used across the CAD.">

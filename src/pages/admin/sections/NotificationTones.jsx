@@ -143,7 +143,7 @@ export default function NotificationTones() {
             icon={MdSos}
             accentColor="#ef4444"
             label="Panic Tone"
-            desc="Plays when any officer triggers a panic alarm * kept separate for immediate urgency."
+            desc="Plays when any officer triggers a panic alarm, kept separate for immediate urgency."
             url={audioTones.panicUrl ?? null}
             name={audioTones.panicName ?? null}
             onUpload={file => upload('panic', file)}

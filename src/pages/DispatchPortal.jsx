@@ -672,7 +672,7 @@ export default function DispatchPortal() {
 
   const handleDispatch = ({ nature, location, priority, units, description, reportingParty }) => {
     dispatch({ type: 'CREATE_CALL', payload: { nature, location, priority, units, category: 'police', description, reportingParty, city: '', county: '', status: units.length ? 'ACTIVE' : 'PENDING', timestamp: new Date().toISOString().slice(0,16).replace('T',' ') } });
-    toast.success(units.length ? `${nature} dispatched * ${units.length} unit${units.length > 1 ? 's' : ''}` : `${nature} created`, { title: 'Call dispatched' });
+    toast.success(units.length ? `${nature} dispatched, ${units.length} unit${units.length > 1 ? 's' : ''}` : `${nature} created`, { title: 'Call dispatched' });
     dispatch({ type: 'REMOVE_INCOMING_911', payload: dispatchTarget.id });
     units.forEach(uid => dispatch({ type: 'SET_UNIT_STATUS', payload: { unitId: uid, status: 'ENRT' } }));
     setDispatchTarget(null);

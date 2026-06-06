@@ -305,7 +305,7 @@ export default function RecordsCenter() {
                 {selRecord.type}
               </span>
               <span className="text-[9px] text-cad-muted font-mono">
-                {selRecord.recordNumber} * {selRecord.date}
+                {selRecord.recordNumber}, {selRecord.date}
               </span>
               <span className={`${STATUS_BADGE[selRecord.status] || BADGE.gray} text-[9px]`}>
                 {selRecord.status}

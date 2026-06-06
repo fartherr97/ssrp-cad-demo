@@ -450,7 +450,7 @@ export default function FireOpsBoard() {
 
   const acknowledgeRequest = (req) => {
     dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'ACKNOWLEDGED' } });
-    toast.info(`Acknowledged * ${req.assistType}`, { title: 'HCFR' });
+    toast.info(`Acknowledged, ${req.assistType}`, { title: 'HCFR' });
     dispatch({
       type: 'DISPATCH_RADIO',
       payload: { from: currentUser?.id, to: recipientsFor(req), text: `HCFR has acknowledged the ${req.assistType} request at ${req.location}${req.callId ? ` (Call ${req.callId})` : ''} and is responding.` },
@@ -459,7 +459,7 @@ export default function FireOpsBoard() {
 
   const declineRequest = (req) => {
     dispatch({ type: 'UPDATE_HCFR_REQUEST', payload: { id: req.id, status: 'DECLINED' } });
-    toast.warning(`Declined * ${req.assistType}`, { title: 'HCFR' });
+    toast.warning(`Declined, ${req.assistType}`, { title: 'HCFR' });
   };
 
   const confirmQuickDispatch = (req, unitIds) => {
@@ -575,7 +575,7 @@ export default function FireOpsBoard() {
       {incoming911HCFR.length > 0 && (
         <div className="shrink-0">
           <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
-            <MdPhone size={14} /> Incoming 911 * EMS / Fire ({incoming911HCFR.length})
+            <MdPhone size={14} /> Incoming 911, EMS / Fire ({incoming911HCFR.length})
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))', gap: 12 }}>
             {incoming911HCFR.map(c => (

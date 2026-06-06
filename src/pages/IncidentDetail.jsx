@@ -52,7 +52,7 @@ const ST_COLOR = {
 const PRI_COLORS = { 1:'#f87171', 2:'#fb923c', 3:'#facc15', 4:'#4ade80' };
 
 const FDOT_REQ_META = {
-  PENDING:      { label: 'FDOT Requested * Pending',  color: '#f59e0b' },
+  PENDING:      { label: 'FDOT Requested, Pending',  color: '#f59e0b' },
   ACKNOWLEDGED: { label: 'FDOT Acknowledged',         color: '#06b6d4' },
   DISPATCHED:   { label: 'FDOT Unit Dispatched',      color: '#22c55e' },
   COMPLETED:    { label: 'FDOT Assist Completed',     color: '#6b7280' },
@@ -259,7 +259,7 @@ export default function IncidentDetail() {
       {/* ── HCFR request status banner ── */}
       {hcfrReq && (() => {
         const HCFR_META = {
-          PENDING:      { label: 'HCFR Requested * Pending',  color: '#ef4444' },
+          PENDING:      { label: 'HCFR Requested, Pending',  color: '#ef4444' },
           ACKNOWLEDGED: { label: 'HCFR Acknowledged',         color: '#06b6d4' },
           DISPATCHED:   { label: 'HCFR Unit Dispatched',      color: '#22c55e' },
           COMPLETED:    { label: 'HCFR Assist Completed',     color: '#6b7280' },

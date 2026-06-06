@@ -91,7 +91,7 @@ export default function CivilianHome() {
       <PortalHeader
         icon={MdHome}
         title="Civilian Services"
-        subtitle={`Welcome back, ${currentUser?.name || 'Citizen'} * manage your records and services here.`}
+        subtitle={`Welcome back, ${currentUser?.name || 'Citizen'}, manage your records and services here.`}
         accent={ACCENT}
       />
 
@@ -107,7 +107,7 @@ export default function CivilianHome() {
               {myWarrants.length} active warrant{myWarrants.length !== 1 ? 's' : ''} on your record{myWarrants.length !== 1 ? 's' : ''}
             </div>
             <div className="text-xs text-red-300/75 mt-[3px]">
-              {myWarrants.map(w => `${w.civilianName} * ${w.charge}`).join('  •  ')}
+              {myWarrants.map(w => `${w.civilianName}, ${w.charge}`).join('  •  ')}
             </div>
           </div>
         </PortalCard>
@@ -124,7 +124,7 @@ export default function CivilianHome() {
         </div>
         <div className="flex-1 text-left">
           <div className="text-[16px] font-extrabold text-red-300 tracking-tight">Call 911</div>
-          <div className="text-[12px] text-red-300/60 mt-0.5">Report an emergency * dispatched immediately to law enforcement</div>
+          <div className="text-[12px] text-red-300/60 mt-0.5">Report an emergency, dispatched immediately to law enforcement</div>
         </div>
         <div className="text-[13px] font-bold text-red-400 border border-red-500/40 rounded-lg px-3 py-1.5 bg-red-500/10">
           EMERGENCY

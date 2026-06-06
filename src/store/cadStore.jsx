@@ -232,13 +232,13 @@ const initialState = {
   // panel so LEOs can reference a panic after its toast is gone.
   activePanics: [],
   dispatchLog: [
-    { id: 'seed-6', time: '15:04:11', kind: 'call',   text: 'Call 26-1051 created * Road Hazard (I-275 SB / Sligh Ave)' },
-    { id: 'seed-5', time: '15:01:44', kind: 'call',   text: 'Call 26-1050 created * Theft / Shoplifting (4302 W Boy Scout Blvd)' },
-    { id: 'seed-4', time: '14:52:00', kind: 'alert',  text: 'Call 26-1048 * CARDIAC ARREST. 210 Bayshore Blvd Apt 4B. ALS required.' },
+    { id: 'seed-6', time: '15:04:11', kind: 'call',   text: 'Call 26-1051 created, Road Hazard (I-275 SB / Sligh Ave)' },
+    { id: 'seed-5', time: '15:01:44', kind: 'call',   text: 'Call 26-1050 created, Theft / Shoplifting (4302 W Boy Scout Blvd)' },
+    { id: 'seed-4', time: '14:52:00', kind: 'alert',  text: 'Call 26-1048, CARDIAC ARREST. 210 Bayshore Blvd Apt 4B. ALS required.' },
     { id: 'seed-3', time: '14:45:22', kind: 'unit',   text: 'Unit FHP-214 dispatched to 26-1046 (MVA w/ Injuries)' },
     { id: 'seed-2', time: '14:35:18', kind: 'unit',   text: 'Units HCFR-E11, HCFR-L7, HCFR-M3 dispatched to 26-1044 (Structure Fire)' },
-    { id: 'seed-1', time: '14:22:04', kind: 'call',   text: 'Call 26-1042 created * Traffic Stop (Elm St / Route 9)' },
-    { id: 'seed-0', time: '14:05:11', kind: 'alert',  text: 'BOLO * Black Dodge Charger plate SUS-1109. Owner has active warrant. No approach without backup.' },
+    { id: 'seed-1', time: '14:22:04', kind: 'call',   text: 'Call 26-1042 created, Traffic Stop (Elm St / Route 9)' },
+    { id: 'seed-0', time: '14:05:11', kind: 'alert',  text: 'BOLO, Black Dodge Charger plate SUS-1109. Owner has active warrant. No approach without backup.' },
   ],
 };
 
@@ -376,7 +376,7 @@ function baseReducer(state, action) {
     case 'CREATE_CALL': {
       const newCall = { ...action.payload, id: `23-${1048 + state.calls.length}`, timestamp: new Date().toLocaleString(), createdAt: Date.now(), units: [] };
       const audit = addAuditEntry(state, `Created call ${newCall.id} (${newCall.nature})`, 'Dispatch');
-      const log = addDispatchLog(state, `Call ${newCall.id} created * ${newCall.nature} (${newCall.location})`, 'call');
+      const log = addDispatchLog(state, `Call ${newCall.id} created, ${newCall.nature} (${newCall.location})`, 'call');
       return { ...state, calls: [newCall, ...state.calls], ...audit, ...log };
     }
     case 'UPDATE_CALL': {
@@ -391,7 +391,7 @@ function baseReducer(state, action) {
       );
       const calls = state.calls.map(c => c.id === action.payload ? { ...c, status: 'CLOSED' } : c);
       const audit = addAuditEntry(state, `Closed call ${action.payload}`, 'Dispatch');
-      const log = addDispatchLog(state, `Call ${action.payload} closed * units cleared`, 'call');
+      const log = addDispatchLog(state, `Call ${action.payload} closed, units cleared`, 'call');
       return { ...state, calls, officers, ...audit, ...log };
     }
     case 'ASSIGN_UNIT': {
@@ -449,7 +449,7 @@ function baseReducer(state, action) {
 
     case 'PANIC': {
       const { unit, name, location, officerId, x, y, z } = action.payload || {};
-      const text = `OFFICER PANIC * ${unit || 'UNIT'}${name ? ` (${name})` : ''} * ${location || 'LOCATION UNKNOWN'} * ALL UNITS RESPOND`;
+      const text = `OFFICER PANIC, ${unit || 'UNIT'}${name ? ` (${name})` : ''}, ${location || 'LOCATION UNKNOWN'}, ALL UNITS RESPOND`;
       const log = addDispatchLog(state, `[PANIC] ${text}`, 'alert');
       const officers = state.officers.map(o => o.id === officerId ? { ...o, panic: true } : o);
       const id = `${Date.now()}`;
@@ -1158,7 +1158,7 @@ function baseReducer(state, action) {
 
     case 'ADD_TOW_JOB': {
       const job = { ...action.payload, id: state.nextId, status: action.payload.status || 'PENDING', createdAt: Date.now() };
-      const log = addDispatchLog(state, `Tow job #${state.nextId} created * ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
+      const log = addDispatchLog(state, `Tow job #${state.nextId} created, ${job.plate || 'Unknown plate'} @ ${job.location}`, 'info');
       return { ...state, towJobs: [job, ...state.towJobs], nextId: state.nextId + 1, ...log };
     }
     case 'UPDATE_TOW_JOB': {
@@ -1172,7 +1172,7 @@ function baseReducer(state, action) {
     case 'ADD_TOW_UNIT': {
       // payload: { operatorName, discordId, companyId, companyName, truckId, truckName, zone }
       const unit = { ...action.payload, id: state.nextId, status: 'AVAILABLE', signedOnAt: Date.now() };
-      const log = addDispatchLog(state, `Tow unit online: ${unit.operatorName} (${unit.truckName}) * ${unit.zone}`, 'unit');
+      const log = addDispatchLog(state, `Tow unit online: ${unit.operatorName} (${unit.truckName}), ${unit.zone}`, 'unit');
       return { ...state, towUnits: [...state.towUnits, unit], nextId: state.nextId + 1, ...log };
     }
     case 'UPDATE_TOW_UNIT': {
@@ -1212,7 +1212,7 @@ function baseReducer(state, action) {
       const who = req.source === 'CIVILIAN' ? `Civilian tow request (${req.requestedBy || 'unknown'})` : 'FDOT assistance requested';
       const log = addDispatchLog(
         state,
-        `${who} * ${req.assistType || 'Assist'} @ ${req.location}${req.source === 'CIVILIAN' ? ` → ${dest}` : ''}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        `${who}, ${req.assistType || 'Assist'} @ ${req.location}${req.source === 'CIVILIAN' ? ` → ${dest}` : ''}${req.callId ? ` (Call ${req.callId})` : ''}`,
         'alert'
       );
       return { ...state, fdotRequests: [req, ...state.fdotRequests], nextId: state.nextId + 1, ...log };
@@ -1255,7 +1255,7 @@ function baseReducer(state, action) {
 
       const log = addDispatchLog(
         state,
-        `HCFR assistance requested * ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
+        `HCFR assistance requested, ${req.assistType || 'Assist'} @ ${req.location}${req.callId ? ` (Call ${req.callId})` : ''}`,
         'alert'
       );
       return { ...state, hcfrRequests: [req, ...(state.hcfrRequests || [])], nextId: state.nextId + 1, ...log };

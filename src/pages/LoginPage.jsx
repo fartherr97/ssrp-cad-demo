@@ -234,7 +234,7 @@ export default function LoginPage() {
           {/* Demo note */}
           {!connected && (
             <div style={{ fontSize: 11, color: 'rgba(120,160,200,0.4)', textAlign: 'center' }}>
-              Demo environment * select your role after connecting
+              Demo environment, select your role after connecting
             </div>
           )}
 

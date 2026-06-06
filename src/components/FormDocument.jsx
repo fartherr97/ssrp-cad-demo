@@ -707,13 +707,13 @@ export function DynamicFormDoc({ template, data = {}, editable, onChange, meta =
                   ) : entries.map((s, i) => (
                     <div key={s.id || i} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: i < entries.length - 1 ? '1px dashed #ddd' : 'none' }}>
                       <div style={{ fontSize: 8, fontWeight: 700, color: '#444', marginBottom: 2 }}>
-                        SUPPLEMENT #{i + 1} * {s.date}
+                        SUPPLEMENT #{i + 1}, {s.date}
                       </div>
                       <div style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: '#000', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                         {s.text}
                       </div>
                       <div style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: '#666', marginTop: 2 }}>
-                        * {s.authorLine || s.author || s.badge}
+                       , {s.authorLine || s.author || s.badge}
                       </div>
                     </div>
                   ))}
@@ -763,7 +763,7 @@ function ReturnHeader({ type, title }) {
 function ReturnFooter() {
   return (
     <div style={S_RECORD_RETURN_FOOTER}>
-      END OF RETURN * RMS * {new Date().toLocaleString().toUpperCase()}
+      END OF RETURN, RMS, {new Date().toLocaleString().toUpperCase()}
     </div>
   );
 }
@@ -892,7 +892,7 @@ export function RecordReturn({ type, subject, data }) {
       <div className={S_RECORD_RETURN}>
         <ReturnHeader type="VEHICLE" title={`VR · Plate: ${data.plate}`} />
         {data.stolen && (
-          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE * CAUTION ADVISED · CONTACT LOCAL LE IMMEDIATELY ***</div>
+          <div style={S_RECORD_RETURN_ALERT}>*** STOLEN VEHICLE, CAUTION ADVISED · CONTACT LOCAL LE IMMEDIATELY ***</div>
         )}
         {subject && subject.flags?.includes('WARRANT') && (
           <div style={S_RECORD_RETURN_ALERT_WARN}>*** REGISTERED OWNER HAS ACTIVE WARRANT ON FILE ***</div>

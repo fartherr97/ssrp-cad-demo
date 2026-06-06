@@ -18,9 +18,9 @@ export const HCFR_ASSIST_TYPES = [
 ];
 
 const PRIORITIES = [
-  { val: 1, label: 'P1 * Emergency', color: '#ef4444' },
-  { val: 2, label: 'P2 * Urgent',    color: '#f59e0b' },
-  { val: 3, label: 'P3 * Routine',   color: '#6b7280' },
+  { val: 1, label: 'P1, Emergency', color: '#ef4444' },
+  { val: 2, label: 'P2, Urgent',    color: '#f59e0b' },
+  { val: 3, label: 'P3, Routine',   color: '#6b7280' },
 ];
 
 export default function RequestHCFRModal({ call, officer, onClose }) {

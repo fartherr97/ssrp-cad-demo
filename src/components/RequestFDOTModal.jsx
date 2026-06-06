@@ -19,9 +19,9 @@ export const FDOT_ASSIST_TYPES = [
 ];
 
 const PRIORITIES = [
-  { val: 1, label: 'P1 * Emergency', color: '#ef4444' },
-  { val: 2, label: 'P2 * Urgent',    color: '#f59e0b' },
-  { val: 3, label: 'P3 * Routine',   color: '#6b7280' },
+  { val: 1, label: 'P1, Emergency', color: '#ef4444' },
+  { val: 2, label: 'P2, Urgent',    color: '#f59e0b' },
+  { val: 3, label: 'P3, Routine',   color: '#6b7280' },
 ];
 
 /*
@@ -125,7 +125,7 @@ export default function RequestFDOTModal({ call, officer, onClose }) {
           <div>
             <label className={LABEL}>What's Needed</label>
             <textarea className={INPUT} rows={3} value={description} onChange={e => setDescription(e.target.value)}
-              placeholder="Brief description * e.g. Overturned semi blocking 2 lanes, need heavy rotator + lane closure." required />
+              placeholder="Brief description, e.g. Overturned semi blocking 2 lanes, need heavy rotator + lane closure." required />
           </div>
 
           {officer && (

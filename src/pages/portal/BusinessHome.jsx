@@ -45,8 +45,8 @@ export default function BusinessHome() {
         const licAccent   = licRevoked || licExpired ? 'red' : licWarn ? 'amber' : 'green';
         const licVal      = licRevoked ? 'REVOKED' : licExpired ? 'EXPIRED' : days !== null ? `${days}d` : (myBiz.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE');
         const licHint     = licRevoked ? 'License has been revoked'
-          : licExpired  ? 'License has expired * contact admin'
-          : licWarn     ? `Expires in ${days} day${days === 1 ? '' : 's'} * renew soon`
+          : licExpired  ? 'License has expired, contact admin'
+          : licWarn     ? `Expires in ${days} day${days === 1 ? '' : 's'}, renew soon`
           : days !== null ? `${days} days remaining`
           : `Expires ${myBiz.licenseExpiry}`;
         return (

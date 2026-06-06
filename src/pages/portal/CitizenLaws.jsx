@@ -37,7 +37,7 @@ export default function CitizenLaws() {
       <PortalHeader
         icon={MdMenuBook}
         title="State Laws & Statutes"
-        subtitle="Public reference for the Florida penal code * fines, jail time, and classifications."
+        subtitle="Public reference for the Florida penal code, fines, jail time, and classifications."
         accent={accent}
       />
 

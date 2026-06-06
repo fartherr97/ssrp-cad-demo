@@ -371,10 +371,10 @@ function Dispatch911Modal({ call, onClose }) {
             <div className={S_FIELD}>
               <label className={S_LABEL}>Priority</label>
               <Select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: Number(e.target.value) }))}>
-                <option value={1}>P1 * Critical / Life Safety</option>
-                <option value={2}>P2 * High</option>
-                <option value={3}>P3 * Medium</option>
-                <option value={4}>P4 * Low / Routine</option>
+                <option value={1}>P1, Critical / Life Safety</option>
+                <option value={2}>P2, High</option>
+                <option value={3}>P3, Medium</option>
+                <option value={4}>P4, Low / Routine</option>
               </Select>
             </div>
           </div>
@@ -624,10 +624,10 @@ function Sim911Modal({ onClose }) {
           <div className={S_FIELD}>
             <label className={S_LABEL}>Priority</label>
             <Select className={S_SELECT} value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))}>
-              <option value={1}>P1 * Critical</option>
-              <option value={2}>P2 * High</option>
-              <option value={3}>P3 * Medium</option>
-              <option value={4}>P4 * Low</option>
+              <option value={1}>P1, Critical</option>
+              <option value={2}>P2, High</option>
+              <option value={3}>P3, Medium</option>
+              <option value={4}>P4, Low</option>
             </Select>
           </div>
         </div>
@@ -743,10 +743,10 @@ export default function DispatchCenter() {
               <label className={S_LABEL}>Priority</label>
               <Select className={S_SELECT} value={priFilter} onChange={e => setPriFilter(e.target.value)}>
                 <option value="ALL">All Priorities</option>
-                <option value="1">P1 * Critical</option>
-                <option value="2">P2 * High</option>
-                <option value="3">P3 * Medium</option>
-                <option value="4">P4 * Low</option>
+                <option value="1">P1, Critical</option>
+                <option value="2">P2, High</option>
+                <option value="3">P3, Medium</option>
+                <option value="4">P4, Low</option>
               </Select>
             </div>
             <div className={S_FIELD}>
@@ -889,7 +889,7 @@ export default function DispatchCenter() {
                   type: 'PANIC',
                   payload: { officerId: me?.id, unit, name: me?.name || currentUser?.name, location, x: c.x, y: c.y, z: c.z },
                 });
-                toast.error(`${unit} * ${location}`, { title: 'PANIC * Officer in Distress' });
+                toast.error(`${unit}, ${location}`, { title: 'PANIC, Officer in Distress' });
               }}
                 className="press w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
                 <MdSos size={16} /> Panic Alert
@@ -1122,10 +1122,10 @@ export default function DispatchCenter() {
                 <div className={S_FIELD}>
                   <label className={S_LABEL}>Priority</label>
                   <Select className={S_SELECT} value={newCall.priority} onChange={e => setNewCall(p => ({ ...p, priority:Number(e.target.value) }))}>
-                    <option value={1}>P1 * Critical / Life Safety</option>
-                    <option value={2}>P2 * High</option>
-                    <option value={3}>P3 * Medium</option>
-                    <option value={4}>P4 * Low / Routine</option>
+                    <option value={1}>P1, Critical / Life Safety</option>
+                    <option value={2}>P2, High</option>
+                    <option value={3}>P3, Medium</option>
+                    <option value={4}>P4, Low / Routine</option>
                   </Select>
                 </div>
               </div>

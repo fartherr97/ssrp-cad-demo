@@ -53,7 +53,7 @@ export const TEN_CODES = [
   { id: 17, code: '10-20',  label: 'Location' },
   { id: 18, code: '10-22',  label: 'Disregard' },
   { id: 19, code: '10-23',  label: 'Standby' },
-  { id: 20, code: '10-24',  label: 'TROUBLE * Send Help' },
+  { id: 20, code: '10-24',  label: 'TROUBLE, Send Help' },
   { id: 21, code: '10-76',  label: 'En Route' },
   { id: 22, code: '10-97',  label: 'Arrived on Scene' },
 ];
@@ -106,9 +106,9 @@ export const NOTIFICATION_TONES = [
 ];
 
 export const ADMIN_SERVERS = [
-  { id: 1, name: 'SSRP * Primary',  description: 'Main FiveM roleplay server. Max 128 players.' },
-  { id: 2, name: 'SSRP * Overflow', description: 'Secondary server for player overflow. Max 64 players.' },
-  { id: 3, name: 'SSRP * Staff',    description: 'Staff-only testing and development server.' },
+  { id: 1, name: 'SSRP, Primary',  description: 'Main FiveM roleplay server. Max 128 players.' },
+  { id: 2, name: 'SSRP, Overflow', description: 'Secondary server for player overflow. Max 64 players.' },
+  { id: 3, name: 'SSRP, Staff',    description: 'Staff-only testing and development server.' },
 ];
 
 export const LOOKUP_TYPES = [
@@ -133,7 +133,7 @@ export const COMMUNITY_CONFIG = {
   timezone: 'America/New_York (EST)',
   defaultLanguage: 'English (US)',
   maxCharacters: 5,
-  description: 'Florida-based serious roleplay community * emergency services, civilian operations, and command.',
+  description: 'Florida-based serious roleplay community, emergency services, civilian operations, and command.',
   logoUrl: 'https://cdn.ssrp.us/images/ssrp.png',
   subtitle: 'Florida-Based Serious Roleplay',
   website: 'https://ssrp.us',
@@ -156,7 +156,7 @@ export const GEO_SETTINGS = {
 export const LOGIN_PAGE_CONFIG = {
   title: 'Sunshine State Roleplay',
   subtitle: 'Computer Aided Dispatch',
-  description: 'Unified platform for Emergency Services, Civilian Operations, and Command * TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.',
+  description: 'Unified platform for Emergency Services, Civilian Operations, and Command, TPD, HCSO, FHP, HCFR, FDOT, and Civ-Ops.',
   logoUrl: 'https://cdn.ssrp.us/images/ssrp.png',
   primaryColor: '#3a88e8',
   backgroundStyle: 'Gradient (Deep Blue)',
@@ -177,7 +177,7 @@ export const DISCORD_PRESENCE = {
   enabled: true,
   clientId: '1234567890123456789',
   iconName: 'ssrp_logo',
-  details: 'On Duty * {department}',
+  details: 'On Duty, {department}',
   state: 'Unit {callsign}',
   largeImage: 'ssrp_logo',
   showElapsed: true,

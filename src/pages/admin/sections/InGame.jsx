@@ -40,7 +40,7 @@ export default function InGame() {
 
       <div className="flex flex-col gap-4">
         <div className="px-4 py-4 rounded-xl bg-app-elevated border border-border-base text-[12.5px] text-slate-400 leading-relaxed text-center">
-          The Web API allows you to update unit locations in real time, trigger PANIC alerts, generate 911 calls, and more * all from in-game.
+          The Web API allows you to update unit locations in real time, trigger PANIC alerts, generate 911 calls, and more, all from in-game.
         </div>
 
         {/* Community ID row */}

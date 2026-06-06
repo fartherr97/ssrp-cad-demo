@@ -41,7 +41,7 @@ function ConfirmModal({ bizName, plate, onConfirm, onCancel }) {
             <div className="text-[15px] font-bold text-white mb-1">Register to {bizName}?</div>
             <div className="text-[12.5px] text-slate-400 leading-relaxed">
               Plate <span className="font-mono text-white font-bold">{plate}</span> will be registered under the business name.
-              Details cannot be edited after filing * contact an admin for corrections.
+              Details cannot be edited after filing, contact an admin for corrections.
             </div>
           </div>
         </div>

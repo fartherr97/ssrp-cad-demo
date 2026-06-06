@@ -324,9 +324,9 @@ function JobCard({ job, companies, calls, towUnits, currentUnitId, dispatch, toa
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/25">
           <MdLink size={14} className="text-amber-400 shrink-0" />
           <div className="min-w-0">
-            <div className="text-[11px] font-bold text-amber-300">Linked * Call {linkedCall.id}</div>
+            <div className="text-[11px] font-bold text-amber-300">Linked, Call {linkedCall.id}</div>
             <div className="text-[10.5px] text-amber-400/80 truncate">
-              {linkedCall.nature} * {linkedCall.location}
+              {linkedCall.nature}, {linkedCall.location}
             </div>
           </div>
         </div>
@@ -487,7 +487,7 @@ function NewJobForm({ companies, calls, towUnits, initial, onSubmit, onCancel })
             <Select className={INPUT} value={form.callId} onChange={e => set('callId', e.target.value)}>
               <option value="">* None *</option>
               {callOptions.map(c => (
-                <option key={c.id} value={c.id}>{c.id} * {c.nature} @ {c.location}</option>
+                <option key={c.id} value={c.id}>{c.id}, {c.nature} @ {c.location}</option>
               ))}
             </Select>
           </div>
@@ -1207,7 +1207,7 @@ export default function TowCAD() {
             <span className="font-bold">
               {unhandledRoadCalls.length} active road incident{unhandledRoadCalls.length > 1 ? 's' : ''} awaiting a tow job.
             </span>{' '}
-            Road Hazard or MVA calls in the dispatch queue have no tow job linked yet * link one to coordinate response.
+            Road Hazard or MVA calls in the dispatch queue have no tow job linked yet, link one to coordinate response.
           </div>
         </div>
       )}

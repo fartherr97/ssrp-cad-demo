@@ -36,7 +36,7 @@ export default function DutyGuard() {
       clearTimeout(idleTimer.current);
       idleTimer.current = setTimeout(() => {
         dispatch({ type: 'SET_STATUS', payload: 'OFFDUTY' });
-        toast.warning('Set off duty after 15 min of inactivity * duty hours paused.', {
+        toast.warning('Set off duty after 15 min of inactivity, duty hours paused.', {
           title: 'Auto Off-Duty',
           color: '#f59e0b',
         });

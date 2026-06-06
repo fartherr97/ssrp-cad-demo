@@ -281,7 +281,7 @@ function ReportPDF({ template, data = {}, meta = {} }) {
                       <Text style={styles.noCharges}>No supplements filed.</Text>
                     ) : entries.map((s, i) => (
                       <View key={s.id || i} wrap={false} style={{ marginTop: 3, paddingTop: 3, borderTop: i ? `0.5px solid ${lgray}` : undefined }}>
-                        <Text style={{ fontSize: 7, color: gray }}>SUPPLEMENT #{i + 1} * {s.date}</Text>
+                        <Text style={{ fontSize: 7, color: gray }}>SUPPLEMENT #{i + 1}, {s.date}</Text>
                         <Text style={styles.fieldValueNarr}>{s.text}</Text>
                         <Text style={{ fontSize: 7, color: gray }}>* {s.authorLine || s.author || s.badge}</Text>
                       </View>
