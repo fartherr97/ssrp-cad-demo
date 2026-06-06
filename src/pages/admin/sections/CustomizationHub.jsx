@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { AdminPageTitle, SonCard } from '../AdminKit';
 import {
-  MdListAlt, MdPublic, MdShield, MdLink, MdNotificationsActive,
+  MdPublic, MdShield, MdLink, MdNotificationsActive,
   MdPersonOff, MdLocationOn, MdSearch, MdGraphicEq,
 } from 'react-icons/md';
 
 const CARDS = [
-  { icon: MdListAlt,            title: 'Community Info',           desc: 'Name, owner, timezone, character limits.',    route: '/admin/community-info' },
   { icon: MdPublic,             title: 'Geographical Settings',    desc: 'Cities, counties, and postal codes.',         route: '/admin/geographical' },
   { icon: MdShield,             title: 'Unit Status Codes',        desc: 'Status labels and colors for units.',         route: '/admin/status-codes' },
   { icon: MdLink,               title: 'Quick Links',              desc: 'Shortcut links shown across the CAD.',        route: '/admin/quick-links' },

@@ -73,7 +73,6 @@ const DiscordIntegration = lazy(() => import('./pages/admin/sections/DiscordInte
 const Limits = lazy(() => import('./pages/admin/sections/Limits'));
 const WipeRecords = lazy(() => import('./pages/admin/sections/WipeRecords'));
 const Authenticate = lazy(() => import('./pages/admin/sections/Authenticate'));
-const CommunityInfo = lazy(() => import('./pages/admin/sections/CommunityInfo'));
 const Geographical = lazy(() => import('./pages/admin/sections/Geographical'));
 const StatusCodes = lazy(() => import('./pages/admin/sections/StatusCodes'));
 const QuickLinks = lazy(() => import('./pages/admin/sections/QuickLinks'));
@@ -191,7 +190,6 @@ function CADApp() {
           <Route path="wipe"               element={<WipeRecords />} />
           <Route path="authenticate"       element={<Authenticate />} />
           <Route path="businesses"         element={<AdminBusinesses />} />
-          <Route path="community-info"     element={<CommunityInfo />} />
           <Route path="geographical"       element={<Geographical />} />
           <Route path="status-codes"       element={<StatusCodes />} />
           <Route path="quick-links"        element={<QuickLinks />} />
