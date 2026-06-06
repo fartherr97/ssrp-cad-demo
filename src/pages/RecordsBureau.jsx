@@ -360,9 +360,9 @@ function StatusChip({ status }) {
 }
 
 const SEARCH_TYPES = [
-  { id: 'PERSON',   label: 'Person',            Icon: MdPerson },
-  { id: 'VEHICLE',  label: 'Vehicle',            Icon: MdDirectionsCar },
-  { id: 'WARRANT',  label: 'Warrant',            Icon: MdGavel },
+  { id: 'PERSON',   label: 'Person',             Icon: MdPerson,       activeClass: 'bg-sky-400/15 border-sky-400/40 text-sky-300',       hoverClass: 'hover:bg-sky-400/[0.08] hover:border-sky-400/25 hover:text-sky-300'       },
+  { id: 'VEHICLE',  label: 'Vehicle',            Icon: MdDirectionsCar, activeClass: 'bg-violet-400/15 border-violet-400/40 text-violet-300', hoverClass: 'hover:bg-violet-400/[0.08] hover:border-violet-400/25 hover:text-violet-300' },
+  { id: 'WARRANT',  label: 'Warrant',            Icon: MdGavel,        activeClass: 'bg-red-400/15 border-red-400/40 text-red-300',       hoverClass: 'hover:bg-red-400/[0.08] hover:border-red-400/25 hover:text-red-300'       },
   { id: 'CASES',    label: 'Reports & Records',  Icon: MdFolder, activeClass: 'bg-amber-400/15 border-amber-400/40 text-amber-300', hoverClass: 'hover:bg-amber-400/[0.08] hover:border-amber-400/25 hover:text-amber-300' },
   { id: 'BUSINESS', label: 'Business',           Icon: MdStore,        activeClass: 'bg-cyan-400/15 border-cyan-400/40 text-cyan-300',   hoverClass: 'hover:bg-cyan-400/[0.08] hover:border-cyan-400/25 hover:text-cyan-300'   },
   { id: 'PERMIT',   label: 'Permits',            Icon: MdVerifiedUser, activeClass: 'bg-green-400/15 border-green-400/40 text-green-300', hoverClass: 'hover:bg-green-400/[0.08] hover:border-green-400/25 hover:text-green-300' },
