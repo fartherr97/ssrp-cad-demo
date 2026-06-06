@@ -252,7 +252,7 @@ function ChatView({ header, badge, badgeCls, subtitle, messages, currentUserId, 
 
       {/* Reply bar */}
       {onReply && (
-        <div className="shrink-0 border-t border-border-base p-3 flex gap-2 items-end bg-app-toolbar/60">
+        <div className="shrink-0 border-t border-border-base p-3 flex gap-2 items-end bg-app-toolbar/60" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           <textarea
             className="flex-1 bg-app-input border border-border-base rounded-xl px-3 py-2 text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none focus:border-brand/60 transition-colors resize-none"
             placeholder={replyPlaceholder || 'Message…'}

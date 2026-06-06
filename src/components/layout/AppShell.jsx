@@ -99,6 +99,8 @@ export default function AppShell({ children }) {
   // The Admin suite is a self-contained sub-app: it renders its own top nav
   // (AdminShell) and fills the whole shell, so the global chrome is hidden.
   const inAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
+  // Hide the footer on fullscreen immersive pages where every pixel counts on mobile.
+  const hideFooter = inAdmin || pathname === '/messages' || pathname.startsWith('/messages/');
 
   return (
     <div className="cad-shell">
@@ -106,7 +108,7 @@ export default function AppShell({ children }) {
       <div className="cad-workspace">
         {children}
       </div>
-      <SiteFooter />
+      {!hideFooter && <SiteFooter />}
       <RadioToast />
       <BlastToast />
       <MessageToast />
