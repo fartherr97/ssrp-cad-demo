@@ -1,15 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import {
   MdPerson, MdBusiness, MdGroup, MdPhone, MdCalendarToday,
-  MdVerifiedUser, MdStore, MdCheck, MdStorefront,
+  MdVerifiedUser, MdStore, MdCheck,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, PortalCard, StatCard, SectionTitle } from './PortalKit';
 import AccessDenied from './AccessDenied';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
-import { useCAD } from '../../store/cadStore';
-import { useToast } from '../../contexts/ToastContext';
 import { BADGE } from '../../constants/styles';
-import { BUSINESS_STATUSES, DEFAULT_BUSINESS_STATUS } from '../../constants/statusColors';
 
 const ACCENT = 'brand';
 
@@ -38,8 +35,6 @@ function Avatar({ name, size = 'lg' }) {
 
 export default function EmployeeProfile() {
   const navigate = useNavigate();
-  const { dispatch } = useCAD();
-  const toast = useToast();
   const { activeBiz: myBiz, isOwner, myEmployeeRecord } = useActiveBusiness();
 
   if (!myBiz) return <AccessDenied portalName="the Business Center" />;
@@ -48,14 +43,6 @@ export default function EmployeeProfile() {
   const myName = isOwner ? myBiz.owner : myEmployeeRecord?.name;
   const myPhone = isOwner ? myBiz.phone : myEmployeeRecord?.phone;
   const mySince = isOwner ? myBiz.licenseIssuedAt : myEmployeeRecord?.since;
-
-  const opCode = myBiz.opStatus || DEFAULT_BUSINESS_STATUS;
-  const opStatus = BUSINESS_STATUSES.find(s => s.code === opCode) || BUSINESS_STATUSES[0];
-  const setOpStatus = (code) => {
-    dispatch({ type: 'UPDATE_BUSINESS', payload: { id: myBiz.id, opStatus: code } });
-    const opt = BUSINESS_STATUSES.find(o => o.code === code);
-    toast.info(`Business status set to ${opt?.label || code}`, { color: opt?.color });
-  };
 
   return (
     <PortalPage>
@@ -72,43 +59,12 @@ export default function EmployeeProfile() {
         <div className="flex items-center gap-4">
           <Avatar name={myName} size="lg" />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="text-[18px] font-bold text-white leading-tight">{myName || '—'}</div>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border"
-                style={{ background: `${opStatus.color}1f`, borderColor: `${opStatus.color}55`, color: opStatus.color }}>
-                <span className="w-2 h-2 rounded-full" style={{ background: opStatus.color }} />
-                {opStatus.label}
-              </span>
-            </div>
+            <div className="text-[18px] font-bold text-white leading-tight">{myName || '—'}</div>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {myRoles.map(r => <RoleBadge key={r} role={r} />)}
             </div>
           </div>
         </div>
-
-        {/* Owner-settable operational status */}
-        {isOwner && (
-          <div className="mt-4 pt-4 border-t border-border-faint">
-            <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-2 flex items-center gap-1.5">
-              <MdStorefront size={11} /> Set Operational Status
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {BUSINESS_STATUSES.map(s => {
-                const on = opCode === s.code;
-                return (
-                  <button key={s.code} type="button" onClick={() => setOpStatus(s.code)}
-                    className="press-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold cursor-pointer transition-all border"
-                    style={on
-                      ? { background: `${s.color}22`, borderColor: `${s.color}66`, color: s.color }
-                      : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color }} />
-                    {s.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
         <div className="grid gap-5 mt-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.6px] text-slate-500 mb-1 flex items-center gap-1.5">

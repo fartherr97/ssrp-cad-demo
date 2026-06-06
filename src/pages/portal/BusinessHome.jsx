@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import {
   MdStore, MdGroup, MdReceiptLong,
-  MdCheckCircle, MdBusiness, MdMenuBook, MdPerson, MdStorefront,
+  MdCheckCircle, MdBusiness, MdMenuBook, MdPerson,
 } from 'react-icons/md';
 import { PortalPage, PortalHeader, StatCard, PortalCard, SectionTitle } from './PortalKit';
 import AccessDenied from './AccessDenied';
 import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessContext';
-import { BUSINESS_STATUSES, DEFAULT_BUSINESS_STATUS } from '../../constants/statusColors';
 
 function licenseDaysLeft(issuedAt) {
   if (!issuedAt) return null;
@@ -56,12 +55,10 @@ export default function BusinessHome() {
           : licWarn     ? `Expires in ${days} day${days === 1 ? '' : 's'}, renew soon`
           : days !== null ? `${days} days remaining`
           : `Expires ${myBiz.licenseExpiry}`;
-        const op = BUSINESS_STATUSES.find(s => s.code === (myBiz.opStatus || DEFAULT_BUSINESS_STATUS)) || BUSINESS_STATUSES[0];
         return (
           <div className="flex gap-3.5 flex-wrap mb-7">
             <StatCard label="Employees"       value={myBiz.employees.length} accent={ACCENT}   icon={MdGroup}       hint="On the roster" />
             <StatCard label="License"         value={licVal}                 accent={licAccent} icon={MdReceiptLong} hint={licHint} />
-            <StatCard label="Open Status"     value={op.label}               accent={op.color}  icon={MdStorefront}  hint={isOwner ? 'Set from your profile menu' : 'Current operating status'} />
             <StatCard label="Business Status" value={myBiz.status}           accent={myBiz.status === 'ACTIVE' ? 'green' : 'amber'} icon={MdCheckCircle} hint="Registration standing" />
           </div>
         );

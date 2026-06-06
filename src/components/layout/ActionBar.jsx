@@ -4,16 +4,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCAD } from '../../store/cadStore';
 import { useToast } from '../../contexts/ToastContext';
 import { useMountTransition } from '../ui/Modal';
-import { STATUS_COLORS, BUSINESS_STATUSES, DEFAULT_BUSINESS_STATUS } from '../../constants/statusColors';
+import { STATUS_COLORS } from '../../constants/statusColors';
 import { PORTALS, DEFAULT_PORTAL } from '../../constants/portals';
 import { templatesForPortal } from '../../utils/templateScope';
-import { useActiveBusiness } from '../../contexts/BusinessContext';
 import {
   MdLogout, MdAccountCircle,
   MdCheckCircle, MdDirectionsCar, MdWarningAmber, MdLocationOn,
   MdDoNotDisturb, MdPowerSettingsNew, MdHome, MdSos, MdPerson, MdExpandMore,
   MdMenu, MdClose, MdCircle, MdInbox, MdNotifications, MdNotificationsNone,
-  MdStorefront,
 } from 'react-icons/md';
 
 // Icons matched to standard status codes; custom admin codes fall back to a dot.
@@ -127,7 +125,7 @@ function DropdownNav({ Icon: IconComp, label, items, active, navigate }) {
 }
 
 /* ─── User chip with dropdown (status, panic, profile, portal, sign-out) ─── */
-function UserChip({ currentUser, portal, me, myStatus, statusOptions, bizStatus, bizStatusOptions = [], canSetBizStatus, setBizStatus, dispatch, navigate, isActive }) {
+function UserChip({ currentUser, portal, me, myStatus, statusOptions, dispatch, navigate, isActive }) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
@@ -156,22 +154,13 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, bizStatus,
   const scheduleClose = () => { closeTimer.current = setTimeout(doClose, 80); };
   const toggle = () => open ? doClose() : openMenu();
 
-  // Dot color depends on portal: civilians are always "online" green, businesses
-  // reflect their operational status, everyone else uses their officer status.
-  const bizDot = bizStatusOptions.find(s => s.code === bizStatus)?.color;
-  const dot = portal.id === 'civilian' ? '#4ade80'
-    : portal.id === 'business' ? (bizDot || '#94a3b8')
+  const dot = portal.id === 'civilian' || portal.id === 'business' ? '#4ade80'
     : (statusOptions.find(s => s.code === myStatus)?.color || STATUS_COLORS[myStatus] || '#94a3b8');
 
   const setStatus = (s) => {
     dispatch({ type: 'SET_STATUS', payload: s });
     const opt = statusOptions.find(o => o.code === s);
     toast.info(`Status set to ${opt?.label || s}`, { color: opt?.color });
-  };
-  const setBusinessStatus = (code) => {
-    setBizStatus?.(code);
-    const opt = bizStatusOptions.find(o => o.code === code);
-    toast.info(`Business status set to ${opt?.label || code}`, { color: opt?.color });
   };
   const triggerPanic = () => {
     const mockCoords = [
@@ -268,36 +257,6 @@ function UserChip({ currentUser, portal, me, myStatus, statusOptions, bizStatus,
                 className="w-full flex items-center justify-center gap-2 px-2.5 py-2 mb-1 rounded-lg text-[12px] font-bold text-white bg-red-600 hover:bg-red-500 cursor-pointer transition-colors animate-pulse-red">
                 <MdSos size={16} /> PANIC · Officer in Distress
               </button>
-              <div className="h-px bg-border-faint my-1 mx-1" />
-            </>
-          )}
-
-          {/* Business operational status — owner-settable */}
-          {portal.id === 'business' && canSetBizStatus && (
-            <>
-              <div className="px-2.5 pt-1.5 pb-1 text-[9px] font-bold uppercase tracking-[0.6px] text-slate-600">Business Status</div>
-              <div className="grid grid-cols-2 gap-1 px-1 pb-1.5">
-                {bizStatusOptions.map(s => {
-                  const on = bizStatus === s.code;
-                  const hov = hoveredStatus === s.code;
-                  const c = s.color;
-                  const lit = on || hov;
-                  return (
-                    <button key={s.code} onClick={() => setBusinessStatus(s.code)}
-                      onMouseEnter={() => setHoveredStatus(s.code)}
-                      onMouseLeave={() => setHoveredStatus(null)}
-                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-all duration-75 border"
-                      style={lit
-                        ? { background: `${c}22`, borderColor: `${c}55`, color: c }
-                        : { borderColor: 'transparent', color: '#94a3b8' }
-                      }
-                    >
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: c }} />
-                      {s.label}
-                    </button>
-                  );
-                })}
-              </div>
               <div className="h-px bg-border-faint my-1 mx-1" />
             </>
           )}
@@ -484,15 +443,6 @@ export default function ActionBar() {
   const me       = officers.find(o => o.id === currentUser?.id);
   const myStatus = me?.status || 'OFFDUTY';
 
-  // Business portal: the user-chip dot + status selector reflect the active
-  // business's operational status (owner-settable).
-  const { activeBiz, isOwner: isBizOwner } = useActiveBusiness();
-  const bizStatus = activeBiz?.opStatus || DEFAULT_BUSINESS_STATUS;
-  const setBizStatus = (code) => {
-    if (!activeBiz) return;
-    dispatch({ type: 'UPDATE_BUSINESS', payload: { id: activeBiz.id, opStatus: code } });
-  };
-
   const go       = (route) => { navigate(route); setMobileOpen(false); };
   const isActive = (route) => location.pathname === route || location.pathname.startsWith(route + '/');
 
@@ -566,7 +516,6 @@ export default function ActionBar() {
           notifications={notifications.filter(n => !n.recipientBadge || n.recipientBadge === currentUser?.badge)}
           dispatch={dispatch} navigate={navigate} />
         <UserChip currentUser={currentUser} portal={portal} me={me} myStatus={myStatus} statusOptions={statusOptions}
-          bizStatus={bizStatus} bizStatusOptions={BUSINESS_STATUSES} canSetBizStatus={isBizOwner} setBizStatus={setBizStatus}
           dispatch={dispatch} navigate={navigate} isActive={isActive} />
         {/* Hamburger (mobile/tablet) */}
         <button onClick={() => setMobileOpen(o => !o)}
