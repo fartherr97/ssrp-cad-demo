@@ -5,6 +5,7 @@ import { PORTALS, DEFAULT_PORTAL } from './constants/portals';
 import AppShell from './components/layout/AppShell';
 import DutyGuard from './components/DutyGuard';
 import LoginPage from './pages/LoginPage';
+import AccessDeniedPage from './pages/AccessDeniedPage';
 import DispatchCenter from './pages/DispatchCenter';
 import IncidentDetail from './pages/IncidentDetail';
 import DispatchBoard from './pages/DispatchBoard';
@@ -147,6 +148,7 @@ function CADApp() {
   return (
     <Routes>
       <Route path="/" element={<LoginRoute />} />
+      <Route path="/access-denied" element={<AccessDeniedPage />} />
       <Route element={<AuthShell />}>
         <Route path="/dispatch"      element={<DispatchPortal />} />
         <Route path="/cad"           element={<DispatchCenter />} />

@@ -28,31 +28,37 @@ const ROLES = [
     id: 'admin', label: 'Admin', route: '/admin',
     color: '#c09010', bg: 'rgba(160,120,8,0.12)', border: 'rgba(160,120,8,0.35)',
     deptShorts: ['TPD'],
+    restricted: true,
   },
   {
     id: 'leo', label: 'Law Enforcement', route: '/cad',
     color: '#3a88e8', bg: 'rgba(58,136,232,0.12)', border: 'rgba(58,136,232,0.35)',
     deptShorts: ['TPD', 'HCSO', 'FHP'],
+    restricted: true,
   },
   {
     id: 'civilian', label: 'Civilian', route: '/civilians',
     color: '#9090cc', bg: 'rgba(144,144,204,0.12)', border: 'rgba(144,144,204,0.35)',
     deptShorts: [],
+    restricted: false,
   },
   {
     id: 'business', label: 'Business', route: '/civilians',
     color: '#44aacc', bg: 'rgba(68,170,204,0.12)', border: 'rgba(68,170,204,0.35)',
     deptShorts: [],
+    restricted: true,
   },
   {
     id: 'fire', label: 'Fire & EMS', route: '/fire',
     color: '#e04020', bg: 'rgba(224,64,32,0.12)', border: 'rgba(224,64,32,0.35)',
     deptShorts: ['HCFR'],
+    restricted: true,
   },
   {
     id: 'dispatch', label: 'Dispatch', route: '/cad',
     color: '#3aaa44', bg: 'rgba(58,170,68,0.12)', border: 'rgba(58,170,68,0.35)',
     deptShorts: ['FDOT'],
+    restricted: true,
   },
 ];
 
@@ -97,25 +103,46 @@ export default function LoginPage() {
     setTimeout(() => {
       const portal = PORTALS[role.id];
       let user;
-      if (role.id === 'civilian' || role.id === 'business') {
-        // Citizen-facing portals * not tied to an officer record.
+
+      if (role.id === 'civilian') {
         user = {
-          id: role.id === 'civilian' ? 'self-civ' : 'self-biz',
-          name: 'Jordan Maxwell',
-          role: role.id,
-          badge: role.id === 'civilian' ? 'CIV' : 'BIZ',
-          deptShort: role.id === 'civilian' ? 'CIV' : 'BIZ',
-          discordId: '205947291075078247',
-          discordUsername: 'jordanmaxwell',
+          id: 'self-civ', name: 'Jordan Maxwell', role: role.id,
+          badge: 'CIV', deptShort: 'CIV',
+          discordId: '205947291075078247', discordUsername: 'jordanmaxwell',
+          memberSince: '2024-06-01',
+        };
+      } else if (role.id === 'business') {
+        // Business: only accessible if the Discord account is linked to a business.
+        const discordId = state.discordAccount?.id;
+        const hasBizAccess = !discordId || state.businesses?.some(b =>
+          b.ownedByPlayer ||
+          b.ownerDiscordId === discordId ||
+          b.employees?.some(e => e.discordId === discordId)
+        );
+        if (!hasBizAccess) {
+          setLoading(false);
+          navigate('/access-denied', { state: { code: 'AUTH_ROLE_MISSING', portal: 'Business' } });
+          return;
+        }
+        user = {
+          id: 'self-biz', name: 'Jordan Maxwell', role: role.id,
+          badge: 'BIZ', deptShort: 'BIZ',
+          discordId: '205947291075078247', discordUsername: 'jordanmaxwell',
           memberSince: '2024-06-01',
         };
       } else {
-        // Emergency-service portals log in as a representative officer.
+        // Emergency-service / admin portals: require a matching officer record.
         const officer = OFFICERS.find(o =>
           role.deptShorts.length === 0 ? true : role.deptShorts.includes(o.deptShort)
-        ) || OFFICERS[0];
+        );
+        if (!officer) {
+          setLoading(false);
+          navigate('/access-denied', { state: { code: 'AUTH_ROLE_MISSING', portal: role.label } });
+          return;
+        }
         user = { ...officer };
       }
+
       dispatch({ type: 'LOGIN', payload: { ...user, portal: role.id } });
       navigate(portal?.landing || role.route, { replace: true });
     }, 350);
