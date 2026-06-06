@@ -402,6 +402,8 @@ tbody tr { transition: background-color 0.13s ease, box-shadow 0.13s ease; }
   .mob-list-panel.mob-gone   { display: none !important; }
   .mob-detail-panel.mob-gone { display: none !important; }
   .mob-back-btn { display: flex; }
+  /* Ensure the detail pane fills height and scrolls on mobile */
+  .mob-detail-panel:not(.mob-gone) { height: 100%; min-height: 0; }
 
   /* Grid helpers */
   .n-grid-4 { grid-template-columns: 1fr 1fr; }

@@ -2,13 +2,13 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCAD } from '../store/cadStore';
 import {
   MdSend, MdSearch, MdClose, MdPerson, MdLock,
-  MdArrowBack, MdInfo, MdGroup, MdForum, MdCampaign,
+  MdArrowBack, MdGroup, MdForum,
 } from 'react-icons/md';
 import {
   S_PAGE, S_INPUT, S_LABEL, S_FIELD,
 } from '../constants/styles';
 
-const DISCLAIMER = 'Messages in this system are monitored for security and compliance purposes.';
+const COMPOSE_DISCLAIMER = 'Messages in this system are monitored for security and compliance purposes.';
 
 /* Parse our stored "M/D/YYYY h:mm AM" timestamps into a sortable number. */
 const tval = (s) => { const t = new Date(s).getTime(); return Number.isNaN(t) ? 0 : t; };
@@ -167,7 +167,7 @@ function ComposeModal({ onClose, currentUser, officers, onSend, onGroupSend }) {
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-[10.5px] text-slate-500"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <MdLock size={12} className="shrink-0" />
-            {DISCLAIMER}
+            {COMPOSE_DISCLAIMER}
           </div>
 
           {/* Actions */}
@@ -209,7 +209,7 @@ function ChatView({ header, badge, badgeCls, subtitle, messages, currentUserId, 
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
       <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint shrink-0">
         {badge && (
@@ -226,7 +226,7 @@ function ChatView({ header, badge, badgeCls, subtitle, messages, currentUserId, 
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
         {messages.map((msg, i) => {
           const isMe = String(msg.fromId) === String(currentUserId);
           return (
@@ -273,47 +273,12 @@ function ChatView({ header, badge, badgeCls, subtitle, messages, currentUserId, 
   );
 }
 
-/* ── System notifications feed (read-only) ── */
-function SystemFeed({ items }) {
-  return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="px-4 py-3 bg-app-card/40 border-b border-border-faint shrink-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.3px] rounded-full border bg-amber-500/15 text-amber-400 border-amber-500/30">
-            SYSTEM
-          </span>
-        </div>
-        <div className="text-[15px] font-bold">System Notifications</div>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
-        {items.map((m, i) => (
-          <div key={m.id || i} className="rounded-xl border border-border-faint bg-white/[0.03] px-3.5 py-3">
-            <div className="flex items-center gap-2 mb-1">
-              {m.priority === 'HIGH' && (
-                <span className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.3px] rounded-full border bg-red-500/20 text-red-400 border-red-500/30">HIGH PRI</span>
-              )}
-              <span className="text-[12.5px] font-bold text-white">{m.subject}</span>
-              <span className="text-[9px] text-cad-muted font-mono ml-auto">{m.timestamp}</span>
-            </div>
-            <div className="text-[12px] leading-[1.7] text-cad-text whitespace-pre-wrap">{m.body}</div>
-            {(m.from || m.to) && (
-              <div className="text-[9.5px] text-cad-dim font-mono mt-1.5">
-                {m.from ? `From: ${m.from}` : ''}{m.to ? ` → ${m.to}` : ''}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ════════════════════════════════
    MAIN PAGE
 ════════════════════════════════ */
 export default function Messages() {
   const { state, dispatch } = useCAD();
-  const { messages, directMessages, groupThreads = [], currentUser, officers } = state;
+  const { directMessages, groupThreads = [], currentUser, officers } = state;
 
   const [selectedKey, setSelectedKey] = useState(null); // 'direct:<id>' | 'group:<id>' | 'system'
   const [composing,   setComposing]   = useState(false);
@@ -361,18 +326,7 @@ export default function Messages() {
         };
       });
 
-    // System notices collapsed into a single feed entry
-    const sysItems = [...messages].sort((a, b) => tval(b.timestamp) - tval(a.timestamp));
-    const systemConvo = sysItems.length ? [{
-      kind: 'system', key: 'system', title: 'System Notifications',
-      items: sysItems,
-      last: sysItems[0],
-      preview: sysItems[0]?.subject || '',
-      ts: tval(sysItems[0]?.timestamp),
-      unread: sysItems.some(m => !m.read),
-    }] : [];
-
-    const all = [...directConvos, ...groupConvos, ...systemConvo];
+    const all = [...directConvos, ...groupConvos];
     const q = search.trim().toLowerCase();
     return all
       .filter(c => {
@@ -381,7 +335,7 @@ export default function Messages() {
           || (c.preview || '').toLowerCase().includes(q);
       })
       .sort((a, b) => b.ts - a.ts);
-  }, [directMessages, groupThreads, messages, meId, search]);
+  }, [directMessages, groupThreads, meId, search]);
 
   const selected = useMemo(
     () => conversations.find(c => c.key === selectedKey) || null,
@@ -399,8 +353,6 @@ export default function Messages() {
       });
     } else if (c.kind === 'group') {
       dispatch({ type: 'MARK_GROUP_THREAD_READ', payload: { threadId: c.thread.id, userId: currentUser?.id } });
-    } else if (c.kind === 'system') {
-      c.items.forEach(m => { if (!m.read) dispatch({ type: 'MARK_MESSAGE_READ', payload: m.id }); });
     }
   };
 
@@ -448,16 +400,10 @@ export default function Messages() {
         </button>
       </div>
 
-      {/* Disclaimer */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/[0.06] border-b border-amber-500/20 shrink-0 text-[10.5px] text-amber-400/80">
-        <MdInfo size={13} className="shrink-0" />
-        {DISCLAIMER}
-      </div>
-
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex-1 overflow-hidden flex min-h-0">
 
         {/* Left: conversation list */}
-        <div className={`mob-list-panel${selected ? ' mob-gone' : ''} flex flex-col w-full md:w-[300px] md:shrink-0 border-r border-border-base overflow-hidden`}>
+        <div className={`mob-list-panel${selected ? ' mob-gone' : ''} flex flex-col w-full md:w-[300px] md:shrink-0 border-r border-border-base overflow-hidden min-h-0`}>
           <div className="p-2 border-b border-border-faint shrink-0">
             <div className="flex items-center gap-2 bg-app-input border border-border-base rounded-lg px-3 py-1.5">
               <MdSearch size={13} className="text-slate-500 shrink-0" />
@@ -481,9 +427,8 @@ export default function Messages() {
             ) : conversations.map(c => {
               const isSel = selectedKey === c.key;
               const title = c.otherName || c.title;
-              const Icon = c.kind === 'group' ? MdGroup : c.kind === 'system' ? MdCampaign : null;
+              const Icon = c.kind === 'group' ? MdGroup : null;
               const avatarCls = c.kind === 'group' ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-                : c.kind === 'system' ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                 : 'bg-brand/15 text-brand-bright border-brand/30';
               return (
                 <div key={c.key}
@@ -510,7 +455,7 @@ export default function Messages() {
         </div>
 
         {/* Right: conversation detail */}
-        <div className={`mob-detail-panel${!selected ? ' mob-gone' : ''} flex-1 flex flex-col overflow-hidden`}>
+        <div className={`mob-detail-panel${!selected ? ' mob-gone' : ''} flex-1 flex flex-col min-h-0 overflow-hidden`}>
           <button className="mob-back-btn" onClick={() => setSelectedKey(null)}>
             <MdArrowBack size={14} /> Back to messages
           </button>
@@ -528,7 +473,7 @@ export default function Messages() {
               onReply={replyDirect(selected)}
               replyPlaceholder={`Message ${selected.otherName}…`}
             />
-          ) : selected.kind === 'group' ? (
+          ) : (
             <ChatView
               header={selected.thread.subject}
               badge="GROUP CHAT"
@@ -539,8 +484,6 @@ export default function Messages() {
               onReply={replyGroup(selected.thread)}
               replyPlaceholder="Reply to group…"
             />
-          ) : (
-            <SystemFeed items={selected.items} />
           )}
         </div>
       </div>
