@@ -8,6 +8,7 @@ import {
   MdDescription, MdFolder, MdSearch, MdExpandMore, MdChevronRight,
   MdPerson, MdDirectionsCar, MdSave, MdLock,
   MdVisibility, MdLink, MdEdit, MdCheckCircle, MdStar, MdCode, MdTag,
+  MdFileUpload, MdFileDownload,
 } from 'react-icons/md';
 
 /* ── uid generators ── */
@@ -513,8 +514,9 @@ function PreviewPanel({ draft }) {
 }
 
 /* ── Left panel: existing record list ── */
-function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicate, onDelete, typeFilter, onTypeFilter }) {
+function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicate, onDelete, typeFilter, onTypeFilter, onExport, onImport }) {
   const [search, setSearch] = useState('');
+  const fileRef = useRef(null);
   const filtered = templates.filter(t => {
     const q = search.toLowerCase();
     return (!q || t.name.toLowerCase().includes(q) || (t.formCode || '').toLowerCase().includes(q)) &&
@@ -619,6 +621,24 @@ function RecordListPanel({ templates, selectedId, onSelect, onCreate, onDuplicat
           className="press flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10.5px] font-bold border-none cursor-pointer"
           style={{ background: 'rgba(34,197,94,0.14)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.24)' }}>
           <MdAdd size={13} /> Record
+        </button>
+      </div>
+
+      {/* Import / Export — back up every template + filed report/record as JSON,
+          then restore it once the live backend is up. */}
+      <div className="shrink-0 px-2.5 pb-2.5 flex gap-2"
+        style={{ background: '#0b1627' }}>
+        <input ref={fileRef} type="file" accept="application/json,.json" className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) onImport(f); }} />
+        <button type="button" onClick={() => fileRef.current?.click()} title="Import a saved bundle (templates + filed reports & records)"
+          className="press flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold border-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#93a4bd', border: '1px solid rgba(255,255,255,0.10)' }}>
+          <MdFileUpload size={13} /> Import
+        </button>
+        <button type="button" onClick={onExport} title="Export all templates + filed reports & records to a JSON file"
+          className="press flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold border-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#93a4bd', border: '1px solid rgba(255,255,255,0.10)' }}>
+          <MdFileDownload size={13} /> Export
         </button>
       </div>
     </div>
@@ -869,7 +889,7 @@ function TemplateEditor({ draft, onChange, isReport, isNew, onSave, onClose }) {
 export default function CustomRecords() {
   const { state, dispatch } = useCAD();
   const toast = useToast();
-  const { reportTemplates = [], recordTemplates = [] } = state;
+  const { reportTemplates = [], recordTemplates = [], reports = [], records = [] } = state;
 
   const [typeFilter, setTypeFilter]       = useState('all');
   const [draft, setDraft]                 = useState(null);
@@ -930,6 +950,61 @@ export default function CustomRecords() {
     toast.success('Template duplicated.');
   };
 
+  /* ── Export / Import the full builder bundle ──
+     Captures every template plus all filed reports & records so the data
+     built up in the demo can be carried straight into the live backend. */
+  const exportBundle = () => {
+    const bundle = {
+      _format: 'ssrp-cad-builder-bundle',
+      _version: 1,
+      exportedAt: new Date().toISOString(),
+      reportTemplates,
+      recordTemplates,
+      reports,
+      records,
+    };
+    const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ssrp-records-bundle-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast.success(
+      `${reportTemplates.length + recordTemplates.length} template(s) · ${reports.length + records.length} filed report(s)/record(s) exported.`,
+      { title: 'Bundle exported' }
+    );
+  };
+
+  const importBundle = (file) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      let data;
+      try { data = JSON.parse(ev.target.result); }
+      catch { toast.error('That file is not valid JSON.'); return; }
+
+      const has = k => Array.isArray(data[k]);
+      if (!has('reportTemplates') && !has('recordTemplates') && !has('reports') && !has('records')) {
+        toast.error('No templates, reports, or records found in that file.');
+        return;
+      }
+      const counts = [
+        has('reportTemplates') && `${data.reportTemplates.length} report template(s)`,
+        has('recordTemplates') && `${data.recordTemplates.length} record template(s)`,
+        has('reports')         && `${data.reports.length} report(s)`,
+        has('records')         && `${data.records.length} record(s)`,
+      ].filter(Boolean);
+
+      if (!window.confirm(
+        `Import will REPLACE the current ${counts.join(', ')} with the file's contents. Continue?`
+      )) return;
+
+      dispatch({ type: 'IMPORT_BUILDER_BUNDLE', payload: data });
+      handleClose();
+      toast.success(`Imported ${counts.join(', ')}.`, { title: 'Bundle imported' });
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="-m-3 md:-m-6 flex overflow-hidden font-ui"
       style={{ height: 'calc(100vh - 56px)', background: '#08111d' }}>
@@ -945,6 +1020,8 @@ export default function CustomRecords() {
           onDelete={deleteTemplate}
           typeFilter={typeFilter}
           onTypeFilter={setTypeFilter}
+          onExport={exportBundle}
+          onImport={importBundle}
         />
       </div>
 

@@ -643,6 +643,27 @@ function baseReducer(state, action) {
       return { ...state, [key]: value, ...audit };
     }
 
+    case 'IMPORT_BUILDER_BUNDLE': {
+      // Restore an exported bundle of report/record templates AND their filed
+      // data. Only the slices present in the file are replaced; missing slices
+      // are left untouched. Used by Records Builder → Import (for moving the
+      // demo's built-up reports/records into the live backend).
+      const b = action.payload || {};
+      const next = { ...state };
+      let parts = [];
+      if (Array.isArray(b.reportTemplates)) { next.reportTemplates = b.reportTemplates; parts.push(`${b.reportTemplates.length} report template(s)`); }
+      if (Array.isArray(b.recordTemplates)) { next.recordTemplates = b.recordTemplates; parts.push(`${b.recordTemplates.length} record template(s)`); }
+      if (Array.isArray(b.reports))         { next.reports = b.reports;                 parts.push(`${b.reports.length} report(s)`); }
+      if (Array.isArray(b.records))         { next.records = b.records;                 parts.push(`${b.records.length} record(s)`); }
+      // Keep the auto-number sequence ahead of anything just imported.
+      const nums = [...(next.reports || []), ...(next.records || [])]
+        .map(r => parseInt(String(r.number || r.reportNumber || '').replace(/\D/g, ''), 10))
+        .filter(n => Number.isFinite(n));
+      if (nums.length) next.reportSeq = Math.max(state.reportSeq || 1, Math.max(...nums) + 1);
+      const audit = addAuditEntry(next, `Imported builder bundle · ${parts.join(', ') || 'no data'}`, 'Customization');
+      return { ...next, ...audit };
+    }
+
     case 'WIPE': {
       // Admin "Wipe Records" — clears a data slice AND auto-saves a restorable
       // backup snapshot of exactly what was removed (see wipeBackups).

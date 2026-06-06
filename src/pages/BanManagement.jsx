@@ -17,9 +17,13 @@ export default function BanManagement() {
   const { bannedUsers, currentUser } = state;
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('ALL');
+  const [query, setQuery] = useState('');
   const [form, setForm] = useState({ name:'', discordId:'', reason:'', duration:'Permanent' });
 
-  const filtered = filter === 'ALL' ? bannedUsers : bannedUsers.filter(b => b.status === filter);
+  const q = query.trim().toLowerCase();
+  const filtered = bannedUsers.filter(b =>
+    (filter === 'ALL' || b.status === filter) &&
+    (!q || b.name?.toLowerCase().includes(q) || String(b.discordId || '').includes(q)));
   const active = bannedUsers.filter(b => b.status === 'Active').length;
   const perma = bannedUsers.filter(b => b.duration === 'Permanent' && b.status === 'Active').length;
 
@@ -53,7 +57,13 @@ export default function BanManagement() {
             <span className="text-[8px] text-cad-muted tracking-[0.6px] uppercase">{s.label}</span>
           </div>
         ))}
-        <div className="ml-auto flex gap-1.5 items-center">
+        <div className="ml-auto flex gap-1.5 items-center flex-wrap">
+          <input
+            className={`${S_INPUT} !w-[200px] !py-1 text-[11px]`}
+            placeholder="Search name or Discord ID…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
           {['ALL','Active','Expired','Lifted'].map(f => (
             <button key={f} className={xs(filter === f ? S_BTN_PRIMARY : S_BTN_SECONDARY)}
               onClick={() => setFilter(f)}>{f}</button>

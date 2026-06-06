@@ -272,7 +272,7 @@ export default function AdminBusinesses() {
                 <input
                   value={ownerSearch}
                   onChange={e => setOwnerSearch(e.target.value)}
-                  placeholder="Search by name or badge…"
+                  placeholder="Search by name, badge, or Discord ID…"
                   className="w-full rounded-lg text-[11.5px] outline-none"
                   style={{ background: '#0d1a2c', border: '1px solid rgba(255,255,255,0.10)', padding: '6px 10px 6px 30px', color: '#dde6f1', fontFamily: 'var(--font-ui)' }}
                 />
@@ -282,7 +282,7 @@ export default function AdminBusinesses() {
                 {(() => {
                   const q = ownerSearch.trim().toLowerCase();
                   const filtered = q
-                    ? officers.filter(o => o.name?.toLowerCase().includes(q) || String(o.badge || '').toLowerCase().includes(q))
+                    ? officers.filter(o => o.name?.toLowerCase().includes(q) || String(o.badge || '').toLowerCase().includes(q) || String(o.discordId || '').includes(q))
                     : officers;
                   if (filtered.length === 0) {
                     return <div className="text-[11px] text-slate-600 italic px-3 py-3 text-center">No accounts match “{ownerSearch}”.</div>;

@@ -220,7 +220,9 @@ export default function LicensePoints() {
     return allDrivers.filter(c =>
       `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
       c.dlNumber?.toLowerCase().includes(q) ||
-      c.ssn?.includes(q)
+      c.ssn?.includes(q) ||
+      c.ownerDiscordId?.includes(q) ||
+      c.discordId?.includes(q)
     );
   })();
 
@@ -337,7 +339,7 @@ export default function LicensePoints() {
             <MdSearch size={14} className="text-slate-500 shrink-0" />
             <input
               className="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-200 placeholder:text-slate-600 outline-none"
-              placeholder="Search name, DL #, or SSN…"
+              placeholder="Search name, DL #, SSN, or Discord ID…"
               value={driverSearch}
               onChange={e => setDriverSearch(e.target.value)}
             />

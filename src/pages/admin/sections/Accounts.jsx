@@ -38,14 +38,14 @@ export default function Accounts() {
           <SonButton key={s} size="sm" variant={statusFilter === s ? 'red' : 'ghost'}
             onClick={() => { setStatusFilter(s); setPage(0); }}>{s}</SonButton>
         ))}
-        <SonSearch value={query} onChange={v => { setQuery(v); setPage(0); }} placeholder="Search username / API ID…" />
+        <SonSearch value={query} onChange={v => { setQuery(v); setPage(0); }} placeholder="Search username / Discord ID…" />
       </>}
     >
       {filtered.length === 0 ? <EmptyState>No accounts match.</EmptyState> : (
         <>
           <SonTable columns={[
             { label: 'Username' }, { label: 'Status' }, { label: 'Permissions' },
-            { label: 'Last Login' }, { label: 'Joined' }, { label: 'API IDs' },
+            { label: 'Last Login' }, { label: 'Joined' }, { label: 'Discord ID' },
           ]}>
             {pageItems.map((a, i) => (
               <SonRow key={a.id} i={i}>
