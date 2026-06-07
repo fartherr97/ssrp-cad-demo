@@ -32,7 +32,7 @@ const STATUS_CFG = {
 
 const EMP_ROLES = ['Manager', 'Employee', 'Driver', 'Security', 'Dispatcher', 'Accountant'];
 
-const BLANK_BIZ = { name: '', type: '', owner: '', ownerDiscordId: '', ein: '', phone: '', address: '', license: '', licenseExpiry: '', status: 'ACTIVE', isTowCompany: false };
+const BLANK_BIZ = { name: '', type: '', owner: '', ownerDiscordId: '', ein: '', phone: '', address: '', license: '', licenseExpiry: '', status: 'ACTIVE', isTowCompany: false, isFDOT: false };
 const BLANK_EMP = { name: '', discordId: '', role: 'Employee', phone: '', since: '' };
 
 function StatusBadge({ status }) {
@@ -103,7 +103,7 @@ export default function AdminBusinesses() {
   };
 
   const openEdit = (biz) => {
-    setForm({ name: biz.name, type: biz.type || '', owner: biz.owner || '', ownerDiscordId: biz.ownerDiscordId || '', ein: biz.ein || '', phone: biz.phone || '', address: biz.address || '', license: biz.license || '', licenseExpiry: biz.licenseExpiry || '', status: biz.status || 'ACTIVE', isTowCompany: biz.isTowCompany || false });
+    setForm({ name: biz.name, type: biz.type || '', owner: biz.owner || '', ownerDiscordId: biz.ownerDiscordId || '', ein: biz.ein || '', phone: biz.phone || '', address: biz.address || '', license: biz.license || '', licenseExpiry: biz.licenseExpiry || '', status: biz.status || 'ACTIVE', isTowCompany: biz.isTowCompany || false, isFDOT: biz.isFDOT || false });
     setSelected(biz.id);
     setIsNew(false);
     setAddingEmp(false);
@@ -244,13 +244,27 @@ export default function AdminBusinesses() {
                     <input
                       type="checkbox"
                       checked={!!form.isTowCompany}
-                      onChange={e => setForm(f => ({ ...f, isTowCompany: e.target.checked }))}
+                      onChange={e => setForm(f => ({ ...f, isTowCompany: e.target.checked, isFDOT: e.target.checked ? f.isFDOT : false }))}
                       className="w-4 h-4 rounded accent-orange-500 cursor-pointer"
                     />
                     <span className="text-[12px] font-semibold text-slate-300">Tow Company</span>
                   </label>
                   <span className="text-[11px] text-slate-500">Enables Tow CAD access in the Business portal</span>
                 </div>
+                {form.isTowCompany && (
+                  <div className="col-span-1 sm:col-span-2 flex items-center gap-3 py-2 pl-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={!!form.isFDOT}
+                        onChange={e => setForm(f => ({ ...f, isFDOT: e.target.checked }))}
+                        className="w-4 h-4 rounded accent-orange-500 cursor-pointer"
+                      />
+                      <span className="text-[12px] font-semibold text-slate-300">State Transport agency (FDOT)</span>
+                    </label>
+                    <span className="text-[11px] text-slate-500">Unlocks FDOT Permits + road-call dispatch; the default auto-route tow provider</span>
+                  </div>
+                )}
                 <FInput label="EIN" value={form.ein} onChange={sf('ein')} placeholder="FL-XX-XXXXXXX" mono />
                 <FInput label="Phone" value={form.phone} onChange={sf('phone')} placeholder="555-0000" />
                 <FInput label="Address" value={form.address} onChange={sf('address')} placeholder="123 Main St, Tampa" span2 />
