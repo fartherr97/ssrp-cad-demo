@@ -164,16 +164,6 @@ input, textarea, select, [aria-haspopup="listbox"], [class*="focus-within:ring"]
   transition-property: color, background-color, border-color, opacity !important;
 }
 
-/* content-visibility: let the browser skip rendering/painting off-screen panels
-   and cards until they scroll near the viewport. Big scroll-FPS win on dense
-   pages (admin sections, Command/Supervisor, portals) with no visual change.
-   `contain-intrinsic-size: auto …` reserves space and remembers real sizes so
-   the scrollbar stays stable. Unsupported browsers simply ignore it. */
-.cv-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 320px;
-}
-
 /* Large blurred box-shadows are one of the most GPU-expensive things to raster
    while scrolling (each is a per-frame Gaussian blur). The profile showed the
    main thread idle but frames dropping = GPU/raster bound, so flatten the heavy

@@ -37,7 +37,7 @@ export function AdminContent({ children }) {
 export function AdminPanel({ title, subtitle, right, children, center, style = {} }) {
   return (
     <div
-      className="cv-auto rounded-xl mb-5 overflow-hidden bg-app-panel border border-border-base shadow-lg shadow-black/20"
+      className="rounded-xl mb-5 overflow-hidden bg-app-panel border border-border-base shadow-lg shadow-black/20"
       style={style}
     >
       {(title || right) && (
