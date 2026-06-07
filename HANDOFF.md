@@ -13,7 +13,7 @@ the integration seams, the action/event catalog, and the data model.
 - **State:** a single `useReducer` store — `src/store/cadStore.jsx` (`CADProvider` / `useCAD()`).
   - `const { state, dispatch } = useCAD();`
   - Components **never fetch or mutate directly** — they `dispatch({ type, payload })`.
-  - There is exactly **one** reducer `switch` (~131 cases). This is the whole write surface.
+  - There is exactly **one** reducer `switch` (~135 cases). This is the whole write surface.
 - **Seed data:** `src/data/mockData.js`, `adminData.js`, `civilianFormsDefaults.js`, `helpDefaults.js`
   are imported into `initialState`. **These define the entity schemas.**
 - **No network layer exists yet** (the only `fetch` is loading a logo image for PDF export).
@@ -26,7 +26,12 @@ the integration seams, the action/event catalog, and the data model.
 ## 2. The four integration seams (Steve's surface)
 
 1. **Hydration** — replace the synchronous `initialState` (mock imports) in
-   `src/store/cadStore.jsx` with data fetched from the API on app load. Add a loading state.
+   `src/store/cadStore.jsx` with data fetched from the API on app load. **The loading/error
+   seam is already scaffolded:** set `hydrated: false` in `initialState`, then on app load
+   dispatch `HYDRATE_START` → `HYDRATE_SUCCESS` (payload is merged into state, sets `hydrated:true`)
+   or `HYDRATE_ERROR` (payload = message). `src/components/HydrationGate.jsx` shows the loading
+   screen while `hydrated === false` and an error screen on `hydrationError`; it also exports
+   `AsyncSection` + `LoadingScreen`/`ErrorScreen` for per-list loading/error/empty states.
 2. **Persistence** — the ~90 *mutating* actions update local state only. Each needs to also
    call the API. Cleanest approach: a **middleware/effect** that maps `action.type → endpoint`
    so components stay unchanged (see §5).
@@ -96,6 +101,12 @@ Actions marked **(read-receipt/UI-only)** are local-only and need no backend (or
 - `RESET_LICENSE_POINTS` — civilianId.
 - `MANUAL_SUSPEND` — `{ civilianId, reason }`.
 - `LIFT_SUSPENSION` — civilianId.
+- **Auto-accrual on filing:** `ADD_REPORT` / `ADD_RECORD` automatically add license points to the
+  subject civilian for any charges on the filed form, then run the same tier auto-suspend. Per-charge
+  points come from the admin Auto-Suspend schedule (matched by penal-code id) or fall back to the penal
+  code entry's own `points`. So the suspension engine fires from normal citation/arrest filing — not
+  only from an explicit `ADD_LICENSE_POINTS`. (Subject is resolved from `formData._civilianId` when the
+  report's top-level `civilianId` is null.)
 
 ### Warrants
 - `ADD_WARRANT` — warrant (also stamps a `WARRANT` flag on the civilian).
@@ -138,7 +149,8 @@ Actions marked **(read-receipt/UI-only)** are local-only and need no backend (or
 - `MARK_MESSAGE_READ` / `MARK_DIRECT_MESSAGE_READ` / `MARK_GROUP_THREAD_READ` — **(read-receipts)**.
 - `NOTIFICATION_BLAST` — `{ senderName, senderBadge, senderId, title, color, body, targetDeptId }`.
 - `ADD_NOTIFICATION` — `{ title, body, sender, color, time }` — supports `recipientBadge` targeting.
-- `MARK_NOTIFICATIONS_READ` / `DISMISS_NOTIFICATION` / `CLEAR_NOTIFICATIONS` — **(UI-only)**.
+- `MARK_NOTIFICATIONS_READ` `{ recipientBadge }` / `CLEAR_NOTIFICATIONS` `{ recipientBadge }` — scoped to
+  the current recipient (omit `recipientBadge` = applies to all). `DISMISS_NOTIFICATION` — id. **(read-state / UI-only)**.
 
 ### Identifiers (officer call-sign profiles)
 - `SAVE_IDENTIFIER` — `{ id, ...fields }`.
@@ -203,11 +215,15 @@ civilians, vehicles, warrants, criminalHistory, penalCode, reports, records, rep
 recordTemplates, civilianForms, bannedUsers, auditLog, messages, directMessages, groupThreads,
 messageLog, notifications, wipeBackups, audioTones, customRecordTypes, towLogs, towJobs,
 towUnits, fdotRequests, hcfrRequests, departments, whitelistApps, activeSessions, businesses,
-permits, unroutedRequests, unitGroups, callNatures, tenCodes, unitStatusCodes, adminAccounts,
+permits, unroutedRequests, unitGroups, callNatures, citizenReportTypes, tenCodes, unitStatusCodes, adminAccounts,
 permissionKeys, quickLinks, notificationTones, adminServers, lookupTypes, adminAddresses,
 communityConfig, helpContent, geoSettings, loginPageConfig, accountRestrictions, discordPresence,
 limitsConfig, discordRoleMappings, adminTiers, caseFiles, inGameConfig, customFlags,
-uniqueIdentifiers, licensePointsConfig, nextId, reportSeq, dispatchLog, activePanics`
+uniqueIdentifiers, licensePointsConfig, hydrated, hydrationError, nextId, reportSeq, dispatchLog, activePanics`
+
+> **New since the audit:** `citizenReportTypes` (civilian File-Report types, admin-managed via the
+> generic `ADMIN_ADD`/`ADMIN_REMOVE`/`ADMIN_REORDER` with `key:'citizenReportTypes'`) and the
+> hydration flags `hydrated`/`hydrationError` (see §2.1).
 
 ### Key entity shapes (from `src/data/`)
 - **Officer:** `id, name, badge, unitId, dept, deptShort, subdivision, rank, status, callId, location, discordId, role`
@@ -257,6 +273,12 @@ This keeps all 80+ pages untouched. Read-receipt / UI-only actions can be skippe
 - **Auth/permissions** are currently role/rank strings on the officer (`role`, `rank`) + `adminTiers`
   / `permissionKeys` / `discordRoleMappings` config — that's the model to enforce server-side.
 - **localStorage** keys: `ssrp_report_draft_*`, `ssrp_record_draft_*`, active-character, login — client-only, fine to keep.
+- **Orphaned config slices:** the Community Info, Community ID, In-Game, Discord Presence, Custom Login
+  Page, and Servers admin pages were removed from the UI, but their state slices (`communityConfig`,
+  `inGameConfig`, `discordPresence`, `loginPageConfig`, `adminServers`) still live in `initialState`
+  with no UI that writes them. Safe to keep, ignore, or drop server-side. (The `/dispatch` `DispatchPortal`
+  page was also removed — the live dispatch board is `/cad` `DispatchCenter`, which renders the
+  dispatcher vs. LEO-field view by role.)
 
 ---
 
