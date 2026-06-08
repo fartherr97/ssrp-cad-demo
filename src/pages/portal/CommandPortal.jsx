@@ -1373,13 +1373,21 @@ export default function CommandPortal() {
     reportTemplates = [], currentUser, callLogs = [],
   } = state;
 
-  /* ── Access control ── */
-  const isAdmin   = currentUser?.role === 'admin';
+  /* ── Access control ──
+     Honor the Discord role mapping first: the backend sets currentUser.cadRole
+     ('command' | 'supervisor' | …) from whatever Command/Supervisor Discord
+     role the member holds (see utils/deptScope.js). A 'command' (or 'admin')
+     cadRole grants the Command Portal. Falls back to the officer's rank so the
+     demo / unmapped officers still work. */
+  const isAdmin   = currentUser?.role === 'admin' || currentUser?.cadRole === 'admin';
   const myOfficer = useMemo(
     () => officers.find(o => o.id === currentUser?.id),
     [officers, currentUser]
   );
-  const hasCommandAccess = isAdmin || (myOfficer && COMMAND_RANKS.includes(myOfficer.rank));
+  const hasCommandAccess =
+    isAdmin ||
+    currentUser?.cadRole === 'command' ||
+    (myOfficer && COMMAND_RANKS.includes(myOfficer.rank));
 
   /* ── Department scoping ──
      Non-admin command users are locked to their own department's command role
