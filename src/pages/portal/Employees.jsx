@@ -9,7 +9,7 @@ import { useActiveBusiness, BusinessSwitcher } from '../../contexts/BusinessCont
 
 const ACCENT = 'brand';
 const ROLES = ['Manager', 'Supervisor', 'Dispatcher', 'Driver', 'Inspector', 'Security', 'Employee'];
-const BLANK = { name: '', roles: ['Employee'], phone: '', since: '' };
+const BLANK = { name: '', discordId: '', roles: ['Employee'], phone: '', since: '' };
 
 /* Normalise legacy single-role string to array */
 function getRoles(emp) {
@@ -63,7 +63,12 @@ export default function Employees() {
 
   const addEmployee = () => {
     if (!canSubmit) return;
-    dispatch({ type: 'ADD_EMPLOYEE', payload: { businessId: myBiz.id, employee: { ...form } } });
+    const did = form.discordId.trim();
+    if (did && !/^\d{17,19}$/.test(did)) {
+      toast.error('Enter a valid Discord ID (17–19 digits), or leave it blank.', { title: 'Invalid Discord ID' });
+      return;
+    }
+    dispatch({ type: 'ADD_EMPLOYEE', payload: { businessId: myBiz.id, employee: { ...form, discordId: did } } });
     toast.success(`${form.name} added to the roster.`, { title: 'Employee Added' });
     setForm(BLANK);
     setAdding(false);
@@ -103,6 +108,11 @@ export default function Employees() {
             <div>
               <label className={PORTAL_LABEL}>Phone</label>
               <input className={PORTAL_INPUT} value={form.phone} onChange={setField('phone')} placeholder="555-0000" />
+            </div>
+            <div>
+              <label className={PORTAL_LABEL}>Discord ID</label>
+              <input className={`${PORTAL_INPUT} font-mono`} value={form.discordId} onChange={setField('discordId')} placeholder="e.g. 216583122775736322" />
+              <div className="text-[11px] text-slate-500 mt-1">Required for this employee to access the business portal.</div>
             </div>
             <div>
               <label className={PORTAL_LABEL}>Since</label>
@@ -159,7 +169,7 @@ export default function Employees() {
                     </button>
                   )}
                 </div>
-                <div className="flex gap-6 mt-3.5 text-xs">
+                <div className="flex gap-6 mt-3.5 text-xs flex-wrap">
                   <div>
                     <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Phone</div>
                     <div className="text-slate-200 mt-0.5">{emp.phone || '—'}</div>
@@ -167,6 +177,10 @@ export default function Employees() {
                   <div>
                     <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Since</div>
                     <div className="text-slate-200 mt-0.5">{emp.since || '—'}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold tracking-[0.5px] uppercase text-slate-500">Discord ID</div>
+                    <div className={`mt-0.5 font-mono ${emp.discordId ? 'text-slate-200' : 'text-amber-400'}`}>{emp.discordId || 'Not set — no access'}</div>
                   </div>
                 </div>
               </PortalCard>
