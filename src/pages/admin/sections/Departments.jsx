@@ -5,7 +5,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import {
   AdminPanel, SonButton, SonIconBtn, SonSearch, SON_INPUT, SON_LABEL, SonBadge, EmptyState, ADMIN,
 } from '../AdminKit';
-import { MdAdd, MdDelete, MdExpandMore, MdChevronRight, MdSave, MdWarning } from 'react-icons/md';
+import { MdAdd, MdDelete, MdExpandMore, MdChevronRight, MdSave, MdWarning, MdClose } from 'react-icons/md';
 
 const ROUTING_ROLES = [
   { value: '',       label: 'None'                       },
@@ -58,11 +58,23 @@ function DeptCard({ d, onSave, onDelete, officers = [] }) {
   const [draft, setDraft] = useState({ ...d });
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [subInput, setSubInput] = useState('');
 
   useEffect(() => { setDraft({ ...d }); setConfirmDelete(false); }, [d.id]);
 
   const set = (patch) => setDraft(p => ({ ...p, ...patch }));
   const dirty = JSON.stringify(draft) !== JSON.stringify(d);
+
+  const addSub = () => {
+    const v = subInput.trim();
+    if (!v) return;
+    const existing = draft.subdivisions || [];
+    if (!existing.some(s => s.toLowerCase() === v.toLowerCase())) {
+      set({ subdivisions: [...existing, v] });
+    }
+    setSubInput('');
+  };
+  const removeSub = (idx) => set({ subdivisions: (draft.subdivisions || []).filter((_, j) => j !== idx) });
 
   const attachedCount = officers.filter(o => o.dept === d.id).length;
   const needsGuard = attachedCount > 0 || !!d.routingRole;
@@ -125,9 +137,29 @@ function DeptCard({ d, onSave, onDelete, officers = [] }) {
               Routing role pins this agency to a specific request feed (HCFR → Fire Board, FDOT → Tow dispatch). Agencies with a role cannot be deleted without a warning.
             </div>
             <div className="sm:col-span-2">
-              <label style={SON_LABEL}>Subdivisions (comma separated)</label>
-              <input style={SON_INPUT} value={(draft.subdivisions || []).join(', ')}
-                onChange={e => set({ subdivisions: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
+              <label style={SON_LABEL}>Subdivisions</label>
+              {(draft.subdivisions || []).length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {draft.subdivisions.map((s, i) => (
+                    <span key={`${s}-${i}`} className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 rounded-full text-[12px] font-semibold"
+                      style={{ background: 'rgba(58,136,232,0.15)', color: '#7fb3f5', border: '1px solid rgba(58,136,232,0.4)' }}>
+                      {s}
+                      <button type="button" onClick={() => removeSub(i)} title={`Remove ${s}`}
+                        className="flex items-center justify-center cursor-pointer bg-transparent border-none p-0 hover:opacity-70"
+                        style={{ color: '#7fb3f5' }}>
+                        <MdClose size={13} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input style={{ ...SON_INPUT, flex: 1 }} value={subInput}
+                  placeholder="Type a subdivision, then press Enter"
+                  onChange={e => setSubInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSub(); } }} />
+                <SonButton variant="red" onClick={addSub} disabled={!subInput.trim()}><MdAdd size={15} /> Add</SonButton>
+              </div>
               <div style={{ fontSize: 11, color: ADMIN.textMute, marginTop: 4 }}>
                 Subdivisions become selectable for this department's units and register in the Command Portal's Subdivision Hours tracker.
               </div>
