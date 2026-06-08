@@ -23,7 +23,7 @@ const GROUPS = [
       { icon: MdSwapHoriz,          label: 'Role Mapping',     route: '/admin/role-mapping',    permKey: 'roleMapping'          },
       { icon: MdAdminPanelSettings, label: 'Mgmt. Roles',      route: '/admin/admin-tiers',     permKey: 'canManageAdminTiers'  },
       { icon: MdPeople,             label: 'Accounts',         route: '/admin/accounts',         permKey: 'accounts'             },
-      { icon: MdGppBad,             label: 'Ban Management',   route: '/bans',                   permKey: 'accounts'             },
+      { icon: MdGppBad,             label: 'Ban Management',   route: '/bans',                   permKey: ['accounts', 'canBanUsers', 'canUnbanUsers'] },
       { icon: MdFingerprint,        label: 'Identifiers',      route: '/admin/identifiers',      permKey: 'identifiers'          },
       { icon: MdVpnKey,             label: 'Permission Keys',  route: '/admin/permission-keys',  permKey: 'permissionKeys'       },
       { icon: MdStore,              label: 'Businesses',       route: '/admin/businesses',       permKey: 'businesses'           },
@@ -268,7 +268,9 @@ export default function AdminShell() {
 
   const canSeeItem = (item) => {
     if (!tierPerms || !item.permKey) return true;
-    return !!tierPerms[item.permKey];
+    // permKey may be a single key or an array — show the item if ANY granted.
+    const keys = Array.isArray(item.permKey) ? item.permKey : [item.permKey];
+    return keys.some(k => !!tierPerms[k]);
   };
 
   const visibleGroups = GROUPS.map(g => ({
