@@ -168,7 +168,9 @@ const initialState = {
   adminTiers: ADMIN_TIERS_DEFAULT,
   caseFiles: CASE_FILES,
   inGameConfig: {
-    apiKey: 'a3f9e2b1-7c84-4d56-b012-9e3a7f2c10d8',
+    // No key is shipped in the client. The real API key must be served by the
+    // backend on load (and only ever shown masked) — never hardcoded here.
+    apiKey: '',
     liveMapEnabled: true,
     staticUrlOnly: false,
     mapType: 'CUSTOM',
